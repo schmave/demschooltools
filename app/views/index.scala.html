@@ -1,7 +1,32 @@
-@(message: String)
+@(students: List[Student], studentForm: Form[Student])
 
-@main("Welcome to Play 2.1") {
-    
-    @play20.welcome(message, style = "Java")
-    
+@import helper._
+
+@main("Todo list") {
+
+    <h1>@students.size() student(s)</h1>
+
+    <ul>
+        @for(student <- students) {
+            <li>
+                @student.firstName
+
+                @form(routes.Application.deleteStudent(student.id)) {
+                    <input type="submit" value="Delete">
+                }
+            </li>
+        }
+    </ul>
+
+    <h2>Add a new student</h2>
+
+    @form(routes.Application.newStudent()) {
+
+        @inputText(studentForm("firstName"))
+        @inputText(studentForm("lastName"))
+
+        <input type="submit" value="Create">
+
+    }
+
 }

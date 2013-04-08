@@ -12,7 +12,8 @@ object ApplicationBuild extends Build {
     javaCore,
     javaJdbc,
     javaEbean,
-    "mysql" % "mysql-connector-java" % "5.1.18"
+    "mysql" % "mysql-connector-java" % "5.1.18",
+    "postgresql" % "postgresql" % "9.1-901-1.jdbc4" // for heroku
   )
 
   val main = play.Project(appName, appVersion, appDependencies).settings(
