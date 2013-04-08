@@ -4,20 +4,20 @@
 # --- !Ups
 
 create table student (
-  id                        bigint auto_increment not null,
+  student_id                integer not null,
   first_name                varchar(255),
   last_name                 varchar(255),
-  constraint pk_student primary key (id))
+  constraint pk_student primary key (student_id))
 ;
+
+create sequence student_seq;
 
 
 
 
 # --- !Downs
 
-SET FOREIGN_KEY_CHECKS=0;
+drop table if exists student cascade;
 
-drop table student;
-
-SET FOREIGN_KEY_CHECKS=1;
+drop sequence if exists student_seq;
 

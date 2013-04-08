@@ -33,7 +33,7 @@ public class Application extends Controller {
         }
     }
 
-    public static Result deleteStudent(Long id) {
+    public static Result deleteStudent(Integer id) {
         Student.delete(id);
         return redirect(routes.Application.students());
     }

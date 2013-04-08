@@ -9,9 +9,9 @@
     <ul>
         @for(student <- students) {
             <li>
-                @student.firstName
+                @student.first_name @student.last_name
 
-                @form(routes.Application.deleteStudent(student.id)) {
+                @form(routes.Application.deleteStudent(student.student_id)) {
                     <input type="submit" value="Delete">
                 }
             </li>
@@ -22,8 +22,8 @@
 
     @form(routes.Application.newStudent()) {
 
-        @inputText(studentForm("firstName"))
-        @inputText(studentForm("lastName"))
+        @inputText(studentForm("first_name"))
+        @inputText(studentForm("last_name"))
 
         <input type="submit" value="Create">
 

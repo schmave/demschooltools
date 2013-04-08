@@ -10,16 +10,16 @@ import javax.persistence.*;
 @Entity
 public class Student extends Model {
     @Id
-    public Long id;
+    public Integer student_id;
 
     @Required
-    public String firstName;
+    public String first_name;
 
     @Required
-    public String lastName;
+    public String last_name;
 
-    public static Finder<Long,Student> find = new Finder(
-        Long.class, Student.class
+    public static Finder<Integer,Student> find = new Finder(
+        Integer.class, Student.class
     );
 
     public static List<Student> all() {
@@ -30,7 +30,7 @@ public class Student extends Model {
         student.save();
     }
 
-    public static void delete(Long id) {
+    public static void delete(Integer id) {
         find.ref(id).delete();
     }
 }
