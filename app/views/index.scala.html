@@ -4,16 +4,12 @@
 
 @main("All people") {
 
-    <h1>@people.size() person(s)</h1>
+    <h1>@people.size() people</h1>
 
     <ul>
         @for(person <- people) {
             <li>
                 <a href="@routes.Application.person(person.person_id)">@person.first_name @person.last_name</a>
-
-                @form(routes.Application.deletePerson(person.person_id)) {
-                    <input type="submit" value="Delete">
-                }
             </li>
         }
     </ul>
