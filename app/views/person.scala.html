@@ -1,0 +1,34 @@
+@(person: Person, family_members: List[Person])
+
+@import helper._
+
+@main(person.first_name + " " + person.last_name) {
+
+	<h1>@person.first_name @person.last_name</h1>
+
+	<p>Notes: @person.notes
+
+	<p><a href="mailto:@person.email">@person.email</a>
+
+	<p>@person.address
+	<br>@person.city, @person.state @person.zip
+	<br>'hood: @person.neighborhood
+
+	@if(person.dob != null) {
+		<p>Born on @person.dob
+	}
+
+	@form(routes.Application.deletePerson(person.person_id)) {
+		<input type="submit" value="Delete">
+	}
+
+    <a href="@routes.Application.newPerson()">Add a new person</a>
+
+	<h2>Family members</h2>
+	<ul>
+		@for( p <- family_members ) {
+			<li><a href="@routes.Application.person(p.person_id)">
+				@p.first_name @p.last_name</a></li>
+		}
+	</ul>
+}

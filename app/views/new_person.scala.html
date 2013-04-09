@@ -1,0 +1,38 @@
+@(personForm: Form[Person], all_people: String)
+
+@import helper._
+
+@main("Create a new person") {
+
+	<script type="text/javascript">
+        var all_people = @Html(all_people);
+    </script>
+
+    <h2>Add a new person</h2>
+
+    @form(routes.Application.makeNewPerson()) {
+
+        @inputText(personForm("first_name"), '_label -> "First Name")
+        @inputText(personForm("last_name"), '_label -> "Last Name")
+		@textarea(personForm("notes"), '_label -> "Notes")
+		<hr/>
+		@inputText(personForm("address"), '_label -> "Address")
+		@inputText(personForm("city"), '_label -> "City")
+		@inputText(personForm("state"), '_label -> "State")
+		@inputText(personForm("zip"), '_label -> "Zip")
+		@inputText(personForm("neighborhood"), '_label -> "Neighborhood")
+		<hr/>
+
+		@inputText(personForm("email"), '_label -> "Email")
+		@inputDate(personForm("dob"), '_label -> "Date of Birth")
+
+		<hr/>
+		@inputText(personForm("same_family_name"), '_label -> "Same family as: ")
+		<input type="hidden" id = "same_family_id" name="same_family_id"/>
+
+
+        <input type="submit" value="Create">
+
+    }
+
+}
