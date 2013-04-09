@@ -11,31 +11,31 @@ import views.html.*;
 
 public class Application extends Controller {
 
-    static Form<Student> studentForm = Form.form(Student.class);
+    static Form<Person> personForm = Form.form(Person.class);
 
     public static Result index() {
-        return redirect(routes.Application.students());
+        return redirect(routes.Application.people());
     }
 
-    public static Result students() {
-        return ok(views.html.index.render(Student.all(), studentForm));
+    public static Result people() {
+        return ok(views.html.index.render(Person.all(), personForm));
     }
 
-    public static Result newStudent() {
-        Form<Student> filledForm = studentForm.bindFromRequest();
+    public static Result newPerson() {
+        Form<Person> filledForm = personForm.bindFromRequest();
         if(filledForm.hasErrors()) {
             return badRequest(
-                views.html.index.render(Student.all(), filledForm)
+                views.html.index.render(Person.all(), filledForm)
             );
         } else {
-            Student.create(filledForm.get());
-            return redirect(routes.Application.students());
+            Person.create(filledForm.get());
+            return redirect(routes.Application.people());
         }
     }
 
-    public static Result deleteStudent(Integer id) {
-        Student.delete(id);
-        return redirect(routes.Application.students());
+    public static Result deletePerson(Integer id) {
+        Person.delete(id);
+        return redirect(routes.Application.people());
     }
 
 }

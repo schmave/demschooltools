@@ -8,9 +8,9 @@ import java.util.*;
 import javax.persistence.*;
 
 @Entity
-public class Student extends Model {
+public class Person extends Model {
     @Id
-    public Integer student_id;
+    public Integer person_id;
 
     @Required
     public String first_name;
@@ -18,16 +18,16 @@ public class Student extends Model {
     @Required
     public String last_name;
 
-    public static Finder<Integer,Student> find = new Finder(
-        Integer.class, Student.class
+    public static Finder<Integer,Person> find = new Finder(
+        Integer.class, Person.class
     );
 
-    public static List<Student> all() {
+    public static List<Person> all() {
         return find.all();
     }
 
-    public static void create(Student student) {
-        student.save();
+    public static void create(Person person) {
+        person.save();
     }
 
     public static void delete(Integer id) {

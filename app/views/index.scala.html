@@ -1,29 +1,29 @@
-@(students: List[Student], studentForm: Form[Student])
+@(people: List[Person], personForm: Form[Person])
 
 @import helper._
 
 @main("Todo list") {
 
-    <h1>@students.size() student(s)</h1>
+    <h1>@people.size() person(s)</h1>
 
     <ul>
-        @for(student <- students) {
+        @for(person <- people) {
             <li>
-                @student.first_name @student.last_name
+                @person.first_name @person.last_name
 
-                @form(routes.Application.deleteStudent(student.student_id)) {
+                @form(routes.Application.deletePerson(person.person_id)) {
                     <input type="submit" value="Delete">
                 }
             </li>
         }
     </ul>
 
-    <h2>Add a new student</h2>
+    <h2>Add a new person</h2>
 
-    @form(routes.Application.newStudent()) {
+    @form(routes.Application.newPerson()) {
 
-        @inputText(studentForm("first_name"))
-        @inputText(studentForm("last_name"))
+        @inputText(personForm("first_name"))
+        @inputText(personForm("last_name"))
 
         <input type="submit" value="Create">
 
