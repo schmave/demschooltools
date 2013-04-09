@@ -18,14 +18,22 @@ public class Application extends Controller {
     }
 
     public static Result people() {
-        return ok(views.html.index.render(Person.all(), personForm));
+        return ok(views.html.index.render(Person.all()));
+    }
+
+    public static Result person(Integer id) {
+        return ok(views.html.person.render(Person.find.ref(id)));
     }
 
     public static Result newPerson() {
+        return ok(views.html.new_person.render(personForm));
+    }
+
+    public static Result makeNewPerson() {
         Form<Person> filledForm = personForm.bindFromRequest();
         if(filledForm.hasErrors()) {
             return badRequest(
-                views.html.index.render(Person.all(), filledForm)
+                views.html.new_person.render(filledForm)
             );
         } else {
             Person.create(filledForm.get());

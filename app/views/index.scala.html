@@ -1,15 +1,15 @@
-@(people: List[Person], personForm: Form[Person])
+@(people: List[Person])
 
 @import helper._
 
-@main("Todo list") {
+@main("All people") {
 
     <h1>@people.size() person(s)</h1>
 
     <ul>
         @for(person <- people) {
             <li>
-                @person.first_name @person.last_name
+                <a href="@routes.Application.person(person.person_id)">@person.first_name @person.last_name</a>
 
                 @form(routes.Application.deletePerson(person.person_id)) {
                     <input type="submit" value="Delete">
@@ -18,15 +18,5 @@
         }
     </ul>
 
-    <h2>Add a new person</h2>
-
-    @form(routes.Application.newPerson()) {
-
-        @inputText(personForm("first_name"))
-        @inputText(personForm("last_name"))
-
-        <input type="submit" value="Create">
-
-    }
-
+    <a href="@routes.Application.newPerson()">Add a new person</a>
 }
