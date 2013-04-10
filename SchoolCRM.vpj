@@ -162,6 +162,8 @@
 			<F N="/play-2.1.1/repository/local/org.avaje.ebeanorm/avaje-ebeanorm-api/3.1.1/jars/avaje-ebeanorm-api.jar"/>
 			<F N="/play-2.1.1/repository/local/org.avaje.ebeanorm/avaje-ebeanorm-server/3.1.2/jars/avaje-ebeanorm-server.jar"/>
 			<F N="/play-2.1.1/repository/local/org.avaje.ebeanorm/avaje-ebeanorm/3.1.2/jars/avaje-ebeanorm.jar"/>
+			<F N="/play-2.1.1/repository/cache/com.feth/play-authenticate_2.10/jars/play-authenticate_2.10-0.2.5-SNAPSHOT.jar"/>
+			<F N="/play-2.1.1/repository/cache/com.feth/play-easymail_2.10/jars/play-easymail_2.10-0.2-SNAPSHOT.jar"/>
 		</Folder>
 	</Files>
 </Project>

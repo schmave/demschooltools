@@ -1,0 +1,10 @@
+@import helper._
+@import com.feth.play.module.pa.views.html._
+
+@main("SchoolCRM Login") {
+
+Login/Signup:
+	@forProviders() { p =>
+		<a href="@p.getUrl()">@p.getKey()</a>
+	}
+}

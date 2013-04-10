@@ -15,17 +15,25 @@ import play.mvc.*;
 import views.html.*;
 
 /*
+   TODO
 
-    TODO
+* user authentication
 
-* be able to edit a Person
-* tags
-* comments
-* phone numbers
+* add/remove tags
+* add comments
+* add/remove phone numbers
 
+* helper for displaying a summary of a person
+
+* be able to edit a Person (whether family or no)
+
+* show family address, etc.
+
+* browse people by tag
 
  */
 
+@Security.Authenticated(Secured.class)
 public class Application extends Controller {
 
     static Form<Person> personForm = Form.form(Person.class);

@@ -3,7 +3,7 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.index()
+GET     /                         controllers.Public.index()
 
 GET     /people                   controllers.Application.people()
 GET     /people/new               controllers.Application.newPerson()
@@ -13,3 +13,7 @@ POST    /people/:id/delete        controllers.Application.deletePerson(id: Integ
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
+
+GET     /logout                     com.feth.play.module.pa.controllers.Authenticate.logout
+GET     /authenticate/:provider     com.feth.play.module.pa.controllers.Authenticate.authenticate(provider: String)
+GET     /authenticate/:provider/denied     controllers.Public.oAuthDenied(provider: String)
