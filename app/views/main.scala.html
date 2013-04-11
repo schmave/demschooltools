@@ -19,6 +19,7 @@
     <body>
 		@currentAuth() { auth =>
 			@if(auth != null) {
+				<a href="@routes.Application.people()">All people</a>
 				<a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout">Logout</a>
 				<hr/>
 			}

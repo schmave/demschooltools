@@ -17,17 +17,11 @@ import views.html.*;
 /*
    TODO
 
-* user authentication
-
 * add/remove tags
 * add comments
 * add/remove phone numbers
 
-* helper for displaying a summary of a person
-
 * be able to edit a Person (whether family or no)
-
-* show family address, etc.
 
 * browse people by tag
 
@@ -48,7 +42,7 @@ public class Application extends Controller {
 
     public static Result person(Integer id) {
         Person the_person = Person.find.ref(id);
-        return ok(views.html.person.render(
+        return ok(views.html.family.render(
             the_person,
             Person.find.where().isNotNull("family").eq("family", the_person.family).ne("person_id", the_person.person_id).findList()));
     }

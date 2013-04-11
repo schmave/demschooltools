@@ -1,0 +1,22 @@
+@(p : Person, family_members: List[Person])
+
+@import helper._
+
+@main(p.first_name + " " + p.last_name) {
+
+<table cellspacing=20>
+<tr><td valign="top">
+	@person(p)
+
+	@for( family_member <- family_members ) {
+		<td valign="top">@person(family_member)
+	}
+</tr></table>
+
+
+@*	@form(routes.Application.deletePerson(p.person_id)) {
+		<input type="submit" value="Delete">
+	}
+ *@
+
+}
