@@ -5,6 +5,7 @@
 # Home page
 GET     /                         controllers.Public.index()
 
+GET     /jsonPeople               controllers.Application.jsonPeople(term ?= "")
 GET     /people                   controllers.Application.people()
 GET     /people/new               controllers.Application.newPerson()
 GET     /people/:id               controllers.Application.person(id: Integer)

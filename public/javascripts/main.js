@@ -1,6 +1,7 @@
 $(document).ready(function () {
     $( "#same_family_name" ).autocomplete({
-        source: all_people
+        source: "/jsonPeople",
+        minLength: 2
     });
 
     $( "#same_family_name" ).bind( "autocompleteselect", function(event, ui) {

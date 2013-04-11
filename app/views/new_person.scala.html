@@ -1,12 +1,8 @@
-@(personForm: Form[Person], all_people: String)
+@(personForm: Form[Person])
 
 @import helper._
 
 @main("Create a new person") {
-
-	<script type="text/javascript">
-        var all_people = @Html(all_people);
-    </script>
 
     <h2>Add a new person</h2>
 

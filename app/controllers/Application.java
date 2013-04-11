@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.avaje.ebean.Expr;
+
 import models.*;
 
 import play.*;
@@ -17,11 +19,11 @@ import views.html.*;
 /*
    TODO
 
+* be able to edit a Person (whether family or no)
+
+* add/remove phone numbers
 * add/remove tags
 * add comments
-* add/remove phone numbers
-
-* be able to edit a Person (whether family or no)
 
 * browse people by tag
 
@@ -47,27 +49,33 @@ public class Application extends Controller {
             Person.find.where().isNotNull("family").eq("family", the_person.family).ne("person_id", the_person.person_id).findList()));
     }
 
-    static String makeAutocompleteList(List<Person> people) {
+    public static Result jsonPeople(String term) {
+        String like_arg = "%" + term + "%";
+        List<Person> selected_people =
+            Person.find.where().or(
+                Expr.ilike("first_name", "%" + term + "%"),
+                Expr.ilike("last_name", "%" + term + "%")).findList();
+
         List<Map<String, String> > result = new ArrayList<Map<String, String> > ();
-        for (Person p : people) {
+        for (Person p : selected_people) {
             HashMap<String, String> values = new HashMap<String, String>();
             values.put("label", p.first_name + " " + p.last_name);
             values.put("id", "" + p.person_id);
             result.add(values);
         }
 
-        return Json.stringify(Json.toJson(result));
+        return ok(Json.stringify(Json.toJson(result)));
     }
 
     public static Result newPerson() {
-        return ok(views.html.new_person.render(personForm, makeAutocompleteList(Person.all())));
+        return ok(views.html.new_person.render(personForm));
     }
 
     public static Result makeNewPerson() {
         Form<Person> filledForm = personForm.bindFromRequest();
         if(filledForm.hasErrors()) {
             return badRequest(
-                views.html.new_person.render(filledForm, makeAutocompleteList(Person.all()))
+                views.html.new_person.render(filledForm)
             );
         } else {
             Person.create(filledForm.get(), Integer.parseInt(filledForm.field("same_family_id").value()));
