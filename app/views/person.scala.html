@@ -2,8 +2,6 @@
 
 @import helper._
 
-@implicitFieldConstructor = @{ helper.FieldConstructor(twitterBootstrapInput.render) }
-
 <h3><a href="@routes.Application.person(person.person_id)">
 @person.first_name @person.last_name</a></h3>
 @if( person.notes ) {

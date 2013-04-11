@@ -2,7 +2,9 @@
 
 @import helper._
 
-@form(destination) {
+@implicitField = @{ FieldConstructor(myConstructor.f) }
+
+@form(destination, 'class -> "form-horizontal") {
 
 @if(personForm("person_id").value()) {
 	<input type="hidden" name="person_id" value="@personForm("person_id").value()"/>
