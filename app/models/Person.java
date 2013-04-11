@@ -4,9 +4,13 @@ import java.util.*;
 
 import javax.persistence.*;
 
+import com.avaje.ebean.Ebean;
+import com.avaje.ebean.RawSql;
+import com.avaje.ebean.RawSqlBuilder;
+
 import play.data.*;
-import play.data.validation.ValidationError;
 import play.data.validation.Constraints.*;
+import play.data.validation.ValidationError;
 import play.db.ebean.*;
 import static play.libs.F.*;
 
@@ -36,7 +40,8 @@ public class Person extends Model {
     public Date dob;
     public Date approximate_dob;
 
-    // tags
+    @Transient
+    public List<Tag> tags;
 
     // comment references
 
@@ -134,5 +139,18 @@ public class Person extends Model {
         return new Form<Person>(null, Person.class, data,
             new HashMap<String,List<ValidationError>>(),
             Some(this), null);
+    }
+
+    // called by PersonController
+    void loadTags() {
+        RawSql rawSql = RawSqlBuilder.
+            parse("SELECT tag.id, tag.title from person natural join person_tag pt join tag on pt.tag_id=tag.id").
+            create();
+
+        tags = Ebean.find(Tag.class).setRawSql(rawSql).
+            where().eq("person.person_id", person_id).findList();
+        if (tags == null) {
+            tags = new ArrayList<Tag>();
+        }
     }
 }

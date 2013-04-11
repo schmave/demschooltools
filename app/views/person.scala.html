@@ -4,6 +4,20 @@
 
 <h3><a href="@routes.Application.person(person.person_id)">
 @person.first_name @person.last_name</a></h3>
+
+<div id="person_tags_@person.person_id">
+ @for( t <- person.tags ) {
+	<span class="person_tag">@t.title</span>
+  }
+</div>
+<br>
+Add tag: <input type="text" id="person_tag_entry_@person.person_id"/><br>
+<script type="text/javascript">
+enableTagBox("#person_tag_entry_@person.person_id",
+			 "#person_tags_@person.person_id",
+             @person.person_id);
+</script>
+
 @if( person.email ) {
 	<a href="mailto:@person.email">@person.email</a><br>
 }

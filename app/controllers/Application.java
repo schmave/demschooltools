@@ -1,5 +1,7 @@
 package controllers;
 
+import com.feth.play.module.pa.PlayAuthenticate;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,12 +15,14 @@ import play.*;
 import play.data.*;
 import play.libs.Json;
 import play.mvc.*;
+import play.mvc.Http.Context;
 
 /*
    TODO
 
-* add/remove tags
 * add comments
+
+* remove tags
 
 * browse people by tag
 
@@ -60,6 +64,53 @@ public class Application extends Controller {
         }
 
         return ok(Json.stringify(Json.toJson(result)));
+    }
+
+    public static Result jsonTags(String term, Integer personId) {
+        String like_arg = "%" + term + "%";
+        List<Tag> selected_tags =
+            Tag.find.where().ilike("title", "%" + term + "%").findList();
+
+        List<Tag> existing_tags = Person.find.byId(personId).tags;
+
+        List<Map<String, String> > result = new ArrayList<Map<String, String> > ();
+        for (Tag t : selected_tags) {
+            if (existing_tags == null || !existing_tags.contains(t)) {
+                HashMap<String, String> values = new HashMap<String, String>();
+                values.put("label", t.title);
+                values.put("id", "" + t.id);
+                result.add(values);
+            }
+        }
+
+        HashMap<String, String> values = new HashMap<String, String>();
+        values.put("label", "Create new tag: " + term);
+        values.put("id", "-1");
+        result.add(values);
+
+        return ok(Json.stringify(Json.toJson(result)));
+    }
+
+    public static Result addTag(Integer tagId, String title, Integer personId) {
+        Person p = Person.find.byId(personId);
+        if (p == null) {
+            return badRequest();
+        }
+
+        Tag the_tag;
+        if (tagId == null) {
+            the_tag = Tag.create(title);
+        } else {
+            the_tag = Tag.find.ref(tagId);
+        }
+
+        PersonTag pt = PersonTag.create(
+            the_tag,
+            p,
+            User.findByAuthUserIdentity(PlayAuthenticate.getUser(Context.current().session())));
+
+        p.tags.add(the_tag);
+        return ok();
     }
 
     public static Result newPerson() {

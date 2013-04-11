@@ -15,6 +15,10 @@ POST    /people/:id/delete        controllers.Application.deletePerson(id: Integ
 GET     /people/edit/:id          controllers.Application.editPerson(id: Integer)
 POST    /people/edit              controllers.Application.savePersonEdits()
 
+GET     /jsonTags/:personId       controllers.Application.jsonTags(term ?= "", personId: Integer)
+GET    /addTag/:personId         controllers.Application.addTag(tagId : Integer ?= null, title ?= "", personId : Integer)
+POST    /addTag/:personId         controllers.Application.addTag(tagId : Integer ?= null, title ?= "", personId : Integer)
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
 
