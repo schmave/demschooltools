@@ -82,7 +82,7 @@ public class Person extends Model {
         Person p = filledForm.get();
         String family_id = filledForm.field("same_family_id").value();
 
-        if (family_id != null) {
+        if (family_id != null && !family_id.equals("")) {
             p.attachToPersonAsFamily(Integer.parseInt(family_id));
         }
         p.update();
