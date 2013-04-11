@@ -1,12 +1,9 @@
 package models;
 
-import java.util.*;
+import play.db.ebean.Model;
+import play.db.ebean.Model.Finder;
 
 import javax.persistence.*;
-
-import play.data.*;
-import play.data.validation.Constraints.*;
-import play.db.ebean.*;
 
 @Entity
 public class Tag extends Model {
