@@ -10,5 +10,13 @@
 		<li><a href="@routes.Application.person(p.person_id)">@p.first_name @p.last_name</a>
 	}
 </ul>
+
+<p>Emails:
+	@for( p <- people ) {
+		@if( p.email ) {
+			@p.email,
+		}
+	}
+
 }
 

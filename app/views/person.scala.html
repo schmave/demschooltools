@@ -6,7 +6,9 @@
 
 <h3><a href="@routes.Application.person(person.person_id)">
 @person.first_name @person.last_name</a></h3>
-
+@if( person.notes ) {
+	<p>@person.notes</p>
+}
 <div id="person_tags_@person.person_id">
  @for( t <- person.tags ) {
 	<span class="person_tag">@t.title</span>
@@ -42,9 +44,6 @@ enableTagBox("#person_tag_entry_@person.person_id",
 
 @if(person.dob != null) {
 	Age @Application.calcAge(person)<br>
-}
-@if( person.notes ) {
-	<p><i>@person.notes</i></p>
 }
 <a href="@routes.Application.editPerson(person.person_id)">Edit</a>
 
