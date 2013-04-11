@@ -12,6 +12,9 @@ GET     /people/:id               controllers.Application.person(id: Integer)
 POST    /people                   controllers.Application.makeNewPerson()
 POST    /people/:id/delete        controllers.Application.deletePerson(id: Integer)
 
+GET     /people/edit/:id          controllers.Application.editPerson(id: Integer)
+POST    /people/edit              controllers.Application.savePersonEdits()
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
 

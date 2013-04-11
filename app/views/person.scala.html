@@ -8,16 +8,17 @@
 	<p><i>@person.notes</i></p>
 }
 @if( person.email ) {
-	<br><a href="mailto:@person.email">@person.email</a>
+	<a href="mailto:@person.email">@person.email</a><br>
 }
 @if( person.address ) {
-	<br>@person.address
-	<br>@person.city, @person.state @person.zip
-} else { if( person.neighborhood ) {
-	<br>'hood: @person.neighborhood
+	@person.address<br>
+	@person.city, @person.state @person.zip<br>
+} else { @if( person.neighborhood ) {
+	'hood: @person.neighborhood<br>
 } }
 
 @if(person.dob != null) {
-	<br>Born on @person.dob
+	Born on @person.dob<br>
 }
+<a href="@routes.Application.editPerson(person.person_id)">Edit</a>
 

@@ -1,0 +1,32 @@
+@(personForm: Form[Person], destination : play.api.mvc.Call, submit_title : String)
+
+@import helper._
+
+@form(destination) {
+
+@if(personForm("person_id").value()) {
+	<input type="hidden" name="person_id" value="@personForm("person_id").value()"/>
+}
+
+        @inputText(personForm("first_name"), '_label -> "First Name")
+        @inputText(personForm("last_name"), '_label -> "Last Name")
+		@textarea(personForm("notes"), '_label -> "Notes")
+		<hr/>
+		@inputText(personForm("address"), '_label -> "Address")
+		@inputText(personForm("city"), '_label -> "City")
+		@inputText(personForm("state"), '_label -> "State")
+		@inputText(personForm("zip"), '_label -> "Zip")
+		@inputText(personForm("neighborhood"), '_label -> "Neighborhood")
+		<hr/>
+
+		@inputText(personForm("email"), '_label -> "Email")
+		@inputDate(personForm("dob"), '_label -> "Date of Birth")
+
+		<hr/>
+		@inputText(personForm("same_family_name"), '_label -> "Same family as: ")
+		<input type="hidden" id = "same_family_id" name="same_family_id"/>
+
+
+        <input type="submit" value="@submit_title">
+
+}

@@ -14,12 +14,8 @@ import play.data.*;
 import play.libs.Json;
 import play.mvc.*;
 
-import views.html.*;
-
 /*
    TODO
-
-* be able to edit a Person (whether family or no)
 
 * add/remove phone numbers
 * add/remove tags
@@ -86,6 +82,14 @@ public class Application extends Controller {
     public static Result deletePerson(Integer id) {
         Person.delete(id);
         return redirect(routes.Application.people());
+    }
+
+    public static Result editPerson(Integer id) {
+        return ok(views.html.edit_person.render(personForm.fill(Person.find.ref(id))));
+    }
+
+    public static Result savePersonEdits() {
+        return redirect(routes.Application.person(Person.updateFromForm(personForm.bindFromRequest()).person_id));
     }
 
 }
