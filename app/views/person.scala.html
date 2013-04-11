@@ -4,11 +4,15 @@
 
 <h3><a href="@routes.Application.person(person.person_id)">
 @person.first_name @person.last_name</a></h3>
-@if( person.notes ) {
-	<p><i>@person.notes</i></p>
-}
 @if( person.email ) {
 	<a href="mailto:@person.email">@person.email</a><br>
+}
+@for( number <- person.phone_numbers ) {
+    @number.number
+	@if( number.comment ) {
+	    (@number.comment)
+	}
+	<br/>
 }
 @if( person.address ) {
 	@person.address<br>
@@ -19,6 +23,9 @@
 
 @if(person.dob != null) {
 	Born on @person.dob<br>
+}
+@if( person.notes ) {
+	<p><i>@person.notes</i></p>
 }
 <a href="@routes.Application.editPerson(person.person_id)">Edit</a>
 

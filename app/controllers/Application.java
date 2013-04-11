@@ -17,7 +17,6 @@ import play.mvc.*;
 /*
    TODO
 
-* add/remove phone numbers
 * add/remove tags
 * add comments
 
@@ -74,7 +73,7 @@ public class Application extends Controller {
                 views.html.new_person.render(filledForm)
             );
         } else {
-            Person.create(filledForm.get(), Integer.parseInt(filledForm.field("same_family_id").value()));
+            Person.create(filledForm);
             return redirect(routes.Application.people());
         }
     }
@@ -85,7 +84,7 @@ public class Application extends Controller {
     }
 
     public static Result editPerson(Integer id) {
-        return ok(views.html.edit_person.render(personForm.fill(Person.find.ref(id))));
+        return ok(views.html.edit_person.render(Person.find.ref(id).fillForm()));
     }
 
     public static Result savePersonEdits() {

@@ -19,14 +19,18 @@
 		@inputText(personForm("neighborhood"), '_label -> "Neighborhood")
 		<hr/>
 
+		@for( i <- 1 to 3 ) {
+		    @inputText(personForm("number_" + i), '_label -> ("Phone " + i))
+		    @inputText(personForm("number_" + i + "_comment"), '_label -> ("Phone " + i + " comment"))
+		}
+
 		@inputText(personForm("email"), '_label -> "Email")
-		@inputDate(personForm("dob"), '_label -> "Date of Birth")
 
 		<hr/>
+		@inputDate(personForm("dob"), '_label -> "Date of Birth")
 		@inputText(personForm("same_family_name"), '_label -> "Same family as: ")
 		<input type="hidden" id = "same_family_id" name="same_family_id"/>
 
 
         <input type="submit" value="@submit_title">
-
 }

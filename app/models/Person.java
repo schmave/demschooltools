@@ -5,8 +5,10 @@ import java.util.*;
 import javax.persistence.*;
 
 import play.data.*;
+import play.data.validation.ValidationError;
 import play.data.validation.Constraints.*;
 import play.db.ebean.*;
+import static play.libs.F.*;
 
 @Entity
 public class Person extends Model {
@@ -19,6 +21,8 @@ public class Person extends Model {
     public String notes;
 
     // phone number references
+    @OneToMany(mappedBy="owner")
+    public List<PhoneNumber> phone_numbers;
 
     public String address;
     public String city;
@@ -52,8 +56,12 @@ public class Person extends Model {
         return find.where().eq("is_family", Boolean.FALSE).orderBy("last_name, first_name ASC").findList();
     }
 
-    public void attachToPersonAsFamily(Integer id) {
-        Person other_family_member = Person.find.ref(id);
+    public void attachToPersonAsFamily(String id_string) {
+        if (id_string == null || id_string.equals("")) {
+            return;
+        }
+
+        Person other_family_member = Person.find.ref(Integer.parseInt(id_string));
 
         if (other_family_member.family != null) {
             // Attach to their existing family.
@@ -69,27 +77,62 @@ public class Person extends Model {
         }
     }
 
-    public static void create(Person person, Integer same_family_id) {
-        person.is_family = false;
+    public void addPhoneNumbers(Form<Person> form) {
+        phone_numbers = new ArrayList<PhoneNumber>();
 
-        if (same_family_id != null) {
-            person.attachToPersonAsFamily(same_family_id);
+        for (int i = 1; i <= 3; i++) {
+            if (!form.field("number_" + i).value().equals("")) {
+                phone_numbers.add(PhoneNumber.create(
+                    form.field("number_" + i).value(),
+                    form.field("number_" + i + "_comment").value(),
+                    this));
+            }
         }
-        person.save();
     }
 
-    public static Person updateFromForm(Form<Person> filledForm) {
-        Person p = filledForm.get();
-        String family_id = filledForm.field("same_family_id").value();
+    public static void create(Form<Person> form) {
+        Person person = form.get();
+        person.is_family = false;
+        person.attachToPersonAsFamily(form.field("same_family_id").value());
 
-        if (family_id != null && !family_id.equals("")) {
-            p.attachToPersonAsFamily(Integer.parseInt(family_id));
+        person.save();
+        person.addPhoneNumbers(form);
+    }
+
+    public static Person updateFromForm(Form<Person> form) {
+        Person p = form.get();
+        p.attachToPersonAsFamily(form.field("same_family_id").value());
+
+        // Remove all existing phone numbers -- they are not loaded
+        // into the object, so we have to go direct to the DB to get them.
+        List<PhoneNumber> numbers = PhoneNumber.find.where().eq("person_id", p.person_id).findList();
+        for (PhoneNumber number : numbers) {
+            number.delete();
         }
+
+        p.addPhoneNumbers(form);
+
         p.update();
         return p;
     }
 
     public static void delete(Integer id) {
         find.ref(id).delete();
+    }
+
+    public Form<Person> fillForm() {
+        HashMap<String, String> data = new HashMap<String, String>();
+        int i = 1;
+        for (PhoneNumber number : phone_numbers) {
+            data.put("number_" + i, number.number);
+            data.put("number_" + i + "_comment", number.comment);
+            i++;
+        }
+
+        // This is how you create a hybrid form based
+        // on both a map of values and an object. Crazy.
+        return new Form<Person>(null, Person.class, data,
+            new HashMap<String,List<ValidationError>>(),
+            Some(this), null);
     }
 }
