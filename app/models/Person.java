@@ -43,7 +43,8 @@ public class Person extends Model {
     @Transient
     public List<Tag> tags;
 
-    // comment references
+    @OneToMany(mappedBy="person")
+    public List<Comment> comments;
 
     // is_family is true if this Person object represents
     // a family, not a single person.

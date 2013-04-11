@@ -1,13 +1,9 @@
 package controllers;
 
-import com.feth.play.module.pa.PlayAuthenticate;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.avaje.ebean.Expr;
+import com.feth.play.module.pa.PlayAuthenticate;
 
 import models.*;
 
@@ -32,6 +28,7 @@ import play.mvc.Http.Context;
 public class Application extends Controller {
 
     static Form<Person> personForm = Form.form(Person.class);
+    static Form<Comment> commentForm = Form.form(Comment.class);
 
     public static Result index() {
         return redirect(routes.Application.people());
@@ -43,9 +40,24 @@ public class Application extends Controller {
 
     public static Result person(Integer id) {
         Person the_person = Person.find.ref(id);
+
+        List<Person> family_members =
+            Person.find.where().isNotNull("family").eq("family", the_person.family).
+                ne("person_id", the_person.person_id).findList();
+
+        Set<Integer> family_ids = new HashSet<Integer>();
+        family_ids.add(the_person.person_id);
+        for (Person family : family_members) {
+            family_ids.add(family.person_id);
+        }
+
+        List<Comment> all_comments = Comment.find.where().in("person_id", family_ids).
+            order("created DESC").findList();
+
         return ok(views.html.family.render(
             the_person,
-            Person.find.where().isNotNull("family").eq("family", the_person.family).ne("person_id", the_person.person_id).findList()));
+            family_members,
+            all_comments));
     }
 
     public static Result jsonPeople(String term) {
@@ -107,10 +119,15 @@ public class Application extends Controller {
         PersonTag pt = PersonTag.create(
             the_tag,
             p,
-            User.findByAuthUserIdentity(PlayAuthenticate.getUser(Context.current().session())));
+            getCurrentUser());
 
         p.tags.add(the_tag);
         return ok();
+    }
+
+    public static User getCurrentUser() {
+        return User.findByAuthUserIdentity(
+            PlayAuthenticate.getUser(Context.current().session()));
     }
 
     public static Result newPerson() {
@@ -142,4 +159,19 @@ public class Application extends Controller {
         return redirect(routes.Application.person(Person.updateFromForm(personForm.bindFromRequest()).person_id));
     }
 
+    public static Result addComment() {
+        Form<Comment> filledForm = commentForm.bindFromRequest();
+        Comment new_comment = new Comment();
+
+        new_comment.person = Person.find.byId(Integer.parseInt(filledForm.field("person").value()));
+        new_comment.user = getCurrentUser();
+        new_comment.message = filledForm.field("message").value();
+
+        new_comment.save();
+        return ok(views.html.comment.render(Comment.find.byId(new_comment.id)));
+    }
+
+    public static String calcAge(Person p) {
+        return "" + (int)((new Date().getTime() - p.dob.getTime()) / 1000 / 60 / 60 / 24 / 365.25);
+    }
 }

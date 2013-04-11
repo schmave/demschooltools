@@ -1,4 +1,4 @@
-@(p : Person, family_members: List[Person])
+@(p : Person, family_members: List[Person], comments: List[Comment])
 
 @import helper._
 
@@ -14,9 +14,37 @@
 </tr></table>
 
 
-@*	@form(routes.Application.deletePerson(p.person_id)) {
-		<input type="submit" value="Delete">
-	}
- *@
+
+<p><a href="javascript: $('#new_comment').show()">Add a comment</a>
+<div id="new_comment" style="display: none;">
+@form(routes.Application.addComment(), args = 'id -> "comment_form") {
+	<p>I talked with
+	<select name="person">
+		<option value="@p.person_id">
+			@p.first_name @p.last_name
+		</option>
+	   @for(family_member <- family_members) {
+		<option value="@family_member.person_id">
+			@family_member.first_name @family_member.last_name
+		</option>
+			}
+	</select>
+	about:<br>
+	<textarea name="message" rows=10 cols=50></textarea>
+	<input type="submit" value="Save Comment">
+	<script type="text/javascript">
+        $("#comment_form").ajaxForm({"complete" : function(response, status) {
+										 $("#comments").prepend(response.responseText);
+                                         }});
+    </script>
+}
+</div>
+
+<div id="comments">
+@for( c <- comments ) { @comment(c) }
+</div>
+
+
 
 }
+

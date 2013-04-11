@@ -13,3 +13,16 @@ a:link, a:visited {
 a:hover {
     color: #33f;
 }
+
+#comments {
+}
+
+.comment {
+  padding-bottom: 20px;
+}
+
+.comment_time {
+  color:#666;
+  font-size: 11px;
+  padding-left: 40px;
+}
