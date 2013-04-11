@@ -3,8 +3,10 @@
 
 @main("SchoolCRM Login") {
 
-Login/Signup:
+	<div class="container" style="padding-top:100px;">
 	@forProviders() { p =>
-		<a href="@p.getUrl()">@p.getKey()</a>
+		<a href="@p.getUrl()" class="btn btn-large btn-primary" style="color:white;">
+		Login with @p.getKey()</a>
 	}
+	</div>
 }
