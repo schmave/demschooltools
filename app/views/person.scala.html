@@ -2,6 +2,8 @@
 
 @import helper._
 
+@implicitFieldConstructor = @{ helper.FieldConstructor(twitterBootstrapInput.render) }
+
 <h3><a href="@routes.Application.person(person.person_id)">
 @person.first_name @person.last_name</a></h3>
 
@@ -9,9 +11,12 @@
  @for( t <- person.tags ) {
 	<span class="person_tag">@t.title</span>
   }
+<a href="javascript:$('#add_tag_@person.person_id').show();">Add tag</a>
 </div>
 <br>
-Add tag: <input type="text" id="person_tag_entry_@person.person_id"/><br>
+<span id="add_tag_@person.person_id" style="display:none;">
+<input type="text" id="person_tag_entry_@person.person_id"/><br></span>
+
 <script type="text/javascript">
 enableTagBox("#person_tag_entry_@person.person_id",
 			 "#person_tags_@person.person_id",

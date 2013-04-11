@@ -1,0 +1,14 @@
+@(tag: Tag, people: List[Person])
+
+@import helper._
+
+@main("All people tagged " + tag.title) {
+<h1>@tag.title</h1>
+
+<ul>
+	@for( p <- people ) {
+		<li><a href="@routes.Application.person(p.person_id)">@p.first_name @p.last_name</a>
+	}
+</ul>
+}
+

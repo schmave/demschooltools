@@ -2,7 +2,10 @@ package controllers;
 
 import java.util.*;
 
+import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
+import com.avaje.ebean.RawSql;
+import com.avaje.ebean.RawSqlBuilder;
 import com.feth.play.module.pa.PlayAuthenticate;
 
 import models.*;
@@ -16,11 +19,7 @@ import play.mvc.Http.Context;
 /*
    TODO
 
-* add comments
-
 * remove tags
-
-* browse people by tag
 
  */
 
@@ -125,6 +124,22 @@ public class Application extends Controller {
         return ok();
     }
 
+    public static Result viewTag(Integer id) {
+        RawSql rawSql = RawSqlBuilder
+            .parse("SELECT person.person_id, person.first_name, person.last_name from person natural join person_tag pt "+
+                  "join tag on pt.tag_id=tag.id")
+            .columnMapping("person.person_id", "person_id")
+        .columnMapping("person.first_name", "first_name")
+        .columnMapping("person.last_name", "last_name")
+            .create();
+
+        List<Person> people =
+            Ebean.find(Person.class).setRawSql(rawSql).
+            where().eq("tag.id", id).findList();
+
+        return ok(views.html.tag.render(Tag.find.byId(id), people));
+    }
+
     public static User getCurrentUser() {
         return User.findByAuthUserIdentity(
             PlayAuthenticate.getUser(Context.current().session()));
@@ -167,8 +182,12 @@ public class Application extends Controller {
         new_comment.user = getCurrentUser();
         new_comment.message = filledForm.field("message").value();
 
-        new_comment.save();
-        return ok(views.html.comment.render(Comment.find.byId(new_comment.id)));
+        if (new_comment.message.length() > 0) {
+            new_comment.save();
+            return ok(views.html.comment.render(Comment.find.byId(new_comment.id)));
+        } else {
+            return ok();
+        }
     }
 
     public static String calcAge(Person p) {

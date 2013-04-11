@@ -4,16 +4,19 @@
 
 @main(p.first_name + " " + p.last_name) {
 
-<table cellspacing=20>
-<tr><td valign="top">
+<div class="row">
+	<div class="span3">
 	@person(p)
+	</div>
 
 	@for( family_member <- family_members ) {
-		<td valign="top">@person(family_member)
+		<div class="span3">@person(family_member)</div>
 	}
-</tr></table>
+</div>
 
-
+<hr>
+<div class="row">
+<div class="span9">
 
 <p><a href="javascript: $('#new_comment').show()">Add a comment</a>
 <div id="new_comment" style="display: none;">
@@ -30,11 +33,13 @@
 			}
 	</select>
 	about:<br>
-	<textarea name="message" rows=10 cols=50></textarea>
-	<input type="submit" value="Save Comment">
+	<textarea name="message" style="width: 400px;" rows=5 ></textarea>
+	<br><input type="submit" value="Save Comment">
 	<script type="text/javascript">
         $("#comment_form").ajaxForm({"complete" : function(response, status) {
 										 $("#comments").prepend(response.responseText);
+										 $("#new_comment textarea").val("");
+										 $("#new_comment").hide();
                                          }});
     </script>
 }
@@ -44,7 +49,8 @@
 @for( c <- comments ) { @comment(c) }
 </div>
 
-
+</div>
+	</div>
 
 }
 
