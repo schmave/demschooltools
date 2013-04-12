@@ -9,13 +9,14 @@
 }
 <div id="person_tags_@person.person_id">
  @for( t <- person.tags ) {
-	<span class="person_tag">@t.title</span>
+	 @tag_fragment(t)
   }
-<a href="javascript:$('#add_tag_@person.person_id').show();">Add tag</a>
+<a id="add_tag_a_@person.person_id"
+	href="javascript:$('#add_tag_@person.person_id').show();$('#add_tag_@person.person_id input').focus();$('#add_tag_a_@person.person_id').hide();">Add tag</a>
 </div>
 <br>
 <span id="add_tag_@person.person_id" style="display:none;">
-<input type="text" id="person_tag_entry_@person.person_id"/><br></span>
+Add tag:<input type="text" id="person_tag_entry_@person.person_id"/><br></span>
 
 <script type="text/javascript">
 enableTagBox("#person_tag_entry_@person.person_id",

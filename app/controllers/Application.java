@@ -22,15 +22,10 @@ import play.mvc.Http.Context;
 
 * remove tags
 
-* link up tags on person display page
-* why aren't names sorted in tag view?
-
-
 * browse by neighborhood
 * use markdown for notes and comments
 
-
- */
+*/
 
 @Security.Authenticated(Secured.class)
 public class Application extends Controller {
@@ -135,7 +130,7 @@ public class Application extends Controller {
             getCurrentUser());
 
         p.tags.add(the_tag);
-        return ok();
+        return ok(views.html.tag_fragment.render(the_tag));
     }
 
     public static Result viewTag(Integer id) {
@@ -149,7 +144,7 @@ public class Application extends Controller {
 
         List<Person> people =
             Ebean.find(Person.class).setRawSql(rawSql).
-            where().eq("tag.id", id).findList();
+            where().eq("tag.id", id).orderBy("person.last_name, person.first_name").findList();
 
         return ok(views.html.tag.render(Tag.find.byId(id), people));
     }
@@ -198,7 +193,7 @@ public class Application extends Controller {
 
         if (new_comment.message.length() > 0) {
             new_comment.save();
-            return ok(views.html.comment.render(Comment.find.byId(new_comment.id)));
+            return ok(views.html.comment_fragment.render(Comment.find.byId(new_comment.id)));
         } else {
             return ok();
         }
