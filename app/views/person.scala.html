@@ -2,8 +2,8 @@
 
 @import helper._
 
-<h3><a href="@routes.Application.person(person.person_id)">
-@person.first_name @person.last_name</a></h3>
+<h4><a href="@routes.Application.person(person.person_id)">
+@person.first_name @person.last_name</a></h4>
 @if( person.notes ) {
 	<p>@person.notes</p>
 }
