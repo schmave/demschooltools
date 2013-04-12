@@ -25,3 +25,21 @@ body {
   font-size: 11px;
   padding-left: 40px;
 }
+
+
+/*********************************
+ Twitter Bootstrap tweaks
+ *********************************/
+
+.form-horizontal .control-group {
+   margin-bottom: 5px;
+}
+
+.form-horizontal a {
+   margin-left: 150px;
+}
+
+.form-horizontal hr {
+   margin: 8px 0;
+   border-top: 1px solid #999;
+}
