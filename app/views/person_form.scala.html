@@ -9,30 +9,54 @@
 @if(personForm("person_id").value()) {
 	<input type="hidden" name="person_id" value="@personForm("person_id").value()"/>
 }
-
         @inputText(personForm("first_name"), '_label -> "First Name")
         @inputText(personForm("last_name"), '_label -> "Last Name")
+		@inputText(personForm("email"), '_label -> "Email")
 		@textarea(personForm("notes"), '_label -> "Notes", 'rows->6)
 		<hr/>
+
+		@defining(personForm("address").value() ||
+			personForm("city").value() ||
+			personForm("state").value() ||
+			personForm("zip").value()) { has_address =>
+			@if( !has_address ) {
+				<a id="address_controller" href="javascript:$('#address_stuff').show();$('#address_controller').hide();">
+					  Add address
+				</a>
+				<div id="address_stuff" style="display:none">
+			}
 		@inputText(personForm("address"), '_label -> "Address")
 		@inputText(personForm("city"), '_label -> "City")
 		@inputText(personForm("state"), '_label -> "State")
 		@inputText(personForm("zip"), '_label -> "Zip")
+			@if( !has_address ) {
+				</div>
+			}
+		}
 		@inputText(personForm("neighborhood"), '_label -> "Neighborhood")
 		<hr/>
 
+		@defining(personForm("number_2").value() ||
+			personForm("number_3").value()) { has_phones =>
 		@for( i <- 1 to 3 ) {
+			@if( i == 2 && !has_phones ) {
+				<a id="phone_controller" href="javascript:$('#phone_stuff').show();$('#phone_controller').hide();">
+					  Add phone(s)
+				</a>
+				<div id="phone_stuff" style="display:none">
+			}
 		    @inputText(personForm("number_" + i), '_label -> ("Phone " + i))
 		    @inputText(personForm("number_" + i + "_comment"), '_label -> ("Phone " + i + " comment"))
 		}
-
-		@inputText(personForm("email"), '_label -> "Email")
+		@if( !has_phones ) {
+			</div>
+		}
+		}
 
 		<hr/>
 		@inputDate(personForm("dob"), '_label -> "Date of Birth")
 		@inputText(personForm("same_family_name"), '_label -> "Same family as: ")
 		<input type="hidden" id = "same_family_id" name="same_family_id"/>
-
 
         <input type="submit" value="@submit_title">
 }
