@@ -20,8 +20,10 @@ import play.mvc.Http.Context;
 /*
    TODO
 
-* show recent comments on main page sidebar
 * remove tags
+
+* link up tags on person display page
+* why aren't names sorted in tag view?
 
 
 * browse by neighborhood
@@ -41,7 +43,8 @@ public class Application extends Controller {
     }
 
     public static Result people() {
-        return ok(views.html.index.render(Person.all()));
+        List<Comment> recent_comments = Comment.find.orderBy("created DESC").setMaxRows(10).findList();
+        return ok(views.html.index.render(Person.all(), recent_comments));
     }
 
     public static Result person(Integer id) {
