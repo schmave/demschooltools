@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -26,7 +27,7 @@ import com.feth.play.module.pa.user.NameIdentity;
 @Table(name = "users")
 public class User extends Model {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -35,8 +36,8 @@ public class User extends Model {
 
 	@Email
 	// if you make this unique, keep in mind that users *must* merge/link their
-	// accounts then on signup with additional providers
-	// @Column(unique = true)
+	// accounts then on signup with additional provider
+    @Column(unique = true)
 	public String email;
 
 	public String name;
@@ -129,7 +130,7 @@ public class User extends Model {
 		u.linkedAccounts.add(LinkedAccount.create(newUser));
 		u.save();
 	}
-	
+
 	public static User findByEmail(final String email) {
 		return getEmailUserFind(email).findUnique();
 	}

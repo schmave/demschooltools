@@ -1,11 +1,15 @@
 package service;
 
-import models.User;
-import play.Application;
-
+import com.feth.play.module.pa.service.UserServicePlugin;
 import com.feth.play.module.pa.user.AuthUser;
 import com.feth.play.module.pa.user.AuthUserIdentity;
-import com.feth.play.module.pa.service.UserServicePlugin;
+import com.feth.play.module.pa.user.EmailIdentity;
+
+import models.LinkedAccount;
+import models.User;
+
+import play.Application;
+import play.Logger;
 
 public class MyUserServicePlugin extends UserServicePlugin {
 
@@ -13,23 +17,37 @@ public class MyUserServicePlugin extends UserServicePlugin {
 		super(app);
 	}
 
+    // We do not create new user accounts. If you aren't already approved,
+    // you can't log in.
 	@Override
 	public Object save(final AuthUser authUser) {
+        Logger.debug("MyUserServicePlugin::save " + authUser);
 		final boolean isLinked = User.existsByAuthUserIdentity(authUser);
 		if (!isLinked) {
-			return User.create(authUser).id;
-		} else {
-			// we have this user already, so return null
-			return null;
+            if (authUser instanceof EmailIdentity) {
+                Logger.debug("    is email identity");
+                final EmailIdentity identity = (EmailIdentity) authUser;
+                User u = User.find.where().eq("email", identity.getEmail()).findUnique();
+                if (u != null) {
+                    Logger.debug("    found user by email");
+                    u.linkedAccounts.add(LinkedAccount.create(authUser));
+                    u.save();
+                    return u;
+                }
+            }
 		}
+
+        return null;
 	}
 
 	@Override
 	public Object getLocalIdentity(final AuthUserIdentity identity) {
+        Logger.debug("MyUserServicePlugin::getLocalIdentity " + identity);
 		// For production: Caching might be a good idea here...
 		// ...and dont forget to sync the cache when users get deactivated/deleted
 		final User u = User.findByAuthUserIdentity(identity);
 		if(u != null) {
+            Logger.debug("    found user by auth identity");
 			return u.id;
 		} else {
 			return null;
