@@ -20,7 +20,13 @@ import play.mvc.Http.Context;
 /*
    TODO
 
+* show recent comments on main page sidebar
 * remove tags
+
+
+* browse by neighborhood
+* use markdown for notes and comments
+
 
  */
 
@@ -199,7 +205,13 @@ public class Application extends Controller {
         return "" + (int)((new Date().getTime() - p.dob.getTime()) / 1000 / 60 / 60 / 24 / 365.25);
     }
 
+    public static Configuration getConfiguration() {
+		return Play.application().configuration().getConfig("school_crm");
+	}
+
     public static String formatDate(Date d) {
+        d = new Date(d.getTime() +
+            (getConfiguration().getInt("time_zone_offset") * 1000L * 60 * 60));
         Date now = new Date();
         String format = "EEE MMMM d, h:mm a";
         if (d.getYear() != now.getYear()) {
