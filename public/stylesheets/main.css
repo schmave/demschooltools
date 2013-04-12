@@ -13,14 +13,6 @@ body {
     padding: 2px;
 }
 
-a:link, a:visited {
-    color: #1f8dd6;
-}
-
-a:hover {
-    color: #33f;
-}
-
 #comments {
 }
 
