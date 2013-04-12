@@ -98,13 +98,14 @@ public class Person extends Model {
         }
     }
 
-    public static void create(Form<Person> form) {
+    public static Person create(Form<Person> form) {
         Person person = form.get();
         person.is_family = false;
         person.attachToPersonAsFamily(form.field("same_family_id").value());
 
         person.save();
         person.addPhoneNumbers(form);
+        return person;
     }
 
     public static Person updateFromForm(Form<Person> form) {

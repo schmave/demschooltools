@@ -161,8 +161,8 @@ public class Application extends Controller {
                 views.html.new_person.render(filledForm)
             );
         } else {
-            Person.create(filledForm);
-            return redirect(routes.Application.people());
+            Person new_person = Person.create(filledForm);
+            return redirect(routes.Application.person(new_person.person_id));
         }
     }
 

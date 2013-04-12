@@ -4,15 +4,17 @@
 
 @main(p.first_name + " " + p.last_name) {
 
+@defining(if(family_members.size() >= 2){ "span3" } else {"span6"}) { size =>
 <div class="row">
-	<div class="span3">
+	<div class="@size">
 	@person(p)
 	</div>
 
 	@for( family_member <- family_members ) {
-		<div class="span3">@person(family_member)</div>
+		<div class="@size">@person(family_member)</div>
 	}
 </div>
+}
 
 <hr>
 <div class="row">
