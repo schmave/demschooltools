@@ -1,11 +1,12 @@
-@(people: List[Person])
+@(people: List[Person], recent_comments: List[Comment])
 
 @import helper._
 
 @main("All people") {
 
-    <h1>@people.size() people</h1>
-
+	<div class="row">
+	<div class="span4">
+	<h3>People</h3>
     <ul>
         @for(person <- people) {
             <li>
@@ -13,6 +14,20 @@
             </li>
         }
     </ul>
+	</div>
 
-    <a href="@routes.Application.newPerson()">Add a new person</a>
+	<h3>Recent Comments</h3>
+	<div class="span4">
+		@for( c <- recent_comments ) {
+			<div class="comment">
+			<b>@c.user.name</b> to <a href="@routes.Application.person(c.person.person_id)">
+					@c.person.first_name @c.person.last_name</a>:
+			@Html(c.message.replace("\n", "<br>"))
+			<div class="comment_time">@Application.formatDate(c.created)</div>
+			</div>
+		}
+	</div>
+
+	</div>
+
 }
