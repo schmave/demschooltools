@@ -7,6 +7,7 @@ import javax.persistence.*;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
+import com.avaje.ebean.validation.NotNull;
 
 import play.data.*;
 import play.data.validation.Constraints.*;
@@ -48,6 +49,7 @@ public class Person extends Model {
 
     // is_family is true if this Person object represents
     // a family, not a single person.
+    @NotNull
     public boolean is_family;
 
     // family ID

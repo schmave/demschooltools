@@ -1,5 +1,6 @@
 package controllers;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import com.avaje.ebean.Ebean;
@@ -69,7 +70,11 @@ public class Application extends Controller {
         List<Map<String, String> > result = new ArrayList<Map<String, String> > ();
         for (Person p : selected_people) {
             HashMap<String, String> values = new HashMap<String, String>();
-            values.put("label", p.first_name + " " + p.last_name);
+            String label = p.first_name;
+            if (p.last_name != null) {
+                label = label + " " + p.last_name;
+            }
+            values.put("label", label);
             values.put("id", "" + p.person_id);
             result.add(values);
         }
@@ -192,5 +197,14 @@ public class Application extends Controller {
 
     public static String calcAge(Person p) {
         return "" + (int)((new Date().getTime() - p.dob.getTime()) / 1000 / 60 / 60 / 24 / 365.25);
+    }
+
+    public static String formatDate(Date d) {
+        Date now = new Date();
+        String format = "EEE MMMM d, h:mm a";
+        if (d.getYear() != now.getYear()) {
+            format = "EEE MMMM d, YYYY";
+        }
+        return new SimpleDateFormat(format).format(d);
     }
 }
