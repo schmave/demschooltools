@@ -203,7 +203,7 @@ public class Application extends Controller {
         Date now = new Date();
         String format = "EEE MMMM d, h:mm a";
         if (d.getYear() != now.getYear()) {
-            format = "EEE MMMM d, YYYY";
+            format = "EEE MMMM d, yyyy";
         }
         return new SimpleDateFormat(format).format(d);
     }
