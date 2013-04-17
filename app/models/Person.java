@@ -47,6 +47,9 @@ public class Person extends Model {
     @OneToMany(mappedBy="person")
     public List<Comment> comments;
 
+    @OneToMany(mappedBy="person")
+    public List<CompletedTask> completed_tasks;
+
     // is_family is true if this Person object represents
     // a family, not a single person.
     @NotNull
@@ -156,5 +159,14 @@ public class Person extends Model {
         if (tags == null) {
             tags = new ArrayList<Tag>();
         }
+    }
+
+    public CompletedTask completedTask(Task t) {
+        for (CompletedTask ct : completed_tasks) {
+            if (ct.task.id == t.id) {
+                return ct;
+            }
+        }
+        return null;
     }
 }

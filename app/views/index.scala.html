@@ -20,6 +20,9 @@
 	<div class="span6">
 		@for( c <- recent_comments ) {
 			<div class="comment">
+			@for( ct <- c.completed_tasks ) {
+				<span class="label label-info">@ct.task.title</span>
+			}
 			<b>@c.user.name</b> to <a href="@routes.Application.person(c.person.person_id)">
 					@c.person.first_name @c.person.last_name</a>:
 			@Html(c.message.replace("\n", "<br>"))

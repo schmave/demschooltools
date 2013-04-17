@@ -12,6 +12,9 @@ public class Tag extends Model {
 
     public String title;
 
+    @OneToOne(mappedBy="tag")
+    public TaskList task_list;
+
     public static Finder<Integer, Tag> find = new Finder(
         Integer.class, Tag.class
     );

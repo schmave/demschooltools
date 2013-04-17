@@ -16,6 +16,22 @@ $(document).ready(function () {
     $( "#navbar_people_search" ).bind( "autocompleteselect", function(event, ui) {
         window.location.href="/people/" + ui.item.id;
     });
+
+    $( ".task_checkbox" ).click( function (event) {
+        $('#new_comment').show();
+        $("#comment_tasks").empty();
+        $("#comment_task_ids").empty();
+
+        checked_boxes = $(".task_checkbox");
+        for (i = 0; i < checked_boxes.length; i++) {
+            box = checked_boxes[i];
+            id = box.id.split("_")[2];
+            if (!box.disabled && box.checked) {
+                $("#comment_tasks").append("<span class='label'>" + $('label[for=' + box.id + ']').text() + "</span><br>");
+                $("#comment_task_ids").append("," + id);
+            }
+        }
+    });
 });
 
 function enableTagBox(input_box, destination_div, person_id) {
