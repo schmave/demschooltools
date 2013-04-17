@@ -20,6 +20,8 @@ import play.mvc.Http.Context;
 /*
    TODO
 
+* change a number of on delete restrict constraints to on delete cascade
+
 * search all fields for people search
 * upload guidance counselors and college professors
 

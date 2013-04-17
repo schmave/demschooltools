@@ -25,6 +25,10 @@ body {
   overflow: hidden;
 }
 
+.comment_tasks {
+  padding-left: 40px;
+}
+
 .comment_time {
   color:#666;
   font-size: 11px;
