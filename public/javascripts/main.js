@@ -32,6 +32,18 @@ $(document).ready(function () {
             }
         }
     });
+
+    $(".comment_text").each(function() {
+        if (this.offsetHeight > 60) {
+            $(this).addClass("limit_height");
+            $(this).after("<a href='#'>more...</a>");
+            $(this).next().click(function (event) {
+                $(event.target).prev().removeClass("limit_height");
+                $(event.target).remove();
+                return false;
+            });
+        }
+    });
 });
 
 function enableTagBox(input_box, destination_div, person_id) {

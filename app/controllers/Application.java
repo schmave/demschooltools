@@ -20,19 +20,19 @@ import play.mvc.Http.Context;
 /*
    TODO
 
-* show family emails when viewing a tag
-* show last N days of comments, not max number?
-* sort people list by date created, then name
-
 * search all fields for people search
-
 * upload guidance counselors and college professors
 
 
+* show family emails when viewing a tag
+* show last N days of comments, not max number?
+
+
+* sort people list by date created, then name
+* browse by neighborhood
 
 * add ability to remove tags
 
-* browse by neighborhood
 * use markdown for notes and comments
 
 
@@ -50,7 +50,7 @@ public class Application extends Controller {
     }
 
     public static Result people() {
-        List<Comment> recent_comments = Comment.find.orderBy("created DESC").setMaxRows(10).findList();
+        List<Comment> recent_comments = Comment.find.orderBy("created DESC").setMaxRows(20).findList();
         return ok(views.html.index.render(Person.all(), recent_comments));
     }
 
