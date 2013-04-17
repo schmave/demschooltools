@@ -34,7 +34,7 @@
 				}
 				<label for="task_checkbox_@task.id" style="display:inline">@task.title</label>
 				@if( ct != null ) {
-					(@ct.comment.user.name, @Application.formatDate(ct.comment.created))
+					<i>(@ct.comment.user.name, @Application.formatDate(ct.comment.created))</i>
 				}
 				<br>
 			}
