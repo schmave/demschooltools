@@ -203,10 +203,11 @@ public class Application extends Controller {
         new_comment.user = getCurrentUser();
         new_comment.message = filledForm.field("message").value();
 
-        if (new_comment.message.length() > 0) {
+        String task_id_string = filledForm.field("comment_task_ids").value();
+
+        if (task_id_string.length() > 0 || new_comment.message.length() > 0) {
             new_comment.save();
 
-            String task_id_string = filledForm.field("comment_task_ids").value();
             String[] task_ids = task_id_string.split(",");
             for (String id_string : task_ids) {
                 if (!id_string.isEmpty()) {
