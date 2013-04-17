@@ -27,7 +27,7 @@ $(document).ready(function () {
             box = checked_boxes[i];
             id = box.id.split("_")[2];
             if (!box.disabled && box.checked) {
-                $("#comment_tasks").append("<span class='label'>" + $('label[for=' + box.id + ']').text() + "</span><br>");
+                $("#comment_tasks").append("<span class='label label-info'>" + $('label[for=' + box.id + ']').text() + "</span><br>");
                 $("#comment_task_ids").append("," + id);
             }
         }
