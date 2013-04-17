@@ -1,6 +1,9 @@
 @(c : Comment)
 
 <div class="comment">
+@for( ct <- c.completed_tasks ) {
+	<span class="label label-info">@ct.task.title</span>
+}
 <b>@c.user.name</b> to <b>@c.person.first_name</b>:
 @Html(c.message.replace("\n", "<br>"))
 <div class="comment_time">@Application.formatDate(c.created)</div>

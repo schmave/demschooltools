@@ -20,10 +20,22 @@ import play.mvc.Http.Context;
 /*
    TODO
 
-* remove tags
+* show family emails when viewing a tag
+* show last N days of comments, not max number?
+* sort people list by date created, then name
+
+* search all fields for people search
+
+* upload guidance counselors and college professors
+
+
+
+* add ability to remove tags
 
 * browse by neighborhood
 * use markdown for notes and comments
+
+
 
 */
 
@@ -193,6 +205,18 @@ public class Application extends Controller {
 
         if (new_comment.message.length() > 0) {
             new_comment.save();
+
+            String task_id_string = filledForm.field("comment_task_ids").value();
+            String[] task_ids = task_id_string.split(",");
+            for (String id_string : task_ids) {
+                if (!id_string.isEmpty()) {
+                    int id = Integer.parseInt(id_string);
+                    if (id >= 1) {
+                        CompletedTask.create(Task.find.byId(id), new_comment);
+                    }
+                }
+            }
+
             return ok(views.html.comment_fragment.render(Comment.find.byId(new_comment.id)));
         } else {
             return ok();
@@ -216,5 +240,18 @@ public class Application extends Controller {
             format = "EEE MMMM d, yyyy";
         }
         return new SimpleDateFormat(format).format(d);
+    }
+
+    public static Result viewTaskList(Integer id) {
+        TaskList list = TaskList.find.byId(id);
+        Set<Person> people = new HashSet<Person>();
+
+        for( Task t: list.tasks ) {
+            for( CompletedTask ct : t.completed_tasks ) {
+                people.add(ct.person);
+            }
+        }
+
+        return ok(views.html.task_list.render(list, people));
     }
 }

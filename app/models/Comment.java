@@ -28,6 +28,9 @@ public class Comment extends Model {
     @Column(insertable = false, updatable = false)
     public Date created;
 
+    @OneToMany(mappedBy="comment")
+    public List<CompletedTask> completed_tasks;
+
     public static Finder<Integer, Comment> find = new Finder(
         Integer.class, Comment.class
     );

@@ -1,0 +1,28 @@
+@(list: TaskList, people : Set[Person])
+
+@import helper._
+
+@main("List: " + list.title) {
+<h1>@list.title</h1>
+
+<table class="table">
+<tr><th>Task<th>People who have completed it<th>People who have not completed it
+@for( t <- list.tasks ) {
+<tr>
+<td>@t.title
+<td>
+	@for( p <- people ) {
+		@if( p.completedTask(t) != null ) {
+			<a href="@routes.Application.person(p.person_id)">@p.first_name @p.last_name</a>,
+		}
+	}
+<td>
+	@for( p <- people ) {
+		@if( p.completedTask(t) == null ) {
+			<a href="@routes.Application.person(p.person_id)">@p.first_name @p.last_name</a>,
+		}
+	}
+}
+
+</table>
+}
