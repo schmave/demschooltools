@@ -33,7 +33,6 @@ import play.mvc.Http.Context;
 * upload guidance counselors and college professors
 
 
-* show family emails when viewing a tag
 * show last N days of comments, not max number?
 
 
@@ -167,7 +166,14 @@ public class Application extends Controller {
             Ebean.find(Person.class).setRawSql(rawSql).
             where().eq("tag.id", id).orderBy("person.last_name, person.first_name").findList();
 
-        return ok(views.html.tag.render(Tag.find.byId(id), people));
+        Set<Person> people_with_family = new HashSet<Person>();
+        for (Person p : people) {
+            if (p.family != null) {
+                people_with_family.addAll(p.family.family_members);
+            }
+        }
+
+        return ok(views.html.tag.render(Tag.find.byId(id), people, people_with_family));
     }
 
     public static User getCurrentUser() {

@@ -1,4 +1,4 @@
-@(tag: Tag, people: List[Person])
+@(tag: Tag, people: List[Person], people_with_family: Collection[Person])
 
 @import helper._
 
@@ -13,6 +13,13 @@
 
 <p>Emails:
 	@for( p <- people ) {
+		@if( p.email ) {
+			@p.email,
+		}
+	}
+
+<p>Emails for all family members:
+	@for( p <- people_with_family ) {
 		@if( p.email ) {
 			@p.email,
 		}
