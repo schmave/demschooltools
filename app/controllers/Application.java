@@ -20,9 +20,6 @@ import play.mvc.Http.Context;
 /*
    TODO
 
-* change a number of on delete restrict constraints to on delete cascade
-* add created timestamp to person table
-
 * put E:, C:, and "potential" tags in a submenu
    http://twitter.github.io/bootstrap/components.html
 * link task completion badges to their task list.
