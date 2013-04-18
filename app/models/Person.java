@@ -154,7 +154,7 @@ public class Person extends Model {
     // called by PersonController
     void loadTags() {
         RawSql rawSql = RawSqlBuilder.
-            parse("SELECT tag.id, tag.title from person natural join person_tag pt join tag on pt.tag_id=tag.id").
+            parse("SELECT tag.id, tag.title from person join person_tag pt on person.person_id = pt.person_id join tag on pt.tag_id=tag.id").
             create();
 
         tags = Ebean.find(Tag.class).setRawSql(rawSql).

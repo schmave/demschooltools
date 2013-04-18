@@ -148,7 +148,8 @@ public class Application extends Controller {
 
     public static Result viewTag(Integer id) {
         RawSql rawSql = RawSqlBuilder
-            .parse("SELECT person.person_id, person.first_name, person.last_name from person natural join person_tag pt "+
+            .parse("SELECT person.person_id, person.first_name, person.last_name from "+
+                   "person join person_tag pt on person.person_id=pt.person_id "+
                   "join tag on pt.tag_id=tag.id")
             .columnMapping("person.person_id", "person_id")
         .columnMapping("person.first_name", "first_name")
