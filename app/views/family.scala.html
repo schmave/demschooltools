@@ -46,16 +46,7 @@
 <p><a href="javascript:$('#new_comment').show()">Add a comment</a>
 <div id="new_comment" style="display: none;">
 	<div style="float:left">I talked with
-	<select name="person">
-		<option value="@p.person_id">
-			@p.first_name @p.last_name
-		</option>
-	   @for(family_member <- family_members) {
-		<option value="@family_member.person_id">
-			@family_member.first_name @family_member.last_name
-		</option>
-			}
-	</select>
+	<input type=hidden name="person" value="@p.person_id" />@p.first_name @p.last_name
 	about:<br>
 	<textarea name="message" style="width: 400px;" rows=5 ></textarea>
 	<div id="comment_tasks" style="float:right;"></div>
