@@ -20,8 +20,6 @@ import play.mvc.Http.Context;
 /*
    TODO
 
-* link task completion badges to their task list.
-
 * share code between comment_fragment and people index.
 
 * search all fields for people search
