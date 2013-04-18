@@ -20,7 +20,7 @@
 	<div class="span6">
 		@for( c <- recent_comments ) {
 			<div class="comment">
-			<b>@c.user.name</b> to <a href="@routes.Application.person(c.person.person_id)">
+			<b>@c.user.name</b> and <a href="@routes.Application.person(c.person.person_id)">
 					@c.person.first_name @c.person.last_name</a>:
 			<div class="comment_text">
 			@Html(c.message.replace("\n", "<br>"))
