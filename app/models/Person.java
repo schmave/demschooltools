@@ -56,8 +56,11 @@ public class Person extends Model {
     public boolean is_family;
 
     // family ID
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne()
     public Person family;
+
+    @OneToMany(mappedBy="family")
+    public List<Person> family_members;
 
     public static Finder<Integer,Person> find = new Finder(
         Integer.class, Person.class
