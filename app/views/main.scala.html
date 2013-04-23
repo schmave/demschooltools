@@ -52,7 +52,7 @@
 						  Checklists
 						  <b class="caret"></b>
 						</a>
-							<ul class="dropdown-menu" style="max-height: 300px; overflow-y: scroll;">
+							<ul class="dropdown-menu">
 								@for( l <- TaskList.find.all() ) {
 									<li><a href="@routes.Application.viewTaskList(l.id)">@l.title</a></li>
 									}
