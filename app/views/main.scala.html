@@ -43,7 +43,11 @@
 										}
 										</ul></li>
 									} else {
-										<li><a href="@routes.Application.viewTag(kv._2.get(0).id)">@kv._1</a></li>
+										@* There is only one tag, but the for loop is a nice way to bind
+											the variable *@
+										@for( t <- kv._2 ) {
+											<li><a href="@routes.Application.viewTag(t.id)">@t.title</a></li>
+										}
 									}
 								}
 							</ul>
