@@ -11,15 +11,17 @@
 <tr>
 <td>@t.title
 <td>
-	@for( p <- people ) {
-		@if( p.completedTask(t) != null ) {
-			<a href="@routes.Application.person(p.person_id)">@p.first_name @p.last_name</a>,
+	@defining(people.filter(p => p.completedTask(t) != null)) { completed_people =>
+		(@completed_people.size):
+		@for( p <- completed_people) {
+			<a href="@routes.Application.person(p.person_id)">@p.first_name @p.last_name,</a>
 		}
 	}
 <td>
-	@for( p <- people ) {
-		@if( p.completedTask(t) == null ) {
-			<a href="@routes.Application.person(p.person_id)">@p.first_name @p.last_name</a>,
+	@defining(people.filter(p => p.completedTask(t) == null)) { uncompleted_people =>
+		(@uncompleted_people.size):
+		@for( p <- uncompleted_people) {
+			<a href="@routes.Application.person(p.person_id)">@p.first_name @p.last_name,</a>
 		}
 	}
 }
