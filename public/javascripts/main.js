@@ -34,7 +34,7 @@ $(document).ready(function () {
     });
 
     $(".comment_text").each(function() {
-        if (this.offsetHeight > 60) {
+        if (this.offsetHeight > 80) {
             $(this).addClass("limit_height");
             $(this).after("<a href='#'>more...</a>");
             $(this).next().click(function (event) {
