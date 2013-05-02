@@ -2,6 +2,7 @@
 
 @import helper._
 
+<div class="person">
 <h4><a href="@routes.Application.person(person.person_id)">
 @person.first_name @person.last_name</a></h4>
 @if( person.notes ) {
@@ -45,4 +46,4 @@ enableTagBox("#person_tag_entry_@person.person_id",
 	Age @Application.calcAge(person) (born @Application.formatDob(person.dob))<br>
 }
 <a href="@routes.Application.editPerson(person.person_id)">Edit</a>
-
+</div>

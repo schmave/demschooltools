@@ -35,6 +35,13 @@ body {
   padding-left: 40px;
 }
 
+.person {
+  border: 1px solid rgb(121, 147, 252);
+  background: #f7f7f7;
+  padding: 3px;
+  margin-bottom: 10px;
+}
+
 
 /*********************************
  Twitter Bootstrap tweaks
