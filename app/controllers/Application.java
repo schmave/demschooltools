@@ -20,22 +20,29 @@ import play.mvc.Http.Context;
 /*
    TODO
 
-* share code between comment_fragment and people index.
+* show actual birthday in addition to person's age
 
 * search all fields for people search
 * upload guidance counselors and college professors
 
+* add another way to link to people other than making them one family.
+* add an "organization" field to a person
 
-* show last N days of comments, not max number?
+* show birthdays for the current day
 
+* disable comment button while request is pending
 
+* browse people by neighborhood
+
+* share code between comment_fragment and people index.
 * sort people list by date created, then name
-* browse by neighborhood
-
 * add ability to remove tags
-
 * use markdown for notes and comments
 
+
+* Be able to send email to tagged people: using a web rich text editor, or
+  perhaps forwarding emails when they are sent to people+tag_parent@trvs.org
+  from an approved sender?
 
 
 */
@@ -240,6 +247,10 @@ public class Application extends Controller {
     public static Configuration getConfiguration() {
 		return Play.application().configuration().getConfig("school_crm");
 	}
+
+    public static String formatDob(Date d) {
+        return new SimpleDateFormat("MMMM d, ''yy").format(d);
+    }
 
     public static String formatDate(Date d) {
         d = new Date(d.getTime() +
