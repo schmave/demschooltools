@@ -16,7 +16,7 @@ import play.db.ebean.*;
 import static play.libs.F.*;
 
 @Entity
-public class Person extends Model {
+public class Person extends Model implements Comparable<Person> {
     @Id
     public Integer person_id;
 
@@ -171,5 +171,12 @@ public class Person extends Model {
             }
         }
         return null;
+    }
+
+    public int compareTo(Person other) {
+        if (last_name.equals(other.last_name)) {
+            return first_name.compareTo(other.first_name);
+        }
+        return last_name.compareTo(other.last_name);
     }
 }
