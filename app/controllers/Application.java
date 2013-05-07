@@ -20,17 +20,15 @@ import play.mvc.Http.Context;
 /*
    TODO
 
-* show actual birthday in addition to person's age
+*** search all fields for people search
+* disable comment button while request is pending
 
-* search all fields for people search
 * upload guidance counselors and college professors
 
 * add another way to link to people other than making them one family.
 * add an "organization" field to a person
 
 * show birthdays for the current day
-
-* disable comment button while request is pending
 
 * browse people by neighborhood
 
@@ -42,8 +40,7 @@ import play.mvc.Http.Context;
 
 * Be able to send email to tagged people: using a web rich text editor, or
   perhaps forwarding emails when they are sent to people+tag_parent@trvs.org
-  from an approved sender?
-
+  from an approved sender? see mandrill
 
 */
 
@@ -265,13 +262,17 @@ public class Application extends Controller {
 
     public static Result viewTaskList(Integer id) {
         TaskList list = TaskList.find.byId(id);
-        Set<Person> people = new HashSet<Person>();
+        List<Person> people = new ArrayList<Person>();
 
         for( Task t: list.tasks ) {
             for( CompletedTask ct : t.completed_tasks ) {
-                people.add(ct.person);
+                if (!people.contains(ct.person)) {
+                    people.add(ct.person);
+                }
             }
         }
+
+        Collections.sort(people);
 
         return ok(views.html.task_list.render(list, people));
     }
