@@ -174,9 +174,10 @@ public class Person extends Model implements Comparable<Person> {
     }
 
     public int compareTo(Person other) {
-        if (last_name.equals(other.last_name)) {
+        int last_name_compare = last_name.compareTo(other.last_name);
+        if (last_name_compare == 0) {
             return first_name.compareTo(other.first_name);
         }
-        return last_name.compareTo(other.last_name);
+        return last_name_compare;
     }
 }
