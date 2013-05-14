@@ -1,0 +1,32 @@
+@(tag: Tag, people: List[Person], people_with_family: Collection[Person])
+
+@import helper._
+
+@main("All people tagged " + tag.title) {
+<h1>@tag.title</h1>
+
+<table class="table">
+<tr><th>Student<th>Age in the Fall<th>Gender<th># of siblings<th>Address<th>Phone number
+
+@for( p <- people ) {
+	<tr>
+	<td><a href="@routes.Application.person(p.person_id)">@p.first_name @p.last_name</a>
+	<td>@Application.calcAgeAtBeginningOfSchool(p)
+	<td>@p.gender
+	<td>@p.numSiblings()
+	<td>@Html(p.familyAddresses().mkString("<br/>"))
+	<td>@Html(p.familyPhoneNumbers.mkString("<br/>"))
+	</tr>
+}
+
+</table>
+
+<p>Emails for all family members:
+@for( p <- people_with_family ) {
+	@if( p.email ) {
+		@p.email,
+	}
+}
+
+}
+

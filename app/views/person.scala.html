@@ -3,6 +3,15 @@
 @import helper._
 
 <div class="person">
+@if(person.gender.equals("Male")) {
+	<div class="male">M</div>
+}
+@if(person.gender.equals("Female")) {
+	<div class="female">F</div>
+}
+@if(person.isStudent()) {
+	<div class="student"></div>
+}
 <h4><a href="@routes.Application.person(person.person_id)">
 @person.first_name @person.last_name</a></h4>
 @if( person.notes ) {
