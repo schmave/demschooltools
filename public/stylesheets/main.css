@@ -54,6 +54,12 @@ body {
     padding: 0 10px;
 }
 
+.person .other_gender {
+    float: right;
+    background-color: #be98e6;
+    padding: 0 10px;
+}
+
 .person .student {
     width: 32px;
     height: 32px;
