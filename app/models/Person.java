@@ -1,5 +1,7 @@
 package models;
 
+import controllers.Application;
+
 import java.util.*;
 
 import javax.persistence.*;
@@ -24,6 +26,8 @@ public class Person extends Model implements Comparable<Person> {
 
     @Column(columnDefinition = "TEXT")
     public String notes;
+
+    public String gender;
 
     // phone number references
     @OneToMany(mappedBy="owner")
@@ -135,6 +139,11 @@ public class Person extends Model implements Comparable<Person> {
         find.ref(id).delete();
     }
 
+    public boolean isStudent()
+    {
+        return tags.contains(Tag.find.where().eq("title", "Intent to Enroll").findUnique());
+    }
+
     public Form<Person> fillForm() {
         HashMap<String, String> data = new HashMap<String, String>();
         int i = 1;
@@ -171,6 +180,76 @@ public class Person extends Model implements Comparable<Person> {
             }
         }
         return null;
+    }
+
+    public int numSiblings()
+    {
+        if (this.family == null)
+        {
+            return 0;
+        }
+        else
+        {
+            int num_siblings = 0;
+            for (Person p : this.family.family_members)
+            {
+                if (this != p &&
+                    p.dob != null &&
+                    Application.calcAge(p) < 18)
+                {
+                    num_siblings++;
+                }
+            }
+            return num_siblings;
+        }
+    }
+
+    public List<String> familyAddresses()
+    {
+        Set<Person> candidates = new HashSet<Person>();
+        candidates.add(this);
+        if (family != null)
+        {
+            candidates.addAll(family.family_members);
+        }
+
+        ArrayList<String> addresses = new ArrayList<String>();
+        for (Person p : candidates)
+        {
+            if (p.address.length() > 0)
+            {
+                addresses.add(p.first_name + " " + p.last_name +
+                    ": " + p.address + ", " + p.city + ", " + p.state + ", " +
+                    p.zip);
+            }
+        }
+        return addresses;
+    }
+
+    public List<String> familyPhoneNumbers()
+    {
+        Set<Person> candidates = new HashSet<Person>();
+        candidates.add(this);
+        if (family != null)
+        {
+            candidates.addAll(family.family_members);
+        }
+
+        ArrayList<String> numbers = new ArrayList<String>();
+        for (Person p : candidates)
+        {
+            for (PhoneNumber num : p.phone_numbers)
+            {
+                String label = p.first_name + " " + p.last_name;
+                if (num.comment.length() > 0)
+                {
+                    label = label + "(" + num.comment + ")";
+                }
+                numbers.add(label + ": " + num.number);
+            }
+        }
+
+        return numbers;
     }
 
     public int compareTo(Person other) {

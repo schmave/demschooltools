@@ -42,6 +42,24 @@ body {
   margin-bottom: 10px;
 }
 
+.person .male {
+    float: right;
+    background-color: #87a8fb;
+    padding: 0 10px;
+}
+
+.person .female {
+    float: right;
+    background-color: #fb87ce;
+    padding: 0 10px;
+}
+
+.person .student {
+    width: 32px;
+    height: 32px;
+    float: right;
+    background-image: url('/assets/images/gold_star.png')
+}
 
 /*********************************
  Twitter Bootstrap tweaks

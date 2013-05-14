@@ -151,6 +151,8 @@ public class Application extends Controller {
     }
 
     public static Result viewTag(Integer id) {
+        Tag the_tag = Tag.find.byId(id);
+
         RawSql rawSql = RawSqlBuilder
             .parse("SELECT person.person_id, person.first_name, person.last_name from "+
                    "person join person_tag pt on person.person_id=pt.person_id "+
@@ -171,7 +173,20 @@ public class Application extends Controller {
             }
         }
 
-        return ok(views.html.tag.render(Tag.find.byId(id), people, people_with_family));
+        if (the_tag.title.equals("Intent to Enroll"))
+        {
+            return viewIntentToEnroll(the_tag, people, people_with_family);
+        }
+        else
+        {
+            return ok(views.html.tag.render(the_tag, people, people_with_family));
+        }
+    }
+
+    public static Result viewIntentToEnroll(Tag the_tag, List<Person> students,
+        Set<Person> family_members)
+    {
+        return ok(views.html.intent_to_enroll_tag.render(the_tag, students, family_members));
     }
 
     public static User getCurrentUser() {
@@ -237,8 +252,12 @@ public class Application extends Controller {
         }
     }
 
-    public static String calcAge(Person p) {
-        return "" + (int)((new Date().getTime() - p.dob.getTime()) / 1000 / 60 / 60 / 24 / 365.25);
+    public static int calcAge(Person p) {
+        return (int)((new Date().getTime() - p.dob.getTime()) / 1000 / 60 / 60 / 24 / 365.25);
+    }
+
+    public static int calcAgeAtBeginningOfSchool(Person p) {
+        return (int)((new Date(113, 8, 29).getTime() - p.dob.getTime()) / 1000 / 60 / 60 / 24 / 365.25);
     }
 
     public static Configuration getConfiguration() {

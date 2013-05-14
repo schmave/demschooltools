@@ -11,6 +11,7 @@
 }
         @inputText(personForm("first_name"), '_label -> "First Name")
         @inputText(personForm("last_name"), '_label -> "Last Name")
+		@select(personForm("gender"), options = options(Seq("Unknown", "Female", "Male")), '_label -> "Gender")
 		@inputText(personForm("email"), '_label -> "Email")
 		@textarea(personForm("notes"), '_label -> "Notes", 'rows->6)
 		<hr/>
