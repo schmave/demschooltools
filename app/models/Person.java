@@ -27,7 +27,8 @@ public class Person extends Model implements Comparable<Person> {
     @Column(columnDefinition = "TEXT")
     public String notes;
 
-    public String gender;
+    @NotNull
+    public String gender = "Unknown";
 
     // phone number references
     @OneToMany(mappedBy="owner")
