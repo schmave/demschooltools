@@ -1,0 +1,34 @@
+@(people: List[Person], people_with_family: Collection[Person])
+
+<h3>Emails</h3>
+<p>
+	@for( p <- people ) {
+		@if( p.email ) {
+			@p.email,
+		}
+	}
+
+<h3>Emails for all family members</h3>
+<p>
+	@for( p <- people_with_family ) {
+		@if( p.email ) {
+			@p.email,
+		}
+	}
+
+<h3>Table (you can paste this into Excel or mailchimp's "paste from Excel" page</h3>
+<p>
+<table border=1 cellpadding=5 cellspacing=0>
+@for( p <- people ) {
+<tr><td>@if(p.email == "") { &nbsp; } @p.email<td>@p.first_name<td>@p.last_name</tr>
+}
+</table>
+
+<h3>Table, including family members for people in families</h3>
+<p>
+<table border=1 cellpadding=5 cellspacing=0>
+@for( p <- people_with_family ) {
+<tr><td>@if(p.email == "") { &nbsp; } @p.email<td>@p.first_name<td>@p.last_name</tr>
+}
+</table>
+

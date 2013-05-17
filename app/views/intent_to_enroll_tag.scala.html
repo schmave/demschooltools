@@ -21,12 +21,7 @@
 
 </table>
 
-<p>Emails for all family members:
-@for( p <- people_with_family ) {
-	@if( p.email ) {
-		@p.email,
-	}
-}
+@tag_extras(people, people_with_family)
 
 }
 
