@@ -5,6 +5,8 @@
 @main("List: " + list.title) {
 <h1>@list.title</h1>
 
+@defining(new HashSet[Person]()) { people_with_uncompleted_task =>
+
 <table class="table">
 <tr><th>Task<th>People who have completed it<th>People who have not completed it
 @for( t <- list.tasks ) {
@@ -21,10 +23,13 @@
 	@defining(people.filter(p => p.completedTask(t) == null)) { uncompleted_people =>
 		(@uncompleted_people.size):
 		@for( p <- uncompleted_people) {
-			<a href="@routes.Application.person(p.person_id)">@p.first_name @p.last_name,</a>
+			<a @if( people_with_uncompleted_task.add(p) ) { class="first_uncompleted" }
+				href="@routes.Application.person(p.person_id)">@p.first_name @p.last_name,</a>
 		}
 	}
 }
 
 </table>
+}
+
 }

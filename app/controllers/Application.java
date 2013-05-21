@@ -20,6 +20,13 @@ import play.mvc.Http.Context;
 /*
    TODO
 
+* use biological symbols for M/F/T instead of colors
+
+* show recent comments for people in a tag on tag page
+* hide data export sections on tag page by default
+
+* add ability to link to people in comments
+
 *** search all fields for people search
 * disable comment button while request is pending
 
