@@ -67,6 +67,12 @@ body {
     background-image: url('/assets/images/gold_star.png')
 }
 
+.first_uncompleted
+{
+    font-weight: bold;
+    background: #ffff00;
+}
+
 /*********************************
  Twitter Bootstrap tweaks
  *********************************/
