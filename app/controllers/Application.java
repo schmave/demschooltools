@@ -1,5 +1,6 @@
 package controllers;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -20,6 +21,10 @@ import play.mvc.Http.Context;
 /*
    TODO
 
+** search all fields for people search
+
+
+
 * use biological symbols for M/F/T instead of colors
 
 * show recent comments for people in a tag on tag page
@@ -27,7 +32,17 @@ import play.mvc.Http.Context;
 
 * add ability to link to people in comments
 
-*** search all fields for people search
+* bug --can't show comment form in firefox; return false in javascript?
+
+* add tool to merge people
+
+* confirmation when creating a person with the same name as someone already in
+  the database
+
+* strip/trim spaces from person's first and last name on edit/create (and other
+  fields too)
+
+* prevent double submit of comments
 * disable comment button while request is pending
 
 * upload guidance counselors and college professors
@@ -56,6 +71,7 @@ public class Application extends Controller {
 
     static Form<Person> personForm = Form.form(Person.class);
     static Form<Comment> commentForm = Form.form(Comment.class);
+    static Form<Donation> donationForm = Form.form(Donation.class);
 
     public static Result index() {
         return redirect(routes.Application.people());
@@ -85,7 +101,8 @@ public class Application extends Controller {
         return ok(views.html.family.render(
             the_person,
             family_members,
-            all_comments));
+            all_comments,
+            the_person.donations));
     }
 
     public static Result jsonPeople(String term) {
@@ -257,6 +274,82 @@ public class Application extends Controller {
         } else {
             return ok();
         }
+    }
+
+    public static Result addDonation() {
+        Form<Donation> filledForm = donationForm.bindFromRequest();
+        Donation new_donation = new Donation();
+
+        new_donation.person = Person.find.byId(Integer.parseInt(filledForm.field("person").value()));
+        new_donation.description = filledForm.field("description").value();
+        new_donation.dollar_value = Float.parseFloat(filledForm.field("dollar_value").value());
+
+        try
+        {
+            new_donation.date = new SimpleDateFormat("yyyy-MM-dd").parse(filledForm.field("date").value());
+        }
+        catch (ParseException e)
+        {
+            new_donation.date = new Date();
+        }
+
+        new_donation.is_cash = filledForm.field("donation_type").value().equals("Cash");
+        if (filledForm.field("needs_thank_you").value() != null) {
+            new_donation.thanked = !filledForm.field("needs_thank_you").value().equals("on");
+        } else {
+            new_donation.thanked = true;
+        }
+
+        if (filledForm.field("needs_indiegogo_reward").value() != null) {
+            new_donation.indiegogo_reward_given = !filledForm.field("needs_indiegogo_reward").value().equals("on");
+        } else {
+            new_donation.indiegogo_reward_given = true;
+        }
+
+        new_donation.save();
+
+        return ok(views.html.donation_fragment.render(Donation.find.byId(new_donation.id)));
+    }
+
+    public static Result donationThankYou(int id)
+    {
+        Donation d = Donation.find.byId(id);
+        d.thanked = true;
+        d.thanked_by_user = getCurrentUser();
+        d.thanked_time = new Date();
+
+        d.save();
+        return ok();
+    }
+
+    public static Result donationIndiegogoReward(int id)
+    {
+        Donation d = Donation.find.byId(id);
+        d.indiegogo_reward_given = true;
+        d.indiegogo_reward_by_user = getCurrentUser();
+        d.indiegogo_reward_given_time = new Date();
+
+        d.save();
+        return ok();
+    }
+
+    public static Result donationsNeedingThankYou()
+    {
+        List<Donation> donations = Donation.find.where().eq("thanked", false).orderBy("date DESC").findList();
+
+        return ok(views.html.donation_list.render("Donations needing thank you", donations));
+    }
+
+    public static Result donationsNeedingIndiegogo()
+    {
+        List<Donation> donations = Donation.find.where().eq("indiegogo_reward_given", false).orderBy("date DESC").findList();
+
+        return ok(views.html.donation_list.render("Donations needing Indiegogo reward", donations));
+    }
+
+    public static Result donations()
+    {
+        return ok(views.html.donation_list.render("All donations", Donation.find.orderBy("date DESC").findList()));
     }
 
     public static int calcAge(Person p) {
