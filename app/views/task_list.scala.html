@@ -8,7 +8,8 @@
 @defining(new HashSet[Person]()) { people_with_uncompleted_task =>
 
 <table class="table">
-<tr><th>Task<th>People who have completed it<th>People who have not completed it
+<tr><th>Task<th>People who have completed it<th>People who have not completed it. The
+	first time someone appears in this column, their name is <span class="first_uncompleted">highlighted</span>.
 @for( t <- list.tasks ) {
 <tr>
 <td>@t.title
