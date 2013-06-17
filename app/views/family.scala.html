@@ -91,7 +91,7 @@
 		<div id="new_donation" style="display: none;">
 			<input type=hidden name="person" value="@p.person_id" />
 			Description: <textarea name="description" style="width: 400px;" rows=5 ></textarea>
-			<br><label><input type="radio" name="donation_type" value="Cash"> Cash</label> <i>or</i>
+			<br><label><input type="radio" name="donation_type" value="Cash" checked> Cash</label> <i>or</i>
 				<label><input type="radio" name="donation_type" value="Non_cash"> Materials/Time</label>
 			<br>Cash value: <input type="textbox" name="dollar_value">
 			<br>Date (leave blank if today is the day): <input type="date" name="date" value="2013/1/1">
@@ -101,7 +101,7 @@
 			</div>
 			<script type="text/javascript">
 				$("#donation_form").ajaxForm({"complete" : function(response, status) {
-												 $("#donations").prepend(response.responseText);
+												 $("#donations").prepend("<tr>" + response.responseText + "</tr>");
 												 $("#new_donation textarea").val("");
 												 $("#new_donation").hide();
                                                  $('#add_donation_p').show()
