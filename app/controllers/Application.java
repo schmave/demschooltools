@@ -98,11 +98,14 @@ public class Application extends Controller {
         List<Comment> all_comments = Comment.find.where().in("person_id", family_ids).
             order("created DESC").findList();
 
+        List<Donation> all_donations = Donation.find.where().in("person_id", family_ids).
+            order("date DESC").findList();
+
         return ok(views.html.family.render(
             the_person,
             family_members,
             all_comments,
-            the_person.donations));
+            all_donations));
     }
 
     public static Result jsonPeople(String term) {
