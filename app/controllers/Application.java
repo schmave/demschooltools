@@ -290,6 +290,8 @@ public class Application extends Controller {
         try
         {
             new_donation.date = new SimpleDateFormat("yyyy-MM-dd").parse(filledForm.field("date").value());
+            // Set time to 12 noon so that time zone issues won't bump us to the wrong day.
+            new_donation.date.setHours(12);
         }
         catch (ParseException e)
         {
