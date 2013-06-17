@@ -20,6 +20,13 @@ POST    /addTag/:personId         controllers.Application.addTag(tagId : Integer
 
 POST    /addComment               controllers.Application.addComment()
 
+POST    /addDonation              controllers.Application.addDonation()
+POST    /thankDonation/:id        controllers.Application.donationThankYou(id: Integer)
+POST    /indiegogoDonation/:id        controllers.Application.donationIndiegogoReward(id: Integer)
+GET     /donations/thankyou       controllers.Application.donationsNeedingThankYou()
+GET     /donations/indiegogo      controllers.Application.donationsNeedingIndiegogo()
+GET     /donations                controllers.Application.donations()
+
 GET     /viewTag/:id              controllers.Application.viewTag(id: Integer)
 
 GET     /viewTaskList/:id         controllers.Application.viewTaskList(id: Integer)

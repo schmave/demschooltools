@@ -53,6 +53,10 @@ public class Person extends Model implements Comparable<Person> {
     public List<Comment> comments;
 
     @OneToMany(mappedBy="person")
+    @OrderBy("date DESC")
+    public List<Donation> donations;
+
+    @OneToMany(mappedBy="person")
     public List<CompletedTask> completed_tasks;
 
     // is_family is true if this Person object represents
