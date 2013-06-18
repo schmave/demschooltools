@@ -1,5 +1,7 @@
 @(people: List[Person], people_with_family: Collection[Person])
 
+<a href="javascript:$('#tag_extras').show()">Show email data for export</a>
+<div id="tag_extras" style="display:none;">
 <h3>Emails</h3>
 <p>
 	@for( p <- people ) {
@@ -31,4 +33,4 @@
 <tr><td>@if(p.email == "") { &nbsp; } @p.email<td>@p.first_name<td>@p.last_name</tr>
 }
 </table>
-
+</div>
