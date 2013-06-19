@@ -1,15 +1,16 @@
 package models;
 
-import controllers.Application;
-
 import java.util.*;
 
 import javax.persistence.*;
 
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.Expr;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
 import com.avaje.ebean.validation.NotNull;
+
+import controllers.Application;
 
 import play.data.*;
 import play.data.validation.Constraints.*;
@@ -146,7 +147,8 @@ public class Person extends Model implements Comparable<Person> {
 
     public boolean isStudent()
     {
-        return tags.contains(Tag.find.where().eq("title", "Intent to Enroll").findUnique());
+        return tags.contains(Tag.find.where().or(Expr.eq("title", "Intent to Enroll"),
+            Expr.eq("title", "Enrolling")).findUnique());
     }
 
     public Form<Person> fillForm() {

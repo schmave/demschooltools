@@ -64,7 +64,10 @@ body {
     width: 32px;
     height: 32px;
     float: right;
-    background-image: url('/assets/images/gold_star.png')
+    background-image: url('/assets/images/gold_star.png');
+}
+
+.tag_x {
 }
 
 .first_uncompleted

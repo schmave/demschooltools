@@ -46,6 +46,15 @@ $(document).ready(function () {
     });
 });
 
+function removeTag(el, person_id, tag_id)
+{
+    el.prev().empty();
+    el.empty();
+    $.post("/removeTag/" + person_id + "/" + tag_id,
+           function(data, textStatus, jqXHR) {}
+    );
+}
+
 function enableTagBox(input_box, destination_div, person_id) {
     $(input_box).autocomplete({
             source: "/jsonTags/" + person_id,
