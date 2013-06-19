@@ -183,9 +183,8 @@ public class Application extends Controller {
         return ok();
     }
 
-    public static Result viewTag(Integer id) {
-        Tag the_tag = Tag.find.byId(id);
-
+    static List<Person> getPeopleForTag(Integer id)
+    {
         RawSql rawSql = RawSqlBuilder
             .parse("SELECT person.person_id, person.first_name, person.last_name from "+
                    "person join person_tag pt on person.person_id=pt.person_id "+
@@ -195,9 +194,14 @@ public class Application extends Controller {
         .columnMapping("person.last_name", "last_name")
             .create();
 
-        List<Person> people =
-            Ebean.find(Person.class).setRawSql(rawSql).
+        return Ebean.find(Person.class).setRawSql(rawSql).
             where().eq("tag.id", id).orderBy("person.last_name, person.first_name").findList();
+    }
+
+    public static Result viewTag(Integer id) {
+        Tag the_tag = Tag.find.byId(id);
+
+        List<Person> people = getPeopleForTag(id);
 
         Set<Person> people_with_family = new HashSet<Person>();
         for (Person p : people) {
@@ -393,17 +397,7 @@ public class Application extends Controller {
 
     public static Result viewTaskList(Integer id) {
         TaskList list = TaskList.find.byId(id);
-        List<Person> people = new ArrayList<Person>();
-
-        for( Task t: list.tasks ) {
-            for( CompletedTask ct : t.completed_tasks ) {
-                if (!people.contains(ct.person)) {
-                    people.add(ct.person);
-                }
-            }
-        }
-
-        Collections.sort(people);
+        List<Person> people = getPeopleForTag(list.tag.id);
 
         return ok(views.html.task_list.render(list, people));
     }
