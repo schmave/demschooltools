@@ -56,7 +56,6 @@ import play.mvc.Http.Context;
 
 * share code between comment_fragment and people index.
 * sort people list by date created, then name
-* add ability to remove tags
 * use markdown for notes and comments
 
 
@@ -174,7 +173,14 @@ public class Application extends Controller {
             getCurrentUser());
 
         p.tags.add(the_tag);
-        return ok(views.html.tag_fragment.render(the_tag));
+        return ok(views.html.tag_fragment.render(the_tag, p));
+    }
+
+    public static Result removeTag(Integer person_id, Integer tag_id) {
+        Ebean.createSqlUpdate("DELETE from person_tag where person_id=" + person_id +
+            " AND tag_id=" + tag_id).execute();
+
+        return ok();
     }
 
     public static Result viewTag(Integer id) {
