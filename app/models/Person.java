@@ -147,8 +147,13 @@ public class Person extends Model implements Comparable<Person> {
 
     public boolean isStudent()
     {
-        return tags.contains(Tag.find.where().or(Expr.eq("title", "Intent to Enroll"),
-            Expr.eq("title", "Enrolling")).findUnique());
+        for (Tag t : tags) {
+            if (t.title.equals("Intent to Enroll") ||
+                t.title.equals("Enrolling")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Form<Person> fillForm() {
