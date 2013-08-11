@@ -210,8 +210,7 @@ public class Application extends Controller {
             }
         }
 
-        if (the_tag.title.equals("Intent to Enroll") ||
-            the_tag.title.equals("Enrolling"))
+        if (the_tag.use_student_display)
         {
             return viewIntentToEnroll(the_tag, people, people_with_family);
         }

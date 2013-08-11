@@ -17,6 +17,8 @@ public class Tag extends Model {
 
     public String title;
 
+    public boolean use_student_display;
+
     @OneToOne(mappedBy="tag")
     public TaskList task_list;
 
