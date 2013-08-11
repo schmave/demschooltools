@@ -4,6 +4,10 @@
 
 @main("All people tagged " + tag.title) {
 <h1>@tag.title</h1>
+<p>@people.size() people</p>
+@if( tag.task_list != null ) {
+   <p>Also see task list: <a href="@routes.Application.viewTaskList(tag.task_list.id)">@tag.task_list.title</a></p>
+}
 
 <table class="table sortable">
 <tr><th>Student<th>Age in the Fall<th>Gender<th># of siblings<th>Address<th>Phone number
