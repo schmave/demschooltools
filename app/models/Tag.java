@@ -1,9 +1,9 @@
 package models;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.persistence.*;
 
@@ -35,7 +35,7 @@ public class Tag extends Model {
     }
 
     public static Map<String, List<Tag>> getWithPrefixes() {
-        Map<String, List<Tag>> result = new HashMap<String, List<Tag>>();
+        Map<String, List<Tag>> result = new TreeMap<String, List<Tag>>();
 
         for (Tag t : find.order("title ASC").findList()) {
             String[] splits = t.title.split(":");
