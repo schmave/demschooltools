@@ -148,8 +148,7 @@ public class Person extends Model implements Comparable<Person> {
     public boolean isStudent()
     {
         for (Tag t : tags) {
-            if (t.title.equals("Intent to Enroll") ||
-                t.title.equals("Enrolling")) {
+            if (t.title.contains("Admit:")) {
                 return true;
             }
         }
