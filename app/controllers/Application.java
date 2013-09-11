@@ -372,6 +372,9 @@ public class Application extends Controller {
     }
 
     public static int calcAgeAtBeginningOfSchool(Person p) {
+		if (p.dob == null) {
+			return -1;
+		}
         return (int)((new Date(113, 8, 29).getTime() - p.dob.getTime()) / 1000 / 60 / 60 / 24 / 365.25);
     }
 
