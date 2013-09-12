@@ -11,6 +11,7 @@
 <tr><th>Task<th>People who have completed it<th>People who have not completed it. The
 	first time someone appears in this column, their name is <span class="first_uncompleted">highlighted</span>.
 @for( t <- list.tasks ) {
+@if( t.enabled ) {
 <tr>
 <td>@t.title
 <td>
@@ -28,7 +29,7 @@
 				href="@routes.Application.person(p.person_id)">@p.first_name @p.last_name,</a>
 		}
 	}
-}
+} }
 
 </table>
 }
