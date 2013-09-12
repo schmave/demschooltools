@@ -20,6 +20,8 @@ public class Task extends Model {
 
     public Integer sort_order;
 
+	public boolean enabled;
+
     @OneToMany(mappedBy="task")
     public List<CompletedTask> completed_tasks;
 

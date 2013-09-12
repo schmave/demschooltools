@@ -26,6 +26,7 @@
 		<div id="span4">
 		<h4><a href="@routes.Application.viewTaskList(tag.task_list.id)">@tag.task_list.title</a></h4>
 		@for( task <- tag.task_list.tasks ) {
+			@if( task.enabled ) {
 			@defining( p.completedTask(task) ) { ct =>
 				@if( ct != null ) {
 					<input type="checkbox" class="task_checkbox" id="task_checkbox_@task.id" disabled checked/>
@@ -37,6 +38,7 @@
 					<i>(@ct.comment.user.name, @Application.formatDate(ct.comment.created))</i>
 				}
 				<br>
+			}
 			}
 		}
 		</div>
