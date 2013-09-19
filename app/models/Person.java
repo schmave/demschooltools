@@ -46,6 +46,9 @@ public class Person extends Model implements Comparable<Person> {
 
     public Date dob;
     public Date approximate_dob;
+	
+	public String previous_school;
+	public String school_district;
 
     @Transient
     public List<Tag> tags;
