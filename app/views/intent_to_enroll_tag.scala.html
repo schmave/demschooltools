@@ -10,11 +10,12 @@
 }
 
 <table class="table sortable">
-<tr><th>Student<th>Age in the Fall<th>Gender<th># of siblings<th>Address<th>Phone number
+<tr><th>Student<th>School District<th>Age in the Fall<th>Gender<th># of siblings<th>Address<th>Phone number
 
 @for( p <- people ) {
 	<tr>
 	<td><a href="@routes.Application.person(p.person_id)">@p.first_name @p.last_name</a>
+	<td>@p.school_district
 	<td>@Application.calcAgeAtBeginningOfSchool(p)
 	<td>@p.gender
 	<td>@p.numSiblings()
