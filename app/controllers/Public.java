@@ -24,7 +24,7 @@ public class Public extends Controller {
     {
         final AuthUser u = PlayAuthenticate.getUser(Context.current().session());
         if (u != null) {
-            return redirect(routes.Application.people());
+            return redirect(routes.Application.index());
         }
         return ok(views.html.login.render());
     }

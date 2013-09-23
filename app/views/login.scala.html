@@ -1,0 +1,12 @@
+@import helper._
+@import com.feth.play.module.pa.views.html._
+
+@main("JC DB Login") {
+
+	<div class="container" style="padding-top:100px;">
+	@forProviders() { p =>
+		<a href="@p.getUrl()" class="btn btn-large btn-primary" style="color:white;">
+		Login with @p.getKey()</a>
+	}
+	</div>
+}
