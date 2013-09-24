@@ -1,7 +1,5 @@
 # --- !Ups
 
-
-
 CREATE TABLE "case"
   (
    case_number VARCHAR(255) NOT NULL DEFAULT '',
@@ -30,8 +28,6 @@ CREATE TABLE charge
     constraint fk_charge_rule foreign key (rule_id) references rule(id)
     );
 
-
-   
 
 # --- !Downs
 

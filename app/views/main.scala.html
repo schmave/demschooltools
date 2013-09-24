@@ -25,6 +25,7 @@
 		@currentAuth() { auth =>
 			@if(auth != null) {
 				<ul class="nav nav-tabs">
+				<li><a href="@routes.Application.index">Home</a>
 				<li><a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout">Logout</a>
 				</ul>
 			}

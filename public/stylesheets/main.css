@@ -1,3 +1,15 @@
+#meeting
+{
+	background: #ccc;
+}
+
+.case
+{
+    margin-top:10px;
+	padding-top: 2px;
+	border-top: 1px red solid;
+}
+
 body {
     padding-top: 10px;
 
@@ -92,3 +104,5 @@ body {
    margin: 8px 0;
    border-top: 1px solid #999;
 }
+
+

@@ -1,0 +1,25 @@
+@(meeting : Meeting)
+
+@import helper._
+
+@main("Edit meeting minutes for date " + meeting.date) {
+
+<div id="meeting">
+<h3> Justice Committee Minutes for @meeting.date </h3>
+<b>Committee:</b> Lydia, Evan, Scout, Izaya, <input type="textfield">
+<br><b>Chair: </b> <input type="textfield">
+<br><b>Notetaker: </b> <input type="textfield">
+
+</div>
+
+<div class="case" id="case_proto" style="display:none;">
+<p><b>Case #<input type="textfield"></b>
+<p><b>Location:</b> <input type="textfield">
+<p><b>Who wrote complaint:</b><input type="textfield">
+<p><b>Who testified: </b>Quinlan, Lilith,  <input type="textfield">
+<p><b>Findings:</b> <textarea></textarea>
+</div>
+
+<p><button onclick="javascript:addCase()">Add a case</button>
+
+}
