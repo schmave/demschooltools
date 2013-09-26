@@ -6,6 +6,7 @@ import java.util.*;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
+import com.avaje.ebean.Expression;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
 import com.feth.play.module.pa.PlayAuthenticate;
@@ -107,12 +108,26 @@ public class Application extends Controller {
             all_donations));
     }
 
-    public static Result jsonPeople(String term) {
-        String like_arg = "%" + term + "%";
-        List<Person> selected_people =
-            Person.find.where().or(
-                Expr.ilike("first_name", "%" + term + "%"),
-                Expr.ilike("last_name", "%" + term + "%")).findList();
+    public static Result jsonPeople(String query) {
+		Expression search_expr = null;
+        
+		for (String term : query.split(" ")) {
+			Expression this_expr = 
+				Expr.or(Expr.ilike("last_name", "%" + term + "%"),
+				Expr.ilike("first_name", "%" + term + "%"));
+			this_expr = Expr.or(this_expr,
+				Expr.ilike("address", "%" + term + "%"));
+			this_expr = Expr.or(this_expr,
+				Expr.ilike("email", "%" + term + "%"));
+				
+			if (search_expr == null) {
+				search_expr = this_expr;
+			} else {
+				search_expr = Expr.and(search_expr, this_expr);
+			}
+		}
+		
+		List<Person> selected_people = Person.find.where(search_expr).findList();
 
         List<Map<String, String> > result = new ArrayList<Map<String, String> > ();
         for (Person p : selected_people) {
