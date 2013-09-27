@@ -110,8 +110,13 @@ public class Application extends Controller {
 
     public static Result jsonPeople(String query) {
 		Expression search_expr = null;
+		
+		HashSet<Person> selected_people = new HashSet<Person>();
+		boolean first_time = true;
         
 		for (String term : query.split(" ")) {
+			List<Person> people_matched_this_round;
+			
 			Expression this_expr = 
 				Expr.or(Expr.ilike("last_name", "%" + term + "%"),
 				Expr.ilike("first_name", "%" + term + "%"));
@@ -120,15 +125,24 @@ public class Application extends Controller {
 			this_expr = Expr.or(this_expr,
 				Expr.ilike("email", "%" + term + "%"));
 				
-			if (search_expr == null) {
-				search_expr = this_expr;
-			} else {
-				search_expr = Expr.and(search_expr, this_expr);
+			people_matched_this_round = 
+				Person.find.where(this_expr).findList();
+			
+			List<PhoneNumber> phone_numbers = 
+				PhoneNumber.find.where().ilike("number", "%" + term + "%").findList();
+			for (PhoneNumber pn : phone_numbers) {
+				people_matched_this_round.add(pn.owner);
 			}
+			
+			if (first_time) {
+				selected_people.addAll(people_matched_this_round);
+			} else {
+				selected_people.retainAll(people_matched_this_round);
+			}
+			
+			first_time = false;
 		}
 		
-		List<Person> selected_people = Person.find.where(search_expr).findList();
-
         List<Map<String, String> > result = new ArrayList<Map<String, String> > ();
         for (Person p : selected_people) {
             HashMap<String, String> values = new HashMap<String, String>();
