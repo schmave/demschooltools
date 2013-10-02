@@ -37,4 +37,45 @@ public class Application extends Controller {
     public static Result editMinutes(Meeting meeting) {
         return ok(views.html.edit_minutes.render(meeting));
     }
+
+    public static Result saveMinutes() {
+        return ok();
+    }
+
+    static List<Person> getPeopleForTag(Integer id)
+    {
+        RawSql rawSql = RawSqlBuilder
+            .parse("SELECT person.person_id, person.first_name, person.last_name from "+
+                   "person join person_tag pt on person.person_id=pt.person_id "+
+                  "join tag on pt.tag_id=tag.id")
+            .columnMapping("person.person_id", "person_id")
+        .columnMapping("person.first_name", "first_name")
+        .columnMapping("person.last_name", "last_name")
+            .create();
+
+        return Ebean.find(Person.class).setRawSql(rawSql).
+            where().eq("tag.id", id).orderBy("person.last_name, person.first_name").findList();
+    }
+
+    public static Result jsonPeople() {
+        Tag cur_student_tag = Tag.find.where().eq("title", "Current Student").findUnique();
+        Tag staff_tag = Tag.find.where().eq("title", "Staff").findUnique();
+
+        List<Person> people = getPeopleForTag(cur_student_tag.id);
+        people.addAll(getPeopleForTag(staff_tag.id));
+
+        List<Map<String, String> > result = new ArrayList<Map<String, String> > ();
+        for (Person p : people) {
+            HashMap<String, String> values = new HashMap<String, String>();
+            String name = p.first_name;
+            if (p.last_name != null) {
+                name += " " + p.last_name;
+            }
+            values.put("name", name);
+            values.put("id", "" + p.person_id);
+            result.add(values);
+        }
+
+        return ok(Json.stringify(Json.toJson(result)));
+    }
 }

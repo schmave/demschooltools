@@ -4,6 +4,10 @@
 
 @main("Edit meeting minutes for date " + meeting.date) {
 
+@form(routes.Application.saveMinutes(), 'id -> "meeting_form", 'class -> "form-horizontal") {
+
+<p><input type="submit" value="Save">Last saved at <span id="saved_time"></span>.
+
 <div id="meeting">
 <h3> Justice Committee Minutes for @meeting.date </h3>
 <b>Committee:</b> Lydia, Evan, Scout, Izaya, <input type="textfield">
@@ -15,11 +19,25 @@
 <div class="case" id="case_proto" style="display:none;">
 <p><b>Case #<input type="textfield"></b>
 <p><b>Location:</b> <input type="textfield">
+
 <p><b>Who wrote complaint:</b><input type="textfield">
-<p><b>Who testified: </b>Quinlan, Lilith,  <input type="textfield">
-<p><b>Findings:</b> <textarea></textarea>
+
+<p><b>Who testified: </b>
+	<div class="person_list"></div>
+	<input class="person_search" type="textfield">
+<textarea class="person_hidden testifiers"></textarea>
+
+<p><b>Findings:</b> <textarea class="findings"></textarea>
 </div>
 
 <p><button onclick="javascript:addCase()">Add a case</button>
+
+}
+
+<script type="text/javascript">
+	$("#meeting_form").ajaxForm({"complete" : function (response, status) {
+                                     $("#saved_time").text(new Date().toTimeString()) }});
+</script>
+
 
 }
