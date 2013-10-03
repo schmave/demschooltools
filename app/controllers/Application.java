@@ -57,7 +57,7 @@ public class Application extends Controller {
             where().eq("tag.id", id).orderBy("person.last_name, person.first_name").findList();
     }
 
-    public static Result jsonPeople() {
+    public static Result jsonPeople(String term) {
         Tag cur_student_tag = Tag.find.where().eq("title", "Current Student").findUnique();
         Tag staff_tag = Tag.find.where().eq("title", "Staff").findUnique();
 
@@ -66,14 +66,17 @@ public class Application extends Controller {
 
         List<Map<String, String> > result = new ArrayList<Map<String, String> > ();
         for (Person p : people) {
-            HashMap<String, String> values = new HashMap<String, String>();
-            String name = p.first_name;
-            if (p.last_name != null) {
-                name += " " + p.last_name;
+            if (p.first_name.toLowerCase().contains(term) ||
+                p.last_name.toLowerCase().contains(term)) {
+                HashMap<String, String> values = new HashMap<String, String>();
+                String name = p.first_name;
+                if (p.last_name != null) {
+                    name += " " + p.last_name;
+                }
+                values.put("label", name);
+                values.put("id", "" + p.person_id);
+                result.add(values);
             }
-            values.put("name", name);
-            values.put("id", "" + p.person_id);
-            result.add(values);
         }
 
         return ok(Json.stringify(Json.toJson(result)));
