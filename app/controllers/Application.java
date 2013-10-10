@@ -412,7 +412,10 @@ public class Application extends Controller {
 	}
 
     public static String formatDob(Date d) {
-        return new SimpleDateFormat("MMMM d, ''yy").format(d);
+		if (d == null) {
+			return "---";
+		}
+        return new SimpleDateFormat("MM/dd/yy").format(d);
     }
 
     public static String formatDate(Date d) {
