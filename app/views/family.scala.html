@@ -83,7 +83,8 @@
 		<div class="row">
 		<div class="span9" id="comments">
 		@for( c <- comments ) {
-			@if( c.completed_tasks.size() == 0 ) {
+			@if( c.completed_tasks.size() == 0 ||
+				c.message.length() > 80) {
 				@comment_fragment(c, false)
 			}
 		}
