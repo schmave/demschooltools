@@ -55,7 +55,6 @@ import play.mvc.Http.Context;
 
 * browse people by neighborhood
 
-* share code between comment_fragment and people index.
 * sort people list by date created, then name
 * use markdown for notes and comments
 
@@ -312,7 +311,7 @@ public class Application extends Controller {
                 }
             }
 
-            return ok(views.html.comment_fragment.render(Comment.find.byId(new_comment.id)));
+            return ok(views.html.comment_fragment.render(Comment.find.byId(new_comment.id), false));
         } else {
             return ok();
         }
