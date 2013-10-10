@@ -419,9 +419,18 @@ public class Application extends Controller {
         d = new Date(d.getTime() +
             (getConfiguration().getInt("time_zone_offset") * 1000L * 60 * 60));
         Date now = new Date();
-        String format = "EEE MMMM d, h:mm a";
-        if (d.getYear() != now.getYear()) {
-            format = "EEE MMMM d, yyyy";
+		
+		long diffHours = (now.getTime() - d.getTime()) / 1000 / 60 / 60;
+		
+        // String format = "EEE MMMM d, h:mm a";
+		String format;
+		
+		if (diffHours < 24) {
+			format = "h:mm a";
+		} else if (diffHours < 24 * 7) {
+			format = "EEEE, MMMM d";
+		} else {
+            format = "MM/d/yy";
         }
         return new SimpleDateFormat(format).format(d);
     }
