@@ -74,6 +74,8 @@ public class Person extends Model implements Comparable<Person> {
 
     @OneToMany(mappedBy="family")
     public List<Person> family_members;
+	
+	public String grade = "";
 
     public static Finder<Integer,Person> find = new Finder(
         Integer.class, Person.class

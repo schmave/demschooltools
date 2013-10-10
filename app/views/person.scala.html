@@ -65,7 +65,10 @@ enableTagBox("#person_tag_entry_@person.person_id",
 }
 
 @if(person.dob != null) {
-	<br>Age @Application.calcAge(person) (born @Application.formatDob(person.dob))<br>
+	<br>Age @Application.calcAge(person) (born @Application.formatDob(person.dob))
+}
+@if(!person.grade.equals("")) {
+	<br>Grade @person.grade<br>
 }
 <a href="@routes.Application.editPerson(person.person_id)">Edit</a>
 </div>
