@@ -38,14 +38,14 @@ public class Application extends Controller {
         return ok(views.html.edit_minutes.render(meeting));
     }
 
-    public static Result createCase(String id) {
-        Case.create(id);
+    public static Result createCase(String id, Integer meeting_id) {
+        Case.create(id, Meeting.find.ref(meeting_id));
         return ok();
     }
 
     public static Result addPersonAtMeeting(Integer meeting_id, Integer person_id,
         Integer role) {
-        Meeting m = Meeting.find.byId(meeting_id);
+        Meeting m = Meeting.find.ref(meeting_id);
 
         PersonAtMeeting.create(m, Person.find.ref(person_id), role);
 

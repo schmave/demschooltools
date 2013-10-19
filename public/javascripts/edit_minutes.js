@@ -20,17 +20,29 @@ function PeopleChooser(el, on_add, on_remove) {
     });
 
     this.search_box.bind( "autocompleteselect", function(event, ui) {
-        new_person = new Person(ui.item.id, ui.item.label);
-        self.people.push(new_person);
+        new_person = self.addPerson(ui.item.id, ui.item.label);
 
         if (on_add) {
             on_add(new_person);
         }
 
-        el.append(new_person.render());
         self.search_box.val('');
         event.preventDefault(); // keep jquery from inserting name into textbox
     });
+
+    this.addPerson = function(id, name) {
+        p = new Person(id, name);
+        self.people.push(p);
+        el.append(p.render());
+
+        return p;
+    }
+
+    this.loadPeople = function(people) {
+        for (i in people) {
+            self.addPerson(people[i].id, people[i].name);
+        }
+    }
 }
 
 function Case (el) {
@@ -52,6 +64,17 @@ function addPersonAtMeeting(person, role) {
            "&role=" + role );
 }
 
+function loadInitialData() {
+    app.committee_chooser.loadPeople(app.initial_data.committee);
+    app.chair_chooser.loadPeople(app.initial_data.chair);
+    app.notetaker_chooser.loadPeople(app.initial_data.notetaker);
+
+    for (i in app.initial_data.cases) {
+        data = app.initial_data.cases[i];
+        new_case = addCaseNoServer(data.id);
+    }
+}
+
 $(function () {
     Handlebars.registerPartial("people-chooser", $("#people-chooser").html());
 
@@ -67,22 +90,32 @@ $(function () {
 
     app.notetaker_chooser = new PeopleChooser($(".notetaker"),
         function(person) { addPersonAtMeeting(person, app.ROLE_NOTE_TAKER) });
+
+    loadInitialData();
 });
+
+function addCaseNoServer(id)
+{
+    new_case = $("#meeting").append(
+        app.case_template({"num": id})).
+        children(":last-child");
+
+    var case_obj = new Case(new_case);
+
+    $("#meeting").append(case_obj.el);
+
+    next_case_num += 1;
+
+    return case_obj;
+}
 
 function addCase()
 {
     case_id = "09-30-" + next_case_num;
-    $.post("/newCase?id=" + case_id, "",
+    $.post("/newCase?id=" + case_id +
+           "&meeting_id=" + app.meeting_id, "",
            function(data, textStatus, jqXHR) {
-        new_case = $("#meeting").append(
-            app.case_template({"num": case_id})).
-            children(":last-child");
-
-        var case_obj = new Case(new_case);
-
-        $("#meeting").append(case_obj.el);
-
-        next_case_num += 1;
+        addCaseNoServer(case_id);
     });
 }
 

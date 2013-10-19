@@ -12,6 +12,17 @@ app.meeting_id = @meeting.id
 app.ROLE_JC_CHAIR = @PersonAtMeeting.ROLE_JC_CHAIR
 app.ROLE_JC_MEMBER = @PersonAtMeeting.ROLE_JC_MEMBER
 app.ROLE_NOTE_TAKER = @PersonAtMeeting.ROLE_NOTE_TAKER
+
+app.initial_data = {
+	committee : @Html(meeting.getJsonPeople(PersonAtMeeting.ROLE_JC_MEMBER)),
+	chair : @Html(meeting.getJsonPeople(PersonAtMeeting.ROLE_JC_CHAIR)),
+	notetaker : @Html(meeting.getJsonPeople(PersonAtMeeting.ROLE_NOTE_TAKER)),
+	cases: [],
+}
+
+@for( c <- meeting.cases ) {
+	app.initial_data.cases.push( @Html(c.toJson()) );
+}
 </script>
 
 <div id="meeting">
