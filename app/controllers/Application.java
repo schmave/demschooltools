@@ -43,6 +43,15 @@ public class Application extends Controller {
         return ok();
     }
 
+    public static Result saveCase(String id) {
+        Case c = Case.find.byId(id);
+
+        c.edit(request().queryString());
+        c.save();
+
+        return ok();
+    }
+
     public static Result addPersonAtMeeting(Integer meeting_id, Integer person_id,
         Integer role) {
         Meeting m = Meeting.find.ref(meeting_id);
@@ -90,5 +99,9 @@ public class Application extends Controller {
         }
 
         return ok(Json.stringify(Json.toJson(result)));
+    }
+
+    public static String formatMeetingDate(Date d) {
+        return new SimpleDateFormat("EEEE MMMM dd, yyyy").format(d);
     }
 }

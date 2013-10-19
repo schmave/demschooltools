@@ -8,6 +8,7 @@
 
 <script type="text/javascript">
 app = {}
+app.cases = []
 app.meeting_id = @meeting.id
 app.ROLE_JC_CHAIR = @PersonAtMeeting.ROLE_JC_CHAIR
 app.ROLE_JC_MEMBER = @PersonAtMeeting.ROLE_JC_MEMBER
@@ -26,55 +27,60 @@ app.initial_data = {
 </script>
 
 <div id="meeting">
-<h3> Justice Committee Minutes for @meeting.date </h3>
-<b>Committee:</b>
+<h2>Justice Committee minutes<br>@Application.formatMeetingDate(meeting.date)</h2>
+Committee:
 	<div class="committee people_chooser">
-    	<input class="person_search" type="textfield">
+    	<input class="form-control person_search" type="text">
     </div>
-<br><b>Chair: </b>
+<br>Chair:
 	<div class="chair people_chooser">
-    	<input class="person_search" type="textfield">
+    	<input class="form-control person_search" type="text">
     </div>
-<br><b>Notetaker: </b>
+<br>Notetaker:
 	<div class="notetaker people_chooser">
-    	<input class="person_search" type="textfield">
+    	<input class="form-control person_search" type="text">
     </div>
+
+<div id="meeting-cases">
+</div>
 
 </div>
 
 <script id="person-template" type="x-handlebars-template">
-    <div class="person">{{name}}</div>
+    <span class="label label-primary">{{name}}</label>
 </script>
 
 
 <script id="people-chooser" type="x-handlebars-template">
 	<div class="people_chooser">
-    	<input class="person_search" type="textfield">
+    	<input class="form-control person_search" type="text">
     </div>
 </script>
 
 <script id="testimony-template" type="x-handlebars-template">
-	<div><b>Name:</b>{{> people-chooser}}
-        <b>Testimony:</b><textarea></textarea></div>
+	<div>Name:{{> people-chooser}}
+        Testimony:<textarea class="form-control"></textarea></div>
 </script>
 
 <script id="case-template" type="x-handlebars-template">
 <div class="case">
-<div><b>Case #{{num}}</b></div>
-<div><b>Location:</b> <input type="textfield"></div>
+<h4>Case #{{num}}</h4>
 
-<div><b>Who wrote complaint:</b>
+Who wrote complaint:
 <div class="writer people_chooser">
-    	<input class="person_search" type="textfield">
+    	<input class="person_search" type="text">
+    </div>
+
+<p>Location: <input class="form-control location" type="text">
+<p>Date of event: <input class="date" type="date">
+
+<div>Who testified:
+    <div class="testifier people_chooser">
+    	<input class="person_search" type="text">
     </div>
 </div>
 
-<div><b>Testimony: </b>
-   <div class="testimony"></div>
-   <button class="add_testimony">Add testimony</button>
-</div>
-
-<p><b>Findings:</b> <textarea class="findings"></textarea>
+<p>Findings: <textarea class="findings"></textarea>
 </div>
 </script>
 

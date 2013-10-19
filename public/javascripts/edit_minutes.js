@@ -45,17 +45,42 @@ function PeopleChooser(el, on_add, on_remove) {
     }
 }
 
-function Case (el) {
-    this.el = el;
-    this.writer_chooser = new PeopleChooser(el.find(".writer"));
-    this.testifier_chooser = new PeopleChooser(el.find(".testifier"));
+function Case (id, el) {
     var self = this;
 
-    this.add_testimony = function() {
-        self.el.find(".testimony").append(app.testimony_template());
+    this.saveIfNeeded = function() {
+        window.setTimeout(self.saveIfNeeded, 2000);
+        if (!self.is_modified) {
+            return;
+        }
+
+        url = "/saveCase?id=" + id;
+        if (self.writer_chooser.people.length > 0) {
+            url += "&writer_id=" + self.writer_chooser.people[0].id;
+        }
+        url += "&location=" + encodeURIComponent(self.el.find(".location").val());
+        url += "&findings=" + encodeURIComponent(self.el.find(".findings").val());
+        url += "&date=" + encodeURIComponent(self.el.find(".date").val());
+
+        self.is_modified = false;
+        $.post(url);
     }
 
-    el.find(".add_testimony").click(this.add_testimony);
+    this.markAsModified = function() {
+        self.is_modified = true;
+    }
+
+    this.id = id
+    this.el = el;
+    this.writer_chooser = new PeopleChooser(el.find(".writer"), self.markAsModified);
+    this.testifier_chooser = new PeopleChooser(el.find(".testifier"));
+    this.is_modified = false;
+
+    el.find(".location").change(self.markAsModified);
+    el.find(".findings").change(self.markAsModified);
+    el.find(".date").change(self.markAsModified);
+
+    window.setTimeout(self.saveIfNeeded, 2000);
 }
 
 function addPersonAtMeeting(person, role) {
@@ -96,13 +121,14 @@ $(function () {
 
 function addCaseNoServer(id)
 {
-    new_case = $("#meeting").append(
+    new_case = $("#meeting-cases").append(
         app.case_template({"num": id})).
         children(":last-child");
 
-    var case_obj = new Case(new_case);
+    var case_obj = new Case(id, new_case);
+    app.cases.push(case_obj);
 
-    $("#meeting").append(case_obj.el);
+    $("#meeting-cases").append(case_obj.el);
 
     next_case_num += 1;
 
