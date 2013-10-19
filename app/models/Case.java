@@ -12,6 +12,7 @@ import play.db.ebean.Model;
 import play.db.ebean.Model.Finder;
 
 @Entity
+@Table(name="`case`")
 public class Case extends Model {
     @Id
     public String case_number;
@@ -27,4 +28,13 @@ public class Case extends Model {
     public static Finder<String, Case> find = new Finder(
         String.class, Case.class
     );
+
+    public static Case create(String id)
+    {
+        Case result = new Case();
+        result.case_number = id;
+        result.save();
+
+        return result;
+    }
 }

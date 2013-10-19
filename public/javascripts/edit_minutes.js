@@ -71,14 +71,18 @@ $(function () {
 
 function addCase()
 {
-	new_case = $("#meeting").append(
-        app.case_template({"num": "09-30-" + next_case_num})).
-        children(":last-child");
+    case_id = "09-30-" + next_case_num;
+    $.post("/newCase?id=" + case_id, "",
+           function(data, textStatus, jqXHR) {
+        new_case = $("#meeting").append(
+            app.case_template({"num": case_id})).
+            children(":last-child");
 
-    var case_obj = new Case(new_case);
+        var case_obj = new Case(new_case);
 
-    $("#meeting").append(case_obj.el);
+        $("#meeting").append(case_obj.el);
 
-    next_case_num += 1;
+        next_case_num += 1;
+    });
 }
 
