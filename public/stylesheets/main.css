@@ -52,6 +52,7 @@ body {
   background: #f7f7f7;
   padding: 3px;
   margin-bottom: 10px;
+  display:inline;
 }
 
 .person .male {
@@ -86,6 +87,10 @@ body {
 {
     font-weight: bold;
     background: #ffff00;
+}
+
+.people_chooser {
+    display:inline;
 }
 
 /*********************************

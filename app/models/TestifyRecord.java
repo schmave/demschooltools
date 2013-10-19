@@ -20,6 +20,8 @@ public class TestifyRecord extends Model {
     @JoinColumn(name="case_id")
     public Case the_case;
 
+    public String testimony;
+
     public static Finder<Integer, TestifyRecord> find = new Finder(
         Integer.class, TestifyRecord.class
     );

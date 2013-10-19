@@ -1,0 +1,117 @@
+<!DOCTYPE Project SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpj.dtd">
+<Project
+	Version="10.0"
+	VendorName="SlickEdit"
+	WorkingDir=".">
+	<Config
+		Name="Release"
+		OutputFile=""
+		CompilerConfigName="Latest Version">
+		<Menu>
+			<Target
+				Name="Compile"
+				MenuCaption="&amp;Compile"
+				CaptureOutputWith="ProcessBuffer"
+				SaveOption="SaveCurrent"
+				RunFromDir="%rw">
+				<Exec/>
+			</Target>
+			<Target
+				Name="Build"
+				MenuCaption="&amp;Build"
+				CaptureOutputWith="ProcessBuffer"
+				SaveOption="SaveWorkspaceFiles"
+				RunFromDir="%rw">
+				<Exec/>
+			</Target>
+			<Target
+				Name="Rebuild"
+				MenuCaption="&amp;Rebuild"
+				CaptureOutputWith="ProcessBuffer"
+				SaveOption="SaveWorkspaceFiles"
+				RunFromDir="%rw">
+				<Exec/>
+			</Target>
+			<Target
+				Name="Debug"
+				MenuCaption="&amp;Debug"
+				SaveOption="SaveNone"
+				RunFromDir="%rw">
+				<Exec/>
+			</Target>
+			<Target
+				Name="Execute"
+				MenuCaption="E&amp;xecute"
+				SaveOption="SaveNone"
+				RunFromDir="%rw">
+				<Exec CmdLine='"jcdb.exe"'/>
+			</Target>
+		</Menu>
+	</Config>
+	<CustomFolders>
+		<Folder
+			Name="Source Files"
+			Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl">
+		</Folder>
+		<Folder
+			Name="Header Files"
+			Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.inc;*.sh;*.cpy;*.if"/>
+		<Folder
+			Name="Resource Files"
+			Filters="*.ico;*.cur;*.dlg"/>
+		<Folder
+			Name="Bitmaps"
+			Filters="*.bmp"/>
+		<Folder
+			Name="Other Files"
+			Filters="">
+		</Folder>
+	</CustomFolders>
+	<Files AutoFolders="DirectoryView">
+		<Folder Name="app">
+			<Folder Name="controllers">
+				<F N="app/controllers/Application.java"/>
+				<F N="app/controllers/Public.java"/>
+				<F N="app/controllers/Secured.java"/>
+			</Folder>
+			<Folder Name="models">
+				<F N="app/models/Case.java"/>
+				<F N="app/models/Charge.java"/>
+				<F N="app/models/LinkedAccount.java"/>
+				<F N="app/models/Meeting.java"/>
+				<F N="app/models/Person.java"/>
+				<F N="app/models/PersonAtMeeting.java"/>
+				<F N="app/models/PersonController.java"/>
+				<F N="app/models/PersonTag.java"/>
+				<F N="app/models/PhoneNumber.java"/>
+				<F N="app/models/Rule.java"/>
+				<F N="app/models/Tag.java"/>
+				<F N="app/models/TestifyRecord.java"/>
+				<F N="app/models/User.java"/>
+			</Folder>
+			<Folder Name="service">
+				<F N="app/service/MyUserServicePlugin.java"/>
+			</Folder>
+			<Folder Name="views">
+				<F N="app/views/edit_minutes.scala.html"/>
+				<F N="app/views/index.scala.html"/>
+				<F N="app/views/login.scala.html"/>
+				<F N="app/views/main.scala.html"/>
+			</Folder>
+			<F N="app/Global.java"/>
+		</Folder>
+		<Folder Name="public">
+			<Folder Name="javascripts">
+				<F N="public/javascripts/bootstrap.min.js"/>
+				<F N="public/javascripts/edit_minutes.js"/>
+				<F N="public/javascripts/handlebars.js"/>
+				<F N="public/javascripts/jquery-1.9.0.min.js"/>
+				<F N="public/javascripts/sorttable.js"/>
+			</Folder>
+			<Folder Name="stylesheets">
+				<F N="public/stylesheets/bootstrap.min.css"/>
+				<F N="public/stylesheets/main.css"/>
+			</Folder>
+		</Folder>
+	</Files>
+</Project>

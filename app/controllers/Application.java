@@ -38,7 +38,12 @@ public class Application extends Controller {
         return ok(views.html.edit_minutes.render(meeting));
     }
 
-    public static Result saveMinutes() {
+    public static Result addPersonAtMeeting(Integer meeting_id, Integer person_id,
+        Integer role) {
+        Meeting m = Meeting.find.byId(meeting_id);
+
+        PersonAtMeeting.create(m, Person.find.ref(person_id), role);
+
         return ok();
     }
 

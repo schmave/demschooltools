@@ -9,7 +9,10 @@ GET     /                         controllers.Application.index()
 GET     /editToday                controllers.Application.editTodaysMinutes
 
 
-POST /saveMinutes	controllers.Application.saveMinutes
+
+
+POST /addPersonAtMeeting    controllers.Application.addPersonAtMeeting(meeting_id : Integer, person_id : Integer, role : Integer)
+
 
 GET /jsonPeople controllers.Application.jsonPeople(term ?= "")
 

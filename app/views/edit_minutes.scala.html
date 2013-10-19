@@ -6,12 +6,28 @@
 
 <script src="@routes.Assets.at("javascripts/edit_minutes.js")" type="text/javascript"></script>
 
+<script type="text/javascript">
+app = {}
+app.meeting_id = @meeting.id
+app.ROLE_JC_CHAIR = @PersonAtMeeting.ROLE_JC_CHAIR
+app.ROLE_JC_MEMBER = @PersonAtMeeting.ROLE_JC_MEMBER
+app.ROLE_NOTE_TAKER = @PersonAtMeeting.ROLE_NOTE_TAKER
+</script>
 
 <div id="meeting">
 <h3> Justice Committee Minutes for @meeting.date </h3>
-<b>Committee:</b> Lydia, Evan, Scout, Izaya, <input type="textfield">
-<br><b>Chair: </b> <input type="textfield">
-<br><b>Notetaker: </b> <input type="textfield">
+<b>Committee:</b>
+	<div class="committee people_chooser">
+    	<input class="person_search" type="textfield">
+    </div>
+<br><b>Chair: </b>
+	<div class="chair people_chooser">
+    	<input class="person_search" type="textfield">
+    </div>
+<br><b>Notetaker: </b>
+	<div class="notetaker people_chooser">
+    	<input class="person_search" type="textfield">
+    </div>
 
 </div>
 
@@ -26,20 +42,26 @@
     </div>
 </script>
 
+<script id="testimony-template" type="x-handlebars-template">
+	<div><b>Name:</b>{{> people-chooser}}
+        <b>Testimony:</b><textarea></textarea></div>
+</script>
+
 <script id="case-template" type="x-handlebars-template">
 <div class="case">
-<p><b>Case #{{num}}</b>
-<p><b>Location:</b> <input type="textfield">
+<div><b>Case #{{num}}</b></div>
+<div><b>Location:</b> <input type="textfield"></div>
 
-<p><b>Who wrote complaint:</b>
+<div><b>Who wrote complaint:</b>
 <div class="writer people_chooser">
     	<input class="person_search" type="textfield">
     </div>
+</div>
 
-<p><b>Who testified: </b>
-	<div class="testifier people_chooser">
-    	<input class="person_search" type="textfield">
-    </div>
+<div><b>Testimony: </b>
+   <div class="testimony"></div>
+   <button class="add_testimony">Add testimony</button>
+</div>
 
 <p><b>Findings:</b> <textarea class="findings"></textarea>
 </div>
