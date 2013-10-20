@@ -1,3 +1,5 @@
+@(meetings : List [ Meeting ])
+
 @import helper._
 
 @main("JC database") {
@@ -5,4 +7,12 @@
 <h3> Welcome to the JC database. Please fasten your seatbelt. </h3>
 
 <p><a href="@routes.Application.editTodaysMinutes">Edit today's minutes</a>
+
+<table class="table">
+<tr><th>Date<th># cases</tr>
+@for( m <- meetings ) {
+	<tr><td><a href="@routes.Application.viewMeeting(m.id)">
+		@Application.formatMeetingDate(m.date)</a><td>@m.cases.size()</tr>
+}
+</table>
 }

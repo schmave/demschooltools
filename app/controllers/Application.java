@@ -23,7 +23,8 @@ import play.mvc.Http.Context;
 public class Application extends Controller {
 
     public static Result index() {
-        return ok(views.html.index.render());
+        List<Meeting> meetings = Meeting.find.orderBy("date DESC").findList();
+        return ok(views.html.index.render(meetings));
     }
 
     public static Result editTodaysMinutes() {
@@ -37,6 +38,15 @@ public class Application extends Controller {
 
     public static Result editMinutes(Meeting meeting) {
         return ok(views.html.edit_minutes.render(meeting));
+    }
+
+    public static Result viewMeeting(int meeting_id) {
+        return ok(views.html.view_meeting.render(Meeting.find.byId(meeting_id)));
+    }
+
+    public static Result editMeeting(int meeting_id) {
+        Meeting the_meeting = Meeting.find.byId(meeting_id);
+        return editMinutes(the_meeting);
     }
 
     public static Result createCase(String id, Integer meeting_id) {

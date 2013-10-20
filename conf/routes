@@ -9,6 +9,9 @@ GET     /                         controllers.Application.index()
 GET     /editToday                controllers.Application.editTodaysMinutes
 
 
+GET  /viewMeeting/:id	controllers.Application.viewMeeting(id: Integer)
+GET  /editMeeting/:id	controllers.Application.editMeeting(id: Integer)
+
 
 POST /newCase	controllers.Application.createCase(id, meeting_id : Integer)
 POST /saveCase   controllers.Application.saveCase(id)
@@ -26,6 +29,8 @@ POST /saveCharge controllers.Application.saveCharge(id : Integer)
 
 GET /jsonPeople   controllers.Application.jsonPeople(term ?= "")
 GET /jsonRules    controllers.Application.jsonRules(term ?= "")
+
+
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
