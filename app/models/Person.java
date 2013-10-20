@@ -58,12 +58,12 @@ public class Person extends Model implements Comparable<Person> {
     @NotNull
     public boolean is_family;
 
-    // family ID
-    @ManyToOne()
-    public Person family;
+    //// family ID
+    //@ManyToOne()
+    //public Person family;
 
-    @OneToMany(mappedBy="family")
-    public List<Person> family_members;
+    //@OneToMany(mappedBy="family")
+    //public List<Person> family_members;
 
     public static Finder<Integer,Person> find = new Finder(
         Integer.class, Person.class

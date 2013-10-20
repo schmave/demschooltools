@@ -70,6 +70,17 @@ function Case (id, el) {
         self.is_modified = true;
     }
 
+    this.loadData = function(data) {
+        el.find(".location").val(data.location);
+        el.find(".date").val(data.date);
+        el.find(".findings").val(data.findings);
+
+        if (data.writer) {
+            self.writer_chooser.addPerson(data.writer.person_id,
+                  data.writer.first_name + " " + data.writer.last_name);
+        }
+    }
+
     this.id = id
     this.el = el;
     this.writer_chooser = new PeopleChooser(el.find(".writer"), self.markAsModified);
@@ -96,7 +107,8 @@ function loadInitialData() {
 
     for (i in app.initial_data.cases) {
         data = app.initial_data.cases[i];
-        new_case = addCaseNoServer(data.id);
+        new_case = addCaseNoServer(data.case_number);
+        new_case.loadData(data);
     }
 }
 
@@ -137,7 +149,13 @@ function addCaseNoServer(id)
 
 function addCase()
 {
-    case_id = "09-30-" + next_case_num;
+    d = new Date();
+
+    case_id = (d.getFullYear()%100) + "-" + (d.getMonth() + 1) + "-";
+    if (next_case_num < 10) {
+        case_id += "0";
+    }
+    case_id += next_case_num;
     $.post("/newCase?id=" + case_id +
            "&meeting_id=" + app.meeting_id, "",
            function(data, textStatus, jqXHR) {

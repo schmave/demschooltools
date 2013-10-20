@@ -26,6 +26,7 @@ public class Meeting extends Model {
     public List<PersonAtMeeting> people_at_meeting;
 
     @OneToMany(mappedBy="meeting")
+    @OrderBy("case_number ASC")
     public List<Case> cases;
 
     public static Finder<Integer, Meeting> find = new Finder(

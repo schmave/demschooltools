@@ -1,5 +1,7 @@
 package models;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -11,10 +13,13 @@ import java.util.TreeMap;
 
 import javax.persistence.*;
 
+import org.codehaus.jackson.*;
+import org.codehaus.jackson.annotate.*;
+import org.codehaus.jackson.map.*;
+
 import play.db.ebean.Model;
 import play.db.ebean.Model.Finder;
 import play.libs.Json;
-
 
 @Entity
 @Table(name="`case`")
@@ -22,13 +27,14 @@ public class Case extends Model {
     @Id
     public String case_number;
 
-    public String location;
-    public String findings;
+    public String location = "";
+    public String findings = "";
 
     public Date date;
 
     @ManyToOne
     @JoinColumn(name="meeting_id")
+    @JsonIgnore
     public Meeting meeting;
 
     @ManyToOne
@@ -50,9 +56,16 @@ public class Case extends Model {
     }
 
     public String toJson() {
-        Map<String, String> result = new HashMap<String, String>();
-        result.put("id", case_number);
-        return Json.stringify(Json.toJson(result));
+        ObjectMapper m = new ObjectMapper();
+        m.setDateFormat(new SimpleDateFormat("yyyy-MM-dd"));
+        try
+        {
+            return m.writeValueAsString(this);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 
     public void edit(Map<String, String[]> query_string) {
@@ -63,7 +76,7 @@ public class Case extends Model {
         if (!date_string.equals("")) {
             try
             {
-                date = new SimpleDateFormat("yyyy-mm-dd").parse(date_string);
+                date = new SimpleDateFormat("yyyy-MM-dd").parse(date_string);
             } catch (ParseException e) {
                 date = null;
             }
