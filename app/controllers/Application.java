@@ -61,6 +61,12 @@ public class Application extends Controller {
         return ok();
     }
 
+    public static Result addTestifier(String case_number, Integer person_id)
+    {
+        TestifyRecord.create(Case.find.ref(case_number), Person.find.ref(person_id));
+        return ok();
+    }
+
     static List<Person> getPeopleForTag(Integer id)
     {
         RawSql rawSql = RawSqlBuilder

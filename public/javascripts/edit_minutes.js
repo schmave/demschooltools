@@ -19,6 +19,12 @@ function PeopleChooser(el, on_add, on_remove) {
         source: "/jsonPeople",
     });
 
+//  el.mouseleave(function() {
+//      if (self.people.length > 0) {
+//          self.search_box.fadeOut();
+//      } } );
+//  el.mouseenter(function() { self.search_box.fadeIn(); } );
+//
     this.search_box.bind( "autocompleteselect", function(event, ui) {
         new_person = self.addPerson(ui.item.id, ui.item.label);
 
@@ -31,6 +37,14 @@ function PeopleChooser(el, on_add, on_remove) {
     });
 
     this.addPerson = function(id, name) {
+
+        // Don't add people who have already been added.
+        for (i in self.people) {
+            if (id == self.people[i].id) {
+                return;
+            }
+        }
+
         p = new Person(id, name);
         self.people.push(p);
         el.prepend(p.render());
@@ -79,12 +93,24 @@ function Case (id, el) {
             self.writer_chooser.addPerson(data.writer.person_id,
                   data.writer.first_name + " " + data.writer.last_name);
         }
+
+        for (i in data.testify_records) {
+            t_r = data.testify_records[i];
+            self.testifier_chooser.addPerson(
+                t_r.person.person_id,
+                t_r.person.first_name + " " + t_r.person.last_name);
+        }
     }
 
     this.id = id
     this.el = el;
     this.writer_chooser = new PeopleChooser(el.find(".writer"), self.markAsModified);
-    this.testifier_chooser = new PeopleChooser(el.find(".testifier"));
+    this.testifier_chooser = new PeopleChooser(
+        el.find(".testifier"),
+        function(person) {
+            $.post("/addTestifier?case_number=" + id +
+                   "&person_id=" + person.id);
+        });
     this.is_modified = false;
 
     el.find(".location").change(self.markAsModified);

@@ -7,20 +7,33 @@ import java.util.TreeMap;
 
 import javax.persistence.*;
 
+import org.codehaus.jackson.annotate.*;
+
 import play.db.ebean.Model;
 import play.db.ebean.Model.Finder;
 
 @Entity
 public class TestifyRecord extends Model {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "testify_record_id_seq")
+    public Integer id;
+
     @ManyToOne
     @JoinColumn(name="person_id")
     public Person person;
 
     @ManyToOne
-    @JoinColumn(name="case_id")
+    @JoinColumn(name="case_number")
+    @JsonIgnore
     public Case the_case;
 
-    public static Finder<Integer, TestifyRecord> find = new Finder(
-        Integer.class, TestifyRecord.class
-    );
+    public static TestifyRecord create(Case c, Person p)
+    {
+        TestifyRecord result = new TestifyRecord();
+        result.the_case = c;
+        result.person = p;
+        result.save();
+
+        return result;
+    }
 }

@@ -41,6 +41,9 @@ public class Case extends Model {
     @JoinColumn(name="writer_id")
     public Person writer;
 
+    @OneToMany(mappedBy="the_case")
+    public List<TestifyRecord> testify_records;
+
     public static Finder<String, Case> find = new Finder(
         String.class, Case.class
     );

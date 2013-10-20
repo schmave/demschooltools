@@ -10,6 +10,8 @@ ALTER TABLE "case" ADD constraint fk_case_writer foreign key (writer_id) referen
 UPDATE "case" SET findings='' WHERE findings IS NULL;
 ALTER TABLE "case" ALTER findings SET NOT NULL;
 
+ALTER TABLE "testify_record" ADD COLUMN id serial;
+
 # --- !Downs
 
 ALTER TABLE person_at_meeting DROP COLUMN id;
@@ -18,3 +20,6 @@ ALTER TABLE "case" ALTER meeting_id DROP NOT NULL;
 ALTER TABLE "case" DROP COLUMN location;
 ALTER TABLE "case" DROP COLUMN writer_id;
 ALTER TABLE "case" ALTER findings DROP NOT NULL;
+
+ALTER TABLE "testify_record" ADD COLUMN id;
+

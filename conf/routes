@@ -15,6 +15,8 @@ POST /saveCase   controllers.Application.saveCase(id)
 
 POST /addPersonAtMeeting    controllers.Application.addPersonAtMeeting(meeting_id : Integer, person_id : Integer, role : Integer)
 
+POST /addTestifier   controllers.Application.addTestifier(case_number, person_id : Integer)
+
 
 GET /jsonPeople controllers.Application.jsonPeople(term ?= "")
 
