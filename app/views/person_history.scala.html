@@ -1,0 +1,21 @@
+@(p : Person)
+
+@import helper._
+
+<h3>@p.first_name's JC history</h3>
+
+@for( c <- p.charges ) {
+	<p>
+	@if( c.the_case.date != null ) {
+		<b>@Application.formatMeetingDate(c.the_case.date)</b>.
+	}
+	Findings: @c.the_case.findings.
+	@if( c.rule != null ) {
+		Charged with violating rule <b>@c.rule.title</b>.
+	}
+
+	@if( !c.plea.equals("Guilty") ) {
+		Plead <b>@c.plea</b>.
+	}
+}
+

@@ -12,6 +12,7 @@ GET     /editToday                controllers.Application.editTodaysMinutes
 GET  /viewMeeting/:id	controllers.Application.viewMeeting(id: Integer)
 GET  /editMeeting/:id	controllers.Application.editMeeting(id: Integer)
 
+GET   /personHistory/:id    controllers.Application.getPersonHistory(id: Integer)
 
 POST /newCase	controllers.Application.createCase(id, meeting_id : Integer)
 POST /saveCase   controllers.Application.saveCase(id)

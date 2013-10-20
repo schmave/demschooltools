@@ -1,5 +1,14 @@
 next_case_num = 1;
 
+function showPersonHistoryInSidebar(person) {
+    $("#sidebar").html("<h2>Loading...</h2>");
+    $.get("/personHistory/" + person.id,
+          null,
+           function(data, status, jqXHR) {
+            $("#sidebar").html(data);
+    });
+}
+
 function Person(id, name) {
     this.name = name;
     this.id = id;
@@ -7,6 +16,16 @@ function Person(id, name) {
 
     this.render = function() {
         return app.person_template({"name": name});
+    }
+
+    // called by PeopleChooser after self.el has been
+    // initialized.
+    this.activateClick = function() {
+        self.el.click(
+            function() {
+                showPersonHistoryInSidebar(self);
+            }
+        );
     }
 }
 
@@ -56,6 +75,7 @@ function PeopleChooser(el, on_add, on_remove) {
         var p = new Person(id, name);
         self.people.push(p);
         p.el = self.el.find(".people").append(p.render()).children(":last-child");
+        p.activateClick();
 
         p.el.find("img").click(function() { self.removePerson(p) });
 

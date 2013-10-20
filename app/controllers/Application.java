@@ -54,6 +54,11 @@ public class Application extends Controller {
         return ok();
     }
 
+    public static Result getPersonHistory(Integer id) {
+        Person p = Person.find.byId(id);
+        return ok(views.html.person_history.render(p));
+    }
+
     public static Result saveCase(String id) {
         Case c = Case.find.byId(id);
 

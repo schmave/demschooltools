@@ -12,6 +12,8 @@ import com.avaje.ebean.validation.NotNull;
 
 import controllers.Application;
 
+import org.codehaus.jackson.annotate.*;
+
 import play.data.*;
 import play.data.validation.Constraints.*;
 import play.data.validation.ValidationError;
@@ -64,6 +66,12 @@ public class Person extends Model implements Comparable<Person> {
 
     //@OneToMany(mappedBy="family")
     //public List<Person> family_members;
+    //
+
+    @OneToMany(mappedBy="person")
+    @JsonIgnore
+    @OrderBy("id DESC")
+    public List<Charge> charges;
 
     public static Finder<Integer,Person> find = new Finder(
         Integer.class, Person.class

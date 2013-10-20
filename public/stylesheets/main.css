@@ -1,3 +1,8 @@
+#meeting
+{
+    margin-right: 300px;
+}
+
 #meeting .form-control
 {
     display:inline;
@@ -93,6 +98,17 @@
 .rule
 {
     display:inline-block;
+}
+
+#sidebar
+{
+    position: fixed;
+    height: 100%;
+    width: 300px;
+/*  overflow-y: scroll;*/
+    top: 0px;
+    right: 0px;
+    background: white;
 }
 
 body {
