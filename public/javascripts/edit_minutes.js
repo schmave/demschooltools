@@ -33,7 +33,7 @@ function PeopleChooser(el, on_add, on_remove) {
     this.addPerson = function(id, name) {
         p = new Person(id, name);
         self.people.push(p);
-        el.append(p.render());
+        el.prepend(p.render());
 
         return p;
     }

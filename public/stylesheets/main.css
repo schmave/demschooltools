@@ -1,10 +1,40 @@
 #meeting
 {
+    font-size: 12px;
+}
+
+#meeting .form-control
+{
+    display:inline;
+    width: auto;
+    height: auto;
+    padding: 2px 4px;
+}
+
+.case .esm-form-label
+{
+    text-align: right;
+    width: 100px;
+    font-weight: bold;
 }
 
 .case
 {
     margin-top:40px;
+}
+
+.case textarea
+{
+    width: 400px;
+    height: 200px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#meeting .label
+{
+    font-size: inherit;
+    margin: 0px 2px;
 }
 
 body {

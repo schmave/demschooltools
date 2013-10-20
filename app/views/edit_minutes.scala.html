@@ -63,24 +63,28 @@ Committee:
 </script>
 
 <script id="case-template" type="x-handlebars-template">
-<div class="case">
-<h4>Case #{{num}}</h4>
+<div class="case panel panel-info">
+<div class="panel-heading"><h4>Case #{{num}}</h4></div>
+<div class="panel-body">
 
-Who wrote complaint:
-<div class="writer people_chooser">
-    	<input class="person_search" type="text">
-    </div>
+<table>
+<tr><td class="esm-form-label">Who wrote complaint:
+<td><div class="writer people_chooser">
+    	<input class="person_search form-control" type="text">
+    </div></tr>
 
-<p>Location: <input class="form-control location" type="text">
-<p>Date of event: <input class="date" type="date">
+<tr><td class="esm-form-label">Location: <td><input class="form-control location" type="text"></tr>
+<tr><td class="esm-form-label">Date of event: <td><input class="date form-control" type="date"></tr>
 
-<div>Who testified:
+<tr><td class="esm-form-label">Who testified:<td>
     <div class="testifier people_chooser">
-    	<input class="person_search" type="text">
+    	<input class="person_search form-control" type="text">
     </div>
-</div>
+</tr>
 
-<p>Findings: <textarea class="findings"></textarea>
+<tr><td class="esm-form-label">Findings: <td><textarea class="findings"></textarea></tr>
+</table>
+</div>
 </div>
 </script>
 
