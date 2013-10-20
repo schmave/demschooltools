@@ -269,6 +269,7 @@ function loadInitialData() {
     app.committee_chooser.loadPeople(app.initial_data.committee);
     app.chair_chooser.loadPeople(app.initial_data.chair);
     app.notetaker_chooser.loadPeople(app.initial_data.notetaker);
+    app.sub_chooser.loadPeople(app.initial_data.sub);
 
     for (i in app.initial_data.cases) {
         data = app.initial_data.cases[i];
@@ -304,6 +305,8 @@ $(function () {
 
     app.notetaker_chooser =
         makePeopleChooser(".notetaker", app.ROLE_NOTE_TAKER);
+    app.sub_chooser =
+        makePeopleChooser(".sub", app.ROLE_JC_SUB);
 
     loadInitialData();
 });

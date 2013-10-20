@@ -28,6 +28,7 @@ public class PersonAtMeeting extends Model {
     public final static int ROLE_JC_CHAIR = 0;
     public final static int ROLE_JC_MEMBER = 1;
     public final static int ROLE_NOTE_TAKER = 2;
+    public final static int ROLE_JC_SUB = 3;
     public Integer role;
 
     public static PersonAtMeeting create(Meeting m, Person p, Integer role)
