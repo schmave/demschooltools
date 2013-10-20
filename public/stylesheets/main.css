@@ -26,10 +26,34 @@
     border-radius: 4px;
 }
 
-#meeting .label
+.charge textarea
 {
-    font-size: inherit;
-    margin: 0px 2px;
+    width: 400px;
+    height: 50px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.charge :checked + span
+{
+    background-color: #ff0;
+}
+
+.charge .people_chooser .label
+{
+    width: 200px;
+    display: inline-block;
+}
+
+.charge
+{
+    margin-top: 8px;
+    padding-top: 3px;
+    border-top: 1px solid #3a87ad;
+}
+
+.rule_chooser {
+    display: inline;
 }
 
 .people_chooser {
@@ -41,6 +65,24 @@
     top: 3px;
 }
 
+.people_chooser .people {
+    display: inline;
+}
+
+.person img {
+    cursor: pointer;
+}
+
+.person .label
+{
+    font-size: inherit;
+}
+
+.person
+{
+  display:inline;
+}
+
 body {
     font-size: 12px;
 
@@ -49,93 +91,9 @@ body {
     margin-right: 20px;
 }
 
-.person_tag {
-    background: #eee;
-    border-radius: 2px;
-    -webkit-border-radius: 2px;
-    color: #666;
-    padding: 2px;
-}
-
-#comments {
-}
-
-.comment {
-  padding-bottom: 20px;
-}
-
 .limit_height {
   max-height: 60px;
   overflow: hidden;
-}
-
-.comment_tasks {
-  padding-left: 40px;
-}
-
-.comment_time {
-  color:#666;
-  font-size: 11px;
-  padding-left: 40px;
-}
-
-.person {
-  border: 1px solid rgb(121, 147, 252);
-  background: #f7f7f7;
-  padding: 3px;
-  margin-bottom: 10px;
-  display:inline;
-}
-
-.person .male {
-    float: right;
-    background-color: #87a8fb;
-    padding: 0 10px;
-}
-
-.person .female {
-    float: right;
-    background-color: #fb87ce;
-    padding: 0 10px;
-}
-
-.person .other_gender {
-    float: right;
-    background-color: #be98e6;
-    padding: 0 10px;
-}
-
-.person .student {
-    width: 32px;
-    height: 32px;
-    float: right;
-    background-image: url('/assets/images/gold_star.png');
-}
-
-.tag_x {
-}
-
-.first_uncompleted
-{
-    font-weight: bold;
-    background: #ffff00;
-}
-
-/*********************************
- Twitter Bootstrap tweaks
- *********************************/
-
-.form-horizontal .control-group {
-   margin-bottom: 5px;
-}
-
-.form-horizontal a {
-   margin-left: 150px;
-}
-
-.form-horizontal hr {
-   margin: 8px 0;
-   border-top: 1px solid #999;
 }
 
 

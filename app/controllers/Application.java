@@ -8,6 +8,7 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
+import com.avaje.ebean.SqlUpdate;
 import com.feth.play.module.pa.PlayAuthenticate;
 
 import models.*;
@@ -61,9 +62,50 @@ public class Application extends Controller {
         return ok();
     }
 
+    public static Result removePersonAtMeeting(Integer meeting_id, Integer person_id,
+        Integer role) {
+        SqlUpdate update = Ebean.createSqlUpdate(
+            "DELETE from person_at_meeting where meeting_id = :meeting_id"+
+            " and person_id = :person_id and role = :role");
+        update.setParameter("meeting_id", meeting_id);
+        update.setParameter("person_id", person_id);
+        update.setParameter("role", role);
+
+        Ebean.execute(update);
+
+        return ok();
+    }
+
     public static Result addTestifier(String case_number, Integer person_id)
     {
         TestifyRecord.create(Case.find.ref(case_number), Person.find.ref(person_id));
+        return ok();
+    }
+
+    public static Result removeTestifier(String case_number, Integer person_id)
+    {
+        SqlUpdate update = Ebean.createSqlUpdate(
+            "DELETE from testify_record where case_number = :case_number "+
+            "and person_id = :person_id");
+        update.setParameter("case_number", case_number);
+        update.setParameter("person_id", person_id);
+
+        Ebean.execute(update);
+        return ok();
+    }
+
+    public static Result addCharge(String case_number)
+    {
+        Charge c = Charge.create(Case.find.ref(case_number));
+        return ok("" + c.id);
+    }
+
+    public static Result saveCharge(int id) {
+        Charge c = Charge.find.byId(id);
+
+        c.edit(request().queryString());
+        c.save();
+
         return ok();
     }
 

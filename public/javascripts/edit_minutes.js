@@ -3,6 +3,7 @@ next_case_num = 1;
 function Person(id, name) {
     this.name = name;
     this.id = id;
+    var self = this;
 
     this.render = function() {
         return app.person_template({"name": name});
@@ -18,6 +19,8 @@ function PeopleChooser(el, on_add, on_remove) {
     this.search_box.autocomplete({
         source: "/jsonPeople",
     });
+
+    self.one_person_mode = false;
 
 //  el.mouseleave(function() {
 //      if (self.people.length > 0) {
@@ -45,11 +48,37 @@ function PeopleChooser(el, on_add, on_remove) {
             }
         }
 
-        p = new Person(id, name);
+        if (self.one_person_mode) {
+            self.search_box.hide();
+            self.el.find(".glyphicon").hide();
+        }
+
+        var p = new Person(id, name);
         self.people.push(p);
-        el.prepend(p.render());
+        p.el = self.el.find(".people").append(p.render()).children(":last-child");
+
+        p.el.find("img").click(function() { self.removePerson(p) });
 
         return p;
+    }
+
+    this.removePerson = function(person) {
+        if (on_remove) {
+            on_remove(person);
+        }
+
+        $(person.el).remove();
+
+        for (i in self.people) {
+            if (self.people[i] == person) {
+                self.people.splice(i, 1);
+            }
+        }
+
+        if (self.one_person_mode) {
+            self.search_box.show();
+            self.el.find(".glyphicon").show();
+        }
     }
 
     this.loadPeople = function(people) {
@@ -57,6 +86,71 @@ function PeopleChooser(el, on_add, on_remove) {
             self.addPerson(people[i].id, people[i].name);
         }
     }
+
+    this.setOnePersonMode = function(one_person_mode) {
+        self.one_person_mode = one_person_mode;
+        return self;
+    }
+}
+
+function Charge(charge_id, el) {
+    var self = this;
+
+    this.loadData = function(json) {
+        el.find(".resolution_plan").val(json.resolution_plan);
+        if (json.plea == "Guilty") {
+            el.find(".plea-guilty").prop("checked", true);
+        } else if (json.plea == "Not Guilty") {
+            el.find(".plea-not-guilty").prop("checked", true);
+        }
+
+        // rule, person
+        if (json.person) {
+            self.people_chooser.addPerson(
+                json.person.person_id,
+                json.person.first_name + " " + json.person.last_name);
+        }
+    }
+
+    this.saveIfNeeded = function() {
+        window.setTimeout(self.saveIfNeeded, 2000);
+        if (!self.is_modified) {
+            return;
+        }
+
+        url = "/saveCharge?id=" + charge_id;
+
+        if (self.people_chooser.people.length > 0) {
+            url += "&person_id=" + self.people_chooser.people[0].id;
+        }
+
+        url += "&resolution_plan=" + encodeURIComponent(el.find(".resolution_plan").val());
+        plea = el.find(":checked");
+        if (plea) {
+            url += "&plea=" + plea.val();
+        }
+
+        self.is_modified = false;
+        $.post(url);
+    }
+
+    this.markAsModified = function() {
+        self.is_modified = true;
+    }
+
+    self.is_modified = false;
+    window.setTimeout(self.saveIfNeeded, 2000);
+
+    el.find(".resolution_plan").change(self.markAsModified);
+    el.find(".plea-guilty").change(self.markAsModified);
+    el.find(".plea-not-guilty").change(self.markAsModified);
+
+    self.people_chooser = new PeopleChooser(el.find(".people_chooser"),
+                                            self.markAsModified,
+                                            self.markAsModified);
+    self.people_chooser.setOnePersonMode(true);
+
+    el.find("input[type=radio]").prop("name", "plea-" + charge_id);
 }
 
 function Case (id, el) {
@@ -100,22 +194,54 @@ function Case (id, el) {
                 t_r.person.person_id,
                 t_r.person.first_name + " " + t_r.person.last_name);
         }
+
+        for (i in data.charges) {
+            ch = data.charges[i];
+            new_charge = self.addChargeNoServer(ch.id);
+            new_charge.loadData(ch);
+        }
+    }
+
+    this.addCharge = function() {
+        $.post("/addCharge?case_number=" + id,
+               function(data, textStatus, jqXHR) {
+            self.addChargeNoServer(parseInt(data))
+        } );
+    }
+
+    this.addChargeNoServer = function(charge_id) {
+        new_charge_el = el.find(".charges").append(
+            app.charge_template()).children(":last-child");
+        new_charge = new Charge(charge_id, new_charge_el);
+        self.charges.push(new_charge);
+        return new_charge;
     }
 
     this.id = id
     this.el = el;
-    this.writer_chooser = new PeopleChooser(el.find(".writer"), self.markAsModified);
+    this.writer_chooser = new PeopleChooser(el.find(".writer"),
+                                            self.markAsModified,
+                                            self.markAsModified);
+    this.writer_chooser.setOnePersonMode(true);
+
     this.testifier_chooser = new PeopleChooser(
         el.find(".testifier"),
         function(person) {
             $.post("/addTestifier?case_number=" + id +
                    "&person_id=" + person.id);
+        },
+        function(person) {
+            $.post("/removeTestifier?case_number=" + id +
+                   "&person_id=" + person.id);
         });
     this.is_modified = false;
+    this.charges = []
 
     el.find(".location").change(self.markAsModified);
     el.find(".findings").change(self.markAsModified);
     el.find(".date").change(self.markAsModified);
+
+    el.find(".add-charges").click(self.addCharge);
 
     window.setTimeout(self.saveIfNeeded, 2000);
 }
@@ -124,6 +250,19 @@ function addPersonAtMeeting(person, role) {
     $.post("/addPersonAtMeeting?meeting_id=" + app.meeting_id
            + "&person_id=" + person.id +
            "&role=" + role );
+}
+
+function removePersonAtMeeting(person, role) {
+    $.post("/removePersonAtMeeting?meeting_id=" + app.meeting_id
+           + "&person_id=" + person.id +
+           "&role=" + role );
+}
+
+function makePeopleChooser(selector, role) {
+    return new PeopleChooser(
+        $(selector),
+        function(person) { addPersonAtMeeting(person, role) },
+        function(person) { removePersonAtMeeting(person, role) });
 }
 
 function loadInitialData() {
@@ -150,19 +289,21 @@ $(function () {
     $("#meeting").append(Handlebars.compile($("#meeting-template").html())());
 
     Handlebars.registerPartial("people-chooser", $("#people-chooser").html());
+    Handlebars.registerPartial("rule-chooser", $("#rule-chooser").html());
 
     app.case_template = Handlebars.compile($("#case-template").html());
     app.person_template = Handlebars.compile($("#person-template").html());
-    app.testimony_template = Handlebars.compile($("#testimony-template").html());
+    app.charge_template = Handlebars.compile($("#charge-template").html());
 
-    app.committee_chooser = new PeopleChooser($(".committee"),
-         function(person) { addPersonAtMeeting(person, app.ROLE_JC_MEMBER) });
+    app.committee_chooser =
+        makePeopleChooser(".committee", app.ROLE_JC_MEMBER);
 
-    app.chair_chooser = new PeopleChooser($(".chair"),
-         function(person) { addPersonAtMeeting(person, app.ROLE_JC_CHAIR) });
+    app.chair_chooser =
+        makePeopleChooser(".chair", app.ROLE_JC_CHAIR);
+    app.chair_chooser.setOnePersonMode(true);
 
-    app.notetaker_chooser = new PeopleChooser($(".notetaker"),
-        function(person) { addPersonAtMeeting(person, app.ROLE_NOTE_TAKER) });
+    app.notetaker_chooser =
+        makePeopleChooser(".notetaker", app.ROLE_NOTE_TAKER);
 
     loadInitialData();
 });

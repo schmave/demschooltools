@@ -44,20 +44,37 @@ Committee:
 </script>
 
 <script id="person-template" type="text/x-handlebars-template">
-    <span class="label label-primary">{{name}}</label>
+    <div class="person"><span class="label label-primary">{{name}}</span><img
+        src="@routes.Assets.at("images/x.png")"></div>
 </script>
 
 
 <script id="people-chooser" type="text/x-handlebars-template">
 	<div class="{{clazz}} people_chooser">
+    <div class="people"></div>
   <input class="form-control person_search" type="text">
 <span class="glyphicon glyphicon-user"></span>
     </div>
 </script>
 
-<script id="testimony-template" type="text/x-handlebars-template">
-	<div>Name:{{>people-chooser}}
-        Testimony:<textarea class="form-control"></textarea></div>
+<script id="rule-chooser" type="text/x-handlebars-template">
+	<div class="rule_chooser">
+        <input class="form-control rule_search" type="text">
+	</div>
+</script>
+
+<script id="charge-template" type="text/x-handlebars-template">
+	<div class="charge">Charge against:{{render "people-chooser" clazz=""}}
+	Rule: {{> rule-chooser}}
+	Plea:
+<div class="radio-inline">
+  <label><input type="radio" class="plea-guilty" value="Guilty"><span>Guilty</span></label>
+</div>
+<div class="radio-inline">
+  <label><input type="radio" class="plea-not-guilty" value="Not Guilty"><span>Not Guilty</span></label>
+</div>
+	<p>Resolution plan: <textarea class="resolution_plan"></textarea>
+   </div>
 </script>
 
 <script id="case-template" type="text/x-handlebars-template">
@@ -78,6 +95,8 @@ Committee:
 
 <tr><td class="esm-form-label">Findings: <td><textarea class="findings"></textarea></tr>
 </table>
+<div class="charges"></div>
+<button class="add-charges">Add charges</button>
 </div>
 </div>
 </script>

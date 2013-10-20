@@ -44,6 +44,10 @@ public class Case extends Model {
     @OneToMany(mappedBy="the_case")
     public List<TestifyRecord> testify_records;
 
+    @OneToMany(mappedBy="the_case")
+    @OrderBy("id ASC")
+    public List<Charge> charges;
+
     public static Finder<String, Case> find = new Finder(
         String.class, Case.class
     );
@@ -89,6 +93,8 @@ public class Case extends Model {
 
         if (query_string.containsKey("writer_id")) {
             writer = Person.find.ref(Integer.parseInt(query_string.get("writer_id")[0]));
+        } else {
+            writer = null;
         }
     }
 }
