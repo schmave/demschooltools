@@ -27,59 +27,53 @@ app.initial_data = {
 </script>
 
 <div id="meeting">
+</div>
+
+<script id="meeting-template" type="text/x-handlebars-template">
 <h2>Justice Committee minutes<br>@Application.formatMeetingDate(meeting.date)</h2>
 Committee:
-	<div class="committee people_chooser">
-    	<input class="form-control person_search" type="text">
-    </div>
+{{render "people-chooser" clazz="committee"}}
 <br>Chair:
-	<div class="chair people_chooser">
-    	<input class="form-control person_search" type="text">
-    </div>
+{{render "people-chooser" clazz="chair"}}
 <br>Notetaker:
-	<div class="notetaker people_chooser">
-    	<input class="form-control person_search" type="text">
-    </div>
+{{render "people-chooser" clazz="notetaker"}}
 
 <div id="meeting-cases">
 </div>
 
-</div>
+</script>
 
-<script id="person-template" type="x-handlebars-template">
+<script id="person-template" type="text/x-handlebars-template">
     <span class="label label-primary">{{name}}</label>
 </script>
 
 
-<script id="people-chooser" type="x-handlebars-template">
-	<div class="people_chooser">
-    	<input class="form-control person_search" type="text">
+<script id="people-chooser" type="text/x-handlebars-template">
+	<div class="{{clazz}} people_chooser">
+  <input class="form-control person_search" type="text">
+<span class="glyphicon glyphicon-user"></span>
     </div>
 </script>
 
-<script id="testimony-template" type="x-handlebars-template">
-	<div>Name:{{> people-chooser}}
+<script id="testimony-template" type="text/x-handlebars-template">
+	<div>Name:{{>people-chooser}}
         Testimony:<textarea class="form-control"></textarea></div>
 </script>
 
-<script id="case-template" type="x-handlebars-template">
+<script id="case-template" type="text/x-handlebars-template">
 <div class="case panel panel-info">
 <div class="panel-heading"><h4>Case #{{num}}</h4></div>
 <div class="panel-body">
 
 <table>
 <tr><td class="esm-form-label">Who wrote complaint:
-<td><div class="writer people_chooser">
-    	<input class="person_search form-control" type="text">
-    </div></tr>
+<td>{{render "people-chooser" clazz="writer"}}</tr>
 
 <tr><td class="esm-form-label">Location: <td><input class="form-control location" type="text"></tr>
 <tr><td class="esm-form-label">Date of event: <td><input class="date form-control" type="date"></tr>
 
 <tr><td class="esm-form-label">Who testified:<td>
-    <div class="testifier people_chooser">
-    	<input class="person_search form-control" type="text">
-    </div>
+    {{render "people-chooser" clazz="testifier"}}
 </tr>
 
 <tr><td class="esm-form-label">Findings: <td><textarea class="findings"></textarea></tr>

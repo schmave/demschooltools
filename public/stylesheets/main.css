@@ -1,8 +1,3 @@
-#meeting
-{
-    font-size: 12px;
-}
-
 #meeting .form-control
 {
     display:inline;
@@ -37,9 +32,19 @@
     margin: 0px 2px;
 }
 
-body {
-    padding-top: 10px;
+.people_chooser {
+    display: inline;
+}
 
+.people_chooser .glyphicon {
+    right: 20px;
+    top: 3px;
+}
+
+body {
+    font-size: 12px;
+
+    padding-top: 10px;
     margin-left: 20px;
     margin-right: 20px;
 }
@@ -114,10 +119,6 @@ body {
 {
     font-weight: bold;
     background: #ffff00;
-}
-
-.people_chooser {
-    display:inline;
 }
 
 /*********************************

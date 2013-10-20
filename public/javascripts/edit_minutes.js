@@ -28,7 +28,7 @@ function PeopleChooser(el, on_add, on_remove) {
     this.search_box.bind( "autocompleteselect", function(event, ui) {
         new_person = self.addPerson(ui.item.id, ui.item.label);
 
-        if (on_add) {
+        if (on_add && new_person) {
             on_add(new_person);
         }
 
@@ -139,6 +139,16 @@ function loadInitialData() {
 }
 
 $(function () {
+    Handlebars.registerHelper('render', function(partialId, options) {
+      var selector = 'script[type="text/x-handlebars-template"]#' + partialId,
+          source = $(selector).html(),
+          html = Handlebars.compile(source)(options.hash);
+
+      return new Handlebars.SafeString(html);
+    });
+
+    $("#meeting").append(Handlebars.compile($("#meeting-template").html())());
+
     Handlebars.registerPartial("people-chooser", $("#people-chooser").html());
 
     app.case_template = Handlebars.compile($("#case-template").html());
