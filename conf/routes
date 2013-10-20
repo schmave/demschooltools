@@ -24,7 +24,8 @@ POST /addCharge   controllers.Application.addCharge(case_number)
 POST /saveCharge controllers.Application.saveCharge(id : Integer)
 
 
-GET /jsonPeople controllers.Application.jsonPeople(term ?= "")
+GET /jsonPeople   controllers.Application.jsonPeople(term ?= "")
+GET /jsonRules    controllers.Application.jsonRules(term ?= "")
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

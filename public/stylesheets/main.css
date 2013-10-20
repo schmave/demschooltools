@@ -83,6 +83,18 @@
   display:inline;
 }
 
+.rule .label
+{
+    display:inline-block;
+    font-size: inherit;
+    width: 200px;
+}
+
+.rule
+{
+    display:inline-block;
+}
+
 body {
     font-size: 12px;
 

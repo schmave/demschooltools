@@ -61,5 +61,11 @@ public class Charge extends Model {
         } else {
             person = null;
         }
+
+        if (query_string.containsKey("rule_id")) {
+            rule = Rule.find.ref(Integer.parseInt(query_string.get("rule_id")[0]));
+        } else {
+            rule = null;
+        }
     }
 }

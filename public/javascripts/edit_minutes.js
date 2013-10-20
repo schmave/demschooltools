@@ -93,6 +93,51 @@ function PeopleChooser(el, on_add, on_remove) {
     }
 }
 
+function RuleChooser(el, on_change) {
+    this.el = el;
+    var self = this;
+
+    this.search_box = el.find(".rule_search");
+    this.search_box.autocomplete({
+        source: "/jsonRules",
+    });
+
+    this.search_box.bind( "autocompleteselect", function(event, ui) {
+        self.setRule(ui.item.id, ui.item.label);
+
+        if (on_change) { on_change(); }
+
+        self.search_box.val('');
+        event.preventDefault(); // keep jquery from inserting name into textbox
+    });
+
+    this.setRule = function(id, title) {
+        self.search_box.hide();
+
+        self.rule = id;
+        self.rule_el =
+            self.el.prepend(app.rule_template({name: title})).
+                children(":first-child");
+
+        self.rule_el.find("img").click(function() { self.unsetRule() });
+    }
+
+    this.unsetRule = function() {
+        if (on_change) { on_change(); }
+
+        $(self.rule_el).remove();
+
+        self.rule = null;
+        self.rule_el = null;
+
+        self.search_box.show();
+    }
+
+    this.loadData = function(json) {
+        self.setRule(json.id, json.title);
+    }
+}
+
 function Charge(charge_id, el) {
     var self = this;
 
@@ -109,6 +154,10 @@ function Charge(charge_id, el) {
             self.people_chooser.addPerson(
                 json.person.person_id,
                 json.person.first_name + " " + json.person.last_name);
+        }
+
+        if (json.rule) {
+            self.rule_chooser.loadData(json.rule);
         }
     }
 
@@ -130,6 +179,10 @@ function Charge(charge_id, el) {
             url += "&plea=" + plea.val();
         }
 
+        if (self.rule_chooser.rule) {
+            url += "&rule_id=" + self.rule_chooser.rule;
+        }
+
         self.is_modified = false;
         $.post(url);
     }
@@ -149,6 +202,9 @@ function Charge(charge_id, el) {
                                             self.markAsModified,
                                             self.markAsModified);
     self.people_chooser.setOnePersonMode(true);
+
+    self.rule_chooser = new RuleChooser(el.find(".rule_chooser"),
+                                        self.markAsModified);
 
     el.find("input[type=radio]").prop("name", "plea-" + charge_id);
 }
@@ -295,6 +351,7 @@ $(function () {
     app.case_template = Handlebars.compile($("#case-template").html());
     app.person_template = Handlebars.compile($("#person-template").html());
     app.charge_template = Handlebars.compile($("#charge-template").html());
+    app.rule_template = Handlebars.compile($("#rule-template").html());
 
     app.committee_chooser =
         makePeopleChooser(".committee", app.ROLE_JC_MEMBER);

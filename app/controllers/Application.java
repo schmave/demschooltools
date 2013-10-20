@@ -149,6 +149,22 @@ public class Application extends Controller {
         return ok(Json.stringify(Json.toJson(result)));
     }
 
+    public static Result jsonRules(String term) {
+        List<Rule> rules = Rule.find.findList();
+
+        List<Map<String, String> > result = new ArrayList<Map<String, String> > ();
+        for (Rule r : rules) {
+            if (r.title.toLowerCase().contains(term)) {
+                HashMap<String, String> values = new HashMap<String, String>();
+                values.put("label", r.title);
+                values.put("id", "" + r.id);
+                result.add(values);
+            }
+        }
+
+        return ok(Json.stringify(Json.toJson(result)));
+    }
+
     public static String formatMeetingDate(Date d) {
         return new SimpleDateFormat("EEEE MMMM dd, yyyy").format(d);
     }

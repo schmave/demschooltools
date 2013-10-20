@@ -52,13 +52,17 @@ Committee:
         src="@routes.Assets.at("images/x.png")"></div>
 </script>
 
-
 <script id="people-chooser" type="text/x-handlebars-template">
 	<div class="{{clazz}} people_chooser">
     <div class="people"></div>
   <input class="form-control person_search" type="text">
 <span class="glyphicon glyphicon-user"></span>
     </div>
+</script>
+
+<script id="rule-template" type="text/x-handlebars-template">
+    <div class="rule"><span class="label label-success">{{name}}</span><img
+        src="@routes.Assets.at("images/x.png")"></div>
 </script>
 
 <script id="rule-chooser" type="text/x-handlebars-template">
