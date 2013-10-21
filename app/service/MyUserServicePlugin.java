@@ -25,8 +25,8 @@ public class MyUserServicePlugin extends UserServicePlugin {
 		final boolean isLinked = User.existsByAuthUserIdentity(authUser);
 		if (!isLinked) {
             if (authUser instanceof EmailIdentity) {
-                Logger.debug("    is email identity, email='" + identity.getEmail() + "'");
                 final EmailIdentity identity = (EmailIdentity) authUser;
+                Logger.debug("    is email identity, email='" + identity.getEmail() + "'");
                 User u = User.find.where().eq("email", identity.getEmail()).findUnique();
                 if (u != null) {
                     Logger.debug("    found user by email");
