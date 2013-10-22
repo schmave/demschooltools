@@ -145,6 +145,8 @@ public class Application extends Controller {
 
         List<Person> people = getPeopleForTag(cur_student_tag.id);
         people.addAll(getPeopleForTag(staff_tag.id));
+		
+		term = term.toLowerCase();
 
         List<Map<String, String> > result = new ArrayList<Map<String, String> > ();
         for (Person p : people) {
@@ -165,6 +167,8 @@ public class Application extends Controller {
     }
 
     public static Result jsonRules(String term) {
+		term = term.toLowerCase();
+
         List<Rule> rules = Rule.find.findList();
 
         List<Map<String, String> > result = new ArrayList<Map<String, String> > ();
