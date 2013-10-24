@@ -151,12 +151,16 @@ public class Application extends Controller {
         List<Map<String, String> > result = new ArrayList<Map<String, String> > ();
         for (Person p : people) {
             if (p.first_name.toLowerCase().contains(term) ||
-                p.last_name.toLowerCase().contains(term)) {
+                p.last_name.toLowerCase().contains(term) ||
+				p.display_name.toLowerCase().contains(term)) {
                 HashMap<String, String> values = new HashMap<String, String>();
-                String name = p.first_name;
-                if (p.last_name != null) {
-                    name += " " + p.last_name;
-                }
+                String name = p.display_name;
+				if (name.equals("")) {
+					name = p.first_name;
+					if (p.last_name != null) {
+						name += " " + p.last_name;
+					}
+				}
                 values.put("label", name);
                 values.put("id", "" + p.person_id);
                 result.add(values);
