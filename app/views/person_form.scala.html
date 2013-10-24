@@ -4,7 +4,10 @@
 
 @implicitField = @{ FieldConstructor(myConstructor.f) }
 
+<div class="row-fluid">
 @form(destination, 'class -> "form-horizontal") {
+
+<div class="span6">
 
 @if(personForm("person_id").value()) {
 	<input type="hidden" name="person_id" value="@personForm("person_id").value()"/>
@@ -34,9 +37,8 @@
 				</div>
 			}
 		}
+
 		@inputText(personForm("neighborhood"), '_label -> "Neighborhood")
-		@inputText(personForm("previous_school"), '_label -> "Previous School")
-		@inputText(personForm("school_district"), '_label -> "School District")
 		<hr/>
 
 		@defining(personForm("number_2").value() ||
@@ -57,10 +59,24 @@
 		}
 
 		<hr/>
-		@inputDate(personForm("dob"), '_label -> "Date of Birth")
-		@inputText(personForm("grade"), '_label -> "Grade")
 		@inputText(personForm("same_family_name"), '_label -> "Same family as: ")
 		<input type="hidden" id = "same_family_id" name="same_family_id"/>
 
         <input type="submit" value="@submit_title">
+		
+</div>
+<div class="span6">
+
+<p><h4>Student Info</h4>
+		@inputText(personForm("display_name"), '_label -> "Short Name")
+		<hr/>
+		@inputText(personForm("previous_school"), '_label -> "Previous School")
+		@inputText(personForm("school_district"), '_label -> "School District")
+		<hr/>
+		@inputText(personForm("grade"), '_label -> "Current Grade")
+		@inputDate(personForm("dob"), '_label -> "Date of Birth")
+
+		
+</div>
 }
+</div>

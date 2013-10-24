@@ -43,9 +43,11 @@ public class Person extends Model implements Comparable<Person> {
 
     // email address
     public String email;
-
+	
     public Date dob;
     public Date approximate_dob;
+	
+	public String display_name = "";
 	
 	public String previous_school = "";
 	public String school_district = "";
