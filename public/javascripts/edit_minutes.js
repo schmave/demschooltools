@@ -286,9 +286,9 @@ function Case (id, el) {
     }
 
     this.addChargeNoServer = function(charge_id) {
-        new_charge_el = el.find(".charges").append(
+        var new_charge_el = self.el.find(".charges").append(
             app.charge_template()).children(":last-child");
-        new_charge = new Charge(charge_id, new_charge_el);
+        var new_charge = new Charge(charge_id, new_charge_el);
         self.charges.push(new_charge);
         return new_charge;
     }
