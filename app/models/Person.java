@@ -97,6 +97,15 @@ public class Person extends Model implements Comparable<Person> {
         }
     }
 
+	public String getDisplayName()
+	{
+		if (display_name.equals("")) {
+			return first_name;
+		}
+		else {
+			return display_name;
+		}
+	}
 
     public int compareTo(Person other) {
         int last_name_compare = last_name.compareTo(other.last_name);

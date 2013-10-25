@@ -158,6 +158,14 @@ function RuleChooser(el, on_change) {
     }
 }
 
+function displayName(p) {
+	if (p.display_name) {
+		return p.display_name;
+	} else {
+		return p.first_name;
+	}
+}
+
 function Charge(charge_id, el) {
     var self = this;
 
@@ -173,7 +181,7 @@ function Charge(charge_id, el) {
         if (json.person) {
             self.people_chooser.addPerson(
                 json.person.person_id,
-                json.person.first_name + " " + json.person.last_name);
+                displayName(json.person));
         }
 
         if (json.rule) {
@@ -261,14 +269,14 @@ function Case (id, el) {
 
         if (data.writer) {
             self.writer_chooser.addPerson(data.writer.person_id,
-                  data.writer.first_name + " " + data.writer.last_name);
+                  displayName(data.writer));
         }
 
         for (i in data.testify_records) {
             t_r = data.testify_records[i];
             self.testifier_chooser.addPerson(
                 t_r.person.person_id,
-                t_r.person.first_name + " " + t_r.person.last_name);
+                displayName(t_r.person));
         }
 
         for (i in data.charges) {
@@ -408,7 +416,7 @@ function addCase()
 {
     d = new Date();
 
-    case_id = (d.getMonth() + 1) + "-" + (d.getDate()) + "-";
+    case_id = app.case_number_prefix;
     if (next_case_num < 10) {
         case_id += "0";
     }

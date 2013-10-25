@@ -1,5 +1,6 @@
 package models;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -39,7 +40,11 @@ public class Meeting extends Model {
         for (PersonAtMeeting p : people_at_meeting) {
             if (p.role == role) {
                 HashMap<String, String> map = new HashMap<String, String>();
-                map.put("name", p.person.first_name + " " + p.person.last_name);
+				if (p.person.display_name.equals("")) {
+					map.put("name", p.person.first_name);
+				} else {
+					map.put("name", p.person.display_name);
+				}
                 map.put("id", "" + p.person.person_id);
                 result.add(map);
             }
@@ -47,6 +52,11 @@ public class Meeting extends Model {
 
         return Json.stringify(Json.toJson(result));
     }
+	
+	public String getCaseNumberPrefix()
+	{
+		return new SimpleDateFormat("MM-dd-").format(date);
+	}
 
     public static Meeting create(Date d)
     {

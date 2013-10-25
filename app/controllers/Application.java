@@ -127,12 +127,13 @@ public class Application extends Controller {
     static List<Person> getPeopleForTag(Integer id)
     {
         RawSql rawSql = RawSqlBuilder
-            .parse("SELECT person.person_id, person.first_name, person.last_name from "+
+            .parse("SELECT person.person_id, person.first_name, person.last_name, person.display_name from "+
                    "person join person_tag pt on person.person_id=pt.person_id "+
                   "join tag on pt.tag_id=tag.id")
             .columnMapping("person.person_id", "person_id")
         .columnMapping("person.first_name", "first_name")
         .columnMapping("person.last_name", "last_name")
+		.columnMapping("person.display_name", "display_name")
             .create();
 
         return Ebean.find(Person.class).setRawSql(rawSql).
@@ -154,14 +155,7 @@ public class Application extends Controller {
                 p.last_name.toLowerCase().contains(term) ||
 				p.display_name.toLowerCase().contains(term)) {
                 HashMap<String, String> values = new HashMap<String, String>();
-                String name = p.display_name;
-				if (name.equals("")) {
-					name = p.first_name;
-					if (p.last_name != null) {
-						name += " " + p.last_name;
-					}
-				}
-                values.put("label", name);
+                values.put("label", p.getDisplayName());
                 values.put("id", "" + p.person_id);
                 result.add(values);
             }

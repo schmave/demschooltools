@@ -13,25 +13,25 @@
 <tr><td align=right>Chair:<td>
 @for(p <- m.people_at_meeting) {
 	@if(p.role == PersonAtMeeting.ROLE_JC_CHAIR) {
-		@p.person.first_name @p.person.last_name,
+		@p.person.getDisplayName(),
 	}
 }
 <tr><td align=right>Committee Members:<td>
 @for(p <- m.people_at_meeting) {
 	@if(p.role == PersonAtMeeting.ROLE_JC_MEMBER) {
-		@p.person.first_name @p.person.last_name,
+		@p.person.getDisplayName(),
 	}
 }
 <tr><td align=right>Subs:<td>
 @for(p <- m.people_at_meeting) {
 	@if(p.role == PersonAtMeeting.ROLE_JC_SUB) {
-		@p.person.first_name @p.person.last_name,
+		@p.person.getDisplayName(),
 	}
 }
 <tr><td align=right>Notetaker:<td>
 @for(p <- m.people_at_meeting) {
 	@if(p.role == PersonAtMeeting.ROLE_NOTE_TAKER) {
-		@p.person.first_name @p.person.last_name,
+		@p.person.getDisplayName(),
 	}
 }
 
@@ -40,16 +40,16 @@
 @for(c <- m.cases) {
 	<h4>Case #@c.case_number</h4>
 	<p>@if( c.date != null ) { @Application.formatMeetingDate(c.date). }
-	Written up by @if( c.writer != null ) { @c.writer.first_name } else {<i>unknown</i>}
+	Written up by @if( c.writer != null ) { @c.writer.getDisplayName() } else {<i>unknown</i>}
 	in @if(!c.location.equals("")) { the @c.location } else {<i>unknown</i>}.
 	<p>People who testified:
-	@for( tr <- c.testify_records ) { @tr.person.first_name @tr.person.last_name, }
+	@for( tr <- c.testify_records ) { @tr.person.getDisplayName(), }
 	<p><b>Findings:</b> @c.findings
 	@if( c.charges.size() > 0) {
 		<ol>
 		@for( charge <- c.charges ) {
 			@if( charge.person != null && charge.rule != null) {
-				<li>@charge.person.first_name was charged with violating "@charge.rule.title",
+				<li>@charge.person.getDisplayName() was charged with violating "@charge.rule.title",
 				and plead @charge.plea. Resolution plan: @charge.resolution_plan.
 			} else {
 				<li>Charge missing person and/or rule.
