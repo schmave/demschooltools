@@ -51,8 +51,8 @@ public class Person extends Model implements Comparable<Person> {
 
 	public String previous_school;
 	public String school_district;
-	
-	public String display_name = "";
+
+	private String display_name = "";
 
     @Transient
     public List<Tag> tags;

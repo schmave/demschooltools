@@ -40,11 +40,7 @@ public class Meeting extends Model {
         for (PersonAtMeeting p : people_at_meeting) {
             if (p.role == role) {
                 HashMap<String, String> map = new HashMap<String, String>();
-				if (p.person.display_name.equals("")) {
-					map.put("name", p.person.first_name);
-				} else {
-					map.put("name", p.person.display_name);
-				}
+				map.put("name", p.person.getDisplayName());
                 map.put("id", "" + p.person.person_id);
                 result.add(map);
             }
@@ -52,7 +48,7 @@ public class Meeting extends Model {
 
         return Json.stringify(Json.toJson(result));
     }
-	
+
 	public String getCaseNumberPrefix()
 	{
 		return new SimpleDateFormat("MM-dd-").format(date);
