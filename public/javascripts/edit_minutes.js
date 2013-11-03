@@ -215,12 +215,21 @@ function Charge(charge_id, el) {
         $.post(url);
     }
 
+    this.removeCharge = function() {
+        self.el.remove();
+        $.post("/removeCharge?id=" + charge_id);
+    }
+
     this.markAsModified = function() {
         self.is_modified = true;
     }
 
+    self.el = el;
     self.is_modified = false;
     window.setTimeout(self.saveIfNeeded, 2000);
+
+    self.remove_button = el.find("button")
+    self.remove_button.click(self.removeCharge);
 
     el.find(".resolution_plan").change(self.markAsModified);
     el.find(".plea-guilty").change(self.markAsModified);
@@ -235,6 +244,9 @@ function Charge(charge_id, el) {
                                         self.markAsModified);
 
     el.find("input[type=radio]").prop("name", "plea-" + charge_id);
+
+    el.mouseleave(function() { self.remove_button.hide(); } );
+    el.mouseenter(function() { self.remove_button.show(); } );
 }
 
 function Case (id, el) {

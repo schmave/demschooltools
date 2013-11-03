@@ -26,6 +26,7 @@ POST /removeTestifier controllers.Application.removeTestifier(case_number, perso
 
 POST /addCharge   controllers.Application.addCharge(case_number)
 POST /saveCharge controllers.Application.saveCharge(id : Integer)
+POST /removeCharge   controllers.Application.removeCharge(id : Integer)
 
 
 GET /jsonPeople   controllers.Application.jsonPeople(term ?= "")

@@ -124,6 +124,13 @@ public class Application extends Controller {
         return ok();
     }
 
+    public static Result removeCharge(int id) {
+        Charge c = Charge.find.byId(id);
+        c.delete();
+
+        return ok();
+    }
+
     static List<Person> getPeopleForTag(Integer id)
     {
         RawSql rawSql = RawSqlBuilder
@@ -146,14 +153,12 @@ public class Application extends Controller {
 
         List<Person> people = getPeopleForTag(cur_student_tag.id);
         people.addAll(getPeopleForTag(staff_tag.id));
-		
+
 		term = term.toLowerCase();
 
         List<Map<String, String> > result = new ArrayList<Map<String, String> > ();
         for (Person p : people) {
-            if (p.first_name.toLowerCase().contains(term) ||
-                p.last_name.toLowerCase().contains(term) ||
-				p.display_name.toLowerCase().contains(term)) {
+            if (p.searchStringMatches(term)) {
                 HashMap<String, String> values = new HashMap<String, String>();
                 values.put("label", p.getDisplayName());
                 values.put("id", "" + p.person_id);

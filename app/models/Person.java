@@ -107,6 +107,13 @@ public class Person extends Model implements Comparable<Person> {
 		}
 	}
 
+    public boolean searchStringMatches(String term)
+    {
+        return first_name.toLowerCase().contains(term) ||
+                last_name.toLowerCase().contains(term) ||
+				display_name.toLowerCase().contains(term);
+    }
+
     public int compareTo(Person other) {
         int last_name_compare = last_name.compareTo(other.last_name);
         if (last_name_compare == 0) {
