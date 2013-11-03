@@ -159,7 +159,7 @@ function RuleChooser(el, on_change) {
 }
 
 function displayName(p) {
-	if (p.display_name) {
+	if (p.displayName) {
 		return p.displayName;
 	} else {
 		return p.first_name;
