@@ -310,7 +310,6 @@ function Case (id, el) {
         var new_charge_el = self.el.find(".charges").append(
             app.charge_template()).children(":last-child");
         var new_charge = new Charge(charge_id, new_charge_el);
-        self.charges.push(new_charge);
         return new_charge;
     }
 
@@ -332,7 +331,6 @@ function Case (id, el) {
                    "&person_id=" + person.id);
         });
     this.is_modified = false;
-    this.charges = []
 
     el.find(".location").change(self.markAsModified);
     el.find(".findings").change(self.markAsModified);
