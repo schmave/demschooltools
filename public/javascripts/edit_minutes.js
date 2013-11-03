@@ -287,6 +287,7 @@ function Case (id, el) {
     }
 
     this.addCharge = function() {
+        $('body').animate({'scrollTop': $('body').scrollTop() + 90}, 'slow');
         $.post("/addCharge?case_number=" + id,
                function(data, textStatus, jqXHR) {
             self.addChargeNoServer(parseInt(data))
