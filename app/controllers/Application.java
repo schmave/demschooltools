@@ -56,7 +56,7 @@ public class Application extends Controller {
 
     public static Result getPersonHistory(Integer id) {
         Person p = Person.find.byId(id);
-        return ok(views.html.person_history.render(p));
+        return ok(views.html.person_history.render(p, new PersonHistory(p)));
     }
 
     public static Result saveCase(String id) {
@@ -185,6 +185,10 @@ public class Application extends Controller {
         }
 
         return ok(Json.stringify(Json.toJson(result)));
+    }
+
+    public static String formatDateShort(Date d) {
+        return new SimpleDateFormat("MM/dd").format(d);
     }
 
     public static String formatMeetingDate(Date d) {
