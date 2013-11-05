@@ -425,9 +425,7 @@ function addCaseNoServer(id)
 
 function addCase()
 {
-    d = new Date();
-
-    case_id = app.case_number_prefix;
+    var case_id = app.case_number_prefix;
     if (next_case_num < 10) {
         case_id += "0";
     }
@@ -435,7 +433,7 @@ function addCase()
     $.post("/newCase?id=" + case_id +
            "&meeting_id=" + app.meeting_id, "",
            function(data, textStatus, jqXHR) {
-        new_case = addCaseNoServer(case_id);
+        var new_case = addCaseNoServer(case_id);
         $('body').animate({'scrollTop': new_case.el.offset().top + 500}, 'slow');
     });
 }
