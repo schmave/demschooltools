@@ -47,9 +47,9 @@
 @for(c <- m.cases) {
 	<tr>
 	<td><h5>#@c.case_number</h5>
-	<p>@if( c.date != null ) { @Application.formatMeetingDate(c.date). }
-	Written up by @if( c.writer != null ) { @c.writer.getDisplayName() } else {<i>unknown</i>}
-	in @if(!c.location.equals("")) { the @c.location. } else {<i>unknown</i>.}
+	<p>@if( c.date != null ) { @Application.formatDateShort(c.date). }
+	Writer: @if( c.writer != null ) { @c.writer.getDisplayName(), } else {<i>unknown</i>,}
+	location: @if(!c.location.equals("")) { @c.location. } else {<i>unknown</i>.}
 	<td><p>Testifiers: @for( tr <- c.testify_records ) { @tr.person.getDisplayName(), }
 		<p>@c.findings
 	<td>@if( c.charges.size() > 0) {
