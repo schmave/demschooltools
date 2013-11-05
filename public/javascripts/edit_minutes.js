@@ -370,6 +370,7 @@ function loadInitialData() {
         data = app.initial_data.cases[i];
         new_case = addCaseNoServer(data.case_number);
         new_case.loadData(data);
+        next_case_num += 1;
     }
 }
 
@@ -418,8 +419,6 @@ function addCaseNoServer(id)
 
     $("#meeting-cases").append(case_obj.el);
 
-    next_case_num += 1;
-
     return case_obj;
 }
 
@@ -430,6 +429,7 @@ function addCase()
         case_id += "0";
     }
     case_id += next_case_num;
+    next_case_num += 1;
     $.post("/newCase?id=" + case_id +
            "&meeting_id=" + app.meeting_id, "",
            function(data, textStatus, jqXHR) {
