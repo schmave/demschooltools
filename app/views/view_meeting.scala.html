@@ -25,7 +25,7 @@
 
 <h4>&nbsp;<br>Resolution Plans</h4>
 <table class="table resolution_plans">
-	<tr><th>Case<th>Person<th>Rule<th>Resolution Plan</tr>
+	<tr><th width="80">Case<th>Person<th>Rule<th>Resolution Plan</tr>
 	@for(c <- m.cases) {
 		@for(charge <- c.charges) {
 			@if( charge.person != null && charge.rule != null ) {
@@ -43,7 +43,7 @@
 
 <h4>&nbsp;<br>Case Notes</h4>
 <table class="table case_notes">
-<tr><th>Case<th>Findings<th>Charges</tr>
+<tr><th>Case<th>Findings<th width="200">Charges</tr>
 @for(c <- m.cases) {
 	<tr>
 	<td><h5>#@c.case_number</h5>
