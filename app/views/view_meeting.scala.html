@@ -6,58 +6,70 @@
 
 <h3>JC minutes from @Application.formatMeetingDate(m.date)</h3>
 
-<p><a href="@routes.Application.editMeeting(m.id)">Edit these minutes</a>
-
-
-<table cellpadding=5 border=1>
-<tr><td align=right>Chair:<td>
+<p>Committee:
 @for(p <- m.people_at_meeting) {
 	@if(p.role == PersonAtMeeting.ROLE_JC_CHAIR) {
-		@p.person.getDisplayName(),
+		<b>@p.person.getDisplayName()</b>,
 	}
-}
-<tr><td align=right>Committee Members:<td>
-@for(p <- m.people_at_meeting) {
 	@if(p.role == PersonAtMeeting.ROLE_JC_MEMBER) {
 		@p.person.getDisplayName(),
 	}
-}
-<tr><td align=right>Subs:<td>
-@for(p <- m.people_at_meeting) {
 	@if(p.role == PersonAtMeeting.ROLE_JC_SUB) {
-		@p.person.getDisplayName(),
+		(@p.person.getDisplayName()),
 	}
-}
-<tr><td align=right>Notetaker:<td>
-@for(p <- m.people_at_meeting) {
 	@if(p.role == PersonAtMeeting.ROLE_NOTE_TAKER) {
-		@p.person.getDisplayName(),
+		@p.person.getDisplayName()*,
 	}
 }
+</p>
 
+<h4>&nbsp;<br>Resolution Plans</h4>
+<table class="table resolution_plans">
+	<tr><th>Case<th>Person<th>Rule<th>Resolution Plan</tr>
+	@for(c <- m.cases) {
+		@for(charge <- c.charges) {
+			@if( charge.person != null && charge.rule != null ) {
+			<tr><td>@c.case_number<td>@charge.person.getDisplayName()
+				<td>@charge.rule.title
+					<td>@charge.resolution_plan
+						@if( ! charge.plea.equals("Guilty") ) {
+							<i>(Plea: @charge.plea)</i>
+						}
+						</tr>
+			}
+		}
+	}
 </table>
 
+<h4>&nbsp;<br>Case Notes</h4>
+<table class="table case_notes">
+<tr><th>Case<th>Findings<th>Charges</tr>
 @for(c <- m.cases) {
-	<h4>Case #@c.case_number</h4>
+	<tr>
+	<td><h5>#@c.case_number</h5>
 	<p>@if( c.date != null ) { @Application.formatMeetingDate(c.date). }
 	Written up by @if( c.writer != null ) { @c.writer.getDisplayName() } else {<i>unknown</i>}
-	in @if(!c.location.equals("")) { the @c.location } else {<i>unknown</i>}.
-	<p>People who testified:
-	@for( tr <- c.testify_records ) { @tr.person.getDisplayName(), }
-	<p><b>Findings:</b> @c.findings
-	@if( c.charges.size() > 0) {
+	in @if(!c.location.equals("")) { the @c.location. } else {<i>unknown</i>.}
+	<td><p>Testifiers: @for( tr <- c.testify_records ) { @tr.person.getDisplayName(), }
+		<p>@c.findings
+	<td>@if( c.charges.size() > 0) {
 		<ol>
 		@for( charge <- c.charges ) {
 			@if( charge.person != null && charge.rule != null) {
-				<li>@charge.person.getDisplayName() was charged with violating "@charge.rule.title",
-				and plead @charge.plea. Resolution plan: @charge.resolution_plan.
+				<li>@charge.person.getDisplayName()&mdash;@charge.rule.title.
+				@if( ! charge.plea.equals("Guilty") ) { <b>@charge.plea</b>. }
 			} else {
 				<li>Charge missing person and/or rule.
 			}
 		}
 		</ol>
 	} else {
-		<p>No charges.
+		No charges.
 	}
 }
 }
+</table>
+
+<p><a href="@routes.Application.editMeeting(m.id)">Edit these minutes</a>
+
+
