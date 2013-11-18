@@ -7,7 +7,7 @@
 <table class="table">
 <tr><th width=50%>Rule<th width=25%>Most Recent Violation<th># of violations</tr>
 @for( r <- history.rule_records ) {
-	<tr><td width=50%>@r.rule.title
+	<tr><td width=50%>@if(r.rule != null) { @r.rule.title } else { <i>unknown</i> }
 		<td>
 		@if( r.most_recent_charge != null ) {
 			@Application.formatDateShort(r.most_recent_charge)
