@@ -4,6 +4,10 @@ function showPersonHistoryInSidebar(person) {
           null,
            function(data, status, jqXHR) {
             $("#sidebar").html(data);
+            $("#sidebar").find("table.sortable").each(function (i) {
+                sorttable.makeSortable(this);
+                sorttable.innerSortFunction.apply($(this).find("th")[1], []);
+            });
     });
 }
 
