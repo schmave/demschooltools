@@ -1,5 +1,3 @@
-next_case_num = 1;
-
 function showPersonHistoryInSidebar(person) {
     $("#sidebar").html("<h2>Loading...</h2>");
     $.get("/personHistory/" + person.id,
@@ -370,7 +368,6 @@ function loadInitialData() {
         data = app.initial_data.cases[i];
         new_case = addCaseNoServer(data.case_number);
         new_case.loadData(data);
-        next_case_num += 1;
     }
 }
 
@@ -424,16 +421,9 @@ function addCaseNoServer(id)
 
 function addCase()
 {
-    var case_id = app.case_number_prefix;
-    if (next_case_num < 10) {
-        case_id += "0";
-    }
-    case_id += next_case_num;
-    next_case_num += 1;
-    $.post("/newCase?id=" + case_id +
-           "&meeting_id=" + app.meeting_id, "",
+    $.post("/newCase?meeting_id=" + app.meeting_id, "",
            function(data, textStatus, jqXHR) {
-        var new_case = addCaseNoServer(case_id);
+        var new_case = addCaseNoServer(data);
         $('body').animate({'scrollTop': new_case.el.offset().top + 500}, 'slow');
     });
 }

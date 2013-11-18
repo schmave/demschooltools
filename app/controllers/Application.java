@@ -49,9 +49,17 @@ public class Application extends Controller {
         return editMinutes(the_meeting);
     }
 
-    public static Result createCase(String id, Integer meeting_id) {
-        Case.create(id, Meeting.find.ref(meeting_id));
-        return ok();
+    public static Result createCase(Integer meeting_id) {
+        Meeting m = Meeting.find.ref(meeting_id);
+
+        String next_num = "" + (m.cases.size() + 1);
+        if (next_num.length() == 1) {
+            next_num = "0" + next_num;
+        }
+        String id = m.getCaseNumberPrefix() + next_num;
+
+        Case new_case = Case.create(id, m);
+        return ok(id);
     }
 
     public static Result getPersonHistory(Integer id) {

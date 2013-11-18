@@ -14,7 +14,7 @@ GET  /editMeeting/:id	controllers.Application.editMeeting(id: Integer)
 
 GET   /personHistory/:id    controllers.Application.getPersonHistory(id: Integer)
 
-POST /newCase	controllers.Application.createCase(id, meeting_id : Integer)
+POST /newCase	controllers.Application.createCase(meeting_id : Integer)
 POST /saveCase   controllers.Application.saveCase(id)
 
 POST /addPersonAtMeeting    controllers.Application.addPersonAtMeeting(meeting_id : Integer, person_id : Integer, role : Integer)
