@@ -34,7 +34,8 @@ function PeopleChooser(el, on_add, on_remove) {
 
     this.search_box = el.find(".person_search");
     this.search_box.autocomplete({
-        source: "/jsonPeople",
+        source: app.people,
+        delay: 0,
     });
 
     self.one_person_mode = false;
@@ -117,7 +118,8 @@ function RuleChooser(el, on_change) {
 
     this.search_box = el.find(".rule_search");
     this.search_box.autocomplete({
-        source: "/jsonRules",
+        source: app.rules,
+        delay: 0,
     });
 
     this.search_box.bind( "autocompleteselect", function(event, ui) {

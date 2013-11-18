@@ -155,7 +155,7 @@ public class Application extends Controller {
             where().eq("tag.id", id).orderBy("person.last_name, person.first_name").findList();
     }
 
-    public static Result jsonPeople(String term) {
+    public static String jsonPeople(String term) {
         Tag cur_student_tag = Tag.find.where().eq("title", "Current Student").findUnique();
         Tag staff_tag = Tag.find.where().eq("title", "Staff").findUnique();
 
@@ -174,13 +174,13 @@ public class Application extends Controller {
             }
         }
 
-        return ok(Json.stringify(Json.toJson(result)));
+        return Json.stringify(Json.toJson(result));
     }
 
-    public static Result jsonRules(String term) {
+    public static String jsonRules(String term) {
 		term = term.toLowerCase();
 
-        List<Rule> rules = Rule.find.findList();
+        List<Rule> rules = Rule.find.orderBy("title ASC").findList();
 
         List<Map<String, String> > result = new ArrayList<Map<String, String> > ();
         for (Rule r : rules) {
@@ -192,7 +192,7 @@ public class Application extends Controller {
             }
         }
 
-        return ok(Json.stringify(Json.toJson(result)));
+        return Json.stringify(Json.toJson(result));
     }
 
     public static String formatDateShort(Date d) {
