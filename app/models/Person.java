@@ -121,4 +121,11 @@ public class Person extends Model implements Comparable<Person> {
         }
         return last_name_compare;
     }
+
+    public static Comparator<Person> SORT_DISPLAY_NAME = new Comparator<Person>() {
+            @Override
+            public int compare(Person o1, Person o2) {
+                return o1.getDisplayName().compareTo(o2.getDisplayName());
+            }
+        };
 }

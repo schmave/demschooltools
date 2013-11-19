@@ -161,6 +161,7 @@ public class Application extends Controller {
 
         List<Person> people = getPeopleForTag(cur_student_tag.id);
         people.addAll(getPeopleForTag(staff_tag.id));
+        Collections.sort(people, Person.SORT_DISPLAY_NAME);
 
 		term = term.toLowerCase();
 
