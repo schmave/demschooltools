@@ -115,4 +115,21 @@ public class Application extends Controller {
     public static boolean isCurrentUserEditor() {
         return isUserEditor(currentUsername());
     }
+
+    public static Configuration getConfiguration() {
+        return Play.application().configuration().getConfig("jcdb");
+    }
+
+    public static String getRemoteIp() {
+        Context ctx = Context.current();
+        Configuration conf = getConfiguration();
+
+        if (conf.getBoolean("heroku_ips")) {
+            String header = ctx.request().getHeader("HTTP_X_FORWARDED_FOR");
+            String splits[] = header.split("[, ]");
+            return splits[splits.length - 1];
+        } else {
+            return ctx.request().remoteAddress();
+        }
+    }
 }
