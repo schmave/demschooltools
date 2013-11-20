@@ -1,0 +1,6 @@
+@()(body: String => Html)
+
+@defining(Application.currentUsername()) { auth =>
+	@if( auth != null ) { @body(auth) }
+}
+

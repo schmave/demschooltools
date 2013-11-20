@@ -27,116 +27,13 @@ public class Application extends Controller {
         return ok(views.html.index.render(meetings));
     }
 
-    public static Result editTodaysMinutes() {
-        Meeting the_meeting = Meeting.find.where().eq("date", new Date()).findUnique();
-        if (the_meeting == null) {
-            the_meeting = Meeting.create(new Date());
-            the_meeting.save();
-        }
-        return editMinutes(the_meeting);
-    }
-
-    public static Result editMinutes(Meeting meeting) {
-        return ok(views.html.edit_minutes.render(meeting));
-    }
-
     public static Result viewMeeting(int meeting_id) {
         return ok(views.html.view_meeting.render(Meeting.find.byId(meeting_id)));
-    }
-
-    public static Result editMeeting(int meeting_id) {
-        Meeting the_meeting = Meeting.find.byId(meeting_id);
-        return editMinutes(the_meeting);
-    }
-
-    public static Result createCase(Integer meeting_id) {
-        Meeting m = Meeting.find.ref(meeting_id);
-
-        String next_num = "" + (m.cases.size() + 1);
-        if (next_num.length() == 1) {
-            next_num = "0" + next_num;
-        }
-        String id = m.getCaseNumberPrefix() + next_num;
-
-        Case new_case = Case.create(id, m);
-        return ok(id);
     }
 
     public static Result getPersonHistory(Integer id) {
         Person p = Person.find.byId(id);
         return ok(views.html.person_history.render(p, new PersonHistory(p)));
-    }
-
-    public static Result saveCase(String id) {
-        Case c = Case.find.byId(id);
-
-        c.edit(request().queryString());
-        c.save();
-
-        return ok();
-    }
-
-    public static Result addPersonAtMeeting(Integer meeting_id, Integer person_id,
-        Integer role) {
-        Meeting m = Meeting.find.ref(meeting_id);
-
-        PersonAtMeeting.create(m, Person.find.ref(person_id), role);
-
-        return ok();
-    }
-
-    public static Result removePersonAtMeeting(Integer meeting_id, Integer person_id,
-        Integer role) {
-        SqlUpdate update = Ebean.createSqlUpdate(
-            "DELETE from person_at_meeting where meeting_id = :meeting_id"+
-            " and person_id = :person_id and role = :role");
-        update.setParameter("meeting_id", meeting_id);
-        update.setParameter("person_id", person_id);
-        update.setParameter("role", role);
-
-        Ebean.execute(update);
-
-        return ok();
-    }
-
-    public static Result addTestifier(String case_number, Integer person_id)
-    {
-        TestifyRecord.create(Case.find.ref(case_number), Person.find.ref(person_id));
-        return ok();
-    }
-
-    public static Result removeTestifier(String case_number, Integer person_id)
-    {
-        SqlUpdate update = Ebean.createSqlUpdate(
-            "DELETE from testify_record where case_number = :case_number "+
-            "and person_id = :person_id");
-        update.setParameter("case_number", case_number);
-        update.setParameter("person_id", person_id);
-
-        Ebean.execute(update);
-        return ok();
-    }
-
-    public static Result addCharge(String case_number)
-    {
-        Charge c = Charge.create(Case.find.ref(case_number));
-        return ok("" + c.id);
-    }
-
-    public static Result saveCharge(int id) {
-        Charge c = Charge.find.byId(id);
-
-        c.edit(request().queryString());
-        c.save();
-
-        return ok();
-    }
-
-    public static Result removeCharge(int id) {
-        Charge c = Charge.find.byId(id);
-        c.delete();
-
-        return ok();
     }
 
     static List<Person> getPeopleForTag(Integer id)
@@ -202,5 +99,17 @@ public class Application extends Controller {
 
     public static String formatMeetingDate(Date d) {
         return new SimpleDateFormat("EEEE MMMM dd, yyyy").format(d);
+    }
+
+    public static String currentUsername() {
+        return Context.current().request().username();
+    }
+
+    public static boolean isUserEditor(String username) {
+        return username != null && username.contains("@");
+    }
+
+    public static boolean isCurrentUserEditor() {
+        return isUserEditor(currentUsername());
     }
 }

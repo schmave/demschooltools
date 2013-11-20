@@ -70,6 +70,9 @@
 }
 </table>
 
-<p><a href="@routes.Application.editMeeting(m.id)">Edit these minutes</a>
+
+@if(Application.isCurrentUserEditor()) {
+	<p><a href="@routes.ApplicationEditing.editMeeting(m.id)">Edit these minutes</a>
+}
 
 

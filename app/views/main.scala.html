@@ -1,7 +1,5 @@
 @(title: String)(content: Html)
 
-@import com.feth.play.module.pa.views.html._
-
 <!DOCTYPE html>
 
 <html>
@@ -22,13 +20,19 @@
 		<link rel="stylesheet" media="all" href="@routes.Assets.at("stylesheets/main.css")">
     </head>
     <body>
-		@currentAuth() { auth =>
-			@if(auth != null) {
-				<ul class="nav nav-tabs">
-				<li><a href="@routes.Application.index">Home</a>
-				<li><a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout">Logout</a>
-				</ul>
+		@ifAuth() { username =>
+			<ul class="nav nav-tabs">
+			<li><a href="@routes.Application.index">Home</a>
+			@if(Application.isCurrentUserEditor()) {
+				<li><a href="@routes.ApplicationEditing.editTodaysMinutes">Edit today's minutes</a>
 			}
+			<li><a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout">
+				@if(Application.isCurrentUserEditor()) {
+					Logout
+				} else { Login }
+					</a>
+			<li class="username"><a class="username">@username</a></li>
+			</ul>
 		}
 
 		@content

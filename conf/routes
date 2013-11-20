@@ -6,27 +6,27 @@ GET /login	controllers.Public.index()
 
 GET     /                         controllers.Application.index()
 
-GET     /editToday                controllers.Application.editTodaysMinutes
+GET     /editToday                controllers.ApplicationEditing.editTodaysMinutes
 
 
 GET  /viewMeeting/:id	controllers.Application.viewMeeting(id: Integer)
-GET  /editMeeting/:id	controllers.Application.editMeeting(id: Integer)
+GET  /editMeeting/:id	controllers.ApplicationEditing.editMeeting(id: Integer)
 
 GET   /personHistory/:id    controllers.Application.getPersonHistory(id: Integer)
 
-POST /newCase	controllers.Application.createCase(meeting_id : Integer)
-POST /saveCase   controllers.Application.saveCase(id)
+POST /newCase	controllers.ApplicationEditing.createCase(meeting_id : Integer)
+POST /saveCase   controllers.ApplicationEditing.saveCase(id)
 
-POST /addPersonAtMeeting    controllers.Application.addPersonAtMeeting(meeting_id : Integer, person_id : Integer, role : Integer)
-POST /removePersonAtMeeting    controllers.Application.removePersonAtMeeting(meeting_id : Integer, person_id : Integer, role : Integer)
+POST /addPersonAtMeeting    controllers.ApplicationEditing.addPersonAtMeeting(meeting_id : Integer, person_id : Integer, role : Integer)
+POST /removePersonAtMeeting    controllers.ApplicationEditing.removePersonAtMeeting(meeting_id : Integer, person_id : Integer, role : Integer)
 
 
-POST /addTestifier   controllers.Application.addTestifier(case_number, person_id : Integer)
-POST /removeTestifier controllers.Application.removeTestifier(case_number, person_id : Integer)
+POST /addTestifier   controllers.ApplicationEditing.addTestifier(case_number, person_id : Integer)
+POST /removeTestifier controllers.ApplicationEditing.removeTestifier(case_number, person_id : Integer)
 
-POST /addCharge   controllers.Application.addCharge(case_number)
-POST /saveCharge controllers.Application.saveCharge(id : Integer)
-POST /removeCharge   controllers.Application.removeCharge(id : Integer)
+POST /addCharge   controllers.ApplicationEditing.addCharge(case_number)
+POST /saveCharge controllers.ApplicationEditing.saveCharge(id : Integer)
+POST /removeCharge   controllers.ApplicationEditing.removeCharge(id : Integer)
 
 
 

@@ -133,3 +133,11 @@ body {
 .case_notes ol {
     -webkit-padding-start: 10px;
 }
+
+li.username {
+    float:right;
+}
+
+a.username {
+    font-weight: bold;
+}
