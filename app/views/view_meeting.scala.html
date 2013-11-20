@@ -25,7 +25,7 @@
 
 <h4>&nbsp;<br>Resolution Plans</h4>
 <table class="table resolution_plans">
-	<tr><th width="80">Case<th>Person<th>Rule<th>Resolution Plan</tr>
+	<thead><th width="70">Case<th width="20">Person<th width="280">Rule<th>Resolution Plan</thead>
 	@for(c <- m.cases) {
 		@for(charge <- c.charges) {
 			@if( charge.person != null && charge.rule != null ) {
