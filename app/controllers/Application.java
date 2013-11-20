@@ -98,7 +98,7 @@ public class Application extends Controller {
     }
 
     public static String formatMeetingDate(Date d) {
-        return new SimpleDateFormat("EEEE MMMM dd, yyyy").format(d);
+        return new SimpleDateFormat("EE--MMMM dd, yyyy").format(d);
     }
 
     public static String currentUsername() {
