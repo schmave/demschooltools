@@ -24,7 +24,10 @@ public class Application extends Controller {
 
     public static Result index() {
         List<Meeting> meetings = Meeting.find.orderBy("date DESC").findList();
-        return ok(views.html.index.render(meetings));
+
+        List<Charge> sm_charges = Charge.find.where().eq("referred_to_sm", true).eq("sm_decision", null).findList();
+
+        return ok(views.html.index.render(meetings, sm_charges));
     }
 
     public static Result viewMeeting(int meeting_id) {

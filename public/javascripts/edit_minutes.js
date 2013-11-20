@@ -191,6 +191,10 @@ function Charge(charge_id, el) {
         if (json.rule) {
             self.rule_chooser.loadData(json.rule);
         }
+
+        if (json.referred_to_sm) {
+            el.find(".refer-to-sm").prop("checked", true);
+        }
     }
 
     this.saveIfNeeded = function() {
@@ -206,10 +210,19 @@ function Charge(charge_id, el) {
         }
 
         url += "&resolution_plan=" + encodeURIComponent(el.find(".resolution_plan").val());
-        plea = el.find(":checked");
-        if (plea) {
-            url += "&plea=" + plea.val();
+
+        plea = el.find(".plea-guilty");
+        if (plea.prop("checked")) {
+            url += "&plea=Guilty";
         }
+
+        plea = el.find(".plea-not-guilty");
+        if (plea.prop("checked")) {
+            url += "&plea=Not Guilty";
+        }
+
+        refer = el.find(".refer-to-sm");
+        url += "&referred_to_sm=" + refer.prop("checked");
 
         if (self.rule_chooser.rule) {
             url += "&rule_id=" + self.rule_chooser.rule;
@@ -238,6 +251,7 @@ function Charge(charge_id, el) {
     el.find(".resolution_plan").change(self.markAsModified);
     el.find(".plea-guilty").change(self.markAsModified);
     el.find(".plea-not-guilty").change(self.markAsModified);
+    el.find(".refer-to-sm").change(self.markAsModified);
 
     self.people_chooser = new PeopleChooser(el.find(".people_chooser"),
                                             self.markAsModified,
@@ -303,7 +317,7 @@ function Case (id, el) {
     }
 
     this.addCharge = function() {
-        $('body').animate({'scrollTop': $('body').scrollTop() + 90}, 'slow');
+        $('body').animate({'scrollTop': $('body').scrollTop() + 100}, 'slow');
         $.post("/addCharge?case_number=" + id,
                function(data, textStatus, jqXHR) {
             self.addChargeNoServer(parseInt(data))

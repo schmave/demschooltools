@@ -141,3 +141,7 @@ li.username {
 a.username {
     font-weight: bold;
 }
+
+.charge label {
+    font-weight: normal;
+}

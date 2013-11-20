@@ -34,6 +34,9 @@ public class Charge extends Model {
     public String plea = "";
     public String resolution_plan = "";
 
+    public boolean referred_to_sm;
+    public String sm_decision;
+
     public static Finder<Integer, Charge> find = new Finder(
         Integer.class, Charge.class
     );
@@ -67,5 +70,7 @@ public class Charge extends Model {
         } else {
             rule = null;
         }
+
+        referred_to_sm = Boolean.parseBoolean(query_string.get("referred_to_sm")[0]);
     }
 }
