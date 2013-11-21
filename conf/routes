@@ -14,6 +14,10 @@ GET  /editMeeting/:id	controllers.ApplicationEditing.editMeeting(id: Integer)
 
 GET   /personHistory/:id    controllers.Application.getPersonHistory(id: Integer)
 
+
+GET   /enterSchoolMeeting  controllers.ApplicationEditing.enterSchoolMeetingDecisions()
+POST  /enterSchoolMeeting  controllers.ApplicationEditing.saveSchoolMeetingDecisions()
+
 POST /newCase	controllers.ApplicationEditing.createCase(meeting_id : Integer)
 POST /saveCase   controllers.ApplicationEditing.saveCase(id)
 

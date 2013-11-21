@@ -1,0 +1,34 @@
+@(sm_charges : List [ Charge ])
+
+@import helper._
+
+@main("Enter School Meeting charges") {
+
+<h3> Charges awaiting School Meeting decision</h3>
+
+@if( sm_charges.size() > 0 ) {
+
+	@for( c <- sm_charges ) {
+		@caseTableOpen()
+		@caseTableRow(c.the_case)
+		</table>
+
+		<p>Charge against @c.person.getDisplayName() was referred to School Meeting.
+		The recommended resolution plan was:
+			<p style="padding-left:1in">@c.resolution_plan
+		<p>The plea was @c.plea.
+
+		<form method=POST>
+		<input type="hidden" name="charge_id" value="@c.id">
+		School Meeting decision: <textarea rows="12" cols="90" name="sm_decision"></textarea>
+		<br><input style="margin-left: 200px" type="submit" class="btn btn-primary" value="Submit and mark as closed">
+			<hr/>
+		</form>
+	}
+	</table>
+} else {
+   <p>None!!!
+}
+
+
+}

@@ -145,3 +145,13 @@ a.username {
 .charge label {
     font-weight: normal;
 }
+
+
+/* Used in case display */
+.table tbody>tr>td.sm_decision {
+    padding-left: 1in;
+    padding-right: 1in;
+    background: #ccc;
+}
+
+

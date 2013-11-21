@@ -1,0 +1,32 @@
+@(c : Case)
+
+@import helper._
+
+	<tr>
+	<td><h5>#@c.case_number</h5>
+	<p>@if( c.date != null ) { @Application.formatDateShort(c.date). }
+	Writer: @if( c.writer != null ) { @c.writer.getDisplayName(), } else {<i>unknown</i>,}
+	location: @if(!c.location.equals("")) { @c.location. } else {<i>unknown</i>.}
+	<td><p>Testifiers: @for( tr <- c.testify_records ) { @tr.person.getDisplayName(), }
+		<p>@c.findings
+	<td>@if( c.charges.size() > 0) {
+		<ol>
+			@for( charge <- c.charges ) {
+				@if( charge.person != null && charge.rule != null) {
+					<li>@charge.person.getDisplayName()&mdash;@charge.rule.title.
+					@if( ! charge.plea.equals("Guilty") ) { <b>@charge.plea</b>. }
+				} else {
+					<li>Charge missing person and/or rule.
+				}
+			}
+		</ol>
+	} else {
+		No charges.
+	}
+
+	@for( charge <- c.charges ) {
+		@if( charge.sm_decision != null ) {
+			<tr><td colspan=3 class="sm_decision">School meeting decision on charging @charge.person.getDisplayName() with @charge.rule.title: @charge.sm_decision
+		}
+	}
+

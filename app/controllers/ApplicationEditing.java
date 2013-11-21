@@ -125,4 +125,21 @@ public class ApplicationEditing extends Controller {
         return ok();
     }
 
+    public static Result enterSchoolMeetingDecisions() {
+        return ok(views.html.enter_sm_decisions.render(Application.getActiveSchoolMeetingReferrals()));
+    }
+
+    public static Result saveSchoolMeetingDecisions() {
+        Map<String, String[]> form_data = request().body().asFormUrlEncoded();
+
+        Integer charge_id = Integer.parseInt(form_data.get("charge_id")[0]);
+        String decision = form_data.get("sm_decision")[0];
+
+        Charge c = Charge.find.byId(charge_id);
+        c.updateSchoolMeetingDecision(decision);
+        c.save();
+
+        return redirect(routes.ApplicationEditing.enterSchoolMeetingDecisions());
+    }
+
 }

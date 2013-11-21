@@ -19,7 +19,13 @@
 			<td>@c.the_case.findings
 	}
 	</table>
+
+@if( Application.isCurrentUserEditor() ) {
+	<a class="btn btn-primary" href="@routes.ApplicationEditing.enterSchoolMeetingDecisions">
+	Record School Meeting decisions</a>
 }
+}
+
 
 <h4>Minutes</h4>
 <table class="table">

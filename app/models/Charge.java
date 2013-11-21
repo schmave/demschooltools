@@ -73,4 +73,11 @@ public class Charge extends Model {
 
         referred_to_sm = Boolean.parseBoolean(query_string.get("referred_to_sm")[0]);
     }
+
+    public void updateSchoolMeetingDecision(String decision) {
+        decision = decision.trim();
+        if (!decision.equals("")) {
+            this.sm_decision = decision;
+        }
+    }
 }

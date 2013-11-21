@@ -22,10 +22,14 @@ import play.mvc.Http.Context;
 @Security.Authenticated(Secured.class)
 public class Application extends Controller {
 
+    public static List<Charge> getActiveSchoolMeetingReferrals() {
+        return Charge.find.where().eq("referred_to_sm", true).eq("sm_decision", null).findList();
+    }
+
     public static Result index() {
         List<Meeting> meetings = Meeting.find.orderBy("date DESC").findList();
 
-        List<Charge> sm_charges = Charge.find.where().eq("referred_to_sm", true).eq("sm_decision", null).findList();
+        List<Charge> sm_charges = getActiveSchoolMeetingReferrals();
 
         return ok(views.html.index.render(meetings, sm_charges));
     }
