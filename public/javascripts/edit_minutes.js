@@ -40,6 +40,7 @@ function PeopleChooser(el, on_add, on_remove) {
     this.search_box.autocomplete({
         source: app.people,
         delay: 0,
+        autoFocus: true,
     });
 
     self.one_person_mode = false;
@@ -124,6 +125,7 @@ function RuleChooser(el, on_change) {
     this.search_box.autocomplete({
         source: app.rules,
         delay: 0,
+        autoFocus: true,
     });
 
     this.search_box.bind( "autocompleteselect", function(event, ui) {
