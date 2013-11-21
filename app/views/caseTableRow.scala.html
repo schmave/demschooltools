@@ -25,6 +25,9 @@
 	}
 
 	@for( charge <- c.charges ) {
+		@if( charge.referred_to_sm && charge.sm_decision == null) {
+			<tr><td colspan=3 class="sm_decision">*** Awaiting School Meeting decision on charging @charge.person.getDisplayName() with @charge.rule.title.
+		}
 		@if( charge.sm_decision != null ) {
 			<tr><td colspan=3 class="sm_decision">School meeting decision on charging @charge.person.getDisplayName() with @charge.rule.title: @charge.sm_decision
 		}

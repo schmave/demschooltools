@@ -35,6 +35,9 @@
 						@if( ! charge.plea.equals("Guilty") ) {
 							<i>(Plea: @charge.plea)</i>
 						}
+						@if( charge.referred_to_sm ) {
+							<br>*** Referred to School Meeting ***
+						}
 						</tr>
 			}
 		}
