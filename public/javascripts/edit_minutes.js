@@ -11,6 +11,11 @@ function showPersonHistoryInSidebar(person) {
     });
 }
 
+function selectNextInput(cur_input) {
+    var next = $(":input:eq(" + ($(":input").index(cur_input) + 1) + ")");
+    next.focus();
+}
+
 function Person(id, name) {
     this.name = name;
     this.id = id;
@@ -74,6 +79,7 @@ function PeopleChooser(el, on_add, on_remove) {
         if (self.one_person_mode) {
             self.search_box.hide();
             self.el.find(".glyphicon").hide();
+            selectNextInput(self.search_box);
         }
 
         var p = new Person(id, name);
@@ -146,6 +152,8 @@ function RuleChooser(el, on_change) {
                 children(":first-child");
 
         self.rule_el.find("img").click(function() { self.unsetRule() });
+
+        selectNextInput(self.search_box);
     }
 
     this.unsetRule = function() {
