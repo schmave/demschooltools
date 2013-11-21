@@ -39,13 +39,14 @@ public class Secured extends Security.Authenticator {
         if (allow_ip) {
             String sql = "select ip from allowed_ips where ip like :ip";
             SqlQuery sqlQuery = Ebean.createSqlQuery(sql);
-            sqlQuery.setParameter("ip", Application.getRemoteIp());
+            String address = Application.getRemoteIp();
+            sqlQuery.setParameter("ip", address);
 
             // execute the query returning a List of MapBean objects
             SqlRow result = sqlQuery.findUnique();
 
             if (result != null) {
-                return ctx.request().remoteAddress();
+                return address;
             }
         }
 

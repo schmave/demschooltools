@@ -9,7 +9,11 @@
 @if( sm_charges.size() > 0 ) {
 	<h4>Charges referred to School Meeting</h4>
 	<table class="table">
-		<thead><th>Case<th>Person<th>Rule<th>Plea<th>Resolution Plan<th>Findings</thead>
+		<thead><th width="70">Case
+			<th width="20">Person
+			<th width="150">Rule
+			<th width="70">Plea
+			<th>Resolution Plan<th>Findings</thead>
 	@for( c <- sm_charges ) {
 		<tr><td>@c.the_case.case_number
 			<td>@c.person.getDisplayName()
