@@ -18,10 +18,11 @@
 
 
 		<link rel="stylesheet" media="all" href="@routes.Assets.at("stylesheets/main.css")">
+		<link rel="stylesheet" media="print" href="@routes.Assets.at("stylesheets/print.css")">
     </head>
     <body>
 		@ifAuth() { username =>
-			<ul class="nav nav-tabs">
+			<ul class="nav nav-tabs no-print">
 			<li><a href="@routes.Application.index">Home</a>
 			@if(Application.isCurrentUserEditor()) {
 				<li><a href="@routes.ApplicationEditing.editTodaysMinutes">Edit today's minutes</a>
