@@ -129,7 +129,10 @@ public class Application extends Controller {
         Configuration conf = getConfiguration();
 
         if (conf.getBoolean("heroku_ips")) {
-            String header = ctx.request().getHeader("HTTP_X_FORWARDED_FOR");
+            String header = ctx.request().getHeader("X-Forwarded-For");
+            if (header == null) {
+                return "unknown-ip";
+            }
             String splits[] = header.split("[, ]");
             return splits[splits.length - 1];
         } else {
