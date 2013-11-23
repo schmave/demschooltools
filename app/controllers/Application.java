@@ -31,7 +31,15 @@ public class Application extends Controller {
 
         List<Charge> sm_charges = getActiveSchoolMeetingReferrals();
 
-        return ok(views.html.index.render(meetings, sm_charges));
+        Tag cur_student_tag = Tag.find.where().eq("title", "Current Student").findUnique();
+        Tag staff_tag = Tag.find.where().eq("title", "Staff").findUnique();
+
+        List<Person> people = getPeopleForTag(cur_student_tag.id);
+        people.addAll(getPeopleForTag(staff_tag.id));
+        Collections.sort(people, Person.SORT_DISPLAY_NAME);
+
+        return ok(views.html.index.render(meetings, sm_charges, people,
+            Rule.find.orderBy("title ASC").findList()));
     }
 
     public static Result viewMeeting(int meeting_id) {
@@ -46,6 +54,16 @@ public class Application extends Controller {
     public static Result getRuleHistory(Integer id) {
         Rule r = Rule.find.byId(id);
         return ok(views.html.rule_history.render(r, new RuleHistory(r)));
+    }
+
+    public static Result viewPersonHistory(Integer id) {
+        Person p = Person.find.byId(id);
+        return ok(views.html.view_person_history.render(p, new PersonHistory(p)));
+    }
+
+    public static Result viewRuleHistory(Integer id) {
+        Rule r = Rule.find.byId(id);
+        return ok(views.html.view_rule_history.render(r, new RuleHistory(r)));
     }
 
     static List<Person> getPeopleForTag(Integer id)

@@ -1,0 +1,18 @@
+@(p : Person, history : PersonHistory)
+
+@import helper._
+
+@main(p.getDisplayName() + "'s JC history") {
+
+<script type="text/javascript">
+$(function() {
+	$("table.sortable").each(function (i) {
+		sorttable.makeSortable(this);
+		sorttable.innerSortFunction.apply($(this).find("th")[1], []);
+	});
+});
+</script>
+
+@person_history(p, history)
+
+}

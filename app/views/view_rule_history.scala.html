@@ -1,0 +1,9 @@
+@(r : Rule, history : RuleHistory)
+
+@import helper._
+
+@main("History of " + r.title) {
+
+@rule_history(r, history)
+
+}

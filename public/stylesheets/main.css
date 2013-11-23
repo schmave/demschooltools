@@ -156,4 +156,19 @@ a.username {
     background: #ccc;
 }
 
+.scroll-table {
+    margin-right: 30px;
+    width: 300px;
+}
+
+.scroll-table thead > tr, .scroll-table tbody {
+    display: block;
+    width: 300px;
+}
+
+.scroll-table tbody {
+    height: 350px;
+    overflow: auto;
+}
+
 

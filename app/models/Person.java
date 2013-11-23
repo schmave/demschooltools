@@ -75,6 +75,11 @@ public class Person extends Model implements Comparable<Person> {
     @OrderBy("id DESC")
     public List<Charge> charges;
 
+    @OneToMany(mappedBy="writer")
+    @JsonIgnore
+    @OrderBy("case_number DESC")
+    public List<Case> cases_written_up;
+
     public static Finder<Integer,Person> find = new Finder(
         Integer.class, Person.class
     );
