@@ -83,6 +83,7 @@ public class Person extends Model implements Comparable<Person> {
         return find.where().eq("is_family", Boolean.FALSE).orderBy("last_name, first_name ASC").findList();
     }
 
+    @JsonIgnore
     public Map<Rule, List<Charge>> getChargesByRule() {
         Map<Rule, List<Charge>> result = new TreeMap<Rule, List<Charge>>();
         for (Charge c : charges) {
