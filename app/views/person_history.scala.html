@@ -18,21 +18,26 @@
 </tbody>
 </table>
 
-<h4>Detailed Charges</h4>
-@for( c <- p.charges ) {
-	<p><b>@c.the_case.case_number</b>.
+<hr>
+@defining( p.getChargesByRule() ) { charges_by_rule =>
+	@for( (rule, charges) <- charges_by_rule ) {
+		@if( rule != null ) {
+			<h4 style="margin-top: 2em;">@rule.title</h4>
+		}
+		@for( c <- charges) {
+			<p><b>@c.the_case.case_number</b>.
 
-	Findings: @c.the_case.findings.
-	@if( c.rule != null ) {
-		<b>@c.rule.title</b>.
-	}
+			<i>Findings</i>: @c.the_case.findings.
 
-	@if( !c.plea.equals("Guilty") ) {
-		Plead <b>@c.plea</b>.
-	}
+			@if( !c.plea.equals("Guilty") ) {
+				Plead <b>@c.plea</b>.
+			}
 
-	@if( c.sm_decision != null) {
-		<b>School Meeting ruled: </b>@c.sm_decision
+			<i>Resolution plan</i>: @c.resolution_plan.
+
+			@if( c.sm_decision != null) {
+				<i>School Meeting ruled</i>: @c.sm_decision
+			}
+		}
 	}
 }
-
