@@ -220,7 +220,7 @@ function Charge(charge_id, el) {
     }
 
     this.saveIfNeeded = function() {
-        window.setTimeout(self.saveIfNeeded, 2000);
+        window.setTimeout(self.saveIfNeeded, 5000);
         if (!self.is_modified) {
             return;
         }
@@ -250,8 +250,9 @@ function Charge(charge_id, el) {
             url += "&rule_id=" + self.rule_chooser.rule;
         }
 
-        self.is_modified = false;
-        $.post(url);
+        $.post(url, function(data) {
+            self.is_modified = false;
+        });
     }
 
     this.removeCharge = function() {
@@ -265,7 +266,7 @@ function Charge(charge_id, el) {
 
     self.el = el;
     self.is_modified = false;
-    window.setTimeout(self.saveIfNeeded, 2000);
+    window.setTimeout(self.saveIfNeeded, 5000);
 
     self.remove_button = el.find("button")
     self.remove_button.click(self.removeCharge);
@@ -293,7 +294,7 @@ function Case (id, el) {
     var self = this;
 
     this.saveIfNeeded = function() {
-        window.setTimeout(self.saveIfNeeded, 2000);
+        window.setTimeout(self.saveIfNeeded, 5000);
         if (!self.is_modified) {
             return;
         }
@@ -306,8 +307,9 @@ function Case (id, el) {
         url += "&findings=" + encodeURIComponent(self.el.find(".findings").val());
         url += "&date=" + encodeURIComponent(self.el.find(".date").val());
 
-        self.is_modified = false;
-        $.post(url);
+        $.post(url, function(data) {
+            self.is_modified = false;
+        });
     }
 
     this.markAsModified = function() {
@@ -378,7 +380,7 @@ function Case (id, el) {
 
     el.find(".add-charges").click(self.addCharge);
 
-    window.setTimeout(self.saveIfNeeded, 2000);
+    window.setTimeout(self.saveIfNeeded, 5000);
 }
 
 function addPersonAtMeeting(person, role) {
