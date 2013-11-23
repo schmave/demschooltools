@@ -4,7 +4,11 @@
 
 @main("JC minutes from " + Application.formatMeetingDate(m.date)) {
 
-<h3>JC minutes from @Application.formatMeetingDate(m.date)</h3>
+<h3>JC minutes from @Application.formatMeetingDate(m.date)
+<a href="javascript:print()" class="btn btn-warning no-print" style="margin-left: 100px">
+Print minutes</a></h3>
+
+
 
 <p>Committee:
 @for(p <- m.people_at_meeting) {
