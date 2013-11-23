@@ -76,6 +76,7 @@
 .person .label
 {
     font-size: inherit;
+    cursor: pointer;
 }
 
 .person
@@ -85,6 +86,7 @@
 
 .rule .label
 {
+    cursor: pointer;
     display:inline-block;
     font-size: inherit;
     width: 200px;
