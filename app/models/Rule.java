@@ -7,6 +7,8 @@ import java.util.TreeMap;
 
 import javax.persistence.*;
 
+import org.codehaus.jackson.annotate.*;
+
 import play.db.ebean.Model;
 import play.db.ebean.Model.Finder;
 
@@ -16,6 +18,11 @@ public class Rule extends Model implements Comparable<Rule> {
     public Integer id;
 
     public String title;
+
+    @OneToMany(mappedBy="rule")
+    @JsonIgnore
+    @OrderBy("id DESC")
+    public List<Charge> charges;
 
     public static Finder<Integer, Rule> find = new Finder(
         Integer.class, Rule.class

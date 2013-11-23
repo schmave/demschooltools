@@ -1,0 +1,26 @@
+@(r : Rule, history : RuleHistory)
+
+@import helper._
+
+<h3>History of @r.title</h3>
+
+<table class="table sortable">
+<thead><tr><th width=50%>Person<th width=25%>Most Recent Violation<th># of violations</tr></thead>
+<tbody>
+@for( r <- history.rule_records ) {
+	<tr><td>@if(r.person != null) { @r.person.getDisplayName() } else { <i>unknown</i> }
+		<td>
+		@if( r.most_recent_charge != null ) {
+			@Application.formatDateShort(r.most_recent_charge)
+		}
+		<td align=right>@r.count</tr>
+}
+</tbody>
+</table>
+
+<hr>
+
+@for( c <- r.charges) {
+	@historyCharge(c, true)
+}
+

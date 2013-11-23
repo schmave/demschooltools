@@ -43,6 +43,11 @@ public class Application extends Controller {
         return ok(views.html.person_history.render(p, new PersonHistory(p)));
     }
 
+    public static Result getRuleHistory(Integer id) {
+        Rule r = Rule.find.byId(id);
+        return ok(views.html.rule_history.render(r, new RuleHistory(r)));
+    }
+
     static List<Person> getPeopleForTag(Integer id)
     {
         RawSql rawSql = RawSqlBuilder

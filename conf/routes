@@ -13,6 +13,7 @@ GET  /viewMeeting/:id	controllers.Application.viewMeeting(id: Integer)
 GET  /editMeeting/:id	controllers.ApplicationEditing.editMeeting(id: Integer)
 
 GET   /personHistory/:id    controllers.Application.getPersonHistory(id: Integer)
+GET   /ruleHistory/:id    controllers.Application.getRuleHistory(id: Integer)
 
 
 GET   /enterSchoolMeeting  controllers.ApplicationEditing.enterSchoolMeetingDecisions()

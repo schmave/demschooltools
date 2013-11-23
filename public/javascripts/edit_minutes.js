@@ -1,6 +1,6 @@
-function showPersonHistoryInSidebar(person) {
+function showSomethingInSidebar(url) {
     $("#sidebar").html("<h2>Loading...</h2>");
-    $.get("/personHistory/" + person.id,
+    $.get(url,
           null,
            function(data, status, jqXHR) {
             $("#sidebar").html(data);
@@ -9,6 +9,14 @@ function showPersonHistoryInSidebar(person) {
                 sorttable.innerSortFunction.apply($(this).find("th")[1], []);
             });
     });
+}
+
+function showPersonHistoryInSidebar(person) {
+    showSomethingInSidebar("/personHistory/" + person.id)
+}
+
+function showRuleHistoryInSidebar(rule_id) {
+    showSomethingInSidebar("/ruleHistory/" + rule_id);
 }
 
 function selectNextInput(cur_input) {
@@ -150,6 +158,10 @@ function RuleChooser(el, on_change) {
         self.rule_el =
             self.el.prepend(app.rule_template({name: title})).
                 children(":first-child");
+
+        self.rule_el.find(".label").click(function() {
+            showRuleHistoryInSidebar(self.rule);
+        });
 
         self.rule_el.find("img").click(function() { self.unsetRule() });
 

@@ -25,19 +25,7 @@
 			<h4 style="margin-top: 2em;">@rule.title</h4>
 		}
 		@for( c <- charges) {
-			<p><b>@c.the_case.case_number</b>.
-
-			<i>Findings</i>: @c.the_case.findings.
-
-			@if( !c.plea.equals("Guilty") ) {
-				Plead <b>@c.plea</b>.
-			}
-
-			<i>Resolution plan</i>: @c.resolution_plan.
-
-			@if( c.sm_decision != null) {
-				<i>School Meeting ruled</i>: @c.sm_decision
-			}
+			@historyCharge(c, false)
 		}
 	}
 }
