@@ -9,22 +9,20 @@
 Print minutes</a></h3>
 
 
-
-<p>Committee:
-@for(p <- m.people_at_meeting) {
-	@if(p.role == PersonAtMeeting.ROLE_JC_CHAIR) {
-		<b>@p.person.getDisplayName()</b>,
-	}
-	@if(p.role == PersonAtMeeting.ROLE_JC_MEMBER) {
-		@p.person.getDisplayName(),
-	}
-	@if(p.role == PersonAtMeeting.ROLE_JC_SUB) {
-		(@p.person.getDisplayName()),
-	}
-	@if(p.role == PersonAtMeeting.ROLE_NOTE_TAKER) {
-		@p.person.getDisplayName()*,
-	}
-}
+<p><i>Committee</i>:
+@Html(
+	m.people_at_meeting.map { p =>
+		if(p.role == PersonAtMeeting.ROLE_JC_CHAIR) {
+			"<b>" + p.person.getDisplayName() + "</b>"
+		} else if(p.role == PersonAtMeeting.ROLE_JC_MEMBER) {
+			p.person.getDisplayName()
+		} else if(p.role == PersonAtMeeting.ROLE_JC_SUB) {
+			"(" + p.person.getDisplayName() + ")"
+		} else if(p.role == PersonAtMeeting.ROLE_NOTE_TAKER) {
+			p.person.getDisplayName() + "*"
+		}
+	}.mkString(", ")
+)
 </p>
 
 <h4>&nbsp;<br>Resolution Plans</h4>

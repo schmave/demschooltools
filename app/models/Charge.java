@@ -31,7 +31,7 @@ public class Charge extends Model {
     @JsonIgnore
     public Case the_case;
 
-    public String plea = "";
+    public String plea = "not entered";
     public String resolution_plan = "";
 
     public boolean referred_to_sm;
