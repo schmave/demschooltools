@@ -19,6 +19,9 @@ public class PersonHistory {
             if (r == null) {
                 r = new Record();
                 r.most_recent_charge = c.the_case.date;
+                if (r.most_recent_charge == null) {
+                    r.most_recent_charge = c.the_case.meeting.date;
+                }
                 r.count = 1;
                 r.rule = c.rule;
                 records.put(c.rule, r);
