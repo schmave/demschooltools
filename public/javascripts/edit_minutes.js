@@ -459,7 +459,9 @@ function addCaseNoServer(id)
     app.cases.push(case_obj);
 
     $("#meeting-cases").append(case_obj.el);
-	case_obj.el.find(".date").datepicker();
+	case_obj.el.find(".date").datepicker({
+		showOtherMonths: true,
+		selectOtherMonths: true});
 	case_obj.el.find(".date").datepicker("option", "dateFormat", "yy-mm-dd");
 
     return case_obj;

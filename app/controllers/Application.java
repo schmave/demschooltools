@@ -130,6 +130,10 @@ public class Application extends Controller {
     public static String formatMeetingDate(Date d) {
         return new SimpleDateFormat("EE--MMMM dd, yyyy").format(d);
     }
+	
+	public static String yymmddDate(Date d ) {
+		return new SimpleDateFormat("yyyy-M-d").format(d);
+	}
 
     public static String currentUsername() {
         return Context.current().request().username();
