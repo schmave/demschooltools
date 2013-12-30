@@ -11,8 +11,8 @@
 	@for( c <- sm_charges ) {
 		<div class="panel panel-info">
 		<div class="panel-heading"><h4>#@c.the_case.case_number &bull;
-			@c.person.getDisplayName() &bull;
-			@c.rule.title</div>
+			@if(c.person != null) { @c.person.getDisplayName() } &bull;
+			@if(c.rule != null) { @c.rule.title }</div>
 		<div class="panel-body">
 		@caseTableOpen()
 		@caseTableRow(c.the_case)
