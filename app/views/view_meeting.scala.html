@@ -49,7 +49,9 @@ Print minutes</a></h3>
 <h4>&nbsp;<br>Case Notes</h4>
 @caseTableOpen()
 @for(c <- m.cases) {
-	@caseTableRow(c)
+	@if( !c.empty() ) {
+		@caseTableRow(c)
+	}
 }
 </table>
 

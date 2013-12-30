@@ -97,4 +97,13 @@ public class Case extends Model {
             writer = null;
         }
     }
+	
+	public boolean empty() {
+		return findings.equals("") &&
+			location.equals("") &&
+			writer == null &&
+			date == null &&
+			testify_records.size() == 0 &&
+			charges.size() == 0;
+	}
 }
