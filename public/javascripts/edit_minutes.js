@@ -286,8 +286,8 @@ function Charge(charge_id, el) {
 
     el.find("input[type=radio]").prop("name", "plea-" + charge_id);
 
-    el.mouseleave(function() { self.remove_button.hide(); } );
-    el.mouseenter(function() { self.remove_button.show(); } );
+    // el.mouseleave(function() { self.remove_button.hide(); } );
+    // el.mouseenter(function() { self.remove_button.show(); } );
 }
 
 function Case (id, el) {

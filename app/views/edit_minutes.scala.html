@@ -87,18 +87,21 @@ Committee:
 </script>
 
 <script id="charge-template" type="text/x-handlebars-template">
-	<div class="charge">Charge against:{{render "people-chooser" clazz=""}}
-	Rule: {{> rule-chooser}}
-	Plea:
+<div class="charge">
+<table>
+	<tr><td class="esm-form-label">Charge against:<td>{{render "people-chooser" clazz=""}}
+	<b>Rule:</b> {{> rule-chooser}}
+	<tr><td class="esm-form-label">Plea:<td>
 <div class="radio-inline">
   <label><input type="radio" class="plea-guilty" value="Guilty"><span>Guilty</span></label>
 </div>
 <div class="radio-inline">
   <label><input type="radio" class="plea-not-guilty" value="Not Guilty"><span>Not Guilty</span></label>
 </div>
-	<br>Resolution plan: <textarea class="resolution_plan"></textarea>
-        <button class="btn btn-danger" style="display:none;">Remove Charge</button>
-   <br><label><input type="checkbox" class="refer-to-sm"><span> Refer to School Meeting</span></label>
+&nbsp;&nbsp;&nbsp;<label><input type="checkbox" class="refer-to-sm"><span> Refer to School Meeting</span></label>
+	<tr><td class="esm-form-label">Resolution plan: <td><textarea class="resolution_plan"></textarea>
+   </table>
+   <button style="margin-left: 200px" class="btn btn-danger btn-xs">Remove Charge</button>
    </div>
 </script>
 
