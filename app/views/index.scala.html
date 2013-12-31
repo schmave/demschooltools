@@ -7,28 +7,39 @@ rules : List[ Rule ])
 
 <script type="text/javascript">
 
-var dates_with_meetings = [ @Html(
-	meetings.map( m => "\"" + Application.yymmddDate(m.date) + "\"").mkString(",")) ];
+var meeting_info = [ @Html(
+	meetings.map( m => "{ date: \"" + Application.yymmddDate(m.date) + 
+			"\", link: \"" + routes.Application.viewMeeting(m.id) + 
+			"\", case_count: " + m.cases.size() + "}").mkString(",")) ];
 
 function hasMeeting(date)
 {
 	var str_date = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
-	for (i in dates_with_meetings) {
-		if (dates_with_meetings[i] == str_date) {
-			return [true, "", ""];
+	for (i in meeting_info) {
+		if (meeting_info[i].date == str_date) {
+			return [true, "", "" + meeting_info[i].case_count + " cases"];
 		}
 	}
 	
 	return [false, "", ""];
 }
 
+function meetingSelected(str_date, datepicker) {
+	for (i in meeting_info) {
+		if (meeting_info[i].date == str_date) {
+			location.href = meeting_info[i].link;
+		}
+	}
+}
+
 $(function() { 
 	$("#month-picker").datepicker({
 		minDate: new Date(2013, 8, 1),
 		maxDate: new Date(2014, 6, 31),
-		dateFormat: 'yy-mm-dd',
+		dateFormat: 'yy-m-d',
 		constrainInput: true,
-		beforeShowDay: hasMeeting
+		beforeShowDay: hasMeeting,
+		onSelect: meetingSelected
 	})
 });
 </script>
@@ -64,9 +75,7 @@ $(function() {
 <div class="row">
 <div class="col-xs-4">
 <h4>Minutes</h4>
-<div id="month-picker"></div>
-@* @routes.Application.viewMeeting(m.id)
-*@
+<div id="month-picker" style="padding-top: 25px"></div>
 </div>
 
 <div class="col-xs-4">
