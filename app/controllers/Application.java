@@ -46,6 +46,10 @@ public class Application extends Controller {
         return ok(views.html.view_meeting.render(Meeting.find.byId(meeting_id)));
     }
 
+    public static Result viewMeetingResolutionPlans(int meeting_id) {
+        return ok(views.html.view_meeting_resolution_plans.render(Meeting.find.byId(meeting_id)));
+    }
+
     public static Result getPersonHistory(Integer id) {
         Person p = Person.find.byId(id);
         return ok(views.html.person_history.render(p, new PersonHistory(p)));
@@ -130,7 +134,7 @@ public class Application extends Controller {
     public static String formatMeetingDate(Date d) {
         return new SimpleDateFormat("EE--MMMM dd, yyyy").format(d);
     }
-	
+
 	public static String yymmddDate(Date d ) {
 		return new SimpleDateFormat("yyyy-M-d").format(d);
 	}

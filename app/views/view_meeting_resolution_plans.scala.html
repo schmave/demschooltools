@@ -1,0 +1,43 @@
+@(m : Meeting)
+
+@import helper._
+
+@main("JC resolution plans from " + Application.formatMeetingDate(m.date)) {
+
+<script>
+$(function() {
+	print();
+});
+</script>
+
+<p>JC resolution plans from @Application.formatMeetingDate(m.date)</p>
+
+<table align=center class="printable-res-plans">
+	@defining(new OddOrEven) { oddOrEven =>
+		@for(c <- m.cases) {
+			@for(charge <- c.charges) {
+				@if( charge.person != null && charge.rule != null
+					&& !charge.referred_to_sm
+					&& !charge.resolution_plan.trim().toLowerCase().equals("warning")) {
+				@if( oddOrEven.getAndToggle() ) { <tr> }
+				<td>
+					<p> <span style="font-size: 8pt">JC resolution plan for:</span>
+					<span style="font-size: 12pt; font-weight: bold">@charge.person.getDisplayName()</span></p>
+
+					<p style="font-size: 12pt">@charge.resolution_plan
+
+					@if( ! charge.plea.equals("Guilty") ) {
+						<i>(Plea: @charge.plea)</i>
+					}
+
+					<p style="font-size: 8pt">Case @c.case_number. Rule "@charge.rule.title".
+				</td>
+				}
+			}
+		}
+	}
+</table>
+
+
+}
+
