@@ -92,12 +92,14 @@ public class Person extends Model implements Comparable<Person> {
     public Map<Rule, List<Charge>> getChargesByRule() {
         Map<Rule, List<Charge>> result = new TreeMap<Rule, List<Charge>>();
         for (Charge c : charges) {
-            List<Charge> cur_list = result.get(c.rule);
-            if (cur_list == null) {
-                cur_list = new ArrayList<Charge>();
-                result.put(c.rule, cur_list);
+            if (c.rule != null) {
+                List<Charge> cur_list = result.get(c.rule);
+                if (cur_list == null) {
+                    cur_list = new ArrayList<Charge>();
+                    result.put(c.rule, cur_list);
+                }
+                cur_list.add(c);
             }
-            cur_list.add(c);
         }
 
         return result;
