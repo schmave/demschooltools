@@ -128,6 +128,9 @@ public class Application extends Controller {
     }
 
     public static String formatDateShort(Date d) {
+        if (d.after(new Date(113, 11, 31))) {
+            return new SimpleDateFormat("_ MM/dd").format(d);
+        }
         return new SimpleDateFormat("MM/dd").format(d);
     }
 
