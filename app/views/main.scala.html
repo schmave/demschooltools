@@ -1,4 +1,4 @@
-@(title: String)(content: Html)
+@(title: String, activeTab : String = "")(content: Html)
 
 <!DOCTYPE html>
 
@@ -23,9 +23,9 @@
     <body>
 		@ifAuth() { username =>
 			<ul class="nav nav-tabs no-print">
-			<li><a href="@routes.Application.index">Home</a>
+			<li @if(activeTab.equals("home")) { class="active" } ><a href="@routes.Application.index">Home</a>
 			@if(Application.isCurrentUserEditor()) {
-				<li><a href="@routes.ApplicationEditing.editTodaysMinutes">Edit today's minutes</a>
+				<li @if(activeTab.equals("edit_today")) { class="active" } ><a href="@routes.ApplicationEditing.editTodaysMinutes">Edit today's minutes</a>
 			}
 			<li><a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout">
 				@if(Application.isCurrentUserEditor()) {
