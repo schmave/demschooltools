@@ -13,7 +13,7 @@ import play.db.ebean.Model;
 import play.db.ebean.Model.Finder;
 
 @Entity
-public class Charge extends Model {
+public class Charge extends Model implements Comparable<Charge> {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "charge_id_seq")
     public Integer id;
@@ -79,5 +79,10 @@ public class Charge extends Model {
         if (!decision.equals("")) {
             this.sm_decision = decision;
         }
+    }
+
+    @Override
+    public int compareTo(Charge c2) {
+        return the_case.meeting.date.compareTo(c2.the_case.meeting.date);
     }
 }

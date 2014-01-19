@@ -1,6 +1,6 @@
-@(c : Charge, show_chargee : Boolean)
+@(c : Charge, show_chargee : Boolean, show_rule : Boolean)
 
-<p><b>@c.the_case.case_number@if( show_chargee && c.person != null ){, @c.person.getDisplayName()}</b>.
+<p><b>@c.the_case.case_number@if( show_chargee && c.person != null ){, @c.person.getDisplayName()}@if( show_rule && c.rule != null ){, @c.rule.title}</b>.
 
 <i>Findings</i>: @c.the_case.findings.
 

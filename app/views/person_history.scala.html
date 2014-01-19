@@ -18,14 +18,34 @@
 </tbody>
 </table>
 
-<hr>
-@defining( p.getChargesByRule() ) { charges_by_rule =>
-	@for( (rule, charges) <- charges_by_rule ) {
-		@if( rule != null ) {
-			<h4 style="margin-top: 2em;">@rule.title</h4>
-		}
-		@for( c <- charges) {
-			@historyCharge(c, false)
+<h3>Case Details...</h3>
+<ul class="nav nav-tabs">
+  <li class="active"><a href="#byrule" data-toggle="tab">... by Rule</a></li>
+  <li><a href="#bydate" data-toggle="tab">... by Date</a></li>
+</ul>
+
+<!-- Tab panes -->
+<div class="tab-content">
+  <div class="tab-pane active" id="byrule">
+	@defining( p.getChargesByRule() ) { charges_by_rule =>
+		@for( (rule, charges) <- charges_by_rule ) {
+			@if( rule != null ) {
+				<h4 style="margin-top: 2em;">@rule.title</h4>
+			}
+			@for( c <- charges) {
+				@historyCharge(c, false, false)
+			}
 		}
 	}
-}
+	</div>
+
+	<div class="tab-pane" id="bydate">
+	<p>&nbsp;</p>
+	@defining( p.getChargesInDateOrder() ) { charges =>
+		@for( c <- charges) {
+			@historyCharge(c, false, true)
+		}
+	}
+	</div>
+</div>
+

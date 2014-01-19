@@ -105,6 +105,13 @@ public class Person extends Model implements Comparable<Person> {
         return result;
     }
 
+    @JsonIgnore
+    public List<Charge> getChargesInDateOrder() {
+        List<Charge> result = new ArrayList<Charge>(charges);
+        Collections.sort(result, Collections.reverseOrder());
+        return result;
+    }
+
 
     // called by PersonController
     void loadTags() {
