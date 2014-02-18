@@ -1,13 +1,14 @@
-import play.Application;
-import play.GlobalSettings;
-import play.mvc.Call;
-
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.PlayAuthenticate.Resolver;
 import com.feth.play.module.pa.exceptions.AccessDeniedException;
 import com.feth.play.module.pa.exceptions.AuthException;
 
+import controllers.Public;
 import controllers.routes;
+
+import play.Application;
+import play.GlobalSettings;
+import play.mvc.Call;
 
 public class Global extends GlobalSettings {
 
@@ -36,8 +37,7 @@ public class Global extends GlobalSettings {
 			public Call auth(final String provider) {
 				// You can provide your own authentication implementation,
 				// however the default should be sufficient for most cases
-				return com.feth.play.module.pa.controllers.routes.Authenticate
-						.authenticate(provider);
+				return routes.Public.authenticate(provider);
 			}
 
 			@Override

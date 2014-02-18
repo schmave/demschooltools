@@ -17,6 +17,7 @@ public class Public extends Controller {
 
     public static Result oAuthDenied(String provider)
     {
+        session().remove("timeout");
         return redirect(routes.Public.index());
     }
 
@@ -27,5 +28,10 @@ public class Public extends Controller {
             return redirect(routes.Application.index());
         }
         return ok(views.html.login.render());
+    }
+
+    public static Result authenticate(String provider) {
+        session("timeout", "" + System.currentTimeMillis());
+        return com.feth.play.module.pa.controllers.Authenticate.authenticate(provider);
     }
 }
