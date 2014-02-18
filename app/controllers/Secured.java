@@ -25,25 +25,6 @@ public class Secured extends Security.Authenticator {
 	}
 
     public String getUsername(final Context ctx, boolean allow_ip) {
-        Session sess = ctx.session();
-        if (sess.get("timeout") == null) {
-            return null;
-        } else {
-            try
-            {
-                long timeout = Long.parseLong(sess.get("timeout"));
-                if (System.currentTimeMillis() - timeout > 1000 * 60 * 30) {
-                    // timeout after 30 mins of inactivity
-                    System.out.println("timeout, old time " + timeout + ", now " + System.currentTimeMillis());
-                    return null;
-                }
-            }
-            catch (NumberFormatException e) {
-                return null;
-            }
-        }
-        sess.put("timeout", "" + System.currentTimeMillis());
-
         Logger.debug("Secured::getUsername " + ctx + ", " + allow_ip);
         final AuthUser u = PlayAuthenticate.getUser(ctx.session());
 
@@ -52,6 +33,29 @@ public class Secured extends Security.Authenticator {
             if (the_user == null) {
                 return null;
             }
+			else {
+				// If a user is logged in already, check the session timeout.
+				// If there is no timeout, or we can't parse it, or it's too old,
+				// reject the user.
+				Session sess = ctx.session();
+				if (sess.get("timeout") == null) {
+					return null;
+				} else {
+					try
+					{
+						long timeout = Long.parseLong(sess.get("timeout"));
+						if (System.currentTimeMillis() - timeout > 1000 * 60 * 30) {
+							// timeout after 30 mins of inactivity
+							System.out.println("timeout, old time " + timeout + ", now " + System.currentTimeMillis());
+							return null;
+						}
+					}
+					catch (NumberFormatException e) {
+						return null;
+					}
+				}
+				sess.put("timeout", "" + System.currentTimeMillis());
+			}
 
             return the_user.email;
         }
