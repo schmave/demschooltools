@@ -10,6 +10,7 @@ import com.avaje.ebean.Expression;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
 import com.feth.play.module.pa.PlayAuthenticate;
+import com.typesafe.plugin.*;
 
 import models.*;
 
@@ -18,52 +19,6 @@ import play.data.*;
 import play.libs.Json;
 import play.mvc.*;
 import play.mvc.Http.Context;
-
-/*
-   TODO
-
-** search all fields for people search
-
-
-
-* use biological symbols for M/F/T instead of colors
-
-* show recent comments for people in a tag on tag page
-* hide data export sections on tag page by default
-
-* add ability to link to people in comments
-
-* bug --can't show comment form in firefox; return false in javascript?
-
-* add tool to merge people
-
-* confirmation when creating a person with the same name as someone already in
-  the database
-
-* strip/trim spaces from person's first and last name on edit/create (and other
-  fields too)
-
-* prevent double submit of comments
-* disable comment button while request is pending
-
-* upload guidance counselors and college professors
-
-* add another way to link to people other than making them one family.
-* add an "organization" field to a person
-
-* show birthdays for the current day
-
-* browse people by neighborhood
-
-* sort people list by date created, then name
-* use markdown for notes and comments
-
-
-* Be able to send email to tagged people: using a web rich text editor, or
-  perhaps forwarding emails when they are sent to people+tag_parent@trvs.org
-  from an approved sender? see mandrill
-
-*/
 
 @Security.Authenticated(Secured.class)
 public class Application extends Controller {
@@ -109,39 +64,39 @@ public class Application extends Controller {
 
     public static Result jsonPeople(String query) {
 		Expression search_expr = null;
-		
+
 		HashSet<Person> selected_people = new HashSet<Person>();
 		boolean first_time = true;
-        
+
 		for (String term : query.split(" ")) {
 			List<Person> people_matched_this_round;
-			
-			Expression this_expr = 
+
+			Expression this_expr =
 				Expr.or(Expr.ilike("last_name", "%" + term + "%"),
 				Expr.ilike("first_name", "%" + term + "%"));
 			this_expr = Expr.or(this_expr,
 				Expr.ilike("address", "%" + term + "%"));
 			this_expr = Expr.or(this_expr,
 				Expr.ilike("email", "%" + term + "%"));
-				
-			people_matched_this_round = 
+
+			people_matched_this_round =
 				Person.find.where(this_expr).findList();
-			
-			List<PhoneNumber> phone_numbers = 
+
+			List<PhoneNumber> phone_numbers =
 				PhoneNumber.find.where().ilike("number", "%" + term + "%").findList();
 			for (PhoneNumber pn : phone_numbers) {
 				people_matched_this_round.add(pn.owner);
 			}
-			
+
 			if (first_time) {
 				selected_people.addAll(people_matched_this_round);
 			} else {
 				selected_people.retainAll(people_matched_this_round);
 			}
-			
+
 			first_time = false;
 		}
-		
+
         List<Map<String, String> > result = new ArrayList<Map<String, String> > ();
         for (Person p : selected_people) {
             HashMap<String, String> values = new HashMap<String, String>();
@@ -288,6 +243,17 @@ public class Application extends Controller {
         return redirect(routes.Application.person(Person.updateFromForm(personForm.bindFromRequest()).person_id));
     }
 
+    public static String getInitials(Person p) {
+        String result = "";
+        if (p.first_name != null && p.first_name.length() > 0) {
+            result += p.first_name.charAt(0);
+        }
+        if (p.last_name != null && p.last_name.length() > 0) {
+            result += p.last_name.charAt(0);
+        }
+        return result;
+    }
+
     public static Result addComment() {
         Form<Comment> filledForm = commentForm.bindFromRequest();
         Comment new_comment = new Comment();
@@ -309,6 +275,14 @@ public class Application extends Controller {
                         CompletedTask.create(Task.find.byId(id), new_comment);
                     }
                 }
+            }
+
+            if (filledForm.field("send_email").value() != null) {
+                MailerAPI mail = play.Play.application().plugin(MailerPlugin.class).email();
+                mail.setSubject("Papal comment: " + new_comment.user.name + " & " + getInitials(new_comment.person));
+                mail.addRecipient("TRVS Staff <staff@threeriversvillageschool.org>");
+                mail.addFrom("Papal DB <noreply@threeriversvillageschool.org>");
+                mail.sendHtml(views.html.comment_email.render(Comment.find.byId(new_comment.id)).toString());
             }
 
             return ok(views.html.comment_fragment.render(Comment.find.byId(new_comment.id), false));
@@ -421,12 +395,12 @@ public class Application extends Controller {
         d = new Date(d.getTime() +
             (getConfiguration().getInt("time_zone_offset") * 1000L * 60 * 60));
         Date now = new Date();
-		
+
 		long diffHours = (now.getTime() - d.getTime()) / 1000 / 60 / 60;
-		
+
         // String format = "EEE MMMM d, h:mm a";
 		String format;
-		
+
 		if (diffHours < 24) {
 			format = "h:mm a";
 		} else if (diffHours < 24 * 7) {

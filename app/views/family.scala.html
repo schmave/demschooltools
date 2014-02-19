@@ -37,7 +37,7 @@
 				@if( ct != null ) {
 					<i>(@ct.comment.user.name, @Application.formatDate(ct.comment.created))</i>
 					@if(ct.comment.message.length() > 0) {
-						-- @ct.comment.message 
+						-- @ct.comment.message
 					}
 				}
 				<br>
@@ -67,7 +67,10 @@
 			<textarea name="message" style="width: 400px;" rows=5 ></textarea>
 			<div id="comment_tasks" style="float:right;"></div>
 			<textarea style="display:none" name="comment_task_ids" id="comment_task_ids"></textarea>
-			<br><input type="submit" value="Save Comment">
+			<br>
+
+			<input type="submit" value="Save Comment">
+			<label style="display:inline; padding-left: 25px"><input type="checkbox" name="send_email">Email note to staff@@trvs</label>
 			</div>
 			<script type="text/javascript">
 				$("#comment_form").ajaxForm({"complete" : function(response, status) {

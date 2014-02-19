@@ -12,7 +12,8 @@ object ApplicationBuild extends Build {
     "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
       "be.objectify"  %%  "deadbolt-java"     % "2.1-SNAPSHOT",
       "com.feth"      %%  "play-authenticate" % "0.2.5-SNAPSHOT",
-    javaCore,
+	"com.typesafe" %% "play-plugins-mailer" % "2.1-RC2",
+	javaCore,
     javaJdbc,
     javaEbean
   )
