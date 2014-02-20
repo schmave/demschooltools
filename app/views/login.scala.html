@@ -1,12 +1,15 @@
+@(notice : String)
+
 @import helper._
 @import com.feth.play.module.pa.views.html._
 
 @main("JC DB Login") {
 
 	<div class="container" style="padding-top:100px;">
+	@if( notice != null ) { <div class="alert alert-warning"><strong>@notice</strong></div> }
 	<a href="@routes.Application.index()" class="btn btn-large btn-primary" style="color:white;">
 	Browse in read-only mode</a>
-	
+
 	<hr>
 	<h3>OR</h3>
 	<hr>

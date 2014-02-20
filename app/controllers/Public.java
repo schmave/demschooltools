@@ -27,7 +27,7 @@ public class Public extends Controller {
         if (u != null) {
             return redirect(routes.Application.index());
         }
-        return ok(views.html.login.render());
+        return ok(views.html.login.render(flash("notice")));
     }
 
     public static Result authenticate(String provider) {

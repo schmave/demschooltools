@@ -28,6 +28,10 @@ public class Secured extends Security.Authenticator {
         Logger.debug("Secured::getUsername " + ctx + ", " + allow_ip);
         final AuthUser u = PlayAuthenticate.getUser(ctx.session());
 
+        // This is sloppy to always store this url in the session,
+        // but it is quick and easy.
+        PlayAuthenticate.storeOriginalUrl(ctx);
+
         if (u != null) {
             User the_user = User.findByAuthUserIdentity(u);
             if (the_user == null) {
@@ -80,6 +84,6 @@ public class Secured extends Security.Authenticator {
 
 	@Override
 	public Result onUnauthorized(final Context ctx) {
-		return redirect(com.feth.play.module.pa.controllers.routes.Authenticate.logout());
+		return redirect(routes.Public.index());
 	}
 }
