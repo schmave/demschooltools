@@ -28,11 +28,13 @@ public class Secured extends Security.Authenticator {
             return u.getId();
         }
 
+        PlayAuthenticate.storeOriginalUrl(ctx);
+
         return null;
 	}
 
 	@Override
 	public Result onUnauthorized(final Context ctx) {
-		return redirect(com.feth.play.module.pa.controllers.routes.Authenticate.logout());
+		return redirect(controllers.routes.Public.index());
 	}
 }
