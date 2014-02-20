@@ -28,40 +28,26 @@ public class Secured extends Security.Authenticator {
         Logger.debug("Secured::getUsername " + ctx + ", " + allow_ip);
         final AuthUser u = PlayAuthenticate.getUser(ctx.session());
 
-        // This is sloppy to always store this url in the session,
-        // but it is quick and easy.
-        PlayAuthenticate.storeOriginalUrl(ctx);
-
         if (u != null) {
             User the_user = User.findByAuthUserIdentity(u);
-            if (the_user == null) {
-                return null;
-            }
-			else {
+            if (the_user != null) {
 				// If a user is logged in already, check the session timeout.
 				// If there is no timeout, or we can't parse it, or it's too old,
-				// reject the user.
+				// don't count the user as being logged in.
 				Session sess = ctx.session();
-				if (sess.get("timeout") == null) {
-					return null;
-				} else {
+				if (sess.get("timeout") != null) {
 					try
 					{
 						long timeout = Long.parseLong(sess.get("timeout"));
-						if (System.currentTimeMillis() - timeout > 1000 * 60 * 30) {
-							// timeout after 30 mins of inactivity
-							System.out.println("timeout, old time " + timeout + ", now " + System.currentTimeMillis());
-							return null;
+						if (System.currentTimeMillis() - timeout < 1000 * 60 * 30) {
+							sess.put("timeout", "" + System.currentTimeMillis());
+							return the_user.email;
 						}
 					}
 					catch (NumberFormatException e) {
-						return null;
 					}
 				}
-				sess.put("timeout", "" + System.currentTimeMillis());
 			}
-
-            return the_user.email;
         }
 
         // If we don't have a logged-in user, try going by IP address.
@@ -78,6 +64,8 @@ public class Secured extends Security.Authenticator {
                 return address;
             }
         }
+
+        PlayAuthenticate.storeOriginalUrl(ctx);
 
         return null;
     }

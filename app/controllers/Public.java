@@ -23,7 +23,7 @@ public class Public extends Controller {
 
     public static Result index()
     {
-        final AuthUser u = PlayAuthenticate.getUser(Context.current().session());
+        String u = new EditorSecured().getUsername(ctx());
         if (u != null) {
             return redirect(routes.Application.index());
         }
