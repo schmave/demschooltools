@@ -141,5 +141,30 @@ public class ApplicationEditing extends Controller {
 
         return redirect(routes.ApplicationEditing.enterSchoolMeetingDecisions());
     }
+	
+	public static Result viewRules() {
+		return ok(views.html.rules.render(Rule.find.orderBy("title ASC").findList(), Form.form(Rule.class)));
+	}
+	
+	public static Result editRuleForm(Integer id) {
+		Form<Rule> filled_form = new Form<Rule>(Rule.class).fill(Rule.find.byId(id));
+		return ok(views.html.edit_rule.render(filled_form));
+	}
+	
+	public static Result editRule(Integer id) {
+		// save rule change
+		Form<Rule> form = new Form<Rule>(Rule.class).bindFromRequest();
+		Rule.find.byId(id).updateFromForm(form);
+	
+		return redirect(routes.ApplicationEditing.viewRules());
+	}
+	
+	public static Result addRule() {
+		// save new rule 
+		Form<Rule> form = new Form<Rule>(Rule.class).bindFromRequest();
+		Rule new_rule = Rule.create(form);
+	
+		return redirect(routes.ApplicationEditing.viewRules());
+	}
 
 }

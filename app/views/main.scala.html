@@ -27,7 +27,11 @@
 			@if(Application.isCurrentUserEditor()) {
 				<li @if(activeTab.equals("edit_today")) { class="active" } ><a href="@routes.ApplicationEditing.editTodaysMinutes">Edit today's minutes</a>
 			}
-			<li><a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout">
+			<li><a href="@routes.ApplicationEditing.viewRules">
+				@if(Application.isCurrentUserEditor()) {
+					Rules
+				}</a>
+			<li style="float:right;"><a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout">
 				@if(Application.isCurrentUserEditor()) {
 					Logout
 				} else { Login }

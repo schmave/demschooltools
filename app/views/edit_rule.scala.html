@@ -1,0 +1,8 @@
+@(ruleForm: Form[Rule])
+
+@main("Edit a rule") {
+
+    <h2>Edit a rule</h2>
+
+	@rule_form(ruleForm, routes.ApplicationEditing.editRule(Integer.parseInt(ruleForm("id").value())), "Edit")
+}

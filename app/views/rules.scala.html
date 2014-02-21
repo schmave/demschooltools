@@ -1,0 +1,26 @@
+@(rules : List[ Rule ], ruleForm : Form[ Rule ])
+
+@import helper._
+
+@main("TRVS rules") {
+
+<h3>All TRVS rules</h3>
+
+<table class="table">
+<thead><tr><th width=10%>Database ID<th width="50%">Rule</tr></thead>
+<tbody>
+@for( r <- rules ) {
+	<tr><td width='10%' class="rule_id">@r.id
+		<td class="rule_title">@if( r.removed ) { <strike> } @r.title @if( r.removed ) { </strike> } 
+		<a href="@routes.ApplicationEditing.editRule(r.id)" class="edit_link">Edit or Disable</a>
+}
+</tbody>
+</table>
+
+<hr>
+<h3>Add a new rule</h3>
+
+@rule_form(ruleForm, routes.ApplicationEditing.addRule(), "Add")
+<hr>
+
+}

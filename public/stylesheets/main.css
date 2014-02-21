@@ -177,3 +177,12 @@ a.username {
     padding-right: .4in;
     width: 3.5in;
 }
+
+.rule_id  {
+	color: #ccc;
+}
+
+a.edit_link {
+	color:#99f;
+	font-size: 0.8em;
+}

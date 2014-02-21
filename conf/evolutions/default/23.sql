@@ -1,0 +1,7 @@
+# --- !Ups
+
+ALTER TABLE rule ADD COLUMN removed BOOLEAN NOT NULL DEFAULT FALSE;
+
+# --- !Downs
+
+ALTER TABLE rule DROP COLUMN removed;
