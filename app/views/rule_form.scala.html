@@ -8,7 +8,7 @@
 @if(ruleForm("id").value()) {
 	<input type="hidden" name="id" value="@ruleForm("id").value()"/>
 }
-        @inputText(ruleForm("title"), '_label -> "Title", '_size -> 50)
+        @inputText(ruleForm("title"), '_label -> "Title", 'size -> 75)
 		@checkbox(ruleForm("removed"), '_label -> "Disabled")
 
 		<input type="submit" value="@submit_title">
