@@ -23,7 +23,7 @@ public class Public extends Controller {
 
     public static Result index()
     {
-        String u = new EditorSecured().getUsername(ctx());
+        String u = new Secured().getUsername(ctx(), false);
         if (u != null) {
             return redirect(routes.Application.index());
         }

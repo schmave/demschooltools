@@ -65,13 +65,12 @@ public class Secured extends Security.Authenticator {
             }
         }
 
-        PlayAuthenticate.storeOriginalUrl(ctx);
-
         return null;
     }
 
 	@Override
 	public Result onUnauthorized(final Context ctx) {
+        PlayAuthenticate.storeOriginalUrl(ctx);
 		return redirect(routes.Public.index());
 	}
 }

@@ -18,7 +18,7 @@ public class Global extends GlobalSettings {
 			@Override
 			public Call login() {
 				// Your login page
-				return routes.Application.index();
+				return routes.Public.index();
 			}
 
 			@Override
