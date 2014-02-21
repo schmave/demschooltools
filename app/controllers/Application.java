@@ -112,7 +112,7 @@ public class Application extends Controller {
     public static String jsonRules(String term) {
 		term = term.toLowerCase();
 
-        List<Rule> rules = Rule.find.orderBy("title ASC").findList();
+        List<Rule> rules = Rule.find.where().eq("removed", false).orderBy("title ASC").findList();
 
         List<Map<String, String> > result = new ArrayList<Map<String, String> > ();
         for (Rule r : rules) {
