@@ -27,7 +27,7 @@
 			@if(Application.isCurrentUserEditor()) {
 				<li @if(activeTab.equals("edit_today")) { class="active" } ><a href="@routes.ApplicationEditing.editTodaysMinutes">Edit today's minutes</a>
 			}
-			<li><a href="@routes.ApplicationEditing.viewRules">
+			<li @if(activeTab.equals("view_rules")) { class="active" } ><a href="@routes.ApplicationEditing.viewRules">
 				@if(Application.isCurrentUserEditor()) {
 					Rules
 				}</a>
