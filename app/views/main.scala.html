@@ -75,7 +75,8 @@
 					<li><form class="navbar-search pull-left">
 					<input type="text" id="navbar_people_search" placeholder="Search People"/></form></li>
 
-				<li><a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout">Logout</a>
+				<li style="float:right"><a style="font-weight: bold" name="bar">@User.findByAuthUserIdentity(auth).email</a>
+				<li style="float:right;"><a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout">Logout</a>
 
 				</ul>
 

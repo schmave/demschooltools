@@ -17,15 +17,21 @@ public class Public extends Controller {
 
     public static Result oAuthDenied(String provider)
     {
+        session().remove("timeout");
         return redirect(routes.Public.index());
     }
 
     public static Result index()
     {
-        final AuthUser u = PlayAuthenticate.getUser(Context.current().session());
-        if (u != null) {
+        final String username = new Secured().getUsername(ctx());
+        if (username != null) {
             return redirect(routes.Application.people());
         }
         return ok(views.html.login.render());
+    }
+
+    public static Result authenticate(String provider) {
+        session("timeout", "" + System.currentTimeMillis());
+        return com.feth.play.module.pa.controllers.Authenticate.authenticate(provider);
     }
 }
