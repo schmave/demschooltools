@@ -23,7 +23,7 @@ import play.mvc.Http.Context;
 public class Application extends Controller {
 
     public static List<Charge> getActiveSchoolMeetingReferrals() {
-        return Charge.find.where().eq("referred_to_sm", true).eq("sm_decision", null).findList();
+        return Charge.find.where().eq("referred_to_sm", true).eq("sm_decision", null).orderBy("id DESC").findList();
     }
 
     public static Result index() {
