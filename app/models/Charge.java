@@ -1,6 +1,7 @@
 package models;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -36,6 +37,7 @@ public class Charge extends Model implements Comparable<Charge> {
 
     public boolean referred_to_sm;
     public String sm_decision;
+    public Date sm_decision_date;
 
     public static Finder<Integer, Charge> find = new Finder(
         Integer.class, Charge.class
@@ -74,11 +76,12 @@ public class Charge extends Model implements Comparable<Charge> {
         referred_to_sm = Boolean.parseBoolean(query_string.get("referred_to_sm")[0]);
     }
 
-    public void updateSchoolMeetingDecision(String decision) {
+    public void updateSchoolMeetingDecision(String decision, Date date) {
         decision = decision.trim();
         if (!decision.equals("")) {
             this.sm_decision = decision;
         }
+        this.sm_decision_date = date;
     }
 
     @Override

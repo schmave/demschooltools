@@ -80,16 +80,7 @@ public class Case extends Model {
         location = query_string.get("location")[0];
 
         String date_string = query_string.get("date")[0];
-        if (!date_string.equals("")) {
-            try
-            {
-                date = new SimpleDateFormat("yyyy-MM-dd").parse(date_string);
-            } catch (ParseException e) {
-                date = null;
-            }
-        } else {
-            date = null;
-        }
+        date = controllers.Application.getDateFromString(date_string);
 
         if (query_string.containsKey("writer_id")) {
             writer = Person.find.ref(Integer.parseInt(query_string.get("writer_id")[0]));
@@ -97,7 +88,7 @@ public class Case extends Model {
             writer = null;
         }
     }
-	
+
 	public boolean empty() {
 		return findings.equals("") &&
 			location.equals("") &&

@@ -134,36 +134,37 @@ public class ApplicationEditing extends Controller {
 
         Integer charge_id = Integer.parseInt(form_data.get("charge_id")[0]);
         String decision = form_data.get("sm_decision")[0];
+        Date date = Application.getDateFromString(form_data.get("date")[0]);
 
         Charge c = Charge.find.byId(charge_id);
-        c.updateSchoolMeetingDecision(decision);
+        c.updateSchoolMeetingDecision(decision, date);
         c.save();
 
         return redirect(routes.ApplicationEditing.enterSchoolMeetingDecisions());
     }
-	
+
 	public static Result viewRules() {
 		return ok(views.html.rules.render(Rule.find.orderBy("title ASC").findList(), Form.form(Rule.class)));
 	}
-	
+
 	public static Result editRuleForm(Integer id) {
 		Form<Rule> filled_form = new Form<Rule>(Rule.class).fill(Rule.find.byId(id));
 		return ok(views.html.edit_rule.render(filled_form));
 	}
-	
+
 	public static Result editRule(Integer id) {
 		// save rule change
 		Form<Rule> form = new Form<Rule>(Rule.class).bindFromRequest();
 		Rule.find.byId(id).updateFromForm(form);
-	
+
 		return redirect(routes.ApplicationEditing.viewRules());
 	}
-	
+
 	public static Result addRule() {
-		// save new rule 
+		// save new rule
 		Form<Rule> form = new Form<Rule>(Rule.class).bindFromRequest();
 		Rule new_rule = Rule.create(form);
-	
+
 		return redirect(routes.ApplicationEditing.viewRules());
 	}
 

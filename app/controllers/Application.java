@@ -22,6 +22,19 @@ import play.mvc.Http.Context;
 @Security.Authenticated(Secured.class)
 public class Application extends Controller {
 
+    public static Date getDateFromString(String date_string) {
+        if (!date_string.equals("")) {
+            try
+            {
+                return new SimpleDateFormat("yyyy-MM-dd").parse(date_string);
+            } catch (ParseException e) {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
     public static List<Charge> getActiveSchoolMeetingReferrals() {
         return Charge.find.where().eq("referred_to_sm", true).eq("sm_decision", null).orderBy("id DESC").findList();
     }
