@@ -24,6 +24,7 @@
 		@ifAuth() { username =>
 			<ul class="nav nav-tabs no-print">
 			<li @if(activeTab.equals("home")) { class="active" } ><a href="@routes.Application.index">Home</a>
+			<li @if(activeTab.equals("view_sm")) { class="active" } ><a href="@routes.Application.viewSchoolMeetingDecisions">View S.M. decisions</a>
 			@if(Application.isCurrentUserEditor()) {
 				<li @if(activeTab.equals("edit_today")) { class="active" } ><a href="@routes.ApplicationEditing.editTodaysMinutes">Edit today's minutes</a>
 			}

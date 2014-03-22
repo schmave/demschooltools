@@ -26,6 +26,15 @@ public class Application extends Controller {
         return Charge.find.where().eq("referred_to_sm", true).eq("sm_decision", null).orderBy("id DESC").findList();
     }
 
+    public static Result viewSchoolMeetingDecisions() {
+        List<Charge> the_charges =
+            Charge.find.where().
+                eq("referred_to_sm", true).
+                isNotNull("sm_decision").
+                orderBy("id DESC").findList();
+        return ok(views.html.view_sm_decisions.render(the_charges));
+    }
+
     public static Result index() {
         List<Meeting> meetings = Meeting.find.orderBy("date DESC").findList();
 

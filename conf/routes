@@ -23,6 +23,8 @@ GET   /viewRuleHistory/:id    controllers.Application.viewRuleHistory(id: Intege
 GET   /enterSchoolMeeting  controllers.ApplicationEditing.enterSchoolMeetingDecisions()
 POST  /enterSchoolMeeting  controllers.ApplicationEditing.saveSchoolMeetingDecisions()
 
+GET /viewSchoolMeeting controllers.Application.viewSchoolMeetingDecisions()
+
 POST /newCase	controllers.ApplicationEditing.createCase(meeting_id : Integer)
 POST /saveCase   controllers.ApplicationEditing.saveCase(id)
 
