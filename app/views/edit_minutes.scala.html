@@ -48,7 +48,9 @@ app.initial_data = {
 
 <script id="meeting-template" type="text/x-handlebars-template">
 <h2>Justice Committee minutes<br>@Application.formatMeetingDate(meeting.date)</h2>
-Committee:
+<p><a href="@routes.Application.viewMeeting(meeting.id)" class="btn btn-warning">
+View printable minutes</a>
+<p>Committee:
 {{render "people-chooser" clazz="committee"}}
 <br>Subs:
 {{render "people-chooser" clazz="sub"}}
