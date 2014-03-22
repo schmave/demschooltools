@@ -3,6 +3,11 @@ function showSomethingInSidebar(url) {
     $.get(url,
           null,
            function(data, status, jqXHR) {
+            // Remove a href links from data to avoid inadvertent clicks
+            var patt = /<a nosidebar href="[^"]+"/gi;
+
+            data = data.replace(patt, "<a ");
+
             $("#sidebar").html(data);
             $("#sidebar").find("table.sortable").each(function (i) {
                 sorttable.makeSortable(this);

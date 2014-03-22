@@ -1,6 +1,12 @@
 @(c : Charge, show_chargee : Boolean, show_rule : Boolean)
 
-<p><b>@c.the_case.case_number@if( show_chargee && c.person != null ){, @c.person.getDisplayName()}@if( show_rule && c.rule != null ){, @c.rule.title}</b>.
+<p>
+
+<a nosidebar href="@routes.Application.viewMeeting(c.the_case.meeting.id)">
+<b>@c.the_case.case_number</a>@if( show_chargee && c.person != null ){,
+<a nosidebar href="@routes.Application.viewPersonHistory(c.person.person_id)">
+@c.person.getDisplayName()}</a>@if( show_rule && c.rule != null ){,
+<a nosidebar href="@routes.Application.viewRuleHistory(c.rule.id)">@c.rule.title</a>}</b>.
 
 <i>Findings</i>: @c.the_case.findings.
 
