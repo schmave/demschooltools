@@ -29,6 +29,7 @@ sorttable = {
 
     if (!document.createElement || !document.getElementsByTagName) return;
 
+    sorttable.NO_YEAR_DATE_RE = /^(\d\d?)[\/-](\d\d?)$/;
     sorttable.DATE_RE = /^(\d\d?)[\/\.-](\d\d?)[\/\.-]((\d\d)?\d\d)$/;
 
     forEach(document.getElementsByTagName('table'), function(table) {
@@ -79,7 +80,7 @@ sorttable = {
     for (var i=0; i<headrow.length; i++) {
       // manually override the type with a sorttable_type attribute
       if (!headrow[i].className.match(/\bsorttable_nosort\b/)) { // skip this col
-        mtch = headrow[i].className.match(/\bsorttable_([a-z0-9]+)\b/);
+        mtch = headrow[i].className.match(/\bsorttable_([a-z0-9_]+)\b/);
         if (mtch) { override = mtch[1]; }
 	      if (mtch && typeof sorttable["sort_"+override] == 'function') {
 	        headrow[i].sorttable_sortfunction = sorttable["sort_"+override];
@@ -297,6 +298,36 @@ sorttable = {
     if (m.length == 1) m = '0'+m;
     if (d.length == 1) d = '0'+d;
     dt2 = y+m+d;
+    if (dt1==dt2) return 0;
+    if (dt1<dt2) return -1;
+    return 1;
+  },
+
+  // Added by ESM.
+  // if m is a month between 01 and 06, add 12 to it.
+  correctSchoolMonth: function(m) {
+       month_num = parseInt(m)
+       if (month_num <= 6) {
+           month_num += 12;
+       }
+       return "" + month_num;
+  },
+
+  // Added by ESM.
+  // For months within a single school year, 01-06 come after 08-12
+  sort_school_mmdd: function(a,b) {
+    mtch = a[0].match(sorttable.NO_YEAR_DATE_RE);
+    d = mtch[2]; m = mtch[1];
+    m = sorttable.correctSchoolMonth(m);
+    if (m.length == 1) m = '0'+m;
+    if (d.length == 1) d = '0'+d;
+    dt1 = m+d;
+    mtch = b[0].match(sorttable.NO_YEAR_DATE_RE);
+    d = mtch[2]; m = mtch[1];
+    m = sorttable.correctSchoolMonth(m);
+    if (m.length == 1) m = '0'+m;
+    if (d.length == 1) d = '0'+d;
+    dt2 = m+d;
     if (dt1==dt2) return 0;
     if (dt1<dt2) return -1;
     return 1;

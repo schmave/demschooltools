@@ -4,6 +4,15 @@
 
 @main("History of " + r.title) {
 
+<script type="text/javascript">
+$(function() {
+	$("table.sortable").each(function (i) {
+        sorttable.init();
+		sorttable.innerSortFunction.apply($(this).find("th")[1], []);
+	});
+});
+</script>
+
 @rule_history(r, history)
 
 }

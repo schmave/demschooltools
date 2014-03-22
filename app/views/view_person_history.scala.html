@@ -7,7 +7,7 @@
 <script type="text/javascript">
 $(function() {
 	$("table.sortable").each(function (i) {
-		sorttable.makeSortable(this);
+        sorttable.init();
 		sorttable.innerSortFunction.apply($(this).find("th")[1], []);
 	});
 });
