@@ -1,0 +1,13 @@
+@(charges : List [ Charge ])
+
+@import helper._
+
+@main("Past School Meeting decisions", "view_sm") {
+
+<h3>Past School Meeting decisions</h3>
+
+@for( c <- charges) {
+	@historyCharge(c, true, true)
+}
+
+}
