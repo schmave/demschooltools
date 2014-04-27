@@ -279,6 +279,9 @@ function Charge(charge_id, el) {
     el.find(".resolution_plan").change(self.markAsModified);
     el.find(".plea-guilty").change(self.markAsModified);
     el.find(".plea-not-guilty").change(self.markAsModified);
+    el.find(".plea-not-guilty").change(function() {
+            self.el.find(".refer-to-sm").prop("checked", true);
+    });
     el.find(".refer-to-sm").change(self.markAsModified);
 
     self.people_chooser = new PeopleChooser(el.find(".people_chooser"),
