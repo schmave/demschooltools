@@ -171,11 +171,13 @@ a.username {
     overflow: auto;
 }
 
-.printable-res-plans td {
-    padding-top: .5in;
-    padding-bottom: .25in;
-    padding-right: .4in;
-    width: 3.5in;
+.printable-res-plans {
+	width: 6in;
+}
+
+.printable-res-plans td.name {
+    font-weight: bold;
+	font-size: 14px;
 }
 
 .rule_id  {
