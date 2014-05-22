@@ -1,0 +1,13 @@
+@(charge : Charge)
+
+@import helper._
+
+
+			<tr>
+				<td class="name" width="20">@charge.person.getDisplayName()
+				<td>@charge.the_case.case_number<br>
+					@charge.rule.title
+				<td>@charge.resolution_plan
+				@if(charge.sm_decision != null) { <b>[Sch. Mtg. decided:</b> @charge.sm_decision<b>]</b> }
+				<td style="vertical-align:middle;"><div class="checkbox"></div>
+			</tr>

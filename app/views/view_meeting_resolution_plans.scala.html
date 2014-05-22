@@ -18,12 +18,7 @@ $(function() {
 				&& !(charge.resolution_plan.trim().toLowerCase().equals("warning") ||
 					 charge.resolution_plan.trim().toLowerCase().equals("warning."))
 				&& charge.plea.equals("Guilty")) {
-			<tr>
-				<td class="name" width="20">@charge.person.getDisplayName()
-				<td>@c.case_number<br>
-					@charge.rule.title
-				<td>@charge.resolution_plan
-			</tr>
+				@resolution_plan(charge)
 			}
 		}
 	}

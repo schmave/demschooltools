@@ -190,3 +190,9 @@ a.edit_link {
 }
 
 .sm-decision { background: #ff9; }
+
+.checkbox {
+	width: .25in;
+	height: .25in;
+	border: 1px solid black;
+}
