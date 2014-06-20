@@ -1,0 +1,169 @@
+<!DOCTYPE Project SYSTEM "http://www.slickedit.com/dtd/vse/10.0/vpj.dtd">
+<Project
+	Version="10.0"
+	VendorName="SlickEdit"
+	WorkingDir=".">
+	<Config
+		Name="Release"
+		OutputFile=""
+		CompilerConfigName="Latest Version">
+		<Menu>
+			<Target
+				Name="Compile"
+				MenuCaption="&amp;Compile"
+				CaptureOutputWith="ProcessBuffer"
+				SaveOption="SaveCurrent"
+				RunFromDir="%rw">
+				<Exec/>
+			</Target>
+			<Target
+				Name="Build"
+				MenuCaption="&amp;Build"
+				CaptureOutputWith="ProcessBuffer"
+				SaveOption="SaveWorkspaceFiles"
+				RunFromDir="%rw">
+				<Exec/>
+			</Target>
+			<Target
+				Name="Rebuild"
+				MenuCaption="&amp;Rebuild"
+				CaptureOutputWith="ProcessBuffer"
+				SaveOption="SaveWorkspaceFiles"
+				RunFromDir="%rw">
+				<Exec/>
+			</Target>
+			<Target
+				Name="Debug"
+				MenuCaption="&amp;Debug"
+				SaveOption="SaveNone"
+				RunFromDir="%rw">
+				<Exec/>
+			</Target>
+			<Target
+				Name="Execute"
+				MenuCaption="E&amp;xecute"
+				SaveOption="SaveNone"
+				RunFromDir="%rw">
+				<Exec CmdLine='"SchoolCRM.exe"'/>
+			</Target>
+		</Menu>
+	</Config>
+	<Files>
+		<Folder
+			Name="Source Files"
+			Filters="*.c;*.C;*.cc;*.cpp;*.cp;*.cxx;*.c++;*.prg;*.pas;*.dpr;*.asm;*.s;*.bas;*.java;*.cs;*.sc;*.e;*.cob;*.html;*.rc;*.tcl;*.py;*.pl">
+			<F
+				N="*.java"
+				Recurse="1"
+				Refilter="0"
+				Excludes=""/>
+			<F N="/play-2.1.1/framework/src/play/src/main/java/play/mvc/Action.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/main/java/play/libs/Akka.java"/>
+			<F N="/play-2.1.1/framework/src/play-java/src/test/scala/play/data/AnotherUser.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/test/scala/play/data/AnotherUser.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/main/java/play/Application.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/main/java/play/mvc/BodyParser.java"/>
+			<F N="/play-2.1.1/framework/src/play-java/src/main/java/play/cache/Cache.java"/>
+			<F N="/play-2.1.1/framework/src/play-java/src/main/java/play/cache/Cached.java"/>
+			<F N="/play-2.1.1/framework/src/play-java/src/main/java/play/cache/CachedAction.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/main/java/play/mvc/Call.java"/>
+			<F N="/play-2.1.1/framework/src/play-java/src/main/java/play/libs/Classpath.java"/>
+			<F N="/play-2.1.1/framework/src/play-java/src/main/java/play/libs/Comet.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/main/java/play/Configuration.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/test/java/play/ConfigurationTest.java"/>
+			<F N="/play-2.1.1/framework/src/play-java/src/main/java/play/data/validation/Constraints.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/main/java/play/mvc/Content.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/main/java/play/mvc/Controller.java"/>
+			<F N="/play-2.1.1/framework/src/play-java/src/main/java/play/libs/Crypto.java"/>
+			<F N="/play-2.1.1/framework/src/play-java-jdbc/src/main/java/play/db/DB.java"/>
+			<F N="/play-2.1.1/framework/src/play-java/src/main/java/play/data/DynamicForm.java"/>
+			<F N="/play-2.1.1/framework/src/play-java-ebean/src/main/java/play/db/ebean/EbeanPlugin.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/main/java/play/libs/F.java"/>
+			<F N="/play-2.1.1/framework/src/play-test/src/main/java/play/test/FakeApplication.java"/>
+			<F N="/play-2.1.1/framework/src/play-test/src/main/java/play/test/FakeRequest.java"/>
+			<F N="/play-2.1.1/framework/src/play-java/src/main/java/play/data/Form.java"/>
+			<F N="/play-2.1.1/framework/src/play-java/src/main/java/play/data/format/Formats.java"/>
+			<F N="/play-2.1.1/framework/src/play-java/src/main/java/play/data/format/Formatters.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/main/java/play/GlobalSettings.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/main/java/play/mvc/HandlerRef.java"/>
+			<F N="/play-2.1.1/framework/src/play-test/src/main/java/play/test/Helpers.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/main/java/play/mvc/Http.java"/>
+			<F N="/play-2.1.1/framework/src/play-java-jpa/src/main/java/play/db/jpa/JPA.java"/>
+			<F N="/play-2.1.1/framework/src/play-java-jpa/src/main/java/play/db/jpa/JPAPlugin.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/main/java/play/libs/Json.java"/>
+			<F N="/play-2.1.1/framework/src/play-java/src/main/java/play/libs/Jsonp.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/main/java/play/i18n/Lang.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/main/java/play/Logger.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/main/java/play/i18n/Messages.java"/>
+			<F N="/play-2.1.1/framework/src/play-java-ebean/src/main/java/play/db/ebean/Model.java"/>
+			<F N="/play-2.1.1/framework/src/play-java/src/test/scala/play/data/MyUser.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/test/scala/play/data/MyUser.java"/>
+			<F N="/play-2.1.1/framework/src/play-java/src/main/java/play/libs/OAuth.java"/>
+			<F N="/play-2.1.1/framework/src/play-java/src/main/java/play/libs/OpenID.java"/>
+			<F N="/play-2.1.1/framework/src/play-java-ebean/src/main/java/play/db/ebean/package-info.java"/>
+			<F N="/play-2.1.1/framework/src/play-java-jdbc/src/main/java/play/db/package-info.java"/>
+			<F N="/play-2.1.1/framework/src/play-java-jpa/src/main/java/play/db/jpa/package-info.java"/>
+			<F N="/play-2.1.1/framework/src/play-java/src/main/java/play/cache/package-info.java"/>
+			<F N="/play-2.1.1/framework/src/play-java/src/main/java/play/data/package-info.java"/>
+			<F N="/play-2.1.1/framework/src/play-java/src/main/java/play/data/format/package-info.java"/>
+			<F N="/play-2.1.1/framework/src/play-java/src/main/java/play/data/validation/package-info.java"/>
+			<F N="/play-2.1.1/framework/src/play-java/src/main/java/play/libs/package-info.java"/>
+			<F N="/play-2.1.1/framework/src/play-test/src/main/java/play/test/package-info.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/main/java/play/package-info.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/main/java/play/i18n/package-info.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/main/java/play/mvc/package-info.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/main/java/play/mvc/PathBindable.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/main/java/play/Play.java"/>
+			<F N="/play-2.1.1/framework/src/play-exceptions/src/main/java/play/api/PlayException.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/main/java/play/Plugin.java"/>
+			<F N="/play-2.1.1/framework/src/sbt-link/src/main/java/play/core/enhancers/PropertiesEnhancer.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/main/java/play/mvc/QueryStringBindable.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/main/java/play/mvc/Result.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/main/java/play/mvc/Results.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/main/java/play/Routes.java"/>
+			<F N="/play-2.1.1/framework/src/sbt-link/src/main/java/play/core/SBTLink.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/main/java/play/libs/Scala.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/main/java/play/mvc/Security.java"/>
+			<F N="/play-2.1.1/framework/src/sbt-link/src/main/java/play/core/server/ServerWithStop.java"/>
+			<F N="/play-2.1.1/framework/src/play-test/src/main/java/play/test/TestBrowser.java"/>
+			<F N="/play-2.1.1/framework/src/play-test/src/main/java/play/test/TestServer.java"/>
+			<F N="/play-2.1.1/framework/src/play-java/src/main/java/play/libs/Time.java"/>
+			<F N="/play-2.1.1/framework/src/play-java-ebean/src/main/java/play/db/ebean/Transactional.java"/>
+			<F N="/play-2.1.1/framework/src/play-java-jpa/src/main/java/play/db/jpa/Transactional.java"/>
+			<F N="/play-2.1.1/framework/src/play-java-ebean/src/main/java/play/db/ebean/TransactionalAction.java"/>
+			<F N="/play-2.1.1/framework/src/play-java-jpa/src/main/java/play/db/jpa/TransactionalAction.java"/>
+			<F N="/play-2.1.1/framework/src/play-exceptions/src/main/java/play/api/UsefulException.java"/>
+			<F N="/play-2.1.1/framework/src/play-java/src/main/java/play/data/validation/Validation.java"/>
+			<F N="/play-2.1.1/framework/src/play-java/src/main/java/play/data/validation/ValidationError.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/main/java/play/mvc/WebSocket.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/main/java/play/mvc/With.java"/>
+			<F N="/play-2.1.1/framework/src/play-test/src/main/java/play/test/WithApplication.java"/>
+			<F N="/play-2.1.1/framework/src/play-test/src/test/java/play/test/WithApplicationTest.java"/>
+			<F N="/play-2.1.1/framework/src/play-test/src/main/java/play/test/WithBrowser.java"/>
+			<F N="/play-2.1.1/framework/src/play-test/src/main/java/play/test/WithServer.java"/>
+			<F N="/play-2.1.1/framework/src/play-java/src/main/java/play/libs/WS.java"/>
+			<F N="/play-2.1.1/framework/src/play/src/main/java/play/libs/XML.java"/>
+			<F N="/play-2.1.1/framework/src/play-java/src/main/java/play/libs/XPath.java"/>
+			<F N="/play-2.1.1/framework/src/play-java/src/main/java/play/libs/Yaml.java"/>
+		</Folder>
+		<Folder
+			Name="Header Files"
+			Filters="*.h;*.H;*.hh;*.hpp;*.hxx;*.inc;*.sh;*.cpy;*.if"/>
+		<Folder
+			Name="Resource Files"
+			Filters="*.ico;*.cur;*.dlg"/>
+		<Folder
+			Name="Bitmaps"
+			Filters="*.bmp"/>
+		<Folder
+			Name="Other Files"
+			Filters="">
+			<F N="/play-2.1.1/repository/local/org.avaje.ebeanorm/avaje-ebeanorm-agent/3.1.1/jars/avaje-ebeanorm-agent.jar"/>
+			<F N="/play-2.1.1/repository/local/org.avaje.ebeanorm/avaje-ebeanorm-api/3.1.1/jars/avaje-ebeanorm-api.jar"/>
+			<F N="/play-2.1.1/repository/local/org.avaje.ebeanorm/avaje-ebeanorm-server/3.1.2/jars/avaje-ebeanorm-server.jar"/>
+			<F N="/play-2.1.1/repository/local/org.avaje.ebeanorm/avaje-ebeanorm/3.1.2/jars/avaje-ebeanorm.jar"/>
+			<F N="/play-2.1.1/repository/cache/com.feth/play-authenticate_2.10/jars/play-authenticate_2.10-0.2.5-SNAPSHOT.jar"/>
+			<F N="/play-2.1.1/repository/cache/com.feth/play-easymail_2.10/jars/play-easymail_2.10-0.2-SNAPSHOT.jar"/>
+		</Folder>
+	</Files>
+</Project>

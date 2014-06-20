@@ -1,0 +1,82 @@
+@(personForm: Form[Person], destination : play.api.mvc.Call, submit_title : String)
+
+@import helper._
+
+@implicitField = @{ FieldConstructor(myConstructor.f) }
+
+<div class="row-fluid">
+@form(destination, 'class -> "form-horizontal") {
+
+<div class="span6">
+
+@if(personForm("person_id").value()) {
+	<input type="hidden" name="person_id" value="@personForm("person_id").value()"/>
+}
+        @inputText(personForm("first_name"), '_label -> "First Name")
+        @inputText(personForm("last_name"), '_label -> "Last Name")
+		@select(personForm("gender"), options = options(Seq("Unknown", "Female", "Male", "Other")), '_label -> "Gender")
+		@inputText(personForm("email"), '_label -> "Email")
+		@textarea(personForm("notes"), '_label -> "Notes", 'rows->6)
+		<hr/>
+
+		@defining(personForm("address").value() ||
+			personForm("city").value() ||
+			personForm("state").value() ||
+			personForm("zip").value()) { has_address =>
+			@if( !has_address ) {
+				<a id="address_controller" href="javascript:$('#address_stuff').show();$('#address_controller').hide();">
+					  Add address
+				</a>
+				<div id="address_stuff" style="display:none">
+			}
+		@inputText(personForm("address"), '_label -> "Address")
+		@inputText(personForm("city"), '_label -> "City")
+		@inputText(personForm("state"), '_label -> "State")
+		@inputText(personForm("zip"), '_label -> "Zip")
+			@if( !has_address ) {
+				</div>
+			}
+		}
+
+		@inputText(personForm("neighborhood"), '_label -> "Neighborhood")
+		<hr/>
+
+		@defining(personForm("number_2").value() ||
+			personForm("number_3").value()) { has_phones =>
+		@for( i <- 1 to 3 ) {
+			@if( i == 2 && !has_phones ) {
+				<a id="phone_controller" href="javascript:$('#phone_stuff').show();$('#phone_controller').hide();">
+					  Add phone(s)
+				</a>
+				<div id="phone_stuff" style="display:none">
+			}
+		    @inputText(personForm("number_" + i), '_label -> ("Phone " + i))
+		    @inputText(personForm("number_" + i + "_comment"), '_label -> ("Phone " + i + " comment"))
+		}
+		@if( !has_phones ) {
+			</div>
+		}
+		}
+
+		<hr/>
+		@inputText(personForm("same_family_name"), '_label -> "Same family as: ")
+		<input type="hidden" id = "same_family_id" name="same_family_id"/>
+
+        <input type="submit" value="@submit_title">
+		
+</div>
+<div class="span6">
+
+<p><h4>Student Info</h4>
+		@inputText(personForm("display_name"), '_label -> "Short Name")
+		<hr/>
+		@inputText(personForm("previous_school"), '_label -> "Previous School")
+		@inputText(personForm("school_district"), '_label -> "School District")
+		<hr/>
+		@inputText(personForm("grade"), '_label -> "Current Grade")
+		@inputDate(personForm("dob"), '_label -> "Date of Birth")
+
+		
+</div>
+}
+</div>

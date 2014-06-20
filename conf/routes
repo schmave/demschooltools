@@ -45,9 +45,35 @@ GET /editRule/:id    controllers.ApplicationEditing.editRuleForm(id : Integer)
 POST /editRule/:id    controllers.ApplicationEditing.editRule(id : Integer)
 POST /addRule    controllers.ApplicationEditing.addRule()
 
+GET     /jsonPeople               controllers.Application.jsonPeople(term ?= "")
+GET     /people                   controllers.Application.people()
+GET     /people/new               controllers.Application.newPerson()
+GET     /people/:id               controllers.Application.person(id: Integer)
+POST    /people                   controllers.Application.makeNewPerson()
+POST    /people/:id/delete        controllers.Application.deletePerson(id: Integer)
+
+GET     /people/edit/:id          controllers.Application.editPerson(id: Integer)
+POST    /people/edit              controllers.Application.savePersonEdits()
+
+GET     /jsonTags/:personId       controllers.Application.jsonTags(term ?= "", personId: Integer)
+POST    /addTag/:personId         controllers.Application.addTag(tagId : Integer ?= null, title ?= "", personId : Integer)
+POST    /removeTag/:personId/:tagId controllers.Application.removeTag(personId: Integer, tagId: Integer)
+
+POST    /addComment               controllers.Application.addComment()
+
+POST    /addDonation              controllers.Application.addDonation()
+POST    /thankDonation/:id        controllers.Application.donationThankYou(id: Integer)
+POST    /indiegogoDonation/:id        controllers.Application.donationIndiegogoReward(id: Integer)
+GET     /donations/thankyou       controllers.Application.donationsNeedingThankYou()
+GET     /donations/indiegogo      controllers.Application.donationsNeedingIndiegogo()
+GET     /donations                controllers.Application.donations()
+
+GET     /viewTag/:id              controllers.Application.viewTag(id: Integer)
+
+GET     /viewTaskList/:id         controllers.Application.viewTaskList(id: Integer)
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
-
 
 
 

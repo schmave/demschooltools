@@ -1,0 +1,24 @@
+@(c : Comment)
+
+<html>
+<body>
+<h3>An update from the Papal Database</h3>
+
+<p><b>@c.user.name</b>(possibly) communicated with
+<a href="http://people.threeriversvillageschool.org@routes.Application.person(c.person.person_id)">
+<b>@c.person.first_name @c.person.last_name</b>
+</a>
+
+<p><i>Notes</i><br>
+@Html(c.message.replace("\n", "<br>"))
+
+@if( c.completed_tasks.size() > 0) {
+<p>The following tasks were marked complete:
+<ul>
+@for( ct <- c.completed_tasks ) {
+	<li><a href="http://people.threeriversvillageschool.org@routes.Application.viewTaskList(ct.task.task_list.id)" class="label label-info">@ct.task.title</a>
+}
+</ul>
+}
+</body>
+</html>

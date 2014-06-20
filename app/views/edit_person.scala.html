@@ -1,0 +1,8 @@
+@(personForm: Form[Person])
+
+@main("Create a new person") {
+
+    @person_form(personForm,
+		routes.Application.savePersonEdits(),
+		"Save")
+}
