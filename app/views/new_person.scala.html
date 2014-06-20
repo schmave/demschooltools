@@ -1,0 +1,10 @@
+@(personForm: Form[Person])
+
+@import helper._
+
+@main("Create a new person") {
+
+    <h2>Add a new person</h2>
+
+	@person_form(personForm, routes.Application.makeNewPerson(), "Create")
+}

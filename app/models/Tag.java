@@ -19,6 +19,9 @@ public class Tag extends Model {
 
     public boolean use_student_display;
 
+    @OneToOne(mappedBy="tag")
+    public TaskList task_list;
+
     public static Finder<Integer, Tag> find = new Finder(
         Integer.class, Tag.class
     );

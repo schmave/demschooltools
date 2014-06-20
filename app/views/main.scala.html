@@ -1,5 +1,7 @@
 @(title: String, activeTab : String = "")(content: Html)
 
+@import com.feth.play.module.pa.views.html._
+
 <!DOCTYPE html>
 
 <html>
@@ -13,12 +15,14 @@
 		<script src="http://malsup.github.io/jquery.form.js"></script>
 		<script src="@routes.Assets.at("javascripts/handlebars.js")" type="text/javascript"></script>
 
+		<script src="@routes.Assets.at("javascripts/main.js")" type="text/javascript"></script>
 		<script src="@routes.Assets.at("javascripts/bootstrap.min.js")" type="text/javascript"></script>
 		<link rel="stylesheet" media="all" href="@routes.Assets.at("stylesheets/bootstrap.min.css")">
 
 
 		<link rel="stylesheet" media="all" href="@routes.Assets.at("stylesheets/main.css")">
 		<link rel="stylesheet" media="print" href="@routes.Assets.at("stylesheets/print.css")">
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
     </head>
     <body>
 		@ifAuth() { username =>
@@ -38,8 +42,60 @@
 				} else { Login }
 					</a>
 			<li class="username"><a class="username">@username</a></li>
-			</ul>
-		}
+			<li><a href="@routes.Application.people()">All people</a>
+			<li><a href="@routes.Application.newPerson()">Add a person</a>
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+				  Tags
+				  <b class="caret"></b>
+				</a>
+					<ul class="dropdown-menu">
+						@for( kv <- Tag.getWithPrefixes() ) {
+							@if( kv._2.size() > 1 ) {
+								<li class="dropdown-submenu">
+								<a tabindex="-1" href="#">@kv._1</a>
+								<ul class="dropdown-menu">
+								@for( t <- kv._2 ) {
+									<li><a href="@routes.Application.viewTag(t.id)">@t.title</a></li>
+								}
+								</ul></li>
+							} else {
+								@* There is only one tag, but the for loop is a nice way to bind
+									the variable *@
+								@for( t <- kv._2 ) {
+									<li><a href="@routes.Application.viewTag(t.id)">@t.title</a></li>
+								}
+							}
+						}
+					</ul>
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+				  Checklists
+				  <b class="caret"></b>
+				</a>
+					<ul class="dropdown-menu">
+						@for( l <- TaskList.find.all() ) {
+							<li><a href="@routes.Application.viewTaskList(l.id)">@l.title</a></li>
+							}
+					</ul>
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+				  Donations
+				  <b class="caret"></b>
+				</a>
+					<ul class="dropdown-menu">
+					<li><a href="@routes.Application.donations()">All</a></li>
+						<li><a href="@routes.Application.donationsNeedingThankYou()">need thank you</a></li>
+						<li><a href="@routes.Application.donationsNeedingIndiegogo()">need Indiegogo reward</a></li>
+					</ul>
+			<li><form class="navbar-search pull-left">
+			<input type="text" id="navbar_people_search" placeholder="Search People"/></form></li>
+
+		<li style="float:right"><a style="font-weight: bold" name="bar">@User.findByAuthUserIdentity(auth).email</a>
+		<li style="float:right;"><a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout">Logout</a>
+
+		</ul>
+	}
 
 		@content
     </body>

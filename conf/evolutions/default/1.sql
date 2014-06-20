@@ -30,4 +30,3 @@ create index ix_person_family_1 on person (family_person_id);
 drop table if exists person cascade;
 
 drop sequence if exists person_seq;
-

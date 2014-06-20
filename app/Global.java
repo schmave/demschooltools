@@ -10,6 +10,7 @@ import play.Application;
 import play.GlobalSettings;
 import play.mvc.Call;
 
+
 public class Global extends GlobalSettings {
 
 	public void onStart(final Application app) {

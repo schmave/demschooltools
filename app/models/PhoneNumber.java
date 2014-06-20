@@ -19,7 +19,7 @@ public class PhoneNumber extends Model {
 
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="person_id")
-    private Person owner;
+    public Person owner;
 
     public static Finder<Integer, PhoneNumber> find = new Finder(
         Integer.class, PhoneNumber.class

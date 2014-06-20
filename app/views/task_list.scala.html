@@ -1,0 +1,37 @@
+@(list: TaskList, people : List[Person])
+
+@import helper._
+
+@main("List: " + list.title) {
+<h1>@list.title</h1>
+
+@defining(new HashSet[Person]()) { people_with_uncompleted_task =>
+
+<table class="table">
+<tr><th>Task<th>People who have completed it<th>People who have not completed it. The
+	first time someone appears in this column, their name is <span class="first_uncompleted">highlighted</span>.
+@for( t <- list.tasks ) {
+@if( t.enabled ) {
+<tr>
+<td>@t.title
+<td>
+	@defining(people.filter(p => p.completedTask(t) != null)) { completed_people =>
+		(@completed_people.size):
+		@for( p <- completed_people) {
+			<a href="@routes.Application.person(p.person_id)">@p.first_name @p.last_name,</a>
+		}
+	}
+<td>
+	@defining(people.filter(p => p.completedTask(t) == null)) { uncompleted_people =>
+		(@uncompleted_people.size):
+		@for( p <- uncompleted_people) {
+			<a @if( people_with_uncompleted_task.add(p) ) { class="first_uncompleted" }
+				href="@routes.Application.person(p.person_id)">@p.first_name @p.last_name,</a>
+		}
+	}
+} }
+
+</table>
+}
+
+}
