@@ -4,7 +4,7 @@
 
 @main(p.first_name + " " + p.last_name) {
 
-@defining(if(family_members.size() >= 2){ "span3" } else {"span6"}) { size =>
+@defining(if(family_members.size() >= 2){ "col-sm-6 col-md-3" } else {"col-sm-12 col-md-6"}) { size =>
 <div class="row">
 	<div class="@size">
 	@person(p)
@@ -18,12 +18,12 @@
 
 <hr>
 <div class="row">
-<div class="span9">
+<div class="col-md-9">
 
 @form(routes.Application.addComment(), args = 'id -> "comment_form") {
 @for( tag <- p.tags ) {
 	@if( tag.task_list != null ) {
-		<div id="span4">
+		<div id="col-md-4">
 		<h4><a href="@routes.Application.viewTaskList(tag.task_list.id)">@tag.task_list.title</a></h4>
 		@for( task <- tag.task_list.tasks ) {
 			@if( task.enabled ) {
@@ -58,7 +58,7 @@
   <div class="tab-content">
     <div class="tab-pane active" id="tab1">
 		<div class="row">
-		<div class="span9">
+		<div class="col-md-9">
 		<p id="add_comment_p"><a href="javascript:void(0)" onclick="javascript:$('#new_comment').show();$('#add_comment_p').hide();">Add a comment</a>
 		<div id="new_comment" style="display: none;">
 			<div style="float:left">I talked with
@@ -86,7 +86,7 @@
 		</div>
 
 		<div class="row">
-		<div class="span9" id="comments">
+		<div class="col-md-9" id="comments">
 		@for( c <- comments ) {
 			@if( c.completed_tasks.size() == 0 ||
 				c.message.length() > 80) {
