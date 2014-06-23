@@ -15,7 +15,7 @@
 </div>
 <div class="comment_tasks">
 @for( ct <- c.completed_tasks ) {
-	<a href="@routes.CRM.viewTaskList(ct.task.task_list.id)" class="label label-info">@ct.task.title</a>
+	<a href="@routes.CRM.viewTaskList(ct.task.task_list.id)"><span class="label label-primary">@ct.task.title</span></a>
 }
 </div>
 <div class="comment_time">@CRM.formatDate(c.created)</div>
