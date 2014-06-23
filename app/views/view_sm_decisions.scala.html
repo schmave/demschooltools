@@ -2,10 +2,9 @@
 
 @import helper._
 
-@main("Past School Meeting decisions", "view_sm") {
+@main("Past School Meeting decisions", "view_sm", menu = "jc") {
 
 <h3>Past School Meeting decisions</h3>
-
 <table class="table printable-res-plans">
 @for( c <- charges ) {
 	@if( c.sm_decision_date != null &&
@@ -14,7 +13,6 @@
 	}
 }
 </table>
-
 @for( c <- charges) {
 	@historyCharge(c, true, true)
 }

@@ -6,7 +6,7 @@
 <h1>@tag.title</h1>
 <p>@people.size() people</p>
 @if( tag.task_list != null ) {
-   <p>Also see task list: <a href="@routes.Application.viewTaskList(tag.task_list.id)">@tag.task_list.title</a></p>
+   <p>Also see task list: <a href="@routes.CRM.viewTaskList(tag.task_list.id)">@tag.task_list.title</a></p>
 }
 
 <table class="table sortable">
@@ -14,10 +14,10 @@
 
 @for( p <- people ) {
 	<tr>
-	<td><a href="@routes.Application.person(p.person_id)">@p.first_name @p.last_name</a>
+	<td><a href="@routes.CRM.person(p.person_id)">@p.first_name @p.last_name</a>
 	<td>@p.school_district
-	<td>@Application.formatDob(p.dob)
-	<td>@Application.calcAgeAtBeginningOfSchool(p)
+	<td>@CRM.formatDob(p.dob)
+	<td>@CRM.calcAgeAtBeginningOfSchool(p)
 	<td>@p.grade
 	<td>@p.gender
 	<td>@p.numSiblings()

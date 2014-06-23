@@ -5,7 +5,7 @@
 <h3>An update from the Papal Database</h3>
 
 <p><b>@c.user.name</b>(possibly) communicated with
-<a href="http://people.threeriversvillageschool.org@routes.Application.person(c.person.person_id)">
+<a href="http://people.threeriversvillageschool.org@routes.CRM.person(c.person.person_id)">
 <b>@c.person.first_name @c.person.last_name</b>
 </a>
 
@@ -16,7 +16,7 @@
 <p>The following tasks were marked complete:
 <ul>
 @for( ct <- c.completed_tasks ) {
-	<li><a href="http://people.threeriversvillageschool.org@routes.Application.viewTaskList(ct.task.task_list.id)" class="label label-info">@ct.task.title</a>
+	<li><a href="http://people.threeriversvillageschool.org@routes.CRM.viewTaskList(ct.task.task_list.id)" class="label label-info">@ct.task.title</a>
 }
 </ul>
 }

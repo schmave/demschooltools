@@ -10,7 +10,7 @@ import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
 import com.avaje.ebean.validation.NotNull;
 
-import controllers.Application;
+import controllers.*;
 
 import org.codehaus.jackson.annotate.*;
 
@@ -266,7 +266,7 @@ public class Person extends Model implements Comparable<Person> {
             {
                 if (this != p &&
                     p.dob != null &&
-                    Application.calcAge(p) < 18)
+                    CRM.calcAge(p) < 18)
                 {
                     num_siblings++;
                 }

@@ -86,6 +86,9 @@ public class Charge extends Model implements Comparable<Charge> {
 
     @Override
     public int compareTo(Charge c2) {
-        return the_case.meeting.date.compareTo(c2.the_case.meeting.date);
+		if (the_case.meeting.date != null) {
+			return the_case.meeting.date.compareTo(c2.the_case.meeting.date);
+		}
+		return 0;
     }
 }

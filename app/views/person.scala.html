@@ -15,7 +15,7 @@
 @if(person.isStudent()) {
 	<div class="student"></div>
 }
-<h4><a href="@routes.Application.person(person.person_id)">
+<h4><a href="@routes.CRM.person(person.person_id)">
 @person.first_name @person.last_name</a></h4>
 @if( person.notes ) {
 	<p>@person.notes</p>
@@ -66,10 +66,10 @@ enableTagBox("#person_tag_entry_@person.person_id",
 }
 
 @if(person.dob != null) {
-	<br>Age @Application.calcAge(person) (born @Application.formatDob(person.dob))
+	<br>Age @CRM.calcAge(person) (born @CRM.formatDob(person.dob))
 }
 @if(!person.grade.equals("")) {
 	<br>Grade @person.grade<br>
 }
-<a href="@routes.Application.editPerson(person.person_id)">Edit</a>
+<a href="@routes.CRM.editPerson(person.person_id)">Edit</a>
 </div>

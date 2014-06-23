@@ -7,14 +7,14 @@
 @Html(d.description.replace("\n", "<br>"))
 <br>@if( d.is_cash ) { Cash: } else { with cash value: } $@d.dollar_value.
 </div>
-<div class="comment_time">@Application.formatDate(d.date)</div>
+<div class="comment_time">@CRM.formatDate(d.date)</div>
 <td>
 @if(d.thanked && d.thanked_by_user != null) {
-  Thanked by @{d.thanked_by_user.name}, @Application.formatDate(d.thanked_time).
+  Thanked by @{d.thanked_by_user.name}, @CRM.formatDate(d.thanked_time).
 }
 @if(!d.thanked) {
   <span id="needs_thank_you_@d.id">Needs a thank you still.</span>
-			@form(routes.Application.donationThankYou(d.id), args = 'id -> ("thank_you_form_" + d.id)) {
+			@form(routes.CRM.donationThankYou(d.id), args = 'id -> ("thank_you_form_" + d.id)) {
 				<input type="submit" value="Thank You complete">
 			<script type="text/javascript">
 				$("#thank_you_form_@d.id").ajaxForm({"complete" : function(response, status) {
@@ -28,11 +28,11 @@
 <br>
 @if(d.indiegogo_reward_given && d.indiegogo_reward_by_user != null) {
   Indiegogo reward given by
-		@{d.indiegogo_reward_by_user.name}, @Application.formatDate(d.indiegogo_reward_given_time).
+		@{d.indiegogo_reward_by_user.name}, @CRM.formatDate(d.indiegogo_reward_given_time).
 }
 @if(!d.indiegogo_reward_given) {
   <span id="needs_indiegogo_reward_@d.id">Needs Indiegogo reward still.</span>
-			@form(routes.Application.donationIndiegogoReward(d.id), args = 'id -> ("indiegogo_reward_form_" + d.id)) {
+			@form(routes.CRM.donationIndiegogoReward(d.id), args = 'id -> ("indiegogo_reward_form_" + d.id)) {
 				<input type="submit" value="Indiegogo reward delivered">
 			<script type="text/javascript">
 				$("#indiegogo_reward_form_@d.id").ajaxForm({"complete" : function(response, status) {

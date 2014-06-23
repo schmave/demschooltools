@@ -1,4 +1,4 @@
-@(title: String, activeTab : String = "")(content: Html)
+@(title: String, activeTab : String = "", menu : String = "crm")(content: Html)
 
 @import com.feth.play.module.pa.views.html._
 
@@ -27,6 +27,7 @@
     <body>
 		@ifAuth() { username =>
 			<ul class="nav nav-tabs no-print">
+			@if( menu.equals("jc") ) {
 			<li @if(activeTab.equals("home")) { class="active" } ><a href="@routes.Application.index">Home</a>
 			<li @if(activeTab.equals("view_sm")) { class="active" } ><a href="@routes.Application.viewSchoolMeetingDecisions">View S.M. decisions</a>
 			@if(Application.isCurrentUserEditor()) {
@@ -36,8 +37,9 @@
 				@if(Application.isCurrentUserEditor()) {
 					Rules
 				}</a>
-			<li><a href="@routes.Application.people()">All people</a>
-			<li><a href="@routes.Application.newPerson()">Add a person</a>
+			} else { @if( menu.equals( "crm" ) ) {
+			<li><a href="@routes.CRM.people()">All people</a>
+			<li><a href="@routes.CRM.newPerson()">Add a person</a>
 			<li class="dropdown">
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 				  Tags
@@ -50,14 +52,14 @@
 								<a tabindex="-1" href="#">@kv._1</a>
 								<ul class="dropdown-menu">
 								@for( t <- kv._2 ) {
-									<li><a href="@routes.Application.viewTag(t.id)">@t.title</a></li>
+									<li><a href="@routes.CRM.viewTag(t.id)">@t.title</a></li>
 								}
 								</ul></li>
 							} else {
 								@* There is only one tag, but the for loop is a nice way to bind
 									the variable *@
 								@for( t <- kv._2 ) {
-									<li><a href="@routes.Application.viewTag(t.id)">@t.title</a></li>
+									<li><a href="@routes.CRM.viewTag(t.id)">@t.title</a></li>
 								}
 							}
 						}
@@ -69,7 +71,7 @@
 				</a>
 					<ul class="dropdown-menu">
 						@for( l <- TaskList.find.all() ) {
-							<li><a href="@routes.Application.viewTaskList(l.id)">@l.title</a></li>
+							<li><a href="@routes.CRM.viewTaskList(l.id)">@l.title</a></li>
 							}
 					</ul>
 			<li class="dropdown">
@@ -78,15 +80,16 @@
 				  <b class="caret"></b>
 				</a>
 					<ul class="dropdown-menu">
-					<li><a href="@routes.Application.donations()">All</a></li>
-						<li><a href="@routes.Application.donationsNeedingThankYou()">need thank you</a></li>
-						<li><a href="@routes.Application.donationsNeedingIndiegogo()">need Indiegogo reward</a></li>
+					<li><a href="@routes.CRM.donations()">All</a></li>
+						<li><a href="@routes.CRM.donationsNeedingThankYou()">need thank you</a></li>
+						<li><a href="@routes.CRM.donationsNeedingIndiegogo()">need Indiegogo reward</a></li>
 					</ul>
 			<li>
 			<form class="navbar-form navbar-left">
 			   <input id="navbar_people_search" type="Search" placeholder="Search..." class="form-control" />
 			</form>			
 			</li>
+			} }
 			
 			<li style="float:right;"><a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout">
 				@if(Application.isCurrentUserEditor()) {
