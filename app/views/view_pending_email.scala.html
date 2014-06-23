@@ -1,0 +1,14 @@
+@(email : Email)
+
+@import helper._
+
+@main("Pending Email", "email") {
+
+<h3>Pending email</h3>
+@email.sent
+<br>
+@email.deleted
+<br>
+@email.message
+
+}

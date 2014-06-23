@@ -85,6 +85,11 @@
 						<li><a href="@routes.CRM.donationsNeedingIndiegogo()">need Indiegogo reward</a></li>
 					</ul>
 			<li>
+			@if(CRM.hasPendingEmail()) {
+				<li @if(activeTab.equals("email")) { class="active" } >
+					<a href="@routes.CRM.viewPendingEmail()">Pending Email <span class="label label-warning">1</span></a>
+				</li>
+			}
 			<form class="navbar-form navbar-left">
 			   <input id="navbar_people_search" type="Search" placeholder="Search..." class="form-control" />
 			</form>			
