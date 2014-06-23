@@ -24,6 +24,7 @@
  @for( t <- person.tags ) {
 	 @tag_fragment(t, person)
   }
+  @if( person.tags.size() > 0 ) { <br> }
 <a id="add_tag_a_@person.person_id"
 	href="javascript:$('#add_tag_@person.person_id').show();$('#add_tag_@person.person_id input').focus();$('#add_tag_a_@person.person_id').hide();">Add tag</a>
 </div>

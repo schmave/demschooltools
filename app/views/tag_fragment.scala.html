@@ -1,6 +1,6 @@
 @(t : Tag, p : Person)
 
-<a href="@routes.Application.viewTag(t.id)" class="label">@t.title</a><a
-class="tag_x" href="javascript:removeTag($('#@{p.person_id}_@t.id'),@p.person_id, @t.id)"
-id="@{p.person_id}_@t.id"><img src="/assets/images/x.png"></a>
+
+<span style="white-space: nowrap;"><a href="@routes.Application.viewTag(t.id)"><span class="label label-success">@t.title</span></a><a class="tag_x" href="javascript:removeTag($('#@{p.person_id}_@t.id'),@p.person_id, @t.id)"
+id="@{p.person_id}_@t.id"><img src="/assets/images/x.png"></a></span>
 

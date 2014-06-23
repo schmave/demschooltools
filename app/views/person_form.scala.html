@@ -4,19 +4,19 @@
 
 @implicitField = @{ FieldConstructor(myConstructor.f) }
 
-<div class="row-fluid">
-@form(destination, 'class -> "form-horizontal") {
+<div class="row">
+@form(destination, 'class -> "form-horizontal", 'role -> "form") {
 
-<div class="span6">
+<div class="col-sm-6">
 
 @if(personForm("person_id").value()) {
 	<input type="hidden" name="person_id" value="@personForm("person_id").value()"/>
 }
-        @inputText(personForm("first_name"), '_label -> "First Name")
-        @inputText(personForm("last_name"), '_label -> "Last Name")
-		@select(personForm("gender"), options = options(Seq("Unknown", "Female", "Male", "Other")), '_label -> "Gender")
-		@inputText(personForm("email"), '_label -> "Email")
-		@textarea(personForm("notes"), '_label -> "Notes", 'rows->6)
+        @inputText(personForm("first_name"), '_label -> "First Name", 'class -> "form-control")
+        @inputText(personForm("last_name"), '_label -> "Last Name", 'class -> "form-control")
+		@select(personForm("gender"), options = options(Seq("Unknown", "Female", "Male", "Other")), '_label -> "Gender", 'class -> "form-control")
+		@inputText(personForm("email"), '_label -> "Email", 'class -> "form-control")
+		@textarea(personForm("notes"), '_label -> "Notes", 'rows->6, 'class -> "form-control")
 		<hr/>
 
 		@defining(personForm("address").value() ||
@@ -29,16 +29,16 @@
 				</a>
 				<div id="address_stuff" style="display:none">
 			}
-		@inputText(personForm("address"), '_label -> "Address")
-		@inputText(personForm("city"), '_label -> "City")
-		@inputText(personForm("state"), '_label -> "State")
-		@inputText(personForm("zip"), '_label -> "Zip")
+		@inputText(personForm("address"), '_label -> "Address", 'class -> "form-control")
+		@inputText(personForm("city"), '_label -> "City", 'class -> "form-control")
+		@inputText(personForm("state"), '_label -> "State", 'class -> "form-control")
+		@inputText(personForm("zip"), '_label -> "Zip", 'class -> "form-control")
 			@if( !has_address ) {
 				</div>
 			}
 		}
 
-		@inputText(personForm("neighborhood"), '_label -> "Neighborhood")
+		@inputText(personForm("neighborhood"), '_label -> "Neighborhood", 'class -> "form-control")
 		<hr/>
 
 		@defining(personForm("number_2").value() ||
@@ -50,8 +50,8 @@
 				</a>
 				<div id="phone_stuff" style="display:none">
 			}
-		    @inputText(personForm("number_" + i), '_label -> ("Phone " + i))
-		    @inputText(personForm("number_" + i + "_comment"), '_label -> ("Phone " + i + " comment"))
+		    @inputText(personForm("number_" + i), '_label -> ("Phone " + i), 'class -> "form-control")
+		    @inputText(personForm("number_" + i + "_comment"), '_label -> ("Phone " + i + " comment"), 'class -> "form-control")
 		}
 		@if( !has_phones ) {
 			</div>
@@ -59,22 +59,22 @@
 		}
 
 		<hr/>
-		@inputText(personForm("same_family_name"), '_label -> "Same family as: ")
+		@inputText(personForm("same_family_name"), '_label -> "Same family as: ", 'class -> "form-control")
 		<input type="hidden" id = "same_family_id" name="same_family_id"/>
 
         <input type="submit" value="@submit_title">
 		
 </div>
-<div class="span6">
+<div class="col-sm-6">
 
 <p><h4>Student Info</h4>
-		@inputText(personForm("display_name"), '_label -> "Short Name")
+		@inputText(personForm("display_name"), '_label -> "Short Name", 'class -> "form-control")
 		<hr/>
-		@inputText(personForm("previous_school"), '_label -> "Previous School")
-		@inputText(personForm("school_district"), '_label -> "School District")
+		@inputText(personForm("previous_school"), '_label -> "Previous School", 'class -> "form-control")
+		@inputText(personForm("school_district"), '_label -> "School District", 'class -> "form-control")
 		<hr/>
-		@inputText(personForm("grade"), '_label -> "Current Grade")
-		@inputDate(personForm("dob"), '_label -> "Date of Birth")
+		@inputText(personForm("grade"), '_label -> "Current Grade", 'class -> "form-control")
+		@inputDate(personForm("dob"), '_label -> "Date of Birth", 'class -> "form-control")
 
 		
 </div>

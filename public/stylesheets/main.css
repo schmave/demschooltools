@@ -69,17 +69,17 @@
     display: inline;
 }
 
-.person img {
+.name img {
     cursor: pointer;
 }
 
-.person .label
+.name .label
 {
     font-size: inherit;
     cursor: pointer;
 }
 
-.person
+.name
 {
   display:inline;
 }
@@ -110,23 +110,15 @@
     padding-right: 5px;
 }
 
-body {
-    font-size: 12px;
+label {
+	font-weight: normal;
+}
 
+body {
+	font-size: 12px;
     padding-top: 10px;
     margin-left: 20px;
     margin-right: 20px;
-}
-
-.person_tag {
-    background: #eee;
-    border-radius: 2px;
-    -webkit-border-radius: 2px;
-    color: #666;
-    padding: 2px;
-}
-
-#comments {
 }
 
 .comment {
@@ -134,7 +126,7 @@ body {
 }
 
 .limit_height {
-  max-height: 60px;
+  max-height: 50px;
   overflow: hidden;
 }
 
@@ -271,12 +263,12 @@ a.edit_link {
 	margin-left: 160px;
 }
 
-.form-horizontal .control-group {
+.form-horizontal .form-group {
    margin-bottom: 5px;
 }
 
 .form-horizontal .control-label {
-   width: 120px;
+	padding-right: 0px;
 }
 
 .form-horizontal a {
