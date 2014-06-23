@@ -4,7 +4,7 @@
 <div class="comment">
 <b>@c.user.name</b> and 
 @if( show_last_name ) {
-	<a href="@routes.Application.person(c.person.person_id)">
+	<a href="@routes.CRM.person(c.person.person_id)">
 }
 <b>@c.person.first_name @if( show_last_name ) { @c.person.last_name }</b>
 @if( show_last_name ) {
@@ -15,8 +15,8 @@
 </div>
 <div class="comment_tasks">
 @for( ct <- c.completed_tasks ) {
-	<a href="@routes.Application.viewTaskList(ct.task.task_list.id)" class="label label-info">@ct.task.title</a>
+	<a href="@routes.CRM.viewTaskList(ct.task.task_list.id)" class="label label-info">@ct.task.title</a>
 }
 </div>
-<div class="comment_time">@Application.formatDate(c.created)</div>
+<div class="comment_time">@CRM.formatDate(c.created)</div>
 </div>

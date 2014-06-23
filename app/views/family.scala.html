@@ -4,7 +4,7 @@
 
 @main(p.first_name + " " + p.last_name) {
 
-@defining(if(family_members.size() >= 2){ "col-sm-6 col-md-3" } else {"col-sm-12 col-md-6"}) { size =>
+@defining(if(family_members.size() >= 2){ "col-xs-6 col-md-3" } else {"col-xs-6 col-md-6"}) { size =>
 <div class="row">
 	<div class="@size">
 	@person(p)
@@ -20,11 +20,11 @@
 <div class="row">
 <div class="col-md-9">
 
-@form(routes.Application.addComment(), args = 'id -> "comment_form") {
+@form(routes.CRM.addComment(), args = 'id -> "comment_form") {
 @for( tag <- p.tags ) {
 	@if( tag.task_list != null ) {
 		<div id="col-md-4">
-		<h4><a href="@routes.Application.viewTaskList(tag.task_list.id)">@tag.task_list.title</a></h4>
+		<h4><a href="@routes.CRM.viewTaskList(tag.task_list.id)">@tag.task_list.title</a></h4>
 		@for( task <- tag.task_list.tasks ) {
 			@if( task.enabled ) {
 			@defining( p.completedTask(task) ) { ct =>
@@ -35,7 +35,7 @@
 				}
 				<label for="task_checkbox_@task.id" style="display:inline">@task.title</label>
 				@if( ct != null ) {
-					<i>(@ct.comment.user.name, @Application.formatDate(ct.comment.created))</i>
+					<i>(@ct.comment.user.name, @CRM.formatDate(ct.comment.created))</i>
 					@if(ct.comment.message.length() > 0) {
 						-- @ct.comment.message
 					}
@@ -97,7 +97,7 @@
 		</div>
 		</div>
     <div class="tab-pane" id="tab2">
-		@form(routes.Application.addDonation(), args = 'id -> "donation_form") {
+		@form(routes.CRM.addDonation(), args = 'id -> "donation_form") {
 		<p id="add_donation_p"><a href="javascript:void(0)" onclick="javascript:$('#new_donation').show();$('#add_donation_p').hide()">Add a donation</a>
 		<div id="new_donation" style="display: none;">
 			<input type=hidden name="person" value="@p.person_id" />

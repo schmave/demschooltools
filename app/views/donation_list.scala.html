@@ -7,7 +7,7 @@
 <tr><th>Name<th>Donation<th>Thank you info</tr>
 @for( d <- donations ) {
 	<tr><td>
-		<a href="@routes.Application.person(d.person.person_id)">
+		<a href="@routes.CRM.person(d.person.person_id)">
 			@d.person.first_name @d.person.last_name</a>
 	@donation_fragment(d)
 	</tr>

@@ -10,7 +10,7 @@
     <ul>
         @for(person <- people) {
             <li>
-                <a href="@routes.Application.person(person.person_id)">@person.first_name @person.last_name</a>
+                <a href="@routes.CRM.person(person.person_id)">@person.first_name @person.last_name</a>
             </li>
         }
     </ul>

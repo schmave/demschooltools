@@ -23,7 +23,7 @@
 	@for( p <- people_with_family ) {
 		@if( p.email &&
 					(p.dob == null ||
-                    Application.calcAge(p) >= 18)) {
+                    CRM.calcAge(p) >= 18)) {
 			@p.email,
 		}
 	}
