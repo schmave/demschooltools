@@ -62,7 +62,7 @@ public class Application extends Controller {
         people.addAll(getPeopleForTag(staff_tag.id));
         Collections.sort(people, Person.SORT_DISPLAY_NAME);
 
-        return ok(views.html.index.render(meetings, sm_charges, people,
+        return ok(views.html.jc_index.render(meetings, sm_charges, people,
             Rule.find.orderBy("title ASC").findList()));
     }
 
@@ -92,18 +92,15 @@ public class Application extends Controller {
     public static Result viewRuleHistory(Integer id) {
         Rule r = Rule.find.byId(id);
         return ok(views.html.view_rule_history.render(r, new RuleHistory(r)));
+	}
 
 	static Form<Person> personForm = Form.form(Person.class);
     static Form<Comment> commentForm = Form.form(Comment.class);
     static Form<Donation> donationForm = Form.form(Donation.class);
 
-    public static Result index() {
-        return redirect(routes.Application.people());
-    }
-
     public static Result people() {
         List<Comment> recent_comments = Comment.find.orderBy("created DESC").setMaxRows(20).findList();
-        return ok(views.html.index.render(Person.all(), recent_comments));
+        return ok(views.html.people_index.render(Person.all(), recent_comments));
     }
 
     public static Result person(Integer id) {
@@ -252,7 +249,7 @@ public class Application extends Controller {
             where().eq("tag.id", id).orderBy("person.last_name, person.first_name").findList();
     }
 
-    public static String jsonPeople(String term) {
+    public static String jcPeople(String term) {
         Tag cur_student_tag = Tag.find.where().eq("title", "Current Student").findUnique();
         Tag staff_tag = Tag.find.where().eq("title", "Staff").findUnique();
 
@@ -317,10 +314,6 @@ public class Application extends Controller {
         return isUserEditor(currentUsername());
     }
 
-    public static Configuration getConfiguration() {
-        return Play.application().configuration().getConfig("jcdb");
-    }
-
     public static String getRemoteIp() {
         Context ctx = Context.current();
         Configuration conf = getConfiguration();
@@ -335,6 +328,7 @@ public class Application extends Controller {
         } else {
             return ctx.request().remoteAddress();
         }
+	}
 
 	public static Result viewTag(Integer id) {
         Tag the_tag = Tag.find.byId(id);
