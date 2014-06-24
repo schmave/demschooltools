@@ -222,30 +222,46 @@ public class CRM extends Controller {
             return redirect(routes.CRM.person(new_person.person_id));
         }
     }
-	
+
 	public static Result postEmail() {
 		final Map<String, String[]> values = request().body().asFormUrlEncoded();
-		
+
 		Email.create(values.get("email")[0]);
-		return ok();
+
+        return ok();
 	}
-	
+
 	static Email getPendingEmail() {
-		return Email.find.where().eq("deleted", false).eq("sent", false).orderBy("id DESC").setMaxRows(1).findUnique();
+		return Email.find.where().eq("deleted", false).eq("sent", false).orderBy("id ASC").setMaxRows(1).findUnique();
 	}
-	
+
 	public static boolean hasPendingEmail() {
 		return getPendingEmail() != null;
 	}
-	
+
 	public static Result viewPendingEmail() {
 		Email e = getPendingEmail();
 		if (e != null) {
+            e.parseMessage();
 			return ok(views.html.view_pending_email.render(e));
 		} else {
 			return redirect(routes.CRM.people());
 		}
 	}
+
+    public static Result sendTestEmail() {
+        final Map<String, String[]> values = request().body().asFormUrlEncoded();
+        Email e = Email.find.byId(Integer.parseInt(values.get("id")[0]));
+        e.parseMessage();
+
+        MailerAPI mail = play.Play.application().plugin(MailerPlugin.class).email();
+        mail.setSubject(e.parsedMessage.getSubject());
+        mail.addRecipient(values.get("dest_email")[0]);
+        mail.addFrom("Papal DB <noreply@threeriversvillageschool.org>");
+        mail.send(e.textBody.toString(), e.htmlBody.toString());
+
+        return ok();
+    }
 
     public static Result deletePerson(Integer id) {
         Person.delete(id);
