@@ -51,7 +51,13 @@ public class Email extends Model {
 
     public void markSent() {
         this.sent = true;
+		this.save();
     }
+	
+	public void markDeleted() {
+		this.deleted = true;
+		this.save();
+	}
 
     public void parseMessage() {
         textBody = new StringBuffer();

@@ -58,6 +58,7 @@ POST    /people/edit              controllers.CRM.savePersonEdits()
 GET     /jsonTags/:personId       controllers.CRM.jsonTags(term ?= "", personId: Integer)
 POST    /addTag/:personId         controllers.CRM.addTag(tagId : Integer ?= null, title ?= "", personId : Integer)
 POST    /removeTag/:personId/:tagId controllers.CRM.removeTag(personId: Integer, tagId: Integer)
+GET     /getTagMembers			  controllers.CRM.getTagMembers(tagId : Integer, includeMembers : Boolean, includeFamily : Boolean)
 
 POST    /addComment               controllers.CRM.addComment()
 
@@ -75,6 +76,8 @@ GET     /viewTaskList/:id         controllers.CRM.viewTaskList(id: Integer)
 POST	/postEmail				  controllers.CRM.postEmail()
 GET 	/viewPendingEmail		  controllers.CRM.viewPendingEmail()
 POST	/sendTestEmail				  controllers.CRM.sendTestEmail()
+POST	/deleteEmail				  controllers.CRM.deleteEmail()
+POST	/sendEmail				  controllers.CRM.sendEmail()
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
