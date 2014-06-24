@@ -114,7 +114,11 @@ public class CRM extends Controller {
         List<Tag> selected_tags =
             Tag.find.where().ilike("title", "%" + term + "%").findList();
 
-        List<Tag> existing_tags = Person.find.byId(personId).tags;
+		List<Tag> existing_tags = null;
+		Person p = Person.find.byId(personId);
+		if (p != null) {
+			existing_tags = p.tags;
+		}
 
         List<Map<String, String> > result = new ArrayList<Map<String, String> > ();
         for (Tag t : selected_tags) {
@@ -133,6 +137,27 @@ public class CRM extends Controller {
 
         return ok(Json.stringify(Json.toJson(result)));
     }
+	
+	public static Result getTagMembers(Integer tagId, Boolean includeMembers, Boolean includeFamily) {
+        List<Person> people = getPeopleForTag(tagId);
+
+        Set<Person> people_to_render = new HashSet<Person>();
+		people_to_render.addAll(people);
+		if (includeFamily) {
+			for (Person p : people) {
+				if (p.family != null) {
+					people_to_render.addAll(p.family.family_members);
+				}
+			}
+		}
+		
+		if (!includeMembers) {
+			people_to_render.removeAll(people);
+		}
+		
+        Tag the_tag = Tag.find.byId(tagId);
+		return ok(views.html.to_address_fragment.render(the_tag.title, people_to_render));
+	}
 
     public static Result addTag(Integer tagId, String title, Integer personId) {
         Person p = Person.find.byId(personId);
@@ -163,8 +188,7 @@ public class CRM extends Controller {
         return ok();
     }
 
-    public static List<Person> getPeopleForTag(Integer id)
-    {
+    public static List<Person> getPeopleForTag(Integer id) {
         RawSql rawSql = RawSqlBuilder
             .parse("SELECT person.person_id, person.first_name, person.last_name, person.display_name from "+
                    "person join person_tag pt on person.person_id=pt.person_id "+
@@ -241,12 +265,20 @@ public class CRM extends Controller {
 
 	public static Result viewPendingEmail() {
 		Email e = getPendingEmail();
-		if (e != null) {
-            e.parseMessage();
-			return ok(views.html.view_pending_email.render(e));
-		} else {
+		if (e == null) {
 			return redirect(routes.CRM.people());
 		}
+		
+		ArrayList<String> addresses = new ArrayList<String>();
+		addresses.add("evan@threeriversvillageschool.org");
+		addresses.add("jmp@threeriversvillageschool.org");
+		addresses.add("jancey@threeriversvillageschool.org");
+		addresses.add("info@threeriversvillageschool.org");
+		addresses.add("office@threeriversvillageschool.org");
+		addresses.add("staff@threeriversvillageschool.org");
+		
+        e.parseMessage();
+		return ok(views.html.view_pending_email.render(e, addresses));
 	}
 
     public static Result sendTestEmail() {
@@ -260,6 +292,23 @@ public class CRM extends Controller {
         mail.addFrom("Papal DB <noreply@threeriversvillageschool.org>");
         mail.send(e.textBody.toString(), e.htmlBody.toString());
 
+        return ok();
+    }
+
+    public static Result deleteEmail() {
+        final Map<String, String[]> values = request().body().asFormUrlEncoded();
+        Email e = Email.find.byId(Integer.parseInt(values.get("id")[0]));
+        e.markDeleted();
+
+        return ok();
+    }
+
+    public static Result sendEmail() {
+        final Map<String, String[]> values = request().body().asFormUrlEncoded();
+        Email e = Email.find.byId(Integer.parseInt(values.get("id")[0]));
+        
+		
+		e.markSent();
         return ok();
     }
 
