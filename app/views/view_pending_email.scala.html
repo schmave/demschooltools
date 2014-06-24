@@ -4,11 +4,20 @@
 
 @main("Pending Email", "email") {
 
+<script src="@routes.Assets.at("javascripts/send_email.js")" type="text/javascript">
+</script>
+
 <h3>Pending email</h3>
-@email.sent
-<br>
-@email.deleted
-<br>
-@email.message
+<p>Message has @email.attachments.size() attachment(s) and the following body text:
+<pre>@email.textBody</pre>
+
+<select id="test_destination">
+	<option name="evan@@threeriversvillageschool.org">evan@@threeriversvillageschool.org</option>
+	<option name="jmp@@threeriversvillageschool.org" value="jmp@@threeriversvillageschool.org">
+	<option name="jancey@@threeriversvillageschool.org" value="jancey@@threeriversvillageschool.org">
+</select>
+
+<a href="javascript:void(0)"
+onclick="javascript:sendTestEmail('@routes.CRM.sendTestEmail()', @email.id);">Send test email</a>
 
 }
