@@ -1,6 +1,6 @@
 @(people: List[Person], people_with_family: Collection[Person])
 
-<a href="javascript:$('#tag_extras').show()">Show email data for export</a>
+<a href="javascript:void(0)" onclick="javascript:$('#tag_extras').show();">Show email data for export</a>
 <div id="tag_extras" style="display:none;">
 <h3>Emails</h3>
 <p>
@@ -17,7 +17,7 @@
 			@p.email,
 		}
 	}
-	
+
 <h3>Emails for all family members, not including children</h3>
 <p>
 	@for( p <- people_with_family ) {
