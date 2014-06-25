@@ -37,6 +37,7 @@ public class Email extends Model {
 	public static Email create(String message) {
 		Email e = new Email();
 		e.message = message;
+		e.save();
 		return e;
 	}
 
