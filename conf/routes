@@ -73,7 +73,7 @@ GET     /viewTag/:id              controllers.CRM.viewTag(id: Integer)
 
 GET     /viewTaskList/:id         controllers.CRM.viewTaskList(id: Integer)
 
-POST	/postEmail				  controllers.CRM.postEmail()
+POST	/postEmail				  controllers.Public.postEmail()
 GET 	/viewPendingEmail		  controllers.CRM.viewPendingEmail()
 POST	/sendTestEmail				  controllers.CRM.sendTestEmail()
 POST	/deleteEmail				  controllers.CRM.deleteEmail()
