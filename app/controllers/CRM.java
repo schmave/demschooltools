@@ -4,6 +4,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import javax.mail.*;
+import javax.mail.internet.*;
+
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
 import com.avaje.ebean.Expression;
@@ -138,34 +141,39 @@ public class CRM extends Controller {
         return ok(Json.stringify(Json.toJson(result)));
     }
 	
-	public static Result getTagMembers(Integer tagId, String familyMode) {
+	public static Collection<Person> getTagMembers(Integer tagId, String familyMode) {
         List<Person> people = getPeopleForTag(tagId);
 
-        Set<Person> people_to_render = new HashSet<Person>();
+        Set<Person> selected_people = new HashSet<Person>();
 		
-		people_to_render.addAll(people);
+		selected_people.addAll(people);
 		
 		if (!familyMode.equals("just_tags")) {
 			for (Person p : people) {
 				if (p.family != null) {					
-					people_to_render.addAll(p.family.family_members);
+					selected_people.addAll(p.family.family_members);
 				}
 			}
 		}
 
 		if (familyMode.equals("family_no_kids")) {
 			Set<Person> no_kids = new HashSet<Person>();
-			for (Person p2 : people_to_render) {
+			for (Person p2 : selected_people) {
 				if (p2.dob == null ||
 					CRM.calcAge(p2) > 18) {
 					no_kids.add(p2);
 				}
 			}
-			people_to_render = no_kids;
+			selected_people = no_kids;
 		}
 		
+		return selected_people;
+	}
+	
+	public static Result renderTagMembers(Integer tagId, String familyMode) {
         Tag the_tag = Tag.find.byId(tagId);
-		return ok(views.html.to_address_fragment.render(the_tag.title, people_to_render));
+		return ok(views.html.to_address_fragment.render(the_tag.title, 
+			getTagMembers(tagId, familyMode)));
 	}
 
     public static Result addTag(Integer tagId, String title, Integer personId) {
@@ -295,12 +303,42 @@ public class CRM extends Controller {
         Email e = Email.find.byId(Integer.parseInt(values.get("id")[0]));
         e.parseMessage();
 
-        MailerAPI mail = play.Play.application().plugin(MailerPlugin.class).email();
-        mail.setSubject(e.parsedMessage.getSubject());
-        mail.addRecipient(values.get("dest_email")[0]);
-        mail.addFrom("Papal DB <noreply@threeriversvillageschool.org>");
-        mail.send(e.textBody.toString(), e.htmlBody.toString());
+		try {
+			MimeMessage to_send = new MimeMessage(e.parsedMessage);
+			to_send.addRecipient(Message.RecipientType.TO,
+						new InternetAddress(values.get("dest_email")[0]));
+			to_send.setFrom(new InternetAddress("Papal DB <noreply@threeriversvillageschool.org>"));
+			Transport.send(to_send);
+		} catch (MessagingException ex) {
+			ex.printStackTrace();
+		}
+			
+        return ok();
+    }
 
+    public static Result sendEmail() {
+        final Map<String, String[]> values = request().body().asFormUrlEncoded();
+        Email e = Email.find.byId(Integer.parseInt(values.get("id")[0]));
+        e.parseMessage();
+
+		Collection<Person> recipients = getTagMembers(Integer.parseInt(values.get("tagId")[0]),
+			values.get("familyMode")[0]);
+		
+		for (Person p : recipients) {
+			if (p.email != null && !p.email.equals("")) {
+				try {
+					MimeMessage to_send = new MimeMessage(e.parsedMessage);
+					to_send.addRecipient(Message.RecipientType.TO,
+								new InternetAddress(p.first_name + " " + p.last_name + "<" + p.email + ">"));
+					to_send.setFrom(new InternetAddress(values.get("from")[0]));
+					Transport.send(to_send);
+				} catch (MessagingException ex) {
+					ex.printStackTrace();
+				}
+			}
+		}
+		
+		e.markSent();
         return ok();
     }
 
@@ -309,15 +347,6 @@ public class CRM extends Controller {
         Email e = Email.find.byId(Integer.parseInt(values.get("id")[0]));
         e.markDeleted();
 
-        return ok();
-    }
-
-    public static Result sendEmail() {
-        final Map<String, String[]> values = request().body().asFormUrlEncoded();
-        Email e = Email.find.byId(Integer.parseInt(values.get("id")[0]));
-        
-		
-		e.markSent();
         return ok();
     }
 

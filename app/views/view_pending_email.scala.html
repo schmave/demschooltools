@@ -8,17 +8,13 @@
 </script>
 
 <h3>Pending email</h3>
-<p>Message has @email.attachments.size() attachment(s).
 <pre>Subject: @email.parsedMessage.getSubject()</pre>
-Here's the message text (it might look fancier when it is sent):
-<pre>@email.textBody</pre>
-
 
 <hr>
 <h3>Testing...</h3>
 <p>To address:<select id="test_destination">
 	@for( address <- addresses) {
-		<option name="@address">@address</option>
+		<option value="@address">@address</option>
 	}
 </select>
 <button type="button" class="btn btn-warning btn-sm"
@@ -42,7 +38,7 @@ onclick="javascript:deleteEmail('@routes.CRM.deleteEmail()', @email.id);">Delete
 
 <p><b>From address</b> (replies will go here):<select id="source_address">
 	@for( address <- addresses) {
-		<option name="@address">@address</option>
+		<option value="@address">@address</option>
 	}
 </select>
 
