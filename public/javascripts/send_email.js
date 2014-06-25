@@ -33,8 +33,7 @@ function reloadAddresses(id) {
 
 	$("#to_addresses").empty();
 	var args = "?tagId=" + last_tag_id;
-	args += "&includeMembers=" + $("#include_members").prop("checked");
-	args += "&includeFamily=" + $("#include_family").prop("checked");
+	args += "&familyMode=" + $("#family_mode").val();
 	$.get("/getTagMembers" + args, "", function(data, textStatus, jqXHR) {
 		$("#to_addresses").append(jqXHR.responseText);
 		$(input_box).val("");
@@ -53,6 +52,5 @@ $(function() {
 		reloadAddresses(ui.item.id);
     });
 	
-	$("#include_family").change(reloadAddresses);
-	$("#include_members").change(reloadAddresses);
+	$("#family_mode").change(reloadAddresses);
 });
