@@ -58,7 +58,7 @@ POST    /people/edit              controllers.CRM.savePersonEdits()
 GET     /jsonTags/:personId       controllers.CRM.jsonTags(term ?= "", personId: Integer)
 POST    /addTag/:personId         controllers.CRM.addTag(tagId : Integer ?= null, title ?= "", personId : Integer)
 POST    /removeTag/:personId/:tagId controllers.CRM.removeTag(personId: Integer, tagId: Integer)
-GET     /getTagMembers			  controllers.CRM.getTagMembers(tagId : Integer, includeMembers : Boolean, includeFamily : Boolean)
+GET     /getTagMembers			  controllers.CRM.getTagMembers(tagId : Integer, familyMode : String)
 
 POST    /addComment               controllers.CRM.addComment()
 

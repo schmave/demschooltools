@@ -21,19 +21,22 @@ Here's the message text (it might look fancier when it is sent):
 		<option name="@address">@address</option>
 	}
 </select>
-<button type="button" class="btn btn-warning"
+<button type="button" class="btn btn-warning btn-sm"
 onclick="javascript:sendTestEmail('@routes.CRM.sendTestEmail()', @email.id);">Send test email</button>
 
-<p><p>Changed your mind? <button type="button" class="btn btn-danger" 
+<p><p>Changed your mind? <button type="button" class="btn btn-danger btn-sm" 
 onclick="javascript:deleteEmail('@routes.CRM.deleteEmail()', @email.id);">Delete this message.</button>
 
 <hr>
 <h3>Send for real</h3>
 
-<p>Send to tag: <input width=40 id="to_tag"> <button type="button" class="btn btn-xs btn-primary" onclick="javascript:clearAddresses();"> Clear addresses</button>
+<p>Send to tag: <input width=40 id="to_tag"> 
 
-<br><input type="checkbox" class="task_checkbox" id="include_members" checked/> Include tag members
-<br><input type="checkbox" class="task_checkbox" id="include_family"/> Include tag members' family
+<select id="family_mode">
+<option value="just_tags">Tag members</option>
+<option value="with_family">Tag members + family</option>
+<option value="family_no_kids">Tag members + family, not including children</option>
+</select>
 
 <div id="to_addresses"></div>
 
@@ -43,7 +46,7 @@ onclick="javascript:deleteEmail('@routes.CRM.deleteEmail()', @email.id);">Delete
 	}
 </select>
 
-<p><button type="button" class="btn btn-warning" 
+<p><button type="button" class="btn btn-warning btn-sm" 
 onclick="javascript:sendEmail('@routes.CRM.sendEmail()', @email.id);">1...2...3...SEND!</button>
 
 <p>(A copy will be sent to staff@@TRVS)

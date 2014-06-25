@@ -138,21 +138,30 @@ public class CRM extends Controller {
         return ok(Json.stringify(Json.toJson(result)));
     }
 	
-	public static Result getTagMembers(Integer tagId, Boolean includeMembers, Boolean includeFamily) {
+	public static Result getTagMembers(Integer tagId, String familyMode) {
         List<Person> people = getPeopleForTag(tagId);
 
         Set<Person> people_to_render = new HashSet<Person>();
+		
 		people_to_render.addAll(people);
-		if (includeFamily) {
+		
+		if (!familyMode.equals("just_tags")) {
 			for (Person p : people) {
-				if (p.family != null) {
+				if (p.family != null) {					
 					people_to_render.addAll(p.family.family_members);
 				}
 			}
 		}
-		
-		if (!includeMembers) {
-			people_to_render.removeAll(people);
+
+		if (familyMode.equals("family_no_kids")) {
+			Set<Person> no_kids = new HashSet<Person>();
+			for (Person p2 : people_to_render) {
+				if (p2.dob == null ||
+					CRM.calcAge(p2) > 18) {
+					no_kids.add(p2);
+				}
+			}
+			people_to_render = no_kids;
 		}
 		
         Tag the_tag = Tag.find.byId(tagId);
