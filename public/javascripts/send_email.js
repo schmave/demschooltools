@@ -14,7 +14,11 @@ function deleteEmail(url, id) {
 
 function sendEmail(url, id) {
     $.post(url,
-           { id: id }, 
+           { id: id,
+			 familyMode: $("#family_mode").val(),
+			 tagId: last_tag_id,
+			 from: $("#source_address").val(),
+			 }, 
 		   function () { location.reload(); } );
 }
 
