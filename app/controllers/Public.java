@@ -15,6 +15,14 @@ import views.html.*;
 
 public class Public extends Controller {
 
+	public static Result postEmail() {
+		final java.util.Map<String, String[]> values = request().body().asFormUrlEncoded();
+
+		Email.create(values.get("email")[0]);
+
+        return ok();
+	}
+
     public static Result oAuthDenied(String provider)
     {
         session().remove("timeout");

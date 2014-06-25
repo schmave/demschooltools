@@ -264,14 +264,6 @@ public class CRM extends Controller {
         }
     }
 
-	public static Result postEmail() {
-		final Map<String, String[]> values = request().body().asFormUrlEncoded();
-
-		Email.create(values.get("email")[0]);
-
-        return ok();
-	}
-
 	static Email getPendingEmail() {
 		return Email.find.where().eq("deleted", false).eq("sent", false).orderBy("id ASC").setMaxRows(1).findUnique();
 	}
