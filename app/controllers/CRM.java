@@ -279,11 +279,11 @@ public class CRM extends Controller {
 		}
 		
 		ArrayList<String> addresses = new ArrayList<String>();
+		addresses.add("office@threeriversvillageschool.org");
 		addresses.add("evan@threeriversvillageschool.org");
 		addresses.add("jmp@threeriversvillageschool.org");
 		addresses.add("jancey@threeriversvillageschool.org");
 		addresses.add("info@threeriversvillageschool.org");
-		addresses.add("office@threeriversvillageschool.org");
 		addresses.add("staff@threeriversvillageschool.org");
 		
         e.parseMessage();
@@ -313,8 +313,12 @@ public class CRM extends Controller {
         Email e = Email.find.byId(Integer.parseInt(values.get("id")[0]));
         e.parseMessage();
 
-		Collection<Person> recipients = getTagMembers(Integer.parseInt(values.get("tagId")[0]),
-			values.get("familyMode")[0]);
+		int tagId = Integer.parseInt(values.get("tagId")[0]);
+        Tag theTag = Tag.find.byId(tagId);
+		String familyMode = values.get("familyMode")[0];
+		Collection<Person> recipients = getTagMembers(tagId, familyMode);
+			
+		boolean hadErrors = false;
 		
 		for (Person p : recipients) {
 			if (p.email != null && !p.email.equals("")) {
@@ -326,8 +330,25 @@ public class CRM extends Controller {
 					Transport.send(to_send);
 				} catch (MessagingException ex) {
 					ex.printStackTrace();
+					hadErrors = true;
 				}
 			}
+		}
+		
+		// Send confirmation email
+		try {
+			MimeMessage to_send = new MimeMessage(e.parsedMessage);
+			to_send.addRecipient(Message.RecipientType.TO,
+						new InternetAddress("Staff <staff@threeriversvillageschool.org>"));
+			String subject = "(Sent to " + theTag.title + " " + familyMode + ") " + to_send.getSubject();
+			if (hadErrors) {
+				subject = "***ERRORS*** " + subject;
+			}
+			to_send.setSubject(subject);
+			to_send.setFrom(new InternetAddress(values.get("from")[0]));
+			Transport.send(to_send);
+		} catch (MessagingException ex) {
+			ex.printStackTrace();
 		}
 		
 		e.markSent();
