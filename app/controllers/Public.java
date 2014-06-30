@@ -11,6 +11,9 @@ import play.libs.Json;
 import play.mvc.*;
 import play.mvc.Http.Context;
 
+import javax.mail.*;
+import javax.mail.internet.*;
+
 import views.html.*;
 
 public class Public extends Controller {
@@ -18,8 +21,22 @@ public class Public extends Controller {
 	public static Result postEmail() {
 		final java.util.Map<String, String[]> values = request().body().asFormUrlEncoded();
 
-		Email.create(values.get("email")[0]);
-
+		Email new_email = Email.create(values.get("email")[0]);
+		/* new_email.parseMessage();
+		
+		boolean autoSend = false;
+		Address[] rcpts = new_email.parsedMessage.getRecipients(Message.ReceipientType.TO);
+		for (Address a : rcpts) {
+			if (a.toString().contains("papal+parents@")) {
+				autoSend = true;
+			}
+		}
+		
+		if (autoSend) {
+			
+		}
+		*/
+		
         return ok();
 	}
 
