@@ -17,13 +17,12 @@
 }
 
 <hr>
-<div class="row">
-<div class="col-md-9">
 
 @form(routes.CRM.addComment(), args = 'id -> "comment_form") {
+<div class="row">
 @for( tag <- p.tags ) {
 	@if( tag.task_list != null ) {
-		<div id="col-md-4">
+		<div class="col-xs-4">
 		<h4><a href="@routes.CRM.viewTaskList(tag.task_list.id)">@tag.task_list.title</a></h4>
 		@for( task <- tag.task_list.tasks ) {
 			@if( task.enabled ) {
@@ -47,7 +46,6 @@
 		</div>
 	}
 }
-</div>
 </div>
 
 <div class="tabbable"> <!-- Only required for left/right tabs -->
