@@ -5,7 +5,7 @@ import csv
 import datetime
 import re
 
-conn = psycopg2.connect("dbname=school_crm user=postgres host=localhost")
+conn = psycopg2.connect("dbname=school_crm user=postgres host=localhost port=5433")
 cur = conn.cursor()
 
 cur.execute("DELETE from entry")
