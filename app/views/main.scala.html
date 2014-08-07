@@ -37,6 +37,9 @@
 				@if(Application.isCurrentUserEditor()) {
 					Rules
 				}</a>
+			<li @if(activeTab.equals("view_manual")) { class="active" } ><a href="@routes.Application.viewManual">
+					Manual
+				</a>
 			} else { @if( menu.equals( "crm" ) ) {
 			<li @if(activeTab.equals("all_people")) { class="active" } ><a href="@routes.CRM.people()">All people</a>
 			<li @if(activeTab.equals("add_person")) { class="active" } ><a href="@routes.CRM.newPerson()">Add a person</a>

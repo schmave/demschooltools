@@ -1,0 +1,19 @@
+@(form: Form[Section], is_new : Boolean, chapter_options : List [ Chapter ])
+
+@main("Edit a section", menu = "jc") {
+
+    <h2>Edit a section</h2>
+
+@helper.form(routes.ApplicationEditing.saveSection(), 'class -> "form-horizontal") {
+
+
+@if(form("id").value()) {
+	<input type="hidden" name="id" value="@form("id").value()"/>
+}
+		@helper.select(form("chapter.id"), options = chapter_options.map (c => ("" + c.id, c.num + " " + c.title)), '_label -> "Chapter", 'class -> "form-control")
+        @helper.inputText(form("num"), '_label -> "Number", 'size -> 10)
+        @helper.inputText(form("title"), '_label -> "Title", 'size -> 75)
+
+		<input type="submit" value="Save">
+}
+}

@@ -45,6 +45,20 @@ GET /editRule/:id    controllers.ApplicationEditing.editRuleForm(id : Integer)
 POST /editRule/:id    controllers.ApplicationEditing.editRule(id : Integer)
 POST /addRule    controllers.ApplicationEditing.addRule()
 
+GET /viewManual       controllers.Application.viewManual()
+GET /viewChapter/:id       controllers.Application.viewChapter(id : Integer)
+
+GET /addChapter			controllers.ApplicationEditing.addChapter()
+GET /editChapter/:id		controllers.ApplicationEditing.editChapter(id : Integer)
+POST /saveChapter	controllers.ApplicationEditing.saveChapter()
+GET /addSection/:chapterId		controllers.ApplicationEditing.addSection(chapterId : Integer)
+GET /editSection/:id		controllers.ApplicationEditing.editSection(id : Integer)
+POST /saveSection	controllers.ApplicationEditing.saveSection()
+GET /addEntry/:sectionId		controllers.ApplicationEditing.addEntry(sectionId : Integer)
+GET /editEntry/:id		controllers.ApplicationEditing.editEntry(id : Integer)
+POST /saveEntry		controllers.ApplicationEditing.saveEntry()
+
+
 GET     /jsonPeople               controllers.CRM.jsonPeople(term ?= "")
 GET     /people                   controllers.CRM.people()
 GET     /people/new               controllers.CRM.newPerson()
