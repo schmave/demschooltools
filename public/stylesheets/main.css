@@ -280,6 +280,35 @@ a.edit_link {
    border-top: 1px solid #999;
 }
 
+.man-chapter {
+   font-size: 18px;
+   font-weight: bold;
+}
+
+.man-section {
+	font-size: 14px;
+	font-weight: bold;
+	border-bottom: 2px solid black;
+}
+
+.man-entry {
+}
+
+.man-entry-num {
+	font-weight: bold;
+}
+
+.man-entry-content {
+	margin-left: 40px;
+	width: 6in;
+}
+
+.man-edit {
+	font-weight: normal;
+	font-size: 10px;
+	padding-left: 10px;
+}
+
 
 /***************************************************************************
  * From http://stackoverflow.com/questions/9758587/twitter-bootstrap-multilevel-dropdown-menu

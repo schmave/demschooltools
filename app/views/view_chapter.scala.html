@@ -1,0 +1,23 @@
+@(chapter : Chapter)
+
+@import helper._
+
+@main("" + chapter.num + " " + chapter.title, "view_manual", "jc") {
+
+<div class="man-chapter">@chapter.num @chapter.title <a class="man-edit no-print" href="@routes.ApplicationEditing.editChapter(chapter.id)">Edit</a></div>
+<p><a class="no-print" href="@routes.ApplicationEditing.addSection(chapter.id)">Add section in @chapter.num @chapter.title</a>
+
+@for(section <- chapter.sections) {
+<div class="man-section">@chapter.num@section.num @section.title <a class="no-print man-edit" href="@routes.ApplicationEditing.editSection(section.id)">Edit</a></div>
+	<p><a class="no-print" href="@routes.ApplicationEditing.addEntry(section.id)">Add entry in @chapter.num@section.num @section.title</a>
+	@for(entry <- section.entries) {
+	<div class="man-entry">
+		<p class="man-entry-num">@chapter.num@{section.num}.@entry.num @entry.title <a class="no-print man-edit" href="@routes.ApplicationEditing.editEntry(entry.id)">Edit</a></p>
+		<div class="man-entry-content">@Html(Application.markdown(entry.content))</div>
+	</div>
+	}
+}
+
+
+}
+

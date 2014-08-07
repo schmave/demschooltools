@@ -1,0 +1,28 @@
+@(chapters : List [ Chapter ] )
+
+@import helper._
+
+@main("Management Manual", "view_manual", "jc") {
+
+<h1>TRVS Management Manual</h1>
+
+<p><a href="@routes.ApplicationEditing.addChapter()">Add new chapter</a>
+
+<ul>
+@for( c <- chapters ) {
+	<li><a href="@routes.Application.viewChapter(c.id)">@c.num @c.title</a>
+	<ul>
+	@for(section <- c.sections) {
+		<li>@c.num@section.num @section.title
+		<ul>
+		@for(entry <- section.entries) {
+			<li>@c.num@{section.num}.@entry.num @entry.title
+		}
+		</ul>
+	}	
+	</ul>
+}
+</ul>
+
+}
+

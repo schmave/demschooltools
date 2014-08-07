@@ -1,5 +1,6 @@
 package controllers;
 
+import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -14,6 +15,8 @@ import com.feth.play.module.pa.PlayAuthenticate;
 import com.typesafe.plugin.*;
 
 import models.*;
+
+import org.markdown4j.Markdown4jProcessor;
 
 import play.*;
 import play.data.*;
@@ -78,6 +81,14 @@ public class Application extends Controller {
     public static Result viewMeetingResolutionPlans(int meeting_id) {
         return ok(views.html.view_meeting_resolution_plans.render(Meeting.find.byId(meeting_id)));
     }
+	
+	public static Result viewManual() {
+		return ok(views.html.view_manual.render(Chapter.find.order("num ASC").findList()));
+	}
+
+	public static Result viewChapter(Integer id) {
+		return ok(views.html.view_chapter.render(Chapter.find.byId(id)));
+	}
 
     public static Result getPersonHistory(Integer id) {
         Person p = Person.find.byId(id);
@@ -183,5 +194,13 @@ public class Application extends Controller {
 
     public static Configuration getConfiguration() {
 		return Play.application().configuration().getConfig("school_crm");
+	}
+	
+	public static String markdown(String input) {
+		try {
+			return new Markdown4jProcessor().process(input);
+		} catch (IOException e) {
+			return e.toString() + "<br><br>" + input;
+		}
 	}
 }
