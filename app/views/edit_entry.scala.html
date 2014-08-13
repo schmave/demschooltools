@@ -14,14 +14,30 @@
 @if(form("id").value()) {
 	<input type="hidden" name="id" value="@form("id").value()"/>
 }
-        @helper.inputText(form("title"), '_label -> "Title", 'size -> 75)
-        @helper.inputText(form("num"), '_label -> "Number", 'size -> 10)
-		@helper.checkbox(form("deleted"), '_label -> "Check this to delete -- careful, can only be undone by Evan")
-		@helper.select(form("section.id"), options = chapters.flatMap (c => c.sections.map(s => ("" + s.id, s.chapter.num + "" + s.num + " " + s.title))), 
-			'_label -> "Section", 'class -> "form-control")
-        @helper.textarea(form("content"), '_label -> "Content", 'rows->12, 'class -> "form-control")
-		
+	@helper.inputText(form("title"), '_label -> "Title", 'size -> 75)
+	@helper.inputText(form("num"), '_label -> "Number", 'size -> 10)
+	@helper.checkbox(form("deleted"), '_label -> "Check this to delete -- careful, can only be undone by Evan")
+	@helper.select(form("section.id"), options = chapters.flatMap (c => c.sections.map(s => ("" + s.id, s.chapter.num + "" + s.num + " " + s.title))), 
+		'_label -> "Section", 'class -> "form-control")
+	
+	<div class="markdown-guidelines">
+		<h4>Formatting help</h4>
+		<p>_alpha_ or *alpha* --> <em>alpha</em>
+		<p>__beta__ or **beta** --> <strong>beta</strong>
+		<p>Make bullet lists with asterisks, like this:
+		<pre>* an item
+* another item
+* final item</pre>
+		<p>Make numbered lists with numbers, like this (the 1s will be replaced with the correct numbers):
+		<pre>1. the first
+1. the second
+1. the third</pre>
+	</div>
+	
+	<div class="entry-content-edit">
+	@helper.textarea(form("content"), '_label -> "Content", 'rows->12, 'class -> "form-control")
+	</div>
 
-		<input type="submit" value="Save">
+	<input type="submit" value="Save">
 }
 }
