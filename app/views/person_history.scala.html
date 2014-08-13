@@ -5,7 +5,7 @@
 <h3>@p.getDisplayName()'s JC history</h3>
 
 <table class="table sortable">
-<thead><tr><th width=50% class="sorttable_alpha">Rule<th width=25% class="sorttable_school_mmdd">Most Recent Violation<th class="sorttable_numeric"># of violations</tr></thead>
+<thead><tr><th width=50% class="sorttable_alpha">Entry<th width=25% class="sorttable_school_mmdd">Most Recent Violation<th class="sorttable_numeric"># of violations</tr></thead>
 <tbody>
 @for( r <- history.rule_records ) {
 	<tr><td width=50%>@if(r.rule != null) { @r.rule.title } else { <i>unknown</i> }
@@ -20,7 +20,7 @@
 
 <h3>Case Details...</h3>
 <ul class="nav nav-tabs">
-  <li class="active"><a href="#byrule" data-toggle="tab">... by Rule</a></li>
+  <li class="active"><a href="#byrule" data-toggle="tab">... by Entry</a></li>
   <li><a href="#bydate" data-toggle="tab">... by Date</a></li>
 </ul>
 

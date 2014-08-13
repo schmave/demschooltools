@@ -1,5 +1,5 @@
 @(meetings : List [ Meeting ], sm_charges : List [ Charge ], people : List[ Person ],
-rules : List[ Rule ])
+rules : List[ Entry ])
 
 @import helper._
 
@@ -51,7 +51,7 @@ $(function() {
 	<table class="table">
 		<thead><th width="70">Case
 			<th width="20">Person
-			<th width="150">Rule
+			<th width="150">Entry
 			<th width="70">Plea
 			<th>Resolution Plan<th>Findings</thead>
 	@for( c <- sm_charges ) {
@@ -96,7 +96,7 @@ $(function() {
 <h4>Rules</h4>
 <div class="scroll-table">
 <table class="table table-hover table-condensed">
-<thead><th height=50 width=250>Rule<th align=right width=50>Charge count</thead>
+<thead><th height=50 width=250>Entry<th align=right width=50>Charge count</thead>
 @for( r <- rules ) {
 	<tr><td width=250><a href="@routes.Application.viewRuleHistory(r.id)">@r.title</a>
 	<td align=right width=50>@r.charges.size()

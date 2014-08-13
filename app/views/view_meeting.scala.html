@@ -32,7 +32,7 @@ Edit minutes</a>
 
 <h4>&nbsp;<br>Resolution Plans</h4>
 <table class="table resolution_plans">
-	<thead><th width="70">Case<th width="20">Person<th width="220">Rule<th>Resolution Plan</thead>
+	<thead><th width="70">Case<th width="20">Person<th width="220">Entry<th>Resolution Plan</thead>
 	@for(c <- m.cases) {
 		@for(charge <- c.charges) {
 			@if( charge.person != null && charge.rule != null ) {

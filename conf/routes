@@ -40,11 +40,6 @@ POST /saveCharge controllers.ApplicationEditing.saveCharge(id : Integer)
 POST /removeCharge   controllers.ApplicationEditing.removeCharge(id : Integer)
 
 
-GET /viewRules       controllers.ApplicationEditing.viewRules()
-GET /editRule/:id    controllers.ApplicationEditing.editRuleForm(id : Integer)
-POST /editRule/:id    controllers.ApplicationEditing.editRule(id : Integer)
-POST /addRule    controllers.ApplicationEditing.addRule()
-
 GET /viewManual       controllers.Application.viewManual()
 GET /viewChapter/:id       controllers.Application.viewChapter(id : Integer)
 

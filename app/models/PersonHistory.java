@@ -6,14 +6,14 @@ public class PersonHistory {
 
     public class Record {
         public Date most_recent_charge;
-        public Rule rule;
+        public Entry rule;
         public int count;
     }
 
     public ArrayList<Record> rule_records;
 
     public PersonHistory(Person p) {
-        HashMap<Rule, Record> records = new HashMap<Rule, Record>();
+        HashMap<Entry, Record> records = new HashMap<Entry, Record>();
         for (Charge c : p.charges) {
             Record r = records.get(c.rule);
             if (r == null) {

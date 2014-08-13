@@ -71,7 +71,7 @@ public class Application extends Controller {
         Collections.sort(people, Person.SORT_DISPLAY_NAME);
 
         return ok(views.html.jc_index.render(meetings, sm_charges, people,
-            Rule.find.orderBy("title ASC").findList()));
+            Entry.find.orderBy("title ASC").findList()));
     }
 
     public static Result viewMeeting(int meeting_id) {
@@ -96,7 +96,7 @@ public class Application extends Controller {
     }
 
     public static Result getRuleHistory(Integer id) {
-        Rule r = Rule.find.byId(id);
+        Entry r = Entry.find.byId(id);
         return ok(views.html.rule_history.render(r, new RuleHistory(r)));
     }
 
@@ -106,7 +106,7 @@ public class Application extends Controller {
     }
 
     public static Result viewRuleHistory(Integer id) {
-        Rule r = Rule.find.byId(id);
+        Entry r = Entry.find.byId(id);
         return ok(views.html.view_rule_history.render(r, new RuleHistory(r)));
 	}
 
@@ -132,10 +132,10 @@ public class Application extends Controller {
     public static String jsonRules(String term) {
 		term = term.toLowerCase();
 
-        List<Rule> rules = Rule.find.where().eq("removed", false).orderBy("title ASC").findList();
+        List<Entry> rules = Entry.find.where().eq("deleted", false).orderBy("title ASC").findList();
 
         List<Map<String, String> > result = new ArrayList<Map<String, String> > ();
-        for (Rule r : rules) {
+        for (Entry r : rules) {
             if (r.title.toLowerCase().contains(term)) {
                 HashMap<String, String> values = new HashMap<String, String>();
                 values.put("label", r.title);

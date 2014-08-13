@@ -25,7 +25,7 @@ public class Charge extends Model implements Comparable<Charge> {
 
     @ManyToOne
     @JoinColumn(name="rule_id")
-    public Rule rule;
+    public Entry rule;
 
     @ManyToOne
     @JoinColumn(name="case_id")
@@ -68,7 +68,7 @@ public class Charge extends Model implements Comparable<Charge> {
         }
 
         if (query_string.containsKey("rule_id")) {
-            rule = Rule.find.ref(Integer.parseInt(query_string.get("rule_id")[0]));
+            rule = Entry.find.ref(Integer.parseInt(query_string.get("rule_id")[0]));
         } else {
             rule = null;
         }

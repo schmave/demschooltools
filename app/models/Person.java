@@ -100,8 +100,8 @@ public class Person extends Model implements Comparable<Person> {
     }
 
     @JsonIgnore
-    public Map<Rule, List<Charge>> getChargesByRule() {
-        Map<Rule, List<Charge>> result = new TreeMap<Rule, List<Charge>>();
+    public Map<Entry, List<Charge>> getChargesByRule() {
+        Map<Entry, List<Charge>> result = new TreeMap<Entry, List<Charge>>();
         for (Charge c : charges) {
             if (c.rule != null) {
                 List<Charge> cur_list = result.get(c.rule);
