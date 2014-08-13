@@ -21,7 +21,7 @@ import play.db.ebean.*;
 import static play.libs.F.*;
 
 @Entity
-public class Entry extends Model {
+public class Entry extends Model implements Comparable<Entry> {
     @Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "entry_id_seq")
     public Integer id;
@@ -40,6 +40,11 @@ public class Entry extends Model {
 	
 	@NotNull
 	public Boolean deleted;
+	
+	@OneToMany(mappedBy="rule")
+    @JsonIgnore
+    @OrderBy("id DESC")
+    public List<Charge> charges;
 
     public static Finder<Integer,Entry> find = new Finder(
         Integer.class, Entry.class
@@ -61,4 +66,8 @@ public class Entry extends Model {
 		result.save();
 		return result;
 	}
+	
+	public int compareTo(Entry other) {
+        return title.compareTo(other.title);
+    }
 }

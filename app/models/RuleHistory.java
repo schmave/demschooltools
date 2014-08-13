@@ -12,7 +12,7 @@ public class RuleHistory {
 
     public ArrayList<Record> rule_records;
 
-    public RuleHistory(Rule rule) {
+    public RuleHistory(Entry rule) {
         HashMap<Person, Record> records = new HashMap<Person, Record>();
         for (Charge c : rule.charges) {
             Record r = records.get(c.person);
