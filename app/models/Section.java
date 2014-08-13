@@ -29,7 +29,7 @@ public class Section extends Model {
     @NotNull
     public String title = "";
     @NotNull
-	public Integer num = 0;
+	public String num = "";
 
     @OneToMany(mappedBy="section")
     @OrderBy("num ASC")
@@ -44,7 +44,7 @@ public class Section extends Model {
 
 	public void updateFromForm(Form<Section> form) {
 		title = form.field("title").value();
-		num = Integer.parseInt(form.field("num").value());
+		num = form.field("num").value();
 		chapter = Chapter.find.byId(Integer.parseInt(form.field("chapter.id").value()));
 		save();
 	}
