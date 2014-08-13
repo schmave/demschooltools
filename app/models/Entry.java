@@ -29,7 +29,7 @@ public class Entry extends Model {
     @NotNull
     public String title = "";
     @NotNull
-	public Integer num = 0;
+	public String num = "";
 
     @Column(columnDefinition = "TEXT")
     @NotNull
@@ -45,7 +45,7 @@ public class Entry extends Model {
 	public void updateFromForm(Form<Entry> form) {
 		title = form.field("title").value();
 		content = form.field("content").value();
-		num = Integer.parseInt(form.field("num").value());
+		num = form.field("num").value();
 		section = Section.find.byId(Integer.parseInt(form.field("section.id").value()));
 		save();
 	}
