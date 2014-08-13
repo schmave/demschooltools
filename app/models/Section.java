@@ -4,6 +4,7 @@ import java.util.*;
 
 import javax.persistence.*;
 
+import com.avaje.ebean.annotation.Where;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
 import com.avaje.ebean.RawSql;
@@ -33,10 +34,14 @@ public class Section extends Model {
 
     @OneToMany(mappedBy="section")
     @OrderBy("num ASC")
+	@Where(clause = "${ta}.deleted = false")
     public List<Entry> entries;
 
     @ManyToOne()
     public Chapter chapter;
+
+	@NotNull
+	public Boolean deleted;
 
     public static Finder<Integer,Section> find = new Finder(
         Integer.class, Section.class
@@ -46,6 +51,8 @@ public class Section extends Model {
 		title = form.field("title").value();
 		num = form.field("num").value();
 		chapter = Chapter.find.byId(Integer.parseInt(form.field("chapter.id").value()));
+		String deleted_val = form.field("deleted").value();
+		deleted = deleted_val != null && deleted_val.equals("true");
 		save();
 	}
 	

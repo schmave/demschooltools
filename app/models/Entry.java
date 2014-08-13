@@ -37,6 +37,9 @@ public class Entry extends Model {
 
     @ManyToOne()
     public Section section;
+	
+	@NotNull
+	public Boolean deleted;
 
     public static Finder<Integer,Entry> find = new Finder(
         Integer.class, Entry.class
@@ -46,6 +49,8 @@ public class Entry extends Model {
 		title = form.field("title").value();
 		content = form.field("content").value();
 		num = form.field("num").value();
+		String deleted_val = form.field("deleted").value();
+		deleted = deleted_val != null && deleted_val.equals("true");
 		section = Section.find.byId(Integer.parseInt(form.field("section.id").value()));
 		save();
 	}

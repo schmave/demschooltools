@@ -83,7 +83,7 @@ public class Application extends Controller {
     }
 	
 	public static Result viewManual() {
-		return ok(views.html.view_manual.render(Chapter.find.order("num ASC").findList()));
+		return ok(views.html.view_manual.render(Chapter.find.where("deleted = false").order("num ASC").findList()));
 	}
 
 	public static Result viewChapter(Integer id) {

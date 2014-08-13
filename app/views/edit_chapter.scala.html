@@ -2,7 +2,11 @@
 
 @main("Edit a chapter", menu = "jc") {
 
-    <h2>Edit a chapter</h2>
+@if( is_new ) {
+    <h2>New chapter</h2>
+} else {
+    <h2>Edit chapter "@form("title").value()"</h2>
+}
 
 @helper.form(routes.ApplicationEditing.saveChapter(), 'class -> "form-horizontal") {
 
@@ -10,8 +14,9 @@
 @if(form("id").value()) {
 	<input type="hidden" name="id" value="@form("id").value()"/>
 }
-        @helper.inputText(form("num"), '_label -> "Number", 'size -> 10)
         @helper.inputText(form("title"), '_label -> "Title", 'size -> 75)
+		@helper.checkbox(form("deleted"), '_label -> "Check this to delete -- careful, can only be undone by Evan")
+        @helper.inputText(form("num"), '_label -> "Number", 'size -> 10)
 
 		<input type="submit" value="Save">
 }

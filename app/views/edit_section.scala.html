@@ -2,7 +2,11 @@
 
 @main("Edit a section", menu = "jc") {
 
-    <h2>Edit a section</h2>
+@if( is_new ) {
+    <h2>New section</h2>
+} else {
+    <h2>Edit section "@form("title").value()"</h2>
+}
 
 @helper.form(routes.ApplicationEditing.saveSection(), 'class -> "form-horizontal") {
 
@@ -10,9 +14,10 @@
 @if(form("id").value()) {
 	<input type="hidden" name="id" value="@form("id").value()"/>
 }
-		@helper.select(form("chapter.id"), options = chapter_options.map (c => ("" + c.id, c.num + " " + c.title)), '_label -> "Chapter", 'class -> "form-control")
-        @helper.inputText(form("num"), '_label -> "Number", 'size -> 10)
         @helper.inputText(form("title"), '_label -> "Title", 'size -> 75)
+        @helper.inputText(form("num"), '_label -> "Number", 'size -> 10)
+		@helper.checkbox(form("deleted"), '_label -> "Check this to delete -- careful, can only be undone by Evan")
+		@helper.select(form("chapter.id"), options = chapter_options.map (c => ("" + c.id, c.num + " " + c.title)), '_label -> "Chapter", 'class -> "form-control")
 
 		<input type="submit" value="Save">
 }
