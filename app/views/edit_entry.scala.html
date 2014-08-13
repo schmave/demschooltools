@@ -2,7 +2,11 @@
 
 @main("Edit an entry", menu = "jc") {
 
-    <h2>Edit an entry</h2>
+@if( is_new ) {
+    <h2>New entry</h2>
+} else {
+    <h2>Edit entry "@form("title").value()"</h2>
+}
 
 @helper.form(routes.ApplicationEditing.saveEntry(), 'class -> "form-horizontal") {
 
@@ -10,11 +14,13 @@
 @if(form("id").value()) {
 	<input type="hidden" name="id" value="@form("id").value()"/>
 }
+        @helper.inputText(form("title"), '_label -> "Title", 'size -> 75)
+        @helper.inputText(form("num"), '_label -> "Number", 'size -> 10)
+		@helper.checkbox(form("deleted"), '_label -> "Check this to delete -- careful, can only be undone by Evan")
 		@helper.select(form("section.id"), options = chapters.flatMap (c => c.sections.map(s => ("" + s.id, s.chapter.num + "" + s.num + " " + s.title))), 
 			'_label -> "Section", 'class -> "form-control")
-        @helper.inputText(form("num"), '_label -> "Number", 'size -> 10)
-        @helper.inputText(form("title"), '_label -> "Title", 'size -> 75)
         @helper.textarea(form("content"), '_label -> "Content", 'rows->12, 'class -> "form-control")
+		
 
 		<input type="submit" value="Save">
 }
