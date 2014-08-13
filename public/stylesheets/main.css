@@ -309,6 +309,16 @@ a.edit_link {
 	padding-left: 10px;
 }
 
+.entry-content-edit {
+	float: left;
+	width: 75%;
+}
+
+.markdown-guidelines {
+	float: right;
+	width: 25%;
+	padding-left: 20px;
+}
 
 /***************************************************************************
  * From http://stackoverflow.com/questions/9758587/twitter-bootstrap-multilevel-dropdown-menu
