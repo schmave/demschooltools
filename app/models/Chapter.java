@@ -35,6 +35,7 @@ public class Chapter extends Model {
     @OneToMany(mappedBy="chapter")
     @OrderBy("num ASC")
 	@Where(clause = "${ta}.deleted = false")
+    @JsonIgnore
     public List<Section> sections;
 
 	@NotNull
@@ -43,7 +44,7 @@ public class Chapter extends Model {
     public static Finder<Integer,Chapter> find = new Finder(
         Integer.class, Chapter.class
     );
-	
+
 	public void updateFromForm(Form<Chapter> form) {
 		title = form.field("title").value();
 		num = Integer.parseInt(form.field("num").value());
@@ -51,7 +52,7 @@ public class Chapter extends Model {
 		deleted = deleted_val != null && deleted_val.equals("true");
 		save();
 	}
-	
+
 	public static Chapter create(Form<Chapter> form) {
 		Chapter result = form.get();
 		result.updateFromForm(form);
