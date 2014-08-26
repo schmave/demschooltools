@@ -35,6 +35,7 @@ public class Person extends Model implements Comparable<Person> {
 
     // phone number references
     @OneToMany(mappedBy="owner")
+    @JsonIgnore
     public List<PhoneNumber> phone_numbers;
 
     public String address;
@@ -48,23 +49,27 @@ public class Person extends Model implements Comparable<Person> {
 
     public Date dob;
     public Date approximate_dob;
-	
+
 	public String display_name = "";
-	
+
 	public String previous_school = "";
 	public String school_district = "";
 
     @Transient
+    @JsonIgnore
     public List<Tag> tags;
 
     @OneToMany(mappedBy="person")
+    @JsonIgnore
     public List<Comment> comments;
 
     @OneToMany(mappedBy="person")
     @OrderBy("date DESC")
+    @JsonIgnore
     public List<Donation> donations;
 
     @OneToMany(mappedBy="person")
+    @JsonIgnore
     public List<CompletedTask> completed_tasks;
 
     // is_family is true if this Person object represents
@@ -84,11 +89,13 @@ public class Person extends Model implements Comparable<Person> {
 
     // family ID
     @ManyToOne()
+    @JsonIgnore
     public Person family;
 
     @OneToMany(mappedBy="family")
+    @JsonIgnore
     public List<Person> family_members;
-	
+
 	public String grade = "";
 
     public static Finder<Integer,Person> find = new Finder(
@@ -243,7 +250,7 @@ public class Person extends Model implements Comparable<Person> {
                 last_name.toLowerCase().contains(term) ||
 				display_name.toLowerCase().contains(term);
 	}
-	
+
     public CompletedTask completedTask(Task t) {
         for (CompletedTask ct : completed_tasks) {
             if (ct.task.id == t.id) {
