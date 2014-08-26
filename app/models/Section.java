@@ -35,6 +35,7 @@ public class Section extends Model {
     @OneToMany(mappedBy="section")
     @OrderBy("num ASC")
 	@Where(clause = "${ta}.deleted = false")
+    @JsonIgnore
     public List<Entry> entries;
 
     @ManyToOne()
@@ -55,7 +56,7 @@ public class Section extends Model {
 		deleted = deleted_val != null && deleted_val.equals("true");
 		save();
 	}
-	
+
 	public static Section create(Form<Section> form) {
 		Section result = form.get();
 		result.updateFromForm(form);
