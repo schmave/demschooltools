@@ -140,17 +140,17 @@ public class CRM extends Controller {
 
         return ok(Json.stringify(Json.toJson(result)));
     }
-	
+
 	public static Collection<Person> getTagMembers(Integer tagId, String familyMode) {
         List<Person> people = getPeopleForTag(tagId);
 
         Set<Person> selected_people = new HashSet<Person>();
-		
+
 		selected_people.addAll(people);
-		
+
 		if (!familyMode.equals("just_tags")) {
 			for (Person p : people) {
-				if (p.family != null) {					
+				if (p.family != null) {
 					selected_people.addAll(p.family.family_members);
 				}
 			}
@@ -166,13 +166,13 @@ public class CRM extends Controller {
 			}
 			selected_people = no_kids;
 		}
-		
+
 		return selected_people;
 	}
-	
+
 	public static Result renderTagMembers(Integer tagId, String familyMode) {
         Tag the_tag = Tag.find.byId(tagId);
-		return ok(views.html.to_address_fragment.render(the_tag.title, 
+		return ok(views.html.to_address_fragment.render(the_tag.title,
 			getTagMembers(tagId, familyMode)));
 	}
 
@@ -277,17 +277,26 @@ public class CRM extends Controller {
 		if (e == null) {
 			return redirect(routes.CRM.people());
 		}
-		
-		ArrayList<String> addresses = new ArrayList<String>();
-		addresses.add("office@threeriversvillageschool.org");
-		addresses.add("evan@threeriversvillageschool.org");
-		addresses.add("jmp@threeriversvillageschool.org");
-		addresses.add("jancey@threeriversvillageschool.org");
-		addresses.add("info@threeriversvillageschool.org");
-		addresses.add("staff@threeriversvillageschool.org");
-		
+
+        Tag staff_tag = Tag.find.where().eq("title", "Staff").findUnique();
+        List<Person> people = getPeopleForTag(staff_tag.id);
+
+        ArrayList<String> test_addresses = new ArrayList<String>();
+        for (Person p : people) {
+            test_addresses.add(p.email);
+        }
+		test_addresses.add("staff@threeriversvillageschool.org");
+
+        ArrayList<String> from_addresses = new ArrayList<String>();
+        from_addresses.add("office@threeriversvillageschool.org");
+        from_addresses.add("evan@threeriversvillageschool.org");
+        from_addresses.add("jmp@threeriversvillageschool.org");
+        from_addresses.add("jancey@threeriversvillageschool.org");
+        from_addresses.add("info@threeriversvillageschool.org");
+        from_addresses.add("staff@threeriversvillageschool.org");
+
         e.parseMessage();
-		return ok(views.html.view_pending_email.render(e, addresses));
+		return ok(views.html.view_pending_email.render(e, test_addresses, from_addresses));
 	}
 
     public static Result sendTestEmail() {
@@ -304,7 +313,7 @@ public class CRM extends Controller {
 		} catch (MessagingException ex) {
 			ex.printStackTrace();
 		}
-			
+
         return ok();
     }
 
@@ -317,9 +326,9 @@ public class CRM extends Controller {
         Tag theTag = Tag.find.byId(tagId);
 		String familyMode = values.get("familyMode")[0];
 		Collection<Person> recipients = getTagMembers(tagId, familyMode);
-			
+
 		boolean hadErrors = false;
-		
+
 		for (Person p : recipients) {
 			if (p.email != null && !p.email.equals("")) {
 				try {
@@ -334,7 +343,7 @@ public class CRM extends Controller {
 				}
 			}
 		}
-		
+
 		// Send confirmation email
 		try {
 			MimeMessage to_send = new MimeMessage(e.parsedMessage);
@@ -350,7 +359,7 @@ public class CRM extends Controller {
 		} catch (MessagingException ex) {
 			ex.printStackTrace();
 		}
-		
+
 		e.markSent();
         return ok();
     }

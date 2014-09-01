@@ -1,4 +1,4 @@
-@(email : Email, addresses : List [ String ] )
+@(email : Email, test_addresses : List [ String ], from_addresses : List [ String ] )
 
 @import helper._
 
@@ -17,14 +17,14 @@
   </div>
   <div class="panel-body">
 <p>To address:<select id="test_destination">
-	@for( address <- addresses) {
+	@for( address <- test_addresses) {
 		<option value="@address">@address</option>
 	}
 </select>
 <button type="button" class="btn btn-warning btn-sm"
 onclick="javascript:sendTestEmail('@routes.CRM.sendTestEmail()', @email.id);">Send test email</button>
 
-<p><p>Changed your mind? <button type="button" class="btn btn-danger btn-sm" 
+<p><p>Changed your mind? <button type="button" class="btn btn-danger btn-sm"
 onclick="javascript:deleteEmail('@routes.CRM.deleteEmail()', @email.id);">Delete this message.</button>
   </div>
 </div>
@@ -36,7 +36,7 @@ onclick="javascript:deleteEmail('@routes.CRM.deleteEmail()', @email.id);">Delete
     <h3 class="panel-title">Send for real</h3>
   </div>
   <div class="panel-body">
-<p><b>1. </b>Send to tag: <input width=40 id="to_tag"> 
+<p><b>1. </b>Send to tag: <input width=40 id="to_tag">
 
 <select id="family_mode">
 <option value="just_tags">Tag members</option>
@@ -47,12 +47,12 @@ onclick="javascript:deleteEmail('@routes.CRM.deleteEmail()', @email.id);">Delete
 <div id="to_addresses"></div>
 
 <p><b>2. From address</b> (replies will go here):<select id="source_address">
-	@for( address <- addresses) {
+	@for( address <- from_addresses) {
 		<option value="@address">@address</option>
 	}
 </select>
 
-<p><button type="button" class="btn btn-warning btn-sm" 
+<p><button type="button" class="btn btn-warning btn-sm"
 onclick="javascript:sendEmail('@routes.CRM.sendEmail()', @email.id);">3. SEND!</button>
 
 <p>(A copy will be sent to staff@@TRVS)
