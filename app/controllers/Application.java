@@ -52,7 +52,7 @@ public class Application extends Controller {
                 orderBy("id DESC").findList();
         return ok(views.html.view_sm_decisions.render(the_charges));
     }
-	
+
 	static List<Person> allPeople() {
         Tag cur_student_tag = Tag.find.where().eq("title", "Current Student").findUnique();
         Tag staff_tag = Tag.find.where().eq("title", "Staff").findUnique();
@@ -81,7 +81,7 @@ public class Application extends Controller {
     public static Result viewMeetingResolutionPlans(int meeting_id) {
         return ok(views.html.view_meeting_resolution_plans.render(Meeting.find.byId(meeting_id)));
     }
-	
+
 	public static Result viewManual() {
 		return ok(views.html.view_manual.render(Chapter.find.where("deleted = false").order("num ASC").findList()));
 	}
@@ -92,12 +92,12 @@ public class Application extends Controller {
 
     public static Result getPersonHistory(Integer id) {
         Person p = Person.find.byId(id);
-        return ok(views.html.person_history.render(p, new PersonHistory(p)));
+        return ok(views.html.person_history.render(p, new PersonHistory(p, false)));
     }
 
     public static Result getRuleHistory(Integer id) {
         Entry r = Entry.find.byId(id);
-        return ok(views.html.rule_history.render(r, new RuleHistory(r)));
+        return ok(views.html.rule_history.render(r, new RuleHistory(r, false)));
     }
 
     public static Result viewPersonHistory(Integer id) {
@@ -195,7 +195,7 @@ public class Application extends Controller {
     public static Configuration getConfiguration() {
 		return Play.application().configuration().getConfig("school_crm");
 	}
-	
+
 	public static String markdown(String input) {
 		try {
 			return new Markdown4jProcessor().process(input);

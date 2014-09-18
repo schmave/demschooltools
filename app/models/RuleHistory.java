@@ -13,15 +13,26 @@ public class RuleHistory {
     public ArrayList<Record> rule_records;
 
     public RuleHistory(Entry rule) {
+        this(rule, true);
+    }
+
+    public RuleHistory(Entry rule, boolean include_today) {
         HashMap<Person, Record> records = new HashMap<Person, Record>();
+
+        Date today = new Date();
+
         for (Charge c : rule.charges) {
             Record r = records.get(c.person);
+
+            Date d = c.the_case.meeting.date;
+            if (!include_today && d.getDate() == today.getDate() &&
+                d.getMonth() == today.getMonth() && d.getYear() == today.getYear()) {
+                continue;
+            }
+
             if (r == null) {
                 r = new Record();
-                r.most_recent_charge = c.the_case.date;
-                if (r.most_recent_charge == null) {
-                    r.most_recent_charge = c.the_case.meeting.date;
-                }
+                r.most_recent_charge = c.the_case.meeting.date;
                 r.count = 1;
                 r.person = c.person;
                 records.put(c.person, r);
