@@ -147,6 +147,10 @@ public class Application extends Controller {
         return Json.stringify(Json.toJson(result));
     }
 
+    public static String formatDayOfWeek(Date d) {
+        return new SimpleDateFormat("EE").format(d);
+    }
+
     public static String formatDateShort(Date d) {
         return new SimpleDateFormat("MM/dd").format(d);
     }
