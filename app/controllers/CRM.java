@@ -360,14 +360,14 @@ public class CRM extends Controller {
 			ex.printStackTrace();
 		}
 
-		e.markSent();
+		e.delete();
         return ok();
     }
 
     public static Result deleteEmail() {
         final Map<String, String[]> values = request().body().asFormUrlEncoded();
         Email e = Email.find.byId(Integer.parseInt(values.get("id")[0]));
-        e.markDeleted();
+        e.delete();
 
         return ok();
     }
