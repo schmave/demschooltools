@@ -8,13 +8,13 @@
 @c.person.getDisplayName()}</a>@if( show_rule && c.rule != null ){,
 <a nosidebar href="@routes.Application.viewRuleHistory(c.rule.id)">@c.rule.title</a>}</b>.
 
-<i>Findings</i>: @c.the_case.findings.
+<i>Findings</i>: @c.the_case.findings
 
 @if( !c.plea.equals("Guilty") ) {
 	Plead <b>@c.plea</b>.
 }
 
-<i>Resolution plan</i>: @c.resolution_plan.
+<u>RP: @c.resolution_plan</u>
 
 @if( c.sm_decision != null) {
 	<span class="sm-decision"><i>School Meeting ruled@if(
