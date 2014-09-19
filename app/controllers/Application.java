@@ -90,9 +90,25 @@ public class Application extends Controller {
 		return ok(views.html.view_chapter.render(Chapter.find.byId(id)));
 	}
 
+    static List<Charge> getLastWeekCharges(Person p) {
+        List<Charge> last_week_charges = new ArrayList<Charge>();
+
+        Date now = new Date();
+
+        for (Charge c : p.charges) {
+            // Include if <= 7 days ago
+            if (now.getTime() - c.the_case.meeting.date.getTime() <
+                1000 * 60 * 60 * 24 * 7.5) {
+                last_week_charges.add(c);
+            }
+        }
+
+        return last_week_charges;
+    }
+
     public static Result getPersonHistory(Integer id) {
         Person p = Person.find.byId(id);
-        return ok(views.html.person_history.render(p, new PersonHistory(p, false)));
+        return ok(views.html.person_history.render(p, new PersonHistory(p, false), getLastWeekCharges(p)));
     }
 
     public static Result getRuleHistory(Integer id) {
@@ -102,7 +118,7 @@ public class Application extends Controller {
 
     public static Result viewPersonHistory(Integer id) {
         Person p = Person.find.byId(id);
-        return ok(views.html.view_person_history.render(p, new PersonHistory(p)));
+        return ok(views.html.view_person_history.render(p, new PersonHistory(p), getLastWeekCharges(p)));
     }
 
     public static Result viewRuleHistory(Integer id) {
