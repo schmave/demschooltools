@@ -174,14 +174,14 @@ function RuleChooser(el, on_change) {
     }
 
     this.unsetRule = function() {
-        if (on_change) { on_change(); }
-
         $(self.rule_el).remove();
 
         self.rule = null;
         self.rule_el = null;
 
         self.search_box.show();
+
+        if (on_change) { on_change(); }
     }
 
     this.loadData = function(json) {
@@ -267,6 +267,20 @@ function Charge(charge_id, el) {
 
     this.markAsModified = function() {
         self.is_modified = true;
+        if ((self.people_chooser.people.length == 0) ||
+            !self.rule_chooser.rule) {
+            el.find(".last-rp").html("");
+        }
+
+        if (self.people_chooser.people.length == 1 &&
+            self.rule_chooser.rule) {
+            url = "/getLastRp";
+            url += "/" + self.people_chooser.people[0].id;
+            url += "/" + self.rule_chooser.rule;
+            $.get(url, function (data) {
+                el.find(".last-rp").html(data);
+            });
+        }
     }
 
     self.el = el;

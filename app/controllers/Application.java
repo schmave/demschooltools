@@ -182,6 +182,16 @@ public class Application extends Controller {
         return Json.stringify(Json.toJson(result));
     }
 
+    public static Result getLastRp(Integer personId, Integer ruleId) {
+        for (Charge c : Person.find.byId(personId).charges) {
+            if (c.rule != null
+                && c.rule.id == ruleId) {
+                return ok("Last RP for this charge: " + c.resolution_plan);
+            }
+        }
+        return ok("No previous charge.");
+    }
+
     public static String formatDayOfWeek(Date d) {
         return new SimpleDateFormat("EE").format(d);
     }
