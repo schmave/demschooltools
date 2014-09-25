@@ -37,10 +37,10 @@ public class Entry extends Model implements Comparable<Entry> {
 
     @ManyToOne()
     public Section section;
-	
+
 	@NotNull
 	public Boolean deleted;
-	
+
 	@OneToMany(mappedBy="rule")
     @JsonIgnore
     @OrderBy("id DESC")
@@ -49,6 +49,10 @@ public class Entry extends Model implements Comparable<Entry> {
     public static Finder<Integer,Entry> find = new Finder(
         Integer.class, Entry.class
     );
+
+    public String getNumber() {
+        return section.chapter.num + section.num + "." + num;
+    }
 
 	public void updateFromForm(Form<Entry> form) {
 		title = form.field("title").value();
@@ -59,14 +63,14 @@ public class Entry extends Model implements Comparable<Entry> {
 		section = Section.find.byId(Integer.parseInt(form.field("section.id").value()));
 		save();
 	}
-	
+
 	public static Entry create(Form<Entry> form) {
 		Entry result = form.get();
 		result.updateFromForm(form);
 		result.save();
 		return result;
 	}
-	
+
 	public int compareTo(Entry other) {
         return title.compareTo(other.title);
     }

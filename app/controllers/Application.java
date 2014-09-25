@@ -154,7 +154,7 @@ public class Application extends Controller {
         for (Entry r : rules) {
             if (r.title.toLowerCase().contains(term)) {
                 HashMap<String, String> values = new HashMap<String, String>();
-                values.put("label", r.title);
+                values.put("label", r.getNumber() + " " + r.title);
                 values.put("id", "" + r.id);
                 result.add(values);
             }
