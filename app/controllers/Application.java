@@ -106,6 +106,25 @@ public class Application extends Controller {
         return last_week_charges;
     }
 
+    static Collection<String> getLastWeekCharges(Entry r) {
+        Date now = new Date();
+
+        Set<String> rps = new HashSet<String>();
+
+        for (Charge c : r.charges) {
+            // Include if <= 7 days ago
+            if (!c.resolution_plan.toLowerCase().equals("warning") &&
+                !c.resolution_plan.equals("")) {
+                rps.add(c.resolution_plan);
+            }
+            if (rps.size() > 9) {
+                break;
+            }
+        }
+
+        return rps;
+    }
+
     public static Result getPersonHistory(Integer id) {
         Person p = Person.find.byId(id);
         return ok(views.html.person_history.render(p, new PersonHistory(p, false), getLastWeekCharges(p)));
@@ -113,7 +132,7 @@ public class Application extends Controller {
 
     public static Result getRuleHistory(Integer id) {
         Entry r = Entry.find.byId(id);
-        return ok(views.html.rule_history.render(r, new RuleHistory(r, false)));
+        return ok(views.html.rule_history.render(r, new RuleHistory(r, false), getLastWeekCharges(r)));
     }
 
     public static Result viewPersonHistory(Integer id) {
@@ -123,7 +142,7 @@ public class Application extends Controller {
 
     public static Result viewRuleHistory(Integer id) {
         Entry r = Entry.find.byId(id);
-        return ok(views.html.view_rule_history.render(r, new RuleHistory(r)));
+        return ok(views.html.view_rule_history.render(r, new RuleHistory(r), getLastWeekCharges(r)));
 	}
 
     public static String jcPeople(String term) {

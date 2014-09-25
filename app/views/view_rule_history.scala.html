@@ -1,4 +1,4 @@
-@(r : Entry, history : RuleHistory)
+@(r : Entry, history : RuleHistory, recent_rps : Collection[ String ])
 
 @import helper._
 
@@ -13,6 +13,6 @@ $(function() {
 });
 </script>
 
-@rule_history(r, history)
+@rule_history(r, history, recent_rps)
 
 }

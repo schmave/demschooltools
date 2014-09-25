@@ -1,8 +1,20 @@
-@(r : Entry, history : RuleHistory)
+@(r : Entry, history : RuleHistory, recent_rps : Collection[ String ])
 
 @import helper._
 
 <h3>@r.title</h3>
+
+<h4>Recent interesting RPs:</h4>
+
+@if( recent_rps.size() == 0 ) {
+<p>None.
+} else {
+<ul>
+@for( rp <- recent_rps ) {
+<li>@rp
+}
+</ul>
+}
 
 <table class="table sortable">
 <thead><tr><th width=50% class="sorttable_alpha">Person<th width=25% class="sorttable_school_mmdd">Most Recent Violation<th class="sorttable_numeric"># of violations</tr></thead>
