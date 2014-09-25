@@ -39,6 +39,8 @@ POST /addCharge   controllers.ApplicationEditing.addCharge(case_number)
 POST /saveCharge controllers.ApplicationEditing.saveCharge(id : Integer)
 POST /removeCharge   controllers.ApplicationEditing.removeCharge(id : Integer)
 
+GET /getLastRp/:personId/:ruleId	controllers.Application.getLastRp(personId : Integer, ruleId : Integer)
+
 
 GET /viewManual       controllers.Application.viewManual()
 GET /viewChapter/:id       controllers.Application.viewChapter(id : Integer)

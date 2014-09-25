@@ -91,9 +91,9 @@ View printable minutes</a>
 <script id="charge-template" type="text/x-handlebars-template">
 <div class="charge">
 <table>
-	<tr><td class="esm-form-label">Charge against:<td>{{render "people-chooser" clazz=""}}
+	<tr><td class="esm-form-label">Charge against:<td colspan=2>{{render "people-chooser" clazz=""}}
 	<b>Entry:</b> {{> rule-chooser}}
-	<tr><td class="esm-form-label">Plea:<td>
+	<tr><td class="esm-form-label">Plea:<td colspan=2>
 <div class="radio-inline">
   <label><input type="radio" class="plea-guilty" value="Guilty"><span>Guilty</span></label>
 </div>
@@ -102,6 +102,7 @@ View printable minutes</a>
 </div>
 &nbsp;&nbsp;&nbsp;<label><input type="checkbox" class="refer-to-sm"><span> Refer to School Meeting</span></label>
 	<tr><td class="esm-form-label">Resolution plan: <td><textarea class="resolution_plan"></textarea>
+    <td class="last-rp"></td>
    </table>
    <button style="margin-left: 200px" class="btn btn-danger btn-xs">Remove Charge</button>
    </div>
