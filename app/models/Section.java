@@ -48,6 +48,10 @@ public class Section extends Model {
         Integer.class, Section.class
     );
 
+    public String getNumber() {
+        return chapter.num + num;
+    }
+
 	public void updateFromForm(Form<Section> form) {
 		title = form.field("title").value();
 		num = form.field("num").value();
