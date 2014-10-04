@@ -492,7 +492,7 @@ $(function () {
         }
 
         if (dirty) {
-            return "You have unsaved changes. Please wait a few seconds for them to be saved."
+            return "UNsaved changes! Please give me a few more seconds..."
         }
         return null;
     }
