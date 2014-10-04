@@ -32,6 +32,8 @@ public class ApplicationEditing extends Controller {
     }
 
     public static Result editMinutes(Meeting meeting) {
+        response().setHeader("Cache-Control", "max-age=0, no-cache, no-store");
+        response().setHeader("Pragma", "no-cache");
         return ok(views.html.edit_minutes.render(meeting));
     }
 
@@ -147,15 +149,15 @@ public class ApplicationEditing extends Controller {
 		Form<Chapter> form = Form.form(Chapter.class);
 		return ok(views.html.edit_chapter.render(form, true));
 	}
-	
+
 	public static Result editChapter(Integer id) {
 		Form<Chapter> filled_form = new Form<Chapter>(Chapter.class).fill(Chapter.find.byId(id));
 		return ok(views.html.edit_chapter.render(filled_form, false));
 	}
-	
+
 	public static Result saveChapter() {
 		Form<Chapter> form = new Form<Chapter>(Chapter.class).bindFromRequest();
-		
+
 		Chapter c = null;
 		if (form.field("id").value() != null) {
 			c = Chapter.find.byId(Integer.parseInt(form.field("id").value()));
@@ -163,10 +165,10 @@ public class ApplicationEditing extends Controller {
 		} else {
 			c = Chapter.create(form);
 		}
-		
+
 		return redirect(routes.Application.viewChapter(c.id));
 	}
-	
+
 	public static Result addSection(Integer chapterId) {
 		Form<Section> form = Form.form(Section.class);
 		Map<String, String> map = new HashMap<String, String>();
@@ -174,16 +176,16 @@ public class ApplicationEditing extends Controller {
 		form = form.bind(map, "chapter.id");
 		return ok(views.html.edit_section.render(form, true, Chapter.find.order("num ASC").findList()));
 	}
-	
+
 	public static Result editSection(Integer id) {
 		Section existing_section = Section.find.byId(id);
 		Form<Section> filled_form = new Form<Section>(Section.class).fill(existing_section);
 		return ok(views.html.edit_section.render(filled_form, false, Chapter.find.order("num ASC").findList()));
 	}
-	
+
 	public static Result saveSection() {
 		Form<Section> form = new Form<Section>(Section.class).bindFromRequest();
-		
+
 		Section s = null;
 		if (form.field("id").value() != null) {
 			s = Section.find.byId(Integer.parseInt(form.field("id").value()));
@@ -191,10 +193,10 @@ public class ApplicationEditing extends Controller {
 		} else {
 			s = Section.create(form);
 		}
-		
+
 		return redirect(routes.Application.viewChapter(s.chapter.id));
 	}
-	
+
 	public static Result addEntry(Integer sectionId) {
 		Form<Entry> form = Form.form(Entry.class);
 		Map<String, String> map = new HashMap<String, String>();
@@ -202,7 +204,7 @@ public class ApplicationEditing extends Controller {
 		form = form.bind(map, "section.id");
 		return ok(views.html.edit_entry.render(form, true, Chapter.find.order("num ASC").findList()));
 	}
-	
+
 	public static Result editEntry(Integer id) {
 		Form<Entry> filled_form = new Form<Entry>(Entry.class).fill(Entry.find.byId(id));
 		return ok(views.html.edit_entry.render(filled_form, false, Chapter.find.order("num ASC").findList()));
@@ -210,7 +212,7 @@ public class ApplicationEditing extends Controller {
 
 	public static Result saveEntry() {
 		Form<Entry> form = new Form<Entry>(Entry.class).bindFromRequest();
-		
+
 		Entry e = null;
 		if (form.field("id").value() != null) {
 			e = Entry.find.byId(Integer.parseInt(form.field("id").value()));
@@ -218,8 +220,8 @@ public class ApplicationEditing extends Controller {
 		} else {
 			e = Entry.create(form);
 		}
-		
+
 		return redirect(routes.Application.viewChapter(e.section.chapter.id));
 	}
-	
+
 }
