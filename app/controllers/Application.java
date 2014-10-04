@@ -116,13 +116,10 @@ public class Application extends Controller {
         return last_week_charges;
     }
 
-    static Collection<String> getLastWeekCharges(Entry r) {
-        Date now = new Date();
-
+    static Collection<String> getRecentResolutionPlans(Entry r) {
         Set<String> rps = new HashSet<String>();
 
         for (Charge c : r.charges) {
-            // Include if <= 7 days ago
             if (!c.resolution_plan.toLowerCase().equals("warning") &&
                 !c.resolution_plan.equals("")) {
                 rps.add(c.resolution_plan);
@@ -142,7 +139,7 @@ public class Application extends Controller {
 
     public static Result getRuleHistory(Integer id) {
         Entry r = Entry.find.byId(id);
-        return ok(views.html.rule_history.render(r, new RuleHistory(r, false), getLastWeekCharges(r)));
+        return ok(views.html.rule_history.render(r, new RuleHistory(r, false), getRecentResolutionPlans(r)));
     }
 
     public static Result viewPersonHistory(Integer id) {
@@ -152,7 +149,7 @@ public class Application extends Controller {
 
     public static Result viewRuleHistory(Integer id) {
         Entry r = Entry.find.byId(id);
-        return ok(views.html.view_rule_history.render(r, new RuleHistory(r), getLastWeekCharges(r)));
+        return ok(views.html.view_rule_history.render(r, new RuleHistory(r), getRecentResolutionPlans(r)));
 	}
 
     public static String jcPeople(String term) {
@@ -193,10 +190,14 @@ public class Application extends Controller {
     }
 
     public static Result getLastRp(Integer personId, Integer ruleId) {
+        Date now = new Date();
+
         for (Charge c : Person.find.byId(personId).charges) {
-            if (c.rule != null
-                && c.rule.id == ruleId) {
-                return ok("Last RP for this charge: " + c.resolution_plan);
+            if (c.rule != null &&
+                c.rule.id == ruleId &&
+                now.getTime() - c.the_case.meeting.date.getTime() > 1000 * 60 * 60 * 24) {
+                return ok("Last RP for this charge (from case #" + c.the_case.case_number +
+                    "): " + c.resolution_plan);
             }
         }
         return ok("No previous charge.");
