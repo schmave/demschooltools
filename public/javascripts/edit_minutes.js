@@ -374,6 +374,7 @@ function Case (id, el) {
         var new_charge_el = self.el.find(".charges").append(
             app.charge_template()).children(":last-child");
         var new_charge = new Charge(charge_id, new_charge_el);
+        self.charges.push(new_charge);
         return new_charge;
     }
 
@@ -395,6 +396,7 @@ function Case (id, el) {
                    "&person_id=" + person.id);
         });
     this.is_modified = false;
+    this.charges = [];
 
     el.find(".location").change(self.markAsModified);
     el.find(".findings").change(self.markAsModified);
@@ -469,6 +471,27 @@ $(function () {
         makePeopleChooser(".sub", app.ROLE_JC_SUB);
 
     loadInitialData();
+
+    window.onbeforeunload = function(e) {
+        var dirty = false;
+        for (i in app.cases) {
+            var c = app.cases[i]
+            if (c.is_modified) {
+                dirty = true;
+            }
+            for (j in c.charges) {
+                var ch = c.charges[j]
+                if (ch.is_modified) {
+                    dirty = true;
+                }
+            }
+        }
+
+        if (dirty) {
+            return "You have unsaved changes. Please wait a few seconds for them to be saved."
+        }
+        return null;
+    }
 });
 
 function addCaseNoServer(id)
