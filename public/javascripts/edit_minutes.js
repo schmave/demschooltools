@@ -1,3 +1,5 @@
+TEXT_AREA_EVENTS = "change keyup paste cut"
+
 function showSomethingInSidebar(url) {
     $("#sidebar").html("<h2>Loading...</h2>");
     $.get(url,
@@ -291,6 +293,7 @@ function Charge(charge_id, el) {
     self.remove_button.click(self.removeCharge);
 
     el.find(".resolution_plan").change(self.markAsModified);
+    el.find(".resolution_plan").on(TEXT_AREA_EVENTS, self.markAsModified);
     el.find(".plea-guilty").change(self.markAsModified);
     el.find(".plea-not-guilty").change(self.markAsModified);
     el.find(".plea-not-guilty").change(function() {
@@ -400,6 +403,7 @@ function Case (id, el) {
 
     el.find(".location").change(self.markAsModified);
     el.find(".findings").change(self.markAsModified);
+    el.find(".findings").on(TEXT_AREA_EVENTS, self.markAsModified);
     el.find(".date").change(self.markAsModified);
 
     el.find(".add-charges").click(self.addCharge);
