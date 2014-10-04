@@ -108,10 +108,6 @@ function PeopleChooser(el, on_add, on_remove) {
     }
 
     this.removePerson = function(person) {
-        if (on_remove) {
-            on_remove(person);
-        }
-
         $(person.el).remove();
 
         for (i in self.people) {
@@ -123,6 +119,10 @@ function PeopleChooser(el, on_add, on_remove) {
         if (self.one_person_mode) {
             self.search_box.show();
             self.el.find(".glyphicon").show();
+        }
+
+        if (on_remove) {
+            on_remove(person);
         }
     }
 
