@@ -51,7 +51,7 @@ public class Entry extends Model implements Comparable<Entry> {
     );
 
     public String getNumber() {
-        return section.chapter.num + section.num + "." + num;
+        return section.getNumber() + "." + num;
     }
 
 	public void updateFromForm(Form<Entry> form) {

@@ -174,13 +174,13 @@ public class ApplicationEditing extends Controller {
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("chapter.id", "" + chapterId);
 		form = form.bind(map, "chapter.id");
-		return ok(views.html.edit_section.render(form, true, Chapter.find.order("num ASC").findList()));
+		return ok(views.html.edit_section.render(form, Chapter.find.byId(chapterId), true, Chapter.find.order("num ASC").findList()));
 	}
 
 	public static Result editSection(Integer id) {
 		Section existing_section = Section.find.byId(id);
 		Form<Section> filled_form = new Form<Section>(Section.class).fill(existing_section);
-		return ok(views.html.edit_section.render(filled_form, false, Chapter.find.order("num ASC").findList()));
+		return ok(views.html.edit_section.render(filled_form, existing_section.chapter, false, Chapter.find.order("num ASC").findList()));
 	}
 
 	public static Result saveSection() {
@@ -202,12 +202,13 @@ public class ApplicationEditing extends Controller {
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("section.id", "" + sectionId);
 		form = form.bind(map, "section.id");
-		return ok(views.html.edit_entry.render(form, true, Chapter.find.order("num ASC").findList()));
+		return ok(views.html.edit_entry.render(form, Section.find.byId(sectionId), true, Chapter.find.order("num ASC").findList()));
 	}
 
 	public static Result editEntry(Integer id) {
-		Form<Entry> filled_form = new Form<Entry>(Entry.class).fill(Entry.find.byId(id));
-		return ok(views.html.edit_entry.render(filled_form, false, Chapter.find.order("num ASC").findList()));
+        Entry e = Entry.find.byId(id);
+		Form<Entry> filled_form = new Form<Entry>(Entry.class).fill(e);
+		return ok(views.html.edit_entry.render(filled_form, e.section, false, Chapter.find.order("num ASC").findList()));
 	}
 
 	public static Result saveEntry() {

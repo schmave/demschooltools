@@ -1,4 +1,4 @@
-@(form: Form[Section], is_new : Boolean, chapter_options : List [ Chapter ])
+@(form: Form[Section], chapter : Chapter, is_new : Boolean, chapter_options : List [ Chapter ])
 
 @main("Edit a section", menu = "jc") {
 
@@ -15,7 +15,12 @@
 	<input type="hidden" name="id" value="@form("id").value()"/>
 }
         @helper.inputText(form("title"), '_label -> "Title", 'size -> 75)
-        @helper.inputText(form("num"), '_label -> "Number", 'size -> 10)
+<dl class=" " id="num_field">
+    <dt><label for="num">Number</label></dt>
+    <dd>
+    @chapter.num<input type="text" id="num" name="num" value="@form("num").value()" size="10">
+</dd>
+</dl>
 		@helper.checkbox(form("deleted"), '_label -> "Check this to delete -- careful, can only be undone by Evan")
 		@helper.select(form("chapter.id"), options = chapter_options.map (c => ("" + c.id, c.num + " " + c.title)), '_label -> "Chapter", 'class -> "form-control")
 
