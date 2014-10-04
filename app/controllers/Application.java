@@ -70,8 +70,18 @@ public class Application extends Controller {
         List<Person> people = allPeople();
         Collections.sort(people, Person.SORT_DISPLAY_NAME);
 
+        List<Entry> entries = Entry.find.findList();
+        List<Entry> entries_with_charges = new ArrayList<Entry>();
+        for (Entry e : entries) {
+            if (e.charges.size() > 0) {
+                entries_with_charges.add(e);
+            }
+        }
+
+        Collections.sort(entries_with_charges, Entry.SORT_NUMBER);
+
         return ok(views.html.jc_index.render(meetings, sm_charges, people,
-            Entry.find.orderBy("title ASC").findList()));
+            entries_with_charges));
     }
 
     public static Result viewMeeting(int meeting_id) {
