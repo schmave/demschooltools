@@ -74,4 +74,11 @@ public class Entry extends Model implements Comparable<Entry> {
 	public int compareTo(Entry other) {
         return title.compareTo(other.title);
     }
+
+    public static Comparator<Entry> SORT_NUMBER = new Comparator<Entry>() {
+            @Override
+            public int compare(Entry o1, Entry o2) {
+                return o1.getNumber().compareTo(o2.getNumber());
+            }
+        };
 }
