@@ -96,6 +96,13 @@ public class Application extends Controller {
 		return ok(views.html.view_manual.render(Chapter.find.where("deleted = false").order("num ASC").findList()));
 	}
 
+    public static Result viewManualChanges() {
+        Date now = new Date();
+        Date seven_days_before = new Date(now.getTime() - 1000 * 60 * 60 * 24 * 7);
+        List<ManualChange> changes = ManualChange.find.where().gt("date_entered", seven_days_before).findList();
+        return ok(views.html.view_manual_changes.render(changes));
+    }
+
 	public static Result viewChapter(Integer id) {
 		return ok(views.html.view_chapter.render(Chapter.find.byId(id)));
 	}
@@ -257,6 +264,9 @@ public class Application extends Controller {
 	}
 
 	public static String markdown(String input) {
+        if (input == null) {
+            return "";
+        }
 		try {
 			return new Markdown4jProcessor().process(input);
 		} catch (IOException e) {

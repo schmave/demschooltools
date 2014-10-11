@@ -1,0 +1,7 @@
+@(num : String, title : String, content : String, deleted : Boolean)
+
+<div class="man-entry">
+	<p class="man-entry-num">@if(deleted){<strike>}@num @title@if(deleted){</strike>}</p>
+	<div class="man-entry-content">@if(deleted){<strike>}@Html(Application.markdown(content))@if(deleted){</strike>}</div>
+</div>
+

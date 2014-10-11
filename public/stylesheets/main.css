@@ -258,7 +258,7 @@ a.edit_link {
 /*********************************
  Twitter Bootstrap tweaks
  *********************************/
- 
+
 .form-horizontal .controls {
 	margin-left: 160px;
 }
@@ -318,6 +318,15 @@ a.edit_link {
 	float: right;
 	width: 25%;
 	padding-left: 20px;
+}
+
+.change_log {
+    margin: 12px 0 0 0;
+    border-top: 1px solid #ccc;
+}
+
+.change_log .man-entry-content {
+    width: inherit;
 }
 
 /***************************************************************************

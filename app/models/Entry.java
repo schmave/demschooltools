@@ -4,6 +4,8 @@ import java.util.*;
 
 import javax.persistence.*;
 
+import org.codehaus.jackson.annotate.*;
+
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
 import com.avaje.ebean.RawSql;
@@ -11,8 +13,6 @@ import com.avaje.ebean.RawSqlBuilder;
 import com.avaje.ebean.validation.NotNull;
 
 import controllers.*;
-
-import org.codehaus.jackson.annotate.*;
 
 import play.data.*;
 import play.data.validation.Constraints.*;
@@ -39,7 +39,7 @@ public class Entry extends Model implements Comparable<Entry> {
     public Section section;
 
 	@NotNull
-	public Boolean deleted;
+	public boolean deleted;
 
 	@OneToMany(mappedBy="rule")
     @JsonIgnore
@@ -54,19 +54,42 @@ public class Entry extends Model implements Comparable<Entry> {
         return section.getNumber() + "." + num;
     }
 
+    void updateFromForm(Form<Entry> form, boolean make_change_record) {
+        String old_num = (make_change_record ? getNumber() : "");
+        String old_title = title;
+        String old_content = content;
+
+        title = form.field("title").value();
+        content = form.field("content").value();
+        num = form.field("num").value();
+        String deleted_val = form.field("deleted").value();
+
+        boolean previous_deleted = deleted;
+        deleted = deleted_val != null && deleted_val.equals("true");
+
+        section = Section.find.byId(Integer.parseInt(form.field("section.id").value()));
+
+        if (make_change_record) {
+            if (!previous_deleted && deleted) {
+                ManualChange.recordEntryDelete(this);
+            } else if (previous_deleted && !deleted) {
+                ManualChange.recordEntryCreate(this);
+            } else {
+                ManualChange.recordEntryChange(this, old_num, old_title, old_content);
+            }
+        }
+
+        save();
+    }
+
 	public void updateFromForm(Form<Entry> form) {
-		title = form.field("title").value();
-		content = form.field("content").value();
-		num = form.field("num").value();
-		String deleted_val = form.field("deleted").value();
-		deleted = deleted_val != null && deleted_val.equals("true");
-		section = Section.find.byId(Integer.parseInt(form.field("section.id").value()));
-		save();
+        updateFromForm(form, true);
 	}
 
 	public static Entry create(Form<Entry> form) {
 		Entry result = form.get();
-		result.updateFromForm(form);
+		result.updateFromForm(form, false);
+        ManualChange.recordEntryCreate(result);
 		result.save();
 		return result;
 	}
