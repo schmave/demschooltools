@@ -43,6 +43,7 @@ GET /getLastRp/:personId/:ruleId	controllers.Application.getLastRp(personId : In
 
 
 GET /viewManual       controllers.Application.viewManual()
+GET /viewManualChanges       controllers.Application.viewManualChanges()
 GET /viewChapter/:id       controllers.Application.viewChapter(id : Integer)
 
 GET /addChapter			controllers.ApplicationEditing.addChapter()

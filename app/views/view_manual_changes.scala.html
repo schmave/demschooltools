@@ -1,0 +1,28 @@
+@(changes : List [ ManualChange ] )
+
+@import helper._
+
+@main("Management Manual", "--", "jc") {
+
+<h1>Changes to the management manual</h1>
+
+@for( c <- changes ) {
+	<div class="change_log">On @Application.yymmddDate(c.date_entered),
+	@if( c.was_created ) {
+		created:
+		@entry(c.new_num, c.new_title, c.new_content, false)
+	} else { @if( c.was_deleted ) {
+		deleted:
+		@entry(c.old_num, c.old_title, c.old_content, true)
+	} else {
+		changed:
+		<table cellpadding=5><tr>
+		<td width=300>@entry(c.old_num, c.old_title, c.old_content, false)
+		<td><img src="@routes.Assets.at("images/change_arrow.png")">
+		<td width=300>@entry(c.new_num, c.new_title, c.new_content, false)
+		</tr></table>
+	} }
+	</div>
+}
+
+}

@@ -8,11 +8,11 @@
 <p><a class="no-print" href="@routes.ApplicationEditing.addSection(chapter.id)">Add section in @chapter.num @chapter.title</a>
 
 @for(section <- chapter.sections) {
-<div class="man-section">@chapter.num@section.num @section.title <a class="no-print man-edit" href="@routes.ApplicationEditing.editSection(section.id)">Edit</a></div>
+<div class="man-section">@section.getNumber() @section.title <a class="no-print man-edit" href="@routes.ApplicationEditing.editSection(section.id)">Edit</a></div>
 	<p><a class="no-print" href="@routes.ApplicationEditing.addEntry(section.id)">Add entry in @chapter.num@section.num @section.title</a>
 	@for(entry <- section.entries) {
 	<div class="man-entry">
-		<p class="man-entry-num">@chapter.num@{section.num}.@entry.num @entry.title <a class="no-print man-edit" href="@routes.ApplicationEditing.editEntry(entry.id)">Edit</a></p>
+		<p class="man-entry-num">@entry.getNumber() @entry.title <a class="no-print man-edit" href="@routes.ApplicationEditing.editEntry(entry.id)">Edit</a></p>
 		<div class="man-entry-content">@Html(Application.markdown(entry.content))</div>
 	</div>
 	}
