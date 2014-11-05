@@ -159,6 +159,96 @@ public class Application extends Controller {
         return ok(views.html.view_rule_history.render(r, new RuleHistory(r), getRecentResolutionPlans(r)));
 	}
 
+    public static Result viewWeeklyReport(String date_string) {
+        Calendar start_date = new GregorianCalendar();
+
+        try {
+            Date parsed_date = new SimpleDateFormat("yyyy-M-d").parse(date_string);
+            if (parsed_date != null) {
+                start_date.setTime(parsed_date);
+            }
+        } catch (ParseException e) {
+            System.out.println("Failed to parse given date (" + date_string + "), using current");
+        }
+
+        int dow = start_date.get(Calendar.DAY_OF_WEEK);
+        if (dow >= Calendar.WEDNESDAY) {
+            start_date.add(GregorianCalendar.DATE, -(dow - Calendar.WEDNESDAY));
+        } else {
+            start_date.add(GregorianCalendar.DATE, Calendar.WEDNESDAY - dow - 7);
+        }
+
+        Calendar end_date = (Calendar)start_date.clone();
+        end_date.add(GregorianCalendar.DATE, 6);
+
+        List<Charge> all_charges = Charge.find.findList();
+        WeeklyStats result = new WeeklyStats();
+        result.rule_counts = new TreeMap<Entry, Integer>();
+        result.person_counts = new TreeMap<Person, WeeklyStats.PersonCounts>();
+
+        Set<Case> week_cases = new HashSet<Case>();
+        for (Charge c : all_charges) {
+            long case_millis = c.the_case.meeting.date.getTime();
+            long diff = end_date.getTime().getTime() - case_millis;
+
+            if (c.rule != null && c.person != null) {
+                if (diff > 0 &&
+                    diff < 6.5 * 24 * 60 * 60 * 1000) {
+                    result.rule_counts.put(c.rule, 1 + getOrDefault(result.rule_counts, c.rule, 0));
+                    result.person_counts.put(c.person, getOrDefault(result.person_counts, c.person, new WeeklyStats.PersonCounts()).addThisPeriod());
+                    result.num_charges++;
+                }
+                if (diff > 0 &&
+                    diff < 27.5 * 24 * 60 * 60 * 1000) {
+                    result.person_counts.put(c.person, getOrDefault(result.person_counts, c.person, new WeeklyStats.PersonCounts()).addLast28Days());
+                }
+                if (diff > 0) {
+                    result.person_counts.put(c.person, getOrDefault(result.person_counts, c.person, new WeeklyStats.PersonCounts()).addAllTime());
+                }
+            }
+        }
+
+        List<Meeting> meetings = Meeting.find.where().le("date", end_date.getTime()).
+            ge("date", start_date.getTime()).findList();
+        for (Meeting m : meetings) {
+            for (Case c : m.cases) {
+                result.num_cases++;
+            }
+        }
+        /*
+
+        TreeMap<Entry, Integer> rule_counts = new TreeMap<Entry, Integer>();
+        TreeMap<Person, Integer> people_counts = new TreeMap<Person, Integer>();
+        int num_cases = 0, num_charges = 0;
+
+        for (Meeting m : meetings) {
+            for (Case c : m.cases) {
+                num_cases++;
+                for (Charge ch : c.charges) {
+                    if (ch.rule != null && ch.person != null) {
+                        rule_counts.put(ch.rule, 1 + getOrDefault(rule_counts, ch.rule, 0));
+                        people_counts.put(ch.person, 1 + getOrDefault(people_counts, ch.person, 0));
+                    }
+                    num_charges++;
+                }
+            }
+        }
+
+        */
+
+        result.uncharged_people = allPeople();
+        for (Map.Entry<Person, WeeklyStats.PersonCounts> entry : result.person_counts.entrySet()) {
+            if (entry.getValue().this_period > 0) {
+                result.uncharged_people.remove(entry.getKey());
+            }
+        }
+
+        return ok(views.html.jc_weekly_report.render(
+            start_date.getTime(),
+            end_date.getTime(),
+            result));
+    }
+
     public static String jcPeople(String term) {
         List<Person> people = allPeople();
         Collections.sort(people, Person.SORT_DISPLAY_NAME);
@@ -201,13 +291,21 @@ public class Application extends Controller {
 
         for (Charge c : Person.find.byId(personId).charges) {
             if (c.rule != null &&
-                c.rule.id == ruleId &&
+                c.rule.id.equals(ruleId) &&
                 now.getTime() - c.the_case.meeting.date.getTime() > 1000 * 60 * 60 * 24) {
                 return ok("Last RP for this charge (from case #" + c.the_case.case_number +
                     "): " + c.resolution_plan);
             }
         }
         return ok("No previous charge.");
+    }
+
+    public static Date addWeek(Date d, int numWeeks) {
+        return new Date(d.getTime() + numWeeks * 7 * 24 * 60 * 60 * 1000);
+    }
+
+    private static <K, V> V getOrDefault(Map<K,V> map, K key, V defaultValue) {
+        return map.containsKey(key) ? map.get(key) : defaultValue;
     }
 
     public static String formatDayOfWeek(Date d) {

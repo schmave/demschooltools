@@ -1,0 +1,66 @@
+@(start_date : Date, end_date: Date, data : WeeklyStats)
+
+@import helper._
+
+@main("Weekly report starting on " + Application.formatDateShort(start_date), "weekly_report", "jc") {
+
+<h3> Weekly report </h3>
+<p><a href="@routes.Application.viewWeeklyReport(Application.yymmddDate(Application.addWeek(end_date, -1)))">&lt;&lt; Prev week</a>
+&nbsp;&nbsp;&nbsp;&nbsp;
+Period from Wed. @Application.formatDateShort(start_date) to Tue. @{Application.formatDateShort(end_date)}, inclusive.
+&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="@routes.Application.viewWeeklyReport(Application.yymmddDate(Application.addWeek(end_date, 1)))">Next week &gt;&gt;</a>
+<p>
+<p>
+<p>@data.num_cases total cases.
+<p>@data.num_charges total charges.
+
+<div class="row">
+	<div class="col-xs-4">
+        <h4>Charges per rule</h4>
+		<table class="table sortable">
+			<tr><th>Rule<th width=100># Charges</tr>
+			@for( (rule, count) <- data.rule_counts ) {
+				<tr><td>@rule.getNumber() @rule.title<td>@count</tr>
+			}
+		</table>
+	</div>
+	<div class="col-xs-4">
+        <h4>Charges per person</h4>
+		<table class="table sortable">
+		<tr><th>Person
+			<th>Week<th>Month<th>Year
+				</tr>
+			@for( (person, counts) <- data.person_counts ) {
+				@if( counts.this_period > 0 ) {
+				<tr><td>@person.getDisplayName()
+					<td>@counts.this_period
+					<td>@counts.last_28_days
+					<td>@counts.all_time
+						</tr>
+				}
+			}
+		</table>
+	</div>
+	<div class="col-xs-4">
+		<h4>People with no charges this week</h4>
+		<ol>
+		@for( p <- data.uncharged_people) {
+			<li>@p.getDisplayName()
+		}
+		</ol>
+	</div>
+</div>
+
+<script type="text/javascript">
+$(function() {
+	$("table.sortable").each(function (i) {
+		// sorttable.makeSortable(this);
+		// sorttable.innerSortFunction.apply($(this).find("th")[1], []);
+	});
+});
+
+</script>
+
+
+}
