@@ -159,6 +159,10 @@ public class Application extends Controller {
         return ok(views.html.view_rule_history.render(r, new RuleHistory(r), getRecentResolutionPlans(r)));
 	}
 
+    public static Result thisWeekReport() {
+        return viewWeeklyReport("");
+    }
+
     public static Result viewWeeklyReport(String date_string) {
         Calendar start_date = new GregorianCalendar();
 
@@ -192,17 +196,17 @@ public class Application extends Controller {
             long diff = end_date.getTime().getTime() - case_millis;
 
             if (c.rule != null && c.person != null) {
-                if (diff > 0 &&
+                if (diff >= 0 &&
                     diff < 6.5 * 24 * 60 * 60 * 1000) {
                     result.rule_counts.put(c.rule, 1 + getOrDefault(result.rule_counts, c.rule, 0));
                     result.person_counts.put(c.person, getOrDefault(result.person_counts, c.person, new WeeklyStats.PersonCounts()).addThisPeriod());
                     result.num_charges++;
                 }
-                if (diff > 0 &&
+                if (diff >= 0 &&
                     diff < 27.5 * 24 * 60 * 60 * 1000) {
                     result.person_counts.put(c.person, getOrDefault(result.person_counts, c.person, new WeeklyStats.PersonCounts()).addLast28Days());
                 }
-                if (diff > 0) {
+                if (diff >= 0) {
                     result.person_counts.put(c.person, getOrDefault(result.person_counts, c.person, new WeeklyStats.PersonCounts()).addAllTime());
                 }
             }
