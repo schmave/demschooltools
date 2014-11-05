@@ -29,7 +29,7 @@
 			<ul class="nav nav-tabs no-print">
 			@if( menu.equals("jc") ) {
 			<li @if(activeTab.equals("home")) { class="active" } ><a href="@routes.Application.index">Home</a>
-			<li @if(activeTab.equals("weekly_report")) { class="active" } ><a href="@routes.Application.viewWeeklyReport("")">
+			<li @if(activeTab.equals("weekly_report")) { class="active" } ><a href="@routes.Application.thisWeekReport">
 					Weekly Report
 				</a>
 			<li @if(activeTab.equals("view_sm")) { class="active" } ><a href="@routes.Application.viewSchoolMeetingDecisions">View S.M. decisions</a>
