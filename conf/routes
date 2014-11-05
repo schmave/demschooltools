@@ -46,6 +46,9 @@ GET /viewManual       controllers.Application.viewManual()
 GET /viewManualChanges       controllers.Application.viewManualChanges()
 GET /viewChapter/:id       controllers.Application.viewChapter(id : Integer)
 
+GET /viewWeeklyReport/:date	controllers.Application.viewWeeklyReport(date : String)
+
+
 GET /addChapter			controllers.ApplicationEditing.addChapter()
 GET /editChapter/:id		controllers.ApplicationEditing.editChapter(id : Integer)
 POST /saveChapter	controllers.ApplicationEditing.saveChapter()
