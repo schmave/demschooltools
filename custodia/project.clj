@@ -5,8 +5,11 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [compojure "1.1.8"]
+                 [camel-snake-kebab "0.2.4"]
                  [ring/ring-jetty-adapter "1.2.2"]
                  [org.clojure/tools.nrepl "0.2.5"]
+                 [org.clojure/java.jdbc "0.3.5"]
+                 [postgresql "9.1-901-1.jdbc4"]
                  [environ "0.5.0"]]
 
   :min-lein-version "2.0.0"
