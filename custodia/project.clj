@@ -8,13 +8,13 @@
                  [camel-snake-kebab "0.2.4"]
                  [ring/ring-jetty-adapter "1.2.2"]
                  [org.clojure/tools.nrepl "0.2.5"]
-                 [org.clojure/java.jdbc "0.3.5"]
-                 [postgresql "9.1-901-1.jdbc4"]
+                 [sonian/carica "1.1.0" :exclusions [[cheshire]]]
+                 [com.ashafa/clutch "0.4.0"]
                  [environ "0.5.0"]]
-
   :min-lein-version "2.0.0"
   :main clojure-getting-started.web/-main
   :plugins [[cider/cider-nrepl "0.8.1"]
+            [lein-ring "0.7.0"]
             [environ/environ.lein "0.2.1"]]
   :hooks [environ.leiningen.hooks]
   :uberjar-name "clojure-getting-started-standalone.jar"

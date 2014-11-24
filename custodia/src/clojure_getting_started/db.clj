@@ -1,6 +1,11 @@
-(ns clojure-getting-started.db)
+(ns clojure-getting-started.db
+  (:require [carica.core :as c]))
 
-(def db (or (System/getenv "DATABASE_URL")
-            "postgresql://localhost:5432/shouter"
-            (System/getenv "HEROKU_POSTGRESQL_AMBER_URL")
-            "postgresql://localhost:5432/shouter"))
+(def db (assoc (cemerick.url/url (str "https://"
+                                      (c/config :db :user)
+                                      ".cloudant.com/")
+                                 (c/config :db :name))
+          :username (c/config :db :user)
+          :password (c/config :db :password)))
+
+
