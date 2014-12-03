@@ -14,14 +14,36 @@
 ;; (def i  (couch/put-document db/db {:test "test"}))
 ;; (couch/get-document db/db (:_id i))
 
+(defn make-db []
+  (couch/put-document db/db 
+                      {"_id" "_design/view"
+                       "views" {"students" {"map" "function(doc) {\n    if (doc.type === \"student\") {\n        emit(doc.id, doc);\n    }\n}"}}
+                       "language" "javascript"}))
+
 (defn make-student [name]
-  (couch/put-document db/db {:type :student }))
+  (couch/put-document db/db {:type :student :id 1 :name name}))
+
+(defn get-students
+  ([] (get-students nil))
+  ([ids]
+     (if ids
+       (couch/get-view db/db "view" "students" {:keys (if (coll? ids) ids [ids])})
+       (couch/get-view db/db "view" "students"))))
+
+;; (sample-db)
+(defn sample-db []
+  (couch/delete-database db/db)
+  (couch/create-database db/db)
+  (make-db)
+  (make-student "steve")
+  (swipe-in 1)
+  (swipe-out 1))
 
 (defn swipe-in [id]
-  (couch/put-document db/db {:type :swipe-in :id id :time (t/now)}))
+  (couch/put-document db/db {:type :swipe-in :id id :time (str (t/now))}))
 
-(defn swipe-in [id]
-  (couch/put-document db/db {:type :swipe-out :id id :time (t/now)}))
+(defn swipe-out [id]
+  (couch/put-document db/db {:type :swipe-out :id id :time (str (t/now))}))
 
 (defn splash []
   {:status 200
