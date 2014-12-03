@@ -14,8 +14,14 @@
 ;; (def i  (couch/put-document db/db {:test "test"}))
 ;; (couch/get-document db/db (:_id i))
 
+(defn make-student [name]
+  (couch/put-document db/db {:type :student }))
+
 (defn swipe-in [id]
-  (couch/put-document db/db {:type :swipe-in :time (t/now)}))
+  (couch/put-document db/db {:type :swipe-in :id id :time (t/now)}))
+
+(defn swipe-in [id]
+  (couch/put-document db/db {:type :swipe-out :id id :time (t/now)}))
 
 (defn splash []
   {:status 200
