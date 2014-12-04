@@ -14,12 +14,31 @@
 ;; (def i  (couch/put-document db/db {:test "test"}))
 ;; (couch/get-document db/db (:_id i))
 
-(defn make-db []
-  (couch/put-document db/db 
-                      {"_id" "_design/view"
-                       "views" {"students" {"map" "function(doc) {\n    if (doc.type === \"student\") {\n        emit(doc.id, doc);\n    }\n}"}}
-                       "language" "javascript"}))
+(def design-doc
+  {"_id" "_design/view"
+   "views" {"students" {"map" "function(doc) {
+                                 if (doc.type === \"student\") {
+                                   emit(doc.id, doc);
+                                 }
+                               }"}
+            "student-swipes" {"map"
+                              "function(doc) {
+                                if (doc.type == \"student\") {
+                                  map([doc._id, 0], doc);
+                                } else if (doc.type == \"swipe\") {
+                                  map([doc.post, 1], doc);
+                                }
+                              }"}
+            "swipes" {"map"
+                      "function(doc) {
+                         if (doc.type == \"swipe\") {
+                           emit(doc.id, doc);
+                         }
+                       }"}
+            }
+   "language" "javascript"})
 
+(defn make-db [] (couch/put-document db/db design-doc))
 (defn make-student [name]
   (couch/put-document db/db {:type :student :id 1 :name name}))
 
@@ -37,13 +56,15 @@
   (make-db)
   (make-student "steve")
   (swipe-in 1)
-  (swipe-out 1))
+  ;;(swipe-out 1)
+  )
 
 (defn swipe-in [id]
-  (couch/put-document db/db {:type :swipe-in :id id :time (str (t/now))}))
+  (couch/put-document db/db {:type :swipe :id id :in-time (str (t/now))}))
 
 (defn swipe-out [id]
-  (couch/put-document db/db {:type :swipe-out :id id :time (str (t/now))}))
+  ;;(couch/get-view "view" "swipes" {:keys [id]})
+  (couch/put-document db/db {:type :swipe :id id :time (str (t/now))}))
 
 (defn splash []
   {:status 200
