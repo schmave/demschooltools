@@ -8,9 +8,14 @@
             [ring.adapter.jetty :as jetty]
             [com.ashafa.clutch :as couch]
             [clojure-getting-started.db :as db]
+            [clj-time.core :as t]
             [environ.core :refer [env]]))
 
-(couch/put-document db/db {:test "test"})
+;; (def i  (couch/put-document db/db {:test "test"}))
+;; (couch/get-document db/db (:_id i))
+
+(defn swipe-in [id]
+  (couch/put-document db/db {:type :swipe-in :time (t/now)}))
 
 (defn splash []
   {:status 200
@@ -27,8 +32,3 @@
   (let [port (Integer. (or port (env :port) 5000))]
     (jetty/run-jetty (site #'app) {:port port :join? false})))
 
-;; For interactive development:
-;; (.stop server)
-;; (def server (-main))
-
-;; To push:  

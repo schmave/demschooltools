@@ -9,6 +9,7 @@
                  [ring/ring-jetty-adapter "1.2.2"]
                  [org.clojure/tools.nrepl "0.2.5"]
                  [sonian/carica "1.1.0" :exclusions [[cheshire]]]
+                 [clj-time "0.8.0"]
                  [com.ashafa/clutch "0.4.0"]
                  [environ "0.5.0"]]
   :min-lein-version "2.0.0"
