@@ -11,9 +11,6 @@
             [clj-time.core :as t]
             [environ.core :refer [env]]))
 
-;; (def i  (couch/put-document db/db {:test "test"}))
-;; (couch/get-document db/db (:_id i))
-
 (def design-doc
   {"_id" "_design/view"
    "views" {"students" {"map" "function(doc) {
@@ -56,15 +53,37 @@
   (make-db)
   (make-student "steve")
   (swipe-in 1)
-  ;;(swipe-out 1)
+  (swipe-in 2)
+  ;; (swipe-out 1)
+  ;; (get-students)
+  ;; (get-students)
   )
 
 (defn swipe-in [id]
   (couch/put-document db/db {:type :swipe :id id :in-time (str (t/now))}))
 
+(defn get-swipes [id]
+  (couch/get-view db/db "view" "swipes" {:keys [4]}))
+(defn- lookup-in-swipe [id]
+  (-> (get-swipes id)
+      last
+      :value))
+(defn swiped-in? [in-swipe] (and in-swipe (not (:out-time in-swipe))))
+(defn- ask-for-in-swipe [id] (swipe-in id))
+
 (defn swipe-out [id]
-  ;;(couch/get-view "view" "swipes" {:keys [id]})
-  (couch/put-document db/db {:type :swipe :id id :time (str (t/now))}))
+  (let [in-swipe (lookup-in-swipe id)]
+    (if (swiped-in? in-swipe)
+      (couch/put-document db/db (assoc in-swipe :out-time (str (t/now))))
+      (let [in-swipe (ask-for-in-swipe id)]
+        (couch/put-document db/db (assoc in-swipe :out-time (str (t/now))))))))
+
+;; (sample-db)
+;; (swipe-in 4)
+;; (swipe-out 4)
+;; (lookup-in-swipe 4)
+;; (get-swipes 4)
+
 
 (defn splash []
   {:status 200
