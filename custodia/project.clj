@@ -7,6 +7,8 @@
                  [compojure "1.1.8"]
                  [camel-snake-kebab "0.2.4"]
                  [ring/ring-jetty-adapter "1.2.2"]
+                 [enlive "1.1.5"]
+                 [hiccup "1.0.5"]
                  [org.clojure/tools.nrepl "0.2.5"]
                  [sonian/carica "1.1.0" :exclusions [[cheshire]]]
                  [clj-time "0.8.0"]
