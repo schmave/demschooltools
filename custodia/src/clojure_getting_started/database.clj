@@ -35,9 +35,10 @@
 (defn get-students
   ([] (get-students nil))
   ([ids]
-     (if ids
-       (couch/get-view db/db "view" "students" {:keys (if (coll? ids) ids [ids])})
-       (couch/get-view db/db "view" "students"))))
+     (map :value
+          (if ids
+            (couch/get-view db/db "view" "students" {:keys (if (coll? ids) ids [ids])})
+            (couch/get-view db/db "view" "students")))))
 
 (defn swipe-in [id]
   (couch/put-document db/db {:type :swipe :id id :in-time (str (t/now))}))

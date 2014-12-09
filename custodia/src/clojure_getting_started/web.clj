@@ -7,6 +7,7 @@
             [cider.nrepl :refer (cider-nrepl-handler)]
             [ring.adapter.jetty :as jetty]
             [ring.util.response :as resp]
+            [clojure.tools.trace :as trace]
             [com.ashafa.clutch :as couch]
             [clojure-getting-started.db :as db]
             [clojure-getting-started.database :as data]
@@ -24,6 +25,9 @@
 
 (defn main-form []
   (html/html [:div
+              [:div
+               [:ul
+                (map (fn [s] [:li (:name s)]) (data/get-students))]]
               [:a {:href "/student/create"} "Create Student"]]))
 
 (enlive/deftemplate main-template "index.html" [form]
@@ -32,7 +36,7 @@
 (defroutes app
   (GET "/" [] (apply str (main-template (main-form))))
   (GET "/student/create" [] (apply str (main-template create-student-form)))
-  (POST "/student/create" req (resp/redirect "/"))
+  (POST "/student/create" req () (resp/redirect "/"))
   (route/resources "/")
   (ANY "*" []
        (route/not-found (slurp (io/resource "404.html")))))
