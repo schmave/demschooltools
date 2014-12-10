@@ -7,7 +7,7 @@
   {"_id" "_design/view"
    "views" {"students" {"map" "function(doc) {
                                  if (doc.type === \"student\") {
-                                   emit(doc.id, doc);
+                                   emit(doc.name, doc);
                                  }
                                }"}
             "student-swipes" {"map"
@@ -27,24 +27,28 @@
             }
    "language" "javascript"})
 
-
 (defn make-db [] (couch/put-document db/db design-doc))
-(defn make-student [name]
-  (couch/put-document db/db {:type :student :id 1 :name name}))
+
 
 (defn get-students
   ([] (get-students nil))
-  ([ids]
+  ([names]
      (map :value
-          (if ids
-            (couch/get-view db/db "view" "students" {:keys (if (coll? ids) ids [ids])})
+          (if names
+            (couch/get-view db/db "view" "students" {:keys (if (coll? names) names [names])})
             (couch/get-view db/db "view" "students")))))
+
+(defn make-student [name]
+  (if (empty? (get-students name))
+    (couch/put-document db/db {:type :student :id 1 :name name})
+    :student-already-exists))
 
 (defn swipe-in [id]
   (couch/put-document db/db {:type :swipe :id id :in-time (str (t/now))}))
 
 (defn get-swipes [id]
   (couch/get-view db/db "view" "swipes" {:keys [id]}))
+
 (defn- lookup-in-swipe [id]
   (-> (get-swipes id)
       last
@@ -69,4 +73,5 @@
   ;; (swipe-out 1)
   ;; (get-students)
   ;; (get-students)
+  ;; (get-students "steve")
   )
