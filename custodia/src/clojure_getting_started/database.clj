@@ -29,22 +29,23 @@
 
 (defn make-db [] (couch/put-document db/db design-doc))
 
+(defn get-* [type ids]
+  (map :value
+       (if ids
+         (couch/get-view db/db "view" type {:keys (if (coll? ids) ids [ids])})
+         (couch/get-view db/db "view" type))))
 
 (defn get-students
-  ([] (get-students nil))
-  ([names]
-     (map :value
-          (if names
-            (couch/get-view db/db "view" "students" {:keys (if (coll? names) names [names])})
-            (couch/get-view db/db "view" "students")))))
+  ([]  (get-students nil))
+  ([ids] (get-* "students" ids)))
 
 (defn make-student [name]
   (if (empty? (get-students name))
-    (couch/put-document db/db {:type :student :id 1 :name name})
+    (couch/put-document db/db {:type :student :name name})
     :student-already-exists))
 
 (defn swipe-in [id]
-  (couch/put-document db/db {:type :swipe :id id :in-time (str (t/now))}))
+  (couch/put-document db/db {:type :swipe :student-id id :in-time (str (t/now))}))
 
 (defn get-swipes [id]
   (couch/get-view db/db "view" "swipes" {:keys [id]}))
@@ -68,8 +69,8 @@
   (couch/delete-database db/db)
   (couch/create-database db/db)
   (make-db)
-  ;; (make-student "steve")
-  ;; (swipe-in 1)
+  (let [s (:_id (make-student "steve"))]
+    (swipe-in s))
   ;; (swipe-out 1)
   ;; (get-students)
   ;; (get-students)

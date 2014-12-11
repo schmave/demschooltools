@@ -36,7 +36,9 @@
 (defroutes app
   (GET "/" [] (apply str (main-template (main-form))))
   (GET "/student/create" [] (apply str (main-template create-student-form)))
-  (POST "/student/create" req () (resp/redirect "/"))
+  (POST "/student/create" req
+        (let [made? (-> req :params :name data/make-student)]
+          (resp/redirect "/")))
   (route/resources "/")
   (ANY "*" []
        (route/not-found (slurp (io/resource "404.html")))))
