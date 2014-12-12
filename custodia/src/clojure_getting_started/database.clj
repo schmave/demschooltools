@@ -40,9 +40,8 @@
   ([ids] (get-* "students" ids)))
 
 (defn make-student [name]
-  (if (empty? (get-students name))
-    (couch/put-document db/db {:type :student :name name})
-    :student-already-exists))
+  (when (empty? (get-students name))
+    (couch/put-document db/db {:type :student :name name})))
 
 (defn swipe-in [id]
   (couch/put-document db/db {:type :swipe :student-id id :in-time (str (t/now))}))

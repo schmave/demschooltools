@@ -16,12 +16,14 @@
             [hiccup.core :as html]
             [environ.core :refer [env]]))
 
-(def create-student-form 
-  (html/html [:form {:method "POST" :action "/student/create" :role "form"}
-              [:div {:class "form-group"}
-               [:label {:for "s-name" :name "name"} "Name"]
-               [:input {:class "form-control" :id "s-name" :type "text" :name "name"}]]
-              [:button {:class "btn btn-default" :type "submit" :value "Create"}]]))
+(defn create-student-form [show-student-exists?] 
+  (html/html [:div [:form {:method "POST" :action "/student/create" :role "form"}
+                    [:div {:class "form-group"}
+                     [:label {:for "s-name" :name "name"} "Name"]
+                     [:input {:class "form-control" :id "s-name" :type "text" :name "name"}]]
+                    [:button {:class "btn btn-default" :type "submit" :value "Create"} "Create"]]
+              (when show-student-exists?
+                [:div "A student with that name already exists"])]))
 
 (defn main-form []
   (html/html [:div
@@ -31,14 +33,15 @@
               [:a {:href "/student/create"} "Create Student"]]))
 
 (enlive/deftemplate main-template "index.html" [form]
-  [:p.lead] (enlive/html-content form ))
+  [:p.lead] (enlive/html-content form))
 
 (defroutes app
   (GET "/" [] (apply str (main-template (main-form))))
-  (GET "/student/create" [] (apply str (main-template create-student-form)))
+  (GET "/student/create" [] (apply str (main-template (create-student-form false))))
   (POST "/student/create" req
-        (let [made? (-> req :params :name data/make-student)]
-          (resp/redirect "/")))
+        (if-let [made? (-> req :params :name data/make-student)]
+          (resp/redirect "/")
+          (apply str (main-template (create-student-form true)))))
   (route/resources "/")
   (ANY "*" []
        (route/not-found (slurp (io/resource "404.html")))))
