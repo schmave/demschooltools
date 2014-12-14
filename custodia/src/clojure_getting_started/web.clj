@@ -25,13 +25,18 @@
               (when show-student-exists?
                 [:div "A student with that name already exists"])]))
 
-(def swipe-form 
-  (html/html [:form {:method "POST" :action "/swipe/in" :role "form"}
-              [:div {:class "form-group"}
-               [:select {:name "_id"}
-                (map (fn [s] [:option {:value (:_id s)} (:name s)])
-                     (data/get-students))]]
-              [:button {:class "btn btn-default" :type "submit" :value "Swipe In"} "Swipe In"]]))
+(defn swipe-form []
+  (html/html [:div
+              [:div
+               [:ul (map (fn [s] [:li s])
+                          (map (comp data/get-swipes :_id)
+                               (data/get-students)))]]
+              [:form {:method "POST" :action "/swipe/in" :role "form"}
+               [:div {:class "form-group"}
+                [:select {:name "_id"}
+                 (map (fn [s] [:option {:value (:_id s)} (:name s)])
+                      (data/get-students))]]
+               [:button {:class "btn btn-default" :type "submit" :value "Swipe In"} "Swipe In"]]]))
 
 (defn main-form []
   (html/html [:div
@@ -44,17 +49,20 @@
 (enlive/deftemplate main-template "index.html" [form]
   [:p.lead] (enlive/html-content form))
 
+(defn render [p]
+  (apply str p))
+
 (defroutes app
-  (GET "/" [] (apply str (main-template (main-form))))
-  (GET "/swipe" [] (apply str (main-template swipe-form)))
+  (GET "/" [] (render (main-template (main-form))))
+  (GET "/swipe" [] (render (main-template (swipe-form))))
   (POST "/swipe/in" req
         (data/swipe-in (-> req :params :_id))
-        (apply str (main-template swipe-form)))
-  (GET "/student/create" [] (apply str (main-template (create-student-form false))))
+        (resp/redirect "/swipe"))
+  (GET "/student/create" [] (render (main-template (create-student-form false))))
   (POST "/student/create" req
         (if-let [made? (-> req :params :name data/make-student)]
           (resp/redirect "/")
-          (apply str (main-template (create-student-form true)))))
+          (render (main-template (create-student-form true)))))
   (route/resources "/")
   (ANY "*" []
        (route/not-found (slurp (io/resource "404.html")))))

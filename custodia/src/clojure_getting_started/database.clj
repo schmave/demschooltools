@@ -21,7 +21,7 @@
             "swipes" {"map"
                       "function(doc) {
                          if (doc.type == \"swipe\") {
-                           emit(doc.id, doc);
+                           emit(doc.student_id, doc);
                          }
                        }"}
             }
@@ -44,7 +44,7 @@
     (couch/put-document db/db {:type :student :name name})))
 
 (defn swipe-in [id]
-  (couch/put-document db/db {:type :swipe :student-id id :in-time (str (t/now))}))
+  (couch/put-document db/db {:type :swipe :student_id id :in_time (str (t/now))}))
 
 (defn get-swipes [id]
   (couch/get-view db/db "view" "swipes" {:keys [id]}))
@@ -53,17 +53,17 @@
   (-> (get-swipes id)
       last
       :value))
-(defn swiped-in? [in-swipe] (and in-swipe (not (:out-time in-swipe))))
+(defn swiped-in? [in-swipe] (and in-swipe (not (:out_time in-swipe))))
 (defn- ask-for-in-swipe [id] (swipe-in id))
 
 (defn swipe-out [id]
   (let [in-swipe (lookup-in-swipe id)]
     (if (swiped-in? in-swipe)
-      (couch/put-document db/db (assoc in-swipe :out-time (str (t/now))))
+      (couch/put-document db/db (assoc in-swipe :out_time (str (t/now))))
       (let [in-swipe (ask-for-in-swipe id)]
-        (couch/put-document db/db (assoc in-swipe :out-time (str (t/now))))))))
+        (couch/put-document db/db (assoc in-swipe :out_time (str (t/now))))))))
 
-;; (sample-db)
+;; (sample-db)   
 (defn sample-db []
   (couch/delete-database db/db)
   (couch/create-database db/db)
