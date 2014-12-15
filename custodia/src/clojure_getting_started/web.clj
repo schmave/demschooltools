@@ -27,6 +27,7 @@
 
 (defn swipe-form []
   (html/html [:div
+              [:div [:a {:href "/resetdb"} "reset database"]]
               [:div
                [:ul (map (comp (fn [s] [:li (str s)]) #(dissoc % :_id :_rev :type))
                          (mapcat (comp data/get-swipes :_id) (data/get-students)))]]
@@ -55,6 +56,7 @@
 (defroutes app
   (GET "/" [] (render (main-template (main-form))))
   (GET "/swipe" [] (render (main-template (swipe-form))))
+  (GET "/resetdb" [] (data/sample-db) (resp/redirect "/swipe"))
   (POST "/swipe" [direction _id]
         (if (= direction "in")
           (data/swipe-in _id)

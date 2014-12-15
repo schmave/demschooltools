@@ -63,7 +63,7 @@
   (let [last-swipe (lookup-last-swipe id)]
     (if (only-swiped-in? last-swipe)
       (couch/put-document db/db (assoc last-swipe :out_time (str (t/now))))
-      (let [in-swipe (ask-for-in-swipe id)]
+      #_(let [in-swipe (ask-for-in-swipe id)]
         (couch/put-document db/db (assoc in-swipe :out_time (str (t/now))))))))
 
 ;; (sample-db)   
@@ -71,8 +71,7 @@
   (couch/delete-database db/db)
   (couch/create-database db/db)
   (make-db)
-  (let [s (:_id (make-student "steve"))]
-    (swipe-in s))
+  (make-student "steve")
   ;; (swipe-out 1)
   ;; (get-students)
   ;; (get-students)
