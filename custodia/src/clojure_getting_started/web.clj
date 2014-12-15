@@ -25,12 +25,15 @@
               (when show-student-exists?
                 [:div "A student with that name already exists"])]))
 
-(defn swipe-form []
+(defn swipe-form [student-id]
   (html/html [:div
               [:div [:a {:href "/resetdb"} "reset database"]]
               [:div
-               [:ul (map (comp (fn [s] [:li (str s)]) #(dissoc % :_id :_rev :type))
-                         (mapcat (comp data/get-swipes :_id) (data/get-students)))]]
+               [:ul (-> student-id
+                        data/get-swipes
+                        #(dissoc % :_id :_rev :type)
+                        str
+                        [:li])]]
               [:form {:method "POST" :action "/swipe" :role "form"}
                [:div {:class "form-group"}
                 [:select {:name "_id"}
@@ -44,7 +47,9 @@
               [:a {:href "/swipe"} "Swipe page"]
               [:div
                [:ul
-                (map (fn [s] [:li (:name s)]) (data/get-students))]]
+                (map (fn [s] [:li [:a {:href (str "/swipe/" (:_id s))
+                                       :value (:name s)}]])
+                     (data/get-students))]]
               [:a {:href "/student/create"} "Create Student"]]))
 
 (enlive/deftemplate main-template "index.html" [form]
@@ -55,7 +60,7 @@
 
 (defroutes app
   (GET "/" [] (render (main-template (main-form))))
-  (GET "/swipe" [] (render (main-template (swipe-form))))
+  (GET "/swipe/:sid" [sid] (render (main-template (swipe-form sid))))
   (GET "/resetdb" [] (data/sample-db) (resp/redirect "/swipe"))
   (POST "/swipe" [direction _id]
         (if (= direction "in")
