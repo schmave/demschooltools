@@ -28,15 +28,15 @@
 (defn swipe-form []
   (html/html [:div
               [:div
-               [:ul (map (fn [s] [:li s])
-                          (map (comp data/get-swipes :_id)
-                               (data/get-students)))]]
-              [:form {:method "POST" :action "/swipe/in" :role "form"}
+               [:ul (map (comp (fn [s] [:li (str s)]) #(dissoc % :_id :_rev :type))
+                         (mapcat (comp data/get-swipes :_id) (data/get-students)))]]
+              [:form {:method "POST" :action "/swipe" :role "form"}
                [:div {:class "form-group"}
                 [:select {:name "_id"}
                  (map (fn [s] [:option {:value (:_id s)} (:name s)])
                       (data/get-students))]]
-               [:button {:class "btn btn-default" :type "submit" :value "Swipe In"} "Swipe In"]]]))
+               [:button {:class "btn btn-default" :type "submit" :name "direction" :value "out"} "Swipe Out"]
+               [:button {:class "btn btn-default" :type "submit" :name "direction" :value "in"} "Swipe In"]]]))
 
 (defn main-form []
   (html/html [:div
@@ -55,8 +55,10 @@
 (defroutes app
   (GET "/" [] (render (main-template (main-form))))
   (GET "/swipe" [] (render (main-template (swipe-form))))
-  (POST "/swipe/in" req
-        (data/swipe-in (-> req :params :_id))
+  (POST "/swipe" [direction _id]
+        (if (= direction "in")
+          (data/swipe-in _id)
+          (data/swipe-out _id))
         (resp/redirect "/swipe"))
   (GET "/student/create" [] (render (main-template (create-student-form false))))
   (POST "/student/create" req

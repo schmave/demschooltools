@@ -43,23 +43,26 @@
   (when (empty? (get-students name))
     (couch/put-document db/db {:type :student :name name})))
 
-(defn swipe-in [id]
-  (couch/put-document db/db {:type :swipe :student_id id :in_time (str (t/now))}))
+(defn get-swipes [ids]
+  (get-* "swipes" ids))
 
-(defn get-swipes [id]
-  (couch/get-view db/db "view" "swipes" {:keys [id]}))
-
-(defn- lookup-in-swipe [id]
+(defn- lookup-last-swipe [id]
   (-> (get-swipes id)
-      last
-      :value))
-(defn swiped-in? [in-swipe] (and in-swipe (not (:out_time in-swipe))))
+      last))
+
+(defn only-swiped-in? [in-swipe] (and in-swipe (not (:out_time in-swipe))))
 (defn- ask-for-in-swipe [id] (swipe-in id))
 
+(defn swipe-in [id]
+  (let [last-swipe (lookup-last-swipe id)]
+    (if (only-swiped-in? last-swipe)
+      (+ 1 1);; (ask-for-out-swipe)
+      (couch/put-document db/db {:type :swipe :student_id id :in_time (str (t/now))}))))
+
 (defn swipe-out [id]
-  (let [in-swipe (lookup-in-swipe id)]
-    (if (swiped-in? in-swipe)
-      (couch/put-document db/db (assoc in-swipe :out_time (str (t/now))))
+  (let [last-swipe (lookup-last-swipe id)]
+    (if (only-swiped-in? last-swipe)
+      (couch/put-document db/db (assoc last-swipe :out_time (str (t/now))))
       (let [in-swipe (ask-for-in-swipe id)]
         (couch/put-document db/db (assoc in-swipe :out_time (str (t/now))))))))
 
