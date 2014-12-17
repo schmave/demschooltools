@@ -51,20 +51,20 @@
       last))
 
 (defn only-swiped-in? [in-swipe] (and in-swipe (not (:out_time in-swipe))))
-(defn- ask-for-in-swipe [id] (swipe-in id))
 
 (defn swipe-in [id]
   (let [last-swipe (lookup-last-swipe id)]
     (if (only-swiped-in? last-swipe)
       (+ 1 1);; (ask-for-out-swipe)
       (couch/put-document db/db {:type :swipe :student_id id :in_time (str (t/now))}))))
+(defn- ask-for-in-swipe [id] (swipe-in id))
 
 (defn swipe-out [id]
   (let [last-swipe (lookup-last-swipe id)]
     (if (only-swiped-in? last-swipe)
       (couch/put-document db/db (assoc last-swipe :out_time (str (t/now))))
       #_(let [in-swipe (ask-for-in-swipe id)]
-        (couch/put-document db/db (assoc in-swipe :out_time (str (t/now))))))))
+          (couch/put-document db/db (assoc in-swipe :out_time (str (t/now))))))))
 
 ;; (sample-db)   
 (defn sample-db []

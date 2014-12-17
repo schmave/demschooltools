@@ -29,26 +29,18 @@
   (html/html [:div
               [:div [:a {:href "/resetdb"} "reset database"]]
               [:div
-               [:ul (-> student-id
-                        data/get-swipes
-                        #(dissoc % :_id :_rev :type)
-                        str
-                        [:li])]]
+               [:ul (map (comp (fn [x] [:li (str x)])
+                               #(dissoc % :_id :_rev :type))
+                         (data/get-swipes student-id))]]
               [:form {:method "POST" :action "/swipe" :role "form"}
-               [:div {:class "form-group"}
-                [:select {:name "_id"}
-                 (map (fn [s] [:option {:value (:_id s)} (:name s)])
-                      (data/get-students))]]
                [:button {:class "btn btn-default" :type "submit" :name "direction" :value "out"} "Swipe Out"]
                [:button {:class "btn btn-default" :type "submit" :name "direction" :value "in"} "Swipe In"]]]))
 
 (defn main-form []
   (html/html [:div
-              [:a {:href "/swipe"} "Swipe page"]
               [:div
                [:ul
-                (map (fn [s] [:li [:a {:href (str "/swipe/" (:_id s))
-                                       :value (:name s)}]])
+                (map (fn [s] [:li [:a {:href (str "/swipe/" (:_id s))} (:name s)]])
                      (data/get-students))]]
               [:a {:href "/student/create"} "Create Student"]]))
 
@@ -61,12 +53,12 @@
 (defroutes app
   (GET "/" [] (render (main-template (main-form))))
   (GET "/swipe/:sid" [sid] (render (main-template (swipe-form sid))))
-  (GET "/resetdb" [] (data/sample-db) (resp/redirect "/swipe"))
+  (GET "/resetdb" [] (data/sample-db) (resp/redirect "/"))
   (POST "/swipe" [direction _id]
         (if (= direction "in")
           (data/swipe-in _id)
           (data/swipe-out _id))
-        (resp/redirect "/swipe"))
+        (resp/redirect (str "/swipe/" _id)))
   (GET "/student/create" [] (render (main-template (create-student-form false))))
   (POST "/student/create" req
         (if-let [made? (-> req :params :name data/make-student)]
