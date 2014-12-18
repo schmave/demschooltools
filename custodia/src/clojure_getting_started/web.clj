@@ -52,13 +52,14 @@
 
 (defroutes app
   (GET "/" [] (render (main-template (main-form))))
-  (GET "/swipe/:sid" [sid] (render (main-template (swipe-form sid))))
+  (GET "/swipe/:sid" [sid] (data/get-swipes sid))
   (GET "/resetdb" [] (data/sample-db) (resp/redirect "/"))
   (POST "/swipe" [direction _id]
         (if (= direction "in")
           (data/swipe-in _id)
           (data/swipe-out _id))
         (resp/redirect (str "/swipe/" _id)))
+  (GET "/student/all" [] (data/get-students))
   (GET "/student/create" [] (render (main-template (create-student-form false))))
   (POST "/student/create" req
         (if-let [made? (-> req :params :name data/make-student)]
