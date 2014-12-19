@@ -10,6 +10,8 @@
                  [enlive "1.1.5"]
                  [hiccup "1.0.5"]
                  [org.clojure/tools.nrepl "0.2.5"]
+                 [org.clojure/data.json "0.2.5"]
+                 [ring/ring-json "0.3.1"]
                  [sonian/carica "1.1.0" :exclusions [[cheshire]]]
                  [clj-time "0.8.0"]
                  [com.ashafa/clutch "0.4.0"]

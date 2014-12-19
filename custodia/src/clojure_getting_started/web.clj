@@ -1,5 +1,6 @@
 (ns clojure-getting-started.web
   (:require [compojure.core :refer [defroutes GET PUT POST DELETE ANY]]
+            [ring.middleware.json :refer [wrap-json-response wrap-json-body]]
             [compojure.handler :refer [site]]
             [compojure.route :as route]
             [clojure.java.io :as io]
@@ -11,6 +12,8 @@
             [com.ashafa.clutch :as couch]
             [clojure-getting-started.db :as db]
             [clojure-getting-started.database :as data]
+            [clojure.data.json :as json]
+            [ring/ring-json "0.3.1"]
             [clj-time.core :as t]
             [net.cgrand.enlive-html :as enlive]
             [hiccup.core :as html]
@@ -69,8 +72,10 @@
   (ANY "*" []
        (route/not-found (slurp (io/resource "404.html")))))
 
+(def tapp (-> #'app wrap-json-body wrap-json-response))
+
 (defn -main [& [port]]
   (nrepl-server/start-server :port 7888 :handler cider-nrepl-handler)
   (let [port (Integer. (or port (env :port) 5000))]
-    (jetty/run-jetty (site #'app) {:port port :join? false})))
+    (jetty/run-jetty (site #'tapp) {:port port :join? false})))
 
