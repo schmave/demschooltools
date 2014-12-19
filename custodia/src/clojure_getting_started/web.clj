@@ -13,7 +13,6 @@
             [clojure-getting-started.db :as db]
             [clojure-getting-started.database :as data]
             [clojure.data.json :as json]
-            [ring/ring-json "0.3.1"]
             [clj-time.core :as t]
             [net.cgrand.enlive-html :as enlive]
             [hiccup.core :as html]
@@ -54,7 +53,7 @@
   (apply str p))
 
 (defroutes app
-  (GET "/" [] (render (main-template (main-form))))
+  (GET "/" [] (io/resource "index.html"))
   (GET "/swipe/:sid" [sid] (data/get-swipes sid))
   (GET "/resetdb" [] (data/sample-db) (resp/redirect "/"))
   (POST "/swipe" [direction _id]

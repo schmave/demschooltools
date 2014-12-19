@@ -33,15 +33,23 @@
         </div>
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="/">Home</a></li>
+            <li class="active"><a href="#" ng-click="">Home</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
     </nav>
     <div class="container">
       <div class="starter-template">
-        <h1>{{main.students}}</h1>
-        <p class="lead">Use this document as a way to quickly start any new project.<br> All you get is this text and a mostly barebones HTML document.</p>
+        <p class="lead" ng-show="screen=='home'">
+          <ul>
+            <li ng-repeat="student in students">
+              <button ng-click="showStudent(student)">{{student.name}}</button>
+            </li>
+          </ul>
+        </p>
+        <p class="lead" ng-show="screen=='student'">
+          Swipe in {{student}}
+        </p>
       </div>
     </div><!-- /.container -->
 
