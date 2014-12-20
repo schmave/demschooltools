@@ -9,6 +9,12 @@ angular.module('app').controller("MainController", function($scope, $http){
     $scope.showHome = function() {
         $scope.screen = "home";
     };
+    $scope.showCreate = function() {
+        $scope.screen = "create";
+    };
+    $scope.createStudent = function() {
+        $scope.screen = "home";
+    };
     $http.get('/student/all').
         success(function(data){
             var t = 1;
