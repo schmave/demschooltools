@@ -12,8 +12,18 @@ angular.module('app').controller("MainController", function($scope, $http){
     $scope.showCreate = function() {
         $scope.screen = "create";
     };
-    $scope.createStudent = function() {
-        $scope.screen = "home";
+    $scope.createStudent = function(name) {
+        $http.post('/student/create', {"name":name}).
+            success(function(data){
+                $scope.students = data.students;
+                if(data.made) {
+                    $scope.screen = "home";
+                    $scope.message = "";
+                    $scope.cstudent = "";
+                } else {
+                    $scope.message = "A student with that name already exists";
+                }
+            }). error(function(){});
     };
     $http.get('/student/all').
         success(function(data){

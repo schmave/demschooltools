@@ -1,6 +1,6 @@
 (ns clojure-getting-started.web
   (:require [compojure.core :refer [defroutes GET PUT POST DELETE ANY]]
-            [ring.middleware.json :refer [wrap-json-response wrap-json-body]]
+            [ring.middleware.json :refer [wrap-json-response wrap-json-body wrap-json-params]]
             [compojure.handler :refer [site]]
             [compojure.route :as route]
             [clojure.java.io :as io]
@@ -63,15 +63,14 @@
         (resp/redirect (str "/swipe/" _id)))
   (GET "/student/all" [] (data/get-students))
   (GET "/student/create" [] (render (main-template (create-student-form false))))
-  (POST "/student/create" req
-        (if-let [made? (-> req :params :name data/make-student)]
-          (resp/redirect "/")
-          (render (main-template (create-student-form true)))))
+  (POST "/student/create" [name]
+        (let [made? (data/make-student name)]
+          (resp/response {:made made? :students (data/get-students)})))
   (route/resources "/")
   (ANY "*" []
        (route/not-found (slurp (io/resource "404.html")))))
 
-(def tapp (-> #'app wrap-json-body wrap-json-response))
+(def tapp (-> #'app wrap-json-body wrap-json-params wrap-json-response))
 
 (defn -main [& [port]]
   (nrepl-server/start-server :port 7888 :handler cider-nrepl-handler)
