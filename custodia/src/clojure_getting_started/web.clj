@@ -60,12 +60,12 @@
         (if (= direction "in")
           (data/swipe-in _id)
           (data/swipe-out _id))
-        (resp/redirect (str "/swipe/" _id)))
+        (resp/response {:swipes (data/get-swipes _id)}))
   (GET "/student/all" [] (data/get-students))
   (GET "/student/create" [] (render (main-template (create-student-form false))))
   (POST "/student/create" [name]
         (let [made? (data/make-student name)]
-          (resp/response {:made made? :students (data/get-students)})))
+          {:made made? :students (data/get-students)}))
   (route/resources "/")
   (ANY "*" []
        (route/not-found (slurp (io/resource "404.html")))))

@@ -57,6 +57,7 @@
     (if (only-swiped-in? last-swipe)
       (+ 1 1);; (ask-for-out-swipe)
       (couch/put-document db/db {:type :swipe :student_id id :in_time (str (t/now))}))))
+
 (defn- ask-for-in-swipe [id] (swipe-in id))
 
 (defn swipe-out [id]

@@ -40,7 +40,7 @@
     </nav>
     <div class="container">
       <div class="starter-template">
-        <div class="lead" ng-show="screen ==='home'">
+        <div class="lead form-group" ng-show="screen ==='home'">
           <ul ng-show="screen ==='home'">
             <li ng-repeat="student in students">
               <button ng-click="showStudent(student)">{{student.name}}</button>
@@ -48,12 +48,20 @@
           </ul>
           <button ng-click="showCreate()">Create Student</button>
         </div>
-        <div class="lead" ng-show="screen === 'student'">
-          Swipe in {{student}}
+        <div class="lead form-group" ng-show="screen === 'student'">
+          <h1>{{student.name}}</h1>
+          <a type="href" ng-click="screen='home'">Back to student list</a>
+          <div>
+            <button ng-click="swipe('out', student._id)">Swipe Out</button>
+            <button ng-click="swipe('in', student._id)">Swipe In</button>
+          </div>
+          <ul>
+            <li ng-repeat="swipe in swipes">{{swipe}}</li>
+          </ul>
         </div>
         <div class="form-group"  ng-show="screen === 'create'">
           <label for="s-name" name="name">Name</label>
-          <input ng-model="cstudent" ng-change="message=''"class="form-control" id="s-name" type="text"></input>
+          <input ng-model="cstudent" ng-change="message=''"class="form-control" id="s-name" type="text" />
           <button ng-click="createStudent(cstudent)">Create</button>
           <div>{{message}}</div>
         </div>

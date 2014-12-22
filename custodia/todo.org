@@ -1,0 +1,10 @@
+* DONE Create student
+  CLOSED: [2014-12-23 Tue 12:03]
+* TODO Edit student
+* TODO Delete student
+* TODO swipe in 
+* TODO swipe outp
+* TODO get missing in swipe
+* TODO get missing out swipe
+* TODO view students attendence
+* TODO add date override for student
