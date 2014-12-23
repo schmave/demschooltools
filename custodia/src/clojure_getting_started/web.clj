@@ -54,13 +54,13 @@
 
 (defroutes app
   (GET "/" [] (io/resource "index.html"))
-  (GET "/swipe/:sid" [sid] (data/get-swipes sid))
+  (GET "/swipe/:sid" [sid] (data/get-attendance sid))
   (GET "/resetdb" [] (data/sample-db) (resp/redirect "/"))
   (POST "/swipe" [direction _id]
         (if (= direction "in")
           (data/swipe-in _id)
           (data/swipe-out _id))
-        (resp/response {:swipes (data/get-swipes _id)}))
+        (resp/response {:swipes (data/get-attendance _id)}))
   (GET "/student/all" [] (data/get-students))
   (GET "/student/create" [] (render (main-template (create-student-form false))))
   (POST "/student/create" [name]

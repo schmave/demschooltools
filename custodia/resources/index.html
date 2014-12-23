@@ -56,8 +56,23 @@
             <button ng-click="swipe('in', student._id)">Swipe In</button>
           </div>
           <ul>
-            <li ng-repeat="swipe in swipes">{{swipe}}</li>
+            <li ng-repeat="swipe in swipes">
+              {{swipe.day}} {{swipe.valid}}
+              <table class="table table-striped">
+                <tr>
+                  <th>In Time</th>
+                  <th>Out Time</th>
+                  <th>Minutes</th>
+                </tr>
+                <tr ng-repeat="s in swipe.swipes">
+                  <td>{{s.nice_in_time}}</td>
+                  <td>{{s.nice_out_time}}</td>
+                  <td>{{s.interval}}</td>
+                </tr>
+              </table>
+            </li>
           </ul>
+          <div> {{swipes}} </div> 
         </div>
         <div class="form-group"  ng-show="screen === 'create'">
           <label for="s-name" name="name">Name</label>
