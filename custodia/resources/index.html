@@ -34,6 +34,7 @@
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
             <li class="active"><a href="#" ng-click="showHome()">Home</a></li>
+            <li><a href="#" ng-click="showStudents()">Student Totals</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
@@ -49,36 +50,50 @@
           <button ng-click="showCreate()">Create Student</button>
         </div>
         <div class="lead form-group" ng-show="screen === 'student'">
-          <h1>{{student.name}}</h1>
+          <h1>{{student.name}}</h1> 
+          Attended: {{att.total_days}} - Absent: {{att.total_abs}}
           <a type="href" ng-click="screen='home'">Back to student list</a>
           <div>
             <button ng-click="swipe('out', student._id)">Swipe Out</button>
             <button ng-click="swipe('in', student._id)">Swipe In</button>
           </div>
           <ul>
-            <li ng-repeat="swipe in swipes">
-              {{swipe.day}} {{swipe.valid}}
-              <table class="table table-striped">
-                <tr>
-                  <th>In Time</th>
-                  <th>Out Time</th>
-                  <th>Minutes</th>
-                </tr>
-                <tr ng-repeat="s in swipe.swipes">
-                  <td>{{s.nice_in_time}}</td>
-                  <td>{{s.nice_out_time}}</td>
-                  <td>{{s.interval}}</td>
-                </tr>
-              </table>
+            <li ng-repeat="swipe in att.days" style="text-left">
+              <span style="width:50px" 
+                    ng-click="setDay(swipe)"
+                    ng-style="{'background':(swipe.valid)?'green':'red',
+                              'border-color':(swipe.day==current_day.day)?'black':'red'
+                              }">
+                {{swipe.day}} - {{swipe.total_mins}} 
+              </span>
             </li>
           </ul>
-          <div> {{swipes}} </div> 
+          <table class="table table-striped" ng-show="current_day">
+            <tr>
+              <th>In Time</th>
+              <th>Out Time</th>
+              <th>Minutes</th>
+            </tr>
+            <tr ng-repeat="s in current_day.swipes">
+              <td>{{s.nice_in_time}}</td>
+              <td>{{s.nice_out_time}}</td>
+              <td>{{s.interval}}</td>
+            </tr>
+          </table>
+          <!-- <div> {{swipes}} </div> -->
         </div>
         <div class="form-group"  ng-show="screen === 'create'">
           <label for="s-name" name="name">Name</label>
           <input ng-model="cstudent" ng-change="message=''"class="form-control" id="s-name" type="text" />
           <button ng-click="createStudent(cstudent)">Create</button>
           <div>{{message}}</div>
+        </div>
+        <div class="form-group"  ng-show="screen === 'student-totals'">
+          <ul>
+            <li ng-repeat="student in students">
+              {{student.name}} Attended: {{att.total_days}} - Absent: {{att.total_abs}}
+            </li>
+          </ul>
         </div>
       </div>
     </div><!-- /.container -->

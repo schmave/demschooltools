@@ -5,9 +5,7 @@ angular.module('app').controller("MainController", function($scope, $http){
     $scope.showStudent = function(s) {
         $scope.screen = "student";
         $scope.student = s;
-        $http.get('/swipe/' + s._id)
-            .success(function(data){$scope.swipes = data;})
-            .error(function(){});
+        $scope.att = s;
     };
     $scope.showHome = function() {
         $scope.screen = "home";
@@ -15,13 +13,17 @@ angular.module('app').controller("MainController", function($scope, $http){
     $scope.showCreate = function() {
         $scope.screen = "create";
     };
-    $scope.swipeOut = function() {
-        $scope.screen = "create";
+    $scope.showStudents = function() {
+        $scope.screen = "student-totals";
+    };
+    $scope.setDay = function(s) {
+        $scope.current_day = s;
     };
     $scope.swipe = function(direction, id) {
         $http.post('/swipe', {"_id":id, "direction": direction}).
             success(function(data){
-                $scope.swipes = data.swipes;
+                $scope.att = data;
+                $scope.current_day = undefined;
             }). error(function(){});
     };
     $scope.createStudent = function(name) {

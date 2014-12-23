@@ -18,51 +18,16 @@
             [hiccup.core :as html]
             [environ.core :refer [env]]))
 
-(defn create-student-form [show-student-exists?] 
-  (html/html [:div [:form {:method "POST" :action "/student/create" :role "form"}
-                    [:div {:class "form-group"}
-                     [:label {:for "s-name" :name "name"} "Name"]
-                     [:input {:class "form-control" :id "s-name" :type "text" :name "name"}]]
-                    [:button {:class "btn btn-default" :type "submit" :value "Create"} "Create"]]
-              (when show-student-exists?
-                [:div "A student with that name already exists"])]))
-
-(defn swipe-form [student-id]
-  (html/html [:div
-              [:div [:a {:href "/resetdb"} "reset database"]]
-              [:div
-               [:ul (map (comp (fn [x] [:li (str x)])
-                               #(dissoc % :_id :_rev :type))
-                         (data/get-swipes student-id))]]
-              [:form {:method "POST" :action "/swipe" :role "form"}
-               [:button {:class "btn btn-default" :type "submit" :name "direction" :value "out"} "Swipe Out"]
-               [:button {:class "btn btn-default" :type "submit" :name "direction" :value "in"} "Swipe In"]]]))
-
-(defn main-form []
-  (html/html [:div
-              [:div
-               [:ul
-                (map (fn [s] [:li [:a {:href (str "/swipe/" (:_id s))} (:name s)]])
-                     (data/get-students))]]
-              [:a {:href "/student/create"} "Create Student"]]))
-
-(enlive/deftemplate main-template "index.html" [form]
-  [:p.lead] (enlive/html-content form))
-
-(defn render [p]
-  (apply str p))
-
 (defroutes app
   (GET "/" [] (io/resource "index.html"))
-  (GET "/swipe/:sid" [sid] (data/get-attendance sid))
+  (GET "/swipe/:sid" [sid]  (resp/response (data/get-attendance sid)))
   (GET "/resetdb" [] (data/sample-db) (resp/redirect "/"))
   (POST "/swipe" [direction _id]
         (if (= direction "in")
           (data/swipe-in _id)
           (data/swipe-out _id))
-        (resp/response {:swipes (data/get-attendance _id)}))
+        (resp/response (data/get-attendance _id)))
   (GET "/student/all" [] (data/get-students))
-  (GET "/student/create" [] (render (main-template (create-student-form false))))
   (POST "/student/create" [name]
         (let [made? (data/make-student name)]
           {:made made? :students (data/get-students)}))

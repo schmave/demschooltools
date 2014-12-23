@@ -38,13 +38,6 @@
          (couch/get-view db/db "view" type {:keys (if (coll? ids) ids [ids])})
          (couch/get-view db/db "view" type))))
 
-(defn get-students
-  ([]  (get-students nil))
-  ([ids] (get-* "students" ids)))
-
-(defn make-student [name]
-  (when (empty? (get-students name))
-    (couch/put-document db/db {:type :student :name name})))
 
 (defn get-swipes [ids]
   (get-* "swipes" ids))
@@ -59,7 +52,8 @@
   (let [last-swipe (lookup-last-swipe id)]
     (if (only-swiped-in? last-swipe)
       (+ 1 1);; (ask-for-out-swipe)
-      (couch/put-document db/db {:type :swipe :student_id id :in_time (str (l/local-now))}))))
+      (couch/put-document db/db
+                          {:type :swipe :student_id id :in_time (str (l/local-now))}))))
 
 (defn- ask-for-in-swipe [id] (swipe-in id))
 
@@ -114,9 +108,20 @@
         swipes (map clean-dates swipes)
         grouped-swipes (group-by swipe-day swipes)
         summed-days (map #(append-validity min-hours %) grouped-swipes)]
-    summed-days))
-
+    {:total_days (count (filter :valid summed-days))
+     :total_abs (count (filter (comp not :valid) summed-days))
+     :days summed-days}))
 (get-attendance  "fa5a8a9cbef3dbb6b0bc2733ed00a7db")
+
+(defn get-students
+  ([]  (get-students nil))
+  ([ids]
+     (map #(merge (get-attendance (:_id %)) %)
+          (get-* "students" ids))))
+
+(defn make-student [name]
+  (when (empty? (get-students name))
+    (couch/put-document db/db {:type :student :name name})))
 
 ;; (sample-db)   
 (defn sample-db []
