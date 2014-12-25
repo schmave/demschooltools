@@ -5,7 +5,24 @@
             [clj-time.format :as f]
             [clj-time.local :as l]
             [clj-time.core :as t]
+            [clj-time.coerce :as c]
             ))
+
+(defn wrap-args-with-trace [[symb val]]
+  [symb (list `trace/trace (str "let-" symb) val)])
+(defmacro tracelet [args & body]
+  (let [arg-pairs (partition 2 args)
+        new-bindings (vec (mapcat wrap-args-with-trace arg-pairs))]
+    `(let ~new-bindings ~@body)))
+
+(defn ?assoc
+  "Same as assoc, but skip the assoc if v is nil"
+  [m & kvs]
+  (->> kvs
+       (partition 2)
+       (filter second)
+       (map vec)
+       (into m)))
 
 (def design-doc
   {"_id" "_design/view"
@@ -49,8 +66,8 @@
 
 (defn only-swiped-in? [in-swipe] (and in-swipe (not (:out_time in-swipe))))
 
-(defn swipe-in
-  ([id] (swipe-in (l/local-now)))
+(trace/deftrace swipe-in
+  ([id] (swipe-in id (t/now)))
   ([id time] 
      (let [last-swipe (lookup-last-swipe id)]
        (if (only-swiped-in? last-swipe)
@@ -61,7 +78,7 @@
 (defn- ask-for-in-swipe [id] (swipe-in id))
 
 (defn swipe-out
-  ([id] (swipe-out (l/local-now)))
+  ([id] (swipe-out id (t/now)))
   ([id time] (let [last-swipe (lookup-last-swipe id)]
                (if (only-swiped-in? last-swipe)
                  (couch/put-document db/db (assoc last-swipe :out_time (str time)))
@@ -75,13 +92,17 @@
 (def date-format (f/formatter "MM-dd-yyyy"))
 (def time-format (f/formatter "hh:mm:ss"))
 
+(trace/deftrace make-date-string [d]
+  (when d
+    (f/unparse-local date-format (c/to-local-date-time (f/parse d)))))
+(trace/deftrace make-time-string [d]
+  (when d
+    (f/unparse-local time-format (c/to-local-date-time (f/parse d)))))
+
 (defn clean-dates [swipe]
-  (let [in-ed (assoc swipe
-                :nice_in_time
-                (f/unparse-local time-format (f/parse-local (:in_time swipe))))]
-    (if (:out_time swipe)
-      (assoc in-ed :nice_out_time (f/unparse-local time-format (f/parse-local (:out_time swipe))))
-      in-ed)))
+  (?assoc swipe
+          :nice_in_time (make-time-string (:in_time swipe))
+          :nice_out_time (make-time-string (:out_time swipe))))
 
 ;; (get-attendance  "fa5a8a9cbef3dbb6b0bc2733ed00a7db")  
 (defn append-validity [min-hours swipes]
@@ -97,26 +118,29 @@
      :swipes (second swipes)}))
 
 (defn swipe-day [swipe]
-  (f/unparse-local date-format (f/parse-local (:in_time swipe))))
+  (make-date-string (:in_time swipe)))
 
 (defn append-interval [swipe]
   (if (:out_time swipe)
-    (let [int (t/interval (f/parse-local (:in_time swipe)) (f/parse-local (:out_time swipe)))
+    (let [int (t/interval (f/parse (:in_time swipe))
+                          (f/parse (:out_time swipe)))
           int-hours (t/in-minutes int)]
       (assoc swipe :interval int-hours))))
 
 (defn get-attendance [id]
-  (let [min-hours (get-hours-needed id)
-        swipes (get-swipes id)
-        swipes (map append-interval swipes)
-        swipes (map clean-dates swipes)
-        grouped-swipes (group-by swipe-day swipes)
-        summed-days (map #(append-validity min-hours %) grouped-swipes)]
-    {:total_days (count (filter :valid summed-days))
-     :total_abs (count (filter (comp not :valid) summed-days))
-     :days summed-days}))
+  (tracelet [min-hours (get-hours-needed id)
+             swipes (get-swipes id)
+             swipes (map append-interval swipes)
+             swipes (map clean-dates swipes)
+             grouped-swipes (group-by swipe-day swipes)
+             summed-days (map #(append-validity min-hours %) grouped-swipes)]
+            {:total_days (count (filter :valid summed-days))
+             :total_abs (count (filter (comp not :valid) summed-days))
+             :days summed-days}))
 
-;; (get-attendance  "fa5a8a9cbef3dbb6b0bc2733ed00a7db")
+(get-attendance  "d152dcfff8282f3ffa590d8f9a04717b")
+(swipe-in "d152dcfff8282f3ffa590d8f9a04717b")
+(swipe-out "d152dcfff8282f3ffa590d8f9a04717b")
 
 (defn get-students
   ([]  (get-students nil))

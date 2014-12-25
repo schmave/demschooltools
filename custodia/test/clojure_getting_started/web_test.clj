@@ -3,13 +3,14 @@
             [clj-time.format :as f]
             [clj-time.local :as l]
             [clj-time.core :as t]
+            [clj-time.coerce :as c]
             [clojure-getting-started.database :as db]))
 
 
-(def basetime (t/date-time 2014 10 14 9 9 27 246))
+(def basetime (t/local-date-time 2014 10 14 9 9 27 246))
 
 (comment
-  (run-tests 'clojure-getting-started.web-test)
+  (run-tests 'clojure-getting-started.web-test)  
   )  
 
 (deftest first-test
@@ -37,7 +38,7 @@
       (is (= (:total_days att) 3))
       (is (= (:total_abs att) 1))
       )
-    )
+    ) 
 
   )
 
