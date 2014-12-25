@@ -1,22 +1,44 @@
 (ns clojure-getting-started.web-test
   (:require [clojure.test :refer :all]
-            [clojure-getting-started.web :refer :all]))
+            [clj-time.format :as f]
+            [clj-time.local :as l]
+            [clj-time.core :as t]
+            [clojure-getting-started.database :as db]))
+
+
+(def basetime (t/date-time 2014 10 14 9 9 27 246))
 
 (comment
-  (run-tests 'clojure-getting-started.web-test)  
-  )
-
-(run-tests 'clojure-getting-started.web-test)  
+  (run-tests 'clojure-getting-started.web-test)
+  )  
 
 (deftest first-test
-  (sample-db)
-  (make-student "steve")
-  (swipe-in 1)
-  (swipe-out 1)
-  (let [swipes (get-swipes 1)]
-    (is 1 (count swipes))
-    (is true (not= nil (:swipe-out (first swipes)))))
+  (db/sample-db)  
+  (let [sid (-> "test" db/make-student :_id)]
+    ;; good today
+    (db/swipe-in sid basetime)
+    (db/swipe-out sid (t/plus basetime (t/hours 6)))
+
+    ;; good tomorrow
+    (db/swipe-in sid (t/plus basetime (t/days 1)))
+    (db/swipe-out sid (t/plus basetime (t/days 1) (t/hours 6)))
+
+    ;; short the next
+    (db/swipe-in sid (t/plus basetime (t/days 2)))
+    (db/swipe-out sid (t/plus basetime (t/days 2) (t/hours 4)))
+
+    ;; two short the next but long enough
+    (db/swipe-in sid (t/plus basetime (t/days 3)))
+    (db/swipe-out sid (t/plus basetime (t/days 3) (t/hours 4)))
+    (db/swipe-in sid (t/plus basetime (t/days 3)))
+    (db/swipe-out sid (t/plus basetime (t/days 3) (t/hours 3)))
+
+    (let [att (db/get-attendance sid)]
+      (is (= (:total_days att) 3))
+      (is (= (:total_abs att) 1))
+      )
+    )
+
   )
 
-#_(with-redefs [clj-time.core/now (fn [] "adf")]
-    (clj-time.core/now))
+(comment {:total_days 2, :total_abs 1, :days ({:valid true, :day "10-14-2014", :total_mins 360, :swipes [{:nice_out_time "03:09:27", :nice_in_time "09:09:27", :interval 360, :_id "d152dcfff8282f3ffa590d8f9a00fb4e", :_rev "2-0c6538f07be3e825f457a6c77c086ca4", :out_time "2014-10-14T15:09:27.246Z", :type "swipe", :student_id "d152dcfff8282f3ffa590d8f9a00f951", :in_time "2014-10-14T09:09:27.246Z"}]} {:valid true, :day "10-15-2014", :total_mins 360, :swipes [{:nice_out_time "03:09:27", :nice_in_time "09:09:27", :interval 360, :_id "d152dcfff8282f3ffa590d8f9a010780", :_rev "2-9b40bea0ef22868cadba5fb23bc26d80", :out_time "2014-10-15T15:09:27.246Z", :type "swipe", :student_id "d152dcfff8282f3ffa590d8f9a00f951", :in_time "2014-10-15T09:09:27.246Z"}]} {:valid false, :day "10-16-2014", :total_mins 240, :swipes [{:nice_out_time "01:09:27", :nice_in_time "09:09:27", :interval 240, :_id "d152dcfff8282f3ffa590d8f9a011101", :_rev "2-b438d5cb24cb92e5a3b411df19aea4c0", :out_time "2014-10-16T13:09:27.246Z", :type "swipe", :student_id "d152dcfff8282f3ffa590d8f9a00f951", :in_time "2014-10-16T09:09:27.246Z"}]})}) 

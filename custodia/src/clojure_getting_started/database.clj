@@ -4,7 +4,8 @@
             [clojure.tools.trace :as trace]
             [clj-time.format :as f]
             [clj-time.local :as l]
-            [clj-time.core :as t]))
+            [clj-time.core :as t]
+            ))
 
 (def design-doc
   {"_id" "_design/view"
@@ -48,21 +49,24 @@
 
 (defn only-swiped-in? [in-swipe] (and in-swipe (not (:out_time in-swipe))))
 
-(defn swipe-in [id]
-  (let [last-swipe (lookup-last-swipe id)]
-    (if (only-swiped-in? last-swipe)
-      (+ 1 1);; (ask-for-out-swipe)
-      (couch/put-document db/db
-                          {:type :swipe :student_id id :in_time (str (l/local-now))}))))
+(defn swipe-in
+  ([id] (swipe-in (l/local-now)))
+  ([id time] 
+     (let [last-swipe (lookup-last-swipe id)]
+       (if (only-swiped-in? last-swipe)
+         (+ 1 1);; (ask-for-out-swipe)
+         (couch/put-document db/db
+                             {:type :swipe :student_id id :in_time (str time)})))))
 
 (defn- ask-for-in-swipe [id] (swipe-in id))
 
-(defn swipe-out [id]
-  (let [last-swipe (lookup-last-swipe id)]
-    (if (only-swiped-in? last-swipe)
-      (couch/put-document db/db (assoc last-swipe :out_time (str (l/local-now))))
-      #_(let [in-swipe (ask-for-in-swipe id)]
-          (couch/put-document db/db (assoc in-swipe :out_time (str (l/local-now))))))))
+(defn swipe-out
+  ([id] (swipe-out (l/local-now)))
+  ([id time] (let [last-swipe (lookup-last-swipe id)]
+               (if (only-swiped-in? last-swipe)
+                 (couch/put-document db/db (assoc last-swipe :out_time (str time)))
+                 #_(let [in-swipe (ask-for-in-swipe id)]
+                     (couch/put-document db/db (assoc in-swipe :out_time (str time))))))))
 
 (defn get-hours-needed [id]
   ;; TODO implement this
@@ -74,9 +78,9 @@
 (defn clean-dates [swipe]
   (let [in-ed (assoc swipe
                 :nice_in_time
-                (f/unparse time-format (f/parse (:in_time swipe))))]
+                (f/unparse-local time-format (f/parse-local (:in_time swipe))))]
     (if (:out_time swipe)
-      (assoc in-ed :nice_out_time (f/unparse time-format (f/parse (:out_time swipe))))
+      (assoc in-ed :nice_out_time (f/unparse-local time-format (f/parse-local (:out_time swipe))))
       in-ed)))
 
 ;; (get-attendance  "fa5a8a9cbef3dbb6b0bc2733ed00a7db")  
@@ -93,11 +97,11 @@
      :swipes (second swipes)}))
 
 (defn swipe-day [swipe]
-  (f/unparse date-format (f/parse (:in_time swipe))))
+  (f/unparse-local date-format (f/parse-local (:in_time swipe))))
 
 (defn append-interval [swipe]
   (if (:out_time swipe)
-    (let [int (t/interval (f/parse (:in_time swipe)) (f/parse (:out_time swipe)))
+    (let [int (t/interval (f/parse-local (:in_time swipe)) (f/parse-local (:out_time swipe)))
           int-hours (t/in-minutes int)]
       (assoc swipe :interval int-hours))))
 
@@ -111,7 +115,8 @@
     {:total_days (count (filter :valid summed-days))
      :total_abs (count (filter (comp not :valid) summed-days))
      :days summed-days}))
-(get-attendance  "fa5a8a9cbef3dbb6b0bc2733ed00a7db")
+
+;; (get-attendance  "fa5a8a9cbef3dbb6b0bc2733ed00a7db")
 
 (defn get-students
   ([]  (get-students nil))
@@ -129,6 +134,7 @@
   (couch/create-database db/db)
   (make-db)
   (make-student "steve")
+  (make-student "jim")
   ;; (swipe-out 1)
   ;; (get-students)
   ;; (get-students)
