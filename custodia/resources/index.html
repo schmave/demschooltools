@@ -45,17 +45,18 @@
           <ul ng-show="screen ==='home'">
             <li ng-repeat="student in students">
               <button ng-click="showStudent(student)">{{student.name}}</button>
+              {{student}}
             </li>
           </ul>
           <button ng-click="showCreate()">Create Student</button>
         </div>
         <div class="lead form-group" ng-show="screen === 'student'">
-          <h1>{{student.name}}</h1> 
+          <h1>{{att.name}}</h1> 
           Attended: {{att.total_days}} - Absent: {{att.total_abs}}
           <a type="href" ng-click="screen='home'">Back to student list</a>
           <div>
-            <button ng-click="swipe('out', student._id)">Swipe Out</button>
-            <button ng-click="swipe('in', student._id)">Swipe In</button>
+            <button ng-click="swipe('out', att._id)">Swipe Out</button>
+            <button ng-click="swipe('in', att._id)">Swipe In</button>
           </div>
           <ul>
             <li ng-repeat="swipe in att.days" style="text-left">

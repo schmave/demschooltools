@@ -28,7 +28,7 @@
   {"_id" "_design/view"
    "views" {"students" {"map" "function(doc) {
                                  if (doc.type === \"student\") {
-                                   emit(doc.name, doc);
+                                   emit(doc._id, doc);
                                  }
                                }"}
             "student-swipes" {"map"
@@ -56,7 +56,6 @@
          (couch/get-view db/db "view" type {:keys (if (coll? ids) ids [ids])})
          (couch/get-view db/db "view" type))))
 
-
 (defn get-swipes [ids]
   (get-* "swipes" ids))
 
@@ -66,7 +65,7 @@
 
 (defn only-swiped-in? [in-swipe] (and in-swipe (not (:out_time in-swipe))))
 
-(trace/deftrace swipe-in
+(defn swipe-in
   ([id] (swipe-in id (t/now)))
   ([id time] 
      (let [last-swipe (lookup-last-swipe id)]
@@ -92,10 +91,10 @@
 (def date-format (f/formatter "MM-dd-yyyy"))
 (def time-format (f/formatter "hh:mm:ss"))
 
-(trace/deftrace make-date-string [d]
+(defn make-date-string [d]
   (when d
     (f/unparse-local date-format (c/to-local-date-time (f/parse d)))))
-(trace/deftrace make-time-string [d]
+(defn make-time-string [d]
   (when d
     (f/unparse-local time-format (c/to-local-date-time (f/parse d)))))
 
@@ -128,25 +127,23 @@
       (assoc swipe :interval int-hours))))
 
 (defn get-attendance [id]
-  (tracelet [min-hours (get-hours-needed id)
-             swipes (get-swipes id)
-             swipes (map append-interval swipes)
-             swipes (map clean-dates swipes)
-             grouped-swipes (group-by swipe-day swipes)
-             summed-days (map #(append-validity min-hours %) grouped-swipes)]
-            {:total_days (count (filter :valid summed-days))
-             :total_abs (count (filter (comp not :valid) summed-days))
-             :days summed-days}))
-
-(get-attendance  "d152dcfff8282f3ffa590d8f9a04717b")
-(swipe-in "d152dcfff8282f3ffa590d8f9a04717b")
-(swipe-out "d152dcfff8282f3ffa590d8f9a04717b")
+  (let [min-hours (get-hours-needed id)
+        swipes (get-swipes id)
+        swipes (map append-interval swipes)
+        swipes (map clean-dates swipes)
+        grouped-swipes (group-by swipe-day swipes)
+        summed-days (map #(append-validity min-hours %) grouped-swipes)]
+    {:total_days (count (filter :valid summed-days))
+     :total_abs (count (filter (comp not :valid) summed-days))
+     :days summed-days}))
 
 (defn get-students
-  ([]  (get-students nil))
+  ([] (get-students nil))
   ([ids]
      (map #(merge (get-attendance (:_id %)) %)
           (get-* "students" ids))))
+
+;; (get-swipes  "d152dcfff8282f3ffa590d8f9a05afc7")
 
 (defn make-student [name]
   (when (empty? (get-students name))

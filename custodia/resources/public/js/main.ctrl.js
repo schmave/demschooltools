@@ -1,11 +1,10 @@
 angular.module('app').controller("MainController", function($scope, $http){
     $scope.students = [];
     $scope.screen = "home";
-    $scope.student = null;
     $scope.showStudent = function(s) {
         $scope.screen = "student";
-        $scope.student = s;
         $scope.att = s;
+        $scope.current_day = s.days[0];
     };
     $scope.showHome = function() {
         $scope.screen = "home";
@@ -23,8 +22,9 @@ angular.module('app').controller("MainController", function($scope, $http){
         $http.post('/swipe', {"_id":id, "direction": direction}).
             success(function(data){
                 $scope.att = data;
-                $scope.current_day = undefined;
+                $scope.current_day = data.days[0];
             }). error(function(){});
+        $scope.getStudents();
     };
     $scope.createStudent = function(name) {
         $http.post('/student/create', {"name":name}).
@@ -39,9 +39,11 @@ angular.module('app').controller("MainController", function($scope, $http){
                 }
             }). error(function(){});
     };
-    $http.get('/student/all').
-        success(function(data){
-            var t = 1;
-            $scope.students = data;
-        }). error(function(){});
+    $scope.getStudents = function() {
+        $http.get('/student/all').
+            success(function(data){
+                $scope.students = data;
+            }). error(function(){});
+    };
+    $scope.getStudents();
 });

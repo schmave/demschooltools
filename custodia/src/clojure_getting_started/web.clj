@@ -26,7 +26,7 @@
         (if (= direction "in")
           (data/swipe-in _id)
           (data/swipe-out _id))
-        (resp/response (data/get-attendance _id)))
+        (resp/response (first (data/get-students [_id]))))
   (GET "/student/all" [] (data/get-students))
   (POST "/student/create" [name]
         (let [made? (data/make-student name)]
