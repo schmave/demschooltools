@@ -1,28 +1,13 @@
 (ns clojure-getting-started.database
   (:require [com.ashafa.clutch :as couch]
             [clojure-getting-started.db :as db]
+            [clojure-getting-started.helpers :refer :all]
             [clojure.tools.trace :as trace]
             [clj-time.format :as f]
             [clj-time.local :as l]
             [clj-time.core :as t]
             [clj-time.coerce :as c]
             ))
-
-(defn wrap-args-with-trace [[symb val]]
-  [symb (list `trace/trace (str "let-" symb) val)])
-(defmacro tracelet [args & body]
-  (let [arg-pairs (partition 2 args)
-        new-bindings (vec (mapcat wrap-args-with-trace arg-pairs))]
-    `(let ~new-bindings ~@body)))
-
-(defn ?assoc
-  "Same as assoc, but skip the assoc if v is nil"
-  [m & kvs]
-  (->> kvs
-       (partition 2)
-       (filter second)
-       (map vec)
-       (into m)))
 
 (def design-doc
   {"_id" "_design/view"
@@ -90,13 +75,17 @@
 
 (def date-format (f/formatter "MM-dd-yyyy"))
 (def time-format (f/formatter "hh:mm:ss"))
+;; TODO make this configurable?
+(def local-time-zone-id (t/time-zone-for-id "America/New_York"))
+
+(defn format-to-local [d f]
+  (f/unparse (f/with-zone f local-time-zone-id)
+             (f/parse d)))
 
 (defn make-date-string [d]
-  (when d
-    (f/unparse-local date-format (c/to-local-date-time (f/parse d)))))
+  (when d (format-to-local d date-format)))
 (defn make-time-string [d]
-  (when d
-    (f/unparse-local time-format (c/to-local-date-time (f/parse d)))))
+  (when d (format-to-local d time-format)))
 
 (defn clean-dates [swipe]
   (?assoc swipe

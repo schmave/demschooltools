@@ -12,3 +12,6 @@
 * TODO add date override for student
 * TODO mark student "older"
 * TODO sign in for admin/swipes
+* TODO reverse list of dates
+* TODO fix swipe in date nil
+* TODO fix utc date issue showing up wrong timezone
