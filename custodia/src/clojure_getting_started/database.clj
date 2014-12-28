@@ -132,10 +132,11 @@
      (map #(merge (get-attendance (:_id %)) %)
           (get-* "students" ids))))
 
-;; (get-swipes  "d152dcfff8282f3ffa590d8f9a05afc7")
+(defn student-not-yet-created [name]
+  (empty? (filter #(= name (:name %)) (get-students))))
 
 (defn make-student [name]
-  (when (empty? (get-students name))
+  (when (student-not-yet-created name)
     (couch/put-document db/db {:type :student :name name})))
 
 ;; (sample-db)   

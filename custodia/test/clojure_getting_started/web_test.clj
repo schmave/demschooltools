@@ -7,10 +7,6 @@
             [clojure.tools.trace :as trace]
             [clojure-getting-started.database :as db]))
 
-
-;; 14 hours in UTC is 9 Am here
-(def basetime (t/date-time 2014 10 14 14 9 27 246))
-
 (comment
   (run-tests 'clojure-getting-started.web-test)  
   )  
@@ -22,10 +18,9 @@
   (is (= (db/make-time-string "2014-12-28T14:32:12.509Z")
          "09:32:12")))
 
-(deftest swipe-attendence-test
-  (db/sample-db)  
-  (let [sid (-> "test" db/make-student :_id)]
-    ;; good today
+(defn add-swipes [sid]
+  ;; 14 hours in UTC is 9 Am here
+  (let [basetime (t/date-time 2014 10 14 14 9 27 246)]
     (db/swipe-in sid basetime)
     (db/swipe-out sid (t/plus basetime (t/hours 6)))
 
@@ -41,8 +36,13 @@
     (db/swipe-in sid (t/plus basetime (t/days 3)))
     (db/swipe-out sid (t/plus basetime (t/days 3) (t/hours 4)))
     (db/swipe-in sid (t/plus basetime (t/days 3)))
-    (db/swipe-out sid (t/plus basetime (t/days 3) (t/hours 3)))
+    (db/swipe-out sid (t/plus basetime (t/days 3) (t/hours 3)))))
 
+(deftest swipe-attendence-test
+  (db/sample-db)  
+  (let [sid (-> "test" db/make-student :_id)]
+    ;; good today
+    (add-swipes sid)
     (let [att (db/get-attendance sid)]
       (testing "Total Valid Day Count"
         (is (= (:total_days att)

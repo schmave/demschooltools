@@ -42,13 +42,13 @@
     <div class="container">
       <div class="starter-template">
         <div class="lead form-group" ng-show="screen ==='home'">
+          <button ng-click="showCreate()">Create Student</button>
           <ul ng-show="screen ==='home'">
             <li ng-repeat="student in students">
               <button ng-click="showStudent(student)">{{student.name}}</button>
-              {{student}}
+              <!-- {{student}} -->
             </li>
           </ul>
-          <button ng-click="showCreate()">Create Student</button>
         </div>
         <div class="lead form-group" ng-show="screen === 'student'">
           <h1>{{att.name}}</h1> 

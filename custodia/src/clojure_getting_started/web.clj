@@ -30,7 +30,7 @@
   (GET "/student/all" [] (data/get-students))
   (POST "/student/create" [name]
         (let [made? (data/make-student name)]
-          {:made made? :students (data/get-students)}))
+          (resp/response {:made made? :students (data/get-students)})))
   (route/resources "/")
   (ANY "*" []
        (route/not-found (slurp (io/resource "404.html")))))
