@@ -113,18 +113,19 @@
     (let [int (t/interval (f/parse (:in_time swipe))
                           (f/parse (:out_time swipe)))
           int-hours (t/in-minutes int)]
-      (assoc swipe :interval int-hours))))
+      (assoc swipe :interval int-hours))
+    swipe))
 
 (defn get-attendance [id]
-  (let [min-hours (get-hours-needed id)
-        swipes (get-swipes id)
-        swipes (map append-interval swipes)
-        swipes (map clean-dates swipes)
-        grouped-swipes (group-by swipe-day swipes)
-        summed-days (map #(append-validity min-hours %) grouped-swipes)]
-    {:total_days (count (filter :valid summed-days))
-     :total_abs (count (filter (comp not :valid) summed-days))
-     :days summed-days}))
+  (tracelet [min-hours (get-hours-needed id)
+             swipes (get-swipes id)
+             swipes (map append-interval swipes)
+             swipes (map clean-dates swipes)
+             grouped-swipes (group-by swipe-day swipes)
+             summed-days (map #(append-validity min-hours %) grouped-swipes)]
+            {:total_days (count (filter :valid summed-days))
+             :total_abs (count (filter (comp not :valid) summed-days))
+             :days summed-days}))
 
 (defn get-students
   ([] (get-students nil))

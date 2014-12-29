@@ -60,12 +60,16 @@
           </div>
           <ul>
             <li ng-repeat="swipe in att.days" style="text-left">
-              <span style="width:50px" 
-                    ng-click="setDay(swipe)"
-                    ng-style="{'background':(swipe.valid)?'green':'red',
-                              'border-color':(swipe.day==current_day.day)?'black':'red'}">
-                {{swipe.day}} - {{swipe.total_mins}} 
-              </span>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" ng-checked="(swipe.valid)" disabled>
+                  <span style="width:50px" 
+                        ng-click="setDay(swipe)"
+                        ng-style="{'border':(swipe.day==current_day.day)?'1px solid black':''}">
+                    {{swipe.day}} - {{swipe.total_mins}} minutes
+                  </span>
+                </label>
+              </div>
             </li>
           </ul>
           <table class="table table-striped" ng-show="current_day">
@@ -80,7 +84,7 @@
               <td>{{s.interval}}</td>
             </tr>
           </table>
-          <div> {{att}} </div>
+          <!-- <div> {{att}} </div> -->
         </div>
         <div class="form-group"  ng-show="screen === 'create'">
           <label for="s-name" name="name">Name</label>

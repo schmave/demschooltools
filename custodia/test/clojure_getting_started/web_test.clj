@@ -35,8 +35,8 @@
     ;; two short the next but long enough
     (db/swipe-in sid (t/plus basetime (t/days 3)))
     (db/swipe-out sid (t/plus basetime (t/days 3) (t/hours 4)))
-    (db/swipe-in sid (t/plus basetime (t/days 3)))
-    (db/swipe-out sid (t/plus basetime (t/days 3) (t/hours 3)))))
+    (db/swipe-in sid (t/plus basetime (t/days 3) (t/hours 5)))
+    (db/swipe-out sid (t/plus basetime (t/days 3) (t/hours 7)))))
 
 (deftest swipe-attendence-test
   (db/sample-db)  
@@ -56,6 +56,20 @@
       (testing "Nice time shown correctly"
         (is (= (-> att :days first :swipes first :nice_in_time)
                "09:09:27")))
+      )) 
+  )
+
+(deftest swipe-attendence-shows-only-when-in
+  (db/sample-db)  
+  (let [sid (-> "test" db/make-student :_id)]
+    ;; good today
+    (let [basetime (t/date-time 2014 10 14 14 9 27 246)]
+      (db/swipe-in sid basetime))
+    (trace/trace sid)
+    (let [att (db/get-attendance sid)]
+      (testing "Total Valid Day Count"
+        (is (= (-> att :days first :day)
+               "10-14-2014")))
       )) 
   )
 
