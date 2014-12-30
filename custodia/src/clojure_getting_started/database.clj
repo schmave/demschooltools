@@ -125,7 +125,7 @@
              summed-days (map #(append-validity min-hours %) grouped-swipes)]
             {:total_days (count (filter :valid summed-days))
              :total_abs (count (filter (comp not :valid) summed-days))
-             :days summed-days}))
+             :days (reverse summed-days)}))
 
 (defn get-students
   ([] (get-students nil))

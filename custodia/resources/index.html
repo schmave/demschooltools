@@ -52,38 +52,42 @@
         </div>
         <div class="lead form-group" ng-show="screen === 'student'">
           <h1>{{att.name}}</h1> 
-          Attended: {{att.total_days}} - Absent: {{att.total_abs}}
-          <a type="href" ng-click="screen='home'">Back to student list</a>
-          <div>
+          <div class="col-md-12">
+            Attended: {{att.total_days}} - Absent: {{att.total_abs}}
+            <a type="href" ng-click="screen='home'">Back to student list</a>
+          </div>
+          <div class="col-md-6">
             <button ng-click="swipe('out', att._id)">Swipe Out</button>
             <button ng-click="swipe('in', att._id)">Swipe In</button>
+            <ul>
+              <li ng-repeat="swipe in att.days" style="text-left">
+                <div class="checkbox">
+                  <label>
+                    <input type="checkbox" ng-checked="(swipe.valid)" disabled>
+                    <span style="width:50px" 
+                          ng-click="setDay(swipe)"
+                          ng-style="{'border':(swipe.day==current_day.day)?'1px solid black':''}">
+                      {{swipe.day}} - {{swipe.total_mins}} minutes
+                    </span>
+                  </label>
+                </div>
+              </li>
+            </ul>
           </div>
-          <ul>
-            <li ng-repeat="swipe in att.days" style="text-left">
-              <div class="checkbox">
-                <label>
-                  <input type="checkbox" ng-checked="(swipe.valid)" disabled>
-                  <span style="width:50px" 
-                        ng-click="setDay(swipe)"
-                        ng-style="{'border':(swipe.day==current_day.day)?'1px solid black':''}">
-                    {{swipe.day}} - {{swipe.total_mins}} minutes
-                  </span>
-                </label>
-              </div>
-            </li>
-          </ul>
-          <table class="table table-striped" ng-show="current_day">
-            <tr>
-              <th>In Time</th>
-              <th>Out Time</th>
-              <th>Minutes</th>
-            </tr>
-            <tr ng-repeat="s in current_day.swipes">
-              <td>{{s.nice_in_time}}</td>
-              <td>{{s.nice_out_time}}</td>
-              <td>{{s.interval}}</td>
-            </tr>
-          </table>
+          <div class="col-md-6">
+            <table class="table table-striped" ng-show="current_day">
+              <tr>
+                <th>In Time</th>
+                <th>Out Time</th>
+                <th>Minutes</th>
+              </tr>
+              <tr ng-repeat="s in current_day.swipes">
+                <td>{{s.nice_in_time}}</td>
+                <td>{{s.nice_out_time}}</td>
+                <td>{{s.interval}}</td>
+              </tr>
+            </table>
+          </div>
           <!-- <div> {{att}} </div> -->
         </div>
         <div class="form-group"  ng-show="screen === 'create'">
