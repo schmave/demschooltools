@@ -8,10 +8,15 @@
   CLOSED: [2014-12-23 Tue 12:31]
 * TODO get missing in swipe
 * TODO get missing out swipe
-* TODO view students attendence
+* DONE view students attendence
+  CLOSED: [2015-01-03 Sat 09:51]
 * TODO add date override for student
 * TODO mark student "older"
 * TODO sign in for admin/swipes
-* TODO reverse list of dates
-* TODO fix swipe in date nil
-* TODO fix utc date issue showing up wrong timezone
+* DONE reverse list of dates
+  CLOSED: [2015-01-03 Sat 09:52]
+* DONE fix swipe in date nil
+  CLOSED: [2015-01-03 Sat 09:52]
+* DONE fix utc date issue showing up wrong timezone
+  CLOSED: [2015-01-03 Sat 10:52]
+* TODO Make school year to show totals

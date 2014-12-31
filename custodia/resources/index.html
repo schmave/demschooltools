@@ -19,7 +19,6 @@
         <![endif]-->
   </head>
   <body ng-app="app" ng-controller="MainController as main">
-
     <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
       <div class="container">
         <div class="navbar-header">
@@ -99,7 +98,7 @@
         <div class="form-group"  ng-show="screen === 'student-totals'">
           <ul>
             <li ng-repeat="student in students">
-              {{student.name}} Attended: {{att.total_days}} - Absent: {{att.total_abs}}
+              {{student.name}} Attended: {{student.total_days}} - Absent: {{student.total_abs}}
             </li>
           </ul>
         </div>

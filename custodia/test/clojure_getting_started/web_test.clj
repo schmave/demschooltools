@@ -8,7 +8,7 @@
             [clojure-getting-started.database :as db]))
 
 (comment
-  (run-tests 'clojure-getting-started.web-test)  
+  (run-tests 'clojure-getting-started.web-test) 
   )  
 
 (deftest date-stuff
@@ -52,10 +52,11 @@
                1)))
       (testing "Days sorted correctly"
         (is (= (-> att :days first :day)
-               "10-14-2014")))
+               "10-17-2014")))
       (testing "Nice time shown correctly"
         (is (= (-> att :days first :swipes first :nice_in_time)
-               "09:09:27")))
+               ;; shown as hour 10 because that was DST forward +1
+               "10:09:27")))
       )) 
   )
 
