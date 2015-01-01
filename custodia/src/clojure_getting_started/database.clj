@@ -9,32 +9,6 @@
             [clj-time.coerce :as c]
             ))
 
-(def design-doc
-  {"_id" "_design/view"
-   "views" {"students" {"map" "function(doc) {
-                                 if (doc.type === \"student\") {
-                                   emit(doc._id, doc);
-                                 }
-                               }"}
-            "student-swipes" {"map"
-                              "function(doc) {
-                                if (doc.type == \"student\") {
-                                  map([doc._id, 0], doc);
-                                } else if (doc.type == \"swipe\") {
-                                  map([doc.post, 1], doc);
-                                }
-                              }"}
-            "swipes" {"map"
-                      "function(doc) {
-                         if (doc.type == \"swipe\") {
-                           emit(doc.student_id, doc);
-                         }
-                       }"}
-            }
-   "language" "javascript"})
-
-(defn make-db [] (couch/put-document db/db design-doc))
-
 (defn get-* [type ids]
   (map :value
        (if ids
@@ -43,6 +17,9 @@
 
 (defn get-swipes [ids]
   (get-* "swipes" ids))
+
+(defn get-overrides [ids]
+  (get-* "overrides" ids))
 
 (defn- lookup-last-swipe [id]
   (-> (get-swipes id)
@@ -82,8 +59,12 @@
   (f/unparse (f/with-zone f local-time-zone-id)
              (f/parse d)))
 
+(defn parse-date-string [d]
+  (f/parse date-format d))
+
 (defn make-date-string [d]
   (when d (format-to-local d date-format)))
+
 (defn make-time-string [d]
   (when d (format-to-local d time-format)))
 
@@ -94,19 +75,28 @@
 
 ;; (get-attendance  "fa5a8a9cbef3dbb6b0bc2733ed00a7db")  
 (defn append-validity [min-hours swipes]
-  (let [int-mins (->> swipes
+  (let [has-override? (->> swipes
+                           second
+                           (filter #(= (:type %) "override"))
+                           not-empty
+                           boolean)
+        int-mins (->> swipes
                       second
                       (map (comp :interval))
                       (filter (comp not nil?))
                       (reduce +))
         int-hours (/ int-mins 60)]
-    {:valid (> int-hours min-hours)
+    {:valid (or has-override? (> int-hours min-hours))
+     :override has-override?
      :day (first swipes)
      :total_mins int-mins
      :swipes (second swipes)}))
 
+;; TODO - make multimethod on type
 (defn swipe-day [swipe]
-  (make-date-string (:in_time swipe)))
+  (if (:in_time swipe)
+    (make-date-string (:in_time swipe))
+    (:date swipe)))
 
 (defn append-interval [swipe]
   (if (:out_time swipe)
@@ -121,11 +111,18 @@
         swipes (get-swipes id)
         swipes (map append-interval swipes)
         swipes (map clean-dates swipes)
+        swipes (concat swipes (get-overrides id))
         grouped-swipes (group-by swipe-day swipes)
         summed-days (map #(append-validity min-hours %) grouped-swipes)]
     {:total_days (count (filter :valid summed-days))
      :total_abs (count (filter (comp not :valid) summed-days))
      :days (reverse summed-days)}))
+
+(defn override-date [id date-string]
+  (->> {:type :override
+        :student_id id
+        :date date-string}
+       (couch/put-document db/db)))
 
 (defn get-students
   ([] (get-students nil))
@@ -144,7 +141,7 @@
 (defn sample-db []
   (couch/delete-database db/db)
   (couch/create-database db/db)
-  (make-db)
+  (db/make-db)
   (make-student "steve")
   (make-student "jim")
   ;; (swipe-out 1)

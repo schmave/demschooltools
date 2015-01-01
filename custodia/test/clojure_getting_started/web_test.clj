@@ -32,27 +32,55 @@
     (db/swipe-in sid (t/plus basetime (t/days 2)))
     (db/swipe-out sid (t/plus basetime (t/days 2) (t/hours 4)))
 
+
     ;; two short the next but long enough
     (db/swipe-in sid (t/plus basetime (t/days 3)))
     (db/swipe-out sid (t/plus basetime (t/days 3) (t/hours 4)))
     (db/swipe-in sid (t/plus basetime (t/days 3) (t/hours 5)))
-    (db/swipe-out sid (t/plus basetime (t/days 3) (t/hours 7)))))
+    (db/swipe-out sid (t/plus basetime (t/days 3) (t/hours 7)))
+
+    ;; short the next - 10-18-2014
+    (db/swipe-in sid (t/plus basetime (t/days 4)))
+    (db/swipe-out sid (t/plus basetime (t/days 4) (t/hours 4)))
+    ))
+
+(deftest swipe-attendence-override-test
+  (db/sample-db)  
+  (let [sid (-> "test" db/make-student :_id)]
+    (let [basetime (t/date-time 2014 10 14 14 9 27 246)]
+      (db/swipe-in sid basetime)
+      (db/swipe-out sid (t/plus basetime (t/hours 4)))
+      )
+    (db/override-date sid "10-14-2014")
+    (let [att (db/get-attendance sid)]
+      (testing "Total Valid Day Count"
+        (is (= (:total_days att)
+               1)))
+      (testing "Total Abs Count"
+        (is (= (:total_abs att)
+               0)))
+      (testing "Override"
+        (is (= (-> att :days first :override)
+               true)))
+      )) 
+  )
 
 (deftest swipe-attendence-test
   (db/sample-db)  
   (let [sid (-> "test" db/make-student :_id)]
     ;; good today
     (add-swipes sid)
+    (db/override-date sid "10-18-2014")
     (let [att (db/get-attendance sid)]
       (testing "Total Valid Day Count"
         (is (= (:total_days att)
-               3)))
+               4)))
       (testing "Total Abs Count"
         (is (= (:total_abs att)
                1)))
       (testing "Days sorted correctly"
         (is (= (-> att :days first :day)
-               "10-17-2014")))
+               "10-18-2014")))
       (testing "Nice time shown correctly"
         (is (= (-> att :days first :swipes first :nice_in_time)
                ;; shown as hour 10 because that was DST forward +1
