@@ -52,7 +52,7 @@
         <div class="lead form-group" ng-show="screen === 'student'">
           <h1>{{att.name}}</h1> 
           <div class="col-md-12">
-            Attended: {{att.total_days}} - Absent: {{att.total_abs}}
+            Attended: {{att.total_days}} - Absent: {{att.total_abs}} - Overrides: {{att.total_overrides}}
             <a type="href" ng-click="screen='home'">Back to student list</a>
           </div>
           <div class="col-md-6">
@@ -62,11 +62,13 @@
               <li ng-repeat="swipe in att.days" style="text-left">
                 <div class="checkbox">
                   <label>
-                    <input type="checkbox" ng-checked="(swipe.valid)" disabled>
+                    <input type="checkbox" ng-checked="(swipe.valid)" disabled> 
                     <span style="width:50px" 
                           ng-click="setDay(swipe)"
                           ng-style="{'border':(swipe.day==current_day.day)?'1px solid black':''}">
-                      {{swipe.day}} - {{swipe.total_mins}} minutes
+                      {{swipe.day}} - {{swipe.total_mins}} minutes - 
+                      <span ng-show="swipe.override">Overridden</span>
+                      <a href="" ng-hide="swipe.valid" ng-click="override(att._id,swipe.day)">Override</a>
                     </span>
                   </label>
                 </div>
@@ -98,7 +100,7 @@
         <div class="form-group"  ng-show="screen === 'student-totals'">
           <ul>
             <li ng-repeat="student in students">
-              {{student.name}} Attended: {{student.total_days}} - Absent: {{student.total_abs}}
+              {{student.name}} Attended: {{student.total_days}} - Absent: {{student.total_abs}} - Overrides: {{student.total_overrides}}
             </li>
           </ul>
         </div>

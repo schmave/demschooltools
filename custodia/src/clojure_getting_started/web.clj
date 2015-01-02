@@ -22,6 +22,9 @@
   (GET "/" [] (io/resource "index.html"))
   (GET "/swipe/:sid" [sid]  (resp/response (data/get-attendance sid)))
   (GET "/resetdb" [] (data/sample-db) (resp/redirect "/"))
+  (POST "/override" [_id day]
+        (data/override-date _id day)
+        (resp/response (first (data/get-students [_id]))))
   (POST "/swipe" [direction _id]
         (if (= direction "in")
           (data/swipe-in _id)

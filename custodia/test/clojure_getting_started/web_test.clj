@@ -66,27 +66,31 @@
   )
 
 (deftest swipe-attendence-test
-  (db/sample-db)  
-  (let [sid (-> "test" db/make-student :_id)]
-    ;; good today
-    (add-swipes sid)
-    (db/override-date sid "10-18-2014")
-    (let [att (db/get-attendance sid)]
-      (testing "Total Valid Day Count"
-        (is (= (:total_days att)
-               4)))
-      (testing "Total Abs Count"
-        (is (= (:total_abs att)
-               1)))
-      (testing "Days sorted correctly"
-        (is (= (-> att :days first :day)
-               "10-18-2014")))
-      (testing "Nice time shown correctly"
-        (is (= (-> att :days first :swipes first :nice_in_time)
-               ;; shown as hour 10 because that was DST forward +1
-               "10:09:27")))
-      )) 
+  (do (db/sample-db)  
+      (let [sid (-> "test" db/make-student :_id)]
+        ;; good today
+        (add-swipes sid)
+        (db/override-date sid "10-18-2014")
+        (let [att (db/get-attendance sid)]
+          (testing "Total Valid Day Count"
+            (is (= (:total_days att)
+                   4)))
+          (testing "Total Abs Count"
+            (is (= (:total_abs att)
+                   1)))
+          (testing "Total Overrides"
+            (is (= (:total_overrides att)
+                   1)))
+          (testing "Days sorted correctly"
+            (is (= (-> att :days first :day)
+                   "10-18-2014")))
+          (testing "Nice time shown correctly"
+            (is (= (-> att :days first :swipes first :nice_in_time)
+                   ;; shown as hour 10 because that was DST forward +1
+                   "10:09:27")))
+          ))) 
   )
+
 
 (deftest swipe-attendence-shows-only-when-in
   (db/sample-db)  

@@ -116,6 +116,7 @@
         summed-days (map #(append-validity min-hours %) grouped-swipes)]
     {:total_days (count (filter :valid summed-days))
      :total_abs (count (filter (comp not :valid) summed-days))
+     :total_overrides (count (filter :override summed-days))
      :days (reverse summed-days)}))
 
 (defn override-date [id date-string]

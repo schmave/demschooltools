@@ -18,6 +18,16 @@ angular.module('app').controller("MainController", function($scope, $http){
     $scope.setDay = function(s) {
         $scope.current_day = s;
     };
+    $scope.override = function(id, day) {
+        if (confirm("Override " + day + "?")){
+            $http.post('/override', {"_id":id, "day": day}).
+                success(function(data){
+                    $scope.att = data;
+                    $scope.current_day = data.days[0];
+                }). error(function(){});
+            $scope.getStudents();
+        }
+    };
     $scope.swipe = function(direction, id) {
         $http.post('/swipe', {"_id":id, "direction": direction}).
             success(function(data){
