@@ -34,27 +34,32 @@
        (friend/authorize #{::user}
                          (resp/response (data/get-attendance year sid))))
   (GET "/resetdb" [] (data/sample-db) (resp/redirect "/"))
-  (POST "/override" [_id day year]
+  (POST "/override" [_id day]
         (friend/authorize #{::admin}
                           (data/override-date _id day))
-        (resp/response (first (data/get-students-with-att year [_id]))))
-  (POST "/swipe" [direction _id year]
+        (resp/response (first (data/get-students-with-att
+                               (data/get-current-year-string)
+                               [_id]))))
+  (POST "/swipe" [direction _id]
         (friend/authorize #{::user}
                           (if (= direction "in")
                             (data/swipe-in _id)
                             (data/swipe-out _id)))
-        (resp/response (first (data/get-students-with-att year [_id]))))
-  (GET "/year/all" [year]
+        (resp/response (first (data/get-students-with-att
+                               (data/get-current-year-string)
+                               [_id]))))
+  (GET "/currentyear" [] (data/get-current-year-string))
+  (GET "/year/all" []
        (friend/authorize #{::user}
                          (map :name (data/get-years))))
   (POST "/student/all" [year]
         (friend/authorize #{::user}
-                          (trace/trace "year" year)
-                          (trace/trace "get-studnets" (data/get-students-with-att year))))
-  (POST "/student/create" [name year]
+                          (let [year (if year year (data/get-current-year-string))]
+                            (trace/trace "get-studnets" (data/get-students-with-att year)))))
+  (POST "/student/create" [name]
         (friend/authorize #{::admin}
                           (let [made? (data/make-student name)]
-                            (resp/response {:made made? :students (data/get-students-with-att year)}))))
+                            (resp/response {:made made? :students (data/get-students-with-att)}))))
   (POST "/year/create" [from_date to_date]
         (friend/authorize #{::admin}
                           (let [made? (data/make-year from_date to_date)]

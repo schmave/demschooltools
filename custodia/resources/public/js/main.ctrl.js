@@ -2,7 +2,6 @@ angular.module('app', ['ui.bootstrap']);
 angular.module('app').controller("MainController", function($scope, $http){
     $scope.students = [];
     $scope.screen = "home";
-    $scope.current_year = "2014-2015";
     $scope.current_totals_year = "2014-2015";
     $scope.showStudent = function(s) {
         $scope.screen = "student";
@@ -26,7 +25,7 @@ angular.module('app').controller("MainController", function($scope, $http){
     };
     $scope.override = function(id, day) {
         if (confirm("Override " + day + "?")){
-            $http.post('/override', {"_id":id, "day": day, "year":$scope.current_year}).
+            $http.post('/override', {"_id":id, "day": day}).
                 success(function(data){
                     $scope.att = data;
                     $scope.current_day = data.days[0];
@@ -43,7 +42,7 @@ angular.module('app').controller("MainController", function($scope, $http){
         }
     };
     $scope.swipe = function(direction, id) {
-        $http.post('/swipe', {"_id":id, "direction": direction, "year":$scope.current_year}).
+        $http.post('/swipe', {"_id":id, "direction": direction}).
             success(function(data){
                 $scope.att = data;
                 $scope.current_day = data.days[0];
@@ -51,7 +50,7 @@ angular.module('app').controller("MainController", function($scope, $http){
         $scope.getStudents();
     };
     $scope.createStudent = function(name) {
-        $http.post('/student/create', {"name":name, "year":$scope.current_year}).
+        $http.post('/student/create', {"name":name}).
             success(function(data){
                 $scope.students = data.students;
                 if(data.made) {
@@ -70,7 +69,7 @@ angular.module('app').controller("MainController", function($scope, $http){
             }). error(function(){});
     };
     $scope.getStudents = function() {
-        $http.post('/student/all', {"year":$scope.current_year}).
+        $http.post('/student/all').
             success(function(data){
                 $scope.students = data;
                 $scope.totals_students = data;

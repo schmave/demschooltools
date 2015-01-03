@@ -115,6 +115,14 @@
                       (f/parse (f %)))
           list))
 
+(defn get-current-year-string []
+  (->> (get-years)
+       (filter #(t/within? (t/interval (f/parse (:from %))
+                                       (f/parse (:to %)))
+                           (t/now)))
+       first
+       :name))
+
 (defn get-attendance [year id]
   (let [year (first (get-years year))
         from (f/parse (:from year))
@@ -143,6 +151,7 @@
   ([ids] (get-* "students" ids)))
 
 (defn get-students-with-att
+  ([] (get-students-with-att (get-current-year-string) nil))
   ([year] (get-students-with-att year nil))
   ([year ids]
      (map #(merge (get-attendance year (:_id %)) %)
@@ -162,6 +171,7 @@
         name (str (t/year from) "-" (t/year to))]
     (->> {:type :year :from (str from) :to (str to) :name name}
          (couch/put-document db/db))))
+
 
 ;; (sample-db)   
 (defn sample-db []
