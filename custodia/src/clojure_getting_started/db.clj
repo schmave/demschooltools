@@ -33,6 +33,12 @@
                            emit(doc.student_id, doc);
                          }
                        }"}
+            "years" {"map"
+                     "function(doc) {
+                         if (doc.type == \"year\") {
+                           emit(doc.name, doc);
+                         }
+                       }"}
             "overrides" {"map"
                          "function(doc) {
                             if (doc.type == \"override\") {

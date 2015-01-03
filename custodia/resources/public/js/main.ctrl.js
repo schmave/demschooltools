@@ -1,6 +1,9 @@
+angular.module('app', ['ui.bootstrap']);
 angular.module('app').controller("MainController", function($scope, $http){
     $scope.students = [];
     $scope.screen = "home";
+    $scope.current_year = "2014-2015";
+    $scope.current_totals_year = "2014-2015";
     $scope.showStudent = function(s) {
         $scope.screen = "student";
         $scope.att = s;
@@ -12,6 +15,9 @@ angular.module('app').controller("MainController", function($scope, $http){
     $scope.showCreate = function() {
         $scope.screen = "create";
     };
+    $scope.showCreateYear = function() {
+        $scope.screen = "create-year";
+    };
     $scope.showStudents = function() {
         $scope.screen = "student-totals";
     };
@@ -20,7 +26,7 @@ angular.module('app').controller("MainController", function($scope, $http){
     };
     $scope.override = function(id, day) {
         if (confirm("Override " + day + "?")){
-            $http.post('/override', {"_id":id, "day": day}).
+            $http.post('/override', {"_id":id, "day": day, "year":$scope.current_year}).
                 success(function(data){
                     $scope.att = data;
                     $scope.current_day = data.days[0];
@@ -28,8 +34,16 @@ angular.module('app').controller("MainController", function($scope, $http){
             $scope.getStudents();
         }
     };
+    $scope.createYear = function() {
+        if(confirm("Create school year from " + $scope.from_date + " to " + $scope.to_date + "?")){
+            $http.post('/year/create', {"from_date":$scope.from_date, "to_date": $scope.to_date}).
+                success(function(data){
+                    $scope.init();
+                }). error(function(){});
+        }
+    };
     $scope.swipe = function(direction, id) {
-        $http.post('/swipe', {"_id":id, "direction": direction}).
+        $http.post('/swipe', {"_id":id, "direction": direction, "year":$scope.current_year}).
             success(function(data){
                 $scope.att = data;
                 $scope.current_day = data.days[0];
@@ -37,7 +51,7 @@ angular.module('app').controller("MainController", function($scope, $http){
         $scope.getStudents();
     };
     $scope.createStudent = function(name) {
-        $http.post('/student/create', {"name":name}).
+        $http.post('/student/create', {"name":name, "year":$scope.current_year}).
             success(function(data){
                 $scope.students = data.students;
                 if(data.made) {
@@ -49,10 +63,23 @@ angular.module('app').controller("MainController", function($scope, $http){
                 }
             }). error(function(){});
     };
+    $scope.getTotalsStudents = function() {
+        $http.post('/student/all', {"year":$scope.current_totals_year}).
+            success(function(data){
+                $scope.totals_students = data;
+            }). error(function(){});
+    };
     $scope.getStudents = function() {
-        $http.get('/student/all').
+        $http.post('/student/all', {"year":$scope.current_year}).
             success(function(data){
                 $scope.students = data;
+                $scope.totals_students = data;
+            }). error(function(){});
+    };
+    $scope.getYears = function() {
+        $http.get('/year/all').
+            success(function(data){
+                $scope.years = data;
             }). error(function(){});
     };
     $scope.isAdmin = false;
@@ -65,7 +92,7 @@ angular.module('app').controller("MainController", function($scope, $http){
     $scope.init = function(){
         $scope.checkRole();
         $scope.getStudents();
-        $scope.screen = "home";
     };
+    $scope.getYears();
     $scope.init();
 });

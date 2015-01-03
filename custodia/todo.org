@@ -13,12 +13,14 @@
 * DONE add date override for student
   CLOSED: [2015-01-03 Sat 12:41]
 * TODO mark student "older"
-* TODO sign in for admin/swipes
+* DONE sign in for admin/swipes
+  CLOSED: [2015-01-03 Sat 13:51]
 * DONE reverse list of dates
   CLOSED: [2015-01-03 Sat 09:52]
 * DONE fix swipe in date nil
   CLOSED: [2015-01-03 Sat 09:52]
 * DONE fix utc date issue showing up wrong timezone
   CLOSED: [2015-01-03 Sat 10:52]
-* TODO Make school year to show totals
+* DONE Make school year to show totals
+  CLOSED: [2015-01-03 Sat 15:43]
 * TODO Configurable passwords

@@ -73,7 +73,6 @@
           :nice_in_time (make-time-string (:in_time swipe))
           :nice_out_time (make-time-string (:out_time swipe))))
 
-;; (get-attendance  "fa5a8a9cbef3dbb6b0bc2733ed00a7db")  
 (defn append-validity [min-hours swipes]
   (let [has-override? (->> swipes
                            second
@@ -106,12 +105,26 @@
       (assoc swipe :interval int-hours))
     swipe))
 
-(defn get-attendance [id]
-  (let [min-hours (get-hours-needed id)
+(defn get-years
+  ([] (get-years nil))
+  ([names]
+     (get-* "years" names)))
+
+(defn only-dates-between [list f dfrom dto]
+  (filter #(t/within? (t/interval dfrom dto)
+                      (f/parse (f %)))
+          list))
+
+(defn get-attendance [year id]
+  (let [year (first (get-years year))
+        from (f/parse (:from year))
+        to (f/parse (:to year))
+        min-hours (get-hours-needed id)
         swipes (get-swipes id)
+        swipes (only-dates-between swipes :in_time from to)
         swipes (map append-interval swipes)
         swipes (map clean-dates swipes)
-        swipes (concat swipes (get-overrides id))
+        swipes (concat swipes (only-dates-between (get-overrides id) :date from to))
         grouped-swipes (group-by swipe-day swipes)
         summed-days (map #(append-validity min-hours %) grouped-swipes)]
     {:total_days (count (filter :valid summed-days))
@@ -127,10 +140,15 @@
 
 (defn get-students
   ([] (get-students nil))
-  ([ids]
-     (map #(merge (get-attendance (:_id %)) %)
-          (get-* "students" ids))))
+  ([ids] (get-* "students" ids)))
 
+(defn get-students-with-att
+  ([year] (get-students-with-att year nil))
+  ([year ids]
+     (map #(merge (get-attendance year (:_id %)) %)
+          (get-students ids))))
+
+;; (get-years)    
 (defn student-not-yet-created [name]
   (empty? (filter #(= name (:name %)) (get-students))))
 
@@ -138,11 +156,20 @@
   (when (student-not-yet-created name)
     (couch/put-document db/db {:type :student :name name})))
 
+(defn make-year [from to]
+  (let [from (f/parse from)
+        to (f/parse to)
+        name (str (t/year from) "-" (t/year to))]
+    (->> {:type :year :from (str from) :to (str to) :name name}
+         (couch/put-document db/db))))
+
 ;; (sample-db)   
 (defn sample-db []
   (couch/delete-database db/db)
   (couch/create-database db/db)
   (db/make-db)
+  (make-year (str (t/date-time 2014 6)) (str (t/date-time 2015 6)))
+  (make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
   (make-student "steve")
   (make-student "jim")
   ;; (swipe-out 1)
