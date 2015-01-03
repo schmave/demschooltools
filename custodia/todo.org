@@ -10,7 +10,8 @@
 * TODO get missing out swipe
 * DONE view students attendence
   CLOSED: [2015-01-03 Sat 09:51]
-* TODO add date override for student
+* DONE add date override for student
+  CLOSED: [2015-01-03 Sat 12:41]
 * TODO mark student "older"
 * TODO sign in for admin/swipes
 * DONE reverse list of dates
@@ -20,3 +21,4 @@
 * DONE fix utc date issue showing up wrong timezone
   CLOSED: [2015-01-03 Sat 10:52]
 * TODO Make school year to show totals
+* TODO Configurable passwords

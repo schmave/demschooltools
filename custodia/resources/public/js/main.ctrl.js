@@ -55,5 +55,17 @@ angular.module('app').controller("MainController", function($scope, $http){
                 $scope.students = data;
             }). error(function(){});
     };
-    $scope.getStudents();
+    $scope.isAdmin = false;
+    $scope.checkRole = function() {
+        $http.post('/is-admin').
+            success(function(data){
+                $scope.isAdmin = true;
+            }).error(function(){});
+    };
+    $scope.init = function(){
+        $scope.checkRole();
+        $scope.getStudents();
+        $scope.screen = "home";
+    };
+    $scope.init();
 });

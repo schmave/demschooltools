@@ -16,29 +16,60 @@
             [clj-time.core :as t]
             [net.cgrand.enlive-html :as enlive]
             [hiccup.core :as html]
+            [cemerick.friend :as friend]
+            (cemerick.friend [workflows :as workflows]
+                             [credentials :as creds])
             [environ.core :refer [env]]))
 
+(def users {"admin" {:username "admin"
+                     :password (creds/hash-bcrypt "test")
+                     :roles #{::admin ::user}}
+            "user" {:username "user"
+                    :password (creds/hash-bcrypt "test")
+                    :roles #{::user}}})
+
 (defroutes app
-  (GET "/" [] (io/resource "index.html"))
-  (GET "/swipe/:sid" [sid]  (resp/response (data/get-attendance sid)))
+  (GET "/" [] (friend/authenticated (io/resource "index.html")))
+  (GET "/swipe/:sid" [sid]
+       (friend/authorize #{::user}
+                         (resp/response (data/get-attendance sid))))
   (GET "/resetdb" [] (data/sample-db) (resp/redirect "/"))
   (POST "/override" [_id day]
-        (data/override-date _id day)
+        (friend/authorize #{::admin}
+                          (data/override-date _id day))
         (resp/response (first (data/get-students [_id]))))
   (POST "/swipe" [direction _id]
-        (if (= direction "in")
-          (data/swipe-in _id)
-          (data/swipe-out _id))
+        (friend/authorize #{::user}
+                          (if (= direction "in")
+                            (data/swipe-in _id)
+                            (data/swipe-out _id)))
         (resp/response (first (data/get-students [_id]))))
-  (GET "/student/all" [] (data/get-students))
+  (GET "/student/all" []
+       (friend/authorize #{::user}
+                         (data/get-students)))
   (POST "/student/create" [name]
-        (let [made? (data/make-student name)]
-          (resp/response {:made made? :students (data/get-students)})))
+        (friend/authorize #{::admin}
+                          (let [made? (data/make-student name)]
+                            (resp/response {:made made? :students (data/get-students)}))))
+  (GET "/login" req
+       (io/resource "login.html"))
+  (GET "/logout" req
+       (friend/logout* (resp/redirect (str (:context req) "/"))))
+  (GET "/is-user" req
+       (friend/authorize #{::user} "You're a user!"))
+  (POST "/is-admin" req
+        (friend/authorize #{::admin} (resp/response {:admin true})))
   (route/resources "/")
   (ANY "*" []
        (route/not-found (slurp (io/resource "404.html")))))
 
-(def tapp (-> #'app wrap-json-body wrap-json-params wrap-json-response))
+(def tapp (-> #'app
+              (friend/authenticate {:credential-fn (partial creds/bcrypt-credential-fn users)
+                                    :allow-anon? true
+                                    :login-uri "/login"
+                                    :default-landing-uri "/"
+                                    :workflows [(workflows/interactive-form)]})
+              wrap-json-body wrap-json-params wrap-json-response))
 
 (defn -main [& [port]]
   (nrepl-server/start-server :port 7888 :handler cider-nrepl-handler)
