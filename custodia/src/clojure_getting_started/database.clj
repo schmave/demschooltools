@@ -110,6 +110,10 @@
   ([names]
      (get-* "years" names)))
 
+(defn delete-year [year]
+  (when-let [year (first (get-years year))]
+    (couch/delete-document db/db year)))
+
 (defn only-dates-between [list f dfrom dto]
   (filter #(t/within? (t/interval dfrom dto)
                       (f/parse (f %)))
@@ -168,10 +172,9 @@
 (defn make-year [from to]
   (let [from (f/parse from)
         to (f/parse to)
-        name (str (t/year from) "-" (t/year to))]
+        name (str (f/unparse date-format from) "-"  (f/unparse date-format to))]
     (->> {:type :year :from (str from) :to (str to) :name name}
          (couch/put-document db/db))))
-
 
 ;; (sample-db)   
 (defn sample-db []

@@ -52,6 +52,10 @@
   (GET "/year/all" []
        (friend/authorize #{::user}
                          (map :name (data/get-years))))
+  (POST "/year/delete" [year]
+        (friend/authorize #{::admin}
+                          (data/delete-year year)
+                          (map :name (data/get-years))))
   (POST "/student/all" [year]
         (friend/authorize #{::user}
                           (let [year (if year year (data/get-current-year-string))]

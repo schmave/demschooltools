@@ -53,7 +53,7 @@
       (db/swipe-out sid (t/plus basetime (t/hours 4)))
       )
     (db/override-date sid "10-14-2014")
-    (let [att (db/get-attendance "2014-2015" sid)]
+    (let [att (db/get-attendance (db/get-current-year-string) sid)]
       (testing "Total Valid Day Count"
         (is (= (:total_days att)
                1)))
@@ -72,7 +72,7 @@
         ;; good today
         (add-swipes sid)
         (db/override-date sid "10-18-2014")
-        (let [att (db/get-attendance "2014-2015" sid)]
+        (let [att (db/get-attendance (db/get-current-year-string) sid)]
           (testing "Total Valid Day Count"
             (is (= (:total_days att)
                    4)))
@@ -90,7 +90,8 @@
                    ;; shown as hour 10 because that was DST forward +1
                    "10:09:27")))
           )
-        (let [att (db/get-attendance "2012-2013" sid)]
+        ;; old date string
+        (let [att (db/get-attendance  "06-01-2013-05-01-2014" sid)]
           (testing "Total Valid Day Count"
             (is (= (:total_days att)
                    0)))
@@ -111,7 +112,7 @@
     (let [basetime (t/date-time 2014 10 14 14 9 27 246)]
       (db/swipe-in sid basetime))
     (trace/trace sid)
-    (let [att (db/get-attendance "2014-2015"  sid)]
+    (let [att (db/get-attendance (db/get-current-year-string)  sid)]
       (testing "Total Valid Day Count"
         (is (= (-> att :days first :day)
                "10-14-2014")))

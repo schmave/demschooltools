@@ -2,7 +2,7 @@ angular.module('app', ['ui.bootstrap']);
 angular.module('app').controller("MainController", function($scope, $http){
     $scope.students = [];
     $scope.screen = "home";
-    $scope.current_totals_year = "2014-2015";
+    $scope.current_totals_year = null;
     $scope.showStudent = function(s) {
         $scope.screen = "student";
         $scope.att = s;
@@ -80,6 +80,14 @@ angular.module('app').controller("MainController", function($scope, $http){
             success(function(data){
                 $scope.years = data;
             }). error(function(){});
+    };
+    $scope.deleteYear = function(year) {
+        if(confirm("Delete year " + year + "?")){
+            $http.post('/year/delete', {"year":year}).
+                success(function(data){
+                    $scope.years = data;
+                }). error(function(){});
+        }
     };
     $scope.isAdmin = false;
     $scope.checkRole = function() {
