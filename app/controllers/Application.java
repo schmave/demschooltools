@@ -108,10 +108,7 @@ public class Application extends Controller {
     }
 
 	public static Result viewManual() {
-		return ok(views.html.view_manual.render(Chapter.find
-            .where().eq("deleted", Boolean.FALSE)
-            .eq("organization", Organization.getByHost())
-            .order("num ASC").findList()));
+		return ok(views.html.view_manual.render(Chapter.all()));
 	}
 
     public static Result viewManualChanges() {

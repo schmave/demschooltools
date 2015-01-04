@@ -30,13 +30,11 @@ public class Chapter extends Model {
     @NotNull
     public String title = "";
     @NotNull
-	public Integer num = 0;
+	public String num = "";
 
     @OneToMany(mappedBy="chapter")
-    @OrderBy("num ASC")
-	@Where(clause = "${ta}.deleted = false")
     @JsonIgnore
-    public List<Section> sections;
+    private List<Section> sections;
 
     @ManyToOne()
     public Organization organization;
@@ -55,13 +53,21 @@ public class Chapter extends Model {
 
     public static List<Chapter> all() {
         return find.where()
+            .eq("deleted", Boolean.FALSE)
             .eq("organization", Organization.getByHost())
+            .orderBy("num ASC").findList();
+    }
+
+    public List<Section> sections() {
+        return Section.find.where()
+            .eq("chapter", this)
+            .eq("deleted", Boolean.FALSE)
             .orderBy("num ASC").findList();
     }
 
 	public void updateFromForm(Form<Chapter> form) {
 		title = form.field("title").value();
-		num = Integer.parseInt(form.field("num").value());
+		num = form.field("num").value();
 		String deleted_val = form.field("deleted").value();
 		deleted = deleted_val != null && deleted_val.equals("true");
 		save();
