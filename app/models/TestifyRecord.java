@@ -7,7 +7,7 @@ import java.util.TreeMap;
 
 import javax.persistence.*;
 
-import org.codehaus.jackson.annotate.*;
+import com.fasterxml.jackson.annotation.*;
 
 import play.db.ebean.Model;
 import play.db.ebean.Model.Finder;

@@ -15,7 +15,7 @@ import javax.persistence.*;
 
 import javax.mail.*;
 import javax.mail.internet.*;
-import org.codehaus.jackson.annotate.*;
+import com.fasterxml.jackson.annotation.*;
 
 import play.db.ebean.Model;
 import play.db.ebean.Model.Finder;

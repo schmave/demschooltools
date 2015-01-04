@@ -431,11 +431,12 @@ public class CRM extends Controller {
             }
 
             if (filledForm.field("send_email").value() != null) {
-                MailerAPI mail = play.Play.application().plugin(MailerPlugin.class).email();
+                play.libs.mailer.Email mail = new play.libs.mailer.Email();
                 mail.setSubject("Papal comment: " + new_comment.user.name + " & " + getInitials(new_comment.person));
-                mail.addRecipient("TRVS Staff <staff@threeriversvillageschool.org>");
-                mail.addFrom("Papal DB <noreply@threeriversvillageschool.org>");
-                mail.sendHtml(views.html.comment_email.render(Comment.find.byId(new_comment.id)).toString());
+                mail.addTo("TRVS Staff <staff@threeriversvillageschool.org>");
+                mail.setFrom("Papal DB <noreply@threeriversvillageschool.org>");
+                mail.setBodyHtml(views.html.comment_email.render(Comment.find.byId(new_comment.id)).toString());
+                play.libs.mailer.MailerPlugin.send(mail);
             }
 
             return ok(views.html.comment_fragment.render(Comment.find.byId(new_comment.id), false));
