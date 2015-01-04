@@ -35,6 +35,9 @@
             <li class="{{(screen==='home')?'active':''}}"><a href="#" ng-click="showHome()">Home</a></li>
             <li class="{{(screen==='student-totals')?'active':''}}"><a href="#" ng-show="isAdmin" ng-click="showStudents()">Student Totals</a></li>
             <li class="{{(screen==='create-year')?'active':''}}"><a href="#" ng-show="isAdmin" ng-click="showCreateYear()">Create Year</a></li>
+            <li class="{{(screen==='swiped-today')?'active':''}}">
+              <a href="#" ng-show="isAdmin" ng-click="showSwipedToday()">Today's Attendance</a>
+            </li>
             <li><a href="/logout">Logout</a></li>
           </ul>
         </div><!--/.nav-collapse -->
@@ -54,13 +57,19 @@
           <button class="btn btn-primary" ng-click="createYear()">Create Year</button>
         </div>
         <div class="lead form-group" ng-show="screen ==='home'">
-          <button ng-show="isAdmin" ng-click="showCreate()">Create Student</button>
+          <button class="btn btn-success" ng-show="isAdmin" ng-click="showCreate()">Create Student</button>
           <ul ng-show="screen ==='home'">
             <li ng-repeat="student in students">
-              <button ng-click="showStudent(student)">{{student.name}}</button>
+              <button class="btn btn-primary" ng-click="showStudent(student)">{{student.name}}</button>
               <!-- {{student}} -->
             </li>
           </ul>
+        </div>
+        <div class="form-group"  ng-show="screen === 'swiped-today'">
+          <h2>Today's Attendance</h2>
+            <li ng-repeat="student in students | filter:{today:'true'}">
+              {{student.name}}
+            </li>
         </div>
         <div class="lead form-group" ng-show="screen === 'student'">
           <h1>{{att.name}}</h1> 

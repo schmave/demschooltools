@@ -59,7 +59,7 @@
   (POST "/student/all" [year]
         (friend/authorize #{::user}
                           (let [year (if year year (data/get-current-year-string))]
-                            (trace/trace "get-studnets" (data/get-students-with-att year)))))
+                             (data/get-students-with-att year))))
   (POST "/student/create" [name]
         (friend/authorize #{::admin}
                           (let [made? (data/make-student name)]

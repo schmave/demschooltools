@@ -8,18 +8,11 @@ angular.module('app').controller("MainController", function($scope, $http){
         $scope.att = s;
         $scope.current_day = s.days[0];
     };
-    $scope.showHome = function() {
-        $scope.screen = "home";
-    };
-    $scope.showCreate = function() {
-        $scope.screen = "create";
-    };
-    $scope.showCreateYear = function() {
-        $scope.screen = "create-year";
-    };
-    $scope.showStudents = function() {
-        $scope.screen = "student-totals";
-    };
+    $scope.showHome = function() {$scope.screen = "home";};
+    $scope.showSwipedToday = function() {$scope.screen = "swiped-today";};
+    $scope.showCreate = function() {$scope.screen = "create";};
+    $scope.showCreateYear = function() {$scope.screen = "create-year";};
+    $scope.showStudents = function() {$scope.screen = "student-totals";};
     $scope.setDay = function(s) {
         $scope.current_day = s;
     };

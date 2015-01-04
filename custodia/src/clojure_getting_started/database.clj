@@ -55,18 +55,17 @@
 ;; TODO make this configurable?
 (def local-time-zone-id (t/time-zone-for-id "America/New_York"))
 
-(defn format-to-local [d f]
-  (f/unparse (f/with-zone f local-time-zone-id)
-             (f/parse d)))
+(defn format-to-local [f d]
+  (f/unparse (f/with-zone f local-time-zone-id) d))
 
 (defn parse-date-string [d]
   (f/parse date-format d))
 
 (defn make-date-string [d]
-  (when d (format-to-local d date-format)))
+  (when d (format-to-local date-format (f/parse d))))
 
 (defn make-time-string [d]
-  (when d (format-to-local d time-format)))
+  (when d (format-to-local time-format (f/parse d))))
 
 (defn clean-dates [swipe]
   (?assoc swipe
@@ -138,11 +137,15 @@
         swipes (map clean-dates swipes)
         swipes (concat swipes (only-dates-between (get-overrides id) :date from to))
         grouped-swipes (group-by swipe-day swipes)
-        summed-days (map #(append-validity min-hours %) grouped-swipes)]
+        summed-days (map #(append-validity min-hours %) grouped-swipes)
+        summed-days (reverse summed-days)
+        today-string (format-to-local date-format (t/now))
+        swiped-in-today? (-> summed-days first :day (= today-string))]
     {:total_days (count (filter :valid summed-days))
      :total_abs (count (filter (comp not :valid) summed-days))
      :total_overrides (count (filter :override summed-days))
-     :days (reverse summed-days)}))
+     :today swiped-in-today?
+     :days summed-days}))
 
 (defn override-date [id date-string]
   (->> {:type :override
@@ -172,7 +175,7 @@
 (defn make-year [from to]
   (let [from (f/parse from)
         to (f/parse to)
-        name (str (f/unparse date-format from) "-"  (f/unparse date-format to))]
+        name (str (f/unparse date-format from) " "  (f/unparse date-format to))]
     (->> {:type :year :from (str from) :to (str to) :name name}
          (couch/put-document db/db))))
 

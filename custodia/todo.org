@@ -24,3 +24,5 @@
 * DONE Make school year to show totals
   CLOSED: [2015-01-03 Sat 15:43]
 * TODO Configurable passwords
+* DONE Report - Students swiped in today
+  CLOSED: [2015-01-03 Sat 20:49]
