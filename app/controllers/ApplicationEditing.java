@@ -23,7 +23,9 @@ import play.mvc.Http.Context;
 public class ApplicationEditing extends Controller {
 
     public static Result editTodaysMinutes() {
-        Meeting the_meeting = Meeting.find.where().eq("date", new Date()).findUnique();
+        Meeting the_meeting = Meeting.find.where()
+            .eq("organization", Organization.getByHost())
+            .eq("date", new Date()).findUnique();
         if (the_meeting == null) {
             the_meeting = Meeting.create(new Date());
             the_meeting.save();
@@ -38,7 +40,7 @@ public class ApplicationEditing extends Controller {
     }
 
     public static Result editMeeting(int meeting_id) {
-        Meeting the_meeting = Meeting.find.byId(meeting_id);
+        Meeting the_meeting = Meeting.findById(meeting_id);
         return editMinutes(the_meeting);
     }
 
@@ -56,7 +58,7 @@ public class ApplicationEditing extends Controller {
     }
 
     public static Result saveCase(String id) {
-        Case c = Case.find.byId(id);
+        Case c = Case.findById(id);
 
         c.edit(request().queryString());
         c.save();
@@ -112,7 +114,7 @@ public class ApplicationEditing extends Controller {
     }
 
     public static Result saveCharge(int id) {
-        Charge c = Charge.find.byId(id);
+        Charge c = Charge.findById(id);
 
         c.edit(request().queryString());
         c.save();
@@ -121,7 +123,7 @@ public class ApplicationEditing extends Controller {
     }
 
     public static Result removeCharge(int id) {
-        Charge c = Charge.find.byId(id);
+        Charge c = Charge.findById(id);
         c.delete();
 
         return ok();
@@ -138,7 +140,7 @@ public class ApplicationEditing extends Controller {
         String decision = form_data.get("sm_decision")[0];
         Date date = Application.getDateFromString(form_data.get("date")[0]);
 
-        Charge c = Charge.find.byId(charge_id);
+        Charge c = Charge.findById(charge_id);
         c.updateSchoolMeetingDecision(decision, date);
         c.save();
 
@@ -151,7 +153,7 @@ public class ApplicationEditing extends Controller {
 	}
 
 	public static Result editChapter(Integer id) {
-		Form<Chapter> filled_form = new Form<Chapter>(Chapter.class).fill(Chapter.find.byId(id));
+		Form<Chapter> filled_form = new Form<Chapter>(Chapter.class).fill(Chapter.findById(id));
 		return ok(views.html.edit_chapter.render(filled_form, false));
 	}
 
@@ -160,7 +162,7 @@ public class ApplicationEditing extends Controller {
 
 		Chapter c = null;
 		if (form.field("id").value() != null) {
-			c = Chapter.find.byId(Integer.parseInt(form.field("id").value()));
+			c = Chapter.findById(Integer.parseInt(form.field("id").value()));
 			c.updateFromForm(form);
 		} else {
 			c = Chapter.create(form);
@@ -174,13 +176,13 @@ public class ApplicationEditing extends Controller {
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("chapter.id", "" + chapterId);
 		form = form.bind(map, "chapter.id");
-		return ok(views.html.edit_section.render(form, Chapter.find.byId(chapterId), true, Chapter.find.order("num ASC").findList()));
+		return ok(views.html.edit_section.render(form, Chapter.findById(chapterId), true, Chapter.all()));
 	}
 
 	public static Result editSection(Integer id) {
-		Section existing_section = Section.find.byId(id);
+		Section existing_section = Section.findById(id);
 		Form<Section> filled_form = new Form<Section>(Section.class).fill(existing_section);
-		return ok(views.html.edit_section.render(filled_form, existing_section.chapter, false, Chapter.find.order("num ASC").findList()));
+		return ok(views.html.edit_section.render(filled_form, existing_section.chapter, false, Chapter.all()));
 	}
 
 	public static Result saveSection() {
@@ -188,7 +190,7 @@ public class ApplicationEditing extends Controller {
 
 		Section s = null;
 		if (form.field("id").value() != null) {
-			s = Section.find.byId(Integer.parseInt(form.field("id").value()));
+			s = Section.findById(Integer.parseInt(form.field("id").value()));
 			s.updateFromForm(form);
 		} else {
 			s = Section.create(form);
@@ -202,13 +204,13 @@ public class ApplicationEditing extends Controller {
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("section.id", "" + sectionId);
 		form = form.bind(map, "section.id");
-		return ok(views.html.edit_entry.render(form, Section.find.byId(sectionId), true, Chapter.find.order("num ASC").findList()));
+		return ok(views.html.edit_entry.render(form, Section.findById(sectionId), true, Chapter.all()));
 	}
 
 	public static Result editEntry(Integer id) {
-        Entry e = Entry.find.byId(id);
+        Entry e = Entry.findById(id);
 		Form<Entry> filled_form = new Form<Entry>(Entry.class).fill(e);
-		return ok(views.html.edit_entry.render(filled_form, e.section, false, Chapter.find.order("num ASC").findList()));
+		return ok(views.html.edit_entry.render(filled_form, e.section, false, Chapter.all()));
 	}
 
 	public static Result saveEntry() {
@@ -216,7 +218,7 @@ public class ApplicationEditing extends Controller {
 
 		Entry e = null;
 		if (form.field("id").value() != null) {
-			e = Entry.find.byId(Integer.parseInt(form.field("id").value()));
+			e = Entry.findById(Integer.parseInt(form.field("id").value()));
 			e.updateFromForm(form);
 		} else {
 			e = Entry.create(form);

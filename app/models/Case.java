@@ -52,6 +52,11 @@ public class Case extends Model {
         String.class, Case.class
     );
 
+    public static Case findById(String id) {
+        return find.where().eq("meeting.organization", Organization.getByHost())
+            .eq("case_number", id).findUnique();
+    }
+
     public static Case create(String id, Meeting m)
     {
         Case result = new Case();

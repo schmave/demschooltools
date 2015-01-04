@@ -32,12 +32,14 @@ public class CRM extends Controller {
     static Form<Donation> donationForm = Form.form(Donation.class);
 
     public static Result people() {
-        List<Comment> recent_comments = Comment.find.orderBy("created DESC").setMaxRows(20).findList();
+        List<Comment> recent_comments = Comment.find
+            .where().eq("person.organization", Organization.getByHost())
+            .orderBy("created DESC").setMaxRows(20).findList();
         return ok(views.html.people_index.render(Person.all(), recent_comments));
     }
 
     public static Result person(Integer id) {
-        Person the_person = Person.find.ref(id);
+        Person the_person = Person.findById(id);
 
         List<Person> family_members =
             Person.find.where().isNotNull("family").eq("family", the_person.family).
@@ -80,10 +82,13 @@ public class CRM extends Controller {
 				Expr.ilike("email", "%" + term + "%"));
 
 			people_matched_this_round =
-				Person.find.where(this_expr).findList();
+				Person.find.where(this_expr).where().eq("organization", Organization.getByHost())
+                    .findList();
 
 			List<PhoneNumber> phone_numbers =
-				PhoneNumber.find.where().ilike("number", "%" + term + "%").findList();
+				PhoneNumber.find.where().ilike("number", "%" + term + "%")
+                    .eq("owner.organization", Organization.getByHost())
+                    .findList();
 			for (PhoneNumber pn : phone_numbers) {
 				people_matched_this_round.add(pn.owner);
 			}
@@ -115,10 +120,12 @@ public class CRM extends Controller {
     public static Result jsonTags(String term, Integer personId) {
         String like_arg = "%" + term + "%";
         List<Tag> selected_tags =
-            Tag.find.where().ilike("title", "%" + term + "%").findList();
+            Tag.find.where()
+                .eq("organization", Organization.getByHost())
+                .ilike("title", "%" + term + "%").findList();
 
 		List<Tag> existing_tags = null;
-		Person p = Person.find.byId(personId);
+		Person p = Person.findById(personId);
 		if (p != null) {
 			existing_tags = p.tags;
 		}
@@ -171,13 +178,13 @@ public class CRM extends Controller {
 	}
 
 	public static Result renderTagMembers(Integer tagId, String familyMode) {
-        Tag the_tag = Tag.find.byId(tagId);
+        Tag the_tag = Tag.findById(tagId);
 		return ok(views.html.to_address_fragment.render(the_tag.title,
 			getTagMembers(tagId, familyMode)));
 	}
 
     public static Result addTag(Integer tagId, String title, Integer personId) {
-        Person p = Person.find.byId(personId);
+        Person p = Person.findById(personId);
         if (p == null) {
             return badRequest();
         }
@@ -221,7 +228,7 @@ public class CRM extends Controller {
     }
 
 	public static Result viewTag(Integer id) {
-        Tag the_tag = Tag.find.byId(id);
+        Tag the_tag = Tag.findById(id);
 
         List<Person> people = getPeopleForTag(id);
 
@@ -265,7 +272,9 @@ public class CRM extends Controller {
     }
 
 	static Email getPendingEmail() {
-		return Email.find.where().eq("deleted", false).eq("sent", false).orderBy("id ASC").setMaxRows(1).findUnique();
+		return Email.find.where()
+            .eq("organization", Organization.getByHost())
+            .eq("deleted", false).eq("sent", false).orderBy("id ASC").setMaxRows(1).findUnique();
 	}
 
 	public static boolean hasPendingEmail() {
@@ -278,7 +287,9 @@ public class CRM extends Controller {
 			return redirect(routes.CRM.people());
 		}
 
-        Tag staff_tag = Tag.find.where().eq("title", "Staff").findUnique();
+        Tag staff_tag = Tag.find.where()
+            .eq("organization", Organization.getByHost())
+            .eq("title", "Staff").findUnique();
         List<Person> people = getPeopleForTag(staff_tag.id);
 
         ArrayList<String> test_addresses = new ArrayList<String>();
@@ -301,7 +312,7 @@ public class CRM extends Controller {
 
     public static Result sendTestEmail() {
         final Map<String, String[]> values = request().body().asFormUrlEncoded();
-        Email e = Email.find.byId(Integer.parseInt(values.get("id")[0]));
+        Email e = Email.findById(Integer.parseInt(values.get("id")[0]));
         e.parseMessage();
 
 		try {
@@ -319,11 +330,11 @@ public class CRM extends Controller {
 
     public static Result sendEmail() {
         final Map<String, String[]> values = request().body().asFormUrlEncoded();
-        Email e = Email.find.byId(Integer.parseInt(values.get("id")[0]));
+        Email e = Email.findById(Integer.parseInt(values.get("id")[0]));
         e.parseMessage();
 
 		int tagId = Integer.parseInt(values.get("tagId")[0]);
-        Tag theTag = Tag.find.byId(tagId);
+        Tag theTag = Tag.findById(tagId);
 		String familyMode = values.get("familyMode")[0];
 		Collection<Person> recipients = getTagMembers(tagId, familyMode);
 
@@ -366,7 +377,7 @@ public class CRM extends Controller {
 
     public static Result deleteEmail() {
         final Map<String, String[]> values = request().body().asFormUrlEncoded();
-        Email e = Email.find.byId(Integer.parseInt(values.get("id")[0]));
+        Email e = Email.findById(Integer.parseInt(values.get("id")[0]));
         e.delete();
 
         return ok();
@@ -378,7 +389,7 @@ public class CRM extends Controller {
     }
 
     public static Result editPerson(Integer id) {
-        return ok(views.html.edit_person.render(Person.find.ref(id).fillForm()));
+        return ok(views.html.edit_person.render(Person.findById(id).fillForm()));
     }
 
     public static Result savePersonEdits() {
@@ -400,7 +411,7 @@ public class CRM extends Controller {
         Form<Comment> filledForm = commentForm.bindFromRequest();
         Comment new_comment = new Comment();
 
-        new_comment.person = Person.find.byId(Integer.parseInt(filledForm.field("person").value()));
+        new_comment.person = Person.findById(Integer.parseInt(filledForm.field("person").value()));
         new_comment.user = Application.getCurrentUser();
         new_comment.message = filledForm.field("message").value();
 
@@ -414,7 +425,7 @@ public class CRM extends Controller {
                 if (!id_string.isEmpty()) {
                     int id = Integer.parseInt(id_string);
                     if (id >= 1) {
-                        CompletedTask.create(Task.find.byId(id), new_comment);
+                        CompletedTask.create(Task.findById(id), new_comment);
                     }
                 }
             }
@@ -437,7 +448,7 @@ public class CRM extends Controller {
         Form<Donation> filledForm = donationForm.bindFromRequest();
         Donation new_donation = new Donation();
 
-        new_donation.person = Person.find.byId(Integer.parseInt(filledForm.field("person").value()));
+        new_donation.person = Person.findById(Integer.parseInt(filledForm.field("person").value()));
         new_donation.description = filledForm.field("description").value();
         new_donation.dollar_value = Float.parseFloat(filledForm.field("dollar_value").value());
 
@@ -483,7 +494,7 @@ public class CRM extends Controller {
 
     public static Result donationIndiegogoReward(int id)
     {
-        Donation d = Donation.find.byId(id);
+        Donation d = Donation.findById(id);
         d.indiegogo_reward_given = true;
         d.indiegogo_reward_by_user = Application.getCurrentUser();
         d.indiegogo_reward_given_time = new Date();
@@ -494,21 +505,28 @@ public class CRM extends Controller {
 
     public static Result donationsNeedingThankYou()
     {
-        List<Donation> donations = Donation.find.where().eq("thanked", false).orderBy("date DESC").findList();
+        List<Donation> donations = Donation.find.where()
+            .eq("person.organization", Organization.getByHost())
+            .eq("thanked", false).orderBy("date DESC").findList();
 
         return ok(views.html.donation_list.render("Donations needing thank you", donations));
     }
 
     public static Result donationsNeedingIndiegogo()
     {
-        List<Donation> donations = Donation.find.where().eq("indiegogo_reward_given", false).orderBy("date DESC").findList();
+        List<Donation> donations = Donation.find.where()
+            .eq("person.organization", Organization.getByHost())
+            .eq("indiegogo_reward_given", false).orderBy("date DESC").findList();
 
         return ok(views.html.donation_list.render("Donations needing Indiegogo reward", donations));
     }
 
     public static Result donations()
     {
-        return ok(views.html.donation_list.render("All donations", Donation.find.orderBy("date DESC").findList()));
+        return ok(views.html.donation_list.render("All donations",
+            Donation.find.where()
+                .eq("person.organization", Organization.getByHost())
+                .orderBy("date DESC").findList()));
     }
 
     public static int calcAge(Person p) {
@@ -550,7 +568,7 @@ public class CRM extends Controller {
     }
 
     public static Result viewTaskList(Integer id) {
-        TaskList list = TaskList.find.byId(id);
+        TaskList list = TaskList.findById(id);
         List<Person> people = getPeopleForTag(list.tag.id);
 
         return ok(views.html.task_list.render(list, people));

@@ -72,7 +72,7 @@
 				  <b class="caret"></b>
 				</a>
 					<ul class="dropdown-menu">
-						@for( l <- TaskList.find.all() ) {
+						@for( l <- TaskList.find.where().eq("organization", Organization.getByHost()).findList() ) {
 							<li><a href="@routes.CRM.viewTaskList(l.id)">@l.title</a></li>
 							}
 					</ul>

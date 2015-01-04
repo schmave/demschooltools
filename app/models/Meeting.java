@@ -23,6 +23,9 @@ public class Meeting extends Model {
 
     public Date date;
 
+    @ManyToOne()
+    public Organization organization;
+
     @OneToMany(mappedBy="meeting")
     public List<PersonAtMeeting> people_at_meeting;
 
@@ -33,6 +36,11 @@ public class Meeting extends Model {
     public static Finder<Integer, Meeting> find = new Finder(
         Integer.class, Meeting.class
     );
+
+    public static Meeting findById(int id) {
+        return find.where().eq("organization", Organization.getByHost())
+            .eq("id", id).findUnique();
+    }
 
     public String getJsonPeople(int role) {
         List<Map<String, String> > result = new ArrayList<Map<String, String> >();
@@ -58,6 +66,7 @@ public class Meeting extends Model {
     {
         Meeting result = new Meeting();
         result.date = d;
+        result.organization = Organization.getByHost();
         return result;
     }
 }

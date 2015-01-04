@@ -26,6 +26,9 @@ public class Email extends Model {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "email_id_seq")
     public Integer id;
 
+    @ManyToOne()
+    public Organization organization;
+
     public String message;
 	public boolean sent;
 	public boolean deleted;
@@ -34,8 +37,14 @@ public class Email extends Model {
         Integer.class, Email.class
     );
 
+    public static Email findById(int id) {
+        return find.where().eq("organization", Organization.getByHost())
+            .eq("id", id).findUnique();
+    }
+
 	public static Email create(String message) {
 		Email e = new Email();
+        e.organization = Organization.getByHost();
 		e.message = message;
 		e.save();
 		return e;
@@ -48,7 +57,7 @@ public class Email extends Model {
         this.sent = true;
 		this.save();
     }
-	
+
 	public void markDeleted() {
 		this.deleted = true;
 		this.save();
@@ -71,7 +80,7 @@ public class Email extends Model {
 			Session session = Session.getInstance(properties, new Authenticator());
 			// session.setDebug(true);
 			parsedMessage = new MimeMessage(session, new ByteArrayInputStream(message.getBytes()));
-			
+
 			for (Enumeration e = parsedMessage.getAllHeaders(); e.hasMoreElements() ;) {
 				Header h = (Header)e.nextElement();
 				if (!h.getName().toLowerCase().equals("content-type") &&

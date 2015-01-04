@@ -19,6 +19,9 @@ public class Tag extends Model {
 
     public boolean use_student_display;
 
+    @ManyToOne()
+    public Organization organization;
+
     @OneToOne(mappedBy="tag")
     public TaskList task_list;
 
@@ -26,9 +29,15 @@ public class Tag extends Model {
         Integer.class, Tag.class
     );
 
+    public static Tag findById(int id) {
+        return find.where().eq("organization", Organization.getByHost())
+            .eq("id", id).findUnique();
+    }
+
     public static Tag create(String title) {
         Tag result = new Tag();
         result.title = title;
+        result.organization = Organization.getByHost();
 
         result.save();
         return result;
@@ -37,7 +46,9 @@ public class Tag extends Model {
     public static Map<String, List<Tag>> getWithPrefixes() {
         Map<String, List<Tag>> result = new TreeMap<String, List<Tag>>();
 
-        for (Tag t : find.order("title ASC").findList()) {
+        for (Tag t : find.where()
+                .eq("organization", Organization.getByHost())
+                .order("title ASC").findList()) {
             String[] splits = t.title.split(":");
             String prefix = t.title;
 

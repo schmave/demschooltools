@@ -6,12 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import play.db.ebean.Model;
 
@@ -30,6 +25,9 @@ public class User extends Model {
 	 *
 	 */
 	private static final long serialVersionUID = 1L;
+
+    @ManyToOne()
+    public Organization organization;
 
 	@Id
 	public Long id;
@@ -58,13 +56,6 @@ public class User extends Model {
 		return exp.findRowCount() > 0;
 	}
 
-	private static ExpressionList<User> getAuthUserFind(
-			final AuthUserIdentity identity) {
-		return find.where().eq("active", true)
-				.eq("linkedAccounts.providerUserId", identity.getId())
-				.eq("linkedAccounts.providerKey", identity.getProvider());
-	}
-
 	public static User findByAuthUserIdentity(final AuthUserIdentity identity) {
 		if (identity == null) {
 			return null;
@@ -83,32 +74,32 @@ public class User extends Model {
 		Ebean.save(Arrays.asList(new User[] { otherUser, this }));
 	}
 
-	public static User create(final AuthUser authUser) {
-		final User user = new User();
-		user.active = true;
-		user.linkedAccounts = Collections.singletonList(LinkedAccount
-				.create(authUser));
-
-		if (authUser instanceof EmailIdentity) {
-			final EmailIdentity identity = (EmailIdentity) authUser;
-			// Remember, even when getting them from FB & Co., emails should be
-			// verified within the application as a security breach there might
-			// break your security as well!
-			user.email = identity.getEmail();
-			user.emailValidated = false;
-		}
-
-		if (authUser instanceof NameIdentity) {
-			final NameIdentity identity = (NameIdentity) authUser;
-			final String name = identity.getName();
-			if (name != null) {
-				user.name = name;
-			}
-		}
-
-		user.save();
-		return user;
-	}
+	//public static User create(final AuthUser authUser) {
+	//	final User user = new User();
+	//	user.active = true;
+	//	user.linkedAccounts = Collections.singletonList(LinkedAccount
+	//			.create(authUser));
+    //
+	//	if (authUser instanceof EmailIdentity) {
+	//		final EmailIdentity identity = (EmailIdentity) authUser;
+	//		// Remember, even when getting them from FB & Co., emails should be
+	//		// verified within the application as a security breach there might
+	//		// break your security as well!
+	//		user.email = identity.getEmail();
+	//		user.emailValidated = false;
+	//	}
+    //
+	//	if (authUser instanceof NameIdentity) {
+	//		final NameIdentity identity = (NameIdentity) authUser;
+	//		final String name = identity.getName();
+	//		if (name != null) {
+	//			user.name = name;
+	//		}
+	//	}
+    //
+	//	user.save();
+	//	return user;
+	//}
 
 	public static void merge(final AuthUser oldUser, final AuthUser newUser) {
 		User.findByAuthUserIdentity(oldUser).merge(
@@ -135,8 +126,19 @@ public class User extends Model {
 		return getEmailUserFind(email).findUnique();
 	}
 
+    private static ExpressionList<User> getAuthUserFind(
+            final AuthUserIdentity identity) {
+        return find.where().eq("active", true)
+                .eq("linkedAccounts.providerUserId", identity.getId())
+                .eq("linkedAccounts.providerKey", identity.getProvider())
+                .eq("organization", Organization.getByHost());
+    }
+
 	private static ExpressionList<User> getEmailUserFind(final String email) {
-		return find.where().eq("active", true).eq("email", email);
+		return find.where()
+                .eq("active", true)
+                .eq("email", email)
+                .eq("organization", Organization.getByHost());
 	}
 
 	public LinkedAccount getAccountByProvider(final String providerKey) {
