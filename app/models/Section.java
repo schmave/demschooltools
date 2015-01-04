@@ -33,10 +33,11 @@ public class Section extends Model {
 	public String num = "";
 
     @OneToMany(mappedBy="section")
-    @OrderBy("num ASC")
-	@Where(clause = "${ta}.deleted = false")
+    // Doesn't seem to work in Play 2.3.7... I think it used to.
+    //@OrderBy("num ASC")
+	//@Where(clause = "${ta}.deleted = false")
     @JsonIgnore
-    public List<Entry> entries;
+    private List<Entry> entries;
 
     @ManyToOne()
     public Chapter chapter;
@@ -51,6 +52,13 @@ public class Section extends Model {
     public static Section findById(int id) {
         return find.where().eq("chapter.organization", Organization.getByHost())
             .eq("id", id).findUnique();
+    }
+
+    public List<Entry> entries() {
+        return Entry.find.where()
+            .eq("section", this)
+            .eq("deleted", Boolean.FALSE)
+            .orderBy("num ASC").findList();
     }
 
     public String getNumber() {
