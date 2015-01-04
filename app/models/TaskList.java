@@ -14,6 +14,9 @@ public class TaskList extends Model {
 
     public String title;
 
+    @ManyToOne()
+    public Organization organization;
+
     @OneToMany(mappedBy="task_list")
     @OrderBy("sort_order")
     public List<Task> tasks;
@@ -25,5 +28,11 @@ public class TaskList extends Model {
     public static Finder<Integer, TaskList> find = new Finder(
         Integer.class, TaskList.class
     );
+
+    public static TaskList findById(int id) {
+        return find.where().eq("organization", Organization.getByHost())
+            .eq("id", id).findUnique();
+    }
+
 }
 

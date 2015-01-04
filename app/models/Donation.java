@@ -41,4 +41,10 @@ public class Donation extends Model {
     public static Finder<Integer, Donation> find = new Finder(
         Integer.class, Donation.class
     );
+
+    public static Donation findById(int id) {
+        return find.where().eq("person.organization", Organization.getByHost())
+            .eq("id", id).findUnique();
+    }
+
 }

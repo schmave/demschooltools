@@ -43,6 +43,11 @@ public class Charge extends Model implements Comparable<Charge> {
         Integer.class, Charge.class
     );
 
+    public static Charge findById(int id) {
+        return find.where().eq("the_case.meeting.organization", Organization.getByHost())
+            .eq("id", id).findUnique();
+    }
+
     public static Charge create(Case c)
     {
         Charge result = new Charge();

@@ -28,4 +28,9 @@ public class Task extends Model {
     public static Finder<Integer, Task> find = new Finder(
         Integer.class, Task.class
     );
+
+    public static Task findById(int id) {
+        return find.where().eq("task_list.organization", Organization.getByHost())
+            .eq("id", id).findUnique();
+    }
 }

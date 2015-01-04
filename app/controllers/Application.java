@@ -41,21 +41,32 @@ public class Application extends Controller {
     }
 
     public static List<Charge> getActiveSchoolMeetingReferrals() {
-        return Charge.find.where().eq("referred_to_sm", true).eq("sm_decision", null).orderBy("id DESC").findList();
+        return Charge.find.where()
+            .eq("referred_to_sm", true)
+            .eq("sm_decision", null)
+            .eq("person.organization", Organization.getByHost())
+            .orderBy("id DESC").findList();
     }
 
     public static Result viewSchoolMeetingDecisions() {
         List<Charge> the_charges =
-            Charge.find.where().
-                eq("referred_to_sm", true).
-                isNotNull("sm_decision").
-                orderBy("id DESC").findList();
+            Charge.find.where()
+                .eq("referred_to_sm", true)
+                .eq("person.organization", Organization.getByHost())
+                .isNotNull("sm_decision")
+                .orderBy("id DESC").findList();
         return ok(views.html.view_sm_decisions.render(the_charges));
     }
 
 	static List<Person> allPeople() {
-        Tag cur_student_tag = Tag.find.where().eq("title", "Current Student").findUnique();
-        Tag staff_tag = Tag.find.where().eq("title", "Staff").findUnique();
+        Tag cur_student_tag = Tag.find.where()
+            .eq("title", "Current Student")
+            .eq("organization", Organization.getByHost())
+            .findUnique();
+        Tag staff_tag = Tag.find.where()
+            .eq("title", "Staff")
+            .eq("organization", Organization.getByHost())
+            .findUnique();
 
         List<Person> people = CRM.getPeopleForTag(cur_student_tag.id);
         people.addAll(CRM.getPeopleForTag(staff_tag.id));
@@ -63,14 +74,18 @@ public class Application extends Controller {
 	}
 
     public static Result index() {
-        List<Meeting> meetings = Meeting.find.orderBy("date DESC").findList();
+        List<Meeting> meetings = Meeting.find
+            .where().eq("organization", Organization.getByHost())
+            .orderBy("date DESC").findList();
 
         List<Charge> sm_charges = getActiveSchoolMeetingReferrals();
 
         List<Person> people = allPeople();
         Collections.sort(people, Person.SORT_DISPLAY_NAME);
 
-        List<Entry> entries = Entry.find.findList();
+        List<Entry> entries = Entry.find
+            .where().eq("section.chapter.organization", Organization.getByHost())
+            .findList();
         List<Entry> entries_with_charges = new ArrayList<Entry>();
         for (Entry e : entries) {
             if (e.charges.size() > 0) {
@@ -85,26 +100,33 @@ public class Application extends Controller {
     }
 
     public static Result viewMeeting(int meeting_id) {
-        return ok(views.html.view_meeting.render(Meeting.find.byId(meeting_id)));
+        return ok(views.html.view_meeting.render(Meeting.findById(meeting_id)));
     }
 
     public static Result viewMeetingResolutionPlans(int meeting_id) {
-        return ok(views.html.view_meeting_resolution_plans.render(Meeting.find.byId(meeting_id)));
+        return ok(views.html.view_meeting_resolution_plans.render(Meeting.findById(meeting_id)));
     }
 
 	public static Result viewManual() {
-		return ok(views.html.view_manual.render(Chapter.find.where("deleted = false").order("num ASC").findList()));
+		return ok(views.html.view_manual.render(Chapter.find
+            .where().eq("deleted", Boolean.FALSE)
+            .eq("organization", Organization.getByHost())
+            .order("num ASC").findList()));
 	}
 
     public static Result viewManualChanges() {
         Date now = new Date();
         Date seven_days_before = new Date(now.getTime() - 1000 * 60 * 60 * 24 * 7);
-        List<ManualChange> changes = ManualChange.find.where().gt("date_entered", seven_days_before).findList();
+        List<ManualChange> changes =
+            ManualChange.find.where()
+                .gt("date_entered", seven_days_before)
+                .eq("entry.section.chapter.organization", Organization.getByHost())
+                .findList();
         return ok(views.html.view_manual_changes.render(changes));
     }
 
 	public static Result viewChapter(Integer id) {
-		return ok(views.html.view_chapter.render(Chapter.find.byId(id)));
+		return ok(views.html.view_chapter.render(Chapter.findById(id)));
 	}
 
     static List<Charge> getLastWeekCharges(Person p) {
@@ -140,22 +162,22 @@ public class Application extends Controller {
     }
 
     public static Result getPersonHistory(Integer id) {
-        Person p = Person.find.byId(id);
+        Person p = Person.findById(id);
         return ok(views.html.person_history.render(p, new PersonHistory(p, false), getLastWeekCharges(p)));
     }
 
     public static Result getRuleHistory(Integer id) {
-        Entry r = Entry.find.byId(id);
+        Entry r = Entry.findById(id);
         return ok(views.html.rule_history.render(r, new RuleHistory(r, false), getRecentResolutionPlans(r)));
     }
 
     public static Result viewPersonHistory(Integer id) {
-        Person p = Person.find.byId(id);
+        Person p = Person.findById(id);
         return ok(views.html.view_person_history.render(p, new PersonHistory(p), getLastWeekCharges(p)));
     }
 
     public static Result viewRuleHistory(Integer id) {
-        Entry r = Entry.find.byId(id);
+        Entry r = Entry.findById(id);
         return ok(views.html.view_rule_history.render(r, new RuleHistory(r), getRecentResolutionPlans(r)));
 	}
 
@@ -185,7 +207,9 @@ public class Application extends Controller {
         Calendar end_date = (Calendar)start_date.clone();
         end_date.add(GregorianCalendar.DATE, 6);
 
-        List<Charge> all_charges = Charge.find.findList();
+        List<Charge> all_charges = Charge.find
+            .where().eq("person.organization", Organization.getByHost())
+            .findList();
         WeeklyStats result = new WeeklyStats();
         result.rule_counts = new TreeMap<Entry, Integer>();
         result.person_counts = new TreeMap<Person, WeeklyStats.PersonCounts>();
@@ -212,8 +236,10 @@ public class Application extends Controller {
             }
         }
 
-        List<Meeting> meetings = Meeting.find.where().le("date", end_date.getTime()).
-            ge("date", start_date.getTime()).findList();
+        List<Meeting> meetings = Meeting.find.where()
+            .eq("organization", Organization.getByHost())
+            .le("date", end_date.getTime())
+            .ge("date", start_date.getTime()).findList();
         for (Meeting m : meetings) {
             for (Case c : m.cases) {
                 result.num_cases++;
@@ -275,7 +301,9 @@ public class Application extends Controller {
     public static String jsonRules(String term) {
 		term = term.toLowerCase();
 
-        List<Entry> rules = Entry.find.where().eq("deleted", false).orderBy("title ASC").findList();
+        List<Entry> rules = Entry.find.where()
+            .eq("section.chapter.organization", Organization.getByHost())
+            .eq("deleted", false).orderBy("title ASC").findList();
 
         List<Map<String, String> > result = new ArrayList<Map<String, String> > ();
         for (Entry r : rules) {
@@ -293,7 +321,7 @@ public class Application extends Controller {
     public static Result getLastRp(Integer personId, Integer ruleId) {
         Date now = new Date();
 
-        for (Charge c : Person.find.byId(personId).charges) {
+        for (Charge c : Person.findById(personId).charges) {
             if (c.rule != null &&
                 c.rule.id.equals(ruleId) &&
                 now.getTime() - c.the_case.meeting.date.getTime() > 1000 * 60 * 60 * 24) {

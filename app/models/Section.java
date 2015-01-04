@@ -48,6 +48,11 @@ public class Section extends Model {
         Integer.class, Section.class
     );
 
+    public static Section findById(int id) {
+        return find.where().eq("chapter.organization", Organization.getByHost())
+            .eq("id", id).findUnique();
+    }
+
     public String getNumber() {
         return chapter.num + num;
     }

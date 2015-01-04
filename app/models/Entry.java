@@ -50,6 +50,11 @@ public class Entry extends Model implements Comparable<Entry> {
         Integer.class, Entry.class
     );
 
+    public static Entry findById(int id) {
+        return find.where().eq("section.chapter.organization", Organization.getByHost())
+            .eq("id", id).findUnique();
+    }
+
     public String getNumber() {
         return section.getNumber() + "." + num;
     }

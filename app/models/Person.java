@@ -4,6 +4,8 @@ import java.util.*;
 
 import javax.persistence.*;
 
+import org.codehaus.jackson.annotate.*;
+
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
 import com.avaje.ebean.RawSql;
@@ -12,8 +14,7 @@ import com.avaje.ebean.validation.NotNull;
 
 import controllers.*;
 
-import org.codehaus.jackson.annotate.*;
-
+import play.Logger;
 import play.data.*;
 import play.data.validation.Constraints.*;
 import play.data.validation.ValidationError;
@@ -29,6 +30,9 @@ public class Person extends Model implements Comparable<Person> {
 
     @Column(columnDefinition = "TEXT")
     public String notes;
+
+    @ManyToOne()
+    public Organization organization;
 
     @NotNull
     public String gender = "Unknown";
@@ -102,8 +106,16 @@ public class Person extends Model implements Comparable<Person> {
         Integer.class, Person.class
     );
 
+    public static Person findById(int id) {
+        return find.where().eq("organization", Organization.getByHost())
+            .eq("person_id", id).findUnique();
+    }
+
     public static List<Person> all() {
-        return find.where().eq("is_family", Boolean.FALSE).orderBy("last_name, first_name ASC").findList();
+        return find.where()
+            .eq("organization", Organization.getByHost())
+            .eq("is_family", Boolean.FALSE)
+            .orderBy("last_name, first_name ASC").findList();
     }
 
     @JsonIgnore
@@ -165,11 +177,17 @@ public class Person extends Model implements Comparable<Person> {
     }
 
     public static Person create(Form<Person> form) {
+        java.util.Map<java.lang.String,java.lang.String> data = form.data();
+        Logger.debug("+++++++++ Person [create]");
+        for (String key : data.keySet()) {
+            Logger.debug(key + " --> " + data.get(key));
+        }
         Person person = form.get();
         person.is_family = false;
         person.attachToPersonAsFamily(form.field("same_family_id").value());
-
+        person.organization = Organization.getByHost();
         person.save();
+
         person.addPhoneNumbers(form);
         return person;
     }
