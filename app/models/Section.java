@@ -13,7 +13,7 @@ import com.avaje.ebean.validation.NotNull;
 
 import controllers.*;
 
-import org.codehaus.jackson.annotate.*;
+import com.fasterxml.jackson.annotation.*;
 
 import play.data.*;
 import play.data.validation.Constraints.*;

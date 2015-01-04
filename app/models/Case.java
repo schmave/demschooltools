@@ -13,9 +13,9 @@ import java.util.TreeMap;
 
 import javax.persistence.*;
 
-import org.codehaus.jackson.*;
-import org.codehaus.jackson.annotate.*;
-import org.codehaus.jackson.map.*;
+import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import play.db.ebean.Model;
 import play.db.ebean.Model.Finder;

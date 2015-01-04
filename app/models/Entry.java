@@ -4,7 +4,7 @@ import java.util.*;
 
 import javax.persistence.*;
 
-import org.codehaus.jackson.annotate.*;
+import com.fasterxml.jackson.annotation.*;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
