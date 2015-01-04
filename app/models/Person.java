@@ -26,10 +26,14 @@ public class Person extends Model implements Comparable<Person> {
     @Id
     public Integer person_id;
 
-    public String first_name, last_name;
+    @NotNull
+    public String first_name="";
+    @NotNull
+    public String last_name="";
 
     @Column(columnDefinition = "TEXT")
-    public String notes;
+    @NotNull
+    public String notes="";
 
     @ManyToOne()
     public Organization organization;
@@ -42,21 +46,30 @@ public class Person extends Model implements Comparable<Person> {
     @JsonIgnore
     public List<PhoneNumber> phone_numbers;
 
-    public String address;
-    public String city;
-    public String state;
-    public String zip;
-    public String neighborhood;
+    @NotNull
+    public String address="";
+    @NotNull
+    public String city="";
+    @NotNull
+    public String state="";
+    @NotNull
+    public String zip="";
+    @NotNull
+    public String neighborhood="";
 
     // email address
-    public String email;
+    @NotNull
+    public String email="";
 
     public Date dob;
     public Date approximate_dob;
 
+    @NotNull
 	public String display_name = "";
 
+    @NotNull
 	public String previous_school = "";
+    @NotNull
 	public String school_district = "";
 
     @Transient
@@ -100,6 +113,7 @@ public class Person extends Model implements Comparable<Person> {
     @JsonIgnore
     public List<Person> family_members;
 
+    @NotNull
 	public String grade = "";
 
     public static Finder<Integer,Person> find = new Finder(
@@ -156,6 +170,7 @@ public class Person extends Model implements Comparable<Person> {
             // Create a new family to hold these two people.
             Person family = new Person();
             family.is_family = true;
+            family.organization = Organization.getByHost();
             family.save();
             this.family = family;
             other_family_member.family = family;
@@ -178,10 +193,6 @@ public class Person extends Model implements Comparable<Person> {
 
     public static Person create(Form<Person> form) {
         java.util.Map<java.lang.String,java.lang.String> data = form.data();
-        Logger.debug("+++++++++ Person [create]");
-        for (String key : data.keySet()) {
-            Logger.debug(key + " --> " + data.get(key));
-        }
         Person person = form.get();
         person.is_family = false;
         person.attachToPersonAsFamily(form.field("same_family_id").value());
