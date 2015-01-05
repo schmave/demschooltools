@@ -12,6 +12,8 @@
             [com.ashafa.clutch :as couch]
             [clojure-getting-started.db :as db]
             [clojure-getting-started.database :as data]
+            [clojure-getting-started.dates :as dates]
+            [clojure-getting-started.attendance :as att]
             [clojure.data.json :as json]
             [clj-time.core :as t]
             [net.cgrand.enlive-html :as enlive]
@@ -32,23 +34,23 @@
   (GET "/" [] (friend/authenticated (io/resource "index.html")))
   (GET "/swipe/:sid" [sid year]
        (friend/authorize #{::user}
-                         (resp/response (data/get-attendance year sid))))
+                         (resp/response (att/get-attendance year sid))))
   (GET "/resetdb" [] (data/sample-db) (resp/redirect "/"))
   (POST "/override" [_id day]
         (friend/authorize #{::admin}
                           (data/override-date _id day))
-        (resp/response (first (data/get-students-with-att
-                               (data/get-current-year-string)
+        (resp/response (first (att/get-students-with-att
+                               (dates/get-current-year-string (data/get-years))
                                [_id]))))
   (POST "/swipe" [direction _id]
         (friend/authorize #{::user}
                           (if (= direction "in")
                             (data/swipe-in _id)
                             (data/swipe-out _id)))
-        (resp/response (first (data/get-students-with-att
-                               (data/get-current-year-string)
+        (resp/response (first (att/get-students-with-att
+                               (dates/get-current-year-string (data/get-years))
                                [_id]))))
-  (GET "/currentyear" [] (data/get-current-year-string))
+  (GET "/currentyear" [] (dates/get-current-year-string (data/get-years)))
   (GET "/year/all" []
        (friend/authorize #{::user}
                          (map :name (data/get-years))))
@@ -58,12 +60,12 @@
                           (map :name (data/get-years))))
   (POST "/student/all" [year]
         (friend/authorize #{::user}
-                          (let [year (if year year (data/get-current-year-string))]
-                             (data/get-students-with-att year))))
+                          (let [year (if year year (dates/get-current-year-string (data/get-years)))]
+                            (att/get-students-with-att year))))
   (POST "/student/create" [name]
         (friend/authorize #{::admin}
                           (let [made? (data/make-student name)]
-                            (resp/response {:made made? :students (data/get-students-with-att)}))))
+                            (resp/response {:made made? :students (att/get-students-with-att)}))))
   (POST "/year/create" [from_date to_date]
         (friend/authorize #{::admin}
                           (let [made? (data/make-year from_date to_date)]

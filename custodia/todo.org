@@ -26,3 +26,5 @@
 * TODO Configurable passwords
 * DONE Report - Students swiped in today
   CLOSED: [2015-01-03 Sat 20:49]
+* TODO School day is student swipe in
+* TODO Prevent swipe going over many days

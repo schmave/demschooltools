@@ -5,7 +5,10 @@
             [clj-time.core :as t]
             [clj-time.coerce :as c]
             [clojure.tools.trace :as trace]
-            [clojure-getting-started.database :as db]))
+            [clojure-getting-started.database :as db]
+            [clojure-getting-started.attendance :as att]
+            [clojure-getting-started.dates :as dates]
+            ))
 
 (comment
   (run-tests 'clojure-getting-started.web-test) 
@@ -13,10 +16,10 @@
   )  
 
 (deftest date-stuff
-  (= (db/make-date-string "2014-12-28T14:32:12.509Z")
+  (= (dates/make-date-string "2014-12-28T14:32:12.509Z")
      "12-28-2014")
   ;; this will fail after DST *shakes fist*
-  (is (= (db/make-time-string "2014-12-28T14:32:12.509Z")
+  (is (= (dates/make-time-string "2014-12-28T14:32:12.509Z")
          "09:32:12")))
 
 (defn add-swipes [sid]
@@ -53,7 +56,7 @@
       (db/swipe-out sid (t/plus basetime (t/hours 4)))
       )
     (db/override-date sid "10-14-2014")
-    (let [att (db/get-attendance (db/get-current-year-string) sid)]
+    (let [att (att/get-attendance (dates/get-current-year-string (db/get-years)) sid)]
       (testing "Total Valid Day Count"
         (is (= (:total_days att)
                1)))
@@ -72,7 +75,7 @@
         ;; good today
         (add-swipes sid)
         (db/override-date sid "10-18-2014")
-        (let [att (db/get-attendance (db/get-current-year-string) sid)]
+        (let [att (att/get-attendance (dates/get-current-year-string (db/get-years)) sid)]
           (testing "Total Valid Day Count"
             (is (= (:total_days att)
                    4)))
@@ -91,7 +94,7 @@
                    "10:09:27")))
           )
         ;; old date string
-        (let [att (db/get-attendance  "06-01-2013-05-01-2014" sid)]
+        (let [att (att/get-attendance  "06-01-2013-05-01-2014" sid)]
           (testing "Total Valid Day Count"
             (is (= (:total_days att)
                    0)))
@@ -112,7 +115,7 @@
     (let [basetime (t/date-time 2014 10 14 14 9 27 246)]
       (db/swipe-in sid basetime))
     (trace/trace sid)
-    (let [att (db/get-attendance (db/get-current-year-string)  sid)]
+    (let [att (att/get-attendance (dates/get-current-year-string (db/get-years))  sid)]
       (testing "Total Valid Day Count"
         (is (= (-> att :days first :day)
                "10-14-2014")))

@@ -2,6 +2,7 @@
   (:require [com.ashafa.clutch :as couch]
             [clojure-getting-started.db :as db]
             [clojure-getting-started.helpers :refer :all]
+            [clojure-getting-started.dates :refer :all]
             [clojure.tools.trace :as trace]
             [clj-time.format :as f]
             [clj-time.local :as l]
@@ -46,63 +47,8 @@
                  #_(let [in-swipe (ask-for-in-swipe id)]
                      (couch/put-document db/db (assoc in-swipe :out_time (str time))))))))
 
-(defn get-hours-needed [id]
-  ;; TODO implement this
-  5)
-
-(def date-format (f/formatter "MM-dd-yyyy"))
-(def time-format (f/formatter "hh:mm:ss"))
-;; TODO make this configurable?
-(def local-time-zone-id (t/time-zone-for-id "America/New_York"))
-
-(defn format-to-local [f d]
-  (f/unparse (f/with-zone f local-time-zone-id) d))
-
-(defn parse-date-string [d]
-  (f/parse date-format d))
-
-(defn make-date-string [d]
-  (when d (format-to-local date-format (f/parse d))))
-
-(defn make-time-string [d]
-  (when d (format-to-local time-format (f/parse d))))
-
-(defn clean-dates [swipe]
-  (?assoc swipe
-          :nice_in_time (make-time-string (:in_time swipe))
-          :nice_out_time (make-time-string (:out_time swipe))))
-
-(defn append-validity [min-hours swipes]
-  (let [has-override? (->> swipes
-                           second
-                           (filter #(= (:type %) "override"))
-                           not-empty
-                           boolean)
-        int-mins (->> swipes
-                      second
-                      (map (comp :interval))
-                      (filter (comp not nil?))
-                      (reduce +))
-        int-hours (/ int-mins 60)]
-    {:valid (or has-override? (> int-hours min-hours))
-     :override has-override?
-     :day (first swipes)
-     :total_mins int-mins
-     :swipes (second swipes)}))
 
 ;; TODO - make multimethod on type
-(defn swipe-day [swipe]
-  (if (:in_time swipe)
-    (make-date-string (:in_time swipe))
-    (:date swipe)))
-
-(defn append-interval [swipe]
-  (if (:out_time swipe)
-    (let [int (t/interval (f/parse (:in_time swipe))
-                          (f/parse (:out_time swipe)))
-          int-hours (t/in-minutes int)]
-      (assoc swipe :interval int-hours))
-    swipe))
 
 (defn get-years
   ([] (get-years nil))
@@ -113,39 +59,6 @@
   (when-let [year (first (get-years year))]
     (couch/delete-document db/db year)))
 
-(defn only-dates-between [list f dfrom dto]
-  (filter #(t/within? (t/interval dfrom dto)
-                      (f/parse (f %)))
-          list))
-
-(defn get-current-year-string []
-  (->> (get-years)
-       (filter #(t/within? (t/interval (f/parse (:from %))
-                                       (f/parse (:to %)))
-                           (t/now)))
-       first
-       :name))
-
-(defn get-attendance [year id]
-  (let [year (first (get-years year))
-        from (f/parse (:from year))
-        to (f/parse (:to year))
-        min-hours (get-hours-needed id)
-        swipes (get-swipes id)
-        swipes (only-dates-between swipes :in_time from to)
-        swipes (map append-interval swipes)
-        swipes (map clean-dates swipes)
-        swipes (concat swipes (only-dates-between (get-overrides id) :date from to))
-        grouped-swipes (group-by swipe-day swipes)
-        summed-days (map #(append-validity min-hours %) grouped-swipes)
-        summed-days (reverse summed-days)
-        today-string (format-to-local date-format (t/now))
-        swiped-in-today? (-> summed-days first :day (= today-string))]
-    {:total_days (count (filter :valid summed-days))
-     :total_abs (count (filter (comp not :valid) summed-days))
-     :total_overrides (count (filter :override summed-days))
-     :today swiped-in-today?
-     :days summed-days}))
 
 (defn override-date [id date-string]
   (->> {:type :override
@@ -156,13 +69,6 @@
 (defn get-students
   ([] (get-students nil))
   ([ids] (get-* "students" ids)))
-
-(defn get-students-with-att
-  ([] (get-students-with-att (get-current-year-string) nil))
-  ([year] (get-students-with-att year nil))
-  ([year ids]
-     (map #(merge (get-attendance year (:_id %)) %)
-          (get-students ids))))
 
 ;; (get-years)    
 (defn student-not-yet-created [name]
