@@ -367,7 +367,7 @@ function Case (id, el) {
 
     this.addCharge = function() {
         $('body').animate({'scrollTop': $('body').scrollTop() + 100}, 'slow');
-        $.post("/addCharge?case_number=" + id,
+        $.post("/addCharge?case_id=" + id,
                function(data, textStatus, jqXHR) {
             self.addChargeNoServer(parseInt(data))
         } );
@@ -381,7 +381,7 @@ function Case (id, el) {
         return new_charge;
     }
 
-    this.id = id
+    this.id = id;
     this.el = el;
     this.writer_chooser = new PeopleChooser(el.find(".writer"),
                                             self.markAsModified,
@@ -391,11 +391,11 @@ function Case (id, el) {
     this.testifier_chooser = new PeopleChooser(
         el.find(".testifier"),
         function(person) {
-            $.post("/addTestifier?case_number=" + id +
+            $.post("/addTestifier?case_id=" + id +
                    "&person_id=" + person.id);
         },
         function(person) {
-            $.post("/removeTestifier?case_number=" + id +
+            $.post("/removeTestifier?case_id=" + id +
                    "&person_id=" + person.id);
         });
     this.is_modified = false;
@@ -438,7 +438,7 @@ function loadInitialData() {
 
     for (i in app.initial_data.cases) {
         data = app.initial_data.cases[i];
-        new_case = addCaseNoServer(data.case_number);
+        new_case = addCaseNoServer(data.id, data.case_number);
         new_case.loadData(data);
     }
 }
@@ -498,10 +498,10 @@ $(function () {
     }
 });
 
-function addCaseNoServer(id)
+function addCaseNoServer(id, number)
 {
     new_case = $("#meeting-cases").append(
-        app.case_template({"num": id})).
+        app.case_template({"num": number})).
         children(":last-child");
 
     var case_obj = new Case(id, new_case);
@@ -520,7 +520,8 @@ function addCase()
 {
     $.post("/newCase?meeting_id=" + app.meeting_id, "",
            function(data, textStatus, jqXHR) {
-        var new_case = addCaseNoServer(data);
+        id_num_pair = eval(data);
+        var new_case = addCaseNoServer(id_num_pair[0], id_num_pair[1]);
         $('body').animate({'scrollTop': new_case.el.offset().top + 500}, 'slow');
     });
 }

@@ -25,6 +25,9 @@ import play.libs.Json;
 @Table(name="`case`")
 public class Case extends Model {
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "case_id_seq")
+    public Integer id;
+
     public String case_number;
 
     public String location = "";
@@ -48,19 +51,19 @@ public class Case extends Model {
     @OrderBy("id ASC")
     public List<Charge> charges;
 
-    public static Finder<String, Case> find = new Finder(
-        String.class, Case.class
+    public static Finder<Integer, Case> find = new Finder(
+        Integer.class, Case.class
     );
 
-    public static Case findById(String id) {
+    public static Case findById(Integer id) {
         return find.where().eq("meeting.organization", Organization.getByHost())
-            .eq("case_number", id).findUnique();
+            .eq("id", id).findUnique();
     }
 
-    public static Case create(String id, Meeting m)
+    public static Case create(String number, Meeting m)
     {
         Case result = new Case();
-        result.case_number = id;
+        result.case_number = number;
         result.meeting = m;
         result.save();
 
