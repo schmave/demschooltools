@@ -21,7 +21,8 @@
 		<option value="@address">@address</option>
 	}
 </select>
-<button type="button" class="btn btn-warning btn-sm"
+<img src="@routes.Assets.at("/images/loading.gif")" id="loading-indicator-test" style="display:none" />
+<button type="button" id="send-button-test" class="btn btn-warning btn-sm"
 onclick="javascript:sendTestEmail('@routes.CRM.sendTestEmail()', @email.id);">Send test email</button>
 
 <p><p>Changed your mind? <button type="button" class="btn btn-danger btn-sm"
@@ -52,7 +53,9 @@ onclick="javascript:deleteEmail('@routes.CRM.deleteEmail()', @email.id);">Delete
 	}
 </select>
 
-<p><button type="button" class="btn btn-warning btn-sm"
+<p>
+<img src="@routes.Assets.at("/images/loading.gif")" id="loading-indicator" style="display:none" />
+<button type="button" id="send-button" class="btn btn-warning btn-sm"
 onclick="javascript:sendEmail('@routes.CRM.sendEmail()', @email.id);">3. SEND!</button>
 
 <p>(A copy will be sent to staff@@TRVS)
