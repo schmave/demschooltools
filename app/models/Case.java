@@ -23,7 +23,7 @@ import play.libs.Json;
 
 @Entity
 @Table(name="`case`")
-public class Case extends Model {
+public class Case extends Model implements Comparable<Case> {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "case_id_seq")
     public Integer id;
@@ -105,4 +105,8 @@ public class Case extends Model {
 			testify_records.size() == 0 &&
 			charges.size() == 0;
 	}
+
+    public int compareTo(Case other) {
+        return case_number.compareTo(other.case_number);
+    }
 }

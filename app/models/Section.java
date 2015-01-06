@@ -34,6 +34,10 @@ public class Section extends Model {
 
     @OneToMany(mappedBy="section")
     // Doesn't seem to work in Play 2.3.7... I think it used to.
+    // See https://github.com/ebean-orm/avaje-ebeanorm/issues/154
+    //
+    // updated in ebean 4.1.x and beyond, which Play doesn't work with.
+    //
     //@OrderBy("num ASC")
 	//@Where(clause = "${ta}.deleted = false")
     @JsonIgnore
