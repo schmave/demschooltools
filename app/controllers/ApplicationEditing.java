@@ -54,7 +54,7 @@ public class ApplicationEditing extends Controller {
         String case_num = m.getCaseNumberPrefix() + next_num;
 
         Case new_case = Case.create(case_num, m);
-        return ok("[" + new_case.id + ", " + new_case.case_number + "]");
+        return ok("[" + new_case.id + ", '" + new_case.case_number + "']");
     }
 
     public static Result saveCase(Integer id) {
