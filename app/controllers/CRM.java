@@ -1,5 +1,6 @@
 package controllers;
 
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -345,12 +346,15 @@ public class CRM extends Controller {
 				try {
 					MimeMessage to_send = new MimeMessage(e.parsedMessage);
 					to_send.addRecipient(Message.RecipientType.TO,
-								new InternetAddress(p.first_name + " " + p.last_name + "<" + p.email + ">"));
+								new InternetAddress(p.email, p.first_name + " " + p.last_name));
 					to_send.setFrom(new InternetAddress(values.get("from")[0]));
 					Transport.send(to_send);
 				} catch (MessagingException ex) {
 					ex.printStackTrace();
 					hadErrors = true;
+                } catch (UnsupportedEncodingException ex) {
+                    ex.printStackTrace();
+                    hadErrors = true;
 				}
 			}
 		}
