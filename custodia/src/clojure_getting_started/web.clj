@@ -29,6 +29,10 @@
             "user" {:username "user"
                     :password (creds/hash-bcrypt "test")
                     :roles #{::user}}})
+(defn year-resp []
+  (let [years (data/get-years)]
+    (resp/response {:years (map :name years)
+                    :current_year (dates/get-current-year-string years)})))
 
 (defroutes app
   (GET "/" [] (friend/authenticated (io/resource "index.html")))
@@ -52,12 +56,11 @@
                                [_id]))))
   (GET "/currentyear" [] (dates/get-current-year-string (data/get-years)))
   (GET "/year/all" []
-       (friend/authorize #{::user}
-                         (map :name (data/get-years))))
+       (friend/authorize #{::user} (year-resp)))
   (POST "/year/delete" [year]
         (friend/authorize #{::admin}
                           (data/delete-year year)
-                          (map :name (data/get-years))))
+                          (year-resp)))
   (POST "/student/all" [year]
         (friend/authorize #{::user}
                           (let [year (if year year (dates/get-current-year-string (data/get-years)))]

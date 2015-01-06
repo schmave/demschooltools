@@ -71,14 +71,17 @@ angular.module('app').controller("MainController", function($scope, $http){
     $scope.getYears = function() {
         $http.get('/year/all').
             success(function(data){
-                $scope.years = data;
+                $scope.years = data.years;
+                $scope.current_totals_year = data.current_year;
             }). error(function(){});
     };
     $scope.deleteYear = function(year) {
         if(confirm("Delete year " + year + "?")){
             $http.post('/year/delete', {"year":year}).
                 success(function(data){
-                    $scope.years = data;
+                $scope.years = data.years;
+                $scope.current_totals_year = data.current_year;
+                $scope.init();
                 }). error(function(){});
         }
     };
@@ -92,7 +95,7 @@ angular.module('app').controller("MainController", function($scope, $http){
     $scope.init = function(){
         $scope.checkRole();
         $scope.getStudents();
+        $scope.getYears();
     };
-    $scope.getYears();
     $scope.init();
 });
