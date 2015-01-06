@@ -1,25 +1,38 @@
 
 function sendTestEmail(url, id) {
+    $("#loading-indicator-test").show();
+    $("#send-button-test").prop("disabled", true);
     $.post(url,
            { dest_email: $("#test_destination").val(),
-               id: id });
+               id: id },
+           function() {
+                  $("#loading-indicator-test").hide();
+                  $("#send-button-test").prop("disabled", false);
+             }
+               );
 }
 
 
 function deleteEmail(url, id) {
     $.post(url,
-           { id: id }, 
+           { id: id },
 		   function () { location.reload(); } );
 }
 
 function sendEmail(url, id) {
+    $("#loading-indicator").show();
+    $("#send-button").prop("disabled", true);
     $.post(url,
            { id: id,
 			 familyMode: $("#family_mode").val(),
 			 tagId: last_tag_id,
 			 from: $("#source_address").val(),
-			 }, 
-		   function () { location.reload(); } );
+			 },
+		   function () {
+                  location.reload();
+                  $("#loading-indicator").hide();
+                  $("#send-button").prop("disabled", false);
+           } );
 }
 
 var input_box = "#to_tag";
@@ -55,6 +68,6 @@ $(function() {
 		}
 		reloadAddresses(ui.item.id);
     });
-	
-	$("#family_mode").change(reloadAddresses);
+
+    $("#family_mode").change(reloadAddresses);
 });
