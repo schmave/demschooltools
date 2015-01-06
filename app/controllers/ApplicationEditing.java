@@ -45,7 +45,7 @@ public class ApplicationEditing extends Controller {
     }
 
     public static Result createCase(Integer meeting_id) {
-        Meeting m = Meeting.find.ref(meeting_id);
+        Meeting m = Meeting.find.byId(meeting_id);
 
         String next_num = "" + (m.cases.size() + 1);
         if (next_num.length() == 1) {
@@ -68,7 +68,7 @@ public class ApplicationEditing extends Controller {
 
     public static Result addPersonAtMeeting(Integer meeting_id, Integer person_id,
         Integer role) {
-        Meeting m = Meeting.find.ref(meeting_id);
+        Meeting m = Meeting.find.byId(meeting_id);
 
         PersonAtMeeting.create(m, Person.find.ref(person_id), role);
 
