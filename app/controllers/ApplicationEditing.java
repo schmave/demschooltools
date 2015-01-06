@@ -51,13 +51,13 @@ public class ApplicationEditing extends Controller {
         if (next_num.length() == 1) {
             next_num = "0" + next_num;
         }
-        String id = m.getCaseNumberPrefix() + next_num;
+        String case_num = m.getCaseNumberPrefix() + next_num;
 
-        Case new_case = Case.create(id, m);
-        return ok(id);
+        Case new_case = Case.create(case_num, m);
+        return ok("[" + new_case.id + ", " + new_case.case_number + "]");
     }
 
-    public static Result saveCase(String id) {
+    public static Result saveCase(Integer id) {
         Case c = Case.findById(id);
 
         c.edit(request().queryString());
@@ -89,27 +89,27 @@ public class ApplicationEditing extends Controller {
         return ok();
     }
 
-    public static Result addTestifier(String case_number, Integer person_id)
+    public static Result addTestifier(Integer case_id, Integer person_id)
     {
-        TestifyRecord.create(Case.find.ref(case_number), Person.find.ref(person_id));
+        TestifyRecord.create(Case.find.ref(case_id), Person.find.ref(person_id));
         return ok();
     }
 
-    public static Result removeTestifier(String case_number, Integer person_id)
+    public static Result removeTestifier(Integer case_id, Integer person_id)
     {
         SqlUpdate update = Ebean.createSqlUpdate(
-            "DELETE from testify_record where case_number = :case_number "+
+            "DELETE from testify_record where case_id = :case_id "+
             "and person_id = :person_id");
-        update.setParameter("case_number", case_number);
+        update.setParameter("case_id", case_id);
         update.setParameter("person_id", person_id);
 
         Ebean.execute(update);
         return ok();
     }
 
-    public static Result addCharge(String case_number)
+    public static Result addCharge(Integer case_id)
     {
-        Charge c = Charge.create(Case.find.ref(case_number));
+        Charge c = Charge.create(Case.find.ref(case_id));
         return ok("" + c.id);
     }
 

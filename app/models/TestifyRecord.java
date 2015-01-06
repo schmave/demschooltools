@@ -23,7 +23,7 @@ public class TestifyRecord extends Model {
     public Person person;
 
     @ManyToOne
-    @JoinColumn(name="case_number")
+    @JoinColumn(name="case_id")
     @JsonIgnore
     public Case the_case;
 
