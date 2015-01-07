@@ -135,6 +135,7 @@ public class Person extends Model implements Comparable<Person> {
     @JsonIgnore
     public Map<Entry, List<Charge>> getChargesByRule() {
         Map<Entry, List<Charge>> result = new TreeMap<Entry, List<Charge>>();
+        Collections.sort(charges);
         for (Charge c : charges) {
             if (c.rule != null) {
                 List<Charge> cur_list = result.get(c.rule);
