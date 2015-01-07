@@ -177,11 +177,11 @@ sorttable = {
         // check for a date: dd/mm/yyyy or dd/mm/yy
         // can have / or . or - as separator
         // can be mm/dd as well
-        possdate = text.match(sorttable.DATE_RE)
+        possdate = text.match(sorttable.DATE_RE);
         if (possdate) {
           // looks like a date
-          first = parseInt(possdate[1]);
-          second = parseInt(possdate[2]);
+          first = parseInt(possdate[1], 10);
+          second = parseInt(possdate[2], 10);
           if (first > 12) {
             // definitely dd/mm
             return sorttable.sort_ddmm;
@@ -305,31 +305,34 @@ sorttable = {
 
   // Added by ESM.
   // if m is a month between 01 and 06, add 12 to it.
-  correctSchoolMonth: function(m) {
-       month_num = parseInt(m)
+  correctSchoolMonth: function(month_num_as_string) {
+       var month_num = parseInt(month_num_as_string, 10);
        if (month_num <= 6) {
            month_num += 12;
        }
-       return "" + month_num;
+       return String(month_num);
   },
 
   // Added by ESM.
   // For months within a single school year, 01-06 come after 08-12
   sort_school_mmdd: function(a,b) {
+    var mtch, d, m, dt1, dt2;
     mtch = a[0].match(sorttable.NO_YEAR_DATE_RE);
-    d = mtch[2]; m = mtch[1];
+    d = mtch[2];
+    m = mtch[1];
     m = sorttable.correctSchoolMonth(m);
-    if (m.length == 1) m = '0'+m;
-    if (d.length == 1) d = '0'+d;
+    if (m.length === 1) { m = '0'+m; }
+    if (d.length === 1) { d = '0'+d; }
     dt1 = m+d;
     mtch = b[0].match(sorttable.NO_YEAR_DATE_RE);
-    d = mtch[2]; m = mtch[1];
+    d = mtch[2];
+    m = mtch[1];
     m = sorttable.correctSchoolMonth(m);
-    if (m.length == 1) m = '0'+m;
-    if (d.length == 1) d = '0'+d;
+    if (m.length === 1) { m = '0'+m; }
+    if (d.length === 1) { d = '0'+d; }
     dt2 = m+d;
-    if (dt1==dt2) return 0;
-    if (dt1<dt2) return -1;
+    if (dt1===dt2) { return 0; }
+    if (dt1<dt2) { return -1; }
     return 1;
   },
 
@@ -363,7 +366,7 @@ sorttable = {
 
     } // while(swap)
   }
-}
+};
 
 /* ******************************************************************
    Supporting functions: bundled here to avoid depending on a library
@@ -427,7 +430,7 @@ function dean_addEvent(element, type, handler) {
 		// assign a global event handler to do all the work
 		element["on" + type] = handleEvent;
 	}
-};
+}
 // a counter used to create unique IDs
 dean_addEvent.guid = 1;
 
@@ -440,7 +443,7 @@ function removeEvent(element, type, handler) {
 			delete element.events[type][handler.$$guid];
 		}
 	}
-};
+}
 
 function handleEvent(event) {
 	var returnValue = true;
@@ -456,20 +459,21 @@ function handleEvent(event) {
 		}
 	}
 	return returnValue;
-};
+}
 
 function fixEvent(event) {
 	// add W3C standard event methods
 	event.preventDefault = fixEvent.preventDefault;
 	event.stopPropagation = fixEvent.stopPropagation;
 	return event;
-};
+}
+
 fixEvent.preventDefault = function() {
 	this.returnValue = false;
 };
 fixEvent.stopPropagation = function() {
   this.cancelBubble = true;
-}
+};
 
 // Dean's forEach: http://dean.edwards.name/base/forEach.js
 /*
