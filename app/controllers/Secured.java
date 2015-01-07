@@ -6,10 +6,10 @@ import java.util.Date;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.SqlQuery;
 import com.avaje.ebean.SqlRow;
-
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.user.AuthUser;
 
+import models.Organization;
 import models.User;
 
 import play.Logger;
@@ -53,10 +53,11 @@ public class Secured extends Security.Authenticator {
 
         // If we don't have a logged-in user, try going by IP address.
         if (allow_ip) {
-            String sql = "select ip from allowed_ips where ip like :ip";
+            String sql = "select ip from allowed_ips where ip like :ip and organization_id=:org_id";
             SqlQuery sqlQuery = Ebean.createSqlQuery(sql);
             String address = Application.getRemoteIp();
             sqlQuery.setParameter("ip", address);
+            sqlQuery.setParameter("org_id", Organization.getByHost().id);
 
             // execute the query returning a List of MapBean objects
             SqlRow result = sqlQuery.findUnique();
