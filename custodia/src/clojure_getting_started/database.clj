@@ -16,8 +16,10 @@
          (couch/get-view db/db "view" type {:keys (if (coll? ids) ids [ids])})
          (couch/get-view db/db "view" type))))
 
-(defn get-swipes [ids]
-  (get-* "swipes" ids))
+(defn get-swipes
+  ([] (get-swipes nil))
+  ([ids]
+     (get-* "swipes" ids)))
 
 (defn get-overrides [ids]
   (get-* "overrides" ids))

@@ -11,9 +11,15 @@
             ))
 
 (comment
-  (run-tests 'clojure-getting-started.web-test) 
-  
+  (run-tests 'clojure-getting-started.web-test)  
   )  
+
+(def basetime (t/date-time 2014 10 14 14 9 27 246))
+
+(defn get-att [id]
+  (let [year (dates/get-current-year-string (db/get-years))
+        school-days (att/get-school-days year)]
+    (att/get-attendance school-days year id)))
 
 (deftest date-stuff
   (= (dates/make-date-string "2014-12-28T14:32:12.509Z")
@@ -22,41 +28,43 @@
   (is (= (dates/make-time-string "2014-12-28T14:32:12.509Z")
          "09:32:12")))
 
+
 (defn add-swipes [sid]
   ;; 14 hours in UTC is 9 Am here
-  (let [basetime (t/date-time 2014 10 14 14 9 27 246)]
-    (db/swipe-in sid basetime)
-    (db/swipe-out sid (t/plus basetime (t/hours 6)))
+  (db/swipe-in sid basetime)
+  (db/swipe-out sid (t/plus basetime (t/hours 6)))
 
-    ;; good tomorrow
-    (db/swipe-in sid (t/plus basetime (t/days 1)))
-    (db/swipe-out sid (t/plus basetime (t/days 1) (t/hours 6)))
+  ;; good tomorrow
+  
+  (db/swipe-in sid (t/plus basetime (t/days 1)))
+  (db/swipe-out sid (t/plus basetime (t/days 1) (t/hours 6)))
 
-    ;; short the next
-    (db/swipe-in sid (t/plus basetime (t/days 2)))
-    (db/swipe-out sid (t/plus basetime (t/days 2) (t/hours 4)))
+  ;; short the next
+  
+  (db/swipe-in sid (t/plus basetime (t/days 2)))
+  (db/swipe-out sid (t/plus basetime (t/days 2) (t/hours 4)))
 
 
-    ;; two short the next but long enough
-    (db/swipe-in sid (t/plus basetime (t/days 3)))
-    (db/swipe-out sid (t/plus basetime (t/days 3) (t/hours 4)))
-    (db/swipe-in sid (t/plus basetime (t/days 3) (t/hours 5)))
-    (db/swipe-out sid (t/plus basetime (t/days 3) (t/hours 7)))
+  ;; two short the next but long enough
+  
+  (db/swipe-in sid (t/plus basetime (t/days 3)))
+  (db/swipe-out sid (t/plus basetime (t/days 3) (t/hours 4)))
+  (db/swipe-in sid (t/plus basetime (t/days 3) (t/hours 5)))
+  (db/swipe-out sid (t/plus basetime (t/days 3) (t/hours 7)))
 
-    ;; short the next - 10-18-2014
-    (db/swipe-in sid (t/plus basetime (t/days 4)))
-    (db/swipe-out sid (t/plus basetime (t/days 4) (t/hours 4)))
-    ))
+  ;; short the next - 10-18-2014
+  
+  (db/swipe-in sid (t/plus basetime (t/days 4)))
+  (db/swipe-out sid (t/plus basetime (t/days 4) (t/hours 4)))
+  )
 
 (deftest swipe-attendence-override-test
   (db/sample-db)  
   (let [sid (-> "test" db/make-student :_id)]
-    (let [basetime (t/date-time 2014 10 14 14 9 27 246)]
-      (db/swipe-in sid basetime)
-      (db/swipe-out sid (t/plus basetime (t/hours 4)))
-      )
+    (db/swipe-in sid basetime)
+    (db/swipe-out sid (t/plus basetime (t/hours 4)))
     (db/override-date sid "10-14-2014")
-    (let [att (att/get-attendance (dates/get-current-year-string (db/get-years)) sid)]
+    (let [att (get-att sid)]
       (testing "Total Valid Day Count"
         (is (= (:total_days att)
                1)))
@@ -71,11 +79,18 @@
 
 (deftest swipe-attendence-test
   (do (db/sample-db)  
-      (let [sid (-> "test" db/make-student :_id)]
+      (let [sid (-> "test" db/make-student :_id)
+            sid2 (-> "test2" db/make-student :_id)]
         ;; good today
         (add-swipes sid)
         (db/override-date sid "10-18-2014")
-        (let [att (att/get-attendance (dates/get-current-year-string (db/get-years)) sid)]
+
+        (testing "School year is list of days with swipes"
+          (is (= (att/get-school-days "06-01-2014 06-01-2015")
+                 (list "10-14-2014" "10-15-2014" "10-16-2014" "10-17-2014" "10-18-2014"))))
+        (let [att (get-att sid)
+              att2 (get-att sid2)]
+          (trace/trace "att2" att2)
           (testing "Total Valid Day Count"
             (is (= (:total_days att)
                    4)))
@@ -92,19 +107,22 @@
             (is (= (-> att :days first :swipes first :nice_in_time)
                    ;; shown as hour 10 because that was DST forward +1
                    "10:09:27")))
+          (testing "Total Abs Count For Student 2 Should equal number of total days for student 1"
+            (is (= (:total_abs att2)
+                   5)))
           )
-        ;; old date string
-        (let [att (att/get-attendance  "06-01-2013-05-01-2014" sid)]
-          (testing "Total Valid Day Count"
-            (is (= (:total_days att)
-                   0)))
-          (testing "Total Abs Count"
-            (is (= (:total_abs att)
-                   0)))
-          (testing "Total Overrides"
-            (is (= (:total_overrides att)
-                   0)))
-          ))) 
+        (testing "an older date string shows no attendance in that time"
+          (let [att (att/get-attendance [] "06-01-2013-05-01-2014" sid)]
+            (testing "Total Valid Day Count"
+              (is (= (:total_days att)
+                     0)))
+            (testing "Total Abs Count"
+              (is (= (:total_abs att)
+                     0)))
+            (testing "Total Overrides"
+              (is (= (:total_overrides att)
+                     0)))
+            )))) 
   )
 
 
@@ -112,10 +130,9 @@
   (db/sample-db)  
   (let [sid (-> "test" db/make-student :_id)]
     ;; good today
-    (let [basetime (t/date-time 2014 10 14 14 9 27 246)]
-      (db/swipe-in sid basetime))
-    (trace/trace sid)
-    (let [att (att/get-attendance (dates/get-current-year-string (db/get-years))  sid)]
+    ;;(let [basetime (t/date-time 2014 10 14 14 9 27 246)])
+    (db/swipe-in sid basetime)
+    (let [att (get-att sid)]
       (testing "Total Valid Day Count"
         (is (= (-> att :days first :day)
                "10-14-2014")))

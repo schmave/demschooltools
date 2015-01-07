@@ -38,10 +38,15 @@
      :total_mins int-mins
      :swipes (second swipes)}))
 
-(defn get-attendance [year id]
-  (let [year (first (get-years year))
+(defn get-year-from-to [year-string]
+  (let [year (first (get-years year-string))
         from (f/parse (:from year))
-        to (f/parse (:to year))
+        to (f/parse (:to year))]
+    [from to]))
+
+(defn get-attendance [school-days year id]
+  (let [school-days (zipmap (reverse school-days) (repeat nil))
+        [from to] (get-year-from-to year)
         min-hours (get-hours-needed id)
         swipes (get-swipes id)
         swipes (only-dates-between swipes :in_time from to)
@@ -49,6 +54,7 @@
         swipes (map clean-dates swipes)
         swipes (concat swipes (only-dates-between (get-overrides id) :date from to))
         grouped-swipes (group-by swipe-day swipes)
+        grouped-swipes (merge school-days grouped-swipes)
         summed-days (map #(append-validity min-hours %) grouped-swipes)
         summed-days (reverse summed-days)
         today-string (format-to-local date-format (t/now))
@@ -59,9 +65,16 @@
      :today swiped-in-today?
      :days summed-days}))
 
+(defn get-school-days [year]
+  (let [[from to] (get-year-from-to year)
+        swipes (get-swipes)
+        swipes (only-dates-between swipes :in_time from to)]
+    #_(reverse) (keys (group-by swipe-day swipes))))
+
 (defn get-students-with-att
   ([] (get-students-with-att (get-current-year-string (get-years)) nil))
   ([year] (get-students-with-att year nil))
   ([year ids]
-     (map #(merge (get-attendance year (:_id %)) %)
-          (get-students ids))))
+     (let [school-days (get-school-days year)]
+       (->> (get-students ids)
+            (map #(merge (get-attendance school-days year (:_id %)) %))))))
