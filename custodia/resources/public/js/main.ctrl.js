@@ -39,6 +39,7 @@ angular.module('app').controller("MainController", function($scope, $http){
             success(function(data){
                 $scope.att = data;
                 $scope.current_day = data.days[0];
+                $scope.showHome();
             }). error(function(){});
         $scope.getStudents();
     };

@@ -73,9 +73,11 @@
         </div>
         <div class="lead form-group" ng-show="screen === 'student'">
           <h1>{{att.name}}</h1> 
-          <div class="col-md-12">
-            Attended: {{att.total_days}} - Partial: {{att.total_abs}} - Overrides: {{att.total_overrides}}
+          <div>
             <a type="href" ng-click="screen='home'">Back to student list</a>
+          </div> 
+          <div class="col-md-12" ng-hide="swipe.valid || !isAdmin">
+            Attended: {{att.total_days}} - Absent: {{att.total_abs}} - Overrides: {{att.total_overrides}}
           </div>
           <div class="col-md-6">
             <button ng-click="swipe('in', att._id)">Swipe In</button>
@@ -126,7 +128,7 @@
           </div>
           <ul>
             <li ng-repeat="student in totals_students">
-              {{student.name}} Attended: {{student.total_days}} - Partial: {{student.total_abs}} - Overrides: {{student.total_overrides}}
+              {{student.name}} Attended: {{student.total_days}} - Absent: {{student.total_abs}} - Overrides: {{student.total_overrides}}
             </li>
           </ul>
         </div>

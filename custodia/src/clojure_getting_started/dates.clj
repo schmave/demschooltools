@@ -9,7 +9,7 @@
             [clj-time.coerce :as c]
             ))
 
-(def date-format (f/formatter "MM-dd-yyyy"))
+(def date-format (f/formatter "yyyy-MM-dd"))
 (def time-format (f/formatter "hh:mm:ss"))
 ;; TODO make this configurable?
 (def local-time-zone-id (t/time-zone-for-id "America/New_York"))

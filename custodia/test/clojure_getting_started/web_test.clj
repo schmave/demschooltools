@@ -63,7 +63,7 @@
   (let [sid (-> "test" db/make-student :_id)]
     (db/swipe-in sid basetime)
     (db/swipe-out sid (t/plus basetime (t/hours 4)))
-    (db/override-date sid "10-14-2014")
+    (db/override-date sid "2014-10-14")
     (let [att (get-att sid)]
       (testing "Total Valid Day Count"
         (is (= (:total_days att)
@@ -83,14 +83,13 @@
             sid2 (-> "test2" db/make-student :_id)]
         ;; good today
         (add-swipes sid)
-        (db/override-date sid "10-18-2014")
+        (db/override-date sid "2014-10-18")
 
         (testing "School year is list of days with swipes"
-          (is (= (att/get-school-days "06-01-2014 06-01-2015")
-                 (list "10-14-2014" "10-15-2014" "10-16-2014" "10-17-2014" "10-18-2014"))))
+          (is (= (att/get-school-days "2014-06-01 2015-06-01")
+                 (list "2014-10-14" "2014-10-15" "2014-10-16" "2014-10-17" "2014-10-18"))))
         (let [att (get-att sid)
               att2 (get-att sid2)]
-          (trace/trace "att2" att2)
           (testing "Total Valid Day Count"
             (is (= (:total_days att)
                    4)))
@@ -102,7 +101,7 @@
                    1)))
           (testing "Days sorted correctly"
             (is (= (-> att :days first :day)
-                   "10-18-2014")))
+                   "2014-10-18")))
           (testing "Nice time shown correctly"
             (is (= (-> att :days first :swipes first :nice_in_time)
                    ;; shown as hour 10 because that was DST forward +1
@@ -135,7 +134,7 @@
     (let [att (get-att sid)]
       (testing "Total Valid Day Count"
         (is (= (-> att :days first :day)
-               "10-14-2014")))
+               "2014-10-14")))
       )) 
   )
 

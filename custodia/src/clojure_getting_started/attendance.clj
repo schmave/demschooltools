@@ -55,6 +55,7 @@
         swipes (concat swipes (only-dates-between (get-overrides id) :date from to))
         grouped-swipes (group-by swipe-day swipes)
         grouped-swipes (merge school-days grouped-swipes)
+        grouped-swipes (into (sorted-map) grouped-swipes)
         summed-days (map #(append-validity min-hours %) grouped-swipes)
         summed-days (reverse summed-days)
         today-string (format-to-local date-format (t/now))
@@ -69,7 +70,7 @@
   (let [[from to] (get-year-from-to year)
         swipes (get-swipes)
         swipes (only-dates-between swipes :in_time from to)]
-    #_(reverse) (keys (group-by swipe-day swipes))))
+    (keys (group-by swipe-day swipes))))
 
 (defn get-students-with-att
   ([] (get-students-with-att (get-current-year-string (get-years)) nil))
