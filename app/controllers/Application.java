@@ -323,14 +323,16 @@ public class Application extends Controller {
         Person p = Person.findById(personId);
         List<Charge> charges = Charge.find.where().eq("person", p)
                 .eq("rule_id", ruleId)
+                .lt("the_case.meeting.date", now)
                 .orderBy("the_case.meeting.date DESC")
                 .findList();
-        for (Charge c : charges) {
-            if (now.getTime() - c.the_case.meeting.date.getTime() > 1000 * 60 * 60 * 24) {
-                return ok("" + charges.size() + " prior charges. Last RP (from case #" + c.the_case.case_number +
-                    "): <u>" + c.resolution_plan + "</u>");
-            }
+
+        if (charges.size() > 0) {
+            Charge c = charges.get(0);
+            return ok("" + charges.size() + " prior charges. Last RP (from case #" + c.the_case.case_number +
+                "): <u>" + c.resolution_plan + "</u>");
         }
+
         return ok("No previous charge.");
     }
 
