@@ -46,11 +46,12 @@
         (resp/response (first (att/get-students-with-att
                                (dates/get-current-year-string (data/get-years))
                                [_id]))))
-  (POST "/swipe" [direction _id]
-        (friend/authorize #{::user}
-                          (if (= direction "in")
-                            (data/swipe-in _id)
-                            (data/swipe-out _id)))
+  (POST "/swipe" [direction _id missing]
+        (trace/trace "coming in" [direction _id missing])
+        #_(friend/authorize #{::user}
+                            (if (= direction "in")
+                              (data/swipe-in _id)
+                              (data/swipe-out _id)))
         (resp/response (first (att/get-students-with-att
                                (dates/get-current-year-string (data/get-years))
                                [_id]))))

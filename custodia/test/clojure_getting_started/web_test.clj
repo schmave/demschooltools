@@ -14,7 +14,7 @@
   (run-tests 'clojure-getting-started.web-test)  
   )  
 
-(def basetime (t/date-time 2014 10 14 14 9 27 246))
+(def basetime (t/date-time 2014 10 14 14 9 27 246)) 
 
 (defn get-att [id]
   (let [year (dates/get-current-year-string (db/get-years))
@@ -27,7 +27,6 @@
   ;; this will fail after DST *shakes fist*
   (is (= (dates/make-time-string "2014-12-28T14:32:12.509Z")
          "09:32:12")))
-
 
 (defn add-swipes [sid]
   ;; 14 hours in UTC is 9 Am here
@@ -126,16 +125,19 @@
 
 
 (deftest swipe-attendence-shows-only-when-in
-  (db/sample-db)  
-  (let [sid (-> "test" db/make-student :_id)]
-    ;; good today
-    ;;(let [basetime (t/date-time 2014 10 14 14 9 27 246)])
-    (db/swipe-in sid basetime)
-    (let [att (get-att sid)]
-      (testing "Total Valid Day Count"
-        (is (= (-> att :days first :day)
-               "2014-10-14")))
-      )) 
+  (do (db/sample-db)  
+      (let [sid (-> "test" db/make-student :_id)]
+        ;; good today
+        ;;(let [basetime (t/date-time 2014 10 14 14 9 27 246)])
+        (db/swipe-in sid basetime)
+        (let [att (get-att sid)]
+          (testing "Total Valid Day Count"
+            (is (= (-> att :days first :day)
+                   "2014-10-14")))
+          (testing "Last Swipe was an 'in'"
+            (is (= (-> att :last_swipe_type)
+                   "in")))
+          ))) 
   )
 
 (comment {:total_days 2, :total_abs 1, :days ({:valid true, :day "10-14-2014", :total_mins 360, :swipes [{:nice_out_time "03:09:27", :nice_in_time "09:09:27", :interval 360, :_id "d152dcfff8282f3ffa590d8f9a00fb4e", :_rev "2-0c6538f07be3e825f457a6c77c086ca4", :out_time "2014-10-14T15:09:27.246Z", :type "swipe", :student_id "d152dcfff8282f3ffa590d8f9a00f951", :in_time "2014-10-14T09:09:27.246Z"}]} {:valid true, :day "10-15-2014", :total_mins 360, :swipes [{:nice_out_time "03:09:27", :nice_in_time "09:09:27", :interval 360, :_id "d152dcfff8282f3ffa590d8f9a010780", :_rev "2-9b40bea0ef22868cadba5fb23bc26d80", :out_time "2014-10-15T15:09:27.246Z", :type "swipe", :student_id "d152dcfff8282f3ffa590d8f9a00f951", :in_time "2014-10-15T09:09:27.246Z"}]} {:valid false, :day "10-16-2014", :total_mins 240, :swipes [{:nice_out_time "01:09:27", :nice_in_time "09:09:27", :interval 240, :_id "d152dcfff8282f3ffa590d8f9a011101", :_rev "2-b438d5cb24cb92e5a3b411df19aea4c0", :out_time "2014-10-16T13:09:27.246Z", :type "swipe", :student_id "d152dcfff8282f3ffa590d8f9a00f951", :in_time "2014-10-16T09:09:27.246Z"}]})}) 

@@ -94,9 +94,11 @@
   (db/make-db)
   (make-year (str (t/date-time 2014 6)) (str (t/date-time 2015 6)))
   (make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
-  (make-student "steve")
   (make-student "jim")
-  ;; (swipe-out 1)
+  (let [s (make-student "steve")]
+    (swipe-in (:_id s) (t/minus (t/now) (t/days 1))))
+
+  ;; 
   ;; (get-students)
   ;; (get-students)
   ;; (get-students "steve")

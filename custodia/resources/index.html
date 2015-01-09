@@ -71,17 +71,28 @@
               {{student.name}}
             </li>
         </div>
+        <div class="lead form-group" ng-show="screen === 'get-swipe-time'">
+          <h1 ng-show="missing_direction == 'out'">What time did you leave on {{att.last_swipe_date}}?</h1>
+          <h1 ng-show="missing_direction == 'in'">What time did you come in this morning?</h1>
+          <timepicker ng-model="missing_swipe" hour-step="1" minute-step="1" show-meridian="true"></timepicker>
+          {{missing_swipe}}
+          <button class="btn btn-primary" ng-click="swipe_with_missing(missing_swipe)">Submit</button> 
+          <button ng-click="backStudent()" class="btn btn-primary">Cancel</button> 
+
+        </div>
         <div class="lead form-group" ng-show="screen === 'student'">
-          <h1>{{att.name}}</h1> 
-          <div>
+          <div class="col-md-12">
             <a type="href" ng-click="screen='home'">Back to student list</a>
           </div> 
+          <div class="col-md-12">
+            <h1>{{att.name}}</h1> 
+          </div>
           <div class="col-md-12" ng-hide="swipe.valid || !isAdmin">
             Attended: {{att.total_days}} - Absent: {{att.total_abs}} - Overrides: {{att.total_overrides}}
           </div>
           <div class="col-md-6">
-            <button ng-click="swipe('in', att._id)">Swipe In</button>
-            <button ng-click="swipe('out', att._id)">Swipe Out</button>
+            <button ng-click="swipe('in')">Swipe In</button>
+            <button ng-hide="hideSwipeOut()" ng-click="swipe('out')">Swipe Out</button>
             <ul>
               <li ng-repeat="swipe in att.days" style="text-left">
                 <div class="checkbox">
