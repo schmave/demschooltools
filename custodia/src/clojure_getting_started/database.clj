@@ -30,27 +30,27 @@
 
 (defn only-swiped-in? [in-swipe] (and in-swipe (not (:out_time in-swipe))))
 
+(declare swipe-out)
+(defn make-swipe [student-id]
+  {:type :swipe :student_id student-id :in_time nil :out_time nil})
+
 (defn swipe-in
   ([id] (swipe-in id (t/now)))
-  ([id time] 
+  ([id time & [missing-out]] 
      (let [last-swipe (lookup-last-swipe id)]
-       (if (only-swiped-in? last-swipe)
-         (+ 1 1);; (ask-for-out-swipe)
-         (couch/put-document db/db
-                             {:type :swipe :student_id id :in_time (str time)})))))
-
-(defn- ask-for-in-swipe [id] (swipe-in id))
+       (when (only-swiped-in? last-swipe)
+         (swipe-out id missing-out))
+       (couch/put-document db/db
+                           (assoc (make-swipe id) :in_time (str time))))))
 
 (defn swipe-out
   ([id] (swipe-out id (t/now)))
-  ([id time] (let [last-swipe (lookup-last-swipe id)]
-               (if (only-swiped-in? last-swipe)
-                 (couch/put-document db/db (assoc last-swipe :out_time (str time)))
-                 #_(let [in-swipe (ask-for-in-swipe id)]
-                     (couch/put-document db/db (assoc in-swipe :out_time (str time))))))))
-
-
-;; TODO - make multimethod on type
+  ([id time & [missing-in]]
+     (let [last-swipe (lookup-last-swipe id)]
+       (if (only-swiped-in? last-swipe)
+         (couch/put-document db/db (assoc last-swipe :out_time (str time)))
+         (couch/put-document db/db (assoc :in_time (str missing-in)
+                                          :out_time (str time)))))))
 
 (defn get-years
   ([] (get-years nil))
