@@ -50,8 +50,8 @@
         (trace/trace "coming in" [direction _id missing])
         (friend/authorize #{::user}
                           (if (= direction "in")
-                            (data/swipe-in _id)
-                            (data/swipe-out _id)))
+                            (data/swipe-in _id (t/now) missing)
+                            (data/swipe-out _id (t/now) missing)))
         (resp/response (first (att/get-students-with-att
                                (dates/get-current-year-string (data/get-years))
                                [_id]))))

@@ -41,6 +41,9 @@ angular.module('app').controller("MainController", function($scope, $http){
     };
     $scope.get_missing_swipe = function(){
         var d = new Date();
+        if($scope.att.last_swipe_date) {
+            d = new Date($scope.att.last_swipe_date + "T10:00:00");
+        } 
         $scope.missing_direction = ($scope.att.last_swipe_type =="in")?"out":"in";
         d.setHours(($scope.missing_direction =="in")?8:15);
         d.setMinutes( 0 );

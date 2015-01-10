@@ -34,24 +34,42 @@
 (defn make-swipe [student-id]
   {:type :swipe :student_id student-id :in_time nil :out_time nil})
 
-(defn swipe-in
+(trace/deftrace swipe-in
   ([id] (swipe-in id (t/now)))
-  ([id time & [missing-out]] 
+  ([id in-time & [missing-out]] 
      (let [last-swipe (lookup-last-swipe id)]
        (when (only-swiped-in? last-swipe)
          (swipe-out id missing-out))
        (couch/put-document db/db
-                           (assoc (make-swipe id) :in_time (str time))))))
+                           (assoc (make-swipe id) :in_time (str in-time))))))
 
-(defn swipe-out
+(defn persist! [doc]
+  (couch/put-document db/db doc))
+
+(defn sanitize-out [swipe]
+  (let [in (:in_time swipe)
+        in (when in (f/parse in))
+        out (:out_time swipe)
+        out (when out (f/parse out))]
+    (if (and in out)
+      (if (or (not (t/before? in out))
+              (not (= (t/day in) (t/day out))))
+        (assoc swipe :out_time (:in_time swipe))
+        swipe)
+      swipe)))
+
+;; (sample-db)   
+(trace/deftrace swipe-out
   ([id] (swipe-out id (t/now)))
-  ([id time & [missing-in]]
-     (let [last-swipe (lookup-last-swipe id)]
-       (if (only-swiped-in? last-swipe)
-         (couch/put-document db/db (assoc last-swipe :out_time (str time)))
-         (couch/put-document db/db (assoc :in_time (str missing-in)
-                                          :out_time (str time)))))))
+  ([id out-time & [missing-in]]
+     (let [last-swipe (lookup-last-swipe id)
+           in-swipe (if (only-swiped-in? last-swipe) last-swipe 
+                        (assoc (make-swipe id) :in_time (str missing-in)))
+           out-swipe (assoc in-swipe :out_time (str out-time))
+           out-swipe (sanitize-out out-swipe)]
+       (persist! out-swipe))))
 
+;; TODO - make multimethod on type
 (defn get-years
   ([] (get-years nil))
   ([names]
@@ -96,7 +114,7 @@
   (make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
   (make-student "jim")
   (let [s (make-student "steve")]
-    (swipe-in (:_id s) (t/minus (t/now) (t/days 1))))
+    (swipe-in (:_id s) (t/minus (t/now) (t/days 1) (t/hours 5))))
 
   ;; 
   ;; (get-students)

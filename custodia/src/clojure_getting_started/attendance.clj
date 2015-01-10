@@ -46,12 +46,10 @@
 
 (defn get-last-swipe-type [summed-days]
   (when (-> summed-days first :valid not)
-    (trace/trace "summed" summed-days)
     (let [day (-> summed-days first :day)
           swipes (-> summed-days first :swipes)
           swipes (filter #(= "swipe" (:type %)) swipes)
           last-swipe (last swipes)]
-      (trace/trace last-swipe)
       (cond
        (:out_time last-swipe) ["out" day]
        (:in_time last-swipe) ["in" day]
