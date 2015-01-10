@@ -45,15 +45,16 @@
     [from to]))
 
 (defn get-last-swipe-type [summed-days]
-  (when (-> summed-days first :valid not)
-    (let [day (-> summed-days first :day)
-          swipes (-> summed-days first :swipes)
-          swipes (filter #(= "swipe" (:type %)) swipes)
-          last-swipe (last swipes)]
-      (cond
-       (:out_time last-swipe) ["out" day]
-       (:in_time last-swipe) ["in" day]
-       :else nil))))
+  (let [summed-days (filter #(not (nil? (:swipes %))) summed-days)]
+    (when (-> summed-days first :valid not)
+      (let [day (-> summed-days first :day)
+            swipes (-> summed-days first :swipes)
+            swipes (filter #(= "swipe" (:type %)) swipes)
+            last-swipe (last swipes)]
+        (cond
+         (:out_time last-swipe) ["out" day]
+         (:in_time last-swipe) ["in" day]
+         :else nil)))))
 
 (defn get-attendance [school-days year id]
   (let [school-days (zipmap (reverse school-days) (repeat nil))
@@ -69,7 +70,7 @@
         grouped-swipes (merge school-days grouped-swipes)
         grouped-swipes (into (sorted-map) grouped-swipes)
         summed-days (map #(append-validity min-hours %) grouped-swipes)
-        summed-days (reverse summed-days)
+        summed-days (trace/trace "summed days" (reverse summed-days))
         today-string (format-to-local date-format (t/now))
         [last-swipe-type last-swipe-date] (get-last-swipe-type summed-days)]
     {:total_days (count (filter :valid summed-days))
