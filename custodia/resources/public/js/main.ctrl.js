@@ -6,18 +6,32 @@ angular.module('app').controller("MainController", function($scope, $http){
     $scope.missing_date = "";
     $scope.missing_swipe = "";
     $scope.backStudent = function(s) {
+        $scope.swipedWorked = false;
         $scope.screen = "student";
     };
     $scope.showStudent = function(s) {
+        $scope.swipedWorked = false;
         $scope.backStudent();
         $scope.att = s;
         $scope.current_day = s.days[0];
     };
-    $scope.showHome = function() {$scope.screen = "home";};
-    $scope.showSwipedToday = function() {$scope.screen = "swiped-today";};
-    $scope.showCreate = function() {$scope.screen = "create";};
-    $scope.showCreateYear = function() {$scope.screen = "create-year";};
-    $scope.showStudents = function() {$scope.screen = "student-totals";};
+    $scope.showHome = function(worked) {
+        $scope.swipedWorked = worked;
+        $scope.screen = "home";
+    };
+    $scope.showSwipedToday = function() {
+        $scope.swipedWorked = false;
+        $scope.screen = "swiped-today";
+    };
+    $scope.showCreate = function() {
+        $scope.swipedWorked = false;
+        $scope.screen = "create";};
+    $scope.showCreateYear = function() {
+        $scope.swipedWorked = false;
+        $scope.screen = "create-year";};
+    $scope.showStudents = function() {
+        $scope.swipedWorked = false;
+        $scope.screen = "student-totals";};
     $scope.setDay = function(s) {
         $scope.current_day = s;
     };
@@ -61,7 +75,7 @@ angular.module('app').controller("MainController", function($scope, $http){
                 $scope.att = data;
                 $scope.current_day = data.days[0];
                 $scope.getStudents();
-                $scope.showHome();
+                $scope.showHome($scope.att.name + " swiped successfully!");
             }). error(function(){});
     };
     $scope.hideSwipeOut = function(){
@@ -116,9 +130,9 @@ angular.module('app').controller("MainController", function($scope, $http){
         if(confirm("Delete year " + year + "?")){
             $http.post('/year/delete', {"year":year}).
                 success(function(data){
-                $scope.years = data.years;
-                $scope.current_totals_year = data.current_year;
-                $scope.init();
+                    $scope.years = data.years;
+                    $scope.current_totals_year = data.current_year;
+                    $scope.init();
                 }). error(function(){});
         }
     };
