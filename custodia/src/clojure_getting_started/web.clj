@@ -70,6 +70,10 @@
         (friend/authorize #{::admin}
                           (let [made? (data/make-student name)]
                             (resp/response {:made made? :students (att/get-students-with-att)}))))
+  (POST "/student/togglehours" [_id]
+        (friend/authorize #{::admin}
+                          (let [made? (data/toggle-student _id)]
+                            (resp/response {:made made?}))))
   (POST "/year/create" [from_date to_date]
         (friend/authorize #{::admin}
                           (let [made? (data/make-year from_date to_date)]

@@ -96,14 +96,21 @@
 
 (defn make-student [name]
   (when (student-not-yet-created name)
-    (couch/put-document db/db {:type :student :name name})))
+    (persist! {:type :student :name name :minutes 300})))
+
+(defn- toggle-minutes [hours]
+  (if (= hours 300) 330 300))
+
+(defn toggle-student [_id]
+  (let [student (first (get-students _id))] 
+    (persist! (assoc student :minutes (toggle-minutes (:minutes student))))))
 
 (defn make-year [from to]
   (let [from (f/parse from)
         to (f/parse to)
         name (str (f/unparse date-format from) " "  (f/unparse date-format to))]
     (->> {:type :year :from (str from) :to (str to) :name name}
-         (couch/put-document db/db))))
+         persist!)))
 
 ;; (sample-db true)   
 (defn sample-db

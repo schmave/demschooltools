@@ -53,6 +53,15 @@ angular.module('app').controller("MainController", function($scope, $http){
                 }). error(function(){});
         }
     };
+    $scope.toggleHours = function(student) {
+        if(confirm("Toggle student's required hours?")){
+            $http.post('/student/togglehours', {_id : student._id }).
+                success(function(data){
+                    $scope.getStudents();
+                    $scope.init();
+                }). error(function(){});
+        }
+    };
     $scope.get_missing_swipe = function(){
         var d = new Date();
         if($scope.att.last_swipe_date) {

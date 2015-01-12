@@ -28,4 +28,7 @@
   CLOSED: [2015-01-03 Sat 20:49]
 * DONE School day is student swipe in
   CLOSED: [2015-01-08 Thu 08:11]
-* TODO Prevent swipe going over many days
+* DONE Prevent swipe going over many days
+  CLOSED: [2015-01-13 Tue 20:16]
+* DONE Show swipe success
+  CLOSED: [2015-01-13 Tue 20:16]

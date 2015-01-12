@@ -88,11 +88,13 @@
             <a type="href" ng-click="screen='home'">Back to student list</a>
           </div> 
           <div class="col-md-12">
-            <h1>{{att.name}}</h1> 
+            <h1 class="col-md-6">{{att.name}}</h1> 
+            <span class="col-md-6" ng-hide="swipe.valid || !isAdmin">
+              Attended: {{att.total_days}} - Absent: {{att.total_abs}} - Overrides: {{att.total_overrides}}
+              Requires {{att.min_hours}} hours a day <button class="btn" ng-click="toggleHours(att)">Toggle Hours</button>
+            </span>
           </div>
-          <div class="col-md-12" ng-hide="swipe.valid || !isAdmin">
-            Attended: {{att.total_days}} - Absent: {{att.total_abs}} - Overrides: {{att.total_overrides}}
-          </div>
+          <div class="clearfix"></div>
           <div class="col-md-6">
             <button ng-click="swipe('in')">Swipe In</button>
             <button ng-hide="hideSwipeOut()" ng-click="swipe('out')">Swipe Out</button>
