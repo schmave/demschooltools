@@ -96,14 +96,14 @@
 
 (defn make-student [name]
   (when (student-not-yet-created name)
-    (persist! {:type :student :name name :minutes 300})))
+    (persist! {:type :student :name name :olderdate nil})))
 
-(defn- toggle-minutes [hours]
-  (if (= hours 300) 330 300))
+(defn- toggle-older [older]
+  (if older nil (str (t/now))))
 
 (defn toggle-student [_id]
   (let [student (first (get-students _id))] 
-    (persist! (assoc student :minutes (toggle-minutes (:minutes student))))))
+    (persist! (assoc student :olderdate (toggle-older (:olderdate student))))))
 
 (defn make-year [from to]
   (let [from (f/parse from)

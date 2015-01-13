@@ -16,22 +16,24 @@
     (make-date-string (:in_time swipe))
     (:date swipe)))
 
-(defn append-validity [min-minutes swipes]
+(defn get-min-minutes [student day]
+  ())
+
+(defn append-validity [student [day swipes]]
   (let [has-override? (->> swipes
-                           second
                            (filter #(= (:type %) "override"))
                            not-empty
                            boolean)
         int-mins (->> swipes
-                      second
                       (map (comp :interval))
                       (filter (comp not nil?))
-                      (reduce +))]
+                      (reduce +))
+        min-minutes (get-min-minutes student day)]
     {:valid (or has-override? (> int-mins min-minutes))
      :override has-override?
-     :day (first swipes)
+     :day day
      :total_mins int-mins
-     :swipes (second swipes)}))
+     :swipes swipes}))
 
 (defn get-year-from-to [year-string]
   (let [year (first (get-years year-string))
@@ -54,7 +56,6 @@
 (defn get-attendance [school-days year id student]
   (let [school-days (zipmap (reverse school-days) (repeat nil))
         [from to] (get-year-from-to year)
-        min-minutes (:minutes student)
         swipes (get-swipes id)
         swipes (only-dates-between swipes :in_time from to)
         swipes (map append-interval swipes)
@@ -64,7 +65,7 @@
         ;; adding last swipe before absences
         grouped-swipes (merge school-days grouped-swipes)
         grouped-swipes (into (sorted-map) grouped-swipes)
-        summed-days (map #(append-validity min-minutes %) grouped-swipes)
+        summed-days (map #(append-validity student %) grouped-swipes)
         summed-days (trace/trace "summed days" (reverse summed-days))
         today-string (format-to-local date-format (t/now))
         [last-swipe-type last-swipe-date] (get-last-swipe-type summed-days)]
@@ -73,7 +74,6 @@
                     :total_overrides (count (filter :override summed-days))
                     :today today-string
                     :last_swipe_type last-swipe-type
-                    :min_minutes min-minutes
                     :last_swipe_date last-swipe-date
                     :days summed-days})))
 
