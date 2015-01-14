@@ -16,10 +16,10 @@
 
 (def basetime (t/date-time 2014 10 14 14 9 27 246)) 
 
-(defn get-att [id]
+(defn get-att [id student]
   (let [year (dates/get-current-year-string (db/get-years))
         school-days (att/get-school-days year)]
-    (att/get-attendance school-days year id)))
+    (att/get-attendance school-days year id student)))
 
 (deftest date-stuff
   (= (dates/make-date-string "2014-12-28T14:32:12.509Z")
@@ -90,11 +90,12 @@
 
 (deftest swipe-attendence-override-test
   (db/sample-db)  
-  (let [sid (-> "test" db/make-student :_id)]
+  (let [s (db/make-student "test")
+        sid (:_id s)]
     (db/swipe-in sid basetime)
     (db/swipe-out sid (t/plus basetime (t/hours 4)))
     (db/override-date sid "2014-10-14")
-    (let [att (get-att sid)]
+    (let [att (get-att sid s)]
       (testing "Total Valid Day Count"
         (is (= (:total_days att)
                1)))
@@ -109,8 +110,11 @@
 
 (deftest swipe-attendence-test
   (do (db/sample-db)  
-      (let [sid (-> "test" db/make-student :_id)
-            sid2 (-> "test2" db/make-student :_id)]
+      (let [
+            s (db/make-student "test")
+            sid (:_id s) 
+            s2 (db/make-student "test2")
+            sid2 (:_id s)]
         ;; good today
         (add-swipes sid)
         (db/override-date sid "2014-10-18")
@@ -118,8 +122,8 @@
         (testing "School year is list of days with swipes"
           (is (= (att/get-school-days "2014-06-01 2015-06-01")
                  (list "2014-10-14" "2014-10-15" "2014-10-16" "2014-10-17" "2014-10-18"))))
-        (let [att (get-att sid)
-              att2 (get-att sid2)]
+        (let [att (get-att sid s)
+              att2 (get-att sid2 s2)]
           (testing "Total Valid Day Count"
             (is (= (:total_days att)
                    4)))
@@ -141,7 +145,7 @@
                    5)))
           )
         (testing "an older date string shows no attendance in that time"
-          (let [att (att/get-attendance [] "06-01-2013-05-01-2014" sid)]
+          (let [att (att/get-attendance [] "06-01-2013-05-01-2014" sid s)]
             (testing "Total Valid Day Count"
               (is (= (:total_days att)
                      0)))
@@ -157,7 +161,8 @@
 
 (deftest swipe-attendence-shows-only-when-in
   (do (db/sample-db)  
-      (let [sid (-> "test" db/make-student :_id)]
+      (let [s (db/make-student "test")
+            sid (:_id s)]
         ;; good today
         ;;(let [basetime (t/date-time 2014 10 14 14 9 27 246)])
         (db/swipe-in sid basetime)

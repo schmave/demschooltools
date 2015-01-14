@@ -16,8 +16,14 @@
     (make-date-string (:in_time swipe))
     (:date swipe)))
 
+
 (defn get-min-minutes [student day]
-  ())
+  (let [older-date (-> student :olderdate f/parse)
+        current-date (f/parse day)]
+    (if (and older-date
+             current-date
+             (t/before? older-date current-date))
+      330 300)))
 
 (defn append-validity [student [day swipes]]
   (let [has-override? (->> swipes
