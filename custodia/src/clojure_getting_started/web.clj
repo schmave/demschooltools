@@ -38,7 +38,8 @@
   (GET "/" [] (friend/authenticated (io/resource "index.html")))
   (GET "/swipe/:sid" [sid year]
        (friend/authorize #{::user}
-                         (resp/response (att/get-attendance year sid))))
+                         (let [s (data/get-students sid)]
+                           (resp/response (att/get-attendance year sid s)))))
   (GET "/resetdb" [] (data/sample-db) (resp/redirect "/"))
   (POST "/override" [_id day]
         (friend/authorize #{::admin}

@@ -166,7 +166,7 @@
         ;; good today
         ;;(let [basetime (t/date-time 2014 10 14 14 9 27 246)])
         (db/swipe-in sid basetime)
-        (let [att (get-att sid)]
+        (let [att (get-att sid s)]
           (testing "Total Valid Day Count"
             (is (= (-> att :days first :day)
                    "2014-10-14")))

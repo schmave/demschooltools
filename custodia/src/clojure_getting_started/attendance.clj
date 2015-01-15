@@ -72,7 +72,7 @@
         grouped-swipes (merge school-days grouped-swipes)
         grouped-swipes (into (sorted-map) grouped-swipes)
         summed-days (map #(append-validity student %) grouped-swipes)
-        summed-days (trace/trace "summed days" (reverse summed-days))
+        summed-days (reverse summed-days)
         today-string (format-to-local date-format (t/now))
         [last-swipe-type last-swipe-date] (get-last-swipe-type summed-days)]
     (merge student {:total_days (count (filter :valid summed-days))
@@ -94,5 +94,5 @@
   ([year] (get-students-with-att year nil))
   ([year ids]
      (let [school-days (get-school-days year)]
-       (map #(get-attendance school-days year (:_id %))
+       (map #(get-attendance school-days year (:_id %) %)
             (get-students ids)))))

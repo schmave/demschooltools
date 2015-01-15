@@ -45,6 +45,10 @@ angular.module('app').controller("MainController", function($scope, $http){
             $scope.getStudents();
         }
     };
+    $scope.requiredMinutes = function(student){
+        if (!student) {return "";}
+        return student.olderdate ? 330 : 300;
+    };
     $scope.createYear = function() {
         if(confirm("Create school year from " + $scope.from_date + " to " + $scope.to_date + "?")){
             $http.post('/year/create', {"from_date":$scope.from_date, "to_date": $scope.to_date}).
@@ -54,7 +58,8 @@ angular.module('app').controller("MainController", function($scope, $http){
         }
     };
     $scope.toggleHours = function(student) {
-        if(confirm("Toggle student's required hours?")){
+        if(confirm(student.olderdate ? "Mark student younger?":"Mark student as older starting today?")){
+            student.olderdate = !!!student.olderdate;
             $http.post('/student/togglehours', {_id : student._id }).
                 success(function(data){
                     $scope.getStudents();
