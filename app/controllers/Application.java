@@ -131,6 +131,8 @@ public class Application extends Controller {
 
         Date now = new Date();
 
+		Collections.sort(p.charges);
+		Collections.reverse(p.charges);
         for (Charge c : p.charges) {
             // Include if <= 7 days ago
             if (now.getTime() - c.the_case.meeting.date.getTime() <
@@ -144,6 +146,9 @@ public class Application extends Controller {
 
     static Collection<String> getRecentResolutionPlans(Entry r) {
         Set<String> rps = new HashSet<String>();
+		
+		Collections.sort(r.charges);
+		Collections.reverse(r.charges);
 
         for (Charge c : r.charges) {
             if (!c.resolution_plan.toLowerCase().equals("warning") &&
