@@ -158,6 +158,26 @@
             )))) 
   )
 
+(deftest older-student-required-minutes
+  (db/sample-db)
+  (let [s (db/make-student "test")
+        sid (:_id s)
+        s (db/toggle-student sid)
+        s (first (db/get-students sid))]
+    ;; good today
+    ;;(let [basetime (t/date-time 2014 10 14 14 9 27 246)])
+
+    (db/swipe-in sid basetime)
+    (db/swipe-out sid (t/plus basetime (t/minutes 331)))
+
+    (db/swipe-in sid (t/plus basetime (t/days 2)))
+    (db/swipe-out sid (t/plus basetime (t/days 2) (t/minutes 329)))
+
+    (let [att (get-att sid s)]
+      (testing "Total Valid Day Count"
+        (is (= (-> att :total_days) 1)))))
+  )
+
 
 (deftest swipe-attendence-shows-only-when-in
   (do (db/sample-db)  
