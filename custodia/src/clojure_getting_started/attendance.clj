@@ -17,7 +17,7 @@
     (:date swipe)))
 
 
-(defn get-min-minutes [student day]
+(trace/deftrace get-min-minutes [student day]
   (let [older-date (-> student :olderdate f/parse)
         current-date (f/parse day)]
     (if (and older-date

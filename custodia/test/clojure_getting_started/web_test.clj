@@ -163,15 +163,16 @@
   (let [s (db/make-student "test")
         sid (:_id s)
         s (db/toggle-student sid)
-        s (first (db/get-students sid))]
+        s (first (db/get-students sid))
+        tomorrow (-> (t/now) (t/plus (t/days 1)))]
     ;; good today
     ;;(let [basetime (t/date-time 2014 10 14 14 9 27 246)])
 
-    (db/swipe-in sid basetime)
-    (db/swipe-out sid (t/plus basetime (t/minutes 331)))
+    (db/swipe-in sid tomorrow)
+    (db/swipe-out sid (t/plus tomorrow (t/minutes 331)))
 
-    (db/swipe-in sid (t/plus basetime (t/days 2)))
-    (db/swipe-out sid (t/plus basetime (t/days 2) (t/minutes 329)))
+    (db/swipe-in sid (t/plus tomorrow (t/days 2)))
+    (db/swipe-out sid (t/plus tomorrow (t/days 2) (t/minutes 329)))
 
     (let [att (get-att sid s)]
       (testing "Total Valid Day Count"
