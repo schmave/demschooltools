@@ -1,18 +1,21 @@
 * DONE Create student
   CLOSED: [2014-12-23 Tue 12:03]
 * TODO Edit student
-* TODO Delete student
+* TODO Hide student
 * DONE swipe in 
   CLOSED: [2014-12-23 Tue 12:31]
 * DONE swipe outp
   CLOSED: [2014-12-23 Tue 12:31]
-* TODO get missing in swipe
-* TODO get missing out swipe
+* DONE get missing in swipe
+  CLOSED: [2015-01-20 Tue 07:36]
+* DONE get missing out swipe
+  CLOSED: [2015-01-20 Tue 07:36]
 * DONE view students attendence
   CLOSED: [2015-01-03 Sat 09:51]
 * DONE add date override for student
   CLOSED: [2015-01-03 Sat 12:41]
-* TODO mark student "older"
+* DONE mark student "older"
+  CLOSED: [2015-01-20 Tue 07:36]
 * DONE sign in for admin/swipes
   CLOSED: [2015-01-03 Sat 13:51]
 * DONE reverse list of dates

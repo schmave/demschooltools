@@ -2,6 +2,7 @@
   (:require [compojure.core :refer [defroutes GET PUT POST DELETE ANY]]
             [ring.middleware.json :refer [wrap-json-response wrap-json-body wrap-json-params]]
             [compojure.handler :refer [site]]
+            [carica.core :as c]
             [compojure.route :as route]
             [clojure.java.io :as io]
             [clojure.tools.nrepl.server :as nrepl-server]
@@ -24,10 +25,10 @@
             [environ.core :refer [env]]))
 
 (def users {"admin" {:username "admin"
-                     :password (creds/hash-bcrypt "test")
+                     :password (creds/hash-bcrypt (c/config :admin))
                      :roles #{::admin ::user}}
             "user" {:username "user"
-                    :password (creds/hash-bcrypt "test")
+                    :password (creds/hash-bcrypt (c/config :user))
                     :roles #{::user}}})
 (defn year-resp []
   (let [years (data/get-years)]
