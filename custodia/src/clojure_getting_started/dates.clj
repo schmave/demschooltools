@@ -37,6 +37,7 @@
           list))
 
 (defn append-interval [swipe]
+  ;; todo exception
   (if (:out_time swipe)
     (let [int (t/interval (f/parse (:in_time swipe))
                           (f/parse (:out_time swipe)))

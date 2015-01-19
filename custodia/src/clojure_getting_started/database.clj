@@ -112,12 +112,16 @@
     (->> {:type :year :from (str from) :to (str to) :name name}
          persist!)))
 
+(defn reset-db []
+  (couch/delete-database db/db)
+  (couch/create-database db/db)
+  (db/make-db))
+
 ;; (sample-db true)   
 (defn sample-db
   ([] (sample-db false))
-  ([have-extra?] (couch/delete-database db/db)
-     (couch/create-database db/db)
-     (db/make-db)
+  ([have-extra?]
+     (reset-db)
      (make-year (str (t/date-time 2014 6)) (str (t/date-time 2015 6)))
      (make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
      (let [s (make-student "jim")]

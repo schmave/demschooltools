@@ -41,7 +41,10 @@
        (friend/authorize #{::user}
                          (let [s (data/get-students sid)]
                            (resp/response (att/get-attendance year sid s)))))
-  (GET "/resetdb" [] (data/sample-db) (resp/redirect "/"))
+  (GET "/resetdb" []
+       (friend/authorize #{::admin}
+                         (data/reset-db)
+                         (resp/redirect "/")))
   (POST "/override" [_id day]
         (friend/authorize #{::admin}
                           (data/override-date _id day))

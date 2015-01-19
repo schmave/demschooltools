@@ -9,7 +9,8 @@
             [clojure-getting-started.attendance :as att]
             [clojure-getting-started.dates :as dates]
             ))
-
+;; run test C-c M-,
+;; run tests C-c C-,
 (comment
   (run-tests 'clojure-getting-started.web-test)  
   )  
