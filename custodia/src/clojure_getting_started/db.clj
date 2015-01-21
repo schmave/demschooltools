@@ -2,11 +2,12 @@
   (:require [carica.core :as c]
             [cemerick.url :as url]
             [com.ashafa.clutch :as couch]
+            [environ.core :refer [env]]
             ))
-(def db (assoc (url/url (c/config :db :url)
-                        (c/config :db :name))
-          :username (c/config :db :user)
-          :password (c/config :db :password)))
+(def db (assoc (url/url (env :db-url)
+                        (env :db-name))
+          :username (env :db-user)
+          :password (env :db-password)))
 #_(def db (cemerick.url/url "http://127.0.0.1:5984" (c/config :db :name)))
 
 (def design-doc

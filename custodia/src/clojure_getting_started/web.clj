@@ -25,10 +25,10 @@
             [environ.core :refer [env]]))
 
 (def users {"admin" {:username "admin"
-                     :password (creds/hash-bcrypt (c/config :admin))
+                     :password (creds/hash-bcrypt (env :admin))
                      :roles #{::admin ::user}}
             "user" {:username "user"
-                    :password (creds/hash-bcrypt (c/config :user))
+                    :password (creds/hash-bcrypt (env :user))
                     :roles #{::user}}})
 (defn year-resp []
   (let [years (data/get-years)]
