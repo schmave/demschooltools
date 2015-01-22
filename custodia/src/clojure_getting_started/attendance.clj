@@ -98,5 +98,6 @@
   ([year] (get-students-with-att year nil))
   ([year ids]
      (let [school-days (get-school-days year)]
-       (map #(get-attendance school-days year (:_id %) %)
-            (get-students ids)))))
+       (sort-by :name
+                (map #(get-attendance school-days year (:_id %) %)
+                     (get-students ids))))))

@@ -28,7 +28,7 @@
                      :password (creds/hash-bcrypt (env :admin))
                      :roles #{::admin ::user}}
             "user" {:username "user"
-                    :password (creds/hash-bcrypt (env :user))
+                    :password (creds/hash-bcrypt (env :userpass))
                     :roles #{::user}}})
 (defn year-resp []
   (let [years (data/get-years)]
@@ -56,7 +56,7 @@
                                          (dates/get-current-year-string (data/get-years))
                                          [_id]))
                         :all (att/get-students-with-att
-                                         (dates/get-current-year-string (data/get-years)))}))
+                              (dates/get-current-year-string (data/get-years)))}))
   (POST "/swipe" [direction _id missing]
         (trace/trace "coming in" [direction _id missing])
         (friend/authorize #{::user}

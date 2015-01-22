@@ -60,7 +60,7 @@
         </div>
 
         <div class="lead form-group" ng-show="screen ==='home'">
-          <div class="col-md-6">
+          <div class="col-md-6" ng-show="isAdmin" >
             <button class="btn btn-success" ng-show="isAdmin" ng-click="showCreate()">Create Student</button>
           </div>
           <div class="col-md-6" ng-show="screen ==='home'">
@@ -106,8 +106,8 @@
           </div>
           <div class="clearfix"></div>
           <div class="col-md-6">
-            <button ng-click="swipe('in')">Swipe In</button>
-            <button ng-hide="hideSwipeOut()" ng-click="swipe('out')">Swipe Out</button>
+            <button type="button" class="btn" ng-click="swipe('in')" ng-class="inButtonStyle()">Swipe In</button>
+            <button type="button" class="btn" ng-hide="hideSwipeOut()" ng-click="swipe('out')" ng-class="outButtonStyle()">Swipe Out</button>
             <ul>
               <li ng-repeat="swipe in att.days" style="text-left">
                 <div class="checkbox">
@@ -159,11 +159,22 @@
           <div class="col-md-6">
             <!-- <ul> -->
             <!---- <li ng-repeat="student in totals_students"> ---->
-            <div ng-repeat="student in totals_students">
-              <span ng-show="student.total_days > 0">
-                {{student.name}} Attended: {{student.total_days}} - Absent: {{student.total_abs}} - Overrides: {{student.total_overrides}}
-              </span>
-            </div>
+            <table class="table table-striped">
+              <tr>
+                <th>Name</th>
+                <th>Attended</th>
+                <th>Absent</th>
+                <th>Overrides</th>
+              </tr>
+              <tr ng-repeat="student in totals_students">
+                <!-- <span ng-show="student.total_days > 0"> -->
+                <td>{{student.name}}</td>
+                <td>{{student.total_days}}</td>
+                <td>{{student.total_abs}}</td>
+                <td>{{student.total_overrides}}</td>
+                <!-- </span> -->
+              </div>
+            </table>
             <!-- </li> -->
             <!-- </ul> -->
           </div>
