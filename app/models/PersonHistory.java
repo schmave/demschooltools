@@ -21,6 +21,9 @@ public class PersonHistory {
 
         Date today = new Date();
 
+        Collections.sort(p.charges);
+        Collections.reverse(p.charges);
+
         for (Charge c : p.charges) {
             Record r = records.get(c.rule);
 
