@@ -181,7 +181,6 @@
         (is (= (-> att :total_days) 1)))))
   )
 
-
 (deftest swipe-attendence-shows-only-when-in
   (do (db/sample-db)  
       (let [s (db/make-student "test")

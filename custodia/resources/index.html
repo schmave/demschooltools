@@ -56,20 +56,20 @@
           <div style="display:inline-block; min-height:290px;">
             <datepicker ng-model="to_date" min-date="minDate" show-weeks="false" class="well well-sm"></datepicker>
           </div>
-          <button class="btn btn-primary" ng-click="createYear()">Create Year</button>
+          <button class="btn btn-primary" ng-click="createYear()" ng-disabled="!(to_date && from_date)">Create Year</button>
         </div>
 
         <div class="lead form-group" ng-show="screen ==='home'">
-          <div class="col-md-6" ng-show="isAdmin" >
-            <button class="btn btn-success" ng-show="isAdmin" ng-click="showCreate()">Create Student</button>
-          </div>
           <div class="col-md-6" ng-show="screen ==='home'">
             <ul ng-show="screen ==='home'">
-              <li ng-repeat="student in students">
-                <button class="btn btn-primary" ng-click="showStudent(student)">{{student.name}}</button>
+              <li class="list-unstyled" ng-repeat="student in students">
+                <a class="" ng-click="showStudent(student)">{{student.name}}</a>
                 <!-- {{student}} -->
               </li>
             </ul>
+          </div>
+          <div class="row col-md-6" ng-show="isAdmin" >
+            <button class="btn btn-success" ng-show="isAdmin" ng-click="showCreate()">Create Student</button>
           </div>
         </div>
         <div class="form-group"  ng-show="screen === 'swiped-today'">
@@ -98,22 +98,21 @@
             <a type="href" ng-click="screen='home'">Back to student list</a>
           </div> 
           <div class="col-md-12">
-            <h1 class="col-md-6">{{att.name}}</h1> 
-            <span class="col-md-6" ng-hide="swipe.valid || !isAdmin">
-              Attended: {{att.total_days}} - Absent: {{att.total_abs}} - Overrides: {{att.total_overrides}}
-              Requires {{requiredMinutes(att)}} minutes a day <button class="btn" ng-click="toggleHours(att)">Toggle Hours</button>
-            </span>
+            <h1 class="col-md-6">{{att.name}}</h1><span class="col-md-6">(Requires {{requiredMinutes(att)}} minutes a day)</span>
+          </div>
+          <div class="col-md-6" ng-show="isAdmin">
+            Attended: {{att.total_days}} - Absent: {{att.total_abs}} - Overrides: {{att.total_overrides}}
+            <button class="btn" ng-click="toggleHours(att)">Toggle Hours</button>
           </div>
           <div class="clearfix"></div>
           <div class="col-md-6">
             <button type="button" class="btn" ng-click="swipe('in')" ng-class="inButtonStyle()">Swipe In</button>
             <button type="button" class="btn" ng-hide="hideSwipeOut()" ng-click="swipe('out')" ng-class="outButtonStyle()">Swipe Out</button>
-            <ul>
+            <ul ng-show="isAdmin">
               <li ng-repeat="swipe in att.days" style="text-left">
-                <div class="checkbox">
+                <div>
                   <label>
-                    <input type="checkbox" ng-checked="(swipe.valid)" disabled> 
-                    <span style="width:50px" 
+                    <span ng-class="{validday: swipe.valid}" style="width:50px" 
                           ng-click="setDay(swipe)"
                           ng-style="{'border':(swipe.day==current_day.day)?'1px solid black':''}">
                       {{swipe.day}} - {{swipe.total_mins}} minutes 
@@ -141,11 +140,18 @@
           </div>
           <!-- <div> {{att}} </div> -->
         </div>
-        <div class="form-group"  ng-show="screen === 'create'">
-          <label for="s-name" name="name">Name</label>
-          <input ng-model="cstudent" ng-change="message=''"class="form-control" id="s-name" type="text" />
-          <button ng-click="createStudent(cstudent)">Create</button>
-
+        <div class="form-horizontal"  ng-show="screen === 'create'">
+          <div class="form-group">
+            <label for="s-name" class="col-sm-2 control-label" name="name">Name</label>
+            <div class="col-sm-10">
+              <input ng-model="cstudent" ng-change="message=''"class="form-control" id="s-name" type="text" />
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+              <button class="btn btn-primary" ng-click="createStudent(cstudent)">Create</button>
+            </div>
+          </div>
           <div class="alert alert-danger collapsable" role="alert" ng-show="message">
             {{message}}
           </div>
@@ -173,20 +179,20 @@
                 <td>{{student.total_abs}}</td>
                 <td>{{student.total_overrides}}</td>
                 <!-- </span> -->
-              </div>
-            </table>
-            <!-- </li> -->
-            <!-- </ul> -->
           </div>
+          </table>
+          <!-- </li> -->
+          <!-- </ul> -->
         </div>
       </div>
-    </div><!-- /.container -->
+    </div>
+</div><!-- /.container -->
 
-    <script src="/js/jquery.js"></script>
-    <script src="/js/bootstrap.min.js"></script>
-    <script src="/js/angular.js"></script>
-    <script src="/js/ui-bootstrap.js"></script>
-    <script src="/js/app.js"></script>
-    <script src="/js/main.ctrl.js"></script>
-  </body>
+<script src="/js/jquery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/angular.js"></script>
+<script src="/js/ui-bootstrap.js"></script>
+<script src="/js/app.js"></script>
+<script src="/js/main.ctrl.js"></script>
+</body>
 </html>
