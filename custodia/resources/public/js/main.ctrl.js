@@ -40,8 +40,8 @@ angular.module('app').controller("MainController", function($scope, $http){
             $scope.screen = "saving";
             $http.post('/override', {"_id":id, "day": day}).
                 success(function(data){
-                    $scope.att = data;
-                    $scope.current_day = data.days[0];
+                    $scope.att = data.student;
+                    $scope.current_day = data.student.days[0];
                     $scope.loadStudentData(data.all);
                     $scope.screen = "student";
                 }). error(function(){});
