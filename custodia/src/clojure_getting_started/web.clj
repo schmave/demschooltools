@@ -52,9 +52,11 @@
   (POST "/override" [_id day]
         (friend/authorize #{::admin}
                           (data/override-date _id day))
-        (resp/response (first (att/get-students-with-att
-                               (dates/get-current-year-string (data/get-years))
-                               [_id]))))
+        (resp/response {:student (first (att/get-students-with-att
+                                         (dates/get-current-year-string (data/get-years))
+                                         [_id]))
+                        :all (att/get-students-with-att
+                                         (dates/get-current-year-string (data/get-years)))}))
   (POST "/swipe" [direction _id missing]
         (trace/trace "coming in" [direction _id missing])
         (friend/authorize #{::user}

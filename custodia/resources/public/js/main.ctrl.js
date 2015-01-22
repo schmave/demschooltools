@@ -37,12 +37,14 @@ angular.module('app').controller("MainController", function($scope, $http){
     };
     $scope.override = function(id, day) {
         if (confirm("Override " + day + "?")){
+            $scope.screen = "saving";
             $http.post('/override', {"_id":id, "day": day}).
                 success(function(data){
                     $scope.att = data;
                     $scope.current_day = data.days[0];
+                    $scope.loadStudentData(data.all);
+                    $scope.screen = "student";
                 }). error(function(){});
-            $scope.getStudents();
         }
     };
     $scope.requiredMinutes = function(student){
@@ -87,13 +89,8 @@ angular.module('app').controller("MainController", function($scope, $http){
         $scope.screen = "saving";
         $http.post('/swipe', {"_id":$scope.att._id, "direction": $scope.att.direction, "missing": $scope.att.missing}).
             success(function(data){
-                // $scope.att = data;
-                // $scope.current_day = data.days[0];
-
                 $scope.loadStudentData(data);
-                // $scope.getStudents(function (){
                 $scope.showHome($scope.att.name + " swiped successfully!");
-                // });
             }). error(function(){});
     };
     $scope.hideSwipeOut = function(){
@@ -112,15 +109,17 @@ angular.module('app').controller("MainController", function($scope, $http){
         }
     };
     $scope.createStudent = function(name) {
+        $scope.screen = "saving";
         $http.post('/student/create', {"name":name}).
             success(function(data){
                 $scope.students = data.students;
                 if(data.made) {
-                    $scope.screen = "home";
+                    $scope.showHome(name + " created successfully!");
                     $scope.message = "";
                     $scope.cstudent = "";
                 } else {
-                    $scope.message = "A student with that name already exists";
+                    $scope.screen = "create";
+                    $scope.message = "A student named " + name + " already exists";
                 }
             }). error(function(){});
     };
@@ -166,9 +165,12 @@ angular.module('app').controller("MainController", function($scope, $http){
             }).error(function(){});
     };
     $scope.init = function(){
+        $scope.screen = "loading";
         $scope.checkRole();
-        $scope.getStudents();
         $scope.getYears();
+        $scope.getStudents(function(){
+            $scope.showHome();
+        });
     };
     $scope.init();
 });
