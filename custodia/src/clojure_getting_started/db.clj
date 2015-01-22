@@ -5,10 +5,10 @@
             [environ.core :refer [env]]
             ))
 (def db (assoc (url/url (env :db-url)
-                        (env :db-name))
-          :username (env :db-user)
-          :password (env :db-password)))
-#_(def db (cemerick.url/url "http://127.0.0.1:5984" (c/config :db :name)))
+                          (env :db-name))
+            :username (env :db-user)
+            :password (env :db-password)))
+#_(def db (cemerick.url/url "http://127.0.0.1:5984" "test"))
 
 (def design-doc
   {"_id" "_design/view"

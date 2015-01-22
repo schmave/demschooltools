@@ -35,6 +35,10 @@
     (resp/response {:years (map :name years)
                     :current_year (dates/get-current-year-string years)})))
 
+(defn get-all-student-data []
+  (let [year (dates/get-current-year-string (data/get-years))]
+    (att/get-students-with-att year)))
+
 (defroutes app
   (GET "/" [] (friend/authenticated (io/resource "index.html")))
   (GET "/swipe/:sid" [sid year]
@@ -57,9 +61,7 @@
                           (if (= direction "in")
                             (data/swipe-in _id (t/now) missing)
                             (data/swipe-out _id (t/now) missing)))
-        (resp/response (first (att/get-students-with-att
-                               (dates/get-current-year-string (data/get-years))
-                               [_id]))))
+        (resp/response (get-all-student-data)))
   (GET "/currentyear" [] (dates/get-current-year-string (data/get-years)))
   (GET "/year/all" []
        (friend/authorize #{::user} (year-resp)))

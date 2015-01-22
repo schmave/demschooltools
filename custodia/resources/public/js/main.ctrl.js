@@ -84,12 +84,16 @@ angular.module('app').controller("MainController", function($scope, $http){
         $scope.makeSwipePost();
     };
     $scope.makeSwipePost = function() {
+        $scope.screen = "saving";
         $http.post('/swipe', {"_id":$scope.att._id, "direction": $scope.att.direction, "missing": $scope.att.missing}).
             success(function(data){
-                $scope.att = data;
-                $scope.current_day = data.days[0];
-                $scope.getStudents();
+                // $scope.att = data;
+                // $scope.current_day = data.days[0];
+
+                $scope.loadStudentData(data);
+                // $scope.getStudents(function (){
                 $scope.showHome($scope.att.name + " swiped successfully!");
+                // });
             }). error(function(){});
     };
     $scope.hideSwipeOut = function(){
@@ -126,11 +130,15 @@ angular.module('app').controller("MainController", function($scope, $http){
                 $scope.totals_students = data;
             }). error(function(){});
     };
-    $scope.getStudents = function() {
+    $scope.loadStudentData = function(data){
+        $scope.students = data;
+        $scope.totals_students = data;
+    };
+    $scope.getStudents = function(callback) {
         $http.post('/student/all').
             success(function(data){
-                $scope.students = data;
-                $scope.totals_students = data;
+                $scope.loadStudentData(data);
+                if (callback) {callback();}
             }). error(function(){});
     };
     $scope.getYears = function() {

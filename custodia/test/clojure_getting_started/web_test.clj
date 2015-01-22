@@ -115,7 +115,7 @@
             s (db/make-student "test")
             sid (:_id s) 
             s2 (db/make-student "test2")
-            sid2 (:_id s)]
+            sid2 (:_id s2)]
         ;; good today
         (add-swipes sid)
         (db/override-date sid "2014-10-18")
@@ -165,7 +165,8 @@
         sid (:_id s)
         s (db/toggle-student sid)
         s (first (db/get-students sid))
-        tomorrow (-> (t/now) (t/plus (t/days 1)))]
+
+        tomorrow (-> (t/today-at 8 0) (t/plus (t/days 1)))]
     ;; good today
     ;;(let [basetime (t/date-time 2014 10 14 14 9 27 246)])
 
@@ -198,4 +199,7 @@
           ))) 
   )
 
-(comment {:total_days 2, :total_abs 1, :days ({:valid true, :day "10-14-2014", :total_mins 360, :swipes [{:nice_out_time "03:09:27", :nice_in_time "09:09:27", :interval 360, :_id "d152dcfff8282f3ffa590d8f9a00fb4e", :_rev "2-0c6538f07be3e825f457a6c77c086ca4", :out_time "2014-10-14T15:09:27.246Z", :type "swipe", :student_id "d152dcfff8282f3ffa590d8f9a00f951", :in_time "2014-10-14T09:09:27.246Z"}]} {:valid true, :day "10-15-2014", :total_mins 360, :swipes [{:nice_out_time "03:09:27", :nice_in_time "09:09:27", :interval 360, :_id "d152dcfff8282f3ffa590d8f9a010780", :_rev "2-9b40bea0ef22868cadba5fb23bc26d80", :out_time "2014-10-15T15:09:27.246Z", :type "swipe", :student_id "d152dcfff8282f3ffa590d8f9a00f951", :in_time "2014-10-15T09:09:27.246Z"}]} {:valid false, :day "10-16-2014", :total_mins 240, :swipes [{:nice_out_time "01:09:27", :nice_in_time "09:09:27", :interval 240, :_id "d152dcfff8282f3ffa590d8f9a011101", :_rev "2-b438d5cb24cb92e5a3b411df19aea4c0", :out_time "2014-10-16T13:09:27.246Z", :type "swipe", :student_id "d152dcfff8282f3ffa590d8f9a00f951", :in_time "2014-10-16T09:09:27.246Z"}]})}) 
+(comment
+  {:_id "58c6cbea991a928e4c7a66848603da45", :_rev "1-1f2fed784543664c7f72e3196267bacf", :name "test2", :last_swipe_type nil, :today "2015-01-21", :days ({:valid true, :override true, :day "2014-10-18", :total_mins 240, :swipes [{:_id "58c6cbea991a928e4c7a668486040aa4", :_rev "2-67cf053b7af3c80128e75c7adf6ba116", :nice_out_time "02:09:27", :type "swipe", :inserted-date "2015-01-21T23:46:01.920Z", :nice_in_time "10:09:27", :interval 240, :student_id "58c6cbea991a928e4c7a66848603cad9", :out_time "2014-10-18T18:09:27.246Z", :in_time "2014-10-18T14:09:27.246Z"} {:_id "58c6cbea991a928e4c7a668486040d7d", :_rev "1-aadd9ab431da2a9e1aaf0b1adc3473cc", :inserted-date "2015-01-21T23:46:01.968Z", :type "override", :student_id "58c6cbea991a928e4c7a66848603cad9", :date "2014-10-18"}]} {:valid true, :override false, :day "2014-10-17", :total_mins 360, :swipes [{:_id "58c6cbea991a928e4c7a66848603f62a", :_rev "2-5e27806476b04bfb8887978f0646d036", :nice_out_time "02:09:27", :type "swipe", :inserted-date "2015-01-21T23:46:01.718Z", :nice_in_time "10:09:27", :interval 240, :student_id "58c6cbea991a928e4c7a66848603cad9", :out_time "2014-10-17T18:09:27.246Z", :in_time "2014-10-17T14:09:27.246Z"} {:_id "58c6cbea991a928e4c7a66848603fd95", :_rev "2-ce3f156142a3ec247a2dc91314e65e5c", :nice_out_time "05:09:27", :type "swipe", :inserted-date "2015-01-21T23:46:01.812Z", :nice_in_time "03:09:27", :interval 120, :student_id "58c6cbea991a928e4c7a66848603cad9", :out_time "2014-10-17T21:09:27.246Z", :in_time "2014-10-17T19:09:27.246Z"}]} {:valid false, :override false, :day "2014-10-16", :total_mins 240, :swipes [{:_id "58c6cbea991a928e4c7a66848603f33e", :_rev "2-a87c43cd2b1aaee0138c7a557e5c5a84", :nice_out_time "02:09:27", :type "swipe", :inserted-date "2015-01-21T23:46:01.646Z", :nice_in_time "10:09:27", :interval 240, :student_id "58c6cbea991a928e4c7a66848603cad9", :out_time "2014-10-16T18:09:27.246Z", :in_time "2014-10-16T14:09:27.246Z"}]} {:valid true, :override false, :day "2014-10-15", :total_mins 360, :swipes [{:_id "58c6cbea991a928e4c7a66848603e60e", :_rev "2-222bbc141edd14fb47eb05b92f9c49a8", :nice_out_time "04:09:27", :type "swipe", :inserted-date "2015-01-21T23:46:01.582Z", :nice_in_time "10:09:27", :interval 360, :student_id "58c6cbea991a928e4c7a66848603cad9", :out_time "2014-10-15T20:09:27.246Z", :in_time "2014-10-15T14:09:27.246Z"}]} {:valid true, :override false, :day "2014-10-14", :total_mins 360, :swipes [{:_id "58c6cbea991a928e4c7a66848603dc88", :_rev "2-6c0c32c3354c97157715dccb6d55657d", :nice_out_time "04:09:27", :type "swipe", :inserted-date "2015-01-21T23:46:01.508Z", :nice_in_time "10:09:27", :interval 360, :student_id "58c6cbea991a928e4c7a66848603cad9", :out_time "2014-10-14T20:09:27.246Z", :in_time "2014-10-14T14:09:27.246Z"}]}), :total_abs 1, :type :student, :inserted-date "2015-01-21T23:46:01.456Z", :total_overrides 1, :total_days 4, :olderdate nil, :last_swipe_date nil})
+
+

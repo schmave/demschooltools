@@ -74,6 +74,9 @@
             {{student.name}}
           </li>
         </div>
+        <div class="lead form-group" ng-show="screen === 'saving'">
+          <h1>Saving swipe...</h1>
+        </div>
         <div class="lead form-group" ng-show="screen === 'get-swipe-time'">
           <h1 ng-show="missing_direction == 'out'">What time did you leave on {{att.last_swipe_date}}?</h1>
           <h1 ng-show="missing_direction == 'in'">What time did you come in this morning?</h1>
