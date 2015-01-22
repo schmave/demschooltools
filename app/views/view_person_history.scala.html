@@ -1,4 +1,5 @@
-@(p : Person, history : PersonHistory, recent_rps : List[ Charge ])
+@(p : Person, history : PersonHistory, recent_rps : List[ Charge ],
+ redact_names : Boolean)
 
 @import helper._
 
@@ -13,6 +14,6 @@ $(function() {
 });
 </script>
 
-@person_history(p, history, recent_rps)
+@person_history(p, history, recent_rps, redact_names)
 
 }

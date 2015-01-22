@@ -1,21 +1,20 @@
 package models;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import controllers.Application;
 
 import play.db.ebean.Model;
 import play.db.ebean.Model.Finder;
@@ -50,6 +49,8 @@ public class Case extends Model implements Comparable<Case> {
     @OneToMany(mappedBy="the_case")
     @OrderBy("id ASC")
     public List<Charge> charges;
+
+    static Set<String> names;
 
     public static Finder<Integer, Case> find = new Finder(
         Integer.class, Case.class
@@ -105,6 +106,65 @@ public class Case extends Model implements Comparable<Case> {
 			testify_records.size() == 0 &&
 			charges.size() == 0;
 	}
+
+    public void loadNames() {
+        if (names != null) {
+            return;
+        }
+
+        names = new HashSet<String>();
+
+        try {
+            BufferedReader r = new BufferedReader(new FileReader(play.Play.application().getFile("app/assets/names.txt")));
+            while (true) {
+                String line = r.readLine();
+                if (line == null) {
+                    break;
+                }
+
+                String n = line.trim().toLowerCase();
+                if (n.length() > 2) {
+                    // don't add 2-letter names
+                    names.add(n);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("ERROR loading names file");
+            e.printStackTrace();
+        }
+
+        // Add first and display names of all people in JC db
+        for(Person p : Application.allPeople()) {
+            names.add(p.first_name.trim().toLowerCase());
+            names.add(p.getDisplayName().trim().toLowerCase());
+        }
+    }
+
+    public String getRedactedFindings(String keep_this_name) {
+        loadNames();
+
+        keep_this_name = keep_this_name.trim().toLowerCase();
+
+        String[] words = findings.split("\\b");
+        Map<String, String> replacement_names = new HashMap<String, String>();
+        char next_replacement = 'A';
+
+        for (String w : words) {
+            w = w.toLowerCase();
+            if (!w.equals(keep_this_name) && names.contains(w) &&
+                replacement_names.get(w) == null) {
+                replacement_names.put(w, next_replacement + "___");
+                next_replacement++;
+            }
+        }
+
+        String new_findings = this.findings;
+        for (String name : replacement_names.keySet()) {
+            new_findings = new_findings.replaceAll("(?i)" + name, replacement_names.get(name));
+        }
+
+        return new_findings;
+    }
 
     public int compareTo(Case other) {
         return case_number.compareTo(other.case_number);

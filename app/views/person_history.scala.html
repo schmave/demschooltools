@@ -1,4 +1,4 @@
-@(p : Person, history : PersonHistory, recent_rps : List[ Charge ])
+@(p : Person, history : PersonHistory, recent_rps : List[ Charge ], redact_names: Boolean)
 
 @import helper._
 
@@ -35,6 +35,11 @@
 </table>
 
 <h3>Case Details...</h3>
+@if(redact_names) {
+<p>Names have been removed. <a href="@routes.Application.viewPersonHistory(p.person_id, false)">View with names.</a>
+} else {
+<p>Names are intact. <a href="@routes.Application.viewPersonHistory(p.person_id, true)">Remove names.</a>
+}
 <ul class="nav nav-tabs">
   <li class="active"><a href="#byrule" data-toggle="tab">... by Entry</a></li>
   <li><a href="#bydate" data-toggle="tab">... by Date</a></li>
@@ -49,7 +54,7 @@
 				<h4 style="margin-top: 2em;">@rule.title</h4>
 			}
 			@for( c <- charges) {
-				@historyCharge(c, false, false)
+				@historyCharge(c, false, false, redact_names)
 			}
 		}
 	}
@@ -59,7 +64,7 @@
 	<p>&nbsp;</p>
 	@defining( p.getChargesInDateOrder() ) { charges =>
 		@for( c <- charges) {
-			@historyCharge(c, false, true)
+			@historyCharge(c, false, true, redact_names)
 		}
 	}
 	</div>
