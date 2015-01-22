@@ -58,7 +58,7 @@ public class Application extends Controller {
         return ok(views.html.view_sm_decisions.render(the_charges));
     }
 
-	static List<Person> allPeople() {
+	public static List<Person> allPeople() {
         Tag cur_student_tag = Tag.find.where()
             .eq("title", "Current Student")
             .eq("organization", Organization.getByHost())
@@ -146,7 +146,7 @@ public class Application extends Controller {
 
     static Collection<String> getRecentResolutionPlans(Entry r) {
         Set<String> rps = new HashSet<String>();
-		
+
 		Collections.sort(r.charges);
 		Collections.reverse(r.charges);
 
@@ -165,7 +165,7 @@ public class Application extends Controller {
 
     public static Result getPersonHistory(Integer id) {
         Person p = Person.findById(id);
-        return ok(views.html.person_history.render(p, new PersonHistory(p, false), getLastWeekCharges(p)));
+        return ok(views.html.person_history.render(p, new PersonHistory(p, false), getLastWeekCharges(p), false));
     }
 
     public static Result getRuleHistory(Integer id) {
@@ -173,9 +173,9 @@ public class Application extends Controller {
         return ok(views.html.rule_history.render(r, new RuleHistory(r, false), getRecentResolutionPlans(r)));
     }
 
-    public static Result viewPersonHistory(Integer id) {
+    public static Result viewPersonHistory(Integer id, Boolean redact_names) {
         Person p = Person.findById(id);
-        return ok(views.html.view_person_history.render(p, new PersonHistory(p), getLastWeekCharges(p)));
+        return ok(views.html.view_person_history.render(p, new PersonHistory(p), getLastWeekCharges(p), redact_names));
     }
 
     public static Result viewRuleHistory(Integer id) {

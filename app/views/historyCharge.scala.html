@@ -1,4 +1,4 @@
-@(c : Charge, show_chargee : Boolean, show_rule : Boolean)
+@(c : Charge, show_chargee : Boolean, show_rule : Boolean, redact_findings: Boolean)
 
 <p>
 
@@ -8,7 +8,7 @@
 @c.person.getDisplayName()}</a>@if( show_rule && c.rule != null ){,
 <a nosidebar href="@routes.Application.viewRuleHistory(c.rule.id)">@c.rule.getNumber() @c.rule.title</a>}</b>.
 
-<i>Findings</i>: @c.the_case.findings
+<i>Findings</i>: @if( redact_findings ) { @c.the_case.getRedactedFindings(c.person.getDisplayName()) } else { @c.the_case.findings }
 
 @if( !c.plea.equals("Guilty") ) {
 	Plead <b>@c.plea</b>.
