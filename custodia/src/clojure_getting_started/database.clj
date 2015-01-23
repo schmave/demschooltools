@@ -13,10 +13,11 @@
 (defn get-swipes
   ([] (get-swipes nil))
   ([ids]
-     (db/get-* "swipes" ids)))
+     (db/get-* "swipes" ids "student_id")))
+(get-swipes 1)
 
 (defn get-overrides [ids]
-  (db/get-* "overrides" ids))
+  (db/get-* "overrides" ids "student_id"))
 
 (defn- lookup-last-swipe [id]
   (-> (get-swipes id)
@@ -70,7 +71,7 @@
 (defn get-years
   ([] (get-years nil))
   ([names]
-     (db/get-* "years" names)))
+     (db/get-* "years" names "_id")))
 
 (defn delete-year [year]
   (when-let [year (first (get-years year))]
@@ -84,7 +85,7 @@
 
 (defn get-students
   ([] (get-students nil))
-  ([ids] (db/get-* "students" ids)))
+  ([ids] (db/get-* "students" ids "_id")))
 
 ;; (get-years)    
 (defn student-not-yet-created [name]
@@ -116,7 +117,7 @@
      (make-year (str (t/date-time 2014 6)) (str (t/date-time 2015 6)))
      (make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
      (let [s (make-student "jim")]
-       (when have-extra? (swipe-in (:_id s) (t/now) )))
+       (when have-extra? (swipe-in (:_id s) (t/now))))
      (let [s (make-student "steve")]
        (when have-extra? (swipe-in (:_id s) (t/minus (t/now) (t/days 1) (t/hours 5))))))
   )
