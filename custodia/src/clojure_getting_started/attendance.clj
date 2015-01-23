@@ -1,6 +1,5 @@
 (ns clojure-getting-started.attendance
-  (:require [com.ashafa.clutch :as couch]
-            [clojure-getting-started.db :as db]
+  (:require [clojure-getting-started.db :as db]
             [clojure-getting-started.helpers :refer :all]
             [clojure-getting-started.dates :refer :all]
             [clojure-getting-started.database :refer :all]

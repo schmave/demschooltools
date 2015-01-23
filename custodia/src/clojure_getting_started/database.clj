@@ -10,21 +10,13 @@
             [clj-time.coerce :as c]
             ))
 
-(defn get-* [type ids]
-  (let [results (map :value
-                     (if ids
-                       (couch/get-view db/db "view" type {:keys (if (coll? ids) ids [ids])})
-                       (couch/get-view db/db "view" type )))
-        results (sort-by :inserted-date results)]
-    results))
-
 (defn get-swipes
   ([] (get-swipes nil))
   ([ids]
-     (get-* "swipes" ids)))
+     (db/get-* "swipes" ids)))
 
 (defn get-overrides [ids]
-  (get-* "overrides" ids))
+  (db/get-* "overrides" ids))
 
 (defn- lookup-last-swipe [id]
   (-> (get-swipes id)
@@ -34,12 +26,12 @@
 
 (declare swipe-out)
 (defn make-swipe [student-id]
-  {:type :swipe :student_id student-id :in_time nil :out_time nil})
+  {:type :swipes :student_id student-id :in_time nil :out_time nil})
 
-(defn persist! [doc]
-  (couch/put-document db/db (assoc doc :inserted-date
-                                   (or (:inserted-date doc)
-                                       (str (t/now))))))
+;; (defn persist! [doc]
+;;   (couch/put-document db/db (assoc doc :inserted-date
+;;                                    (or (:inserted-date doc)
+;;                                        (str (t/now))))))
 
 (trace/deftrace swipe-in
   ([id] (swipe-in id (t/now)))
@@ -47,7 +39,7 @@
      (let [last-swipe (lookup-last-swipe id)]
        (when (only-swiped-in? last-swipe)
          (swipe-out id missing-out))
-       (persist! (assoc (make-swipe id) :in_time (str in-time))))))
+       (db/persist! (assoc (make-swipe id) :in_time (str in-time))))))
 
 
 (defn sanitize-out [swipe]
@@ -71,28 +63,28 @@
                         (assoc (make-swipe id) :in_time (str missing-in)))
            out-swipe (assoc in-swipe :out_time (str out-time))
            out-swipe (sanitize-out out-swipe)]
-       (persist! out-swipe))))
+       (db/persist! out-swipe))))
 
 ;; TODO - make multimethod on type
+;; (get-years)
 (defn get-years
   ([] (get-years nil))
   ([names]
-     (get-* "years" names)))
+     (db/get-* "years" names)))
 
 (defn delete-year [year]
   (when-let [year (first (get-years year))]
-    (couch/delete-document db/db year)))
-
+    (db/delete! year)))
 
 (defn override-date [id date-string]
-  (->> {:type :override
+  (->> {:type :overrides
         :student_id id
         :date date-string}
-       persist!))
+       db/persist!))
 
 (defn get-students
   ([] (get-students nil))
-  ([ids] (get-* "students" ids)))
+  ([ids] (db/get-* "students" ids)))
 
 ;; (get-years)    
 (defn student-not-yet-created [name]
@@ -100,32 +92,27 @@
 
 (defn make-student [name]
   (when (student-not-yet-created name)
-    (persist! {:type :student :name name :olderdate nil})))
+    (db/persist! {:type :students :name name :olderdate nil})))
 
 (defn- toggle-older [older]
   (if older nil (str (t/now))))
 
 (defn toggle-student [_id]
   (let [student (first (get-students _id))] 
-    (persist! (assoc student :olderdate (toggle-older (:olderdate student))))))
+    (db/persist! (assoc student :olderdate (toggle-older (:olderdate student))))))
 
 (defn make-year [from to]
   (let [from (f/parse from)
         to (f/parse to)
         name (str (f/unparse date-format from) " "  (f/unparse date-format to))]
-    (->> {:type :year :from (str from) :to (str to) :name name}
-         persist!)))
-
-(defn reset-db []
-  (couch/delete-database db/db)
-  (couch/create-database db/db)
-  (db/make-db))
+    (->> {:type :years :from_date (str from) :to_date (str to) :name name}
+         db/persist!)))
 
 ;; (sample-db true)   
 (defn sample-db
   ([] (sample-db false))
   ([have-extra?]
-     (reset-db)
+     (db/reset-db)
      (make-year (str (t/date-time 2014 6)) (str (t/date-time 2015 6)))
      (make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
      (let [s (make-student "jim")]

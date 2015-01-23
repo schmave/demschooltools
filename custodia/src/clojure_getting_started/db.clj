@@ -3,12 +3,87 @@
             [cemerick.url :as url]
             [com.ashafa.clutch :as couch]
             [environ.core :refer [env]]
+            [clojure.java.jdbc :as jdbc]
             ))
-(def db (assoc (url/url (env :db-url)
+#_(def db (assoc (url/url (env :db-url)
                           (env :db-name))
             :username (env :db-user)
             :password (env :db-password)))
-#_(def db (cemerick.url/url "http://127.0.0.1:5984" "test"))
+
+(def db (cemerick.url/url "http://127.0.0.1:5984" "test"))
+
+(def pgdb
+  { :subprotocol "postgresql"
+   :user "postgres"
+   :password "changeme"
+   :subname "//localhost:5432/swipes" })
+
+(defn create-all-tables []
+  (jdbc/execute! pgdb [create-swipes-table-sql])
+  (jdbc/execute! pgdb [create-override-table-sql])
+  (jdbc/execute! pgdb [create-years-table-sql])
+  (jdbc/execute! pgdb [create-students-table-sql]))
+(defn drop-all-tables []
+  (jdbc/execute! pgdb ["drop table students;"])
+  (jdbc/execute! pgdb ["drop table overrides;"])
+  (jdbc/execute! pgdb ["drop table years;"])
+  (jdbc/execute! pgdb ["drop table swipes;"]))
+
+(defn reset-db []
+  (drop-all-tables)
+  (create-all-tables))
+
+(defn delete! [doc]
+  (let [table (:type doc)
+        id (:_id doc)]
+    (jdbc/delete! pgdb table ["_id = ?" id])))
+
+(defn persist! [doc]
+  (let [table (:type doc)
+        doc (dissoc doc :type)]
+    (map #(assoc % :type table)
+         (jdbc/insert! pgdb table doc))))
+
+;; (jdbc/query pgdb ["select * from students"])
+;; (jdbc/query pgdb ["select * from students where id in (?)" "1"])
+;; (persist! {:type :students :name "steve" :olderdate nil})
+
+(defn get-* [type id]
+  (map #(assoc % :type (keyword type))
+       (if id
+         (jdbc/query pgdb [(str "select * from " type " where _id = ? order by inserted_date" id)])
+         (jdbc/query pgdb [(str "select * from " type " order by inserted_date ")]))))
+
+(def create-students-table-sql
+  "create table students(
+  _id bigserial primary key,
+  name varchar(255),
+  inserted_date timestamp default now(),
+  olderdate varchar(255)
+  );")
+(def create-swipes-table-sql
+  "create table swipes(
+  _id bigserial primary key,
+  student_id bigserial,
+  in_time varchar(255),
+  inserted_date timestamp default now(),
+  out_time varchar(255)
+  );")
+(def create-years-table-sql
+  "create table years(
+  _id bigserial primary key,
+  from_date varchar(255),
+  to_date varchar(255),
+  inserted_date timestamp default now(),
+  name varchar(255)
+  );")
+(def create-override-table-sql
+  "create table overrides(
+  _id bigserial primary key,
+  student_id bigserial,
+  inserted_date timestamp default now(),
+  date varchar(255)
+  );")
 
 (def design-doc
   {"_id" "_design/view"

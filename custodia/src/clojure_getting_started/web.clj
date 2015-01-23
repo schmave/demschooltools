@@ -10,7 +10,6 @@
             [ring.adapter.jetty :as jetty]
             [ring.util.response :as resp]
             [clojure.tools.trace :as trace]
-            [com.ashafa.clutch :as couch]
             [clojure-getting-started.db :as db]
             [clojure-getting-started.database :as data]
             [clojure-getting-started.dates :as dates]
