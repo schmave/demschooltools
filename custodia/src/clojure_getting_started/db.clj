@@ -70,6 +70,9 @@
         id (:_id doc)]
     (jdbc/delete! pgdb table ["_id = ?" id])))
 
+(trace/deftrace update! [table id fields]
+  (jdbc/update! pgdb table fields ["_id =?" id]))
+
 (trace/deftrace persist! [doc]
   (let [table (:type doc)
         doc (dissoc doc :type)]
@@ -79,6 +82,7 @@
 ;; (jdbc/query pgdb ["select * from students"])
 ;; (jdbc/query pgdb ["select * from students where id in (?)" "1"])
 ;; (persist! {:type :students :name "steve" :olderdate nil})
+;; (update! :students 1 {:olderdate  "test"})
 
 (defn get-* [type id id-col]
   (map #(assoc % :type (keyword type))

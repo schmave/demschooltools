@@ -64,7 +64,8 @@
                         (assoc (make-swipe id) :in_time (str missing-in)))
            out-swipe (assoc in-swipe :out_time (str out-time))
            out-swipe (sanitize-out out-swipe)]
-       (db/persist! out-swipe))))
+       (db/update! :swipes (:_id out-swipe) out-swipe)
+       out-swipe)))
 
 ;; TODO - make multimethod on type
 ;; (get-years)
@@ -99,8 +100,10 @@
   (if older nil (str (t/now))))
 
 (defn toggle-student [_id]
-  (let [student (first (get-students _id))] 
-    (db/persist! (assoc student :olderdate (toggle-older (:olderdate student))))))
+  (let [student (first (get-students _id))
+        student (assoc student :olderdate (toggle-older (:olderdate student)))] 
+    (db/update! :students _id {:olderdate (:olderdate student)})
+    student))
 
 (defn make-year [from to]
   (let [from (f/parse from)
