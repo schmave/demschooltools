@@ -7,6 +7,7 @@
             [clojure.tools.trace :as trace]
             [clojure-getting-started.database :as db]
             [clojure-getting-started.attendance :as att]
+            [clojure-getting-started.helpers :as h]
             [clojure-getting-started.dates :as dates]
             ))
 ;; run test C-c M-,
@@ -159,13 +160,13 @@
             )))) 
   )
 
+
 (deftest older-student-required-minutes
   (db/sample-db)
   (let [s (db/make-student "test")
         sid (:_id s)
         s (db/toggle-student sid)
         s (first (db/get-students sid))
-
         tomorrow (-> (t/today-at 8 0) (t/plus (t/days 1)))]
     ;; good today
     ;;(let [basetime (t/date-time 2014 10 14 14 9 27 246)])
@@ -176,10 +177,18 @@
     (db/swipe-in sid (t/plus tomorrow (t/days 2)))
     (db/swipe-out sid (t/plus tomorrow (t/days 2) (t/minutes 329)))
 
+    (trace/trace "swipes" (db/get-swipes sid))
     (let [att (get-att sid s)]
+      (trace/trace "att" att)
       (testing "Total Valid Day Count"
         (is (= (-> att :total_days) 1)))))
   )
+
+(deftest get-current-year
+  (db/sample-db)
+  (testing "Getting current year"
+    (is (= (dates/get-current-year-string (db/get-years))
+           "2014-06-01 2015-06-01" ))))
 
 (deftest swipe-attendence-shows-only-when-in
   (do (db/sample-db)  

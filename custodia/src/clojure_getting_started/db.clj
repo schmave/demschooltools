@@ -71,7 +71,8 @@
     (jdbc/delete! pgdb table ["_id = ?" id])))
 
 (trace/deftrace update! [table id fields]
-  (jdbc/update! pgdb table fields ["_id =?" id]))
+  (let [fields (dissoc fields :type)]
+    (jdbc/update! pgdb table fields ["_id =?" id])))
 
 (trace/deftrace persist! [doc]
   (let [table (:type doc)
