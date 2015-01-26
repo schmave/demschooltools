@@ -36,6 +36,8 @@ app.initial_data = {
 @for( c <- meeting.cases ) {
 	app.initial_data.cases.push( @Html(c.toJson()) );
 }
+
+config = @Html(OrgConfig.get().toJson());
 </script>
 
 <div id="meeting">
@@ -104,7 +106,7 @@ View printable minutes</a>
   <label><input type="radio" class="plea-not-guilty" value="Not Guilty"><span>Not Guilty</span></label>
 </div>
 &nbsp;&nbsp;&nbsp;<label><input type="checkbox" class="refer-to-sm"><span> Refer to School Meeting</span></label>
-	<tr><td class="esm-form-label">Resolution plan: <td><textarea class="resolution_plan"></textarea>
+	<tr><td class="esm-form-label">@OrgConfig.get().str_res_plan_cap: <td><textarea class="resolution_plan"></textarea>
     <td class="last-rp"></td>
    </table>
    <button style="margin-left: 200px" class="btn btn-danger btn-xs">Remove Charge</button>

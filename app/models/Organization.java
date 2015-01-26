@@ -8,9 +8,7 @@ import com.avaje.ebean.SqlRow;
 
 import play.db.ebean.Model;
 import play.db.ebean.Model.Finder;
-import play.libs.Json;
 import play.mvc.Http.Context;
-
 
 @Entity
 public class Organization extends Model {
@@ -41,3 +39,4 @@ public class Organization extends Model {
         return null;
     }
 }
+

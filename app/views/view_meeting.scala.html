@@ -9,7 +9,7 @@
 1. Print minutes</a>
 <a href="@routes.Application.viewMeetingResolutionPlans(m.id)"
 class="btn btn-success no-print" style="margin-left: 75px">
-2. Print resolution plans</a>
+2. Print @OrgConfig.get().str_res_plans</a>
 <p><a href="@routes.ApplicationEditing.editMeeting(m.id)" class="btn btn-warning no-print">
 Edit minutes</a>
 
@@ -30,9 +30,9 @@ Edit minutes</a>
 )
 </p>
 
-<h4>&nbsp;<br>Resolution Plans</h4>
+<h4>&nbsp;<br>@OrgConfig.get().str_res_plans_cap</h4>
 <table class="table resolution_plans">
-	<thead><th width="70">Case<th width="20">Person<th width="220">Entry<th>Resolution Plan</thead>
+	<thead><th width="70">Case<th width="20">Person<th width="220">Entry<th>@OrgConfig.get().str_res_plan_cap</thead>
 	@for(c <- m.cases) {
 		@for(charge <- c.charges) {
 			@if( charge.person != null && charge.rule != null ) {

@@ -37,7 +37,7 @@
 				<li @if(activeTab.equals("edit_today")) { class="active" } ><a href="@routes.ApplicationEditing.editTodaysMinutes">Edit today's minutes</a>
 			}
 			<li @if(activeTab.equals("view_manual")) { class="active" } ><a href="@routes.Application.viewManual">
-					Manual
+					@OrgConfig.get().str_manual_title_short
 				</a>
 			} else { @if( menu.equals( "crm" ) ) {
 			<li @if(activeTab.equals("all_people")) { class="active" } ><a href="@routes.CRM.people()">All people</a>
