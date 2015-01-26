@@ -53,7 +53,7 @@ $(function() {
 			<th width="20">Person
 			<th width="150">Entry
 			<th width="70">Plea
-			<th>Resolution Plan<th>Findings</thead>
+			<th>@OrgConfig.get().str_res_plan_cap<th>Findings</thead>
 	@for( c <- sm_charges ) {
 		<tr><td>@c.the_case.case_number
 			<td>@if(c.person != null) { @c.person.getDisplayName() } else { <i>No one</i> }

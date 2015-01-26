@@ -14,7 +14,7 @@
 	Plead <b>@c.plea</b>.
 }
 
-<u>RP: @c.resolution_plan</u>
+<u>@OrgConfig.get().str_res_plan_short: @c.resolution_plan</u>
 
 @if( c.sm_decision != null) {
 	<span class="sm-decision"><i>School Meeting ruled@if(

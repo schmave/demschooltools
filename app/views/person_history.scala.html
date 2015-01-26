@@ -2,13 +2,13 @@
 
 @import helper._
 
-<h3>@p.getDisplayName()'s recent RPs:</h3>
+<h3>@p.getDisplayName()'s recent @OrgConfig.get().str_res_plans</h3>
 
 @if( recent_rps.size() == 0 ) {
 <p>None. Go @p.getDisplayName()!
 } else {
 <table class="table">
-<thead><tr><th>Day<th width=45%>Entry<th width=45%>Resolution Plan</tr></thead>
+<thead><tr><th>Day<th width=45%>Entry<th width=45%>@OrgConfig.get().str_res_plan_cap</tr></thead>
 <tbody>
 @for( c <- recent_rps ) {
 <tr><td>@Application.formatDayOfWeek(c.the_case.meeting.date)

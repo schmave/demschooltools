@@ -334,8 +334,9 @@ public class Application extends Controller {
 
         if (charges.size() > 0) {
             Charge c = charges.get(0);
-            return ok("" + charges.size() + " prior charges. Last RP (from case #" + c.the_case.case_number +
-                "): <u>" + c.resolution_plan + "</u>");
+            return ok("" + charges.size() + " prior charges. Last " +
+                OrgConfig.get().str_res_plan_short + " (from case #" +
+                c.the_case.case_number + "): <u>" + c.resolution_plan + "</u>");
         }
 
         return ok("No previous charge.");

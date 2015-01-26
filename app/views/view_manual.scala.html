@@ -2,9 +2,9 @@
 
 @import helper._
 
-@main("Management Manual", "view_manual", "jc") {
+@main(OrgConfig.get().str_manual_title, "view_manual", "jc") {
 
-<h1>TRVS Management Manual</h1>
+<h1>@OrgConfig.get().short_name @OrgConfig.get().str_manual_title</h1>
 
 <h3 class="no-print"><a href="@routes.Application.viewManualChanges()">See what's changed</a></h3>
 
