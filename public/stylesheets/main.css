@@ -110,6 +110,16 @@
     padding-right: 5px;
 }
 
+#notice
+{
+    position:fixed;
+    top: 0px;
+    left: 500px;
+    background: yellow;
+    border: 1px solid black;
+    padding: 10px;
+}
+
 label {
 	font-weight: normal;
 }

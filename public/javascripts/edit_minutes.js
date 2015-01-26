@@ -443,6 +443,32 @@ function loadInitialData() {
     }
 }
 
+function checkDirties() {
+    var num_dirty = 0;
+
+    for (i in app.cases) {
+        var c = app.cases[i]
+        if (c.is_modified) {
+            num_dirty++;
+        }
+        for (j in c.charges) {
+            var ch = c.charges[j]
+            if (ch.is_modified) {
+                num_dirty++;
+            }
+        }
+    }
+
+    if (num_dirty < 3) {
+        $("#notice").hide();
+    } else {
+        $("#notice").show();
+        $("#notice").html("" + num_dirty + " unsaved changes. Connection lost?");
+    }
+
+    window.setTimeout(checkDirties, 1000);
+}
+
 $(function () {
     Handlebars.registerHelper('render', function(partialId, options) {
       var selector = 'script[type="text/x-handlebars-template"]#' + partialId,
@@ -496,6 +522,8 @@ $(function () {
         }
         return null;
     }
+
+    checkDirties();
 });
 
 function addCaseNoServer(id, number)
