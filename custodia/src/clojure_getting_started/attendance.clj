@@ -26,7 +26,7 @@
 
 (defn append-validity [student [day swipes]]
   (let [has-override? (->> swipes
-                           (filter #(= (:type %) "override"))
+                           (filter #(= (:type %) :overrides ))
                            not-empty
                            boolean)
         int-mins (->> swipes
@@ -42,8 +42,8 @@
 
 (defn get-year-from-to [year-string]
   (let [year (first (get-years year-string))
-        from (f/parse (:from year))
-        to (f/parse (:to year))]
+        from (f/parse (:from_date year))
+        to (f/parse (:to_date year))]
     [from to]))
 
 (defn get-last-swipe-type [summed-days]
@@ -51,7 +51,7 @@
     (when (-> summed-days first :valid not)
       (let [day (-> summed-days first :day)
             swipes (-> summed-days first :swipes)
-            swipes (filter #(= "swipe" (:type %)) swipes)
+            swipes (filter #(= :swipes (:type %)) swipes)
             last-swipe (last swipes)]
         (cond
          (:out_time last-swipe) ["out" day]

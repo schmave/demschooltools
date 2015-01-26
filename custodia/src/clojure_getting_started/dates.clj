@@ -31,7 +31,7 @@
           :nice_in_time (make-time-string (:in_time swipe))
           :nice_out_time (make-time-string (:out_time swipe))))
 
-(defn only-dates-between [list f dfrom dto]
+(trace/deftrace only-dates-between [list f dfrom dto]
   (filter #(t/within? (t/interval dfrom dto)
                       (f/parse (f %)))
           list))
@@ -46,8 +46,8 @@
 
 (defn get-current-year-string [years]
   (->> years
-       (filter #(t/within? (t/interval (f/parse (:from %))
-                                       (f/parse (:to %)))
+       (filter #(t/within? (t/interval (f/parse (:from_date %))
+                                       (f/parse (:to_date %)))
                            (t/now)))
        first
        :name))

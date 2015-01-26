@@ -2,7 +2,7 @@
   (:require [clojure.tools.trace :as trace]))
 
 (defn wrap-args-with-trace [[symb val]]
-  [symb (list `trace/trace (str "let-" symb) val)])
+  [symb (list clojure.tools.trace/trace (str "let-" symb) val)])
 
 (defmacro tracelet [args & body]
   (let [arg-pairs (partition 2 args)

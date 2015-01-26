@@ -68,11 +68,11 @@
 (defn delete! [doc]
   (let [table (:type doc)
         id (:_id doc)]
-    (jdbc/delete! pgdb table ["_id = ?" id])))
+    (jdbc/delete! pgdb table ["_id=?" id])))
 
 (trace/deftrace update! [table id fields]
   (let [fields (dissoc fields :type)]
-    (jdbc/update! pgdb table fields ["_id =?" id])))
+    (jdbc/update! pgdb table fields ["_id=?" id])))
 
 (trace/deftrace persist! [doc]
   (let [table (:type doc)
@@ -85,11 +85,12 @@
 ;; (persist! {:type :students :name "steve" :olderdate nil})
 ;; (update! :students 1 {:olderdate  "test"})
 
-(defn get-* [type id id-col]
-  (map #(assoc % :type (keyword type))
-       (if id
-         (jdbc/query pgdb [(str "select * from " type " where " id-col "=? order by inserted_date") id])
-         (jdbc/query pgdb [(str "select * from " type " order by inserted_date ")]))))
+(defn get-*
+  ([type] (map #(assoc % :type (keyword type))
+               (jdbc/query pgdb [(str "select * from " type " order by inserted_date ")])))
+  ([type id id-col]
+     (map #(assoc % :type (keyword type))
+          (jdbc/query pgdb [(str "select * from " type " where " id-col "=? order by inserted_date") id]))))
 
 
 (def design-doc

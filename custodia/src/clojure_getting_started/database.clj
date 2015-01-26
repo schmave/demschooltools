@@ -11,10 +11,9 @@
             ))
 
 (defn get-swipes
-  ([] (get-swipes nil))
+  ([] (db/get-* "swipes"))
   ([ids]
      (db/get-* "swipes" ids "student_id")))
-(get-swipes 1)
 
 (defn get-overrides [ids]
   (db/get-* "overrides" ids "student_id"))
@@ -70,9 +69,9 @@
 ;; TODO - make multimethod on type
 ;; (get-years)
 (defn get-years
-  ([] (get-years nil))
+  ([] (db/get-* "years"))
   ([names]
-     (db/get-* "years" names "_id")))
+     (db/get-* "years" names "name")))
 
 (defn delete-year [year]
   (when-let [year (first (get-years year))]
@@ -85,7 +84,7 @@
        db/persist!))
 
 (defn get-students
-  ([] (get-students nil))
+  ([] (db/get-* "students"))
   ([ids] (db/get-* "students" ids "_id")))
 
 ;; (get-years)    
