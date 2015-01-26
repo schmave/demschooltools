@@ -14,9 +14,9 @@ chapter_id = None
 section_id = None
 
 for line in open(sys.argv[1], 'r'):
-    chapter_match = re.match("PART ([^:]*):\t(.*)", line)
-    section_match = re.match("A(\\d)00(.*)", line)
-    rule_match = re.match("A\\d([^ \\t]*)[\\t ](.*)", line)
+    chapter_match = re.match("PART ([^:]*):[\\t ]*(.*)", line)
+    section_match = re.match("^.(\\d)00[\\t ]*(.*)", line)
+    rule_match = re.match("^.\\d([^ \\t]*)[\\t ]*(.*)", line)
 
     if section_match:
         cur.execute("""INSERT into section(num, title, chapter_id) VALUES
@@ -34,7 +34,7 @@ for line in open(sys.argv[1], 'r'):
     if chapter_match:
         cur.execute("""INSERT into chapter (num, title, organization_id)
             VALUES (%s, %s, 2) returning id""", (
-            "0", chapter_match.group(2).strip()))
+            chapter_match.group(1), chapter_match.group(2).strip()))
         chapter_id = int(cur.fetchone()[0])
 
 
