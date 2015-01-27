@@ -19,6 +19,7 @@ public class OrgConfig {
 
     public boolean show_no_contest_plea = false;
     public boolean show_severity = false;
+    public boolean use_minor_referrals = false;
 
     public static OrgConfig get() {
         return configs.get(Organization.getByHost().name);
@@ -84,6 +85,7 @@ class PhillyFreeSchool extends OrgConfig {
 
         show_no_contest_plea = true;
         show_severity = true;
+        use_minor_referrals = true;
 
         OrgConfig.register(name, this);
     }

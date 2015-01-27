@@ -202,6 +202,14 @@ function displayName(p) {
 function Charge(charge_id, el) {
     var self = this;
 
+    this.checkReferralLabelHighlight = function() {
+        if (el.find(".minor-referral-destination").val()) {
+            el.find(".minor-referral-label").addClass("highlight");
+        } else {
+            el.find(".minor-referral-label").removeClass("highlight");
+        }
+    }
+
     this.loadData = function(json) {
         el.find(".resolution_plan").val(json.resolution_plan);
         if (json.plea == "Guilty") {
@@ -226,6 +234,9 @@ function Charge(charge_id, el) {
         if (json.referred_to_sm) {
             el.find(".refer-to-sm").prop("checked", true);
         }
+
+        el.find(".minor-referral-destination").val(json.minor_referral_destination);
+        self.checkReferralLabelHighlight();
     }
 
     this.saveIfNeeded = function() {
@@ -260,6 +271,12 @@ function Charge(charge_id, el) {
         refer = el.find(".refer-to-sm");
         url += "&referred_to_sm=" + refer.prop("checked");
 
+        minor_referral_destination = el.find(".minor-referral-destination");
+        if (minor_referral_destination.length > 0) {
+            url += "&minor_referral_destination=" +
+                encodeURIComponent(minor_referral_destination.val());
+        }
+
         if (self.rule_chooser.rule) {
             url += "&rule_id=" + self.rule_chooser.rule;
         }
@@ -290,6 +307,8 @@ function Charge(charge_id, el) {
                 el.find(".last-rp").html(data);
             });
         }
+
+        self.checkReferralLabelHighlight();
     }
 
     self.el = el;
@@ -308,6 +327,8 @@ function Charge(charge_id, el) {
             self.el.find(".refer-to-sm").prop("checked", true);
     });
     el.find(".refer-to-sm").change(self.markAsModified);
+    el.find(".minor-referral-destination").change(self.markAsModified);
+    el.find(".minor-referral-destination").on(TEXT_AREA_EVENTS, self.markAsModified);
 
     self.people_chooser = new PeopleChooser(el.find(".people_chooser"),
                                             self.markAsModified,

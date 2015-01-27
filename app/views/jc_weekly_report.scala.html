@@ -1,4 +1,5 @@
-@(start_date : Date, end_date: Date, data : WeeklyStats, cases_wo_charges: List[ Case ])
+@(start_date : Date, end_date: Date, data : WeeklyStats, cases: List[ Case ],
+minor_referral_destinations : List[ String ])
 
 @import helper._
 
@@ -54,12 +55,25 @@ Period from Wed. @Application.formatDateShort(start_date) to Tue. @{Application.
 
 <h4>&nbsp;<br>Cases with no charges</h4>
 @caseTableOpen()
-@for(c <- cases_wo_charges) {
-	@if( !c.empty() ) {
+@for(c <- cases) {
+	@if( !c.empty() && c.charges.size() == 0 ) {
 		@caseTableRow(c)
 	}
 }
 </table>
+
+@if( OrgConfig.get().use_minor_referrals ) {
+  @for( dest <- minor_referral_destinations ) {
+	<h4>&nbsp;<br>Charges referred to @dest</h4>
+	@for(c <- cases) {
+	  @for(ch <- c.charges) {
+		@if( ch.minor_referral_destination.equals(dest) ) {
+		  @historyCharge(ch, true, true, false)
+		}
+	  }
+	}
+  }
+}
 
 <script type="text/javascript">
 $(function() {
