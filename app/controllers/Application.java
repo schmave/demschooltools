@@ -216,7 +216,6 @@ public class Application extends Controller {
         result.rule_counts = new TreeMap<Entry, Integer>();
         result.person_counts = new TreeMap<Person, WeeklyStats.PersonCounts>();
 
-        Set<Case> week_cases = new HashSet<Case>();
         for (Charge c : all_charges) {
             long case_millis = c.the_case.meeting.date.getTime();
             long diff = end_date.getTime().getTime() - case_millis;
@@ -238,6 +237,8 @@ public class Application extends Controller {
             }
         }
 
+        List<Case> cases_wo_charges = new ArrayList<Case>();
+
         List<Meeting> meetings = Meeting.find.where()
             .eq("organization", Organization.getByHost())
             .le("date", end_date.getTime())
@@ -245,6 +246,10 @@ public class Application extends Controller {
         for (Meeting m : meetings) {
             for (Case c : m.cases) {
                 result.num_cases++;
+
+                if (c.charges.size() == 0) {
+                    cases_wo_charges.add(c);
+                }
             }
         }
         /*
@@ -278,7 +283,8 @@ public class Application extends Controller {
         return ok(views.html.jc_weekly_report.render(
             start_date.getTime(),
             end_date.getTime(),
-            result));
+            result,
+            cases_wo_charges));
     }
 
     public static String jcPeople(String term) {

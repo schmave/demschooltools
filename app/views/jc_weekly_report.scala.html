@@ -1,4 +1,4 @@
-@(start_date : Date, end_date: Date, data : WeeklyStats)
+@(start_date : Date, end_date: Date, data : WeeklyStats, cases_wo_charges: List[ Case ])
 
 @import helper._
 
@@ -51,6 +51,15 @@ Period from Wed. @Application.formatDateShort(start_date) to Tue. @{Application.
 		</ol>
 	</div>
 </div>
+
+<h4>&nbsp;<br>Cases with no charges</h4>
+@caseTableOpen()
+@for(c <- cases_wo_charges) {
+	@if( !c.empty() ) {
+		@caseTableRow(c)
+	}
+}
+</table>
 
 <script type="text/javascript">
 $(function() {
