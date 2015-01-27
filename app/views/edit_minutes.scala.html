@@ -135,6 +135,23 @@ View printable minutes</a>
 </tr>
 
 <tr><td class="esm-form-label">Findings: <td colspan=3><textarea class="findings"></textarea></tr>
+
+@if( OrgConfig.get().show_severity ) {
+    <tr><td class="esm-form-label">Severity:<td colspan=3>
+    <div class="radio-inline">
+      <label><input type="radio" class="severity-mild" value="Mild"><span>Mild</span></label>
+    </div>
+	<div class="radio-inline">
+	  <label><input type="radio" class="severity-moderate" value="Moderate"><span>Moderate</span></label>
+	</div>
+	<div class="radio-inline">
+	  <label><input type="radio" class="severity-serious" value="Serious"><span>Serious</span></label>
+	</div>
+	<div class="radio-inline">
+	  <label><input type="radio" class="severity-severe" value="Severe"><span>Severe</span></label>
+	</div>
+}
+
 </table>
 <div class="charges"></div>
 <button class="add-charges">Add charges</button>
