@@ -18,6 +18,7 @@ public class OrgConfig {
     public String str_res_plans_cap;
 
     public boolean show_no_contest_plea = false;
+    public boolean show_severity = false;
 
     public static OrgConfig get() {
         return configs.get(Organization.getByHost().name);
@@ -82,6 +83,7 @@ class PhillyFreeSchool extends OrgConfig {
         str_res_plans_cap = "Sentences";
 
         show_no_contest_plea = true;
+        show_severity = true;
 
         OrgConfig.register(name, this);
     }

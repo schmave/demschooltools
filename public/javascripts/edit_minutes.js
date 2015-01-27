@@ -326,6 +326,13 @@ function Charge(charge_id, el) {
 function Case (id, el) {
     var self = this;
 
+    var SEVERITIES = {
+        "mild": "Mild",
+        "moderate" : "Moderate",
+        "serious": "Serious",
+        "severe": "Severe"
+    }
+
     this.saveIfNeeded = function() {
         window.setTimeout(self.saveIfNeeded, 5000);
         if (!self.is_modified) {
@@ -341,6 +348,12 @@ function Case (id, el) {
         url += "&date=" + encodeURIComponent(self.el.find(".date").val());
         url += "&time=" + encodeURIComponent(self.el.find(".time").val());
 
+        for (key in SEVERITIES) {
+            if (el.find(".severity-" + key).prop("checked")) {
+                url += "&severity=" + SEVERITIES[key];
+            }
+        }
+
         $.post(url, function(data) {
             self.is_modified = false;
         });
@@ -355,6 +368,12 @@ function Case (id, el) {
         el.find(".date").val(data.date);
         el.find(".time").val(data.time);
         el.find(".findings").val(data.findings);
+
+        for (key in SEVERITIES) {
+            if (data.severity == SEVERITIES[key]) {
+                el.find(".severity-" + key).prop("checked", true);
+            }
+        }
 
         if (data.writer) {
             self.writer_chooser.addPerson(data.writer.person_id,
@@ -417,7 +436,13 @@ function Case (id, el) {
     el.find(".date").change(self.markAsModified);
     el.find(".time").change(self.markAsModified);
 
+    for (key in SEVERITIES) {
+        el.find(".severity-" + key).change(self.markAsModified);
+    }
+
     el.find(".add-charges").click(self.addCharge);
+
+    el.find("input[type=radio]").prop("name", "severity-" + id);
 
     window.setTimeout(self.saveIfNeeded, 5000);
 }
