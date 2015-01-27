@@ -34,7 +34,7 @@
 		@if( !charge.minor_referral_destination.equals("")) {
 			<tr><td colspan=3 class="sm_decision">Charge against
 			@if(charge.person != null) { @charge.person.getDisplayName() } else { ??? } with
-			@if(charge.rule != null) { @{charge.rule.title}. } else { ??? } referred to
+			@if(charge.rule != null) { @{charge.rule.title} } else { ??? } referred to
 				@{charge.minor_referral_destination}.
 		}
 		@if( charge.sm_decision != null ) {
