@@ -331,6 +331,7 @@ function Case (id, el) {
         url += "&location=" + encodeURIComponent(self.el.find(".location").val());
         url += "&findings=" + encodeURIComponent(self.el.find(".findings").val());
         url += "&date=" + encodeURIComponent(self.el.find(".date").val());
+        url += "&time=" + encodeURIComponent(self.el.find(".time").val());
 
         $.post(url, function(data) {
             self.is_modified = false;
@@ -344,6 +345,7 @@ function Case (id, el) {
     this.loadData = function(data) {
         el.find(".location").val(data.location);
         el.find(".date").val(data.date);
+        el.find(".time").val(data.time);
         el.find(".findings").val(data.findings);
 
         if (data.writer) {
@@ -405,6 +407,7 @@ function Case (id, el) {
     el.find(".findings").change(self.markAsModified);
     el.find(".findings").on(TEXT_AREA_EVENTS, self.markAsModified);
     el.find(".date").change(self.markAsModified);
+    el.find(".time").change(self.markAsModified);
 
     el.find(".add-charges").click(self.addCharge);
 

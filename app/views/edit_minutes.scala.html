@@ -123,13 +123,13 @@ View printable minutes</a>
 <td>{{render "people-chooser" clazz="writer"}}</tr>
 
 <tr><td class="esm-form-label">Location: <td><input class="form-control location" type="text"></tr>
-<tr><td class="esm-form-label">Date of event: <td><input class="date form-control" type="text"></tr>
+<tr><td class="esm-form-label">Date of event: <td><input class="date form-control" type="text"><td class="esm-form-label">Time:<td><input class="form-control time" type="text"></tr>
 
-<tr><td class="esm-form-label">Who testified:<td>
+<tr><td class="esm-form-label">Who testified:<td colspan=3>
     {{render "people-chooser" clazz="testifier"}}
 </tr>
 
-<tr><td class="esm-form-label">Findings: <td><textarea class="findings"></textarea></tr>
+<tr><td class="esm-form-label">Findings: <td colspan=3><textarea class="findings"></textarea></tr>
 </table>
 <div class="charges"></div>
 <button class="add-charges">Add charges</button>

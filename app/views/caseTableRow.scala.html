@@ -4,7 +4,7 @@
 
 	<tr>
 	<td><h5>#@c.case_number</h5>
-	<p>@if( c.date != null ) { @Application.formatDateShort(c.date). }
+	<p>@if( c.date != null ) { @Application.formatDateShort(c.date)@if( !c.time.equals("") ){, @c.time}. }
 	<i>Writer</i>: @if( c.writer != null ) {@c.writer.getDisplayName()} else {unknown},
 	<i>location</i>: @if(!c.location.equals("")) {@c.location} else {unknown}.
 	<td><p><i>Testifiers</i>: @c.testify_records.map { tr =>@tr.person.getDisplayName()}.mkString(", ")
@@ -26,8 +26,8 @@
 
 	@for( charge <- c.charges ) {
 		@if( charge.referred_to_sm && charge.sm_decision == null) {
-			<tr><td colspan=3 class="sm_decision">*** Awaiting School Meeting decision on charging 
-			@if(charge.person != null) { @charge.person.getDisplayName() } else { ??? } with 
+			<tr><td colspan=3 class="sm_decision">*** Awaiting School Meeting decision on charging
+			@if(charge.person != null) { @charge.person.getDisplayName() } else { ??? } with
 			@if(charge.rule != null) { @{charge.rule.title}. } else { ???. }
 		}
 		@if( charge.sm_decision != null ) {
