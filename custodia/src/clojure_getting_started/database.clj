@@ -83,6 +83,7 @@
         :date date-string}
        db/persist!))
 
+;; (get-students )
 (defn get-students
   ([] (db/get-* "students"))
   ([ids] (db/get-* "students" ids "_id")))

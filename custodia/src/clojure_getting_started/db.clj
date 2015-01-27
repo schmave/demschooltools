@@ -90,7 +90,12 @@
                (jdbc/query pgdb [(str "select * from " type " order by inserted_date ")])))
   ([type id id-col]
      (map #(assoc % :type (keyword type))
-          (jdbc/query pgdb [(str "select * from " type " where " id-col "=? order by inserted_date") id]))))
+          (if id
+            (jdbc/query pgdb [(str "select * from " type
+                                   " where " id-col "=?"
+                                   " order by inserted_date")
+                              id])
+            (jdbc/query pgdb [(str "select * from " type " order by inserted_date")])))))
 
 
 (def design-doc

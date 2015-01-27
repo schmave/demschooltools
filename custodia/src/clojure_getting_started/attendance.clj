@@ -15,7 +15,6 @@
     (make-date-string (:in_time swipe))
     (:date swipe)))
 
-
 (defn get-min-minutes [student day]
   (let [older-date (-> student :olderdate f/parse)
         current-date (f/parse day)]

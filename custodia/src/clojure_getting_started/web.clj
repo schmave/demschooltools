@@ -46,7 +46,7 @@
                            (resp/response (att/get-attendance year sid s)))))
   (GET "/resetdb" []
        (friend/authorize #{::admin}
-                         (data/reset-db)
+                         (db/reset-db)
                          (resp/redirect "/")))
   (POST "/override" [_id day]
         (friend/authorize #{::admin}

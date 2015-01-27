@@ -167,6 +167,10 @@
             )))) 
   )
 
+(deftest students-with-att
+  (db/sample-db)
+  (testing "students with att"
+    (is (not= '() (att/get-students-with-att)))))
 
 (deftest older-student-required-minutes
   (db/sample-db)
@@ -212,6 +216,3 @@
                    "in")))
           ))) 
   )
-
-
-
