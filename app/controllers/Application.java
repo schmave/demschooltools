@@ -237,7 +237,7 @@ public class Application extends Controller {
             }
         }
 
-        List<Case> cases_wo_charges = new ArrayList<Case>();
+        List<Case> all_cases = new ArrayList<Case>();
 
         List<Meeting> meetings = Meeting.find.where()
             .eq("organization", Organization.getByHost())
@@ -247,31 +247,9 @@ public class Application extends Controller {
             for (Case c : m.cases) {
                 result.num_cases++;
 
-                if (c.charges.size() == 0) {
-                    cases_wo_charges.add(c);
-                }
+                all_cases.add(c);
             }
         }
-        /*
-
-        TreeMap<Entry, Integer> rule_counts = new TreeMap<Entry, Integer>();
-        TreeMap<Person, Integer> people_counts = new TreeMap<Person, Integer>();
-        int num_cases = 0, num_charges = 0;
-
-        for (Meeting m : meetings) {
-            for (Case c : m.cases) {
-                num_cases++;
-                for (Charge ch : c.charges) {
-                    if (ch.rule != null && ch.person != null) {
-                        rule_counts.put(ch.rule, 1 + getOrDefault(rule_counts, ch.rule, 0));
-                        people_counts.put(ch.person, 1 + getOrDefault(people_counts, ch.person, 0));
-                    }
-                    num_charges++;
-                }
-            }
-        }
-
-        */
 
         result.uncharged_people = allPeople();
         for (Map.Entry<Person, WeeklyStats.PersonCounts> entry : result.person_counts.entrySet()) {
@@ -280,11 +258,22 @@ public class Application extends Controller {
             }
         }
 
+        ArrayList<String> referral_destinations = new ArrayList<String>();
+        for (Case c : all_cases) {
+            for (Charge ch : c.charges) {
+                if (!ch.minor_referral_destination.equals("") &&
+                    !referral_destinations.contains(ch.minor_referral_destination)) {
+                    referral_destinations.add(ch.minor_referral_destination);
+                }
+            }
+        }
+
         return ok(views.html.jc_weekly_report.render(
             start_date.getTime(),
             end_date.getTime(),
             result,
-            cases_wo_charges));
+            all_cases,
+            referral_destinations));
     }
 
     public static String jcPeople(String term) {

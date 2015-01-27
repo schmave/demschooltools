@@ -8,6 +8,7 @@ import java.util.TreeMap;
 
 import javax.persistence.*;
 
+import com.avaje.ebean.validation.NotNull;
 import com.fasterxml.jackson.annotation.*;
 
 import play.db.ebean.Model;
@@ -39,6 +40,9 @@ public class Charge extends Model implements Comparable<Charge> {
     public boolean referred_to_sm;
     public String sm_decision;
     public Date sm_decision_date;
+
+    @NotNull
+    public String minor_referral_destination = "";
 
     public static Finder<Integer, Charge> find = new Finder(
         Integer.class, Charge.class
@@ -84,6 +88,10 @@ public class Charge extends Model implements Comparable<Charge> {
         }
 
         referred_to_sm = Boolean.parseBoolean(query_string.get("referred_to_sm")[0]);
+
+        if (query_string.containsKey("minor_referral_destination")) {
+            minor_referral_destination = query_string.get("minor_referral_destination")[0];
+        }
     }
 
     public void updateSchoolMeetingDecision(String decision, Date date) {
