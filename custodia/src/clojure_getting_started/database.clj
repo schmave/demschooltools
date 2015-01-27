@@ -28,11 +28,6 @@
 (defn make-swipe [student-id]
   {:type :swipes :student_id student-id :in_time nil :out_time nil})
 
-;; (defn persist! [doc]
-;;   (couch/put-document db/db (assoc doc :inserted-date
-;;                                    (or (:inserted-date doc)
-;;                                        (str (t/now))))))
-
 (trace/deftrace swipe-in
   ([id] (swipe-in id (t/now)))
   ([id in-time & [missing-out]] 

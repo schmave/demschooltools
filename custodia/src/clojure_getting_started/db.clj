@@ -50,10 +50,10 @@
   (jdbc/execute! pgdb [create-years-table-sql])
   (jdbc/execute! pgdb [create-students-table-sql]))
 (defn drop-all-tables []
-  (jdbc/execute! pgdb ["drop table students;"])
-  (jdbc/execute! pgdb ["drop table overrides;"])
-  (jdbc/execute! pgdb ["drop table years;"])
-  (jdbc/execute! pgdb ["drop table swipes;"]))
+  (jdbc/execute! pgdb ["drop table if exists students;"])
+  (jdbc/execute! pgdb ["drop table if exists overrides;"])
+  (jdbc/execute! pgdb ["drop table if exists years;"])
+  (jdbc/execute! pgdb ["drop table if exists swipes;"]))
 
 (defn reset-db []
   (drop-all-tables)
