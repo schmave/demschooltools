@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import controllers.Application;
 
+import com.avaje.ebean.validation.NotNull;
 import play.db.ebean.Model;
 import play.db.ebean.Model.Finder;
 import play.libs.Json;
@@ -33,6 +34,8 @@ public class Case extends Model implements Comparable<Case> {
     public String findings = "";
 
     public Date date;
+    @NotNull
+    public String time = "";
 
     @ManyToOne
     @JoinColumn(name="meeting_id")
@@ -90,6 +93,7 @@ public class Case extends Model implements Comparable<Case> {
 
         String date_string = query_string.get("date")[0];
         date = controllers.Application.getDateFromString(date_string);
+        time = query_string.get("time")[0];
 
         if (query_string.containsKey("writer_id")) {
             writer = Person.find.ref(Integer.parseInt(query_string.get("writer_id")[0]));
@@ -103,6 +107,7 @@ public class Case extends Model implements Comparable<Case> {
 			location.equals("") &&
 			writer == null &&
 			date == null &&
+            time.equals("") &&
 			testify_records.size() == 0 &&
 			charges.size() == 0;
 	}
