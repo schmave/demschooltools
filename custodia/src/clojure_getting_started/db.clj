@@ -2,6 +2,7 @@
   (:require [carica.core :as c]
             [cemerick.url :as url]
             [clojure.tools.trace :as trace]
+            [heroku-database-url-to-jdbc.core :as h]
             [com.ashafa.clutch :as couch]
             [environ.core :refer [env]]
             [clojure.java.jdbc :as jdbc]
@@ -43,13 +44,16 @@
   inserted_date timestamp default now(),
   date varchar(255)
   );")
-
+(comment { :subprotocol "postgresql"
+          ;; :user "postgres"
+          ;; :password "changeme"
+          
+          :subname ""})
 (def pgdb
-  { :subprotocol "postgresql"
-   :user "postgres"
-   :password "changeme"
-   :subname "//localhost:5432/swipes" })
+  (dissoc (h/korma-connection-map "postgres://postgres:changeme@localhost:5432/swipes")
+          :classname))
 
+;; "postgres://postgres:changeme@localhost:5432/swipes"
 (defn create-all-tables []
   (jdbc/execute! pgdb [create-swipes-table-sql])
   (jdbc/execute! pgdb [create-override-table-sql])
