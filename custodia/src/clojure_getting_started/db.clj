@@ -7,12 +7,6 @@
             [environ.core :refer [env]]
             [clojure.java.jdbc :as jdbc]
             ))
-#_(def db (assoc (url/url (env :db-url)
-                          (env :db-name))
-            :username (env :db-user)
-            :password (env :db-password)))
-
-(def db (cemerick.url/url "http://127.0.0.1:5984" "test"))
 
 (def create-students-table-sql
   "create table students(
@@ -37,6 +31,7 @@
   inserted_date timestamp default now(),
   name varchar(255)
   );")
+
 (def create-override-table-sql
   "create table overrides(
   _id bigserial primary key,
@@ -44,16 +39,11 @@
   inserted_date timestamp default now(),
   date varchar(255)
   );")
-(comment { :subprotocol "postgresql"
-          ;; :user "postgres"
-          ;; :password "changeme"
-          
-          :subname ""})
+
 (def pgdb
-  (dissoc (h/korma-connection-map "postgres://postgres:changeme@localhost:5432/swipes")
+  (dissoc (h/korma-connection-map (env :database-url))
           :classname))
 
-;; "postgres://postgres:changeme@localhost:5432/swipes"
 (defn create-all-tables []
   (jdbc/execute! pgdb [create-swipes-table-sql])
   (jdbc/execute! pgdb [create-override-table-sql])
@@ -101,41 +91,3 @@
                               id])
             (jdbc/query pgdb [(str "select * from " type " order by inserted_date")])))))
 
-
-(def design-doc
-  {"_id" "_design/view"
-   "views" {"students" {"map" "function(doc) {
-                                 if (doc.type === \"student\") {
-                                   emit(doc._id, doc);
-                                 }
-                               }"}
-            "student-swipes" {"map"
-                              "function(doc) {
-                                if (doc.type == \"student\") {
-                                  map([doc._id, 0], doc);
-                                } else if (doc.type == \"swipe\") {
-                                  map([doc.post, 1], doc);
-                                }
-                              }"}
-            "swipes" {"map"
-                      "function(doc) {
-                         if (doc.type == \"swipe\") {
-                           emit(doc.student_id, doc);
-                         }
-                       }"}
-            "years" {"map"
-                     "function(doc) {
-                         if (doc.type == \"year\") {
-                           emit(doc.name, doc);
-                         }
-                       }"}
-            "overrides" {"map"
-                         "function(doc) {
-                            if (doc.type == \"override\") {
-                              emit(doc.student_id, doc);
-                            }
-                          }"}
-            }
-   "language" "javascript"})
-
-(defn make-db [] (couch/put-document db design-doc))
