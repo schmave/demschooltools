@@ -32,7 +32,8 @@ public class Charge extends Model implements Comparable<Charge> {
     @JsonIgnore
     public Case the_case;
 
-    public String plea = "not entered";
+    static final String EMPTY_PLEA = "<no plea>";
+    public String plea = EMPTY_PLEA;
     public String resolution_plan = "";
 
     public boolean referred_to_sm;
@@ -64,6 +65,10 @@ public class Charge extends Model implements Comparable<Charge> {
             plea = query_string.get("plea")[0];
         } else {
             plea = "";
+        }
+
+        if (plea.equals("")) {
+            plea = EMPTY_PLEA;
         }
 
         if (query_string.containsKey("person_id")) {
