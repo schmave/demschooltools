@@ -206,6 +206,8 @@ function Charge(charge_id, el) {
         el.find(".resolution_plan").val(json.resolution_plan);
         if (json.plea == "Guilty") {
             el.find(".plea-guilty").prop("checked", true);
+        } else if (json.plea == "No Contest") {
+            el.find(".plea-no-contest").prop("checked", true);
         } else if (json.plea == "Not Guilty") {
             el.find(".plea-not-guilty").prop("checked", true);
         }
@@ -243,6 +245,11 @@ function Charge(charge_id, el) {
         plea = el.find(".plea-guilty");
         if (plea.prop("checked")) {
             url += "&plea=Guilty";
+        }
+
+        plea = el.find(".plea-no-contest");
+        if (plea.prop("checked")) {
+            url += "&plea=No Contest";
         }
 
         plea = el.find(".plea-not-guilty");
@@ -295,6 +302,7 @@ function Charge(charge_id, el) {
     el.find(".resolution_plan").change(self.markAsModified);
     el.find(".resolution_plan").on(TEXT_AREA_EVENTS, self.markAsModified);
     el.find(".plea-guilty").change(self.markAsModified);
+    el.find(".plea-no-contest").change(self.markAsModified);
     el.find(".plea-not-guilty").change(self.markAsModified);
     el.find(".plea-not-guilty").change(function() {
             self.el.find(".refer-to-sm").prop("checked", true);

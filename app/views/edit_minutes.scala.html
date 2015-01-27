@@ -102,6 +102,11 @@ View printable minutes</a>
 <div class="radio-inline">
   <label><input type="radio" class="plea-guilty" value="Guilty"><span>Guilty</span></label>
 </div>
+@if( OrgConfig.get().show_no_contest_plea ) {
+<div class="radio-inline">
+  <label><input type="radio" class="plea-no-contest" value="No Contest"><span>No Contest</span></label>
+</div>
+}
 <div class="radio-inline">
   <label><input type="radio" class="plea-not-guilty" value="Not Guilty"><span>Not Guilty</span></label>
 </div>
