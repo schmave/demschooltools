@@ -48,6 +48,10 @@
        (friend/authorize #{::admin}
                          (db/reset-db)
                          (resp/redirect "/")))
+  (GET "/sampledb" []
+       (friend/authorize #{::admin}
+                         (data/sample-db true)
+                         (resp/redirect "/")))
   (POST "/override" [_id day]
         (friend/authorize #{::admin}
                           (data/override-date _id day))
