@@ -28,7 +28,9 @@
   (let [year (dates/get-current-year-string (db/get-years))
         school-days (att/get-school-days year)]
     (testing "School days"
-      (is (= school-days ["2015-01-26" "2015-01-25"])))))
+      (is (= school-days [(dates/make-date-string (str (t/now)))
+                          (dates/make-date-string (str (t/minus (t/now)
+                                                                (t/days 1))))])))))
 
 (deftest date-stuff
   (= (dates/make-date-string "2014-12-28T14:32:12.509Z")
@@ -60,7 +62,7 @@
   (db/swipe-in sid (t/plus basetime (t/days 3) (t/hours 5)))
   (db/swipe-out sid (t/plus basetime (t/days 3) (t/hours 7)))
 
-  ;; short the next - 10-18-2014
+  ;; short the next - 10-18-2014 
   
   (db/swipe-in sid (t/plus basetime (t/days 4)))
   (db/swipe-out sid (t/plus basetime (t/days 4) (t/hours 4)))
@@ -127,15 +129,19 @@
         ;; good today
         (add-swipes sid)
         (db/override-date sid "2014-10-18")
+        (db/swipe-in sid2 (t/plus basetime (t/days 5)))
 
         (testing "School year is list of days with swipes"
           (is (= (att/get-school-days "2014-06-01 2015-06-01")
-                 (list "2014-10-14" "2014-10-15" "2014-10-16" "2014-10-17" "2014-10-18"))))
+                 (list "2014-10-14" "2014-10-15" "2014-10-16" "2014-10-17" "2014-10-18" "2014-10-19"))))
         (let [att (get-att sid s)
               att2 (get-att sid2 s2)]
           (testing "Total Valid Day Count"
             (is (= (:total_days att)
                    4)))
+          (testing "Total Short Day Count"
+            (is (= (:total_short att)
+                   1)))
           (testing "Total Abs Count"
             (is (= (:total_abs att)
                    1)))
@@ -144,17 +150,17 @@
                    1)))
           (testing "Days sorted correctly"
             (is (= (-> att :days first :day)
-                   "2014-10-18")))
+                   "2014-10-19")))
           (testing "Nice time shown correctly"
-            (is (= (-> att :days first :swipes first :nice_in_time)
+            (is (= (-> att :days second :swipes first :nice_in_time)
                    ;; shown as hour 10 because that was DST forward +1
                    "10:09:27")))
-          (testing "Total Abs Count For Student 2 Should equal number of total days for student 1"
+          (testing "Total Abs Count For Student 2 Should equal number of total days for student 1 and 2"
             (is (= (:total_abs att2)
-                   5)))
+                   6)))
           )
         (testing "an older date string shows no attendance in that time"
-          (let [att (att/get-attendance [] "06-01-2013-05-01-2014" sid s)]
+          (let [att (att/get-attendance [] "06-01-2013 05-01-2014" sid s)]
             (testing "Total Valid Day Count"
               (is (= (:total_days att)
                      0)))
