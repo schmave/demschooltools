@@ -131,16 +131,17 @@ View printable minutes</a>
 <td>{{render "people-chooser" clazz="writer"}}</tr>
 
 <tr><td class="esm-form-label">Location: <td><input class="form-control location" type="text"></tr>
-<tr><td class="esm-form-label">Date of event: <td><input class="date form-control" type="text"><td class="esm-form-label">Time:<td><input class="form-control time" type="text"></tr>
+<tr><td class="esm-form-label">Date of event: <td><input class="date form-control" type="text">
+<span class="esm-form-label" style="margin-left: 40px;">Time:</span><input class="form-control time" type="text"></tr>
 
-<tr><td class="esm-form-label">Who testified:<td colspan=3>
+<tr><td class="esm-form-label">Who testified:<td>
     {{render "people-chooser" clazz="testifier"}}
 </tr>
 
-<tr><td class="esm-form-label">Findings: <td colspan=3><textarea class="findings"></textarea></tr>
+<tr><td class="esm-form-label">Findings: <td><textarea class="findings"></textarea></tr>
 
 @if( OrgConfig.get().show_severity ) {
-    <tr><td class="esm-form-label">Severity:<td colspan=3>
+    <tr><td class="esm-form-label">Severity:<td>
     <div class="radio-inline">
       <label><input type="radio" class="severity-mild" value="Mild"><span>Mild</span></label>
     </div>
