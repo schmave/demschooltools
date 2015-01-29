@@ -34,6 +34,7 @@
                       (reduce +))
         min-minutes (get-min-minutes student day)]
     {:valid (or has-override? (> int-mins min-minutes))
+     :short? (> int-mins 0) 
      :override has-override?
      :day day
      :total_mins int-mins
@@ -77,7 +78,12 @@
                       (-> summed-days first :swipes count (> 0)))
         [last-swipe-type last-swipe-date] (get-last-swipe-type summed-days)]
     (merge student {:total_days (count (filter :valid summed-days))
-                    :total_abs (count (filter (comp not :valid) summed-days))
+                    :total_abs (count (filter #(and (-> % :valid not)
+                                                    (-> % :short? not))
+                                              summed-days))
+                    :total_short (count (filter #(and (-> % :valid not)
+                                                      (:short? %))
+                                                summed-days))
                     :total_overrides (count (filter :override summed-days))
                     :today today-string
                     :in_today in_today 
