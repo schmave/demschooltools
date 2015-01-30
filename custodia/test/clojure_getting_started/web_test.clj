@@ -119,6 +119,27 @@
       )) 
   )
 
+(deftest single-swipe-short-test
+  (do (db/sample-db)  
+      (let [s (db/make-student "test")
+            sid (:_id s)]
+        (db/swipe-in sid basetime)
+
+        (let [att (get-att sid s)]
+          (testing "Total Valid Day Count"
+            (is (= (:total_days att)
+                   0)))
+          (testing "Total Short Day Count"
+            (is (= (:total_short att)
+                   1)))
+          (testing "Total Abs Count"
+            (is (= (:total_abs att)
+                   0)))
+          (testing "Total Overrides"
+            (is (= (:total_overrides att)
+                   0)))
+          ))))
+
 (deftest swipe-attendence-test
   (do (db/sample-db)  
       (let [

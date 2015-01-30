@@ -170,6 +170,7 @@
                 <th>Name</th>
                 <th>Attended</th>
                 <th>Absent</th>
+                <th>Short</th>
                 <th>Overrides</th>
               </tr>
               <tr ng-repeat="student in totals_students">
@@ -177,6 +178,7 @@
                 <td>{{student.name}}</td>
                 <td>{{student.total_days}}</td>
                 <td>{{student.total_abs}}</td>
+                <td>{{student.total_short}}</td>
                 <td>{{student.total_overrides}}</td>
                 <!-- </span> -->
           </div>
