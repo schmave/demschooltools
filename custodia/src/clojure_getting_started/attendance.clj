@@ -34,7 +34,9 @@
                       (reduce +))
         min-minutes (get-min-minutes student day)]
     {:valid (or has-override? (> int-mins min-minutes))
-     :short? (> int-mins 0) 
+     :short? (or (and (not has-override?)
+                      (seq swipes))
+                 (> int-mins 0)) 
      :override has-override?
      :day day
      :total_mins int-mins

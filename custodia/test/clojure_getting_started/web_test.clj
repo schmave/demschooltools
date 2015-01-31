@@ -176,9 +176,12 @@
             (is (= (-> att :days second :swipes first :nice_in_time)
                    ;; shown as hour 10 because that was DST forward +1
                    "10:09:27")))
+          (testing "Total short count student 2"
+            (is (= (:total_short att2)
+                   1)))
           (testing "Total Abs Count For Student 2 Should equal number of total days for student 1 and 2"
             (is (= (:total_abs att2)
-                   6)))
+                   5)))
           )
         (testing "an older date string shows no attendance in that time"
           (let [att (att/get-attendance [] "06-01-2013 05-01-2014" sid s)]
