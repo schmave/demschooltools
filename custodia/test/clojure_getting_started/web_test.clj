@@ -124,7 +124,6 @@
       (let [s (db/make-student "test")
             sid (:_id s)]
         (db/swipe-in sid basetime)
-
         (let [att (get-att sid s)]
           (testing "Total Valid Day Count"
             (is (= (:total_days att)
@@ -169,6 +168,9 @@
           (testing "Total Overrides"
             (is (= (:total_overrides att)
                    1)))
+          (testing "Total Hours"
+            (is (= (:total_hours att)
+                   26)))
           (testing "Days sorted correctly"
             (is (= (-> att :days first :day)
                    "2014-10-19")))

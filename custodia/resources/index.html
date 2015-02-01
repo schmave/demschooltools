@@ -48,15 +48,15 @@
     <div class="container">
       <div class="starter-template">
         <div class="lead form-group" ng-show="screen ==='create-year'">
-          <h4>Year Start</h4>
+          <h4>Report Start</h4>
           <div style="display:inline-block; min-height:290px;">
             <datepicker ng-model="from_date" min-date="minDate" show-weeks="false" class="well well-sm"></datepicker>
           </div>
-          <h4>Year End</h4>
+          <h4>Report End</h4>
           <div style="display:inline-block; min-height:290px;">
             <datepicker ng-model="to_date" min-date="minDate" show-weeks="false" class="well well-sm"></datepicker>
           </div>
-          <button class="btn btn-primary" ng-click="createYear()" ng-disabled="!(to_date && from_date)">Create Year</button>
+          <button class="btn btn-primary" ng-click="createYear()" ng-disabled="!(to_date && from_date)">Create Report</button>
         </div>
 
         <div class="lead form-group" ng-show="screen ==='home'">
@@ -159,8 +159,8 @@
         <div class="form-group"  ng-show="screen === 'student-totals'">
           <div class="col-md-6">
             <select ng-options="y as y for y in years" ng-model="current_totals_year" ng-change="getTotalsStudents()"></select>
-            <button class="btn btn-success" ng-show="isAdmin" ng-click="showCreateYear()">Create Year</button>
-            <button class="btn btn-danger" ng-click="deleteYear(current_totals_year)">Delete Year</button>
+            <button class="btn btn-success" ng-show="isAdmin" ng-click="showCreateYear()">Create Report</button>
+            <button class="btn btn-danger" ng-click="deleteYear(current_totals_year)">Delete Report</button>
           </div>
           <div class="col-md-6">
             <!-- <ul> -->
@@ -172,6 +172,7 @@
                 <th>Absent</th>
                 <th>Short</th>
                 <th>Overrides</th>
+                <th>Total Hours</th>
               </tr>
               <tr ng-repeat="student in totals_students">
                 <!-- <span ng-show="student.total_days > 0"> -->
@@ -180,6 +181,7 @@
                 <td>{{student.total_abs}}</td>
                 <td>{{student.total_short}}</td>
                 <td>{{student.total_overrides}}</td>
+                <td>{{student.total_hours}}</td>
                 <!-- </span> -->
           </div>
           </table>
