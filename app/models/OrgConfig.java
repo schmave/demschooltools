@@ -20,6 +20,7 @@ public class OrgConfig {
     public boolean show_no_contest_plea = false;
     public boolean show_severity = false;
     public boolean use_minor_referrals = false;
+    public boolean show_checkbox_for_res_plan = true;
 
     public static OrgConfig get() {
         return configs.get(Organization.getByHost().name);
@@ -58,6 +59,8 @@ class ThreeRiversVillageSchool extends OrgConfig {
         str_res_plan_cap = "Resolution plan";
         str_res_plans = "resolution plans";
         str_res_plans_cap = "Resolution plans";
+
+        show_checkbox_for_res_plan = false;
 
         OrgConfig.register(name, this);
     }
