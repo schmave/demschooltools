@@ -31,12 +31,12 @@
           :nice_in_time (make-time-string (:in_time swipe))
           :nice_out_time (make-time-string (:out_time swipe))))
 
-(trace/deftrace only-dates-between [list f dfrom dto]
+(defn only-dates-between [list f dfrom dto]
   (filter #(t/within? (t/interval dfrom dto)
                       (f/parse (f %)))
           list))
 
-(trace/deftrace append-interval [swipe]
+(defn append-interval [swipe]
   (if (:out_time swipe)
     (let [int (t/interval (f/parse (:in_time swipe))
                           (f/parse (:out_time swipe)))

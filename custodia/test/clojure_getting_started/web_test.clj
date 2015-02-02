@@ -113,6 +113,9 @@
       (testing "Total Abs Count"
         (is (= (:total_abs att)
                0)))
+      (testing "Total Hours"
+        (is (= (:total_hours att)
+               5)))
       (testing "Override"
         (is (= (-> att :days first :override)
                true)))
@@ -170,7 +173,7 @@
                    1)))
           (testing "Total Hours"
             (is (= (:total_hours att)
-                   26)))
+                   27)))
           (testing "Days sorted correctly"
             (is (= (-> att :days first :day)
                    "2014-10-19")))
@@ -242,7 +245,6 @@
           (testing "Total Valid Day Count"
             (is (= (-> att :days first :day)
                    "2014-10-14")))
-          (trace/trace "att " att)
           (testing "Last Swipe was an 'in'"
             (is (= (-> att :last_swipe_type)
                    "in")))

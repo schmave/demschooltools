@@ -39,7 +39,7 @@
                  (> int-mins 0)) 
      :override has-override?
      :day day
-     :total_mins int-mins
+     :total_mins (if has-override? min-minutes int-mins)
      :swipes swipes}))
 
 (defn get-year-from-to [year-string]

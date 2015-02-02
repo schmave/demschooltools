@@ -28,7 +28,7 @@
 (defn make-swipe [student-id]
   {:type :swipes :student_id student-id :in_time nil :out_time nil})
 
-(trace/deftrace swipe-in
+(defn swipe-in
   ([id] (swipe-in id (t/now)))
   ([id in-time & [missing-out]] 
      (let [last-swipe (lookup-last-swipe id)]
@@ -50,7 +50,7 @@
       swipe)))
 
 ;; (sample-db)   
-(trace/deftrace swipe-out
+(defn swipe-out
   ([id] (swipe-out id (t/now)))
   ([id out-time & [missing-in]]
      (let [last-swipe (lookup-last-swipe id)

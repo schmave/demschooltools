@@ -64,11 +64,11 @@
         id (:_id doc)]
     (jdbc/delete! pgdb table ["_id=?" id])))
 
-(trace/deftrace update! [table id fields]
+(defn update! [table id fields]
   (let [fields (dissoc fields :type)]
     (jdbc/update! pgdb table fields ["_id=?" id])))
 
-(trace/deftrace persist! [doc]
+(defn persist! [doc]
   (let [table (:type doc)
         doc (dissoc doc :type)]
     (first (map #(assoc % :type table)

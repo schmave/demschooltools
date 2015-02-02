@@ -61,7 +61,6 @@
                         :all (att/get-students-with-att
                               (dates/get-current-year-string (data/get-years)))}))
   (POST "/swipe" [direction _id missing]
-        (trace/trace "coming in" [direction _id missing])
         (friend/authorize #{::user}
                           (if (= direction "in")
                             (data/swipe-in _id (t/now) missing)
