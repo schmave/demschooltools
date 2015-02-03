@@ -35,10 +35,12 @@
   CLOSED: [2015-01-13 Tue 20:16]
 * DONE Show swipe success
   CLOSED: [2015-01-13 Tue 20:16]
-* TODO add “short” count and total hours count to the totals
+* DONE add “short” count and total hours count to the totals
+  CLOSED: [2015-02-03 Tue 07:14]
 * TODO add “unexcused” vs “exused” absence - but BOTH are absences
 * TODO remove exused from the addendence column
-* TODO leave in override and make it add minutes to the total count
+* DONE leave in override and make it add minutes to the total count
+  CLOSED: [2015-02-03 Tue 07:14]
 * TODO delete swipe
 * TODO edit student name
 * TODO show students in attendence today

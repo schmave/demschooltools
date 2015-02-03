@@ -104,8 +104,8 @@
 (defn get-students-with-att
   ([] (get-students-with-att (get-current-year-string (get-years)) nil))
   ([year] (get-students-with-att year nil))
-  ([year ids]
+  ([year id]
      (let [school-days (get-school-days year)]
        (sort-by :name
                 (map #(get-attendance school-days year (:_id %) %)
-                     (get-students ids))))))
+                     (get-students id))))))

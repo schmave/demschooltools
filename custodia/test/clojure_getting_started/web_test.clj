@@ -205,7 +205,18 @@
 (deftest students-with-att
   (db/sample-db)
   (testing "students with att"
-    (is (not= '() (att/get-students-with-att)))))
+    (is (not= '() (att/get-students-with-att))))
+  (let [s (db/make-student "test")
+        sid (:_id s)]
+    (db/swipe-in sid basetime)
+    (db/swipe-out sid (t/plus basetime (t/minutes 331)))
+
+    (let [att (att/get-students-with-att
+               (dates/get-current-year-string (db/get-years))
+               sid)]
+      (testing "students with att doesn't throw exceptions"
+        (is (not= '() att)))))
+  )
 
 (deftest older-student-required-minutes
   (db/sample-db)

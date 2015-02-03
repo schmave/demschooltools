@@ -57,7 +57,7 @@
                           (data/override-date _id day))
         (resp/response {:student (first (att/get-students-with-att
                                          (dates/get-current-year-string (data/get-years))
-                                         [_id]))
+                                         _id))
                         :all (att/get-students-with-att
                               (dates/get-current-year-string (data/get-years)))}))
   (POST "/swipe" [direction _id missing]

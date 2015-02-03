@@ -81,7 +81,7 @@
 ;; (get-students )
 (defn get-students
   ([] (db/get-* "students"))
-  ([ids] (db/get-* "students" ids "_id")))
+  ([id] (db/get-* "students" id "_id")))
 
 ;; (get-years)    
 (defn student-not-yet-created [name]
