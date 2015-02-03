@@ -144,19 +144,20 @@
 
 (deftest swipe-attendence-test
   (do (db/sample-db)  
-      (let [
-            s (db/make-student "test")
+      (let [s (db/make-student "test")
             sid (:_id s) 
             s2 (db/make-student "test2")
             sid2 (:_id s2)]
         ;; good today
         (add-swipes sid)
         (db/override-date sid "2014-10-18")
+        (db/excuse-date sid "2014-10-20")
         (db/swipe-in sid2 (t/plus basetime (t/days 5)))
+        (db/swipe-in sid2 (t/plus basetime (t/days 6)))
 
         (testing "School year is list of days with swipes"
           (is (= (att/get-school-days "2014-06-01 2015-06-01")
-                 (list "2014-10-14" "2014-10-15" "2014-10-16" "2014-10-17" "2014-10-18" "2014-10-19"))))
+                 (list "2014-10-14" "2014-10-15" "2014-10-16" "2014-10-17" "2014-10-18" "2014-10-19" "2014-10-20"))))
         (let [att (get-att sid s)
               att2 (get-att sid2 s2)]
           (testing "Total Valid Day Count"
@@ -164,6 +165,9 @@
                    4)))
           (testing "Total Short Day Count"
             (is (= (:total_short att)
+                   1)))
+          (testing "Total Excused Count"
+            (is (= (:total_excused att)
                    1)))
           (testing "Total Abs Count"
             (is (= (:total_abs att)
@@ -176,9 +180,9 @@
                    27)))
           (testing "Days sorted correctly"
             (is (= (-> att :days first :day)
-                   "2014-10-19")))
+                   "2014-10-20")))
           (testing "Nice time shown correctly"
-            (is (= (-> att :days second :swipes first :nice_in_time)
+            (is (= (-> att :days (nth 2) :swipes first :nice_in_time)
                    ;; shown as hour 10 because that was DST forward +1
                    "10:09:27")))
           (testing "Total short count student 2"

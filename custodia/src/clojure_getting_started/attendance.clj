@@ -23,21 +23,26 @@
              (t/before? older-date current-date))
       330 300)))
 
+(defn filter-type [key col]
+  (filter #(= (:type %) key) col))
+
 (defn append-validity [student [day swipes]]
-  (let [has-override? (->> swipes
-                           (filter #(= (:type %) :overrides ))
-                           not-empty
-                           boolean)
+  (let [has-override? (boolean (seq (filter-type :overrides swipes)))
+        has-excuse? (boolean (seq (filter-type :excuses swipes)))
         int-mins (->> swipes
-                      (map (comp :interval))
-                      (filter (comp not nil?))
+                      (map :interval)
+                      (filter number?)
                       (reduce +))
         min-minutes (get-min-minutes student day)]
-    {:valid (or has-override? (> int-mins min-minutes))
-     :short? (or (and (not has-override?)
-                      (seq swipes))
-                 (> int-mins 0)) 
+    {:valid (and (not has-excuse?)
+                 (or has-override?
+                     (> int-mins min-minutes)))
+     :short (or (and (not has-override?)
+                     (not has-excuse?)
+                     (seq swipes))
+                (> int-mins 0)) 
      :override has-override?
+     :excused has-excuse?
      :day day
      :total_mins (if has-override? min-minutes int-mins)
      :swipes swipes}))
@@ -68,6 +73,7 @@
         swipes (map append-interval swipes)
         swipes (map clean-dates swipes)
         swipes (concat swipes (only-dates-between (get-overrides id) :date from to))
+        swipes (concat swipes (only-dates-between (get-excuses id) :date from to))
         grouped-swipes (group-by swipe-day swipes)
         ;; adding last swipe before absences
         grouped-swipes (merge school-days grouped-swipes)
@@ -83,12 +89,14 @@
                     :total_hours (/ (reduce + (map :total_mins summed-days))
                                     60)
                     :total_abs (count (filter #(and (-> % :valid not)
-                                                    (-> % :short? not))
+                                                    (-> % :excused not)
+                                                    (-> % :short not))
                                               summed-days))
                     :total_short (count (filter #(and (-> % :valid not)
-                                                      (:short? %))
+                                                      (:short %))
                                                 summed-days))
                     :total_overrides (count (filter :override summed-days))
+                    :total_excused (count (filter :excused summed-days))
                     :today today-string
                     :in_today in_today 
                     :last_swipe_type last-swipe-type

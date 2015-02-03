@@ -40,6 +40,14 @@
   date varchar(255)
   );")
 
+(def create-excuses-table-sql
+  "create table excuses(
+  _id bigserial primary key,
+  student_id bigserial,
+  inserted_date timestamp default now(),
+  date varchar(255)
+  );")
+
 (def pgdb
   (dissoc (h/korma-connection-map (env :database-url))
           :classname))
@@ -47,10 +55,12 @@
 (defn create-all-tables []
   (jdbc/execute! pgdb [create-swipes-table-sql])
   (jdbc/execute! pgdb [create-override-table-sql])
+  (jdbc/execute! pgdb [create-excuses-table-sql])
   (jdbc/execute! pgdb [create-years-table-sql])
   (jdbc/execute! pgdb [create-students-table-sql]))
 (defn drop-all-tables []
   (jdbc/execute! pgdb ["drop table if exists students;"])
+  (jdbc/execute! pgdb ["drop table if exists excuses;"])
   (jdbc/execute! pgdb ["drop table if exists overrides;"])
   (jdbc/execute! pgdb ["drop table if exists years;"])
   (jdbc/execute! pgdb ["drop table if exists swipes;"]))

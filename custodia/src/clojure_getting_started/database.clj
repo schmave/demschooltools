@@ -18,6 +18,9 @@
 (defn get-overrides [id]
   (db/get-* "overrides" id "student_id"))
 
+(defn get-excuses [id]
+  (db/get-* "excuses" id "student_id"))
+
 (defn- lookup-last-swipe [id]
   (-> (get-swipes id)
       last))
@@ -72,11 +75,15 @@
   (when-let [year (first (get-years year))]
     (db/delete! year)))
 
+(defn excuse-date [id date-string]
+  (db/persist! {:type :excuses
+                :student_id id
+                :date date-string}))
+
 (defn override-date [id date-string]
-  (->> {:type :overrides
-        :student_id id
-        :date date-string}
-       db/persist!))
+  (db/persist! {:type :overrides
+                :student_id id
+                :date date-string}))
 
 ;; (get-students )
 (defn get-students

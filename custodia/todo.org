@@ -37,8 +37,10 @@
   CLOSED: [2015-01-13 Tue 20:16]
 * DONE add “short” count and total hours count to the totals
   CLOSED: [2015-02-03 Tue 07:14]
-* TODO add “unexcused” vs “exused” absence - but BOTH are absences
-* TODO remove exused from the addendence column
+* DONE add “unexcused” vs “exused” absence - but BOTH are absences
+  CLOSED: [2015-02-03 Tue 12:21]
+* DONE remove exused from the addendence column
+  CLOSED: [2015-02-03 Tue 12:27]
 * DONE leave in override and make it add minutes to the total count
   CLOSED: [2015-02-03 Tue 07:14]
 * TODO delete swipe

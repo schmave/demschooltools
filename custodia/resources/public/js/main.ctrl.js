@@ -35,6 +35,18 @@ angular.module('app').controller("MainController", function($scope, $http){
     $scope.setDay = function(s) {
         $scope.current_day = s;
     };
+    $scope.excuse = function(id, day) {
+        if (confirm("Excuse " + day + "?")){
+            $scope.screen = "saving";
+            $http.post('/excuse', {"_id":id, "day": day}).
+                success(function(data){
+                    $scope.att = data.student;
+                    $scope.current_day = data.student.days[0];
+                    $scope.loadStudentData(data.all);
+                    $scope.screen = "student";
+                }). error(function(){});
+        }
+    };
     $scope.override = function(id, day) {
         if (confirm("Override " + day + "?")){
             $scope.screen = "saving";

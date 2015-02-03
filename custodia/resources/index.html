@@ -117,7 +117,9 @@
                           ng-style="{'border':(swipe.day==current_day.day)?'1px solid black':''}">
                       {{swipe.day}} - {{swipe.total_mins}} minutes 
                       <span ng-show="swipe.override"> - Overridden</span>
-                      <a href="" ng-hide="swipe.valid || !isAdmin" ng-click="override(att._id,swipe.day)"> Override</a>
+                      <a href="" ng-hide="(swipe.valid || swipe.excused) || !isAdmin" ng-click="override(att._id,swipe.day)"> Override</a>
+                      <span ng-show="swipe.excused"> - Excused</span>
+                      <a href="" ng-hide="(swipe.valid || swipe.excused) || !isAdmin" ng-click="excuse(att._id,swipe.day)"> Excuse</a>
                     </span>
                   </label>
                 </div>
@@ -172,6 +174,7 @@
                 <th>Name</th>
                 <th>Attended (Overrides)</th>
                 <th>Unexcused Absence</th>
+                <th>Excused Absence</th>
                 <th>Short</th>
                 <th>Total Hours</th>
               </tr>
@@ -180,6 +183,7 @@
                 <td>{{student.name}}</td>
                 <td>{{student.total_days}} ({{student.total_overrides}})</td>
                 <td>{{student.total_abs}}</td>
+                <td>{{student.total_excused}}</td>
                 <td>{{student.total_short}}</td>
                 <td>{{student.total_hours}}</td>
                 <!-- </span> -->

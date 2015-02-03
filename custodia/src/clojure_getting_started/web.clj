@@ -34,6 +34,13 @@
     (resp/response {:years (map :name years)
                     :current_year (dates/get-current-year-string years)})))
 
+(defn student-page-response [student-id]
+  (resp/response {:student (first (att/get-students-with-att
+                                   (dates/get-current-year-string (data/get-years))
+                                   student-id))
+                  :all (att/get-students-with-att
+                        (dates/get-current-year-string (data/get-years)))}))
+
 (defn get-all-student-data []
   (let [year (dates/get-current-year-string (data/get-years))]
     (att/get-students-with-att year)))
@@ -52,14 +59,14 @@
        (friend/authorize #{::admin}
                          (data/sample-db true)
                          (resp/redirect "/")))
+  (POST "/excuse" [_id day]
+        (friend/authorize #{::admin}
+                          (data/excuse-date _id day))
+        (student-page-response _id))
   (POST "/override" [_id day]
         (friend/authorize #{::admin}
                           (data/override-date _id day))
-        (resp/response {:student (first (att/get-students-with-att
-                                         (dates/get-current-year-string (data/get-years))
-                                         _id))
-                        :all (att/get-students-with-att
-                              (dates/get-current-year-string (data/get-years)))}))
+        (student-page-response _id))
   (POST "/swipe" [direction _id missing]
         (friend/authorize #{::user}
                           (if (= direction "in")
