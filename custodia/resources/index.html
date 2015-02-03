@@ -159,28 +159,28 @@
         <div class="form-group"  ng-show="screen === 'student-totals'">
           <div class="col-md-6">
             <select ng-options="y as y for y in years" ng-model="current_totals_year" ng-change="getTotalsStudents()"></select>
+          </div>
+          <div class="col-md-6">
             <button class="btn btn-success" ng-show="isAdmin" ng-click="showCreateYear()">Create Report</button>
             <button class="btn btn-danger" ng-click="deleteYear(current_totals_year)">Delete Report</button>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-12">
             <!-- <ul> -->
             <!---- <li ng-repeat="student in totals_students"> ---->
             <table class="table table-striped">
               <tr>
                 <th>Name</th>
-                <th>Attended</th>
-                <th>Absent</th>
+                <th>Attended (Overrides)</th>
+                <th>Unexcused Absence</th>
                 <th>Short</th>
-                <th>Overrides</th>
                 <th>Total Hours</th>
               </tr>
               <tr ng-repeat="student in totals_students">
                 <!-- <span ng-show="student.total_days > 0"> -->
                 <td>{{student.name}}</td>
-                <td>{{student.total_days}}</td>
+                <td>{{student.total_days}} ({{student.total_overrides}})</td>
                 <td>{{student.total_abs}}</td>
                 <td>{{student.total_short}}</td>
-                <td>{{student.total_overrides}}</td>
                 <td>{{student.total_hours}}</td>
                 <!-- </span> -->
           </div>

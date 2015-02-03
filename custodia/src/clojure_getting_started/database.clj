@@ -12,11 +12,11 @@
 
 (defn get-swipes
   ([] (db/get-* "swipes"))
-  ([ids]
-     (db/get-* "swipes" ids "student_id")))
+  ([id]
+     (db/get-* "swipes" id "student_id")))
 
-(defn get-overrides [ids]
-  (db/get-* "overrides" ids "student_id"))
+(defn get-overrides [id]
+  (db/get-* "overrides" id "student_id"))
 
 (defn- lookup-last-swipe [id]
   (-> (get-swipes id)
