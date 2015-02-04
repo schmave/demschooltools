@@ -132,11 +132,13 @@
                 <th>In Time</th>
                 <th>Out Time</th>
                 <th>Minutes</th>
+                <th></th>
               </tr>
-              <tr ng-repeat="s in current_day.swipes">
+              <tr ng-repeat="s in current_day.swipes | filter:{ type: 'swipe' }">
                 <td>{{s.nice_in_time}}</td>
                 <td>{{s.nice_out_time}}</td>
                 <td>{{s.interval}}</td>
+                <td ng-click="deleteSwipe(s)">Delete</td>
               </tr>
             </table>
           </div>

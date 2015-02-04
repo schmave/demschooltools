@@ -28,8 +28,12 @@
 (defn only-swiped-in? [in-swipe] (and in-swipe (not (:out_time in-swipe))))
 
 (declare swipe-out)
+
 (defn make-swipe [student-id]
   {:type :swipes :student_id student-id :in_time nil :out_time nil})
+
+(defn delete-swipe [swipe]
+  (db/delete! swipe))
 
 (defn swipe-in
   ([id] (swipe-in id (t/now)))

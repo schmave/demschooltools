@@ -35,15 +35,18 @@ angular.module('app').controller("MainController", function($scope, $http){
     $scope.setDay = function(s) {
         $scope.current_day = s;
     };
+    $scope.reloadStudentPage = function(data){
+        $scope.att = data.student;
+        $scope.current_day = data.student.days[0];
+        $scope.loadStudentData(data.all);
+        $scope.screen = "student";
+    };
     $scope.excuse = function(id, day) {
         if (confirm("Excuse " + day + "?")){
             $scope.screen = "saving";
             $http.post('/excuse', {"_id":id, "day": day}).
                 success(function(data){
-                    $scope.att = data.student;
-                    $scope.current_day = data.student.days[0];
-                    $scope.loadStudentData(data.all);
-                    $scope.screen = "student";
+                    $scope.reloadStudentPage(data);
                 }). error(function(){});
         }
     };
@@ -52,10 +55,7 @@ angular.module('app').controller("MainController", function($scope, $http){
             $scope.screen = "saving";
             $http.post('/override', {"_id":id, "day": day}).
                 success(function(data){
-                    $scope.att = data.student;
-                    $scope.current_day = data.student.days[0];
-                    $scope.loadStudentData(data.all);
-                    $scope.screen = "student";
+                    $scope.reloadStudentPage(data);
                 }). error(function(){});
         }
     };
@@ -166,6 +166,14 @@ angular.module('app').controller("MainController", function($scope, $http){
                 $scope.years = data.years;
                 $scope.current_totals_year = data.current_year;
             }). error(function(){});
+    };
+    $scope.deleteSwipe = function(swipe) {
+        if(confirm("Delete swipe?")) {
+            $http.post('/swipe/delete', {"swipe":swipe, "_id" : $scope.att._id}).
+                success(function(data){
+                    $scope.reloadStudentPage(data);
+                }). error(function(){});
+        }
     };
     $scope.deleteYear = function(year) {
         if(confirm("Delete year " + year + "?")){

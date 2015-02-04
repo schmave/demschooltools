@@ -1,6 +1,7 @@
 (ns clojure-getting-started.web
   (:require [compojure.core :refer [defroutes GET PUT POST DELETE ANY]]
             [ring.middleware.json :refer [wrap-json-response wrap-json-body wrap-json-params]]
+            [ring.middleware.keyword-params :refer [wrap-keyword-params]]
             [compojure.handler :refer [site]]
             [carica.core :as c]
             [compojure.route :as route]
@@ -67,6 +68,10 @@
         (friend/authorize #{::admin}
                           (data/override-date _id day))
         (student-page-response _id))
+  (POST "/swipe/delete" [swipe _id]
+        (friend/authorize #{::admin}
+                          (data/delete-swipe swipe)
+                          (student-page-response _id)))
   (POST "/swipe" [direction _id missing]
         (friend/authorize #{::user}
                           (if (= direction "in")
@@ -114,7 +119,8 @@
                                     :login-uri "/login"
                                     :default-landing-uri "/"
                                     :workflows [(workflows/interactive-form)]})
-              wrap-json-body wrap-json-params wrap-json-response))
+              wrap-keyword-params
+              wrap-json-body wrap-json-params wrap-json-response ))
 
 (defn -main [& [port]]
   (nrepl-server/start-server :port 7888 :handler cider-nrepl-handler)
