@@ -207,19 +207,19 @@
   )
 
 (deftest students-with-att
-  (db/sample-db)
-  (testing "students with att"
-    (is (not= '() (att/get-students-with-att))))
-  (let [s (db/make-student "test")
-        sid (:_id s)]
-    (db/swipe-in sid basetime)
-    (db/swipe-out sid (t/plus basetime (t/minutes 331)))
+  (do (db/sample-db)
+      (testing "students with att"
+        (is (not= '() (att/get-students-with-att))))
+      (let [s (db/make-student "test")
+            sid (:_id s)]
+        (db/swipe-in sid basetime)
+        (db/swipe-out sid (t/plus basetime (t/minutes 331)))
 
-    (let [att (att/get-students-with-att
-               (dates/get-current-year-string (db/get-years))
-               sid)]
-      (testing "students with att doesn't throw exceptions"
-        (is (not= '() att)))))
+        (let [att (att/get-students-with-att
+                   (dates/get-current-year-string (db/get-years))
+                   sid)]
+          (testing "students with att doesn't throw exceptions"
+            (is (not= '() att))))))
   )
 
 (deftest older-student-required-minutes
@@ -229,9 +229,6 @@
         s (db/toggle-student sid)
         s (first (db/get-students sid))
         tomorrow (-> (t/today-at 8 0) (t/plus (t/days 1)))]
-    ;; good today
-    ;;(let [basetime (t/date-time 2014 10 14 14 9 27 246)])
-
     (db/swipe-in sid tomorrow)
     (db/swipe-out sid (t/plus tomorrow (t/minutes 331)))
 
@@ -249,12 +246,27 @@
     (is (= (dates/get-current-year-string (db/get-years))
            "2014-06-01 2015-06-01" ))))
 
+(deftest swipe-today-not-in-on-excused-or-override
+  (do (db/sample-db)  
+      (let [s (db/make-student "test")
+            sid (:_id s)
+            s2 (db/make-student "tests1")
+            sid2 (:_id s2)]
+        (db/override-date sid (dates/today-string))
+        (db/excuse-date sid2 (dates/today-string))
+        (let [att (get-att sid s)
+              att2 (get-att sid2 s2)]
+          (testing "S1 not in today"
+            (is (= (:in_today att) false)))
+          (testing "S2 not in today"
+            (is (= (:in_today att2) false)))
+          ))) 
+  )
+
 (deftest swipe-attendence-shows-only-when-in
   (do (db/sample-db)  
       (let [s (db/make-student "test")
             sid (:_id s)]
-        ;; good today
-        ;;(let [basetime (t/date-time 2014 10 14 14 9 27 246)])
         (db/swipe-in sid basetime)
         (let [att (get-att sid s)]
           (testing "Total Valid Day Count"

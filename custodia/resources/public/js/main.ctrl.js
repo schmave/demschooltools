@@ -107,7 +107,7 @@ angular.module('app').controller("MainController", function($scope, $http){
     };
     $scope.inButtonStyle = function(){
         if (!$scope.att){ return "";}
-        return ($scope.att.last_swipe_type == "out") ? "btn-lg btn-success" : "";
+        return ($scope.att.last_swipe_type == "out" || $scope.att.in_today == false) ? "btn-lg btn-success" : "";
     };
     $scope.outButtonStyle = function(){
         if (!$scope.att){ return "";}

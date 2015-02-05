@@ -14,6 +14,7 @@
 ;; TODO make this configurable?
 (def local-time-zone-id (t/time-zone-for-id "America/New_York"))
 
+
 (defn format-to-local [f d]
   (f/unparse (f/with-zone f local-time-zone-id) d))
 
@@ -25,6 +26,9 @@
 
 (defn make-time-string [d]
   (when d (format-to-local time-format (f/parse d))))
+
+(defn today-string []
+  (format-to-local date-format (t/now)))
 
 (defn clean-dates [swipe]
   (?assoc swipe

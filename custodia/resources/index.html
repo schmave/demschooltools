@@ -61,12 +61,23 @@
 
         <div class="lead form-group" ng-show="screen ==='home'">
           <div class="col-md-6" ng-show="screen ==='home'">
-            <ul ng-show="screen ==='home'">
-              <li class="list-unstyled" ng-repeat="student in students">
+            <div class="col-md-6">
+              Not Yet In
+              <li class="list-unstyled" 
+                  ng-repeat="student in students | filter:{in_today:'false'}">
                 <a class="" ng-click="showStudent(student)">{{student.name}}</a>
-                <!-- {{student}} -->
               </li>
-            </ul>
+            </div>
+            <div class="col-md-6">
+              In Today
+              <ul>
+                <li class="list-unstyled" 
+                    ng-repeat="student in students | filter:{in_today:'true'}">
+                  <a class="" ng-click="showStudent(student)">{{student.name}}</a>
+                  <!-- {{student}} -->
+                </li>
+              </ul>
+            </div>
           </div>
           <div class="row col-md-6" ng-show="isAdmin" >
             <button class="btn btn-success" ng-show="isAdmin" ng-click="showCreate()">Create Student</button>
@@ -161,10 +172,10 @@
           </div>
         </div>
         <div class="form-group"  ng-show="screen === 'student-totals'">
-          <div class="col-md-6">
+          <div class="col-md-6 pull-right">
             <select ng-options="y as y for y in years" ng-model="current_totals_year" ng-change="getTotalsStudents()"></select>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-6 pull-left">
             <button class="btn btn-success" ng-show="isAdmin" ng-click="showCreateYear()">Create Report</button>
             <button class="btn btn-danger" ng-click="deleteYear(current_totals_year)">Delete Report</button>
           </div>

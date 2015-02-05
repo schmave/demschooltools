@@ -43,7 +43,9 @@
   CLOSED: [2015-02-03 Tue 12:27]
 * DONE leave in override and make it add minutes to the total count
   CLOSED: [2015-02-03 Tue 07:14]
-* TODO delete swipe
+* DONE delete swipe
+  CLOSED: [2015-02-04 Wed 07:17]
 * TODO edit student name
-* TODO show students in attendence today
+* DONE show students in attendence today on main screen
+  CLOSED: [2015-02-05 Thu 08:06]
 

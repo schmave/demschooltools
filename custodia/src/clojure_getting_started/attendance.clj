@@ -80,10 +80,11 @@
         grouped-swipes (into (sorted-map) grouped-swipes)
         summed-days (map #(append-validity student %) grouped-swipes)
         summed-days (reverse summed-days)
-        today-string (format-to-local date-format (t/now))
+        today-string (today-string)
+        only-swipes (partial filter-type :swipes)
         in_today (and (= today-string
                          (-> summed-days first :day))
-                      (-> summed-days first :swipes count (> 0)))
+                      (-> summed-days first :swipes only-swipes count (> 0)))
         [last-swipe-type last-swipe-date] (get-last-swipe-type summed-days)]
     (merge student {:total_days (count (filter :valid summed-days))
                     :total_hours (/ (reduce + (map :total_mins summed-days))
