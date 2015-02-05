@@ -108,12 +108,15 @@
           <div class="col-md-12">
             <a type="href" ng-click="screen='home'">Back to student list</a>
           </div> 
-          <div class="col-md-12">
-            <h1 class="col-md-6">{{att.name}}</h1><span class="col-md-6">(Requires {{requiredMinutes(att)}} minutes a day)</span>
+          <div class="col-md-12"  ng-hide="!isAdmin" >
+            <h1 class="col-md-6">{{att.name}}</h1>
+            <span class="col-md-6">
+              (Requires {{requiredMinutes(att)}} minutes a day)
+              <button class="btn" ng-click="toggleHours(att)">Toggle Hours</button>
+            </span>
           </div>
-          <div class="col-md-6" ng-show="isAdmin">
-            Attended: {{att.total_days}} - Absent: {{att.total_abs}} - Overrides: {{att.total_overrides}}
-            <button class="btn" ng-click="toggleHours(att)">Toggle Hours</button>
+          <div class="col-md-12" ng-show="isAdmin">
+            Attended: {{att.total_days}} - Absent: {{att.total_abs}} - Excused: {{att.total_excused}} - Overrides: {{att.total_overrides}} - Short: {{att.total_short}}
           </div>
           <div class="clearfix"></div>
           <div class="col-md-6">
@@ -149,7 +152,7 @@
                 <td>{{s.nice_in_time}}</td>
                 <td>{{s.nice_out_time}}</td>
                 <td>{{s.interval}}</td>
-                <td ng-click="deleteSwipe(s)">Delete</td>
+                <td ng-hide="!isAdmin" ng-click="deleteSwipe(s)">Delete</td>
               </tr>
             </table>
           </div>
@@ -199,9 +202,10 @@
                 <td>{{student.total_excused}}</td>
                 <td>{{student.total_short}}</td>
                 <td>{{student.total_hours}}</td>
-                <!-- </span> -->
+              </tr>
+              <!-- </span> -->
+            </table>
           </div>
-          </table>
           <!-- </li> -->
           <!-- </ul> -->
         </div>
