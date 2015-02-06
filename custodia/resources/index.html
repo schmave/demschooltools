@@ -61,18 +61,28 @@
 
         <div class="lead form-group" ng-show="screen ==='home'">
           <div class="col-md-6" ng-show="screen ==='home'">
-            <div class="col-md-6">
+            <div class="col-md-4">
               Not Yet In
               <li class="list-unstyled" 
                   ng-repeat="student in students | filter:{in_today:'false'}">
                 <a class="" ng-click="showStudent(student)">{{student.name}}</a>
               </li>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
               In Today
               <ul>
                 <li class="list-unstyled" 
-                    ng-repeat="student in students | filter:{in_today:'true'}">
+                    ng-repeat="student in students | filter:{in_today:'true',last_swipe_type:'in'}">
+                  <a class="" ng-click="showStudent(student)">{{student.name}}</a>
+                  <!-- {{student}} -->
+                </li>
+              </ul>
+            </div>
+            <div class="col-md-4">
+              Left Today
+              <ul>
+                <li class="list-unstyled" 
+                    ng-repeat="student in students | filter:{in_today:'true',last_swipe_type:'out'}">
                   <a class="" ng-click="showStudent(student)">{{student.name}}</a>
                   <!-- {{student}} -->
                 </li>
