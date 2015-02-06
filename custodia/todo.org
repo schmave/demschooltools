@@ -49,3 +49,7 @@
 * DONE show students in attendence today on main screen
   CLOSED: [2015-02-05 Thu 08:06]
 
+* DONE third column for swiped out today
+  CLOSED: [2015-02-06 Fri 06:56]
+* DONE prevent swipes across days
+  CLOSED: [2015-02-06 Fri 06:59]
