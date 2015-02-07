@@ -45,7 +45,6 @@
   CLOSED: [2015-02-03 Tue 07:14]
 * DONE delete swipe
   CLOSED: [2015-02-04 Wed 07:17]
-* TODO edit student name
 * DONE show students in attendence today on main screen
   CLOSED: [2015-02-05 Thu 08:06]
 
@@ -53,3 +52,9 @@
   CLOSED: [2015-02-06 Fri 06:56]
 * DONE prevent swipes across days
   CLOSED: [2015-02-06 Fri 06:59]
+* DONE change "swipe" to "sign" in ui
+  CLOSED: [2015-02-07 Sat 12:13]
+* DONE change "in today " to "IN"
+  CLOSED: [2015-02-07 Sat 12:13]
+* DONE make columns full width on home page if user
+  CLOSED: [2015-02-07 Sat 12:45]

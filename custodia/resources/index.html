@@ -60,7 +60,10 @@
         </div>
 
         <div class="lead form-group" ng-show="screen ==='home'">
-          <div class="col-md-6" ng-show="screen ==='home'">
+          <div class="row col-md-12" ng-show="isAdmin" >
+            <button class="btn btn-success" ng-show="isAdmin" ng-click="showCreate()">Create Student</button>
+          </div>
+          <div class="row col-md-12" ng-show="screen ==='home'">
             <div class="col-md-4">
               Not Yet In
               <li class="list-unstyled" 
@@ -69,7 +72,7 @@
               </li>
             </div>
             <div class="col-md-4">
-              In Today
+              IN
               <ul>
                 <li class="list-unstyled" 
                     ng-repeat="student in students | filter:{in_today:'true',last_swipe_type:'in'}">
@@ -79,7 +82,7 @@
               </ul>
             </div>
             <div class="col-md-4">
-              Left Today
+              OUT
               <ul>
                 <li class="list-unstyled" 
                     ng-repeat="student in students | filter:{in_today:'true',last_swipe_type:'out'}">
@@ -88,9 +91,6 @@
                 </li>
               </ul>
             </div>
-          </div>
-          <div class="row col-md-6" ng-show="isAdmin" >
-            <button class="btn btn-success" ng-show="isAdmin" ng-click="showCreate()">Create Student</button>
           </div>
         </div>
         <div class="form-group"  ng-show="screen === 'swiped-today'">
@@ -131,8 +131,8 @@
           <div class="clearfix"></div>
           <hr>
           <div class="col-md-6">
-            <button type="button" class="btn" ng-click="swipe('in')" ng-class="inButtonStyle()">Swipe In</button>
-            <button type="button" class="btn" ng-hide="hideSwipeOut()" ng-click="swipe('out')" ng-class="outButtonStyle()">Swipe Out</button>
+            <button type="button" class="btn" ng-click="swipe('in')" ng-class="inButtonStyle()">Sign In</button>
+            <button type="button" class="btn" ng-hide="hideSwipeOut()" ng-click="swipe('out')" ng-class="outButtonStyle()">Sign Out</button>
             <ul ng-show="isAdmin">
               <li ng-repeat="swipe in att.days" style="text-left">
                 <div>
