@@ -111,13 +111,7 @@ angular.module('app').controller("MainController", function($scope, $http){
     };
     $scope.outButtonStyle = function(){
         if (!$scope.att){ return "";}
-        return ($scope.att.last_swipe_type == "in") ? "btn-lg btn-success" : "";
-    };
-    $scope.hideSwipeOut = function(){
-        if ($scope.att) {
-            return ($scope.att.today != $scope.att.last_swipe_date) && $scope.att.last_swipe_type;
-        }
-        return true;
+        return ($scope.att.last_swipe_type == "in" && $scope.att.in_today) ? "btn-lg btn-success" : "";
     };
     $scope.swipe = function(direction) {
         $scope.att.direction = direction;
