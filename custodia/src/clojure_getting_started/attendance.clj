@@ -11,8 +11,8 @@
             ))
 
 (defn swipe-day [swipe]
-  (if (:in_time swipe)
-    (make-date-string (:in_time swipe))
+  (case (:type swipe)
+    :swipes (make-date-string (or (:in_time swipe) (:out_time swipe)))
     (:date swipe)))
 
 (defn get-min-minutes [student day]
@@ -65,11 +65,19 @@
          (:in_time last-swipe) ["in" day]
          :else nil)))))
 
+(defn only-swipes-in-range [list from to]
+  (let [interval (t/interval from to)]
+    (filter #(or (t/within? interval
+                            (f/parse (:in_time %)))
+                 (t/within? interval
+                            (f/parse (:out_time %))))
+            list)))
+
 (defn get-attendance [school-days year id student]
   (let [school-days (zipmap (reverse school-days) (repeat nil))
         [from to] (get-year-from-to year)
         swipes (get-swipes id)
-        swipes (only-dates-between swipes :in_time from to)
+        swipes (only-swipes-in-range swipes from to)
         swipes (map append-interval swipes)
         swipes (map clean-dates swipes)
         swipes (concat swipes (only-dates-between (get-overrides id) :date from to))
@@ -107,7 +115,7 @@
 (defn get-school-days [year]
   (let [[from to] (get-year-from-to year)
         swipes (get-swipes)
-        swipes (only-dates-between swipes :in_time from to)]
+        swipes (only-swipes-in-range swipes from to)]
     (keys (group-by swipe-day swipes))))
 
 (defn get-students-with-att

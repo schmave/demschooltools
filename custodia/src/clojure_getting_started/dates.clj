@@ -41,7 +41,8 @@
           list))
 
 (defn append-interval [swipe]
-  (if (:out_time swipe)
+  (if (and (:in_time swipe)
+           (:out_time swipe))
     (let [int (t/interval (f/parse (:in_time swipe))
                           (f/parse (:out_time swipe)))
           int-hours (t/in-minutes int)]

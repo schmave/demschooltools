@@ -187,7 +187,7 @@
                    "10:09:27")))
           (testing "Total short count student 2"
             (is (= (:total_short att2)
-                   1)))
+                   2)))
           (testing "Total Abs Count For Student 2 Should equal number of total days for student 1 and 2"
             (is (= (:total_abs att2)
                    5)))
@@ -204,6 +204,21 @@
               (is (= (:total_overrides att)
                      0)))
             )))) 
+  )
+
+#_(get-att 3 {:type :students, :olderdate nil, :inserted_date #inst "2015-02-11T16:54:44.165038000-00:00", :name "test", :_id 3})
+
+(deftest sign-out-without-in
+  (do (db/sample-db)
+      (let [s (db/make-student "test")
+            sid (:_id s)]
+        (db/swipe-in sid basetime)
+        (db/swipe-out sid (t/plus basetime (t/days 1) (t/minutes 331)))
+        (trace/trace s)
+        (let [att (get-att sid s)]
+          (testing "swiping out on another day just is an out"
+            
+            (is (= 2 (-> att :days count)))))))
   )
 
 (deftest students-with-att

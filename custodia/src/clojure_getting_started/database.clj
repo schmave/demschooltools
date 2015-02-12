@@ -21,9 +21,10 @@
 (defn get-excuses [id]
   (db/get-* "excuses" id "student_id"))
 
-(defn- lookup-last-swipe [id]
-  (-> (get-swipes id)
-      last))
+(defn- lookup-last-swipe-for-day [id day]
+  (let [last (-> (get-swipes id) last)]
+    (when (= day (make-date-string (:in_time last)))
+      last)))
 
 (defn only-swiped-in? [in-swipe] (and in-swipe (not (:out_time in-swipe))))
 
@@ -37,12 +38,8 @@
 
 (defn swipe-in
   ([id] (swipe-in id (t/now)))
-  ([id in-time & [missing-out]] 
-     (let [last-swipe (lookup-last-swipe id)]
-       (when (only-swiped-in? last-swipe)
-         (swipe-out id missing-out))
-       (db/persist! (assoc (make-swipe id) :in_time (str in-time))))))
-
+  ([id in-time] 
+     (db/persist! (assoc (make-swipe id) :in_time (str in-time)))))
 
 (defn sanitize-out [swipe]
   (let [in (:in_time swipe)
@@ -59,13 +56,17 @@
 ;; (sample-db)   
 (defn swipe-out
   ([id] (swipe-out id (t/now)))
-  ([id out-time & [missing-in]]
-     (let [last-swipe (lookup-last-swipe id)
-           in-swipe (if (only-swiped-in? last-swipe) last-swipe 
-                        (assoc (make-swipe id) :in_time (str missing-in)))
+  ([id out-time]
+     (let [last-swipe (lookup-last-swipe-for-day id (make-date-string (str out-time)))
+           only-swiped-in? (only-swiped-in? last-swipe)
+           in-swipe (if only-swiped-in? 
+                      last-swipe 
+                      (make-swipe id))
            out-swipe (assoc in-swipe :out_time (str out-time))
            out-swipe (sanitize-out out-swipe)]
-       (db/update! :swipes (:_id out-swipe) out-swipe)
+       (if only-swiped-in?
+         (db/update! :swipes (:_id out-swipe) out-swipe)
+         (db/persist! out-swipe))
        out-swipe)))
 
 ;; TODO - make multimethod on type
@@ -126,7 +127,7 @@
      (make-year (str (t/date-time 2014 6)) (str (t/date-time 2015 6)))
      (make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
      (let [s (make-student "jim")]
-       (when have-extra? (swipe-in (:_id s) (t/now))))
+       (when have-extra? (swipe-in (:_id s) (t/minus (t/now) (t/days 2)))))
      (let [s (make-student "steve")]
        (when have-extra? (swipe-in (:_id s) (t/minus (t/now) (t/days 1) (t/hours 5))))))
   )

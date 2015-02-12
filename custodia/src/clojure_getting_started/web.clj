@@ -76,8 +76,10 @@
   (POST "/swipe" [direction _id missing]
         (friend/authorize #{::user}
                           (if (= direction "in")
-                            (data/swipe-in _id (t/now) missing)
-                            (data/swipe-out _id (t/now) missing)))
+                            (do (when missing (data/swipe-out _id missing))
+                                (data/swipe-in _id))
+                            (do (when missing (data/swipe-in _id missing))
+                                (data/swipe-out _id))))
         (resp/response (get-all-student-data)))
   (GET "/currentyear" [] (dates/get-current-year-string (data/get-years)))
   (GET "/year/all" []
