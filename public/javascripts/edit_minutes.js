@@ -201,6 +201,13 @@ function displayName(p) {
 
 function Charge(charge_id, el) {
     var self = this;
+	
+	var SEVERITIES = {
+        "mild": "Mild",
+        "moderate" : "Moderate",
+        "serious": "Serious",
+        "severe": "Severe"
+    }
 
     this.checkReferralLabelHighlight = function() {
         if (el.find(".minor-referral-destination").val()) {
@@ -234,6 +241,12 @@ function Charge(charge_id, el) {
         if (json.referred_to_sm) {
             el.find(".refer-to-sm").prop("checked", true);
         }
+		
+        for (key in SEVERITIES) {
+            if (json.severity == SEVERITIES[key]) {
+                el.find(".severity-" + key).prop("checked", true);
+            }
+        }
 
         el.find(".minor-referral-destination").val(json.minor_referral_destination);
         self.checkReferralLabelHighlight();
@@ -252,6 +265,12 @@ function Charge(charge_id, el) {
         }
 
         url += "&resolution_plan=" + encodeURIComponent(el.find(".resolution_plan").val());
+
+        for (key in SEVERITIES) {
+            if (el.find(".severity-" + key).prop("checked")) {
+                url += "&severity=" + SEVERITIES[key];
+            }
+        }
 
         plea = el.find(".plea-guilty");
         if (plea.prop("checked")) {
@@ -342,17 +361,14 @@ function Charge(charge_id, el) {
 
     // el.mouseleave(function() { self.remove_button.hide(); } );
     // el.mouseenter(function() { self.remove_button.show(); } );
+    for (key in SEVERITIES) {
+        el.find(".severity-" + key).change(self.markAsModified);
+    }
+    el.find(".severity[type=radio]").prop("name", "severity-" + charge_id);
 }
 
 function Case (id, el) {
     var self = this;
-
-    var SEVERITIES = {
-        "mild": "Mild",
-        "moderate" : "Moderate",
-        "serious": "Serious",
-        "severe": "Severe"
-    }
 
     this.saveIfNeeded = function() {
         window.setTimeout(self.saveIfNeeded, 5000);
@@ -369,12 +385,6 @@ function Case (id, el) {
         url += "&date=" + encodeURIComponent(self.el.find(".date").val());
         url += "&time=" + encodeURIComponent(self.el.find(".time").val());
 
-        for (key in SEVERITIES) {
-            if (el.find(".severity-" + key).prop("checked")) {
-                url += "&severity=" + SEVERITIES[key];
-            }
-        }
-
         $.post(url, function(data) {
             self.is_modified = false;
         });
@@ -389,12 +399,6 @@ function Case (id, el) {
         el.find(".date").val(data.date);
         el.find(".time").val(data.time);
         el.find(".findings").val(data.findings);
-
-        for (key in SEVERITIES) {
-            if (data.severity == SEVERITIES[key]) {
-                el.find(".severity-" + key).prop("checked", true);
-            }
-        }
 
         if (data.writer) {
             self.writer_chooser.addPerson(data.writer.person_id,
@@ -457,13 +461,7 @@ function Case (id, el) {
     el.find(".date").change(self.markAsModified);
     el.find(".time").change(self.markAsModified);
 
-    for (key in SEVERITIES) {
-        el.find(".severity-" + key).change(self.markAsModified);
-    }
-
     el.find(".add-charges").click(self.addCharge);
-
-    el.find("input[type=radio]").prop("name", "severity-" + id);
 
     window.setTimeout(self.saveIfNeeded, 5000);
 }
