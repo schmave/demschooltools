@@ -37,9 +37,6 @@ public class Case extends Model implements Comparable<Case> {
     @NotNull
     public String time = "";
 
-    @NotNull
-    public String severity = "";
-
     @ManyToOne
     @JoinColumn(name="meeting_id")
     @JsonIgnore
@@ -93,10 +90,6 @@ public class Case extends Model implements Comparable<Case> {
     public void edit(Map<String, String[]> query_string) {
         findings = query_string.get("findings")[0];
         location = query_string.get("location")[0];
-
-        if (query_string.containsKey("severity")) {
-            severity = query_string.get("severity")[0];
-        }
 
         String date_string = query_string.get("date")[0];
         date = controllers.Application.getDateFromString(date_string);

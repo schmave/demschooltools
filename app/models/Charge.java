@@ -42,6 +42,9 @@ public class Charge extends Model implements Comparable<Charge> {
     public Date sm_decision_date;
 
     @NotNull
+    public String severity = "";
+
+    @NotNull
     public String minor_referral_destination = "";
 
     public static Finder<Integer, Charge> find = new Finder(
@@ -73,6 +76,10 @@ public class Charge extends Model implements Comparable<Charge> {
 
         if (plea.equals("")) {
             plea = EMPTY_PLEA;
+        }
+		
+		if (query_string.containsKey("severity")) {
+            severity = query_string.get("severity")[0];
         }
 
         if (query_string.containsKey("person_id")) {

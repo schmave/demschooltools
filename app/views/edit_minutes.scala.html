@@ -114,6 +114,21 @@ View printable minutes</a>
 	@if( OrgConfig.get().use_minor_referrals ) {
         <label><span class="minor-referral-label">Refer to:</span><input type="text" class="minor-referral-destination"></label>
     }
+@if( OrgConfig.get().show_severity ) {
+    <tr><td class="esm-form-label">Severity:<td>
+    <div class="radio-inline">
+      <label><input type="radio" class="severity severity-mild" value="Mild"><span>Mild</span></label>
+    </div>
+	<div class="radio-inline">
+	  <label><input type="radio" class="severity severity-moderate" value="Moderate"><span>Moderate</span></label>
+	</div>
+	<div class="radio-inline">
+	  <label><input type="radio" class="severity severity-serious" value="Serious"><span>Serious</span></label>
+	</div>
+	<div class="radio-inline">
+	  <label><input type="radio" class="severity severity-severe" value="Severe"><span>Severe</span></label>
+	</div>
+}
 	<tr><td class="esm-form-label">@OrgConfig.get().str_res_plan_cap: <td><textarea class="resolution_plan"></textarea>
     <td class="last-rp"></td>
    </table>
@@ -139,22 +154,6 @@ View printable minutes</a>
 </tr>
 
 <tr><td class="esm-form-label">Findings: <td><textarea class="findings"></textarea></tr>
-
-@if( OrgConfig.get().show_severity ) {
-    <tr><td class="esm-form-label">Severity:<td>
-    <div class="radio-inline">
-      <label><input type="radio" class="severity-mild" value="Mild"><span>Mild</span></label>
-    </div>
-	<div class="radio-inline">
-	  <label><input type="radio" class="severity-moderate" value="Moderate"><span>Moderate</span></label>
-	</div>
-	<div class="radio-inline">
-	  <label><input type="radio" class="severity-serious" value="Serious"><span>Serious</span></label>
-	</div>
-	<div class="radio-inline">
-	  <label><input type="radio" class="severity-severe" value="Severe"><span>Severe</span></label>
-	</div>
-}
 
 </table>
 <div class="charges"></div>
