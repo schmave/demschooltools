@@ -17,7 +17,7 @@ $(function() {
 				&& !charge.referred_to_sm
 				&& !(charge.resolution_plan.trim().toLowerCase().equals("warning") ||
 					 charge.resolution_plan.trim().toLowerCase().equals("warning."))
-				&& charge.plea.equals("Guilty")) {
+				&& !charge.plea.equals("Not Guilty")) {
 				@resolution_plan(charge)
 			}
 		}
