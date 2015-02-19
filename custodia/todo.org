@@ -58,3 +58,4 @@
   CLOSED: [2015-02-07 Sat 12:13]
 * DONE make columns full width on home page if user
   CLOSED: [2015-02-07 Sat 12:45]
+* TODO Fix  IN - - OUT scenario where it doesn't ask for today's IN 

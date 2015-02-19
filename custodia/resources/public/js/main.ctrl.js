@@ -115,8 +115,12 @@ angular.module('app').controller("MainController", function($scope, $http){
     };
     $scope.swipe = function(direction) {
         $scope.att.direction = direction;
-        if((($scope.att.last_swipe_type == "out" || !$scope.att.last_swipe_type) && direction == "out")
-           || ($scope.att.last_swipe_type == "in" && direction == "in")) {
+        var missing_in = (($scope.att.last_swipe_type == "out" 
+                           || !$scope.att.last_swipe_type) 
+                          // && !$scope.att.in_today // - need to better collect the missing for days that are In -  - Out
+                          && direction == "out"),
+            missing_out = ($scope.att.last_swipe_type == "in" && direction == "in");
+        if(missing_in || missing_out) {
             $scope.get_missing_swipe(); 
         } else {
             $scope.makeSwipePost();
