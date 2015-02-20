@@ -55,15 +55,15 @@
 
 (defn get-last-swipe-type [summed-days]
   (let [summed-days (filter #(not (nil? (:swipes %))) summed-days)]
-    (when (-> summed-days first :valid not)
-      (let [day (-> summed-days first :day)
-            swipes (-> summed-days first :swipes)
-            swipes (filter #(= :swipes (:type %)) swipes)
-            last-swipe (last swipes)]
-        (cond
-         (:out_time last-swipe) ["out" day]
-         (:in_time last-swipe) ["in" day]
-         :else nil)))))
+    ;; (when (-> summed-days first :valid not))
+    (let [day (-> summed-days first :day)
+          swipes (-> summed-days first :swipes)
+          swipes (filter #(= :swipes (:type %)) swipes)
+          last-swipe (last swipes)]
+      (cond
+       (:out_time last-swipe) ["out" day]
+       (:in_time last-swipe) ["in" day]
+       :else nil))))
 
 (defn only-swipes-in-range [list from to]
   (let [interval (t/interval from to)]

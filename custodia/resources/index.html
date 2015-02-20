@@ -109,7 +109,6 @@
           <h1 ng-show="missing_direction == 'out'">What time did you leave on {{att.last_swipe_date}}?</h1>
           <h1 ng-show="missing_direction == 'in'">What time did you come in this morning?</h1>
           <timepicker ng-model="missing_swipe" hour-step="1" minute-step="1" show-meridian="true"></timepicker>
-          {{missing_swipe}}
           <button class="btn btn-primary" ng-click="swipe_with_missing(missing_swipe)">Submit</button> 
           <button ng-click="backStudent()" class="btn btn-primary">Cancel</button> 
 
