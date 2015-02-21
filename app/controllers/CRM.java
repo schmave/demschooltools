@@ -1,5 +1,6 @@
 package controllers;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -14,6 +15,9 @@ import com.avaje.ebean.Expression;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
 import com.avaje.ebean.SqlUpdate;
+//import com.ecwid.mailchimp.*;
+//import com.ecwid.mailchimp.method.v2_0.lists.ListMethod;
+//import com.ecwid.mailchimp.method.v2_0.lists.ListMethodResult;
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.typesafe.plugin.*;
 
@@ -36,6 +40,24 @@ public class CRM extends Controller {
         List<Comment> recent_comments = Comment.find
             .where().eq("person.organization", Organization.getByHost())
             .orderBy("created DESC").setMaxRows(20).findList();
+
+        //MailChimpClient mailChimpClient = new MailChimpClient();
+        //ListMethod method = new ListMethod();
+        //method.apikey = "d551e58a4173a1caf64ce791b664b3ee-us5";
+        //
+        //try {
+        //    ListMethodResult result = mailChimpClient.execute(method);
+        //    for(ListMethodResult.Data data : result.data) {
+        //        System.out.println("list name: " + data.name);
+        //    }
+        //}
+        //catch (IOException e) {
+        //    e.printStackTrace();
+        //}
+        //catch (MailChimpException e) {
+        //    e.printStackTrace();
+        //}
+
         return ok(views.html.people_index.render(Person.all(), recent_comments));
     }
 
@@ -197,18 +219,27 @@ public class CRM extends Controller {
             the_tag = Tag.find.ref(tagId);
         }
 
-        PersonTag pt = PersonTag.create(
+        PersonTag pt = PersonTag.create(the_tag, p);
+
+        PersonTagChange ptc = PersonTagChange.create(
             the_tag,
             p,
-            Application.getCurrentUser());
+            Application.getCurrentUser(),
+            true);
 
         p.tags.add(the_tag);
         return ok(views.html.tag_fragment.render(the_tag, p));
     }
 
     public static Result removeTag(Integer person_id, Integer tag_id) {
-        Ebean.createSqlUpdate("DELETE from person_tag where person_id=" + person_id +
-            " AND tag_id=" + tag_id).execute();
+        if (Ebean.createSqlUpdate("DELETE from person_tag where person_id=" + person_id +
+            " AND tag_id=" + tag_id).execute() == 1) {
+            PersonTagChange ptc = PersonTagChange.create(
+                Tag.find.ref(tag_id),
+                Person.findById(person_id),
+                Application.getCurrentUser(),
+                false);
+        }
 
         return ok();
     }
