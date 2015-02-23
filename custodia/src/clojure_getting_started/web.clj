@@ -54,11 +54,11 @@
                            (resp/response (att/get-attendance year sid s)))))
   (GET "/resetdb" []
        (friend/authorize #{::admin}
-                         (db/reset-db)
+                         ;; (db/reset-db)
                          (resp/redirect "/")))
   (GET "/sampledb" []
        (friend/authorize #{::admin}
-                         (data/sample-db true)
+                         ;; (data/sample-db true)
                          (resp/redirect "/")))
   (POST "/excuse" [_id day]
         (friend/authorize #{::admin}
