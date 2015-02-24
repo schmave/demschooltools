@@ -15,9 +15,9 @@ import com.avaje.ebean.Expression;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
 import com.avaje.ebean.SqlUpdate;
-//import com.ecwid.mailchimp.*;
-//import com.ecwid.mailchimp.method.v2_0.lists.ListMethod;
-//import com.ecwid.mailchimp.method.v2_0.lists.ListMethodResult;
+import com.ecwid.mailchimp.*;
+import com.ecwid.mailchimp.method.v2_0.lists.ListMethod;
+import com.ecwid.mailchimp.method.v2_0.lists.ListMethodResult;
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.typesafe.plugin.*;
 
@@ -40,23 +40,6 @@ public class CRM extends Controller {
         List<Comment> recent_comments = Comment.find
             .where().eq("person.organization", Organization.getByHost())
             .orderBy("created DESC").setMaxRows(20).findList();
-
-        //MailChimpClient mailChimpClient = new MailChimpClient();
-        //ListMethod method = new ListMethod();
-        //method.apikey = "d551e58a4173a1caf64ce791b664b3ee-us5";
-        //
-        //try {
-        //    ListMethodResult result = mailChimpClient.execute(method);
-        //    for(ListMethodResult.Data data : result.data) {
-        //        System.out.println("list name: " + data.name);
-        //    }
-        //}
-        //catch (IOException e) {
-        //    e.printStackTrace();
-        //}
-        //catch (MailChimpException e) {
-        //    e.printStackTrace();
-        //}
 
         return ok(views.html.people_index.render(Person.all(), recent_comments));
     }
@@ -140,6 +123,9 @@ public class CRM extends Controller {
         return ok(Json.stringify(Json.toJson(result)));
     }
 
+    // personId should be -1 if the client doesn't care about a particular
+    // person, but just wants a list of available tags. In that case,
+    // the "create new tag" functionality is also disabled.
     public static Result jsonTags(String term, Integer personId) {
         String like_arg = "%" + term + "%";
         List<Tag> selected_tags =
@@ -148,10 +134,12 @@ public class CRM extends Controller {
                 .ilike("title", "%" + term + "%").findList();
 
 		List<Tag> existing_tags = null;
-		Person p = Person.findById(personId);
-		if (p != null) {
-			existing_tags = p.tags;
-		}
+        if (personId >= 0) {
+            Person p = Person.findById(personId);
+            if (p != null) {
+                existing_tags = p.tags;
+            }
+        }
 
         List<Map<String, String> > result = new ArrayList<Map<String, String> > ();
         for (Tag t : selected_tags) {
@@ -163,10 +151,12 @@ public class CRM extends Controller {
             }
         }
 
-        HashMap<String, String> values = new HashMap<String, String>();
-        values.put("label", "Create new tag: " + term);
-        values.put("id", "-1");
-        result.add(values);
+        if (personId >= 0) {
+            HashMap<String, String> values = new HashMap<String, String>();
+            values.put("label", "Create new tag: " + term);
+            values.put("id", "-1");
+            result.add(values);
+        }
 
         return ok(Json.stringify(Json.toJson(result)));
     }
@@ -608,5 +598,60 @@ public class CRM extends Controller {
         List<Person> people = getPeopleForTag(list.tag.id);
 
         return ok(views.html.task_list.render(list, people));
+    }
+
+    public static Result viewMailchimpSettings() {
+        MailChimpClient mailChimpClient = new MailChimpClient();
+        ListMethod method = new ListMethod();
+
+        Organization org = OrgConfig.get().org;
+        method.apikey = org.mailchimp_api_key; // "d551e58a4173a1caf64ce791b664b3ee-us5";
+
+
+        Map<String, ListMethodResult.Data> mc_list_map = new HashMap<String, ListMethodResult.Data>();
+        if (method.apikey != null) {
+            try {
+                ListMethodResult result = mailChimpClient.execute(method);
+                for (ListMethodResult.Data data : result.data) {
+                    mc_list_map.put(data.id, data);
+                }
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+            catch (MailChimpException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return ok(views.html.view_mailchimp_settings.render(
+            Form.form(Organization.class), org,
+            MailchimpSync.find.all(), mc_list_map));
+    }
+
+    public static Result saveMailchimpSettings() {
+        final Map<String, String[]> values = request().body().asFormUrlEncoded();
+
+        if (values.containsKey("mailchimp_api_key")) {
+            OrgConfig.get().org.setMailchimpApiKey(values.get("mailchimp_api_key")[0]);
+        }
+
+        if (values.containsKey("sync_type")) {
+            for (String tag_id : values.get("tag_id")) {
+                Tag t = Tag.findById(Integer.parseInt(tag_id));
+                MailchimpSync sync = MailchimpSync.create(t,
+                    values.get("mailchimp_list_id")[0],
+                    values.get("sync_type")[0].equals("local_add"),
+                    values.get("sync_type")[0].equals("local_remove"));
+            }
+        }
+
+        if (values.containsKey("remove_sync_id")) {
+            MailchimpSync sync = MailchimpSync.find.byId(Integer.parseInt(
+                values.get("remove_sync_id")[0]));
+            sync.delete();
+        }
+
+        return redirect(routes.CRM.viewMailchimpSettings());
     }
 }
