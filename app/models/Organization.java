@@ -18,6 +18,8 @@ public class Organization extends Model {
 
     public String name;
 
+    public String mailchimp_api_key;
+
     public static Finder<Integer, Organization> find = new Finder(
         Integer.class, Organization.class
     );
@@ -37,6 +39,11 @@ public class Organization extends Model {
         }
 
         return null;
+    }
+
+    public void setMailchimpApiKey(String key) {
+        this.mailchimp_api_key = key;
+        this.save();
     }
 }
 

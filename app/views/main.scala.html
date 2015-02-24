@@ -40,8 +40,16 @@
 					@OrgConfig.get().str_manual_title_short
 				</a>
 			} else { @if( menu.equals( "crm" ) ) {
-			<li @if(activeTab.equals("all_people")) { class="active" } ><a href="@routes.CRM.people()">All people</a>
-			<li @if(activeTab.equals("add_person")) { class="active" } ><a href="@routes.CRM.newPerson()">Add a person</a>
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+				  People
+				  <b class="caret"></b>
+				</a>
+					<ul class="dropdown-menu">
+					<li><a href="@routes.CRM.people()">Home</a></li>
+					<li><a href="@routes.CRM.newPerson()">Add a person</a></li>
+					</ul>
+			<li>
 			<li class="dropdown">
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 				  Tags
@@ -86,18 +94,27 @@
 						<li><a href="@routes.CRM.donationsNeedingThankYou()">need thank you</a></li>
 						<li><a href="@routes.CRM.donationsNeedingIndiegogo()">need Indiegogo reward</a></li>
 					</ul>
-			<li>
 			@if(CRM.hasPendingEmail()) {
 				<li @if(activeTab.equals("email")) { class="active" } >
 					<a href="@routes.CRM.viewPendingEmail()">Pending Email <span class="label label-warning">1</span></a>
 				</li>
 			}
+			<li>
 			<form class="navbar-form navbar-left">
 			<div class="form-group">
-			   <input id="navbar_people_search" type="Search" placeholder="Search..." class="form-control" />
+			   <input id="navbar_people_search" type="Search" placeholder="Search people..." class="form-control" />
 			</div>
 			</form>
 			</li>
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+				  Settings
+				  <b class="caret"></b>
+				</a>
+					<ul class="dropdown-menu">
+					<li><a href="@routes.CRM.viewMailchimpSettings()">Mailchimp</a></li>
+					</ul>
+			<li>
 			} }
 
 			<li style="float:right;"><a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout">
