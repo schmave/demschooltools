@@ -45,4 +45,9 @@ public class MailchimpSync extends Model {
         result.save();
         return result;
     }
+
+    public void updateLastSync(Date d) {
+        this.last_sync = d;
+        this.save();
+    }
 }
