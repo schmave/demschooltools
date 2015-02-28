@@ -11,6 +11,8 @@ import com.ecwid.mailchimp.method.v2_0.lists.BatchError;
 import com.ecwid.mailchimp.method.v2_0.lists.BatchSubscribeInfo;
 import com.ecwid.mailchimp.method.v2_0.lists.BatchSubscribeMethod;
 import com.ecwid.mailchimp.method.v2_0.lists.BatchSubscribeResult;
+import com.ecwid.mailchimp.method.v2_0.lists.BatchUnsubscribeMethod;
+import com.ecwid.mailchimp.method.v2_0.lists.BatchUnsubscribeResult;
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.user.AuthUser;
 
@@ -60,6 +62,9 @@ public class Public extends Controller {
 
             for (Tag t : Tag.find.where().eq("organization", org).findList()) {
                 for (MailchimpSync sync : t.syncs) {
+                    if (sync.last_sync == null) {
+                        sync.last_sync = new Date(0, 1, 1);
+                    }
                     List<PersonTagChange> changes = PersonTagChange.find.where()
                         .eq("tag", t)
                         .gt("time", sync.last_sync).findList();
@@ -97,8 +102,9 @@ public class Public extends Controller {
                                 info.email = new com.ecwid.mailchimp.method.v2_0.lists.Email();
                                 info.email.email = p.email;
                                 info.merge_vars = new MailChimpObject();
-                                info.merge_vars.put("first_name", p.first_name);
-                                info.merge_vars.put("last_name", p.last_name);
+                                info.merge_vars.put("FNAME", p.first_name);
+                                info.merge_vars.put("LNAME", p.last_name);
+                                method.batch.add(info);
                             }
                         }
 
@@ -107,6 +113,39 @@ public class Public extends Controller {
                             for (BatchError err : result.errors) {
                                 System.out.println("Error code " + err.code + " (" + err.error + ") for email " + err.email);
                             }
+                            System.out.println("add: " + result.add_count + "; error: " + result.error_count + "; update: " + result.update_count);
+                        }
+                        catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        catch (MailChimpException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    if (removes.size() > 0) {
+                        BatchUnsubscribeMethod method = new BatchUnsubscribeMethod();
+                        method.apikey = org.mailchimp_api_key;
+                        method.id = sync.mailchimp_list_id;
+                        method.send_goodbye = false;
+                        method.delete_member = true;
+                        method.batch = new ArrayList<com.ecwid.mailchimp.method.v2_0.lists.Email>();
+                        for (Person p : removes) {
+                            if (p.email.length() > 0) {
+                                System.out.println("removing " + p.email + " from " + method.id);
+                                com.ecwid.mailchimp.method.v2_0.lists.Email email =
+                                    new com.ecwid.mailchimp.method.v2_0.lists.Email();
+                                email.email = p.email;
+                                method.batch.add(email);
+                            }
+                        }
+
+                        try {
+                            BatchUnsubscribeResult result = client.execute(method);
+                            for (BatchError err : result.errors) {
+                                System.out.println("Error code " + err.code + " (" + err.error + ") for email " + err.email);
+                            }
+                            System.out.println("removed: " + result.success_count + "; errors: " + result.error_count);
                         }
                         catch (IOException e) {
                             e.printStackTrace();
