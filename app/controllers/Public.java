@@ -110,6 +110,7 @@ public class Public extends Controller {
 
                         try {
                             BatchSubscribeResult result = client.execute(method);
+                            sync.updateLastSync(new Date());
                             for (BatchError err : result.errors) {
                                 System.out.println("Error code " + err.code + " (" + err.error + ") for email " + err.email);
                             }
@@ -142,6 +143,7 @@ public class Public extends Controller {
 
                         try {
                             BatchUnsubscribeResult result = client.execute(method);
+                            sync.updateLastSync(new Date());
                             for (BatchError err : result.errors) {
                                 System.out.println("Error code " + err.code + " (" + err.error + ") for email " + err.email);
                             }
