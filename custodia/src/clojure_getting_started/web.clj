@@ -2,6 +2,7 @@
   (:require [compojure.core :refer [defroutes GET PUT POST DELETE ANY]]
             [ring.middleware.json :refer [wrap-json-response wrap-json-body wrap-json-params]]
             [ring.middleware.keyword-params :refer [wrap-keyword-params]]
+            [ring.middleware.session :refer [wrap-session]]
             [compojure.handler :refer [site]]
             [carica.core :as c]
             [compojure.route :as route]
@@ -122,6 +123,7 @@
                                     :login-uri "/login"
                                     :default-landing-uri "/"
                                     :workflows [(workflows/interactive-form)]})
+              (wrap-session {:cookie-attrs {:max-age (* 3 365 24 3600)}})
               wrap-keyword-params
               wrap-json-body wrap-json-params wrap-json-response ))
 
