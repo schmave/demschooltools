@@ -116,6 +116,12 @@ public class Public extends Controller {
         method.apikey = api_key;
 
         Map<String, ListMethodResult.Data> result = new HashMap<String, ListMethodResult.Data>();
+
+        if (api_key.equals("")) {
+            // client.execute() returns an IllegalArgumentException when api_key is empty.
+            return result;
+        }
+
         try {
             ListMethodResult method_result = client.execute(method);
             for (ListMethodResult.Data data : method_result.data) {
