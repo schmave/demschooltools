@@ -615,7 +615,11 @@ public class CRM extends Controller {
         final Map<String, String[]> values = request().body().asFormUrlEncoded();
 
         if (values.containsKey("mailchimp_api_key")) {
-            OrgConfig.get().org.setMailchimpApiKey(values.get("mailchimp_api_key")[0]);
+            OrgConfig.get().org.setMailChimpApiKey(values.get("mailchimp_api_key")[0]);
+        }
+
+        if (values.containsKey("mailchimp_updates_email")) {
+            OrgConfig.get().org.setMailChimpUpdatesEmail(values.get("mailchimp_updates_email")[0]);
         }
 
         if (values.containsKey("sync_type")) {

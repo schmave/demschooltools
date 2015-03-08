@@ -67,7 +67,7 @@ public class Public extends Controller {
         client.execute(method);
     }
 
-    static void updatePersonInList(MailChimpClient client, String api_key, String list_id, String old_email, Person p) throws MailChimpException, IOException {
+    static boolean updatePersonInList(MailChimpClient client, String api_key, String list_id, String old_email, Person p) throws MailChimpException, IOException {
         UpdateMemberMethod method = new UpdateMemberMethod();
         method.apikey = api_key;
         method.id = list_id;
@@ -83,6 +83,7 @@ public class Public extends Controller {
 
         try {
             client.execute(method);
+            return true;
         }
         catch (MailChimpException e) {
             if (e.code != 232 && e.code != 215) {
@@ -90,6 +91,7 @@ public class Public extends Controller {
             }
             else {
                 System.out.println(old_email + " not subscribed to this list.");
+                return false;
             }
         }
     }
@@ -133,16 +135,14 @@ public class Public extends Controller {
     public static Result syncMailchimp() {
         MailChimpClient client = new MailChimpClient();
 
-        //Map<Organization, Map<String, Person>> org_to_list_to_changes =
-        //    new HashMap<Organization, Map<String, List<PersonTagChange>>>();
-
         for (Organization org : Organization.find.all()) {
             if (org.mailchimp_api_key.equals("")) {
                 // Can't do any mailchimp syncing if an org has no mailchimp API key
                 continue;
             }
+            MailChimpSyncInfo info = new MailChimpSyncInfo();
             // Find all PersonChanges since last
-            // Organization.mailchimp_last_sync_person_changes sync them,
+            // Organization.mailchimp_last_sync_person_changes. Sync them,
             // excluding where old_email="" If new email is "", unsubscribe them
             // from all lists.
             List<PersonChange> changes =
@@ -168,13 +168,17 @@ public class Public extends Controller {
                         try {
                             if (change.person.email.equals("")) {
                                 removePersonFromList(client, org.mailchimp_api_key, list_id, change.old_email);
+                                info.remove(list_id, change.person);
                             }
                             else {
                                 updatePersonInList(client, org.mailchimp_api_key, list_id, change.old_email, change.person);
+                                info.update(list_id, change.person);
                             }
                         } catch (IOException e) {
+                            info.error(list_id, "Updating " + change.person + ": " + e);
                             e.printStackTrace();
                         } catch (MailChimpException e) {
+                            info.error(list_id, "Updating " + change.person + ": " + e);
                             e.printStackTrace();
                         }
                     }
@@ -182,9 +186,6 @@ public class Public extends Controller {
             }
 
             org.setLastMailChimpSyncTime(new Date());
-
-            //Map<String, List<PersonTagChange>> list_to_changes =
-            //    org_to_list_to_changes.put(org, new HashMap<String, PersonTagChange>());
 
             for (Tag t : Tag.find.where().eq("organization", org).findList()) {
                 for (MailchimpSync sync : t.syncs) {
@@ -221,11 +222,14 @@ public class Public extends Controller {
                         for (Person p : adds) {
                             try {
                                 addPersonToList(client, org.mailchimp_api_key, sync.mailchimp_list_id, p);
+                                info.add(sync.mailchimp_list_id, p);
                             }
                             catch (IOException e) {
+                                info.error(sync.mailchimp_list_id, "Adding " + p.first_name + ": " + e);
                                 e.printStackTrace();
                             }
                             catch (MailChimpException e) {
+                                info.error(sync.mailchimp_list_id, "Adding " + p.first_name + ": " + e);
                                 e.printStackTrace();
                             }
                         }
@@ -235,11 +239,14 @@ public class Public extends Controller {
                         for (Person p : removes) {
                             try {
                                 removePersonFromList(client, org.mailchimp_api_key, sync.mailchimp_list_id, p.email);
+                                info.remove(sync.mailchimp_list_id, p);
                             }
                             catch (IOException e) {
+                                info.error(sync.mailchimp_list_id, "Removing " + p.first_name + ": " + e);
                                 e.printStackTrace();
                             }
                             catch (MailChimpException e) {
+                                info.error(sync.mailchimp_list_id, "Removing " + p.first_name + ": " + e);
                                 e.printStackTrace();
                             }
                         }
@@ -247,6 +254,16 @@ public class Public extends Controller {
 
                     sync.updateLastSync(new Date());
                 }
+            }
+
+            if (!org.mailchimp_updates_email.equals("") &&
+                !info.isEmpty()) {
+                play.libs.mailer.Email mail = new play.libs.mailer.Email();
+                mail.setSubject("People database: Nightly updates");
+                mail.addTo(org.mailchimp_updates_email);
+                mail.setFrom("Papal DB <noreply@threeriversvillageschool.org>");
+                mail.setBodyHtml(views.html.sync_email.render(mc_lists, info).toString());
+                play.libs.mailer.MailerPlugin.send(mail);
             }
         }
         return ok();
