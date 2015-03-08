@@ -217,6 +217,11 @@ public class Person extends Model implements Comparable<Person> {
 
         p.addPhoneNumbers(form);
 
+        Person old_p = Person.findById(p.person_id);
+        if (!old_p.email.equals(p.email)) {
+            PersonChange.create(old_p, p.email);
+        }
+
         p.update();
         return p;
     }

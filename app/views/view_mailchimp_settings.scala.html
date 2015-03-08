@@ -3,21 +3,38 @@
 
 @main("Mailchimp Settings", menu = "crm") {
 
+<h3>MailChimp settings</h3>
+<p style="width: 400px">To connect your MailChimp account, go to your account page, then select "API keys"
+from the extras menu. Click on the "Create A Key" button, then copy and paste the key
+into the text field below.
 
 @helper.form(routes.CRM.saveMailchimpSettings()) {
-	<p>Mailchimp API key:
+	<p>MailChimp API key:
 		<input type="text" size=80 name="mailchimp_api_key", value="@org.mailchimp_api_key"/>
 	<input type="submit" value="Save">
+}
+
+@if( !org.mailchimp_api_key.equals("") && mc_lists.size() == 0 ) {
+<p><b>The current MailChimp API key is invalid, or belongs to an account that has
+no active lists.</b>
 }
 
 <hr/>
 <h4>Existing MailChimp connections</h4>
 
+@if( mc_lists.size() > 0 ) {
+<p style="width: 400px">Whenever a person's email address is changed in this database,
+the change will be propagated to any of the @mc_lists.size() MailChimp lists that
+the person is subscribed to.
+}
+
 <ul>
 @for( sync <- mc_syncs ) {
   <li>
   When people are <b>@if(sync.sync_local_adds) {added to} else {removed from}</b>
-  tag <label class="label label-success">@sync.tag.title</label>, the same change is made to MailChimp list "@mc_lists.get(sync.mailchimp_list_id).name".
+  tag <label class="label label-success">@sync.tag.title</label>, the same change is made to MailChimp list
+	  @if(mc_lists.get(sync.mailchimp_list_id) != null){ "@mc_lists.get(sync.mailchimp_list_id).name"
+		  } else { with ID @sync.mailchimp_list_id }.
   @helper.form(routes.CRM.saveMailchimpSettings(), 'style -> "display: inline") {
   <input type="hidden" name="remove_sync_id" value=@sync.id>
   <input type="submit" value="Remove">

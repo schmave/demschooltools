@@ -1,5 +1,7 @@
 package models;
 
+import java.util.*;
+
 import javax.persistence.*;
 
 import com.avaje.ebean.Ebean;
@@ -19,6 +21,8 @@ public class Organization extends Model {
     public String name;
 
     public String mailchimp_api_key;
+
+    public Date mailchimp_last_sync_person_changes;
 
     public static Finder<Integer, Organization> find = new Finder(
         Integer.class, Organization.class
@@ -43,6 +47,11 @@ public class Organization extends Model {
 
     public void setMailchimpApiKey(String key) {
         this.mailchimp_api_key = key;
+        this.save();
+    }
+
+    public void setLastMailChimpSyncTime(Date d) {
+        this.mailchimp_last_sync_person_changes = d;
         this.save();
     }
 }

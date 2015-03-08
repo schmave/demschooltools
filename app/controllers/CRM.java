@@ -16,7 +16,6 @@ import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
 import com.avaje.ebean.SqlUpdate;
 import com.ecwid.mailchimp.*;
-import com.ecwid.mailchimp.method.v2_0.lists.ListMethod;
 import com.ecwid.mailchimp.method.v2_0.lists.ListMethodResult;
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.typesafe.plugin.*;
@@ -602,27 +601,10 @@ public class CRM extends Controller {
 
     public static Result viewMailchimpSettings() {
         MailChimpClient mailChimpClient = new MailChimpClient();
-        ListMethod method = new ListMethod();
-
         Organization org = OrgConfig.get().org;
-        method.apikey = org.mailchimp_api_key; // "d551e58a4173a1caf64ce791b664b3ee-us5";
 
-
-        Map<String, ListMethodResult.Data> mc_list_map = new HashMap<String, ListMethodResult.Data>();
-        if (method.apikey != null) {
-            try {
-                ListMethodResult result = mailChimpClient.execute(method);
-                for (ListMethodResult.Data data : result.data) {
-                    mc_list_map.put(data.id, data);
-                }
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-            catch (MailChimpException e) {
-                e.printStackTrace();
-            }
-        }
+        Map<String, ListMethodResult.Data> mc_list_map =
+            Public.getMailChimpLists(mailChimpClient, org.mailchimp_api_key);
 
         return ok(views.html.view_mailchimp_settings.render(
             Form.form(Organization.class), org,
