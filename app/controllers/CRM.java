@@ -608,7 +608,8 @@ public class CRM extends Controller {
 
         return ok(views.html.view_mailchimp_settings.render(
             Form.form(Organization.class), org,
-            MailchimpSync.find.all(), mc_list_map));
+            MailchimpSync.find.where().eq("tag.organization", OrgConfig.get().org).findList(),
+            mc_list_map));
     }
 
     public static Result saveMailchimpSettings() {
