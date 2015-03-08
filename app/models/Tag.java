@@ -25,6 +25,9 @@ public class Tag extends Model {
     @OneToOne(mappedBy="tag")
     public TaskList task_list;
 
+    @OneToMany(mappedBy="tag")
+    public List<MailchimpSync> syncs;
+
     public static Finder<Integer, Tag> find = new Finder(
         Integer.class, Tag.class
     );

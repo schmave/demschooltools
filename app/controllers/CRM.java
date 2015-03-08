@@ -1,5 +1,6 @@
 package controllers;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -14,6 +15,8 @@ import com.avaje.ebean.Expression;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
 import com.avaje.ebean.SqlUpdate;
+import com.ecwid.mailchimp.*;
+import com.ecwid.mailchimp.method.v2_0.lists.ListMethodResult;
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.typesafe.plugin.*;
 
@@ -36,6 +39,7 @@ public class CRM extends Controller {
         List<Comment> recent_comments = Comment.find
             .where().eq("person.organization", Organization.getByHost())
             .orderBy("created DESC").setMaxRows(20).findList();
+
         return ok(views.html.people_index.render(Person.all(), recent_comments));
     }
 
@@ -118,6 +122,9 @@ public class CRM extends Controller {
         return ok(Json.stringify(Json.toJson(result)));
     }
 
+    // personId should be -1 if the client doesn't care about a particular
+    // person, but just wants a list of available tags. In that case,
+    // the "create new tag" functionality is also disabled.
     public static Result jsonTags(String term, Integer personId) {
         String like_arg = "%" + term + "%";
         List<Tag> selected_tags =
@@ -126,10 +133,12 @@ public class CRM extends Controller {
                 .ilike("title", "%" + term + "%").findList();
 
 		List<Tag> existing_tags = null;
-		Person p = Person.findById(personId);
-		if (p != null) {
-			existing_tags = p.tags;
-		}
+        if (personId >= 0) {
+            Person p = Person.findById(personId);
+            if (p != null) {
+                existing_tags = p.tags;
+            }
+        }
 
         List<Map<String, String> > result = new ArrayList<Map<String, String> > ();
         for (Tag t : selected_tags) {
@@ -141,10 +150,12 @@ public class CRM extends Controller {
             }
         }
 
-        HashMap<String, String> values = new HashMap<String, String>();
-        values.put("label", "Create new tag: " + term);
-        values.put("id", "-1");
-        result.add(values);
+        if (personId >= 0) {
+            HashMap<String, String> values = new HashMap<String, String>();
+            values.put("label", "Create new tag: " + term);
+            values.put("id", "-1");
+            result.add(values);
+        }
 
         return ok(Json.stringify(Json.toJson(result)));
     }
@@ -197,18 +208,27 @@ public class CRM extends Controller {
             the_tag = Tag.find.ref(tagId);
         }
 
-        PersonTag pt = PersonTag.create(
+        PersonTag pt = PersonTag.create(the_tag, p);
+
+        PersonTagChange ptc = PersonTagChange.create(
             the_tag,
             p,
-            Application.getCurrentUser());
+            Application.getCurrentUser(),
+            true);
 
         p.tags.add(the_tag);
         return ok(views.html.tag_fragment.render(the_tag, p));
     }
 
     public static Result removeTag(Integer person_id, Integer tag_id) {
-        Ebean.createSqlUpdate("DELETE from person_tag where person_id=" + person_id +
-            " AND tag_id=" + tag_id).execute();
+        if (Ebean.createSqlUpdate("DELETE from person_tag where person_id=" + person_id +
+            " AND tag_id=" + tag_id).execute() == 1) {
+            PersonTagChange ptc = PersonTagChange.create(
+                Tag.find.ref(tag_id),
+                Person.findById(person_id),
+                Application.getCurrentUser(),
+                false);
+        }
 
         return ok();
     }
@@ -577,5 +597,47 @@ public class CRM extends Controller {
         List<Person> people = getPeopleForTag(list.tag.id);
 
         return ok(views.html.task_list.render(list, people));
+    }
+
+    public static Result viewMailchimpSettings() {
+        MailChimpClient mailChimpClient = new MailChimpClient();
+        Organization org = OrgConfig.get().org;
+
+        Map<String, ListMethodResult.Data> mc_list_map =
+            Public.getMailChimpLists(mailChimpClient, org.mailchimp_api_key);
+
+        return ok(views.html.view_mailchimp_settings.render(
+            Form.form(Organization.class), org,
+            MailchimpSync.find.all(), mc_list_map));
+    }
+
+    public static Result saveMailchimpSettings() {
+        final Map<String, String[]> values = request().body().asFormUrlEncoded();
+
+        if (values.containsKey("mailchimp_api_key")) {
+            OrgConfig.get().org.setMailChimpApiKey(values.get("mailchimp_api_key")[0]);
+        }
+
+        if (values.containsKey("mailchimp_updates_email")) {
+            OrgConfig.get().org.setMailChimpUpdatesEmail(values.get("mailchimp_updates_email")[0]);
+        }
+
+        if (values.containsKey("sync_type")) {
+            for (String tag_id : values.get("tag_id")) {
+                Tag t = Tag.findById(Integer.parseInt(tag_id));
+                MailchimpSync sync = MailchimpSync.create(t,
+                    values.get("mailchimp_list_id")[0],
+                    values.get("sync_type")[0].equals("local_add"),
+                    values.get("sync_type")[0].equals("local_remove"));
+            }
+        }
+
+        if (values.containsKey("remove_sync_id")) {
+            MailchimpSync sync = MailchimpSync.find.byId(Integer.parseInt(
+                values.get("remove_sync_id")[0]));
+            sync.delete();
+        }
+
+        return redirect(routes.CRM.viewMailchimpSettings());
     }
 }

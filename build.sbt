@@ -11,10 +11,10 @@ scalaVersion := "2.11.1"
 libraryDependencies ++= Seq(
   javaJdbc,
   javaEbean,
-    "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
-      "be.objectify"  %% "deadbolt-java"     % "2.3.2",
-	"com.feth"      %% "play-authenticate" % "0.6.8",
-	// "com.typesafe.play.plugins" %% "play-plugins-mailer" % "2.3.0"
-        "com.typesafe.play" %% "play-mailer" % "2.4.0-RC1",
-	"org.avaje.ebeanorm" % "avaje-ebeanorm-api" % "3.1.1"
+  "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
+  "be.objectify"  %% "deadbolt-java"     % "2.3.2",
+  "com.feth"      %% "play-authenticate" % "0.6.8",
+  "com.typesafe.play" %% "play-mailer" % "2.4.0-RC1",
+  "org.avaje.ebeanorm" % "avaje-ebeanorm-api" % "3.1.1",
+  "com.ecwid" % "ecwid-mailchimp" % "2.0.1.0"
 )
