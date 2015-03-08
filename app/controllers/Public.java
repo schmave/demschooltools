@@ -62,9 +62,9 @@ public class Public extends Controller {
             method.merge_vars = new MailChimpObject();
             method.merge_vars.put("FNAME", p.first_name);
             method.merge_vars.put("LNAME", p.last_name);
-        }
 
-        client.execute(method);
+            client.execute(method);
+        }
     }
 
     static boolean updatePersonInList(MailChimpClient client, String api_key, String list_id, String old_email, Person p) throws MailChimpException, IOException {
@@ -106,9 +106,9 @@ public class Public extends Controller {
             System.out.println("removing " + email + " from " + method.id);
             method.email = new com.ecwid.mailchimp.method.v2_0.lists.Email();
             method.email.email = email;
-        }
 
-        client.execute(method);
+            client.execute(method);
+        }
     }
 
     public static Map<String, ListMethodResult.Data> getMailChimpLists(MailChimpClient client, String api_key) {
