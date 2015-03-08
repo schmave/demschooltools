@@ -11,7 +11,9 @@ into the text field below.
 @helper.form(routes.CRM.saveMailchimpSettings()) {
 	<p>MailChimp API key:
 		<input type="text" size=80 name="mailchimp_api_key", value="@org.mailchimp_api_key"/>
-	<input type="submit" value="Save">
+	<p>Send confirmation of updates to this email:
+		<input type="text" size=40 name="mailchimp_updates_email", value="@org.mailchimp_updates_email"/>
+	<p><input type="submit" value="Save settings">
 }
 
 @if( !org.mailchimp_api_key.equals("") && mc_lists.size() == 0 ) {

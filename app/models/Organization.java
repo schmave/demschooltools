@@ -24,6 +24,8 @@ public class Organization extends Model {
 
     public Date mailchimp_last_sync_person_changes;
 
+    public String mailchimp_updates_email;
+
     public static Finder<Integer, Organization> find = new Finder(
         Integer.class, Organization.class
     );
@@ -45,8 +47,13 @@ public class Organization extends Model {
         return null;
     }
 
-    public void setMailchimpApiKey(String key) {
+    public void setMailChimpApiKey(String key) {
         this.mailchimp_api_key = key;
+        this.save();
+    }
+
+    public void setMailChimpUpdatesEmail(String email) {
+        this.mailchimp_updates_email = email;
         this.save();
     }
 
