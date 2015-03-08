@@ -22,8 +22,13 @@ public class OrgConfig {
     public boolean use_minor_referrals = false;
     public boolean show_checkbox_for_res_plan = true;
 
+    public Organization org;
+
     public static OrgConfig get() {
-        return configs.get(Organization.getByHost().name);
+        Organization org = Organization.getByHost();
+        OrgConfig result = configs.get(org.name);
+        result.org = org;
+        return result;
     }
 
     static HashMap<String, OrgConfig> configs = new HashMap<String, OrgConfig>();

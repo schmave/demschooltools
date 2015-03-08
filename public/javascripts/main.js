@@ -73,3 +73,41 @@ function enableTagBox(input_box, destination_div, person_id) {
         });
     });
 }
+
+function enableNoPersonTagBox(input_box, destination_div, limit_one) {
+    var self = this;
+    self.tag_template = Handlebars.compile($("#tag-template").html());
+    self.tag_count = 0;
+
+    $(input_box).autocomplete({
+            source: "/jsonTags/-1",
+    });
+
+    var removeTag = function(tag_i) {
+        return function() {
+            $(destination_div).find("#tag-" + tag_i).empty();
+
+            if (limit_one) {
+                $(input_box).show();
+            }
+        }
+    }
+
+    $(input_box).bind( "autocompleteselect", function(event, ui) {
+        var new_tag_html =
+            $(destination_div).append(
+                self.tag_template({"name": ui.item.label,
+                    "num": self.tag_count++,
+                    "tag_id": ui.item.id}))
+                .children(":last-child");
+
+        new_tag_html.find(".tag_x").click(removeTag(self.tag_count - 1));
+
+        $(input_box).val("");
+
+        if (limit_one) {
+            $(input_box).hide();
+        }
+        event.preventDefault();
+    });
+}
