@@ -67,6 +67,8 @@ public class Public extends Controller {
         }
     }
 
+    // Return true iff the person was previously subscribed to this list
+    // and their info was updated.
     static boolean updatePersonInList(MailChimpClient client, String api_key, String list_id, String old_email, Person p) throws MailChimpException, IOException {
         UpdateMemberMethod method = new UpdateMemberMethod();
         method.apikey = api_key;
@@ -96,18 +98,34 @@ public class Public extends Controller {
         }
     }
 
-    static void removePersonFromList(MailChimpClient client, String api_key, String list_id, String email) throws MailChimpException, IOException {
+    // Return true iff person was previously subscribed to this list and
+    // we removed them from the list.
+    static boolean removePersonFromList(MailChimpClient client, String api_key, String list_id, String email) throws MailChimpException, IOException {
+        if (email.equals("")) {
+            return false;
+        }
+
         UnsubscribeMethod method = new UnsubscribeMethod();
         method.apikey = api_key;
         method.id = list_id;
         method.send_goodbye = false;
         method.delete_member = true;
-        if (email.length() > 0) {
-            System.out.println("removing " + email + " from " + method.id);
-            method.email = new com.ecwid.mailchimp.method.v2_0.lists.Email();
-            method.email.email = email;
+        method.email = new com.ecwid.mailchimp.method.v2_0.lists.Email();
+        method.email.email = email;
 
+        try {
+            System.out.println("removing " + email + " from " + method.id);
             client.execute(method);
+            return true;
+        }
+        catch (MailChimpException e) {
+            if (e.code != 232 && e.code != 215) {
+                throw e;
+            }
+            else {
+                System.out.println(email + " not subscribed to this list.");
+                return false;
+            }
         }
     }
 
@@ -173,12 +191,14 @@ public class Public extends Controller {
                     for (String list_id : mc_lists.keySet()) {
                         try {
                             if (change.person.email.equals("")) {
-                                removePersonFromList(client, org.mailchimp_api_key, list_id, change.old_email);
-                                info.remove(list_id, change.person);
+                                if (removePersonFromList(client, org.mailchimp_api_key, list_id, change.old_email)) {
+                                    info.remove(list_id, change.person);
+                                }
                             }
                             else {
-                                updatePersonInList(client, org.mailchimp_api_key, list_id, change.old_email, change.person);
-                                info.update(list_id, change.person);
+                                if (updatePersonInList(client, org.mailchimp_api_key, list_id, change.old_email, change.person)) {
+                                    info.update(list_id, change.person);
+                                }
                             }
                         } catch (IOException e) {
                             info.error(list_id, "Updating " + change.person + ": " + e);
@@ -186,6 +206,27 @@ public class Public extends Controller {
                         } catch (MailChimpException e) {
                             info.error(list_id, "Updating " + change.person + ": " + e);
                             e.printStackTrace();
+                        }
+                    }
+                } else {
+                    // If a person previously didn't have an email address,
+                    // add them to all lists which have an "add" sync from a tag
+                    // that the person is tagged with.
+                    change.person.loadTags();
+                    for (Tag t : change.person.tags) {
+                        List<MailchimpSync> syncs = MailchimpSync.find.where()
+                            .eq("tag", t).eq("sync_local_adds", true).findList();
+                        for (MailchimpSync sync : syncs) {
+                            try {
+                                addPersonToList(client, org.mailchimp_api_key, sync.mailchimp_list_id, change.person);
+                                info.add(sync.mailchimp_list_id, change.person);
+                            } catch (IOException e) {
+                                info.error(sync.mailchimp_list_id, "Changed email, adding " + change.person + ": " + e);
+                                e.printStackTrace();
+                            } catch (MailChimpException e) {
+                                info.error(sync.mailchimp_list_id, "Changed email, adding " + change.person + ": " + e);
+                                e.printStackTrace();
+                            }
                         }
                     }
                 }
@@ -226,6 +267,9 @@ public class Public extends Controller {
 
                     if (adds.size() > 0) {
                         for (Person p : adds) {
+                            if (p.email.equals("")) {
+                                continue;
+                            }
                             try {
                                 addPersonToList(client, org.mailchimp_api_key, sync.mailchimp_list_id, p);
                                 info.add(sync.mailchimp_list_id, p);
@@ -244,8 +288,9 @@ public class Public extends Controller {
                     if (removes.size() > 0) {
                         for (Person p : removes) {
                             try {
-                                removePersonFromList(client, org.mailchimp_api_key, sync.mailchimp_list_id, p.email);
-                                info.remove(sync.mailchimp_list_id, p);
+                                if (removePersonFromList(client, org.mailchimp_api_key, sync.mailchimp_list_id, p.email)) {
+                                    info.remove(sync.mailchimp_list_id, p);
+                                }
                             }
                             catch (IOException e) {
                                 info.error(sync.mailchimp_list_id, "Removing " + p.first_name + ": " + e);
@@ -272,7 +317,7 @@ public class Public extends Controller {
                 play.libs.mailer.MailerPlugin.send(mail);
             }
         }
-        return ok();
+        return ok("");
     }
 
     public static Result oAuthDenied(String provider)
