@@ -257,7 +257,7 @@ public class Person extends Model implements Comparable<Person> {
     }
 
     // called by PersonController
-    void loadTags() {
+    public void loadTags() {
         RawSql rawSql = RawSqlBuilder.
             parse("SELECT tag.id, tag.title from person join person_tag pt on person.person_id = pt.person_id join tag on pt.tag_id=tag.id").
             create();
@@ -363,6 +363,10 @@ public class Person extends Model implements Comparable<Person> {
         }
 
         return numbers;
+    }
+
+    public String toString() {
+        return this.first_name + " " + this.last_name;
     }
 
     public int compareTo(Person other) {
