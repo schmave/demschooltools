@@ -13,11 +13,7 @@ $(function() {
 <table class="table printable-res-plans">
 	@for(c <- m.cases) {
 		@for(charge <- c.charges) {
-			@if( charge.person != null && charge.rule != null
-				&& !charge.referred_to_sm
-				&& !(charge.resolution_plan.trim().toLowerCase().equals("warning") ||
-					 charge.resolution_plan.trim().toLowerCase().equals("warning."))
-				&& !charge.plea.equals("Not Guilty")) {
+			@if(charge.displayInResolutionPlanList() && !charge.referred_to_sm) {
 				@resolution_plan(charge)
 			}
 		}
