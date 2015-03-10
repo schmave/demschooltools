@@ -106,7 +106,7 @@
           <h1>Loading...</h1>
         </div>
         <div class="lead form-group" ng-show="screen === 'get-swipe-time'">
-          <h1 ng-show="missing_direction == 'out'">What time did you leave on {{att.last_swipe_date}}?</h1>
+          <h1 ng-show="missing_direction == 'out'">What time did you leave on {{student.last_swipe_date}}?</h1>
           <h1 ng-show="missing_direction == 'in'">What time did you come in this morning?</h1>
           <timepicker ng-model="missing_swipe" hour-step="1" minute-step="1" show-meridian="true"></timepicker>
           <button class="btn btn-primary" ng-click="swipe_with_missing(missing_swipe)">Submit</button> 
@@ -118,14 +118,14 @@
             <a type="href" ng-click="screen='home'">Back to student list</a>
           </div> 
           <div class="col-md-12"  ng-hide="!isAdmin" >
-            <h1 class="col-md-6">{{att.name}}</h1>
+            <h1 class="col-md-6">{{student.name}}</h1>
             <span class="col-md-6">
-              (Requires {{requiredMinutes(att)}} minutes a day)
-              <button class="btn" ng-click="toggleHours(att)">Toggle Hours</button>
+              (Requires {{requiredMinutes(student)}} minutes a day)
+              <button class="btn" ng-click="toggleHours(student)">Toggle Hours</button>
             </span>
           </div>
           <div class="col-md-12" ng-show="isAdmin">
-            Attended: {{att.total_days}} - Absent: {{att.total_abs}} - Excused: {{att.total_excused}} - Overrides: {{att.total_overrides}} - Short: {{att.total_short}}
+            Attended: {{student.total_days}} - Absent: {{student.total_abs}} - Excused: {{student.total_excused}} - Overrides: {{student.total_overrides}} - Short: {{student.total_short}}
           </div>
           <div class="clearfix"></div>
           <hr>
@@ -133,7 +133,7 @@
             <button type="button" class="btn" ng-click="swipe('in')" ng-class="inButtonStyle()">Sign In</button>
             <button type="button" class="btn" ng-click="swipe('out')" ng-class="outButtonStyle()">Sign Out</button>
             <ul ng-show="isAdmin">
-              <li ng-repeat="swipe in att.days" style="text-left">
+              <li ng-repeat="swipe in student.days" style="text-left">
                 <div>
                   <label>
                     <span ng-class="{validday: swipe.valid}" style="width:50px" 
@@ -141,9 +141,9 @@
                           ng-style="{'border':(swipe.day==current_day.day)?'1px solid black':''}">
                       {{swipe.day}} - {{swipe.total_mins}} minutes 
                       <span ng-show="swipe.override"> - Overridden</span>
-                      <a href="" ng-hide="(swipe.valid || swipe.excused) || !isAdmin" ng-click="override(att._id,swipe.day)"> Override</a>
+                      <a href="" ng-hide="(swipe.valid || swipe.excused) || !isAdmin" ng-click="override(student._id,swipe.day)"> Override</a>
                       <span ng-show="swipe.excused"> - Excused</span>
-                      <a href="" ng-hide="(swipe.valid || swipe.excused) || !isAdmin" ng-click="excuse(att._id,swipe.day)"> Excuse</a>
+                      <a href="" ng-hide="(swipe.valid || swipe.excused) || !isAdmin" ng-click="excuse(student._id,swipe.day)"> Excuse</a>
                     </span>
                   </label>
                 </div>
@@ -166,7 +166,7 @@
               </tr>
             </table>
           </div>
-          <!-- <div> {{att}} </div> -->
+          <!-- <div> {{student}} </div> -->
         </div>
         <div class="form-horizontal"  ng-show="screen === 'create'">
           <div class="form-group">

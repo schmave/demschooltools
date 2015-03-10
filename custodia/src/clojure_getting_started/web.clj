@@ -40,8 +40,9 @@
   (resp/response {:student (first (att/get-students-with-att
                                    (dates/get-current-year-string (data/get-years))
                                    student-id))
-                  :all (att/get-students-with-att
-                        (dates/get-current-year-string (data/get-years)))}))
+                  :all []
+                  #_(att/get-students-with-att
+                     (dates/get-current-year-string (data/get-years)))}))
 
 (defn get-all-student-data []
   (let [year (dates/get-current-year-string (data/get-years))]
@@ -81,7 +82,7 @@
                                 (data/swipe-in _id))
                             (do (when missing (data/swipe-in _id missing))
                                 (data/swipe-out _id))))
-        (resp/response (get-all-student-data)))
+        (student-page-response _id))
   (GET "/currentyear" [] (dates/get-current-year-string (data/get-years)))
   (GET "/year/all" []
        (friend/authorize #{::user} (year-resp)))

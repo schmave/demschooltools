@@ -131,3 +131,20 @@
      (let [s (make-student "steve")]
        (when have-extra? (swipe-in (:_id s) (t/minus (t/now) (t/days 1) (t/hours 5))))))
   )
+
+;; (huge-sample-db)
+(defn huge-sample-db []
+  (db/reset-db)
+  (make-year (str (t/date-time 2014 6)) (str (t/date-time 2015 6)))
+  (make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
+  (loop [x 0]
+    (if (> x 80)
+      :done
+      (do (let [s (make-student (str "zax" x))]
+            (swipe-in (:_id s) (t/minus (t/now) (t/days 2))))
+          (recur (inc x)))))
+  (let [s (make-student "jim")]
+    (swipe-in (:_id s) (t/minus (t/now) (t/days 2))))
+  (let [s (make-student "steve")]
+    (swipe-in (:_id s) (t/minus (t/now) (t/days 1) (t/hours 5))))
+  )

@@ -12,7 +12,7 @@ angular.module('app').controller("MainController", function($scope, $http){
     $scope.showStudent = function(s) {
         $scope.swipedWorked = false;
         $scope.backStudent();
-        $scope.att = s;
+        $scope.student = s;
         $scope.current_day = s.days[0];
     };
     $scope.showHome = function(worked) {
@@ -30,15 +30,19 @@ angular.module('app').controller("MainController", function($scope, $http){
         $scope.swipedWorked = false;
         $scope.screen = "create-year";};
     $scope.showStudents = function() {
-        $scope.swipedWorked = false;
-        $scope.screen = "student-totals";};
+        $scope.screen = "loading";
+        $scope.getStudents(function(){
+            $scope.swipedWorked = false;
+            $scope.screen = "student-totals";
+        });
+    };
     $scope.setDay = function(s) {
         $scope.current_day = s;
     };
-    $scope.reloadStudentPage = function(data){
-        $scope.att = data.student;
+    $scope.reloadStuentPage = function(data){
+        $scope.student = data.student;
         $scope.current_day = data.student.days[0];
-        $scope.loadStudentData(data.all);
+        // $scope.loadStudentData(data.all);
         $scope.screen = "student";
     };
     $scope.excuse = function(id, day) {
@@ -83,13 +87,13 @@ angular.module('app').controller("MainController", function($scope, $http){
     };
     $scope.get_missing_swipe = function(){
         var d = new Date();
-        if($scope.att.last_swipe_date) {
-            d = new Date($scope.att.last_swipe_date + "T10:00:00");
+        if($scope.student.last_swipe_date) {
+            d = new Date($scope.student.last_swipe_date + "T10:00:00");
         } 
-        $scope.missing_direction = ($scope.att.last_swipe_type =="in")?"out":"in";
-        if(!$scope.att.in_today 
-           && $scope.att.last_swipe_type == "in"
-           && $scope.att.direction == "out"){
+        $scope.missing_direction = ($scope.student.last_swipe_type =="in")?"out":"in";
+        if(!$scope.student.in_today 
+           && $scope.student.last_swipe_type == "in"
+           && $scope.student.direction == "out"){
             $scope.missing_direction = "in";
             d = new Date();
         }
@@ -99,33 +103,34 @@ angular.module('app').controller("MainController", function($scope, $http){
         $scope.screen = "get-swipe-time";
     };
     $scope.swipe_with_missing = function(missing){
-        $scope.att.missing = missing;
+        $scope.student.missing = missing;
         $scope.missing_swipe = "";
         $scope.makeSwipePost();
     };
     $scope.makeSwipePost = function() {
         $scope.screen = "saving";
-        $http.post('/swipe', {"_id":$scope.att._id, "direction": $scope.att.direction, "missing": $scope.att.missing}).
+        $http.post('/swipe', {"_id":$scope.student._id, "direction": $scope.student.direction, "missing": $scope.student.missing}).
             success(function(data){
-                $scope.loadStudentData(data);
-                $scope.showHome($scope.att.name + " swiped successfully!");
+                // $scope.loadStudentData(data);
+                $scope.student = data.student;
+                $scope.showHome($scope.student.name + " swiped successfully!");
             }). error(function(){});
     };
     $scope.inButtonStyle = function(){
-        if (!$scope.att){ return "";}
-        return ($scope.att.last_swipe_type == "out" || $scope.att.in_today == false) ? "btn-lg btn-success" : "";
+        if (!$scope.student){ return "";}
+        return ($scope.student.last_swipe_type == "out" || $scope.student.in_today == false) ? "btn-lg btn-success" : "";
     };
     $scope.outButtonStyle = function(){
-        if (!$scope.att){ return "";}
-        return ($scope.att.last_swipe_type == "in" && $scope.att.in_today) ? "btn-lg btn-success" : "";
+        if (!$scope.student){ return "";}
+        return ($scope.student.last_swipe_type == "in" && $scope.student.in_today) ? "btn-lg btn-success" : "";
     };
     $scope.swipe = function(direction) {
-        $scope.att.direction = direction;
-        var missing_in = (($scope.att.last_swipe_type == "out" 
-                           || ($scope.att.last_swipe_type == "in" && !$scope.att.in_today)
-                           || !$scope.att.last_swipe_type) 
+        $scope.student.direction = direction;
+        var missing_in = (($scope.student.last_swipe_type == "out" 
+                           || ($scope.student.last_swipe_type == "in" && !$scope.student.in_today)
+                           || !$scope.student.last_swipe_type) 
                           && direction == "out"),
-            missing_out = ($scope.att.last_swipe_type == "in" 
+            missing_out = ($scope.student.last_swipe_type == "in" 
                            && direction == "in");
         if(missing_in || missing_out) {
             $scope.get_missing_swipe(); 
@@ -174,7 +179,7 @@ angular.module('app').controller("MainController", function($scope, $http){
     };
     $scope.deleteSwipe = function(swipe) {
         if(confirm("Delete swipe?")) {
-            $http.post('/swipe/delete', {"swipe":swipe, "_id" : $scope.att._id}).
+            $http.post('/swipe/delete', {"swipe":swipe, "_id" : $scope.student._id}).
                 success(function(data){
                     $scope.reloadStudentPage(data);
                 }). error(function(){});
