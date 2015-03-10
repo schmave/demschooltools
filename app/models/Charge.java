@@ -77,7 +77,7 @@ public class Charge extends Model implements Comparable<Charge> {
         if (plea.equals("")) {
             plea = EMPTY_PLEA;
         }
-		
+
 		if (query_string.containsKey("severity")) {
             severity = query_string.get("severity")[0];
         }
@@ -99,6 +99,14 @@ public class Charge extends Model implements Comparable<Charge> {
         if (query_string.containsKey("minor_referral_destination")) {
             minor_referral_destination = query_string.get("minor_referral_destination")[0];
         }
+    }
+
+    public boolean displayInResolutionPlanList() {
+        return this.person != null && this.rule != null
+			&& !this.referred_to_sm
+			&& !(this.resolution_plan.trim().toLowerCase().equals("warning") ||
+				 this.resolution_plan.trim().toLowerCase().equals("warning."))
+			&& !this.plea.equals("Not Guilty");
     }
 
     public void updateSchoolMeetingDecision(String decision, Date date) {

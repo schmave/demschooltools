@@ -1,9 +1,12 @@
 package controllers;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import org.markdown4j.Markdown4jProcessor;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
@@ -11,12 +14,11 @@ import com.avaje.ebean.Expression;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
 import com.avaje.ebean.SqlUpdate;
+import com.csvreader.CsvWriter;
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.typesafe.plugin.*;
 
 import models.*;
-
-import org.markdown4j.Markdown4jProcessor;
 
 import play.*;
 import play.data.*;
@@ -105,6 +107,52 @@ public class Application extends Controller {
 
     public static Result viewMeetingResolutionPlans(int meeting_id) {
         return ok(views.html.view_meeting_resolution_plans.render(Meeting.findById(meeting_id)));
+    }
+
+    public static Result downloadMeetingResolutionPlans(int meeting_id) {
+        response().setHeader("Content-Disposition", "attachment; filename=" + OrgConfig.get().str_res_plans + ".csv");
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Charset charset = Charset.forName("UTF-8");
+        CsvWriter writer = new CsvWriter(baos, ',', charset);
+
+        try {
+            writer.write("Person");
+            writer.write("Case #");
+            writer.write("Rule");
+            writer.write(OrgConfig.get().str_res_plan_cap);
+            writer.endRecord();
+
+            Meeting m = Meeting.findById(meeting_id);
+            for (Case c : m.cases) {
+                for (Charge charge : c.charges) {
+                    if (charge.displayInResolutionPlanList() && !charge.referred_to_sm) {
+                        writer.write(charge.person.getDisplayName());
+
+                        // In case it's needed in the future, adding a space to
+                        // the front of the case number prevents MS Excel from
+                        // misinterpreting it as a date.
+                        //
+                        // writer.write(" " + charge.the_case.case_number,
+                        // true);
+
+                        writer.write(charge.the_case.case_number + " (" +
+                            (charge.sm_decision_date != null
+                                ? Application.formatDayOfWeek(charge.sm_decision_date) + "--SM"
+                                : Application.formatDayOfWeek(charge.the_case.meeting.date))
+                            + ")");
+                        writer.write(charge.rule.title);
+                        writer.write(charge.resolution_plan);
+                        writer.endRecord();
+                    }
+                }
+            }
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return ok("\ufeff" + new String(baos.toByteArray(), charset));
     }
 
 	public static Result viewManual() {
