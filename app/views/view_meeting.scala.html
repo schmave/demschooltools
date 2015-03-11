@@ -10,9 +10,8 @@
 <a href="@routes.Application.viewMeetingResolutionPlans(m.id)"
 class="btn btn-success no-print" style="margin-left: 75px">
 2. Print @OrgConfig.get().str_res_plans</a>
-or <a href="@routes.Application.downloadMeetingResolutionPlans(m.id)"
-class="no-print">
-Download @OrgConfig.get().str_res_plans</a>
+<span class="no-print">or <a href="@routes.Application.downloadMeetingResolutionPlans(m.id)">
+Download @OrgConfig.get().str_res_plans</a></span>
 <p><a href="@routes.ApplicationEditing.editMeeting(m.id)" class="btn btn-warning no-print">
 Edit minutes</a>
 
