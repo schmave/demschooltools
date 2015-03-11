@@ -67,16 +67,16 @@
             <div class="col-md-4">
               Not Yet In
               <li class="list-unstyled" 
-                  ng-repeat="student in students | filter:{in_today:'false'}">
-                <a class="" ng-click="showStudent(student)">{{student.name}}</a>
+                  ng-repeat="(id, student) in filterStudentsNotYetIn(students)">
+                <a class="" ng-click="showStudent(student, id)">{{student.name}}</a>
               </li>
             </div>
             <div class="col-md-4">
               IN
               <ul>
                 <li class="list-unstyled" 
-                    ng-repeat="student in students | filter:{in_today:'true',last_swipe_type:'in'}">
-                  <a class="" ng-click="showStudent(student)">{{student.name}}</a>
+                    ng-repeat="(id,student) in filterStudentsIn(students)">
+                  <a class="" ng-click="showStudent(student, id)">{{student.name}}</a>
                   <!-- {{student}} -->
                 </li>
               </ul>
@@ -85,8 +85,8 @@
               OUT
               <ul>
                 <li class="list-unstyled" 
-                    ng-repeat="student in students | filter:{in_today:'true',last_swipe_type:'out'}">
-                  <a class="" ng-click="showStudent(student)">{{student.name}}</a>
+                    ng-repeat="(id,student) in filterStudentsOut(students)">
+                  <a class="" ng-click="showStudent(student, id)">{{student.name}}</a>
                   <!-- {{student}} -->
                 </li>
               </ul>

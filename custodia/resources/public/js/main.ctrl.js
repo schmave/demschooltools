@@ -1,6 +1,6 @@
 angular.module('app', ['ui.bootstrap']);
 angular.module('app').controller("MainController", function($scope, $http){
-    $scope.students = [];
+    $scope.students = {};
     $scope.screen = "home";
     $scope.current_totals_year = null;
     $scope.missing_date = "";
@@ -9,10 +9,11 @@ angular.module('app').controller("MainController", function($scope, $http){
         $scope.swipedWorked = false;
         $scope.screen = "student";
     };
-    $scope.showStudent = function(s) {
+    $scope.showStudent = function(s, index) {
         $scope.swipedWorked = false;
         $scope.backStudent();
         $scope.student = s;
+        $scope.studenti = index;
         $scope.current_day = s.days[0];
     };
     $scope.showHome = function(worked) {
@@ -39,8 +40,9 @@ angular.module('app').controller("MainController", function($scope, $http){
     $scope.setDay = function(s) {
         $scope.current_day = s;
     };
-    $scope.reloadStuentPage = function(data){
+    $scope.reloadStudentPage = function(data){
         $scope.student = data.student;
+        $scope.students[data.student._id] = data.student;
         $scope.current_day = data.student.days[0];
         // $scope.loadStudentData(data.all);
         $scope.screen = "student";
@@ -113,6 +115,7 @@ angular.module('app').controller("MainController", function($scope, $http){
             success(function(data){
                 // $scope.loadStudentData(data);
                 $scope.student = data.student;
+                $scope.students[data.student._id] = data.student;
                 $scope.showHome($scope.student.name + " swiped successfully!");
             }). error(function(){});
     };
@@ -138,11 +141,40 @@ angular.module('app').controller("MainController", function($scope, $http){
             $scope.makeSwipePost();
         }
     };
+    $scope.populateStudentsMap = function(students) {
+        students.map(function(s) {
+            $scope.students[s._id] = s;
+        });
+    };
+    $scope.filterStudentsNotYetIn = function(students) {
+        return $scope.filterStudentsObj(students, function(value){return value['in_today'] === false;});
+    };
+    $scope.filterStudentsIn = function(students) {
+        return $scope.filterStudentsObj(students, function(value){
+            return value['in_today'] === true && value['last_swipe_type'] === 'in';
+        });
+    };
+    $scope.filterStudentsOut = function(students) {
+        return $scope.filterStudentsObj(students, function(value){
+            return value['in_today'] === true && value['last_swipe_type'] === 'out';
+        });
+    };
+
+    $scope.filterStudentsObj = function(students, pred) {
+        var result = {};
+        angular.forEach(students, function(value, key) {
+            if (pred(value)) {
+                result[key] = value;
+            }
+        });
+        return result;
+    };
     $scope.createStudent = function(name) {
         $scope.screen = "saving";
         $http.post('/student/create', {"name":name}).
             success(function(data){
-                $scope.students = data.students;
+                $scope.populateStudentsMap(data.students);
+                
                 if(data.made) {
                     $scope.showHome(name + " created successfully!");
                     $scope.message = "";
@@ -160,7 +192,7 @@ angular.module('app').controller("MainController", function($scope, $http){
             }). error(function(){});
     };
     $scope.loadStudentData = function(data){
-        $scope.students = data;
+        $scope.populateStudentsMap(data);
         $scope.totals_students = data;
     };
     $scope.getStudents = function(callback) {
