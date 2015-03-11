@@ -9,10 +9,10 @@
 <a nosidebar href="@routes.Application.viewRuleHistory(c.rule.id)">@c.rule.getNumber() @c.rule.title</a>}</b>.
 
 @if( c.severity != "" ){
-	(@c.severity) 
+	(@c.severity)
 }
 
-<i>Findings</i>: @if( redact_findings ) { @c.the_case.getRedactedFindings(c.person.getDisplayName()) } else { @c.the_case.findings }
+<i>Findings</i>: @if( redact_findings ) { @c.the_case.getRedactedFindings(c.person) } else { @c.the_case.findings }
 
 @if( !c.plea.equals("Guilty") ) {
 	Plead <b>@c.plea</b>.

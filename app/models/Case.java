@@ -145,10 +145,11 @@ public class Case extends Model implements Comparable<Case> {
         }
     }
 
-    public String getRedactedFindings(String keep_this_name) {
+    public String getRedactedFindings(Person keep_this_persons_name) {
         loadNames();
 
-        keep_this_name = keep_this_name.trim().toLowerCase();
+        String keep_first_name = keep_this_persons_name.first_name.trim().toLowerCase();
+        String keep_display_name = keep_this_persons_name.getDisplayName().trim().toLowerCase();
 
         String[] words = findings.split("\\b");
         Map<String, String> replacement_names = new HashMap<String, String>();
@@ -156,9 +157,10 @@ public class Case extends Model implements Comparable<Case> {
 
         for (String w : words) {
             w = w.toLowerCase();
-            if (!w.equals(keep_this_name) && names.contains(w) &&
-                replacement_names.get(w) == null) {
+            if (!w.equals(keep_first_name) && !w.equals(keep_display_name) &&
+                names.contains(w) && replacement_names.get(w) == null) {
                 replacement_names.put(w, next_replacement + "___");
+
                 next_replacement++;
             }
         }
