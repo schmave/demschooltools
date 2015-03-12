@@ -1,3 +1,7 @@
+setTimeout(function() {
+    window.location.reload(true);
+}, 3 * 60 * 60 * 1000);
+
 angular.module('app', ['ui.bootstrap']);
 angular.module('app').controller("MainController", function($scope, $http){
     $scope.students = {};
