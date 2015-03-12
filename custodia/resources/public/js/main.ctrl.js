@@ -9,12 +9,23 @@ angular.module('app').controller("MainController", function($scope, $http){
         $scope.swipedWorked = false;
         $scope.screen = "student";
     };
-    $scope.showStudent = function(s, index) {
+    $scope.showStudent = function(s, id) {
+        $scope.screen = "loading";
         $scope.swipedWorked = false;
-        $scope.backStudent();
-        $scope.student = s;
-        $scope.studenti = index;
-        $scope.current_day = s.days[0];
+        // update the student with the fresh day
+        $scope.getStudent(id, function(s){
+            $scope.backStudent();
+            $scope.student = s;
+            $scope.studenti = id;
+            $scope.current_day = s.days[0];
+        });
+    };
+
+    $scope.getStudent = function(_id, fn) {
+        $http.get('/student/' + _id).
+            success(function(data){
+                fn(data.student);
+            }). error(function(){});
     };
     $scope.showHome = function(worked) {
         $scope.swipedWorked = worked;

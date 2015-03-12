@@ -48,6 +48,9 @@
   (let [year (dates/get-current-year-string (data/get-years))]
     (att/get-students-with-att year)))
 
+(defn parse-int [s]
+  (Integer. (re-find  #"\d+" s )))
+
 (defroutes app
   (GET "/" [] (friend/authenticated (io/resource "index.html")))
   (GET "/swipe/:sid" [sid year]
@@ -94,6 +97,8 @@
         (friend/authorize #{::user}
                           (let [year (if year year (dates/get-current-year-string (data/get-years)))]
                             (att/get-students-with-att year))))
+  (GET "/student/:id" [id]
+       (friend/authorize #{::user} (student-page-response (parse-int id))))
   (POST "/student/create" [name]
         (friend/authorize #{::admin}
                           (let [made? (data/make-student name)]
