@@ -161,7 +161,9 @@ angular.module('app').controller("MainController", function($scope, $http){
         }
     };
     $scope.populateStudentsMap = function(students) {
-        $scope.today = $scope.students[0].today;
+        if($scope.students[0]) {
+            $scope.today = $scope.students[0].today;
+        }
         students.map(function(s) {
             $scope.students[s._id] = s;
         });

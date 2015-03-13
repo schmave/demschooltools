@@ -141,10 +141,9 @@
     (if (> x 80)
       :done
       (do (let [s (make-student (str "zax" x))]
-            (swipe-in (:_id s) (t/minus (t/now) (t/days 2))))
+            (swipe-in (:_id s) (t/minus (t/now) (t/days 2)))
+            (swipe-out (:_id s) (t/minus (t/plus (t/now) (t/minutes 5))
+                                         (t/days 2)))
+            )
           (recur (inc x)))))
-  (let [s (make-student "jim")]
-    (swipe-in (:_id s) (t/minus (t/now) (t/days 2))))
-  (let [s (make-student "steve")]
-    (swipe-in (:_id s) (t/minus (t/now) (t/days 1) (t/hours 5))))
   )
