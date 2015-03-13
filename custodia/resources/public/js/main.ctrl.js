@@ -1,6 +1,6 @@
-setTimeout(function() {
-    window.location.reload(true);
-}, 3 * 60 * 60 * 1000);
+// setTimeout(function() {
+//     window.location.reload(true);
+// }, 3 * 60 * 60 * 1000);
 
 angular.module('app', ['ui.bootstrap']);
 angular.module('app').controller("MainController", function($scope, $http){
@@ -19,9 +19,7 @@ angular.module('app').controller("MainController", function($scope, $http){
         // update the student with the fresh day
         $scope.getStudent(id, function(s){
             $scope.backStudent();
-            $scope.student = s;
-            $scope.studenti = id;
-            $scope.current_day = s.days[0];
+            $scope.reloadStudentPage(s);
         });
     };
 
@@ -55,19 +53,25 @@ angular.module('app').controller("MainController", function($scope, $http){
     $scope.setDay = function(s) {
         $scope.current_day = s;
     };
-    $scope.reloadStudentPage = function(data){
-        $scope.student = data.student;
-        $scope.students[data.student._id] = data.student;
-        $scope.current_day = data.student.days[0];
-        // $scope.loadStudentData(data.all);
-        $scope.screen = "student";
+    $scope.reloadStudentPage = function(student){
+        $scope.student = student;
+        $scope.students[student._id] = student;
+        $scope.current_day = student.days[0];
+
+        if($scope.today !== student.today) {
+            $scope.today = student.today;
+            $scope.init(function(){$scope.screen = "student";});
+        } else {
+            $scope.today = student.today;
+            $scope.screen = "student";
+        }
     };
     $scope.excuse = function(id, day) {
         if (confirm("Excuse " + day + "?")){
             $scope.screen = "saving";
             $http.post('/excuse', {"_id":id, "day": day}).
                 success(function(data){
-                    $scope.reloadStudentPage(data);
+                    $scope.reloadStudentPage(data.student);
                 }). error(function(){});
         }
     };
@@ -76,7 +80,7 @@ angular.module('app').controller("MainController", function($scope, $http){
             $scope.screen = "saving";
             $http.post('/override', {"_id":id, "day": day}).
                 success(function(data){
-                    $scope.reloadStudentPage(data);
+                    $scope.reloadStudentPage(data.student);
                 }). error(function(){});
         }
     };
@@ -157,6 +161,7 @@ angular.module('app').controller("MainController", function($scope, $http){
         }
     };
     $scope.populateStudentsMap = function(students) {
+        $scope.today = $scope.students[0].today;
         students.map(function(s) {
             $scope.students[s._id] = s;
         });
@@ -228,7 +233,7 @@ angular.module('app').controller("MainController", function($scope, $http){
         if(confirm("Delete swipe?")) {
             $http.post('/swipe/delete', {"swipe":swipe, "_id" : $scope.student._id}).
                 success(function(data){
-                    $scope.reloadStudentPage(data);
+                    $scope.reloadStudentPage(data.student);
                 }). error(function(){});
         }
     };
@@ -249,13 +254,14 @@ angular.module('app').controller("MainController", function($scope, $http){
                 $scope.isAdmin = true;
             }).error(function(){});
     };
-    $scope.init = function(){
+    $scope.init = function(goTo){
+        if (!goTo) {
+            goTo = function(){$scope.showHome();};
+        }
         $scope.screen = "loading";
         $scope.checkRole();
         $scope.getYears();
-        $scope.getStudents(function(){
-            $scope.showHome();
-        });
+        $scope.getStudents(goTo);
     };
     $scope.init();
 });
