@@ -99,6 +99,7 @@ angular.module('app').controller("MainController", function($scope, $http){
     $scope.toggleHours = function(student) {
         if(confirm(student.olderdate ? "Mark student younger?":"Mark student as older starting today?")){
             student.olderdate = !!!student.olderdate;
+            $scope.screen = "saving";
             $http.post('/student/togglehours', {_id : student._id }).
                 success(function(data){
                     $scope.reloadStudentPage(data.student);

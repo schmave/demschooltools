@@ -132,7 +132,7 @@
        (when have-extra? (swipe-in (:_id s) (t/minus (t/now) (t/days 1) (t/hours 5))))))
   )
 
-;; (huge-sample-db)
+;; (huge-sample-db) 
 (defn huge-sample-db []
   (db/reset-db)
   (make-year (str (t/date-time 2014 6)) (str (t/date-time 2015 6)))
