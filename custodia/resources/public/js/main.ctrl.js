@@ -101,8 +101,7 @@ angular.module('app').controller("MainController", function($scope, $http){
             student.olderdate = !!!student.olderdate;
             $http.post('/student/togglehours', {_id : student._id }).
                 success(function(data){
-                    $scope.getStudents();
-                    $scope.init();
+                    $scope.reloadStudentPage(data.student);
                 }). error(function(){});
         }
     };
@@ -113,7 +112,7 @@ angular.module('app').controller("MainController", function($scope, $http){
         } 
         $scope.missing_direction = ($scope.student.last_swipe_type =="in")?"out":"in";
         if(!$scope.student.in_today 
-           && $scope.student.last_swipe_type == "in"
+           // && $scope.student.last_swipe_type == "in"
            && $scope.student.direction == "out"){
             $scope.missing_direction = "in";
             d = new Date();
