@@ -67,16 +67,16 @@
             <div class="col-md-4">
               Not Yet In
               <li class="list-unstyled" 
-                  ng-repeat="(id, student) in filterStudentsNotYetIn(students)">
-                <a class="" ng-click="showStudent(student, id)">{{student.name}}</a>
+                  ng-repeat="student in filterStudentsNotYetIn(students) | orderObjectBy:'name':false">
+                <a class="" ng-click="showStudent(student)">{{student.name}}</a>
               </li>
             </div>
             <div class="col-md-4">
               IN
               <ul>
                 <li class="list-unstyled" 
-                    ng-repeat="(id,student) in filterStudentsIn(students)">
-                  <a class="" ng-click="showStudent(student, id)">{{student.name}}</a>
+                    ng-repeat="student in filterStudentsIn(students) | orderObjectBy:'name':false">
+                  <a class="" ng-click="showStudent(student)">{{student.name}}</a>
                   <!-- {{student}} -->
                 </li>
               </ul>
@@ -85,8 +85,8 @@
               OUT
               <ul>
                 <li class="list-unstyled" 
-                    ng-repeat="(id,student) in filterStudentsOut(students)">
-                  <a class="" ng-click="showStudent(student, id)">{{student.name}}</a>
+                    ng-repeat="student in filterStudentsOut(students) | orderObjectBy:'name':false">
+                  <a class="" ng-click="showStudent(student)">{{student.name}}</a>
                   <!-- {{student}} -->
                 </li>
               </ul>
@@ -117,9 +117,9 @@
           <div class="col-md-12">
             <a type="href" ng-click="screen='home'">Back to student list</a>
           </div> 
-          <div class="col-md-12"  ng-hide="!isAdmin" >
+          <div class="col-md-12">
             <h1 class="col-md-6">{{student.name}}</h1>
-            <span class="col-md-6">
+            <span class="col-md-6" ng-hide="!isAdmin" >
               (Requires {{requiredMinutes(student)}} minutes a day)
               <button class="btn" ng-click="toggleHours(student)">Toggle Hours</button>
             </span>

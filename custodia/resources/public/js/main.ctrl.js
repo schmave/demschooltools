@@ -3,6 +3,19 @@
 // }, 3 * 60 * 60 * 1000);
 
 angular.module('app', ['ui.bootstrap']);
+angular.module('app').filter('orderObjectBy', function() {
+    return function(items, field, reverse) {
+        var filtered = [];
+        angular.forEach(items, function(item) {
+            filtered.push(item);
+        });
+        filtered.sort(function (a, b) {
+            return (a[field] > b[field] ? 1 : -1);
+        });
+        if(reverse) filtered.reverse();
+        return filtered;
+    };
+});
 angular.module('app').controller("MainController", function($scope, $http){
     $scope.students = {};
     $scope.screen = "home";
@@ -13,11 +26,11 @@ angular.module('app').controller("MainController", function($scope, $http){
         $scope.swipedWorked = false;
         $scope.screen = "student";
     };
-    $scope.showStudent = function(s, id) {
+    $scope.showStudent = function(s) {
         $scope.screen = "loading";
         $scope.swipedWorked = false;
         // update the student with the fresh day
-        $scope.getStudent(id, function(s){
+        $scope.getStudent(s._id, function(s){
             $scope.backStudent();
             $scope.reloadStudentPage(s);
         });
