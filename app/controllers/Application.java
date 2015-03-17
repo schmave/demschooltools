@@ -110,6 +110,7 @@ public class Application extends Controller {
     }
 
     public static Result downloadMeetingResolutionPlans(int meeting_id) {
+        response().setHeader("Content-Type", "text/csv; charset=utf-8");
         response().setHeader("Content-Disposition", "attachment; filename=" + OrgConfig.get().str_res_plans + ".csv");
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -152,6 +153,8 @@ public class Application extends Controller {
             e.printStackTrace();
         }
 
+        // Adding the BOM here causes Excel 2010 on Windows to realize
+        // that the file is Unicode-encoded.
         return ok("\ufeff" + new String(baos.toByteArray(), charset));
     }
 
