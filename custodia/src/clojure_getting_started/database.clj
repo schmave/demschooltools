@@ -42,7 +42,7 @@
 (defn swipe-in
   ([id] (swipe-in id (t/now)))
   ([id in-time] 
-     (db/persist! (assoc (make-swipe id) :in_time (make-timestamp (str in-time))))))
+     (db/persist! (assoc (make-swipe id) :in_time (make-timestamp in-time)))))
 
 (defn sanitize-out [swipe]
   (let [in (:in_time swipe)
@@ -86,12 +86,12 @@
 (defn excuse-date [id date-string]
   (db/persist! {:type :excuses
                 :student_id id
-                :date date-string}))
+                :date (make-timestamp date-string)}))
 
 (defn override-date [id date-string]
   (db/persist! {:type :overrides
                 :student_id id
-                :date date-string}))
+                :date (make-timestamp date-string)}))
 
 ;; (get-students )
 (defn get-students
@@ -120,8 +120,8 @@
         to (f/parse to)
         name (str (f/unparse date-format from) " "  (f/unparse date-format to))]
     (->> {:type :years
-          :from_date (make-timestamp (str from))
-          :to_date (make-timestamp (str to))
+          :from_date (make-timestamp from)
+          :to_date (make-timestamp to)
           :name name}
          db/persist!)))
 

@@ -39,7 +39,7 @@
   _id bigserial primary key,
   student_id bigserial,
   inserted_date timestamp default now(),
-  date varchar(255)
+  date timestamp with time zone
   );")
 
 (def create-excuses-table-sql
@@ -47,7 +47,7 @@
   _id bigserial primary key,
   student_id bigserial,
   inserted_date timestamp default now(),
-  date varchar(255)
+  date timestamp with time zone
   );")
 
 (def pgdb
@@ -90,10 +90,38 @@
 ;; (jdbc/query pgdb ["select * from students where id in (?)" "1"])
 ;; (persist! {:type :students :name "steve" :olderdate nil})
 ;; (update! :students 1 {:olderdate  "test"})
+(defn get-overrides-in-year [year-name student-id]
+  (let [q (str "
+select e.*
+       ,'overrides' as type
+from overrides e
+inner join years y 
+ON (e.date BETWEEN y.from_date AND y.to_date)
+where y.name=? AND e.student_id =?
+")]
+    (jdbc/query
+     pgdb
+     [q year-name student-id]))
+  )
+
+(defn get-excuses-in-year [year-name student-id]
+  (let [q (str "
+select e.*
+       ,'excuses' as type
+from excuses e
+inner join years y 
+ON (e.date BETWEEN y.from_date AND y.to_date)
+where y.name=? AND e.student_id =?
+")]
+    (jdbc/query
+     pgdb
+     [q year-name student-id]))
+  )
 
 (defn get-swipes-in-year [year-name student-id]
   (let [q (str "
 select s.*
+       ,'swipes' as type
        , extract(EPOCH FROM (s.out_time - s.in_time)::INTERVAL)/60 as interval
        , to_char(s.in_time, 'HH:MI:SS') as nice_in_time
        , to_char(s.out_time, 'HH:MI:SS') as nice_out_time
@@ -101,14 +129,14 @@ from swipes s
 inner join years y 
 ON ((s.out_time BETWEEN y.from_date AND y.to_date)
     OR (s.in_time BETWEEN y.from_date AND y.to_date))
-where y.name=? AND student_id =?
+where y.name=? AND s.student_id =?
 ")]
     (jdbc/query
      pgdb
      [q year-name student-id]))
   )
 
-;; (get-swipes-in-year "2014-06-01 2015-06-01" 2)
+;; (get-swipes-in-year "2014-06-01 2015-06-01" 3)
 
 
 (defn get-school-days [year-name]
@@ -130,7 +158,7 @@ order by days2.days
   )
 ;; (map :days (get-school-days "2014-06-01 2015-06-01"))
 
-(defn get-school-days [id]
+(defn get-school-days-aflj [id]
   (jdbc/query pgdb ["select * from students"])
   (jdbc/query pgdb ["select * from swipes"])
   (jdbc/query pgdb ["select * from years"])
