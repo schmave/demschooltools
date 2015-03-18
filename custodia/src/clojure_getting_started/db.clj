@@ -5,6 +5,8 @@
             [heroku-database-url-to-jdbc.core :as h]
             [com.ashafa.clutch :as couch]
             [environ.core :refer [env]]
+            [clj-time.coerce :as timec]
+            [clj-time.format :as timef]
             [clojure.java.jdbc :as jdbc]
             ))
 
@@ -19,15 +21,15 @@
   "create table swipes(
   _id bigserial primary key,
   student_id bigserial,
-  in_time varchar(255),
+  in_time timestamp  with time zone,
   inserted_date timestamp default now(),
-  out_time varchar(255)
+  out_time timestamp with time zone
   );")
 (def create-years-table-sql
   "create table years(
   _id bigserial primary key,
-  from_date varchar(255),
-  to_date varchar(255),
+  from_date timestamp  with time zone,
+  to_date timestamp  with time zone,
   inserted_date timestamp default now(),
   name varchar(255)
   );")
@@ -88,6 +90,53 @@
 ;; (jdbc/query pgdb ["select * from students where id in (?)" "1"])
 ;; (persist! {:type :students :name "steve" :olderdate nil})
 ;; (update! :students 1 {:olderdate  "test"})
+
+(defn get-swipes-in-year [year-name student-id]
+  (let [q (str "
+select s.*
+       , extract(EPOCH FROM (s.out_time - s.in_time)::INTERVAL)/60 as interval
+       , to_char(s.in_time, 'HH:MI:SS') as nice_in_time
+       , to_char(s.out_time, 'HH:MI:SS') as nice_out_time
+from swipes s
+inner join years y 
+ON ((s.out_time BETWEEN y.from_date AND y.to_date)
+    OR (s.in_time BETWEEN y.from_date AND y.to_date))
+where y.name=? AND student_id =?
+")]
+    (jdbc/query
+     pgdb
+     [q year-name student-id]))
+  )
+
+;; (get-swipes-in-year "2014-06-01 2015-06-01" 2)
+
+
+(defn get-school-days [year-name]
+  (let [q (str "
+select distinct days2.days
+from (select
+       to_char(s.in_time, 'YYYY-MM-DD') as days
+       , s.in_time
+from swipes s
+inner join years y 
+  ON ((s.out_time BETWEEN y.from_date AND y.to_date)
+      OR (s.in_time BETWEEN y.from_date AND y.to_date))
+where y.name=?) days2
+order by days2.days
+")]
+    (jdbc/query
+     pgdb
+     [q year-name]))
+  )
+;; (map :days (get-school-days "2014-06-01 2015-06-01"))
+
+(defn get-school-days [id]
+  (jdbc/query pgdb ["select * from students"])
+  (jdbc/query pgdb ["select * from swipes"])
+  (jdbc/query pgdb ["select * from years"])
+  
+  
+  )
 
 (defn get-*
   ([type] (map #(assoc % :type (keyword type))

@@ -36,10 +36,13 @@
 (defn delete-swipe [swipe]
   (db/delete! swipe))
 
+(defn make-timestamp [t] 
+  (->> t str (f/parse) c/to-timestamp))
+
 (defn swipe-in
   ([id] (swipe-in id (t/now)))
   ([id in-time] 
-     (db/persist! (assoc (make-swipe id) :in_time (str in-time)))))
+     (db/persist! (assoc (make-swipe id) :in_time (make-timestamp (str in-time))))))
 
 (defn sanitize-out [swipe]
   (let [in (:in_time swipe)
@@ -57,12 +60,12 @@
 (defn swipe-out
   ([id] (swipe-out id (t/now)))
   ([id out-time]
-     (let [last-swipe (lookup-last-swipe-for-day id (make-date-string (str out-time)))
+     (let [last-swipe (lookup-last-swipe-for-day id (make-date-string out-time))
            only-swiped-in? (only-swiped-in? last-swipe)
            in-swipe (if only-swiped-in? 
                       last-swipe 
                       (make-swipe id))
-           out-swipe (assoc in-swipe :out_time (str out-time))
+           out-swipe (assoc in-swipe :out_time (make-timestamp out-time))
            out-swipe (sanitize-out out-swipe)]
        (if only-swiped-in?
          (db/update! :swipes (:_id out-swipe) out-swipe)
@@ -116,7 +119,10 @@
   (let [from (f/parse from)
         to (f/parse to)
         name (str (f/unparse date-format from) " "  (f/unparse date-format to))]
-    (->> {:type :years :from_date (str from) :to_date (str to) :name name}
+    (->> {:type :years
+          :from_date (make-timestamp (str from))
+          :to_date (make-timestamp (str to))
+          :name name}
          db/persist!)))
 
 ;; (sample-db true)   

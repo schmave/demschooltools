@@ -76,10 +76,11 @@
 (defn get-attendance [school-days year id student]
   (let [school-days (zipmap (reverse school-days) (repeat nil))
         [from to] (get-year-from-to year)
-        swipes (get-swipes id)
-        swipes (only-swipes-in-range swipes from to)
-        swipes (map append-interval swipes)
-        swipes (map clean-dates swipes)
+        swipes (db/get-swipes-in-year year id)
+        ;; swipes (get-swipes id)
+        ;; swipes (only-swipes-in-range swipes from to)
+        ;; swipes (map append-interval swipes)
+        ;; swipes (map clean-dates swipes)
         swipes (concat swipes (only-dates-between (get-overrides id) :date from to))
         swipes (concat swipes (only-dates-between (get-excuses id) :date from to))
         grouped-swipes (group-by swipe-day swipes)
@@ -113,10 +114,7 @@
                     :days summed-days})))
 
 (defn get-school-days [year]
-  (let [[from to] (get-year-from-to year)
-        swipes (get-swipes)
-        swipes (only-swipes-in-range swipes from to)]
-    (keys (group-by swipe-day swipes))))
+  (map :days (db/get-school-days year)))
 
 (defn get-students-with-att
   ([] (get-students-with-att (get-current-year-string (get-years)) nil))

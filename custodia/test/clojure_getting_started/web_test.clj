@@ -28,10 +28,10 @@
   (let [year (dates/get-current-year-string (db/get-years))
         school-days (att/get-school-days year)]
     (testing "School days"
-      (is (= school-days [(dates/make-date-string (str (t/minus (t/now)
-                                                                (t/days 2))))
-                          (dates/make-date-string (str (t/minus (t/now)
-                                                                (t/days 1))))])))))
+      (is (= school-days [(dates/make-date-string (t/minus (t/now)
+                                                           (t/days 2)))
+                          (dates/make-date-string (t/minus (t/now)
+                                                           (t/days 1)))])))))
 
 (deftest date-stuff
   (= (dates/make-date-string "2014-12-28T14:32:12.509Z")

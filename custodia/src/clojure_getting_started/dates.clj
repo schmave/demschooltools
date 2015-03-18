@@ -22,10 +22,16 @@
   (f/parse date-format d))
 
 (defn make-date-string [d]
-  (when d (format-to-local date-format (f/parse d))))
+  (when d
+    (if (instance? org.joda.time.DateTime d)
+      (format-to-local date-format d)
+      (format-to-local date-format (c/from-sql-time d)))))
 
 (defn make-time-string [d]
-  (when d (format-to-local time-format (f/parse d))))
+  (when d
+    (if (instance? org.joda.time.DateTime d)
+      (format-to-local time-format d)
+      (format-to-local time-format (c/from-sql-time d)))))
 
 (defn today-string []
   (format-to-local date-format (t/now)))
@@ -51,8 +57,8 @@
 
 (defn get-current-year-string [years]
   (->> years
-       (filter #(t/within? (t/interval (f/parse (:from_date %))
-                                       (f/parse (:to_date %)))
+       (filter #(t/within? (t/interval (c/from-sql-time (:from_date %))
+                                       (c/from-sql-time (:to_date %)))
                            (t/now)))
        first
        :name))
