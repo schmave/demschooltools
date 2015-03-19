@@ -118,6 +118,29 @@ where y.name=? AND e.student_id =?
      [q year-name student-id]))
   )
 
+(defn get-student-list-in-out []
+  (let [q (str "
+select stu.name
+        , l.ins
+        , l.outs
+        , l.student_id
+from students stu
+inner join 
+(select 
+         max(s.in_time) as ins
+        , max(s.out_time) as outs
+        , s.student_id
+from swipes s
+group by s.student_id
+order by ins, outs) as l on (l.student_id = stu._id)
+")]
+    (jdbc/query
+     pgdb
+     [q ]))
+  )
+;; (map :student_id (get-student-list-in-out))
+;; (get-student-list-in-out)
+
 (defn get-swipes-in-year [year-name student-id]
   (let [q (str "
 select s.*
