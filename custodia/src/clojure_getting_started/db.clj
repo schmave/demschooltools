@@ -39,7 +39,7 @@
   _id bigserial primary key,
   student_id bigserial,
   inserted_date timestamp default now(),
-  date timestamp with time zone
+  date timestamp 
   );")
 
 (def create-excuses-table-sql
@@ -47,7 +47,7 @@
   _id bigserial primary key,
   student_id bigserial,
   inserted_date timestamp default now(),
-  date timestamp with time zone
+  date timestamp 
   );")
 
 (def pgdb
@@ -123,27 +123,26 @@ where y.name=? AND e.student_id =?
 select s.*
        ,'swipes' as type
        , extract(EPOCH FROM (s.out_time - s.in_time)::INTERVAL)/60 as interval
-       , to_char(s.in_time, 'HH:MI:SS') as nice_in_time
-       , to_char(s.out_time, 'HH:MI:SS') as nice_out_time
+       , to_char(s.in_time at time zone 'America/New_York', 'HH:MI:SS') as nice_in_time
+       , to_char(s.out_time at time zone 'America/New_York', 'HH:MI:SS') as nice_out_time
 from swipes s
 inner join years y 
 ON ((s.out_time BETWEEN y.from_date AND y.to_date)
     OR (s.in_time BETWEEN y.from_date AND y.to_date))
-where y.name=? AND s.student_id =?
+where y.name=? AND s.student_id =? 
 ")]
     (jdbc/query
      pgdb
      [q year-name student-id]))
   )
 
-;; (get-swipes-in-year "2014-06-01 2015-06-01" 3)
-
+;; (get-swipes-in-year "2014-06-01 2015-06-01" 1)
 
 (defn get-school-days [year-name]
   (let [q (str "
 select distinct days2.days
 from (select
-       to_char(s.in_time, 'YYYY-MM-DD') as days
+       to_char(s.in_time at time zone 'America/New_York', 'YYYY-MM-DD') as days
        , s.in_time
 from swipes s
 inner join years y 
@@ -156,6 +155,7 @@ order by days2.days
      pgdb
      [q year-name]))
   )
+
 ;; (map :days (get-school-days "2014-06-01 2015-06-01"))
 
 (defn get-school-days-aflj [id]

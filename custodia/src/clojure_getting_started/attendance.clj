@@ -26,26 +26,26 @@
 (defn filter-type [key col]
   (filter #(= (:type %) key) col))
 
-(defn append-validity [student [day swipes]]
-  (let [has-override? (boolean (seq (filter-type "overrides" swipes)))
-        has-excuse? (boolean (seq (filter-type "excuses" swipes)))
-        int-mins (->> swipes
-                      (map :interval)
-                      (filter number?)
-                      (reduce +))
-        min-minutes (get-min-minutes student day)]
-    {:valid (and (not has-excuse?)
-                 (or has-override?
-                     (> int-mins min-minutes)))
-     :short (or (and (not has-override?)
-                     (not has-excuse?)
-                     (seq swipes))
-                (> int-mins 0)) 
-     :override has-override?
-     :excused has-excuse?
-     :day day
-     :total_mins (if has-override? min-minutes int-mins)
-     :swipes swipes}))
+(trace/deftrace append-validity [student [day swipes]]
+  (tracelet [has-override? (boolean (seq (filter-type "overrides" swipes)))
+             has-excuse? (boolean (seq (filter-type "excuses" swipes)))
+             int-mins (->> swipes
+                           (map :interval)
+                           (filter number?)
+                           (reduce +))
+             min-minutes (get-min-minutes student day)]
+            {:valid (and (not has-excuse?)
+                         (or has-override?
+                             (> int-mins min-minutes)))
+             :short (or (and (not has-override?)
+                             (not has-excuse?)
+                             (seq swipes))
+                        (> int-mins 0)) 
+             :override has-override?
+             :excused has-excuse?
+             :day day
+             :total_mins (if has-override? min-minutes int-mins)
+             :swipes swipes}))
 
 (defn get-year-from-to [year-string]
   (let [year (first (get-years year-string))
