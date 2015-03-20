@@ -8,13 +8,12 @@ select
      , sum(CASE WHEN oid IS NOT NULL THEN 1 ELSE 0 END) as overrides
      , sum(CASE WHEN stu.intervalmin is null or stu.intervalmin = 0 THEN 1 ELSE 0 END) as absent
 from (select 
-        st._id
+        s.student_id
         , o._id oid
         , sum(extract(EPOCH FROM (s.out_time - s.in_time)::INTERVAL)/60) as intervalmin
          , schooldays.days as day
 
       from swipes s
-      join student st on (st._id = s.student_id)
       full outer join overrides o on (date(s.in_time at time zone 'America/New_York') 
                                        = date(o.date at time zone 'America/New_York') 
                                      and o.student_id = s.student_id)
@@ -31,14 +30,23 @@ from (select
                 on (schooldays.days = date(s.in_time at time zone 'America/New_York')) 
       and s.student_id = 8
       group by  s.student_id, day,oid) as stu
-where student_id = 8
+-- where student_id = 8
 group by stu.student_id;
 
+(select * from (select distinct days2.days
+            from (select
+                   date(s.in_time at time zone 'America/New_York') as days
+                    from swipes s
+                    inner join years y 
+                      ON ((s.out_time BETWEEN y.from_date AND y.to_date)
+                          OR (s.in_time BETWEEN y.from_date AND y.to_date))
+                    where y.name= '2014-06-01 2015-06-01' ) days2
+            order by days2.days) as a
+join students on (1=1)
+where students._id = 8)
 
-
-select * from students st on (st._id = s.student_id)
 select 
-        st._id
+        schooldays._id
         , o._id oid
         , sum(extract(EPOCH FROM (s.out_time - s.in_time)::INTERVAL)/60) as intervalmin
          , schooldays.days as day
@@ -48,7 +56,7 @@ select
                                        = date(o.date at time zone 'America/New_York') 
                                      and o.student_id = s.student_id)
       right outer join 
-        (select distinct days2.days
+        (select a.days, students._id from (select distinct days2.days
             from (select
                    date(s.in_time at time zone 'America/New_York') as days
                     from swipes s
@@ -56,7 +64,9 @@ select
                       ON ((s.out_time BETWEEN y.from_date AND y.to_date)
                           OR (s.in_time BETWEEN y.from_date AND y.to_date))
                     where y.name= '2014-06-01 2015-06-01' ) days2
-            order by days2.days) as schooldays 
+            order by days2.days) as a
+        join students on (1=1)
+        where students._id = 8) as schooldays 
                 on (schooldays.days = date(s.in_time at time zone 'America/New_York')) 
-      and s.student_id = 8
-      group by  st._id, day,oid;
+      and schooldays._id = 8
+      group by  schooldays._id , day,oid;
