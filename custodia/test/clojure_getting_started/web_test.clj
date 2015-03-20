@@ -97,8 +97,8 @@
   (do (db/sample-db)  
       (let [s (db/make-student "test")
             sid (:_id s)]
-        (db/swipe-in sid basetime)
-        (db/swipe-out sid (t/plus basetime (t/hours 4)))
+        (db/swipe-in sid (str basetime))
+        (db/swipe-out sid (str (t/plus basetime (t/hours 4))))
         (db/override-date sid "2014-10-14")
         (let [att (get-att sid s)]
           (testing "Total Valid Day Count"

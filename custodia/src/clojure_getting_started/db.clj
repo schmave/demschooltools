@@ -143,6 +143,32 @@ order by ins, outs) as l on (l.student_id = stu._id)
   )
 ;; (map :student_id (get-student-list-in-out))
 
+(defn get-report [year-name]
+  (let [q (str "
+select
+     stu.student_id
+     , sum(CASE WHEN stu.interval >= 300 THEN 1 ELSE 0 END) as good
+     , sum(CASE WHEN stu.interval >= 300 THEN 0 ELSE 1 END) as short
+from 
+(select 
+        student_id
+        , sum(extract(EPOCH FROM (s.out_time - s.in_time)::INTERVAL)/60) as interval
+from swipes s
+inner join years y 
+ON ((s.out_time BETWEEN y.from_date AND y.to_date)
+    OR (s.in_time BETWEEN y.from_date AND y.to_date))
+where y.name=? 
+group by student_id, to_char(s.in_time, 'YYYY-MM-DD')) as stu
+group by stu.student_id
+")]
+    (jdbc/query
+     pgdb
+     [q year-name]))
+  )
+;; (get-report "2014-06-01 2015-06-01" )
+;; (def t (get-report "2014-06-01 2015-06-01" ))
+;; (count t)
+
 (defn get-swipes-in-year [year-name student-id]
   (let [q (str "
 select s.*
