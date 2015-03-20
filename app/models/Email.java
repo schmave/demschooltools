@@ -20,6 +20,8 @@ import com.fasterxml.jackson.annotation.*;
 import play.db.ebean.Model;
 import play.db.ebean.Model.Finder;
 
+import play.Play;
+
 @javax.persistence.Entity
 public class Email extends Model {
     @Id
@@ -69,8 +71,10 @@ public class Email extends Model {
 			Properties properties = new Properties();
 
 			// Setup mail server
-			properties.setProperty("mail.smtp.host", "smtp.mandrillapp.com");
-			properties.setProperty("mail.smtp.port", "587");
+			properties.setProperty("mail.smtp.host",
+                Play.application().configuration().getString("smtp.host"));
+			properties.setProperty("mail.smtp.port",
+                Play.application().configuration().getString("smtp.port"));
 
 			properties.setProperty("mail.smtp.auth", "true");
 			Authenticator authenticator = new Authenticator();
@@ -78,7 +82,7 @@ public class Email extends Model {
 
 			// Get the default Session object.
 			Session session = Session.getInstance(properties, new Authenticator());
-			// session.setDebug(true);
+            session.setDebug(Play.application().configuration().getBoolean("smtp.debug", false));
 			parsedMessage = new MimeMessage(session, new ByteArrayInputStream(message.getBytes()));
 
 			for (Enumeration e = parsedMessage.getAllHeaders(); e.hasMoreElements() ;) {
@@ -98,6 +102,8 @@ public class Email extends Model {
 
  class Authenticator extends javax.mail.Authenticator {
 	protected PasswordAuthentication getPasswordAuthentication() {
-		return new PasswordAuthentication("schmave@gmail.com", "uQeL5cx3hLXLzRznlP1YYA");
+		return new PasswordAuthentication(
+            Play.application().configuration().getString("smtp.user"),
+            Play.application().configuration().getString("smtp.password"));
 	}
 }
