@@ -206,7 +206,7 @@
               </tr>
               <tr ng-repeat="student in totals_students">
                 <!-- <span ng-show="student.total_days > 0"> -->
-                <td>{{student.name}}</td>
+                <td> <a class="" ng-click="showStudent(student)">{{student.name}}</a> </td>
                 <td>{{student.good}} ({{student.overrides}})</td>
                 <td>{{student.unexcused}}</td>
                 <td>{{student.excuses}}</td>
