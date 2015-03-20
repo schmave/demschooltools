@@ -8,12 +8,13 @@ select
      , sum(CASE WHEN oid IS NOT NULL THEN 1 ELSE 0 END) as overrides
      , sum(CASE WHEN stu.intervalmin is null or stu.intervalmin = 0 THEN 1 ELSE 0 END) as absent
 from (select 
-        s.student_id
+        st._id
         , o._id oid
         , sum(extract(EPOCH FROM (s.out_time - s.in_time)::INTERVAL)/60) as intervalmin
          , schooldays.days as day
 
       from swipes s
+      join student st on (st._id = s.student_id)
       full outer join overrides o on (date(s.in_time at time zone 'America/New_York') 
                                        = date(o.date at time zone 'America/New_York') 
                                      and o.student_id = s.student_id)
@@ -34,8 +35,10 @@ where student_id = 8
 group by stu.student_id;
 
 
+
+select * from students st on (st._id = s.student_id)
 select 
-        s.student_id
+        st._id
         , o._id oid
         , sum(extract(EPOCH FROM (s.out_time - s.in_time)::INTERVAL)/60) as intervalmin
          , schooldays.days as day
@@ -56,4 +59,4 @@ select
             order by days2.days) as schooldays 
                 on (schooldays.days = date(s.in_time at time zone 'America/New_York')) 
       and s.student_id = 8
-      group by  s.student_id, day,oid;
+      group by  st._id, day,oid;
