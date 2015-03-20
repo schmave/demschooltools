@@ -33,13 +33,6 @@
                           (dates/make-date-string (t/minus (t/now)
                                                            (t/days 1)))])))))
 
-(deftest date-stuff
-  (= (dates/make-date-string "2014-12-28T14:32:12.509Z")
-     "12-28-2014")
-  ;; this will fail after DST *shakes fist*
-  (is (= (dates/make-time-string "2014-12-28T14:32:12.509Z")
-         "09:32:12")))
-
 (defn add-swipes [sid]
   ;; 14 hours in UTC is 9 Am here
   (db/swipe-in sid basetime)
@@ -101,26 +94,26 @@
   )
 
 (deftest swipe-attendence-override-test
-  (db/sample-db)  
-  (let [s (db/make-student "test")
-        sid (:_id s)]
-    (db/swipe-in sid basetime)
-    (db/swipe-out sid (t/plus basetime (t/hours 4)))
-    (db/override-date sid "2014-10-14")
-    (let [att (get-att sid s)]
-      (testing "Total Valid Day Count"
-        (is (= (:total_days att)
-               1)))
-      (testing "Total Abs Count"
-        (is (= (:total_abs att)
-               0)))
-      (testing "Total Hours"
-        (is (= (:total_hours att)
-               5)))
-      (testing "Override"
-        (is (= (-> att :days first :override)
-               true)))
-      )) 
+  (do (db/sample-db)  
+      (let [s (db/make-student "test")
+            sid (:_id s)]
+        (db/swipe-in sid basetime)
+        (db/swipe-out sid (t/plus basetime (t/hours 4)))
+        (db/override-date sid "2014-10-14")
+        (let [att (get-att sid s)]
+          (testing "Total Valid Day Count"
+            (is (= (:total_days att)
+                   1)))
+          (testing "Total Abs Count"
+            (is (= (:total_abs att)
+                   0)))
+          (testing "Total Hours"
+            (is (= (:total_hours att)
+                   5)))
+          (testing "Override"
+            (is (= (-> att :days first :override)
+                   true)))
+          ))) 
   )
 
 (deftest single-swipe-short-test
@@ -178,7 +171,7 @@
                    1)))
           (testing "Total Hours"
             (is (= (:total_hours att)
-                   27)))
+                   27.0)))
           (testing "Days sorted correctly"
             (is (= (-> att :days first :day)
                    "2014-10-20")))
@@ -215,10 +208,9 @@
             sid (:_id s)]
         (db/swipe-in sid basetime)
         (db/swipe-out sid (t/plus basetime (t/days 1) (t/minutes 331)))
-        (trace/trace s)
         (let [att (get-att sid s)]
           (testing "swiping out on another day just is an out"
-            
+            (trace/trace att)
             (is (= 2 (-> att :days count)))))))
   )
 

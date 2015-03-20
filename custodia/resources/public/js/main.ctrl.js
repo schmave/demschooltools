@@ -231,7 +231,7 @@ angular.module('app').controller("MainController", function($scope, $http){
         $scope.totals_students = data;
     };
     $scope.getStudents = function(callback) {
-        $http.post('/student/all').
+        $http.get('/students').
             success(function(data){
                 $scope.loadStudentData(data);
                 if (callback) {callback();}

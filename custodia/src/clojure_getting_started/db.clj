@@ -101,8 +101,7 @@ where y.name=? AND e.student_id =?
 ")]
     (jdbc/query
      pgdb
-     [q year-name student-id]))
-  )
+     [q year-name student-id])))
 
 (defn get-excuses-in-year [year-name student-id]
   (let [q (str "
@@ -121,9 +120,13 @@ where y.name=? AND e.student_id =?
 (defn get-student-list-in-out []
   (let [q (str "
 select stu.name
-        , l.ins
-        , l.outs
-        , l.student_id
+       , stu._id
+        , CASE WHEN l.outs > l.ins=true THEN 'out'
+            ELSE 'in'
+          END as last_swipe_type
+        , CASE WHEN l.outs > l.ins=true THEN l.outs
+            ELSE l.ins
+          END as last_swipe_date
 from students stu
 inner join 
 (select 
@@ -139,7 +142,6 @@ order by ins, outs) as l on (l.student_id = stu._id)
      [q ]))
   )
 ;; (map :student_id (get-student-list-in-out))
-;; (get-student-list-in-out)
 
 (defn get-swipes-in-year [year-name student-id]
   (let [q (str "

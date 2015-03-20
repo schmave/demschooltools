@@ -149,7 +149,7 @@
       (do (let [s (make-student (str "zax" x))]
             (do (swipe-in (:_id s) (t/minus (t/now) (t/days 2)))
                 (swipe-out (:_id s) (t/minus (t/plus (t/now) (t/minutes 5))
-                                             (t/days 2))))
+                                             (t/days y))))
             #_(loop [y 0]
                 (if (> y 80)
                   :done

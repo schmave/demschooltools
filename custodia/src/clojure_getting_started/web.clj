@@ -99,6 +99,9 @@
                             (att/get-students-with-att year))))
   (GET "/student/:id" [id]
        (friend/authorize #{::user} (student-page-response (parse-int id))))
+  (GET "/students" []
+       (friend/authorize #{::user}
+                         (resp/response (att/get-student-list))))
   (POST "/student/create" [name]
         (friend/authorize #{::admin}
                           (let [made? (data/make-student name)]

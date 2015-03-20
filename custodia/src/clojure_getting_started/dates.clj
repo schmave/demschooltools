@@ -21,6 +21,12 @@
 (defn parse-date-string [d]
   (f/parse date-format d))
 
+(defn make-date-string-without-timezone [d]
+  (when d
+    (if (instance? org.joda.time.DateTime d)
+      (f/unparse date-format d)
+      (f/unparse date-format (c/from-sql-time d)))))
+
 (defn make-date-string [d]
   (when d
     (if (instance? org.joda.time.DateTime d)
