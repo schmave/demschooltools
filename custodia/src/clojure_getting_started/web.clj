@@ -99,6 +99,9 @@
                             (att/get-students-with-att year))))
   (GET "/student/:id" [id]
        (friend/authorize #{::user} (student-page-response (parse-int id))))
+  (POST "/student/report" [year]
+        (friend/authorize #{::admin}
+                          (resp/response (db/get-report year))))
   (GET "/students" []
        (friend/authorize #{::user}
                          (resp/response (att/get-student-list))))

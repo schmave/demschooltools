@@ -58,10 +58,7 @@ angular.module('app').controller("MainController", function($scope, $http){
         $scope.screen = "create-year";};
     $scope.showStudents = function() {
         $scope.screen = "loading";
-        $scope.getStudents(function(){
-            $scope.swipedWorked = false;
-            $scope.screen = "student-totals";
-        });
+        $scope.getTotalsStudents();
     };
     $scope.setDay = function(s) {
         $scope.current_day = s;
@@ -220,10 +217,13 @@ angular.module('app').controller("MainController", function($scope, $http){
                 }
             }). error(function(){});
     };
+    $scope.Math = window.Math;
     $scope.getTotalsStudents = function() {
-        $http.post('/student/all', {"year":$scope.current_totals_year}).
+        $http.post('/student/report', {"year":$scope.current_totals_year}).
             success(function(data){
                 $scope.totals_students = data;
+                $scope.swipedWorked = false;
+                $scope.screen = "student-totals";
             }). error(function(){});
     };
     $scope.loadStudentData = function(data){

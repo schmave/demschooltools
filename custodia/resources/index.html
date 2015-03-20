@@ -139,7 +139,7 @@
                     <span ng-class="{validday: swipe.valid}" style="width:50px" 
                           ng-click="setDay(swipe)"
                           ng-style="{'border':(swipe.day==current_day.day)?'1px solid black':''}">
-                      {{swipe.day}} - {{swipe.total_mins}} minutes 
+                      {{swipe.day}} - {{Math.round(swipe.total_mins)}} minutes 
                       <span ng-show="swipe.override"> - Overridden</span>
                       <a href="" ng-hide="(swipe.valid || swipe.excused) || !isAdmin" ng-click="override(student._id,swipe.day)"> Override</a>
                       <span ng-show="swipe.excused"> - Excused</span>
@@ -161,7 +161,7 @@
               <tr ng-repeat="s in current_day.swipes | filter:{ type: 'swipe' }">
                 <td>{{s.nice_in_time}}</td>
                 <td>{{s.nice_out_time}}</td>
-                <td>{{s.interval}}</td>
+                <td>{{Math.round(s.interval)}}</td>
                 <td ng-hide="!isAdmin" ng-click="deleteSwipe(s)">Delete</td>
               </tr>
             </table>
@@ -207,11 +207,11 @@
               <tr ng-repeat="student in totals_students">
                 <!-- <span ng-show="student.total_days > 0"> -->
                 <td>{{student.name}}</td>
-                <td>{{student.total_days}} ({{student.total_overrides}})</td>
-                <td>{{student.total_abs}}</td>
-                <td>{{student.total_excused}}</td>
-                <td>{{student.total_short}}</td>
-                <td>{{student.total_hours}}</td>
+                <td>{{student.good}} ({{student.overrides}})</td>
+                <td>{{student.unexcused}}</td>
+                <td>{{student.excuses}}</td>
+                <td>{{student.short}}</td>
+                <td>{{Math.round(student.total_hours)}}</td>
               </tr>
               <!-- </span> -->
             </table>
