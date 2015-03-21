@@ -39,7 +39,7 @@
   _id bigserial primary key,
   student_id bigserial,
   inserted_date timestamp default now(),
-  date timestamp 
+  date date
   );")
 
 (def create-excuses-table-sql
@@ -47,7 +47,7 @@
   _id bigserial primary key,
   student_id bigserial,
   inserted_date timestamp default now(),
-  date timestamp 
+  date date
   );")
 
 (def pgdb
@@ -170,34 +170,64 @@ select
      , stu.student_id as _id
      , (select s.name from students s where s._id = stu.student_id) as name
      , sum(CASE WHEN oid IS NOT NULL THEN 300/60 ELSE stu.intervalmin/60 END) as total_hours
-     , sum(CASE WHEN oid IS NOT NULL OR stu.intervalmin >= 300 THEN 1 ELSE 0 END) as good
-     , sum(CASE WHEN oid IS NOT NULL OR stu.intervalmin >= 300 THEN 0 ELSE 1 END) as short
+     , sum(CASE WHEN oid IS NOT NULL 
+                OR stu.intervalmin >= 300 
+           THEN 1 ELSE 0 END) as good
+     , sum(CASE WHEN (oid IS NULL 
+                      AND eid IS NULL)
+               AND (stu.intervalmin < 300
+                    AND stu.intervalmin IS NOT NULL)
+           THEN 1 ELSE 0 END) as short
      , sum(CASE WHEN oid IS NOT NULL THEN 1 ELSE 0 END) as overrides
-     , (select count(distinct e._id) from excuses e 
-             inner join years y ON (e.date BETWEEN y.from_date AND y.to_date) where e.student_id = stu.student_id) as excuses
-from (select 
-        s.student_id
-        , o._id oid
-        , sum(extract(EPOCH FROM (s.out_time - s.in_time)::INTERVAL)/60) as intervalmin
-        , date(s.in_time at time zone 'America/New_York') as day
-      from swipes s
-      full outer join overrides o on (date(s.in_time at time zone 'America/New_York') = date(o.date at time zone 'America/New_York') and o.student_id = s.student_id)
-      join years y on ((s.out_time BETWEEN y.from_date AND y.to_date)
-           OR (s.in_time BETWEEN y.from_date AND y.to_date))
-      where y.name= ? 
-      group by s.student_id, day, oid) as stu
+     , sum(CASE WHEN eid IS NOT NULL THEN 1 ELSE 0 END) as excuses
+     , sum(CASE WHEN anyswipes IS NULL 
+                    AND eid IS NULL
+                    AND oid IS NULL
+            THEN 1 ELSE 0 END) as unexcused
+from (
+      SELECT 
+        schooldays.student_id
+        , max(s._id) anyswipes
+        , max(o._id) oid
+        , max(e._id) eid
+        , sum(extract(EPOCH FROM (s.out_time - s.in_time)::INTERVAL)/60) AS intervalmin
+         , schooldays.days AS day
+
+      FROM (SELECT a.days, students._id student_id FROM (SELECT DISTINCT days2.days
+            FROM (SELECT
+                   date(s.in_time at time zone 'America/New_York') as days
+                    FROM swipes s
+                    INNER JOIN years y 
+                      ON ((s.out_time BETWEEN y.from_date AND y.to_date)
+                          OR (s.in_time BETWEEN y.from_date AND y.to_date))
+                    WHERE y.name= ?) days2
+            ORDER BY days2.days) as a
+            JOIN students on (1=1)) as schooldays
+
+      LEFT JOIN swipes s
+                ON (schooldays.days = date(s.in_time at time zone 'America/New_York')
+                    AND schooldays.student_id = s.student_id) 
+      LEFT JOIN overrides o 
+           ON (schooldays.days = o.date AND o.student_id = schooldays.student_id)
+      LEFT JOIN excuses e 
+           ON (schooldays.days = e.date AND e.student_id = schooldays.student_id)
+      GROUP BY schooldays.student_id, day
+) as stu
 group by stu.student_id;
+
 ")
         report (jdbc/query pgdb [q year-name])
-        totaldays (count (get-school-days year-name))]
-    (map (fn [r]
-           (let [totalhours (:total_hours r)
-                 unexcused (- totaldays (:short r) (:good r))
-                 good  (:good r) 
-                 short  (:short r) 
-                 unexcused (- unexcused (:excuses r))]
-             (assoc r :good good :short short :unexcused unexcused :total_hours totalhours)))
-         report))
+        ;; totaldays (count (get-school-days year-name))
+        ]
+    report
+    #_(map (fn [r]
+             (let [totalhours (:total_hours r)
+                   unexcused (- totaldays (:short r) (:good r))
+                   good  (:good r) 
+                   short  (:short r) 
+                   unexcused (- unexcused (:excuses r))]
+               (assoc r :good good :short short :unexcused unexcused :total_hours totalhours)))
+           report))
   )
 ;; (get-overrides-in-year "2014-06-01 2015-06-01" 3 )
 ;; (get-report "2014-06-01 2015-06-01" )  

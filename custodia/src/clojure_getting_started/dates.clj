@@ -25,7 +25,7 @@
   (when d
     (if (instance? org.joda.time.DateTime d)
       (f/unparse date-format d)
-      (f/unparse date-format (c/from-sql-time d)))))
+      (f/unparse date-format (c/from-sql-date d)))))
 
 (defn make-date-string [d]
   (when d

@@ -39,6 +39,11 @@
 (defn make-timestamp [t] 
   (->> t str (f/parse) c/to-timestamp))
 
+(defn make-sqldate[t] 
+  (c/to-sql-date
+   (t/plus (->> t str (f/parse))
+           (t/days 1))))
+
 (defn swipe-in
   ([id] (swipe-in id (t/now)))
   ([id in-time] 
@@ -86,12 +91,12 @@
 (defn excuse-date [id date-string]
   (db/persist! {:type :excuses
                 :student_id id
-                :date (make-timestamp date-string)}))
+                :date (make-sqldate date-string)}))
 
 (defn override-date [id date-string]
   (db/persist! {:type :overrides
                 :student_id id
-                :date (make-timestamp date-string)}))
+                :date (make-sqldate date-string)}))
 
 ;; (get-students )
 (defn get-students
@@ -147,14 +152,15 @@
     (if (> x 80)
       :done
       (do (let [s (make-student (str "zax" x))]
-            (do (swipe-in (:_id s) (t/minus (t/now) (t/days 2)))
-                (swipe-out (:_id s) (t/minus (t/plus (t/now) (t/minutes 5))
-                                             (t/days 1))))
-            #_(loop [y 0]
-                (if (> y 80)
-                  :done
-                  (do 
-                    (recur (inc y)))))
+            
+            (loop [y 1]
+              (if (> y 80)
+                :done
+                (do 
+                  (do (swipe-in (:_id s) (t/minus (t/now) (t/days y)))
+                      (swipe-out (:_id s) (t/minus (t/plus (t/now) (t/minutes 5))
+                                                   (t/days y))))
+                  (recur (inc y)))))
             )
           (recur (inc x)))))
   )
