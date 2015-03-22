@@ -112,7 +112,7 @@
     (db/persist! {:type :students :name name :olderdate nil})))
 
 (defn- toggle-older [older]
-  (if older nil (str (t/now))))
+  (if older nil (make-sqldate (str (t/now)))))
 
 (defn toggle-student [_id]
   (let [student (first (get-students _id))

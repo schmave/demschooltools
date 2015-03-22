@@ -2,13 +2,13 @@ select
       stu.student_id 
      , stu.student_id as _id
      , (select s.name from students s where s._id = stu.student_id) as name
-     , sum(CASE WHEN oid IS NOT NULL THEN 300/60 ELSE stu.intervalmin/60 END) as total_hours
+     , sum(CASE WHEN oid IS NOT NULL THEN stu.requiredmin/60 ELSE stu.intervalmin/60 END) as total_hours
      , sum(CASE WHEN oid IS NOT NULL 
-                OR stu.intervalmin >= 300 
+                OR stu.intervalmin >= stu.requiredmin
            THEN 1 ELSE 0 END) as good
      , sum(CASE WHEN (oid IS NULL 
                       AND eid IS NULL)
-               AND (stu.intervalmin < 300
+               AND (stu.intervalmin < stu.requiredmin 
                     AND stu.intervalmin IS NOT NULL)
            THEN 1 ELSE 0 END) as short
      , sum(CASE WHEN oid IS NOT NULL THEN 1 ELSE 0 END) as overrides
@@ -48,17 +48,16 @@ from (
            ON (schooldays.days = o.date AND o.student_id = schooldays.student_id)
       LEFT JOIN excuses e 
            ON (schooldays.days = e.date AND e.student_id = schooldays.student_id)
-           where schooldays.student_id = 11
+      where schooldays.student_id = 11
       GROUP BY schooldays.student_id, day, schooldays.olderdate
 ) as stu
 group by stu.student_id;
 
 
 
+-- WHERE y.name=  '2014-06-01 2015-06-01') days2
+-- where schooldays.student_id = 11
 
-
-                    WHERE y.name=  '2014-06-01 2015-06-01') days2
-      where schooldays.student_id = 11
-
--- se-- lect * from students ;
+-- select * from students ;
 -- alter table students alter column olderdate type date using olderdate::date;
+-- update students set olderdate = '2015-03-18' where _id = 10;

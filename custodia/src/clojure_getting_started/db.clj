@@ -15,7 +15,7 @@
   _id bigserial primary key,
   name varchar(255),
   inserted_date timestamp default now(),
-  olderdate varchar(255)
+  olderdate date
   );")
 (def create-swipes-table-sql
   "create table swipes(
@@ -169,13 +169,13 @@ select
       stu.student_id 
      , stu.student_id as _id
      , (select s.name from students s where s._id = stu.student_id) as name
-     , sum(CASE WHEN oid IS NOT NULL THEN 300/60 ELSE stu.intervalmin/60 END) as total_hours
+     , sum(CASE WHEN oid IS NOT NULL THEN stu.requiredmin/60 ELSE stu.intervalmin/60 END) as total_hours
      , sum(CASE WHEN oid IS NOT NULL 
-                OR stu.intervalmin >= 300 
+                OR stu.intervalmin >= stu.requiredmin
            THEN 1 ELSE 0 END) as good
      , sum(CASE WHEN (oid IS NULL 
                       AND eid IS NULL)
-               AND (stu.intervalmin < 300
+               AND (stu.intervalmin < stu.requiredmin 
                     AND stu.intervalmin IS NOT NULL)
            THEN 1 ELSE 0 END) as short
      , sum(CASE WHEN oid IS NOT NULL THEN 1 ELSE 0 END) as overrides
@@ -190,17 +190,21 @@ from (
         , max(s._id) anyswipes
         , max(o._id) oid
         , max(e._id) eid
+        , schooldays.olderdate
+        , (CASE WHEN schooldays.olderdate IS NULL 
+                     OR schooldays.olderdate > schooldays.days
+                     THEN 300 ELSE 330 END) as requiredmin
         , sum(extract(EPOCH FROM (s.out_time - s.in_time)::INTERVAL)/60) AS intervalmin
          , schooldays.days AS day
 
-      FROM (SELECT a.days, students._id student_id FROM (SELECT DISTINCT days2.days
+      FROM (SELECT a.days, students._id student_id, students.olderdate FROM (SELECT DISTINCT days2.days
             FROM (SELECT
                    date(s.in_time at time zone 'America/New_York') as days
                     FROM swipes s
                     INNER JOIN years y 
                       ON ((s.out_time BETWEEN y.from_date AND y.to_date)
                           OR (s.in_time BETWEEN y.from_date AND y.to_date))
-                    WHERE y.name= ?) days2
+                    WHERE y.name=?) days2
             ORDER BY days2.days) as a
             JOIN students on (1=1)) as schooldays
 
@@ -211,10 +215,9 @@ from (
            ON (schooldays.days = o.date AND o.student_id = schooldays.student_id)
       LEFT JOIN excuses e 
            ON (schooldays.days = e.date AND e.student_id = schooldays.student_id)
-      GROUP BY schooldays.student_id, day
+      GROUP BY schooldays.student_id, day, schooldays.olderdate
 ) as stu
 group by stu.student_id;
-
 ")
         report (jdbc/query pgdb [q year-name])
         ;; totaldays (count (get-school-days year-name))
