@@ -23,17 +23,21 @@ from (
         , max(s._id) anyswipes
         , max(o._id) oid
         , max(e._id) eid
+        , schooldays.olderdate
+        , (CASE WHEN schooldays.olderdate IS NULL 
+                     OR schooldays.olderdate > schooldays.days
+                     THEN 300 ELSE 330 END) as requiredmin
         , sum(extract(EPOCH FROM (s.out_time - s.in_time)::INTERVAL)/60) AS intervalmin
          , schooldays.days AS day
 
-      FROM (SELECT a.days, students._id student_id FROM (SELECT DISTINCT days2.days
+      FROM (SELECT a.days, students._id student_id, students.olderdate FROM (SELECT DISTINCT days2.days
             FROM (SELECT
                    date(s.in_time at time zone 'America/New_York') as days
                     FROM swipes s
                     INNER JOIN years y 
                       ON ((s.out_time BETWEEN y.from_date AND y.to_date)
                           OR (s.in_time BETWEEN y.from_date AND y.to_date))
-                    WHERE y.name=   '2014-06-01 2015-06-01') days2
+                    WHERE y.name='2014-06-01 2015-06-01') days2
             ORDER BY days2.days) as a
             JOIN students on (1=1)) as schooldays
 
@@ -44,14 +48,10 @@ from (
            ON (schooldays.days = o.date AND o.student_id = schooldays.student_id)
       LEFT JOIN excuses e 
            ON (schooldays.days = e.date AND e.student_id = schooldays.student_id)
-      where schooldays.student_id = 2
-      GROUP BY schooldays.student_id, day
+           where schooldays.student_id = 11
+      GROUP BY schooldays.student_id, day, schooldays.olderdate
 ) as stu
-where student_id = 2
 group by stu.student_id;
-
-
-
 
 
 
@@ -59,3 +59,6 @@ group by stu.student_id;
 
                     WHERE y.name=  '2014-06-01 2015-06-01') days2
       where schooldays.student_id = 11
+
+-- se-- lect * from students ;
+-- alter table students alter column olderdate type date using olderdate::date;
