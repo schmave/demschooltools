@@ -204,7 +204,7 @@
                 <th>Short</th>
                 <th>Total Hours</th>
               </tr>
-              <tr ng-repeat="student in totals_students">
+              <tr ng-repeat="student in totals_students | orderBy: 'name'">
                 <!-- <span ng-show="student.total_days > 0"> -->
                 <td> <a class="" ng-click="showStudent(student)">{{student.name}}</a> </td>
                 <td>{{student.good}} ({{student.overrides}})</td>

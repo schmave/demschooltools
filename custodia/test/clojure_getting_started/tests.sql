@@ -58,6 +58,64 @@ group by stu.student_id;
 -- WHERE y.name=  '2014-06-01 2015-06-01') days2
 -- where schooldays.student_id = 11
 
--- select * from students ;
 -- alter table students alter column olderdate type date using olderdate::date;
 -- update students set olderdate = '2015-03-18' where _id = 10;
+
+-- School Migration 
+
+--      Step 1 - olderdate to date
+-- alter table students alter column olderdate type date using olderdate::date;
+-- select * from students ;
+
+--      Step 2 - year dates
+
+-- select * from years ;
+
+-- alter table years 
+-- alter column from_date type timestamp with time zone
+-- using from_date::timestamp with time zone ;
+
+-- alter table years 
+-- alter column to_date type timestamp with time zone
+-- using to_date::timestamp with time zone ;
+
+-- select column_name, data_type, character_maximum_length
+-- from INFORMATION_SCHEMA.COLUMNS where table_name = 'years';
+
+--       Step 3 - Swipes
+
+-- select column_name, data_type, character_maximum_length
+-- from INFORMATION_SCHEMA.COLUMNS where table_name = 'swipes';
+
+-- alter table swipes 
+-- alter column out_time type timestamp with time zone
+-- using out_time::timestamp with time zone ;
+
+-- alter table swipes 
+-- alter column in_time type timestamp with time zone
+-- using in_time::timestamp with time zone ;
+
+
+-- select * from swipes where _id = 515 ;
+
+--       Step 4 - Overrides
+
+-- select column_name, data_type, character_maximum_length
+-- from INFORMATION_SCHEMA.COLUMNS where table_name = 'overrides';
+
+-- alter table overrides 
+-- alter column date type date
+-- using date::date; 
+
+-- select * from overrides;
+
+--       Step 5 - Excuses
+
+-- select column_name, data_type, character_maximum_length
+-- from INFORMATION_SCHEMA.COLUMNS where table_name = 'excuses';
+
+-- alter table excuses 
+-- alter column date type date
+-- using date::date; 
+
+-- select * from excuses;
