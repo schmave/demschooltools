@@ -152,8 +152,8 @@
     (if (> x 80)
       :done
       (do (let [s (make-student (str "zax" x))]
-            (trace/trace (str "Id:" x " Num:" y " of:" (* 80 200)))
             (loop [y 2]
+              (trace/trace (str "Id:" x " Num:" y " of:" (* 80 200)))
               (if (> y 200)
                 :done
                 (do 
