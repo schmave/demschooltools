@@ -71,8 +71,7 @@
         (student-page-response _id))
   (POST "/override" [_id day]
         (friend/authorize #{::admin}
-                          (trace/trace "overriding from webb"
-                                       (data/override-date _id day)))
+                          (data/override-date _id day))
         (student-page-response _id))
   (POST "/swipe/delete" [swipe _id]
         (friend/authorize #{::admin}

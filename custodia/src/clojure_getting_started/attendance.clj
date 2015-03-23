@@ -10,7 +10,7 @@
             [clj-time.coerce :as c]
             ))
 
-(trace/deftrace swipe-day [swipe]
+(defn swipe-day [swipe]
   (case (:type swipe)
     "swipes" (make-date-string (or (:in_time swipe) (:out_time swipe)))
     (make-date-string-without-timezone (:date swipe))))
@@ -26,7 +26,7 @@
 (defn filter-type [key col]
   (filter #(= (:type %) key) col))
 
-(trace/deftrace append-validity [student [day swipes]]
+(defn append-validity [student [day swipes]]
   (let [has-override? (boolean (seq (filter-type "overrides" swipes)))
         has-excuse? (boolean (seq (filter-type "excuses" swipes)))
         int-mins (->> swipes
@@ -83,12 +83,12 @@
   (let [school-days (zipmap (reverse school-days) (repeat nil))
         [from to] (get-year-from-to year)
         swipes (db/get-swipes-in-year year id)
-        swipes (concat swipes (trace/trace "overrides" (db/get-overrides-in-year year id)))
-        swipes (concat swipes (trace/trace "excuses" (db/get-excuses-in-year year id)))
+        swipes (concat swipes (db/get-overrides-in-year year id))
+        swipes (concat swipes (db/get-excuses-in-year year id))
         grouped-swipes (group-by swipe-day swipes)
         ;; adding last swipe before absences
         grouped-swipes (merge school-days grouped-swipes)
-        grouped-swipes (into (sorted-map) (trace/trace "grouped" grouped-swipes))
+        grouped-swipes (into (sorted-map) grouped-swipes)
         summed-days (map #(append-validity student %) grouped-swipes)
         summed-days (reverse summed-days)
         today-string (today-string)
@@ -119,7 +119,7 @@
   (map :days (filter :days (db/get-school-days year))))
 ;; (get-school-days "2014-06-01 2015-06-01")
 
-(defn get-students-with-att
+(trace/deftrace get-students-with-att
   ([] (get-students-with-att (get-current-year-string (get-years)) nil))
   ([year] (get-students-with-att year nil))
   ([year id]

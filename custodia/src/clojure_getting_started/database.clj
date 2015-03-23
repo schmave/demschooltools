@@ -44,7 +44,7 @@
    (t/plus (->> t str (f/parse))
            (t/days 1))))
 
-(defn swipe-in
+(trace/deftrace swipe-in
   ([id] (swipe-in id (t/now)))
   ([id in-time] 
      (db/persist! (assoc (make-swipe id) :in_time (make-timestamp in-time)))))
@@ -62,7 +62,7 @@
       swipe)))
 
 ;; (sample-db)   
-(defn swipe-out
+(trace/deftrace swipe-out
   ([id] (swipe-out id (t/now)))
   ([id out-time]
      (let [last-swipe (lookup-last-swipe-for-day id (make-date-string out-time))
@@ -84,16 +84,16 @@
   ([names]
      (db/get-* "years" names "name")))
 
-(defn delete-year [year]
+(trace/deftrace delete-year [year]
   (when-let [year (first (get-years year))]
     (db/delete! year)))
 
-(defn excuse-date [id date-string]
+(trace/deftrace excuse-date [id date-string]
   (db/persist! {:type :excuses
                 :student_id id
                 :date (make-sqldate date-string)}))
 
-(defn override-date [id date-string]
+(trace/deftrace override-date [id date-string]
   (db/persist! {:type :overrides
                 :student_id id
                 :date (make-sqldate date-string)}))
@@ -107,20 +107,20 @@
 (defn student-not-yet-created [name]
   (empty? (filter #(= name (:name %)) (get-students))))
 
-(defn make-student [name]
+(trace/deftrace make-student [name]
   (when (student-not-yet-created name)
     (db/persist! {:type :students :name name :olderdate nil})))
 
 (defn- toggle-older [older]
   (if older nil (make-sqldate (str (t/now)))))
 
-(defn toggle-student [_id]
+(trace/deftrace toggle-student [_id]
   (let [student (first (get-students _id))
         student (assoc student :olderdate (toggle-older (:olderdate student)))] 
     (db/update! :students _id {:olderdate (:olderdate student)})
     student))
 
-(defn make-year [from to]
+(trace/deftrace make-year [from to]
   (let [from (f/parse from)
         to (f/parse to)
         name (str (f/unparse date-format from) " "  (f/unparse date-format to))]
@@ -148,19 +148,18 @@
   (db/reset-db)
   (make-year (str (t/date-time 2014 6)) (str (t/date-time 2015 6)))
   (make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
-  (loop [x 0]
+  (loop [x 1]
     (if (> x 80)
       :done
       (do (let [s (make-student (str "zax" x))]
-            
-            (loop [y 1]
-              (if (> y 80)
+            (loop [y 90]
+              (if (> y 300)
                 :done
                 (do 
-                  (do (swipe-in (:_id s) (t/minus (t/now) (t/days y)))
-                      (swipe-out (:_id s) (t/minus (t/plus (t/now) (t/minutes 5))
-                                                   (t/days y))))
-                  (recur (inc y)))))
-            )
+                  #_(do (swipe-in x (t/minus (t/now) (t/days y)))
+                        (swipe-out x (t/minus (t/plus (t/now) (t/minutes 5))
+                                              (t/days y))))
+                  (recur (inc y))))))
+          
           (recur (inc x)))))
   )

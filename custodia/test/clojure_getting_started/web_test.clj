@@ -200,8 +200,6 @@
             )))) 
   )
 
-#_(get-att 3 {:type :students, :olderdate nil, :inserted_date #inst "2015-02-11T16:54:44.165038000-00:00", :name "test", :_id 3})
-
 (deftest sign-out-without-in
   (do (db/sample-db)
       (let [s (db/make-student "test")
