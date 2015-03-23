@@ -152,13 +152,14 @@
     (if (> x 80)
       :done
       (do (let [s (make-student (str "zax" x))]
-            (loop [y 90]
-              (if (> y 300)
+            (trace/trace (str "Id:" x " Num:" y " of:" (* 80 200)))
+            (loop [y 2]
+              (if (> y 200)
                 :done
                 (do 
-                  #_(do (swipe-in x (t/minus (t/now) (t/days y)))
-                        (swipe-out x (t/minus (t/plus (t/now) (t/minutes 5))
-                                              (t/days y))))
+                  (swipe-in x (t/minus (t/now) (t/days y)))
+                  (swipe-out x (t/minus (t/plus (t/now) (t/minutes 5))
+                                        (t/days y)))
                   (recur (inc y))))))
           
           (recur (inc x)))))
