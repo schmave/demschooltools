@@ -207,7 +207,6 @@ from (
                     WHERE y.name=?) days2
             ORDER BY days2.days) as a
             JOIN students on (1=1)) as schooldays
-
       LEFT JOIN swipes s
                 ON (schooldays.days = date(s.in_time at time zone 'America/New_York')
                     AND schooldays.student_id = s.student_id) 
@@ -215,6 +214,7 @@ from (
            ON (schooldays.days = o.date AND o.student_id = schooldays.student_id)
       LEFT JOIN excuses e 
            ON (schooldays.days = e.date AND e.student_id = schooldays.student_id)
+      where schooldays.days is not null
       GROUP BY schooldays.student_id, day, schooldays.olderdate
 ) as stu
 group by stu.student_id;
