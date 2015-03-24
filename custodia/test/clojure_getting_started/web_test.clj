@@ -234,7 +234,9 @@
         sid (:_id s)
         s (db/toggle-student sid)
         s (first (db/get-students sid))
-        tomorrow (-> (t/today-at 8 0) (t/plus (t/days 1)))]
+        tomorrow (-> (t/today-at 8 0) (t/plus (t/days 1)))
+        day-after-next (-> (t/today-at 8 0) (t/plus (t/days 2)))
+        ]
     (db/swipe-in sid tomorrow)
     (db/swipe-out sid (t/plus tomorrow (t/minutes 331)))
 

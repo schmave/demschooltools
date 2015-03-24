@@ -18,8 +18,6 @@
             [clojure-getting-started.attendance :as att]
             [clojure.data.json :as json]
             [clj-time.core :as t]
-            [net.cgrand.enlive-html :as enlive]
-            [hiccup.core :as html]
             [cemerick.friend :as friend]
             (cemerick.friend [workflows :as workflows]
                              [credentials :as creds])

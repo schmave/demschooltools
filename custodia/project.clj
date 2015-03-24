@@ -5,10 +5,7 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [compojure "1.1.8"]
-                 [camel-snake-kebab "0.2.4"]
                  [ring/ring-jetty-adapter "1.2.2"]
-                 [enlive "1.1.5"]
-                 [hiccup "1.0.5"]
                  [org.clojure/tools.nrepl "0.2.5"]
                  [org.clojure/data.json "0.2.5"]
                  [com.cemerick/friend "0.2.1"]
@@ -27,4 +24,5 @@
             [environ/environ.lein "0.2.1"]]
   :hooks [environ.leiningen.hooks]
   :uberjar-name "clojure-getting-started-standalone.jar"
-  :profiles {:production {:env {:production true}}})
+  :profiles {:production {:env {:production true}}
+             :uberjar {:aot :all}})
