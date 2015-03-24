@@ -128,7 +128,7 @@ select stu.name
             ELSE l.ins
           END as last_swipe_date
 from students stu
-inner join 
+left join 
 (select 
          max(s.in_time) as ins
         , max(s.out_time) as outs

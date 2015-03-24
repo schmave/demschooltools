@@ -152,6 +152,8 @@
         (testing "School year is list of days with swipes"
           (is (= (att/get-school-days "2014-06-01 2015-06-01")
                  (list "2014-10-14" "2014-10-15" "2014-10-16" "2014-10-17" "2014-10-18" "2014-10-19" "2014-10-20"))))
+        (testing "Student Front Page Count"
+          (is (= (-> (att/get-student-list) count) 4)))
         (let [att (get-att sid s)
               att2 (get-att sid2 s2)]
           (testing "Total Valid Day Count"
@@ -226,6 +228,13 @@
                    sid)]
           (testing "students with att doesn't throw exceptions"
             (is (not= '() att))))))
+  )
+
+(deftest older-student-required-minutes
+  (db/sample-db)
+  (let [att (att/get-student-list)]
+    (testing "Student Count"
+      (is (= (-> att count) 2))))
   )
 
 (deftest older-student-required-minutes
