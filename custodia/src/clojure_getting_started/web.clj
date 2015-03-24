@@ -26,6 +26,9 @@
 (def users {"admin" {:username "admin"
                      :password (creds/hash-bcrypt (env :admin))
                      :roles #{::admin ::user}}
+            "super" {:username "super"
+                     :password (creds/hash-bcrypt (env :admin))
+                     :roles #{::admin ::user}}
             "user" {:username "user"
                     :password (creds/hash-bcrypt (env :userpass))
                     :roles #{::user}}})
