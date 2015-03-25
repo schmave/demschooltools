@@ -1,0 +1,101 @@
+(ns clojure-getting-started.report-test
+  (:require [clojure.test :refer :all]
+            [clj-time.format :as f]
+            [clj-time.local :as l]
+            [clj-time.core :as t]
+            [clj-time.coerce :as c]
+            [clojure.tools.trace :as trace]
+            [clojure-getting-started.db :as db]
+            [clojure-getting-started.database :as data]
+            [clojure-getting-started.attendance :as att]
+            [clojure-getting-started.helpers :as h]
+            [clojure-getting-started.dates :as dates]
+            ))
+
+(def basetime (t/date-time 2014 10 14 14 9 27 246)) 
+(defn add-swipes [sid]
+  ;; 14 hours in UTC is 9 Am here
+  (data/swipe-in sid basetime)
+  (data/swipe-out sid (t/plus basetime (t/hours 6)))
+
+  ;; good tomorrow
+  
+  (data/swipe-in sid (t/plus basetime (t/days 1)))
+  (data/swipe-out sid (t/plus basetime (t/days 1) (t/hours 6)))
+
+  ;; short the next
+  
+  (data/swipe-in sid (t/plus basetime (t/days 2)))
+  (data/swipe-out sid (t/plus basetime (t/days 2) (t/hours 4)))
+
+
+  ;; two short the next but long enough
+  
+  (data/swipe-in sid (t/plus basetime (t/days 3)))
+  (data/swipe-out sid (t/plus basetime (t/days 3) (t/hours 4)))
+  (data/swipe-in sid (t/plus basetime (t/days 3) (t/hours 5)))
+  (data/swipe-out sid (t/plus basetime (t/days 3) (t/hours 7)))
+
+  ;; short the next - 10-18-2014 
+  
+  (data/swipe-in sid (t/plus basetime (t/days 4)))
+  (data/swipe-out sid (t/plus basetime (t/days 4) (t/hours 4)))
+  )
+
+(deftest swipe-attendence-test
+  (do (data/sample-db)  
+      (let [s (data/make-student "test")
+            sid (:_id s) 
+            s2 (data/make-student "test2")
+            sid2 (:_id s2)]
+        ;; good today
+        (add-swipes sid)
+        (data/override-date sid "2014-10-18")
+        (data/excuse-date sid "2014-10-20")
+        (data/swipe-in sid2 (t/plus basetime (t/days 5)))
+        (data/swipe-in sid2 (t/plus basetime (t/days 6)))
+
+        (let [att (db/get-report "2014-06-01 2015-06-01")
+              student1 (filter #(= (:_id s) (:_id %)) att)
+              student2 (filter #(= (:_id s2) (:_id %)) att)
+              ]
+          (testing "Total Valid Day Count"
+            (is (= (:good student1)
+                   4)))
+          (testing "Total Short Day Count"
+            (is (= (:short student1)
+                   1)))
+          (testing "Total Excused Count"
+            (is (= (:excuses student1)
+                   1)))
+          (testing "Total Abs Count"
+            (is (= (:unexcused student1)
+                   1)))
+          (testing "Total Overrides"
+            (is (= (:overrides student1)
+                   1)))
+          (testing "Total Hours"
+            (is (= (:total_hours student1)
+                   27.0)))
+          (testing "Total short count student 2"
+            (is (= (:short student2)
+                   2)))
+          (testing "Total Abs Count For Student 2 Should equal number of total days for student 1 and 2"
+            (is (= (:unexcused student2)
+                   5)))
+          )
+        (testing "an older date string shows no attendance in that time"
+          (let [att (first (db/get-report "06-01-2013 05-01-2014"))]
+            (testing "Total Valid Day Count"
+              (is (= (:good att)
+                     0)))
+            (testing "Total Abs Count"
+              (is (= (:unexcused att)
+                     0)))
+            (testing "Total Overrides"
+              (is (= (:overrides att)
+                     0)))
+            )))) 
+  )
+
+

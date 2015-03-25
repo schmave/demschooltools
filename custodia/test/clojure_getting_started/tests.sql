@@ -48,12 +48,10 @@ from (
            ON (schooldays.days = o.date AND o.student_id = schooldays.student_id)
       LEFT JOIN excuses e 
            ON (schooldays.days = e.date AND e.student_id = schooldays.student_id)
+      where schooldays.days is not null
       GROUP BY schooldays.student_id, day, schooldays.olderdate
 ) as stu
 group by stu.student_id;
-
-
-
 
 
 
@@ -76,7 +74,7 @@ SELECT
                     INNER JOIN years y 
                       ON ((s.out_time BETWEEN y.from_date AND y.to_date)
                           OR (s.in_time BETWEEN y.from_date AND y.to_date))
-                    WHERE y.name='2014-07-23 2015-06-17') days2
+                    WHERE y.name='2014-06-01 2015-06-01') days2
             ORDER BY days2.days) as a
             JOIN students on (1=1)) as schooldays
       LEFT JOIN swipes s
@@ -86,12 +84,10 @@ SELECT
            ON (schooldays.days = o.date AND o.student_id = schooldays.student_id)
       LEFT JOIN excuses e 
            ON (schooldays.days = e.date AND e.student_id = schooldays.student_id)
-      where schooldays.student_id = 7
-      and schooldays.days is not null
-      GROUP BY schooldays.student_id, day, schooldays.olderdate;
+      where schooldays.days is not null
+      and schooldays.student_id = 11
+      GROUP BY schooldays.student_id, day, schooldays.olderdate ;
 
-
-                    WHERE y.name='2014-06-01 2015-06-01') days2
 
 
 -- WHERE y.name=  '2014-06-01 2015-06-01') days2

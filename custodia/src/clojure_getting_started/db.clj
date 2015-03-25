@@ -258,15 +258,6 @@ where y.name=? AND s.student_id =?
 
 ;; (get-swipes-in-year "2014-06-01 2015-06-01" 1)
 
-
-(defn get-school-days-aflj [id]
-  (jdbc/query pgdb ["select * from students"])
-  (jdbc/query pgdb ["select * from swipes"])
-  (jdbc/query pgdb ["select * from years"])
-  
-  
-  )
-
 (defn get-*
   ([type] (map #(assoc % :type (keyword type))
                (jdbc/query pgdb [(str "select * from " type " order by inserted_date ")])))
