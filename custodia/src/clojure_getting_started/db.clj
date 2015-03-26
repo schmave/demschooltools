@@ -68,7 +68,7 @@
   (jdbc/execute! pgdb ["drop table if exists swipes;"]))
 
 (defn reset-db []
-  (drop-all-tables)
+  (drop-all-tables) 
   (create-all-tables))
 
 (defn delete! [doc]
