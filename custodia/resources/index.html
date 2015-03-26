@@ -42,12 +42,12 @@
         </div><!--/.nav-collapse -->
       </div>
     </nav>
-    <div class="alert alert-success collapsable" role="alert" ng-show="swipedWorked">
+    <div class="alert alert-success collapsable" role="alert"  ng-cloak  ng-show="swipedWorked">
       {{swipedWorked}}
     </div>
     <div class="container">
       <div class="starter-template">
-        <div class="lead form-group" ng-show="screen ==='create-year'">
+        <div class="lead form-group" ng-cloak ng-show="screen ==='create-year'">
           <h4>Report Start</h4>
           <div style="display:inline-block; min-height:290px;">
             <datepicker ng-model="from_date" min-date="minDate" show-weeks="false" class="well well-sm"></datepicker>

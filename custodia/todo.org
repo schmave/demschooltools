@@ -1,7 +1,13 @@
+* TODO Fix Angular Jump 
+* TODO Make student page single query
+* TODO New Relic tracing
+* TODO Database stored sessions
+* TODO Web Drive Test Site
+* TODO Edit student
+* TODO Configurable passwords
+* TODO Hide student
 * DONE Create student
   CLOSED: [2014-12-23 Tue 12:03]
-* TODO Edit student
-* TODO Hide student
 * DONE swipe in 
   CLOSED: [2014-12-23 Tue 12:31]
 * DONE swipe outp
@@ -26,7 +32,6 @@
   CLOSED: [2015-01-03 Sat 10:52]
 * DONE Make school year to show totals
   CLOSED: [2015-01-03 Sat 15:43]
-* TODO Configurable passwords
 * DONE Report - Students swiped in today
   CLOSED: [2015-01-03 Sat 20:49]
 * DONE School day is student swipe in
@@ -58,4 +63,5 @@
   CLOSED: [2015-02-07 Sat 12:13]
 * DONE make columns full width on home page if user
   CLOSED: [2015-02-07 Sat 12:45]
-* TODO Fix  IN - - OUT scenario where it doesn't ask for today's IN 
+* DONE Fix  IN - - OUT scenario where it doesn't ask for today's IN 
+  CLOSED: [2015-03-26 Thu 07:09]
