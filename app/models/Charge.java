@@ -117,6 +117,14 @@ public class Charge extends Model implements Comparable<Charge> {
         this.sm_decision_date = date;
     }
 
+    public String getRuleTitle() {
+        if (this.rule == null) {
+            return "<< no rule >>";
+        } else {
+            return this.rule.title;
+        }
+    }
+
     @Override
     public int compareTo(Charge c2) {
 		if (the_case.meeting.date != null) {
