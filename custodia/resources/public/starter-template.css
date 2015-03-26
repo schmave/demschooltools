@@ -9,3 +9,8 @@ body {
 .validday {
     color: #73B88A;
 }
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak],
+.ng-cloak, .x-ng-cloak,
+.ng-hide {
+    display: none !important;
+}
