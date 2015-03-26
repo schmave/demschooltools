@@ -57,7 +57,7 @@ $(function() {
 	@for( c <- sm_charges ) {
 		<tr><td>@c.the_case.case_number
 			<td>@if(c.person != null) { @c.person.getDisplayName() } else { <i>No one</i> }
-			<td>@if(c.rule != null) { @c.rule.title } else { <i>None</i> }
+			<td>@c.getRuleTitle()
 			<td>@c.plea
 			<td>@c.resolution_plan
 			<td>@c.the_case.findings

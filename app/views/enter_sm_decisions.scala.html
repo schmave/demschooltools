@@ -22,7 +22,7 @@ $(function() {
 		<div class="panel panel-info">
 		<div class="panel-heading"><h4>#@c.the_case.case_number &bull;
 			@if(c.person != null) { @c.person.getDisplayName() } &bull;
-			@if(c.rule != null) { @c.rule.title }</div>
+			@c.getRuleTitle()</div>
 		<div class="panel-body">
 		@caseTableOpen()
 		@caseTableRow(c.the_case)

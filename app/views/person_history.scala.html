@@ -12,7 +12,7 @@
 <tbody>
 @for( c <- recent_rps ) {
 <tr><td>@Application.formatDayOfWeek(c.the_case.meeting.date)
-<td>@if(c.rule != null) { @c.rule.title } else { <i>unknown</i> }
+<td>@c.getRuleTitle()
 <td>@c.resolution_plan
 }
 </tbody>
