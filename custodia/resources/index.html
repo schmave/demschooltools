@@ -61,14 +61,14 @@
 
         <div class="lead form-group" ng-show="screen ==='home'">
           <div class="row col-md-12" ng-show="isAdmin" >
-            <button class="btn btn-success" ng-show="isAdmin" ng-click="showCreate()">Create Student</button>
+            <button id="create-student-button" class="btn btn-success" ng-show="isAdmin" ng-click="showCreate()">Create Student</button>
           </div>
           <div class="row col-md-12" ng-show="screen ==='home'">
             <div class="col-md-4">
               Not Yet In
               <li class="list-unstyled" 
                   ng-repeat="student in filterStudentsNotYetIn(students) | orderObjectBy:'name':false">
-                <a class="" ng-click="showStudent(student)">{{student.name}}</a>
+                <a class="" id="student-{{student._id}}" ng-click="showStudent(student)">{{student.name}}</a>
               </li>
             </div>
             <div class="col-md-4">
@@ -124,7 +124,7 @@
               <button class="btn" ng-click="toggleHours(student)">Toggle Hours</button>
             </span>
           </div>
-          <div class="col-md-12" ng-show="isAdmin">
+          <div class="col-md-12" id="student-total-row" ng-show="isAdmin">
             Attended: {{student.total_days}} - Absent: {{student.total_abs}} - Excused: {{student.total_excused}} - Overrides: {{student.total_overrides}} - Short: {{student.total_short}}
           </div>
           <div class="clearfix"></div>
