@@ -8,7 +8,7 @@
                  [ring/ring-jetty-adapter "1.2.2"]
                  [org.clojure/tools.nrepl "0.2.5"]
                  [org.clojure/data.json "0.2.5"]
-                 [com.cemerick/friend "0.2.1"]
+                 [com.cemerick/friend "0.2.1" :exclusions [xerces/xercesImpl]]
                  [environ "1.0.0"]
                  [ring/ring-json "0.3.1"]
                  [sonian/carica "1.1.0" :exclusions [[cheshire]]]
@@ -22,7 +22,11 @@
   :plugins [[cider/cider-nrepl "0.8.1"]
             [lein-ring "0.7.0"]
             [environ/environ.lein "0.2.1"]]
+  :test-selectors {:default (complement :integration)
+                   :integration :integration
+                   :all (constantly true)}
   :hooks [environ.leiningen.hooks]
   :uberjar-name "clojure-getting-started-standalone.jar"
-  :profiles {:production {:env {:production true}}
+  :profiles {:test {:dependencies [[clj-webdriver "0.6.1"]]}
+             :production {:env {:production true}}
              :uberjar {:aot :all}})

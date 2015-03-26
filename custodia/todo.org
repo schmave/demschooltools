@@ -1,4 +1,5 @@
-* TODO Fix Angular Jump 
+* DONE Fix Angular Jump 
+  CLOSED: [2015-03-26 Thu 16:15]
 * TODO Make student page single query
 * TODO New Relic tracing
 * TODO Database stored sessions
