@@ -5,10 +5,10 @@
 	<tr>
 	<td><h5>#@c.case_number</h5>
 	<p>@if( c.date != null ) { @Application.formatDateShort(c.date)@if( !c.time.equals("") ){, @c.time}. }
-	<i>Writer</i>: @if( c.writer != null ) {@c.writer.getDisplayName()} else {unknown},
-	<i>location</i>: @if(!c.location.equals("")) {@c.location} else {unknown}.
+	<i>Writers</i>: @c.people_at_case.filter((p: PersonAtCase) => p.role == PersonAtCase.ROLE_WRITER).map {tr =>@tr.person.getDisplayName()}.mkString(", ").
+	<i>Location</i>: @if(!c.location.equals("")) {@c.location} else {unknown}.
 	<td><p>
-		<i>Testifiers</i>: @c.testify_records.map { tr =>@tr.person.getDisplayName()}.mkString(", ")
+		<i>Testifiers</i>: @c.people_at_case.filter(_.role == PersonAtCase.ROLE_TESTIFIER).map {tr =>@tr.person.getDisplayName()}.mkString(", ")
 		<p>@c.findings
 	<td>@if( c.charges.size() > 0) {
 		<ol>

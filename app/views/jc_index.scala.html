@@ -85,7 +85,7 @@ $(function() {
 <thead><th height=50 width=200>Person<th align=right width=50>Complaint count<th align=right width=50>Charge count</thead>
 @for( p <- people ) {
 	<tr><td width=200><a href="@routes.Application.viewPersonHistory(p.person_id)">@p.getDisplayName()</a>
-	<td align=right width=50>@p.cases_written_up.size()
+	<td align=right width=50>@p.getCasesWrittenUp().size()
 	<td align=right width=50>@p.charges.size()
 }
 </table>

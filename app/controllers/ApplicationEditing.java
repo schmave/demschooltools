@@ -89,19 +89,21 @@ public class ApplicationEditing extends Controller {
         return ok();
     }
 
-    public static Result addTestifier(Integer case_id, Integer person_id)
+    public static Result addPersonAtCase(Integer case_id, Integer person_id, Integer role)
     {
-        TestifyRecord.create(Case.find.ref(case_id), Person.find.ref(person_id));
+        PersonAtCase.create(Case.find.ref(case_id), Person.find.ref(person_id), role);
         return ok();
     }
 
-    public static Result removeTestifier(Integer case_id, Integer person_id)
+    public static Result removePersonAtCase(Integer case_id, Integer person_id, Integer role)
     {
         SqlUpdate update = Ebean.createSqlUpdate(
-            "DELETE from testify_record where case_id = :case_id "+
-            "and person_id = :person_id");
+            "DELETE from person_at_case where case_id = :case_id "+
+            "and person_id = :person_id "+
+            "and role = :role");
         update.setParameter("case_id", case_id);
         update.setParameter("person_id", person_id);
+        update.setParameter("role", role);
 
         Ebean.execute(update);
         return ok();

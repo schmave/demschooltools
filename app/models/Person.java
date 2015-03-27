@@ -99,10 +99,9 @@ public class Person extends Model implements Comparable<Person> {
     @OrderBy("id DESC")
     public List<Charge> charges;
 
-    @OneToMany(mappedBy="writer")
+    @OneToMany(mappedBy="person")
     @JsonIgnore
-    @OrderBy("case_number DESC")
-    public List<Case> cases_written_up;
+    public List<PersonAtCase> cases_involved_in;
 
     // family ID
     @ManyToOne()
@@ -155,6 +154,12 @@ public class Person extends Model implements Comparable<Person> {
         List<Charge> result = new ArrayList<Charge>(charges);
         Collections.sort(result, Collections.reverseOrder());
         return result;
+    }
+
+    @JsonIgnore
+    public List<Case> getCasesWrittenUp() {
+        return Case.find.where().eq("people_at_case.role", 1)
+            .eq("people_at_case.person", this).findList();
     }
 
     public void attachToPersonAsFamily(String id_string) {

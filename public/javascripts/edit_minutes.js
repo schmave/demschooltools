@@ -201,7 +201,7 @@ function displayName(p) {
 
 function Charge(charge_id, el) {
     var self = this;
-	
+
 	var SEVERITIES = {
         "mild": "Mild",
         "moderate" : "Moderate",
@@ -241,7 +241,7 @@ function Charge(charge_id, el) {
         if (json.referred_to_sm) {
             el.find(".refer-to-sm").prop("checked", true);
         }
-		
+
         for (key in SEVERITIES) {
             if (json.severity == SEVERITIES[key]) {
                 el.find(".severity-" + key).prop("checked", true);
@@ -377,9 +377,6 @@ function Case (id, el) {
         }
 
         url = "/saveCase?id=" + id;
-        if (self.writer_chooser.people.length > 0) {
-            url += "&writer_id=" + self.writer_chooser.people[0].id;
-        }
         url += "&location=" + encodeURIComponent(self.el.find(".location").val());
         url += "&findings=" + encodeURIComponent(self.el.find(".findings").val());
         url += "&date=" + encodeURIComponent(self.el.find(".date").val());
@@ -400,16 +397,17 @@ function Case (id, el) {
         el.find(".time").val(data.time);
         el.find(".findings").val(data.findings);
 
-        if (data.writer) {
-            self.writer_chooser.addPerson(data.writer.person_id,
-                  displayName(data.writer));
-        }
-
-        for (i in data.testify_records) {
-            t_r = data.testify_records[i];
-            self.testifier_chooser.addPerson(
-                t_r.person.person_id,
-                displayName(t_r.person));
+        for (i in data.people_at_case) {
+            pac = data.people_at_case[i];
+            if (pac.role == app.ROLE_TESTIFIER) {
+                self.testifier_chooser.addPerson(
+                    pac.person.person_id,
+                    displayName(pac.person));
+            } else if (pac.role == app.ROLE_WRITER) {
+                self.writer_chooser.addPerson(
+                    pac.person.person_id,
+                    displayName(pac.person));
+            }
         }
 
         for (i in data.charges) {
@@ -438,19 +436,28 @@ function Case (id, el) {
     this.id = id;
     this.el = el;
     this.writer_chooser = new PeopleChooser(el.find(".writer"),
-                                            self.markAsModified,
-                                            self.markAsModified);
-    this.writer_chooser.setOnePersonMode(true);
+        function(person) {
+            $.post("/addPersonAtCase?case_id=" + id +
+                   "&person_id=" + person.id +
+                   "&role=" + app.ROLE_WRITER);
+        },
+        function(person) {
+            $.post("/removePersonAtCase?case_id=" + id +
+                   "&person_id=" + person.id +
+                   "&role=" + app.ROLE_WRITER);
+        });
 
     this.testifier_chooser = new PeopleChooser(
         el.find(".testifier"),
         function(person) {
-            $.post("/addTestifier?case_id=" + id +
-                   "&person_id=" + person.id);
+            $.post("/addPersonAtCase?case_id=" + id +
+                   "&person_id=" + person.id +
+                   "&role=" + app.ROLE_TESTIFIER);
         },
         function(person) {
-            $.post("/removeTestifier?case_id=" + id +
-                   "&person_id=" + person.id);
+            $.post("/removePersonAtCase?case_id=" + id +
+                   "&person_id=" + person.id +
+                   "&role=" + app.ROLE_TESTIFIER);
         });
     this.is_modified = false;
     this.charges = [];

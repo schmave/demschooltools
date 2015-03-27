@@ -13,7 +13,7 @@ import play.db.ebean.Model;
 import play.db.ebean.Model.Finder;
 
 @Entity
-public class TestifyRecord extends Model {
+public class PersonAtCase extends Model {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "testify_record_id_seq")
     public Integer id;
@@ -27,11 +27,16 @@ public class TestifyRecord extends Model {
     @JsonIgnore
     public Case the_case;
 
-    public static TestifyRecord create(Case c, Person p)
+    public final static int ROLE_TESTIFIER = 0;
+    public final static int ROLE_WRITER = 1;
+    public Integer role;
+
+    public static PersonAtCase create(Case c, Person p, Integer r)
     {
-        TestifyRecord result = new TestifyRecord();
+        PersonAtCase result = new PersonAtCase();
         result.the_case = c;
         result.person = p;
+        result.role = r;
         result.save();
 
         return result;
