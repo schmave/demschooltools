@@ -1,6 +1,12 @@
 philly-prod-git := git@heroku.com:shining-overseer.git
 web-test-git := git@heroku.com:shining-overseer-test.git
 
+T : 
+	@echo deploy-test
+	@echo deploy-philly
+	@echo unit-test
+	@echo webdriver-test
+
 # example of ls and echo
 hello : 
 	ls
@@ -14,3 +20,6 @@ deploy-philly :
 
 unit-test :
 	lein test
+
+webdriver-test :
+	lein test :integration
