@@ -113,6 +113,8 @@ public class Charge extends Model implements Comparable<Charge> {
         decision = decision.trim();
         if (!decision.equals("")) {
             this.sm_decision = decision;
+        } else {
+            this.sm_decision = null;
         }
         this.sm_decision_date = date;
     }

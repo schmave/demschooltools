@@ -1,0 +1,21 @@
+@(charge : Charge)
+
+@import helper._
+
+@main("Edit School Meeting decision", "", menu = "jc") {
+
+<h3>Edit School Meeting decision</h3>
+
+<script type="text/javascript">
+$(function() {
+    $(".date").datepicker({
+        showOtherMonths: true,
+        selectOtherMonths: true,
+        dateFormat: "yy-mm-dd"});
+}
+);
+</script>
+
+@sm_decision_form(charge)
+
+}
