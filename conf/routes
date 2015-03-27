@@ -22,6 +22,7 @@ GET   /viewRuleHistory/:id    controllers.Application.viewRuleHistory(id: Intege
 
 
 GET   /enterSchoolMeeting  controllers.ApplicationEditing.enterSchoolMeetingDecisions()
+GET   /editSchoolMeeting/:charge_id  controllers.ApplicationEditing.editSchoolMeetingDecision(charge_id: Integer)
 POST  /enterSchoolMeeting  controllers.ApplicationEditing.saveSchoolMeetingDecisions()
 
 GET /viewSchoolMeeting controllers.Application.viewSchoolMeetingDecisions()

@@ -135,6 +135,11 @@ public class ApplicationEditing extends Controller {
         return ok(views.html.enter_sm_decisions.render(Application.getActiveSchoolMeetingReferrals()));
     }
 
+    public static Result editSchoolMeetingDecision(Integer charge_id) {
+        Charge c = Charge.findById(charge_id);
+        return ok(views.html.edit_sm_decision.render(c));
+    }
+
     public static Result saveSchoolMeetingDecisions() {
         Map<String, String[]> form_data = request().body().asFormUrlEncoded();
 

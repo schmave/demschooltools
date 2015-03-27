@@ -8,8 +8,8 @@
 $(function() {
     $(".date").datepicker({
         showOtherMonths: true,
-        selectOtherMonths: true});
-    $(".date").datepicker("option", "dateFormat", "yy-mm-dd");
+        selectOtherMonths: true,
+        dateFormat: "yy-mm-dd"});
 }
 );
 </script>
@@ -19,34 +19,8 @@ $(function() {
 @if( sm_charges.size() > 0 ) {
 
 	@for( c <- sm_charges ) {
-		<div class="panel panel-info">
-		<div class="panel-heading"><h4>#@c.the_case.case_number &bull;
-			@if(c.person != null) { @c.person.getDisplayName() } &bull;
-			@c.getRuleTitle()</div>
-		<div class="panel-body">
-		@caseTableOpen()
-		@caseTableRow(c.the_case)
-		</table>
-
-		<p>The recommended @OrgConfig.get().str_res_plan was:
-			<p style="padding-left:1in">@c.resolution_plan
-		<p>The plea was @c.plea.
-
-		<form class="form-horizontal" method=POST>
-		<input type="hidden" name="charge_id" value="@c.id">
-		<div class="form-group">
-			<label class="col-sm-1">School Meeting decision: </label>
-			<div class="col-sm-6"><textarea rows="12" cols="90" name="sm_decision"></textarea></div>
-		</div>
-		<div class="form-group">
-			<label class="col-sm-1">On date:</label>
-				<div class="col-sm-2"><input name="date" class="date form-control" type="text"></div>
-		</div>
-		<br><input style="margin-left: 200px" type="submit" class="btn btn-primary" value="Submit and mark as closed">
-		</form>
-		</div></div>
+		@sm_decision_form(c)
 	}
-	</table>
 } else {
    <p>None!!!
 }

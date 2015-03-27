@@ -15,6 +15,7 @@
 </table>
 @for( c <- charges) {
 	@historyCharge(c, true, true, false)
+	<a href="@routes.ApplicationEditing.editSchoolMeetingDecision(c.id)" class="man-edit">Edit</a>
 }
 
 }
