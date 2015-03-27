@@ -42,12 +42,8 @@ public class Case extends Model implements Comparable<Case> {
     @JsonIgnore
     public Meeting meeting;
 
-    @ManyToOne
-    @JoinColumn(name="writer_id")
-    public Person writer;
-
     @OneToMany(mappedBy="the_case")
-    public List<TestifyRecord> testify_records;
+    public List<PersonAtCase> people_at_case;
 
     @OneToMany(mappedBy="the_case")
     @OrderBy("id ASC")
@@ -94,21 +90,14 @@ public class Case extends Model implements Comparable<Case> {
         String date_string = query_string.get("date")[0];
         date = controllers.Application.getDateFromString(date_string);
         time = query_string.get("time")[0];
-
-        if (query_string.containsKey("writer_id")) {
-            writer = Person.find.ref(Integer.parseInt(query_string.get("writer_id")[0]));
-        } else {
-            writer = null;
-        }
     }
 
 	public boolean empty() {
 		return findings.equals("") &&
 			location.equals("") &&
-			writer == null &&
 			date == null &&
             time.equals("") &&
-			testify_records.size() == 0 &&
+			people_at_case.size() == 0 &&
 			charges.size() == 0;
 	}
 

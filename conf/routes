@@ -33,8 +33,8 @@ POST /addPersonAtMeeting    controllers.ApplicationEditing.addPersonAtMeeting(me
 POST /removePersonAtMeeting    controllers.ApplicationEditing.removePersonAtMeeting(meeting_id : Integer, person_id : Integer, role : Integer)
 
 
-POST /addTestifier   controllers.ApplicationEditing.addTestifier(case_id : Integer, person_id : Integer)
-POST /removeTestifier controllers.ApplicationEditing.removeTestifier(case_id : Integer, person_id : Integer)
+POST /addPersonAtCase controllers.ApplicationEditing.addPersonAtCase(case_id : Integer, person_id : Integer, role : Integer)
+POST /removePersonAtCase controllers.ApplicationEditing.removePersonAtCase(case_id : Integer, person_id : Integer, role : Integer)
 
 POST /addCharge   controllers.ApplicationEditing.addCharge(case_id : Integer)
 POST /saveCharge controllers.ApplicationEditing.saveCharge(id : Integer)
