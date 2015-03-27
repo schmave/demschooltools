@@ -8,6 +8,7 @@
             [compojure.route :as route]
             [clojure.java.io :as io]
             [clojure.tools.nrepl.server :as nrepl-server]
+            [jdbc-ring-session.core :refer [jdbc-store]] 
             [cider.nrepl :refer (cider-nrepl-handler)]
             [ring.adapter.jetty :as jetty]
             [ring.util.response :as resp]
@@ -135,7 +136,8 @@
                                     :login-uri "/login"
                                     :default-landing-uri "/"
                                     :workflows [(workflows/interactive-form)]})
-              (wrap-session {:cookie-attrs {:max-age (* 3 365 24 3600)}})
+              (wrap-session {:store (jdbc-store db/pgdb)
+                             :cookie-attrs {:max-age (* 3 365 24 3600)}})
               wrap-keyword-params
               wrap-json-body wrap-json-params wrap-json-response ))
 

@@ -50,17 +50,29 @@
   date date
   );")
 
+(def create-session-store-sql
+  "
+  CREATE TABLE session_store (
+  session_id VARCHAR(36) NOT NULL PRIMARY KEY,
+  idle_timeout BIGINT,
+  absolute_timeout BIGINT,
+  value BYTEA
+  )
+")
+
 (def pgdb
   (dissoc (h/korma-connection-map (env :database-url))
           :classname))
 
 (defn create-all-tables []
+  (jdbc/execute! pgdb [create-session-store-sql])
   (jdbc/execute! pgdb [create-swipes-table-sql])
   (jdbc/execute! pgdb [create-override-table-sql])
   (jdbc/execute! pgdb [create-excuses-table-sql])
   (jdbc/execute! pgdb [create-years-table-sql])
   (jdbc/execute! pgdb [create-students-table-sql]))
 (defn drop-all-tables []
+  (jdbc/execute! pgdb ["drop table if exists session_store;"])
   (jdbc/execute! pgdb ["drop table if exists students;"])
   (jdbc/execute! pgdb ["drop table if exists excuses;"])
   (jdbc/execute! pgdb ["drop table if exists overrides;"])

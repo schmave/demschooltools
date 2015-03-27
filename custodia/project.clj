@@ -11,6 +11,7 @@
                  [com.cemerick/friend "0.2.1" :exclusions [xerces/xercesImpl]]
                  [environ "1.0.0"]
                  [ring/ring-json "0.3.1"]
+                 [jdbc-ring-session "0.2"]
                  [sonian/carica "1.1.0" :exclusions [[cheshire]]]
                  [clj-time "0.8.0"]
                  [heroku-database-url-to-jdbc "0.2.2"]

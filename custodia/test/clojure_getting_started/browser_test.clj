@@ -13,14 +13,9 @@
   (submit "#password")
   (wait-until #(exists? "a#student-7"))
   (click "a#student-7")
-  (wait-until #(exists? "div#student-total-row"))
+  (wait-until #(exists? "div#studenttotalrow"))
   (testing "student page totals"
-    (is (= (value "div#student-total-row")
-           "Attended: 3"))
-    (is (= true
-           (.contains (value "#student-total-row")
-                      "Attended: 3")))
-    (is (= true
-           (.contains (value "#student-total-row")
-                      "Absent: 2"))))
+    (is (= (value "div#studenttotalrow")
+           (text "div#studenttotalrow")
+           "Attended: 3")))
   (quit))
