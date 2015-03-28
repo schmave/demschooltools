@@ -51,13 +51,12 @@
   );")
 
 (def create-session-store-sql
-  "
-  CREATE TABLE session_store (
+  " CREATE TABLE session_store (
   session_id VARCHAR(36) NOT NULL PRIMARY KEY,
   idle_timeout BIGINT,
   absolute_timeout BIGINT,
   value BYTEA
-  )
+  );
 ")
 
 (def pgdb
@@ -132,12 +131,12 @@ where y.name=? AND e.student_id =?
 (defn get-student-list-in-out []
   (let [q (str "
 select stu.name
-       , stu._id
-        , CASE WHEN l.outs > l.ins=true THEN 'out'
-            ELSE 'in'
-          END as last_swipe_type
+  , stu._id
+    , CASE WHEN l.outs > l.ins=true THEN 'out'
+      ELSE 'in'
+        END as last_swipe_type
         , CASE WHEN l.outs > l.ins=true THEN l.outs
-            ELSE l.ins
+          ELSE l.ins
           END as last_swipe_date
 from students stu
 left join 
@@ -178,24 +177,24 @@ order by days2.days
 (defn get-report [year-name]
   (let [q (str "
 select
-      stu.student_id 
-     , stu.student_id as _id
-     , (select s.name from students s where s._id = stu.student_id) as name
-     , sum(CASE WHEN oid IS NOT NULL THEN stu.requiredmin/60 ELSE stu.intervalmin/60 END) as total_hours
-     , sum(CASE WHEN oid IS NOT NULL 
-                OR stu.intervalmin >= stu.requiredmin
-           THEN 1 ELSE 0 END) as good
-     , sum(CASE WHEN (oid IS NULL 
-                      AND eid IS NULL)
-               AND (stu.intervalmin < stu.requiredmin 
-                    AND stu.intervalmin IS NOT NULL)
-           THEN 1 ELSE 0 END) as short
-     , sum(CASE WHEN oid IS NOT NULL THEN 1 ELSE 0 END) as overrides
-     , sum(CASE WHEN eid IS NOT NULL THEN 1 ELSE 0 END) as excuses
-     , sum(CASE WHEN anyswipes IS NULL 
-                    AND eid IS NULL
-                    AND oid IS NULL
-            THEN 1 ELSE 0 END) as unexcused
+  stu.student_id 
+    , stu.student_id as _id
+    , (select s.name from students s where s._id = stu.student_id) as name
+    , sum(CASE WHEN oid IS NOT NULL THEN stu.requiredmin/60 ELSE stu.intervalmin/60 END) as total_hours
+    , sum(CASE WHEN oid IS NOT NULL 
+               OR stu.intervalmin >= stu.requiredmin
+          THEN 1 ELSE 0 END) as good
+    , sum(CASE WHEN (oid IS NULL 
+                     AND eid IS NULL)
+              AND (stu.intervalmin < stu.requiredmin 
+                   AND stu.intervalmin IS NOT NULL)
+          THEN 1 ELSE 0 END) as short
+    , sum(CASE WHEN oid IS NOT NULL THEN 1 ELSE 0 END) as overrides
+    , sum(CASE WHEN eid IS NOT NULL THEN 1 ELSE 0 END) as excuses
+    , sum(CASE WHEN anyswipes IS NULL 
+                   AND eid IS NULL
+                   AND oid IS NULL
+           THEN 1 ELSE 0 END) as unexcused
 from (
       SELECT 
         schooldays.student_id
@@ -254,9 +253,9 @@ group by stu.student_id;
   (let [q (str "
 select s.*
        ,'swipes' as type
-       , extract(EPOCH FROM (s.out_time - s.in_time)::INTERVAL)/60 as interval
-       , to_char(s.in_time at time zone 'America/New_York', 'HH:MI:SS') as nice_in_time
-       , to_char(s.out_time at time zone 'America/New_York', 'HH:MI:SS') as nice_out_time
+  , extract(EPOCH FROM (s.out_time - s.in_time)::INTERVAL)/60 as interval
+  , to_char(s.in_time at time zone 'America/New_York', 'HH:MI:SS') as nice_in_time
+  , to_char(s.out_time at time zone 'America/New_York', 'HH:MI:SS') as nice_out_time
 from swipes s
 inner join years y 
 ON ((s.out_time BETWEEN y.from_date AND y.to_date)
