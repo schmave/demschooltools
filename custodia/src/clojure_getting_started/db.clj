@@ -173,6 +173,42 @@ order by days2.days
   )
 
 ;; (map :days (get-school-days "2014-06-01 2015-06-01"))
+(defn get-student-page [id year]
+  (let [q "
+SELECT 
+  schooldays.student_id
+  , s.out_time
+  , s.in_time
+  , extract(EPOCH FROM (s.out_time - s.in_time)::INTERVAL)/60 as intervalmin
+  , o._id oid
+  , e._id eid
+
+  , schooldays.olderdate
+  , schooldays.days AS day
+    FROM (SELECT a.days, students._id student_id, students.olderdate FROM (SELECT DISTINCT days2.days
+          FROM (SELECT
+                 date(s.in_time at time zone 'America/New_York') as days
+                  FROM swipes s
+                  INNER JOIN years y 
+                    ON ((s.out_time BETWEEN y.from_date AND y.to_date)
+                        OR (s.in_time BETWEEN y.from_date AND y.to_date))
+                  WHERE y.name=?) days2
+          ORDER BY days2.days) as a
+          JOIN students on (1=1)
+) as schooldays
+    LEFT JOIN swipes s
+      ON (schooldays.days = date(s.in_time at time zone 'America/New_York')
+        AND schooldays.student_id = s.student_id) 
+    LEFT JOIN overrides o 
+      ON (schooldays.days = o.date AND o.student_id = schooldays.student_id)
+    LEFT JOIN excuses e 
+      ON (schooldays.days = e.date AND e.student_id = schooldays.student_id)
+    where schooldays.days is not null
+    and schooldays.student_id = ?;
+"
+        report (jdbc/query pgdb [q year id])
+        ]
+    report))
 
 (defn get-report [year-name]
   (let [q (str "
