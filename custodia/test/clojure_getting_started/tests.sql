@@ -250,3 +250,17 @@ SELECT
 -- update students set name='Qurzit Torwyn' where _id=93;
 
 -- select * from students;
+
+-- Turns out that heroku restarts the dyno once a day,
+-- and that means storing sessions in memory means you get
+-- logged out each time... time to store in DB!
+
+-- Turns out that Postgres has a default timezone, 
+-- and of course my local machine timezone is "localtime" and
+-- the heroku database is 'UTC'...
+-- show timezone;   => 'localtime' 
+-- set timezone='UTC';     => SET  (only works for that connectiON)
+-- can be reset at the postgresql.conf file found in 
+-- SHOW config_file; 
+-- edit the timezone to 'UTC' then reload it with
+-- select * from pg_reload_conf();
