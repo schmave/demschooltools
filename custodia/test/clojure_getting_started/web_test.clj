@@ -39,25 +39,25 @@
   (db/swipe-out sid (t/plus basetime (t/hours 6)))
 
   ;; good tomorrow
-  
+
   (db/swipe-in sid (t/plus basetime (t/days 1)))
   (db/swipe-out sid (t/plus basetime (t/days 1) (t/hours 6)))
 
   ;; short the next
-  
+
   (db/swipe-in sid (t/plus basetime (t/days 2)))
   (db/swipe-out sid (t/plus basetime (t/days 2) (t/hours 4)))
 
 
   ;; two short the next but long enough
-  
+
   (db/swipe-in sid (t/plus basetime (t/days 3)))
   (db/swipe-out sid (t/plus basetime (t/days 3) (t/hours 4)))
   (db/swipe-in sid (t/plus basetime (t/days 3) (t/hours 5)))
   (db/swipe-out sid (t/plus basetime (t/days 3) (t/hours 7)))
 
   ;; short the next - 10-18-2014 
-  
+
   (db/swipe-in sid (t/plus basetime (t/days 4)))
   (db/swipe-out sid (t/plus basetime (t/days 4) (t/hours 4)))
   )
@@ -90,7 +90,7 @@
         (is (= (:in_time passed) (:in_time result)))
         (is (= (:in_time passed) (:out_time result)))))
     )   
-  
+
   )
 
 (deftest swipe-attendence-override-test
@@ -261,7 +261,22 @@
   (db/sample-db)
   (testing "Getting current year"
     (is (= (dates/get-current-year-string (db/get-years))
-           "2014-06-01 2015-06-01" ))))
+           "2014-06-01 2015-06-01"))))
+
+(deftest excuse-today-is-today
+  (do (db/sample-db)  
+      (let [s (db/make-student "test")
+            sid (:_id s)
+            today-string (dates/today-string)]
+        (db/excuse-date sid today-string)
+        (let [att (trace/trace "att" (get-att sid s))
+              today (-> att :days first)]
+          (testing "First day is today string"
+            (is (= (:day today) today-string)))
+          (testing "Today is excused"
+            (is (= (:excused today) true)))
+          ))) 
+  )
 
 (deftest swipe-today-not-in-on-excused-or-override
   (do (db/sample-db)  

@@ -14,7 +14,6 @@
 ;; TODO make this configurable?
 (def local-time-zone-id (t/time-zone-for-id "America/New_York"))
 
-
 (defn format-to-local [f d]
   (f/unparse (f/with-zone f local-time-zone-id) d))
 

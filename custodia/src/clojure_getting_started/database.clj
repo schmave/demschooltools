@@ -39,10 +39,9 @@
 (defn make-timestamp [t] 
   (->> t str (f/parse) c/to-timestamp))
 
-(defn make-sqldate[t] 
-  (c/to-sql-date
-   (t/plus (->> t str (f/parse))
-           (t/days 1))))
+;; (make-sqldate "2015-03-30")
+(defn- make-sqldate [t] 
+   (->> t str (f/parse) c/to-sql-date))
 
 (trace/deftrace swipe-in
   ([id] (swipe-in id (t/now)))
@@ -87,6 +86,7 @@
 (trace/deftrace delete-year [year]
   (when-let [year (first (get-years year))]
     (db/delete! year)))
+
 
 (trace/deftrace excuse-date [id date-string]
   (db/persist! {:type :excuses
@@ -161,6 +161,6 @@
                   (swipe-out x (t/minus (t/plus (t/now) (t/minutes 5))
                                         (t/days y)))
                   (recur (inc y))))))
-          
+
           (recur (inc x)))))
   )
