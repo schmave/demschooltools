@@ -35,21 +35,24 @@
 
 (defn add-swipes [sid]
   ;; 14 hours in UTC is 9 Am here
+  ;; 10-14-2014 
   (db/swipe-in sid basetime)
   (db/swipe-out sid (t/plus basetime (t/hours 6)))
 
   ;; good tomorrow
+  ;; 10-15-2014 
 
   (db/swipe-in sid (t/plus basetime (t/days 1)))
   (db/swipe-out sid (t/plus basetime (t/days 1) (t/hours 6)))
 
   ;; short the next
+  ;; 10-16-2014 
 
   (db/swipe-in sid (t/plus basetime (t/days 2)))
   (db/swipe-out sid (t/plus basetime (t/days 2) (t/hours 4)))
 
-
   ;; two short the next but long enough
+  ;; 10-17-2014 
 
   (db/swipe-in sid (t/plus basetime (t/days 3)))
   (db/swipe-out sid (t/plus basetime (t/days 3) (t/hours 4)))
@@ -57,7 +60,6 @@
   (db/swipe-out sid (t/plus basetime (t/days 3) (t/hours 7)))
 
   ;; short the next - 10-18-2014 
-
   (db/swipe-in sid (t/plus basetime (t/days 4)))
   (db/swipe-out sid (t/plus basetime (t/days 4) (t/hours 4)))
   )
@@ -136,6 +138,14 @@
                    0)))
           ))))
 
+
+  ;; 10-14-2014 - good
+  ;; 10-15-2014 - good
+  ;; 10-16-2014 - short
+  ;; 10-17-2014 - good
+  ;; 10-18-2014 - short
+  ;; 10-19-2014 - absent
+  ;; 10-20-2014 - absent
 (deftest swipe-attendence-test
   (do (db/sample-db)  
       (let [s (db/make-student "test")
@@ -157,7 +167,7 @@
         (let [att (get-att sid s)
               att2 (get-att sid2 s2)]
           (testing "Total Valid Day Count"
-            (is (= (:total_days att)
+            (is (= (:total_days  att)
                    4)))
           (testing "Total Short Day Count"
             (is (= (:total_short att)
@@ -210,7 +220,6 @@
         (db/swipe-out sid (t/plus basetime (t/days 1) (t/minutes 331)))
         (let [att (get-att sid s)]
           (testing "swiping out on another day just is an out"
-            (trace/trace att)
             (is (= 2 (-> att :days count)))))))
   )
 
@@ -223,9 +232,11 @@
         (db/swipe-in sid basetime)
         (db/swipe-out sid (t/plus basetime (t/minutes 331)))
 
-        (let [att (att/get-students-with-att
-                   (dates/get-current-year-string (db/get-years))
-                   sid)]
+        (let [att  (att/get-students-with-att
+                     (dates/get-current-year-string (db/get-years))
+                     sid)]
+          (testing "has one valid"
+            (is (=  (-> att first :total_days) 1 )))
           (testing "students with att doesn't throw exceptions"
             (is (not= '() att))))))
   )
@@ -269,7 +280,7 @@
             sid (:_id s)
             today-string (dates/today-string)]
         (db/excuse-date sid today-string)
-        (let [att (trace/trace "att" (get-att sid s))
+        (let [att  (get-att sid s)
               today (-> att :days first)]
           (testing "First day is today string"
             (is (= (:day today) today-string)))

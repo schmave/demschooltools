@@ -21,8 +21,8 @@
 (defn get-excuses [id]
   (db/get-* "excuses" id "student_id"))
 
-(defn- lookup-last-swipe-for-day [id day]
-  (let [last (-> (get-swipes id) last)]
+(trace/deftrace lookup-last-swipe-for-day [id day]
+  (let [last (db/lookup-last-swipe id)]
     (when (= day (make-date-string (:in_time last)))
       last)))
 

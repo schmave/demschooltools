@@ -1,5 +1,7 @@
 (ns clojure-getting-started.db
-  (:import [java.sql PreparedStatement])
+ (:import
+    [java.util Date Calendar TimeZone]
+    [java.sql PreparedStatement])
   (:require [carica.core :as c]
             [cemerick.url :as url]
             [clojure.tools.trace :as trace]
@@ -10,6 +12,11 @@
             [clj-time.format :as timef]
             [clojure.java.jdbc :as jdbc]
             ))
+(extend-type Date
+  jdbc/ISQLParameter
+  (set-parameter [val ^PreparedStatement stmt ix]
+    (let [cal (Calendar/getInstance (TimeZone/getTimeZone "UTC"))]
+      (.setTimestamp stmt ix (timec/to-timestamp val) cal))))
 
 (def create-students-table-sql
   "create table students(
@@ -114,6 +121,17 @@ where y.name=? AND e.student_id =?
     (jdbc/query
      pgdb
      [q year-name student-id])))
+
+(defn lookup-last-swipe [student-id]
+  (let [q (str "
+select * 
+from swipes s
+where s.student_id =? and s.in_time is not null
+order by s.in_time desc
+limit 1;
+")]
+    (first (jdbc/query pgdb [q student-id])))
+  )
 
 (defn get-excuses-in-year [year-name student-id]
   (let [q (str "
