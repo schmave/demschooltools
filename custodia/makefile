@@ -6,6 +6,9 @@ T :
 	@echo deploy-philly
 	@echo unit-test
 	@echo webdriver-test
+	@echo drop-tables
+	@echo load-massive-dump
+	@echo load-aliased-dump
 
 # example of ls and echo
 hello : 
@@ -24,6 +27,11 @@ unit-test :
 webdriver-test :
 	lein test :integration
 
-load-massive-dump :
+drop-tables :
 	psql -d swipes -c "drop table if exists session_store; drop table if exists students; drop table if exists excuses; drop table if exists overrides; drop table if exists years; drop table if exists swipes;"
+
+load-massive-dump : drop-tables
 	psql swipes < massive.dump
+
+load-aliased-dump : drop-tables
+	psql swipes < dumps/migrated-students-aliased.dump

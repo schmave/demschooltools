@@ -61,29 +61,29 @@
             <button id="create-student-button" class="btn btn-success" ng-show="isAdmin" ng-click="showCreate()">Create Student</button>
           </div>
           <div class="row col-md-12" ng-show="screen ==='home'">
-            <div class="col-md-4 ins text-center">
+            <div class="col-md-3 ins text-center">
               Not Yet In
               <ul>
-                <li class="list-unstyled col-xs-4" 
+                <li class="list-unstyled col-xs-12" 
                     ng-repeat="student in filterStudentsNotYetIn(students) | orderObjectBy:'name':false">
                   <a class="" id="student-{{student._id}}" ng-click="showStudent(student)">{{student.name}}</a>
                 </li>
               </ul>
             </div>
-            <div class="col-md-4 ins text-center">
+            <div class="col-md-6 ins text-center">
               IN
               <ul>
-                <li class="list-unstyled col-xs-4" 
+                <li class="list-unstyled col-xs-6" 
                     ng-repeat="student in filterStudentsIn(students) | orderObjectBy:'name':false">
                   <a class="" ng-click="showStudent(student)">{{student.name}}</a>
                   <!-- {{student}} -->
                 </li>
               </ul>
             </div>
-            <div class="col-md-4 text-center">
+            <div class="col-md-3 text-center">
               OUT
               <ul>
-                <li class="list-unstyled col-xs-4" 
+                <li class="list-unstyled col-xs-12" 
                     ng-repeat="student in filterStudentsOut(students) | orderObjectBy:'name':false">
                   <a class="" ng-click="showStudent(student)">{{student.name}}</a>
                   <!-- {{student}} -->
