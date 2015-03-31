@@ -23,3 +23,7 @@ unit-test :
 
 webdriver-test :
 	lein test :integration
+
+load-massive-dump :
+	psql -d swipes -c "drop table if exists session_store; drop table if exists students; drop table if exists excuses; drop table if exists overrides; drop table if exists years; drop table if exists swipes;"
+	psql swipes < massive.dump

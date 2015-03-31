@@ -14,3 +14,8 @@ body {
 .ng-hide {
     display: none !important;
 }
+
+
+.ins {
+    border-right: 5px solid gray;
+}

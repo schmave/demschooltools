@@ -1,5 +1,8 @@
 * DONE Fix Angular Jump 
   CLOSED: [2015-03-26 Thu 16:15]
+* TODO Make absent column
+* TODO Make double wide "in" column
+* TODO Remove today's attendance 
 * TODO Make student page single query
 * TODO New Relic tracing
 * TODO Database stored sessions

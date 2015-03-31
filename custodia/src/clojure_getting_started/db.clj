@@ -1,7 +1,7 @@
 (ns clojure-getting-started.db
- (:import
-    [java.util Date Calendar TimeZone]
-    [java.sql PreparedStatement])
+  (:import
+   [java.util Date Calendar TimeZone]
+   [java.sql PreparedStatement])
   (:require [carica.core :as c]
             [cemerick.url :as url]
             [clojure.tools.trace :as trace]
@@ -84,7 +84,8 @@
   (jdbc/execute! pgdb ["drop table if exists excuses;"])
   (jdbc/execute! pgdb ["drop table if exists overrides;"])
   (jdbc/execute! pgdb ["drop table if exists years;"])
-  (jdbc/execute! pgdb ["drop table if exists swipes;"]))
+  (jdbc/execute! pgdb ["drop table if exists swipes;"])
+  )
 
 (defn reset-db []
   (drop-all-tables) 

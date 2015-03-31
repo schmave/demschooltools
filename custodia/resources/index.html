@@ -34,9 +34,6 @@
           <ul class="nav navbar-nav">
             <li class="{{(screen==='home')?'active':''}}"><a href="#" ng-click="showHome()">Home</a></li>
             <li class="{{(screen==='student-totals')?'active':''}}"><a href="#" ng-show="isAdmin" ng-click="showStudents()">Student Totals</a></li>
-            <li class="{{(screen==='swiped-today')?'active':''}}">
-              <a href="#" ng-show="isAdmin" ng-click="showSwipedToday()">Today's Attendance</a>
-            </li>
             <li><a href="/logout">Logout</a></li>
           </ul>
         </div><!--/.nav-collapse -->
@@ -64,27 +61,29 @@
             <button id="create-student-button" class="btn btn-success" ng-show="isAdmin" ng-click="showCreate()">Create Student</button>
           </div>
           <div class="row col-md-12" ng-show="screen ==='home'">
-            <div class="col-md-4">
+            <div class="col-md-4 ins text-center">
               Not Yet In
-              <li class="list-unstyled" 
-                  ng-repeat="student in filterStudentsNotYetIn(students) | orderObjectBy:'name':false">
-                <a class="" id="student-{{student._id}}" ng-click="showStudent(student)">{{student.name}}</a>
-              </li>
+              <ul>
+                <li class="list-unstyled col-xs-4" 
+                    ng-repeat="student in filterStudentsNotYetIn(students) | orderObjectBy:'name':false">
+                  <a class="" id="student-{{student._id}}" ng-click="showStudent(student)">{{student.name}}</a>
+                </li>
+              </ul>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4 ins text-center">
               IN
               <ul>
-                <li class="list-unstyled" 
+                <li class="list-unstyled col-xs-4" 
                     ng-repeat="student in filterStudentsIn(students) | orderObjectBy:'name':false">
                   <a class="" ng-click="showStudent(student)">{{student.name}}</a>
                   <!-- {{student}} -->
                 </li>
               </ul>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4 text-center">
               OUT
               <ul>
-                <li class="list-unstyled" 
+                <li class="list-unstyled col-xs-4" 
                     ng-repeat="student in filterStudentsOut(students) | orderObjectBy:'name':false">
                   <a class="" ng-click="showStudent(student)">{{student.name}}</a>
                   <!-- {{student}} -->
@@ -92,12 +91,6 @@
               </ul>
             </div>
           </div>
-        </div>
-        <div class="form-group"  ng-show="screen === 'swiped-today'">
-          <h2>Today's Attendance</h2>
-          <li ng-repeat="student in filterStudentsIn(students)">
-            {{student.name}}
-          </li>
         </div>
         <div class="lead form-group" ng-show="screen === 'saving'">
           <h1>Saving...</h1>
