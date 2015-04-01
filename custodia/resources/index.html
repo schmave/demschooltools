@@ -61,35 +61,30 @@
             <button id="create-student-button" class="btn btn-success" ng-show="isAdmin" ng-click="showCreate()">Create Student</button>
           </div>
           <div class="row col-md-12 " ng-show="screen ==='home'">
-            <div class="row-same-height">
-              <div class="col-md-3 ins text-center col-xs-height">
-                Not Yet In
-                <ul>
-                  <li class="list-unstyled col-xs-12" 
-                      ng-repeat="student in filterStudentsNotYetIn(students) | orderObjectBy:'name':false">
-                    <a class="" id="student-{{student._id}}" ng-click="showStudent(student)">{{student.name}}</a>
-                  </li>
-                </ul>
+            <div class="row-same-height col-top">
+              <div class="col-md-3 ins text-center col-top col-xs-height list-group">
+                <span class="col-md-12">Not Yet In</span>
+                <a class="list-group-item col-xs-12" 
+                   id="student-{{student._id}}"
+                   ng-click="showStudent(student)"
+                   ng-repeat="student in filterStudentsNotYetIn(students) | orderObjectBy:'name':false">
+                  {{student.name}}
+                </a>
               </div>
-              <div class="col-md-6 ins text-center col-xs-height">
-                IN
-                <ul>
-                  <li class="list-unstyled col-xs-6" 
-                      ng-repeat="student in filterStudentsIn(students) | orderObjectBy:'name':false">
-                    <a class="" ng-click="showStudent(student)">{{student.name}}</a>
-                    <!-- {{student}} -->
-                  </li>
-                </ul>
+              <div class="col-md-6 ins list-group text-center col-top col-xs-height">
+                <span class="col-md-12">In</span>
+                <a class="list-group-item col-xs-6 col-top" 
+                   ng-click="showStudent(student)"
+                   ng-repeat="student in filterStudentsIn(students) | orderObjectBy:'name':false">
+                  {{student.name}}</a>
+                <!-- {{student}} -->
               </div>
-              <div class="col-md-3 text-center col-xs-height">
-                OUT
-                <ul>
-                  <li class="list-unstyled col-xs-12" 
-                      ng-repeat="student in filterStudentsOut(students) | orderObjectBy:'name':false">
-                    <a class="" ng-click="showStudent(student)">{{student.name}}</a>
-                    <!-- {{student}} -->
-                  </li>
-                </ul>
+              <div class="col-md-3 list-group text-center col-top col-xs-height">
+                <span class="col-md-12">Out</span>
+                <a class="list-group-item col-xs-12 col-top" 
+                   ng-repeat="student in filterStudentsOut(students) | orderObjectBy:'name':false"
+                   ng-click="showStudent(student)">
+                  {{student.name}}</a>
               </div>
             </div>
           </div>
