@@ -43,3 +43,7 @@ body {
 .col-bottom {
     vertical-align:bottom;
 }
+
+.list-group-item {
+    padding: 2px 15px;
+}
