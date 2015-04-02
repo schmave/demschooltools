@@ -1,1 +1,1 @@
-web: java $JVM_OPTS -cp target/test.jar clojure.main -m clojure-getting-started.web
+web: java $JVM_OPTS -jar target/clojure-getting-started-standalone.jar -m clojure-getting-started.web
