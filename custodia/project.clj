@@ -30,4 +30,4 @@
   :uberjar-name "clojure-getting-started-standalone.jar"
   :profiles {:test {:dependencies [[clj-webdriver "0.6.1"]]}
              :production {:env {:production true}}
-             :uberjar {:aot :all}})
+             :uberjar {:main clojure-getting-started.web :aot :all}})
