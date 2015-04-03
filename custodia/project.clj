@@ -19,7 +19,6 @@
                  [postgresql "9.1-901.jdbc4"]
                  [com.ashafa/clutch "0.4.0"]]
   :min-lein-version "2.0.0"
-  :main clojure-getting-started.web
   :plugins [[cider/cider-nrepl "0.8.1"]
             [lein-ring "0.7.0"]
             [environ/environ.lein "0.2.1"]]
@@ -27,6 +26,7 @@
                    :integration :integration
                    :all (constantly true)}
   :hooks [environ.leiningen.hooks]
+  :main clojure-getting-started.web
   :uberjar-name "clojure-getting-started-standalone.jar"
   :profiles {:test {:dependencies [[clj-webdriver "0.6.1"]]}
              :production {:env {:production true}}

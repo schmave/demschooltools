@@ -1,5 +1,4 @@
 (ns clojure-getting-started.web
-  (:gen-class)
   (:require [compojure.core :refer [defroutes GET PUT POST DELETE ANY]]
             [ring.middleware.json :refer [wrap-json-response wrap-json-body wrap-json-params]]
             [ring.middleware.keyword-params :refer [wrap-keyword-params]]
