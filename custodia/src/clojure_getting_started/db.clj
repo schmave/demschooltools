@@ -67,24 +67,26 @@
   );
 ")
 
-(def pgdb
-  (dissoc (h/korma-connection-map (env :database-url))
-          :classname))
+(def pgdb (atom nil))
+(defn init-pg []
+  (swap! pgdb (fn [old]
+                (dissoc (h/korma-connection-map (env :database-url))
+                        :classname))))
 
 (defn create-all-tables []
-  (jdbc/execute! pgdb [create-session-store-sql])
-  (jdbc/execute! pgdb [create-swipes-table-sql])
-  (jdbc/execute! pgdb [create-override-table-sql])
-  (jdbc/execute! pgdb [create-excuses-table-sql])
-  (jdbc/execute! pgdb [create-years-table-sql])
-  (jdbc/execute! pgdb [create-students-table-sql]))
+  (jdbc/execute! @pgdb [create-session-store-sql])
+  (jdbc/execute! @pgdb [create-swipes-table-sql])
+  (jdbc/execute! @pgdb [create-override-table-sql])
+  (jdbc/execute! @pgdb [create-excuses-table-sql])
+  (jdbc/execute! @pgdb [create-years-table-sql])
+  (jdbc/execute! @pgdb [create-students-table-sql]))
 (defn drop-all-tables []
-  (jdbc/execute! pgdb ["drop table if exists session_store;"])
-  (jdbc/execute! pgdb ["drop table if exists students;"])
-  (jdbc/execute! pgdb ["drop table if exists excuses;"])
-  (jdbc/execute! pgdb ["drop table if exists overrides;"])
-  (jdbc/execute! pgdb ["drop table if exists years;"])
-  (jdbc/execute! pgdb ["drop table if exists swipes;"])
+  (jdbc/execute! @pgdb ["drop table if exists session_store;"])
+  (jdbc/execute! @pgdb ["drop table if exists students;"])
+  (jdbc/execute! @pgdb ["drop table if exists excuses;"])
+  (jdbc/execute! @pgdb ["drop table if exists overrides;"])
+  (jdbc/execute! @pgdb ["drop table if exists years;"])
+  (jdbc/execute! @pgdb ["drop table if exists swipes;"])
   )
 
 (defn reset-db []
@@ -94,20 +96,20 @@
 (defn delete! [doc]
   (let [table (:type doc)
         id (:_id doc)]
-    (jdbc/delete! pgdb table ["_id=?" id])))
+    (jdbc/delete! @pgdb table ["_id=?" id])))
 
 (defn update! [table id fields]
   (let [fields (dissoc fields :type)]
-    (jdbc/update! pgdb table fields ["_id=?" id])))
+    (jdbc/update! @pgdb table fields ["_id=?" id])))
 
 (defn persist! [doc]
   (let [table (:type doc)
         doc (dissoc doc :type)]
     (first (map #(assoc % :type table)
-                (jdbc/insert! pgdb table doc)))))
+                (jdbc/insert! @pgdb table doc)))))
 
-;; (jdbc/query pgdb ["select * from students"])
-;; (jdbc/query pgdb ["select * from students where id in (?)" "1"])
+;; (jdbc/query @pgdb ["select * from students"])
+;; (jdbc/query @pgdb ["select * from students where id in (?)" "1"])
 ;; (persist! {:type :students :name "steve" :olderdate nil})
 ;; (update! :students 1 {:olderdate  "test"})
 (defn get-overrides-in-year [year-name student-id]
@@ -120,7 +122,7 @@ ON (e.date BETWEEN y.from_date AND y.to_date)
 where y.name=? AND e.student_id =?
 ")]
     (jdbc/query
-     pgdb
+     @pgdb
      [q year-name student-id])))
 
 (defn lookup-last-swipe [student-id]
@@ -131,7 +133,7 @@ where s.student_id =? and s.in_time is not null
 order by s.in_time desc
 limit 1;
 ")]
-    (first (jdbc/query pgdb [q student-id])))
+    (first (jdbc/query @pgdb [q student-id])))
   )
 
 (defn get-excuses-in-year [year-name student-id]
@@ -144,7 +146,7 @@ ON (e.date BETWEEN y.from_date AND y.to_date)
 where y.name=? AND e.student_id =?
 ")]
     (jdbc/query
-     pgdb
+     @pgdb
      [q year-name student-id]))
   )
 
@@ -169,7 +171,7 @@ group by s.student_id
 order by ins, outs) as l on (l.student_id = stu._id)
 ")]
     (jdbc/query
-     pgdb
+     @pgdb
      [q ]))
   )
 ;; (map :student_id (get-student-list-in-out))
@@ -188,7 +190,7 @@ where y.name=?) days2
 order by days2.days
 ")]
     (jdbc/query
-     pgdb
+     @pgdb
      [q year-name]))
   )
 
@@ -226,7 +228,7 @@ SELECT
     where schooldays.days is not null
     and schooldays.student_id = ?;
 "
-        report (jdbc/query pgdb [q year id])
+        report (jdbc/query @pgdb [q year id])
         ]
     report))
 
@@ -286,7 +288,7 @@ from (
 ) as stu
 group by stu.student_id;
 ")
-        report (jdbc/query pgdb [q year-name])
+        report (jdbc/query @pgdb [q year-name])
         ;; totaldays (count (get-school-days year-name))
         ]
     report
@@ -319,7 +321,7 @@ ON ((s.out_time BETWEEN y.from_date AND y.to_date)
 where y.name=? AND s.student_id =? 
 ")]
     (jdbc/query
-     pgdb
+     @pgdb
      [q year-name student-id]))
   )
 
@@ -327,13 +329,13 @@ where y.name=? AND s.student_id =?
 
 (defn get-*
   ([type] (map #(assoc % :type (keyword type))
-               (jdbc/query pgdb [(str "select * from " type " order by inserted_date ")])))
+               (jdbc/query @pgdb [(str "select * from " type " order by inserted_date ")])))
   ([type id id-col]
      (map #(assoc % :type (keyword type))
           (if id
-            (jdbc/query pgdb [(str "select * from " type
+            (jdbc/query @pgdb [(str "select * from " type
                                    " where " id-col "=?"
                                    " order by inserted_date")
                               id])
-            (jdbc/query pgdb [(str "select * from " type " order by inserted_date")])))))
+            (jdbc/query @pgdb [(str "select * from " type " order by inserted_date")])))))
 

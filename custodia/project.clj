@@ -26,7 +26,7 @@
                    :integration :integration
                    :all (constantly true)}
   :hooks [environ.leiningen.hooks]
-  :main clojure-getting-started.web
+  ;; :main clojure-getting-started.web
   :uberjar-name "clojure-getting-started-standalone.jar"
   :profiles {:test {:dependencies [[clj-webdriver "0.6.1"]]}
              :production {:env {:production true}}
