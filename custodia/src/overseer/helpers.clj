@@ -1,4 +1,4 @@
-(ns clojure-getting-started.helpers
+(ns overseer.helpers
   (:require [clojure.tools.trace :as trace]))
 
 (defn wrap-args-with-trace [[symb val]]

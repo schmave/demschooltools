@@ -1,15 +1,15 @@
-(ns clojure-getting-started.report-test
+(ns overseer.report-test
   (:require [clojure.test :refer :all]
             [clj-time.format :as f]
             [clj-time.local :as l]
             [clj-time.core :as t]
             [clj-time.coerce :as c]
             [clojure.tools.trace :as trace]
-            [clojure-getting-started.db :as db]
-            [clojure-getting-started.database :as data]
-            [clojure-getting-started.attendance :as att]
-            [clojure-getting-started.helpers :as h]
-            [clojure-getting-started.dates :as dates]
+            [overseer.db :as db]
+            [overseer.database :as data]
+            [overseer.attendance :as att]
+            [overseer.helpers :as h]
+            [overseer.dates :as dates]
             ))
 
 (def basetime (t/date-time 2014 10 14 14 9 27 246)) 

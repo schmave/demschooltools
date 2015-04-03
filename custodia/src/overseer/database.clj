@@ -1,8 +1,8 @@
-(ns clojure-getting-started.database
+(ns overseer.database
   (:require [com.ashafa.clutch :as couch]
-            [clojure-getting-started.db :as db]
-            [clojure-getting-started.helpers :refer :all]
-            [clojure-getting-started.dates :refer :all]
+            [overseer.db :as db]
+            [overseer.helpers :refer :all]
+            [overseer.dates :refer :all]
             [clojure.tools.trace :as trace]
             [clj-time.format :as f]
             [clj-time.local :as l]
@@ -41,7 +41,7 @@
 
 ;; (make-sqldate "2015-03-30")
 (defn- make-sqldate [t] 
-   (->> t str (f/parse) c/to-sql-date))
+  (->> t str (f/parse) c/to-sql-date))
 
 (trace/deftrace swipe-in
   ([id] (swipe-in id (t/now)))
@@ -134,6 +134,7 @@
 (defn sample-db
   ([] (sample-db false))
   ([have-extra?]
+     (db/init-pg)
      (db/reset-db)
      (make-year (str (t/date-time 2014 6)) (str (t/date-time 2015 6)))
      (make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
@@ -145,6 +146,7 @@
 
 ;; (huge-sample-db) 
 (defn huge-sample-db []
+  (db/init-pg)
   (db/reset-db)
   (make-year (str (t/date-time 2014 6)) (str (t/date-time 2015 6)))
   (make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))

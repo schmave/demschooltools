@@ -1,4 +1,4 @@
-(ns clojure-getting-started.web
+(ns overseer.web
   (:require [compojure.core :refer [defroutes GET PUT POST DELETE ANY]]
             [ring.middleware.json :refer [wrap-json-response wrap-json-body wrap-json-params]]
             [ring.middleware.keyword-params :refer [wrap-keyword-params]]
@@ -13,10 +13,10 @@
             [ring.adapter.jetty :as jetty]
             [ring.util.response :as resp]
             [clojure.tools.trace :as trace]
-            [clojure-getting-started.db :as db]
-            [clojure-getting-started.database :as data]
-            [clojure-getting-started.dates :as dates]
-            [clojure-getting-started.attendance :as att]
+            [overseer.db :as db]
+            [overseer.database :as data]
+            [overseer.dates :as dates]
+            [overseer.attendance :as att]
             [clojure.data.json :as json]
             [clj-time.core :as t]
             [cemerick.friend :as friend]

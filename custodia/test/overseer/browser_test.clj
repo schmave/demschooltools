@@ -1,4 +1,4 @@
-(ns clojure-getting-started.browser-test
+(ns overseer.browser-test
   (:require [clojure.test :refer :all]
             [clojure.java.shell :as sh]
             [clj-webdriver.taxi :refer :all]))

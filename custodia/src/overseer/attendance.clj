@@ -1,8 +1,8 @@
-(ns clojure-getting-started.attendance
-  (:require [clojure-getting-started.db :as db]
-            [clojure-getting-started.helpers :refer :all]
-            [clojure-getting-started.dates :refer :all]
-            [clojure-getting-started.database :refer :all]
+(ns overseer.attendance
+  (:require [overseer.db :as db]
+            [overseer.helpers :refer :all]
+            [overseer.dates :refer :all]
+            [overseer.database :refer :all]
             [clojure.tools.trace :as trace]
             [clj-time.format :as f]
             [clj-time.local :as l]

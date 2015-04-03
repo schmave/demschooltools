@@ -1,7 +1,7 @@
-(ns clojure-getting-started.dates
+(ns overseer.dates
   (:require [com.ashafa.clutch :as couch]
-            [clojure-getting-started.db :as db]
-            [clojure-getting-started.helpers :refer :all]
+            [overseer.db :as db]
+            [overseer.helpers :refer :all]
             [clojure.tools.trace :as trace]
             [clj-time.format :as f]
             [clj-time.local :as l]

@@ -1,1 +1,1 @@
-web: java $JVM_OPTS -jar target/clojure-getting-started-standalone.jar
+web: java $JVM_OPTS -jar target/overseer-standalone.jar

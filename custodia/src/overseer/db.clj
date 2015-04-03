@@ -1,4 +1,4 @@
-(ns clojure-getting-started.db
+(ns overseer.db
   (:import
    [java.util Date Calendar TimeZone]
    [java.sql PreparedStatement])

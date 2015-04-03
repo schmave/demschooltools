@@ -1,19 +1,19 @@
-(ns clojure-getting-started.web-test
+(ns overseer.web-test
   (:require [clojure.test :refer :all]
             [clj-time.format :as f]
             [clj-time.local :as l]
             [clj-time.core :as t]
             [clj-time.coerce :as c]
             [clojure.tools.trace :as trace]
-            [clojure-getting-started.database :as db]
-            [clojure-getting-started.attendance :as att]
-            [clojure-getting-started.helpers :as h]
-            [clojure-getting-started.dates :as dates]
+            [overseer.database :as db]
+            [overseer.attendance :as att]
+            [overseer.helpers :as h]
+            [overseer.dates :as dates]
             ))
 ;; run test C-c M-,
 ;; run tests C-c ,
 (comment
-  (run-tests 'clojure-getting-started.web-test)  
+  (run-tests 'overseer.web-test)  
   )  
 
 (def basetime (t/date-time 2014 10 14 14 9 27 246)) 

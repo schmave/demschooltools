@@ -1,6 +1,6 @@
-(defproject clojure-getting-started "1.0.0-SNAPSHOT"
+(defproject overseer "1.0.0-SNAPSHOT"
   :description "Demo Clojure web app"
-  :url "http://clojure-getting-started.herokuapp.com"
+  :url "http://overseer.herokuapp.com"
   :license {:name "Eclipse Public License v1.0"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.6.0"]
@@ -26,8 +26,8 @@
                    :integration :integration
                    :all (constantly true)}
   :hooks [environ.leiningen.hooks]
-  ;; :main clojure-getting-started.web
-  :uberjar-name "clojure-getting-started-standalone.jar"
+  ;; :main overseer.web
+  :uberjar-name "overseer-standalone.jar"
   :profiles {:test {:dependencies [[clj-webdriver "0.6.1"]]}
              :production {:env {:production true}}
-             :uberjar {:main clojure-getting-started.web :aot :all}})
+             :uberjar {:main overseer.web :aot :all}})
