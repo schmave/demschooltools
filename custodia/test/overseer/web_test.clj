@@ -243,10 +243,15 @@
 
 (deftest older-student-required-minutes
   (db/sample-db)
-  (let [att (att/get-student-list)]
+  (let [s (db/make-student "test")
+        sid (:_id s)
+        s (db/toggle-student-absent sid)
+        att (trace/trace "att" (att/get-student-list))]
     (testing "Student Count"
-      (is (= (-> att count) 2))))
-  )
+      (is (= (-> att count) 3))
+      (is (= (->> att (filter :absent_today) count) 1))
+      (is (= (->> att (filter (complement :in_today)) count) 3))
+      )))
 
 (deftest older-student-required-minutes
   (db/sample-db)
