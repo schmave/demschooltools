@@ -15,7 +15,7 @@ hello :
 	ls
 	@echo Done
 
-deploy-test :
+deploy-test : unit-test
 	git push $(web-test-git) master
 
 deploy-philly :

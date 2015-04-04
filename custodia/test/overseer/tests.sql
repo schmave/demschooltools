@@ -154,6 +154,15 @@ SELECT
 
 -- select * from excuses;
 
+
+-- Step 6 - Absent Date
+-- alter table students add column show_as_absent date;
+
+
+
+
+
+
 -- Aliasing names
 -- update students set name='Arathilion Boom' where _id=1;
 -- update students set name='John Darran' where _id=2;

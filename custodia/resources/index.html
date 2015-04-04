@@ -62,7 +62,16 @@
           </div>
           <div class="row col-md-12 " ng-show="screen ==='home'">
             <div class="row-same-height col-top">
-              <div class="col-md-3 ins text-center col-top col-xs-height list-group">
+              <div class="col-md-2 ins text-center col-top col-xs-height list-group">
+                <span class="col-md-12">Not Coming In</span>
+                <a class="list-group-item col-xs-12"
+                   id="student-{{student._id}}"
+                   ng-click="showStudent(student)"
+                   ng-repeat="student in filterStudentsMarkedAbsent(students) | orderObjectBy:'name':false">
+                  {{student.name}}
+                </a>
+              </div>
+              <div class="col-md-2 ins text-center col-top col-xs-height list-group">
                 <span class="col-md-12">Not Yet In</span>
                 <a class="list-group-item col-xs-12" 
                    id="student-{{student._id}}"
@@ -71,7 +80,7 @@
                   {{student.name}}
                 </a>
               </div>
-              <div class="col-md-6 ins list-group text-center col-top col-xs-height">
+              <div class="col-md-4 ins list-group text-center col-top col-xs-height">
                 <span class="col-md-12">In</span>
                 <a class="list-group-item col-xs-6 col-top" 
                    id="student-{{student._id}}"
@@ -80,7 +89,7 @@
                   {{student.name}}</a>
                 <!-- {{student}} -->
               </div>
-              <div class="col-md-3 list-group text-center col-top col-xs-height">
+              <div class="col-md-2 list-group text-center col-top col-xs-height">
                 <span class="col-md-12">Out</span>
                 <a class="list-group-item col-xs-12 col-top" 
                    id="student-{{student._id}}"
@@ -115,6 +124,9 @@
               (Requires {{requiredMinutes(student)}} minutes a day)
               <button class="btn" ng-click="toggleHours(student)">Toggle Hours</button>
             </span>
+            <div class="col-md-6" ng-hide="!isAdmin" >
+              <button class="btn" ng-click="toggleAbsent(student)">{{absent_button_text(student)}}</button>
+            </div>
           </div>
           <div class="col-md-12" id="studenttotalrow" ng-show="isAdmin">
             Attended: {{student.total_days}} - Absent: {{student.total_abs}} - Excused: {{student.total_excused}} - Overrides: {{student.total_overrides}} - Short: {{student.total_short}}

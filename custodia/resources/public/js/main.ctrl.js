@@ -106,6 +106,20 @@ angular.module('app').controller("MainController", function($scope, $http){
                 }). error(function(){});
         }
     };
+    $scope.absent_button_text = function(student){
+        if (!student) {return "";}
+        return student.show_as_absent ?  "Remove Absence" :"Mark Absent";
+    };
+    $scope.toggleAbsent = function(student) {
+        if(confirm(student.show_as_absent ? "Clear today's absence?":"Mark student as absent today?")){
+            student.show_as_absent = !!!student.show_as_absent;
+            $scope.screen = "saving";
+            $http.post('/student/toggleabsent', {_id : student._id }).
+                success(function(data){
+                    $scope.reloadStudentPage(data.student);
+                }). error(function(){});
+        }
+    };
     $scope.toggleHours = function(student) {
         if(confirm(student.olderdate ? "Mark student younger?":"Mark student as older starting today?")){
             student.olderdate = !!!student.olderdate;
@@ -178,8 +192,11 @@ angular.module('app').controller("MainController", function($scope, $http){
             $scope.students[s._id] = s;
         });
     };
+    $scope.filterStudentsMarkedAbsent = function(students) {
+        return $scope.filterStudentsObj(students, function(value){return value['in_today'] === false && value['absent_today'] === true;});
+    };
     $scope.filterStudentsNotYetIn = function(students) {
-        return $scope.filterStudentsObj(students, function(value){return value['in_today'] === false;});
+        return $scope.filterStudentsObj(students, function(value){return value['in_today'] === false && value['absent_today'] === false;});
     };
     $scope.filterStudentsIn = function(students) {
         return $scope.filterStudentsObj(students, function(value){

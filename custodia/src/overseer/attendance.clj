@@ -56,7 +56,12 @@
 (defn get-student-list []
   (let [today-string (make-date-string (t/now))
         inout (db/get-student-list-in-out)
-        inout (map #(assoc % :in_today (= today-string (make-date-string (:last_swipe_date %)))) inout)]
+        inout (map #(assoc %
+                      :in_today (= today-string
+                                   (make-date-string (:last_swipe_date %)))
+                      :absent_today (= today-string
+                                       (make-date-string-without-timezone (:show_as_absent %)))) inout)
+        ]
     inout))  
 
 (defn get-last-swipe-type [summed-days]
@@ -81,7 +86,7 @@
 
 (defn get-attendance [school-days year id student]
   (let [ school-days (zipmap (reverse school-days) (repeat nil))
-         [from to] (get-year-from-to year)
+        [from to] (get-year-from-to year)
         ;; swipes (db/get-student-page id year)
         swipes (db/get-swipes-in-year year id)
         swipes (concat swipes (db/get-overrides-in-year year id))
@@ -94,6 +99,9 @@
         summed-days (reverse summed-days)
         today-string (today-string)
         only-swipes (partial filter-type "swipes")
+
+        absent_today (= today-string (make-date-string-without-timezone
+                                      (:show_as_absent student)))
         in_today (and (= today-string
                          (-> summed-days first :day))
                       (-> summed-days first :swipes only-swipes count (> 0)))
@@ -111,6 +119,7 @@
                     :total_overrides (count (filter :override summed-days))
                     :total_excused (count (filter :excused summed-days))
                     :today today-string
+                    :absent_today (boolean absent_today)
                     :in_today in_today 
                     :last_swipe_type last-swipe-type
                     :last_swipe_date last-swipe-date

@@ -23,7 +23,8 @@
   _id bigserial primary key,
   name varchar(255),
   inserted_date timestamp default now(),
-  olderdate date
+  olderdate date,
+  show_as_absent date
   );")
 (def create-swipes-table-sql
   "create table swipes(
@@ -154,6 +155,7 @@ where y.name=? AND e.student_id =?
   (let [q (str "
 select stu.name
   , stu._id
+  , stu.show_as_absent
     , CASE WHEN l.outs > l.ins=true THEN 'out'
       ELSE 'in'
         END as last_swipe_type
@@ -334,8 +336,8 @@ where y.name=? AND s.student_id =?
      (map #(assoc % :type (keyword type))
           (if id
             (jdbc/query @pgdb [(str "select * from " type
-                                   " where " id-col "=?"
-                                   " order by inserted_date")
-                              id])
+                                    " where " id-col "=?"
+                                    " order by inserted_date")
+                               id])
             (jdbc/query @pgdb [(str "select * from " type " order by inserted_date")])))))
 

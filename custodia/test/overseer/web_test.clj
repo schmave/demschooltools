@@ -139,13 +139,13 @@
           ))))
 
 
-  ;; 10-14-2014 - good
-  ;; 10-15-2014 - good
-  ;; 10-16-2014 - short
-  ;; 10-17-2014 - good
-  ;; 10-18-2014 - short
-  ;; 10-19-2014 - absent
-  ;; 10-20-2014 - absent
+;; 10-14-2014 - good
+;; 10-15-2014 - good
+;; 10-16-2014 - short
+;; 10-17-2014 - good
+;; 10-18-2014 - short
+;; 10-19-2014 - absent
+;; 10-20-2014 - absent
 (deftest swipe-attendence-test
   (do (db/sample-db)  
       (let [s (db/make-student "test")
@@ -233,8 +233,8 @@
         (db/swipe-out sid (t/plus basetime (t/minutes 331)))
 
         (let [att  (att/get-students-with-att
-                     (dates/get-current-year-string (db/get-years))
-                     sid)]
+                    (dates/get-current-year-string (db/get-years))
+                    sid)]
           (testing "has one valid"
             (is (=  (-> att first :total_days) 1 )))
           (testing "students with att doesn't throw exceptions"
@@ -252,7 +252,7 @@
   (db/sample-db)
   (let [s (db/make-student "test")
         sid (:_id s)
-        s (db/toggle-student sid)
+        s (db/toggle-student-older sid)
         s (first (db/get-students sid))
         tomorrow (-> (t/today-at 8 0) (t/plus (t/days 1)))
         day-after-next (-> (t/today-at 8 0) (t/plus (t/days 2)))

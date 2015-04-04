@@ -113,7 +113,11 @@
                             (resp/response {:made made? :students (att/get-students-with-att)}))))
   (POST "/student/togglehours" [_id]
         (friend/authorize #{::admin}
-                          (do (data/toggle-student _id)
+                          (do (data/toggle-student-older _id)
+                              (student-page-response _id))))
+  (POST "/student/toggleabsent" [_id]
+        (friend/authorize #{::admin}
+                          (do (data/toggle-student-absent _id)
                               (student-page-response _id))))
   (POST "/year/create" [from_date to_date]
         (friend/authorize #{::admin}
