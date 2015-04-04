@@ -108,11 +108,11 @@ angular.module('app').controller("MainController", function($scope, $http){
     };
     $scope.absent_button_text = function(student){
         if (!student) {return "";}
-        return student.show_as_absent ?  "Remove Absence" :"Mark Absent";
+        return student.absent_today ?  "Remove Absence" :"Mark Absent";
     };
     $scope.toggleAbsent = function(student) {
-        if(confirm(student.show_as_absent ? "Clear today's absence?":"Mark student as absent today?")){
-            student.show_as_absent = !!!student.show_as_absent;
+        if(confirm(student.absent_today ? "Clear today's absence?":"Mark student as absent today?")){
+            //student.show_as_absent = !!!student.show_as_absent;
             $scope.screen = "saving";
             $http.post('/student/toggleabsent', {_id : student._id }).
                 success(function(data){

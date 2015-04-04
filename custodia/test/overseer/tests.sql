@@ -160,7 +160,7 @@ SELECT
 
 
 
-
+select * from students;
 
 
 -- Aliasing names

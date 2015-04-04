@@ -124,7 +124,7 @@
               (Requires {{requiredMinutes(student)}} minutes a day)
               <button class="btn" ng-click="toggleHours(student)">Toggle Hours</button>
             </span>
-            <div class="col-md-6" ng-hide="!isAdmin" >
+            <div class="col-md-6" ng-hide="!isAdmin || student.absent_today" >
               <button class="btn" ng-click="toggleAbsent(student)">{{absent_button_text(student)}}</button>
             </div>
           </div>

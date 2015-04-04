@@ -114,17 +114,17 @@
 (defn- toggle-date [older]
   (if older nil (make-sqldate (str (t/now)))))
 
-(defn- toggle-student [_id key]
+(trace/deftrace toggle-student-older [_id]
   (let [student (first (get-students _id))
-        student (assoc student key (toggle-date (key student)))] 
-    (db/update! :students _id {key (key student)})
+        student (assoc student :olderdate (toggle-date (:olderdate student)))] 
+    (db/update! :students _id {:olderdate (:olderdate student)})
     student))
 
-(trace/deftrace toggle-student-older [_id]
-  (toggle-student _id :olderdate))
-
 (trace/deftrace toggle-student-absent [_id]
-  (toggle-student _id :show_as_absent))
+  (let [student (first (get-students _id))
+        student (assoc student :show_as_absent (make-sqldate (str (t/now))))] 
+    (db/update! :students _id {:show_as_absent (:show_as_absent student)})
+    student))
 
 (trace/deftrace make-year [from to]
   (let [from (f/parse from)
