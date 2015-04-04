@@ -1,7 +1,7 @@
 #!/bin/sh
 
 while true; do
-    read -p "WARNING! Do you really wish to push to production? Did you run the tests?[y/n]: " yn
+    read -p "WARNING! Do you really wish to push to production? [y/n]: " yn
     case $yn in
         [Yy]* ) git push $1 master; break;;
         [Nn]* ) exit;;

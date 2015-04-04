@@ -18,7 +18,7 @@ hello :
 deploy-test : unit-test
 	git push $(web-test-git) master
 
-deploy-philly :
+deploy-philly : unit-test
 	./prod-deploy.sh $(philly-prod-git) 
 
 unit-test :
