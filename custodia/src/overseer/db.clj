@@ -197,17 +197,19 @@ order by days2.days
   )
 
 ;; (map :days (get-school-days "2014-06-01 2015-06-01"))
-(defn get-student-page [id year]
+(trace/deftrace get-student-page [id year]
   (let [q "
 SELECT 
   schooldays.student_id
-  , s.out_time
+  , s.out_time 
   , s.in_time
   , extract(EPOCH FROM (s.out_time - s.in_time)::INTERVAL)/60 as intervalmin
-  , o._id oid
-  , e._id eid
-
+  , o._id has_override
+  , e._id has_excuse
   , schooldays.olderdate
+  , (CASE WHEN schooldays.olderdate IS NULL 
+               OR schooldays.olderdate > schooldays.days
+               THEN 300 ELSE 330 END) as requiredmin
   , schooldays.days AS day
     FROM (SELECT a.days, students._id student_id, students.olderdate FROM (SELECT DISTINCT days2.days
           FROM (SELECT

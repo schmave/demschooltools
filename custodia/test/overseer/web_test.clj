@@ -241,7 +241,7 @@
             (is (not= '() att))))))
   )
 
-(deftest older-student-required-minutes
+(deftest absent-student-main-page
   (db/sample-db)
   (let [s (db/make-student "test")
         sid (:_id s)
@@ -254,23 +254,23 @@
       )))
 
 (deftest older-student-required-minutes
-  (db/sample-db)
-  (let [s (db/make-student "test")
-        sid (:_id s)
-        s (db/toggle-student-older sid)
-        s (first (db/get-students sid))
-        tomorrow (-> (t/today-at 8 0) (t/plus (t/days 1)))
-        day-after-next (-> (t/today-at 8 0) (t/plus (t/days 2)))
-        ]
-    (db/swipe-in sid tomorrow)
-    (db/swipe-out sid (t/plus tomorrow (t/minutes 331)))
+  (do (db/sample-db)
+      (let [s (db/make-student "test")
+            sid (:_id s)
+            s (db/toggle-student-older sid)
+            s (first (db/get-students sid))
+            tomorrow (-> (t/today-at 8 0) (t/plus (t/days 1)))
+            day-after-next (-> (t/today-at 8 0) (t/plus (t/days 2)))
+            ]
+        (db/swipe-in sid tomorrow)
+        (db/swipe-out sid (t/plus tomorrow (t/minutes 331)))
 
-    (db/swipe-in sid (t/plus tomorrow (t/days 2)))
-    (db/swipe-out sid (t/plus tomorrow (t/days 2) (t/minutes 329)))
+        (db/swipe-in sid (t/plus tomorrow (t/days 2)))
+        (db/swipe-out sid (t/plus tomorrow (t/days 2) (t/minutes 329)))
 
-    (let [att (get-att sid s)]
-      (testing "Total Valid Day Count"
-        (is (= (-> att :total_days) 1)))))
+        (let [att (get-att sid s)]
+          (testing "Total Valid Day Count"
+            (is (= (-> att :total_days) 1))))))
   )
 
 (deftest get-current-year
@@ -281,9 +281,12 @@
 
 (deftest excuse-today-is-today
   (do (db/sample-db)  
-      (let [s (db/make-student "test")
+      (let [
+            dummy (db/make-student "dummy")
+            s (db/make-student "test")
             sid (:_id s)
             today-string (dates/today-string)]
+        (db/swipe-in (:_id dummy))
         (db/excuse-date sid today-string)
         (let [att  (get-att sid s)
               today (-> att :days first)]
