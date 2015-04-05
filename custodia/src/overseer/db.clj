@@ -201,6 +201,8 @@ order by days2.days
   (let [q "
 SELECT 
   schooldays.student_id
+  , to_char(s.in_time at time zone 'America/New_York', 'HH:MI:SS') as nice_in_time
+  , to_char(s.out_time at time zone 'America/New_York', 'HH:MI:SS') as nice_out_time
   , s.out_time 
   , s.in_time
   , extract(EPOCH FROM (s.out_time - s.in_time)::INTERVAL)/60 as intervalmin
@@ -213,7 +215,9 @@ SELECT
   , schooldays.days AS day
     FROM (SELECT a.days, students._id student_id, students.olderdate FROM (SELECT DISTINCT days2.days
           FROM (SELECT
-                 date(s.in_time at time zone 'America/New_York') as days
+                 (CASE WHEN date(s.in_time at time zone 'America/New_York')  IS NULL 
+                             THEN date(s.out_time at time zone 'America/New_York')
+                             ELSE date(s.in_time at time zone 'America/New_York') END) as days
                   FROM swipes s
                   INNER JOIN years y 
                     ON ((s.out_time BETWEEN y.from_date AND y.to_date)
@@ -223,7 +227,10 @@ SELECT
           JOIN students on (1=1)
 ) as schooldays
     LEFT JOIN swipes s
-      ON (schooldays.days = date(s.in_time at time zone 'America/New_York')
+      ON (
+       ((schooldays.days = date(s.in_time at time zone 'America/New_York'))
+       OR
+        (schooldays.days = date(s.out_time at time zone 'America/New_York')))
         AND schooldays.student_id = s.student_id) 
     LEFT JOIN overrides o 
       ON (schooldays.days = o.date AND o.student_id = schooldays.student_id)

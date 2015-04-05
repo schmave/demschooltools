@@ -139,6 +139,7 @@
           ))))
 
 
+
 ;; 10-14-2014 - good
 ;; 10-15-2014 - good
 ;; 10-16-2014 - short
@@ -156,7 +157,10 @@
         (add-swipes sid)
         (db/override-date sid "2014-10-18")
         (db/excuse-date sid "2014-10-20")
+
+        ;; 10/19
         (db/swipe-in sid2 (t/plus basetime (t/days 5)))
+        ;; 10/20
         (db/swipe-in sid2 (t/plus basetime (t/days 6)))
 
         (testing "School year is list of days with swipes"

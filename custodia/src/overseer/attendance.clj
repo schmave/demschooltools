@@ -23,23 +23,27 @@
   (filter #(= (:type %) key) col))
 
 (defn append-validity [student [day records]]
-  (tracelet [has-override? (-> records first :has_override boolean)
-             has-excuse? (-> records first :has_excuse boolean)
-             int-mins (reduce #(+ %1 (or (:intervalmin %2) 0))
-                              0 records)
-             min-minutes (-> records first :requiredmin)]
-            {:valid (and (not has-excuse?)
-                         (or has-override?
-                             (> int-mins min-minutes)))
-             :short (or (and (not has-override?)
-                             (not has-excuse?)
-                             (seq records))
-                        (> int-mins 0)) 
-             :override has-override?
-             :excused has-excuse?
-             :day day
-             :total_mins (if has-override? min-minutes int-mins)
-             :swipes records}))
+  (let [has-override? (-> records first :has_override boolean)
+        has-excuse? (-> records first :has_excuse boolean)
+        int-mins (reduce #(+ %1 (or (:intervalmin %2) 0))
+                         0 records)
+        min-minutes (-> records first :requiredmin)]
+    {:valid (and (not has-excuse?)
+                 (or has-override?
+                     (> int-mins min-minutes)))
+     :short (boolean (or (and (not has-override?)
+                              (not has-excuse?)
+                              (seq (only-swipes records)))
+                         ;; what is this here for?
+                         (> int-mins 0))) 
+     :absent (boolean (and (not has-override?)
+                           (not has-excuse?)
+                           (not (seq (only-swipes records))))) 
+     :override has-override?
+     :excused has-excuse?
+     :day day
+     :total_mins (if has-override? min-minutes int-mins)
+     :swipes records}))
 
 (defn get-year-from-to [year-string]
   (let [year (first (get-years year-string))
@@ -92,13 +96,13 @@
         ;; grouped-swipes (into (sorted-map) grouped-swipes)
         
         summed-days (map #(append-validity student %) grouped-swipes)
-        ;; summed-days (reverse summed-days)
+        summed-days (trace/trace "summed" (reverse summed-days))
         today-string (today-string)
         absent_today (= today-string (make-date-string-without-timezone
                                       (:show_as_absent student)))
         in_today (and (= today-string
                          (-> summed-days first :day))
-                      (-> summed-days first swipes only-swipes count (> 0)))
+                      (-> summed-days first only-swipes count (> 0)))
         [last-swipe-type last-swipe-date] (get-last-swipe-type summed-days)]
     (merge student {:total_days (count (filter :valid summed-days))
                     :total_hours (/ (reduce + (map :total_mins summed-days))
