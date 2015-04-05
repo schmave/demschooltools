@@ -196,9 +196,24 @@ order by days2.days
      [q year-name]))
   )
 
+(def school-days-fragment
+  " SELECT a.days, students._id student_id, students.olderdate FROM (SELECT DISTINCT days2.days
+  FROM (SELECT
+  (CASE WHEN date(s.in_time at time zone 'America/New_York')  IS NULL 
+  THEN date(s.out_time at time zone 'America/New_York')
+  ELSE date(s.in_time at time zone 'America/New_York') END) as days
+  FROM swipes s
+  INNER JOIN years y 
+  ON ((s.out_time BETWEEN y.from_date AND y.to_date)
+  OR (s.in_time BETWEEN y.from_date AND y.to_date))
+  WHERE y.name=?) days2
+  ORDER BY days2.days) as a
+  JOIN students on (1=1)
+")
+
 ;; (map :days (get-school-days "2014-06-01 2015-06-01"))
 (trace/deftrace get-student-page [id year]
-  (let [q "
+  (let [q (str "
 SELECT 
   schooldays.student_id
   , to_char(s.in_time at time zone 'America/New_York', 'HH:MI:SS') as nice_in_time
@@ -213,19 +228,7 @@ SELECT
                OR schooldays.olderdate > schooldays.days
                THEN 300 ELSE 330 END) as requiredmin
   , schooldays.days AS day
-    FROM (SELECT a.days, students._id student_id, students.olderdate FROM (SELECT DISTINCT days2.days
-          FROM (SELECT
-                 (CASE WHEN date(s.in_time at time zone 'America/New_York')  IS NULL 
-                             THEN date(s.out_time at time zone 'America/New_York')
-                             ELSE date(s.in_time at time zone 'America/New_York') END) as days
-                  FROM swipes s
-                  INNER JOIN years y 
-                    ON ((s.out_time BETWEEN y.from_date AND y.to_date)
-                        OR (s.in_time BETWEEN y.from_date AND y.to_date))
-                  WHERE y.name=?) days2
-          ORDER BY days2.days) as a
-          JOIN students on (1=1)
-) as schooldays
+    FROM (" school-days-fragment ") as schooldays
     LEFT JOIN swipes s
       ON (
        ((schooldays.days = date(s.in_time at time zone 'America/New_York'))
@@ -238,7 +241,7 @@ SELECT
       ON (schooldays.days = e.date AND e.student_id = schooldays.student_id)
     where schooldays.days is not null
     and schooldays.student_id = ?;
-"
+")
         report (jdbc/query @pgdb [q year id])
         ]
     report))
@@ -277,16 +280,7 @@ from (
         , sum(extract(EPOCH FROM (s.out_time - s.in_time)::INTERVAL)/60) AS intervalmin
          , schooldays.days AS day
 
-      FROM (SELECT a.days, students._id student_id, students.olderdate FROM (SELECT DISTINCT days2.days
-            FROM (SELECT
-                   date(s.in_time at time zone 'America/New_York') as days
-                    FROM swipes s
-                    INNER JOIN years y 
-                      ON ((s.out_time BETWEEN y.from_date AND y.to_date)
-                          OR (s.in_time BETWEEN y.from_date AND y.to_date))
-                    WHERE y.name=?) days2
-            ORDER BY days2.days) as a
-            JOIN students on (1=1)) as schooldays
+      FROM ( " school-days-fragment " ) as schooldays
       LEFT JOIN swipes s
                 ON (schooldays.days = date(s.in_time at time zone 'America/New_York')
                     AND schooldays.student_id = s.student_id) 
