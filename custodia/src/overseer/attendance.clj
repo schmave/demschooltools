@@ -64,7 +64,6 @@
 
 (defn get-last-swipe-type [summed-days]
   (let [summed-days (filter #(not (nil? (:swipes %))) summed-days)]
-    ;; (when (-> summed-days first :valid not))
     (let [day (-> summed-days first :day)
           records (-> summed-days first :swipes)
           swipes (only-swipes records)
@@ -82,19 +81,10 @@
                             (f/parse (:out_time %))))
             list)))
 
-(defn get-attendance [school-days year id student]
-  (let [ ;;school-days (zipmap (reverse school-days) (repeat nil))
-        ;; [from to] (get-year-from-to year)
-        swipes (db/get-student-page id year)
-        swipes (trace/trace "swipes" (map #(assoc % :day (-> % :day make-date-string-without-timezone)) swipes))
-        ;;swipes (db/get-swipes-in-year year id)
-        ;;swipes (concat swipes (db/get-overrides-in-year year id))
-        ;; swipes (concat swipes (db/get-excuses-in-year year id))
-        grouped-swipes (trace/trace "grouped" (group-by :day swipes))
-        ;; adding last swipe before absences
-        ;; grouped-swipes (merge school-days grouped-swipes)
-        ;; grouped-swipes (into (sorted-map) grouped-swipes)
-        
+(defn get-attendance [year id student]
+  (let [swipes (db/get-student-page id year)
+        swipes  (map #(assoc % :day (-> % :day make-date-string-without-timezone)) swipes)
+        grouped-swipes (group-by :day swipes)
         summed-days (map #(append-validity student %) grouped-swipes)
         summed-days (trace/trace "summed" (reverse summed-days))
         today-string (today-string)
@@ -102,7 +92,7 @@
                                       (:show_as_absent student)))
         in_today (and (= today-string
                          (-> summed-days first :day))
-                      (-> summed-days first only-swipes count (> 0)))
+                      (-> summed-days first :swipes only-swipes count (> 0)))
         [last-swipe-type last-swipe-date] (get-last-swipe-type summed-days)]
     (merge student {:total_days (count (filter :valid summed-days))
                     :total_hours (/ (reduce + (map :total_mins summed-days))
@@ -131,10 +121,9 @@
   ([] (get-students-with-att (get-current-year-string (get-years)) nil))
   ([year] (get-students-with-att year nil))
   ([year id]
-     (let [school-days (get-school-days year)]
-       (sort-by :name
-                (map #(get-attendance school-days year (:_id %) %)
-                     (get-students id))))))
+     (sort-by :name
+              (map #(get-attendance year (:_id %) %)
+                   (get-students id)))))
 
 ;; (get-students-with-att)
 

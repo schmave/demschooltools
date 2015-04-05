@@ -184,3 +184,7 @@
 -- SHOW config_file; 
 -- edit the timezone to 'UTC' then reload it with
 -- select * from pg_reload_conf();
+
+
+-- make postgres dump
+-- pg_dump dbname > filename

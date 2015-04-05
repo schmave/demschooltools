@@ -43,9 +43,7 @@
   (resp/response {:student (first (att/get-students-with-att
                                    (dates/get-current-year-string (data/get-years))
                                    student-id))
-                  :all []
-                  #_(att/get-students-with-att
-                     (dates/get-current-year-string (data/get-years)))}))
+                  :all []}))
 
 (defn get-all-student-data []
   (let [year (dates/get-current-year-string (data/get-years))]

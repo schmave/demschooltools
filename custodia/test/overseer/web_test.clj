@@ -19,9 +19,8 @@
 (def basetime (t/date-time 2014 10 14 14 9 27 246)) 
 
 (defn get-att [id student]
-  (let [year (dates/get-current-year-string (db/get-years))
-        school-days (att/get-school-days year)]
-    (att/get-attendance school-days year id student)))
+  (let [year (dates/get-current-year-string (db/get-years))]
+    (att/get-attendance year id student)))
 
 (deftest get-school-days
   (db/sample-db true)  
@@ -203,7 +202,7 @@
                    5)))
           )
         (testing "an older date string shows no attendance in that time"
-          (let [att (att/get-attendance [] "06-01-2013 05-01-2014" sid s)]
+          (let [att (att/get-attendance "06-01-2013 05-01-2014" sid s)]
             (testing "Total Valid Day Count"
               (is (= (:total_days att)
                      0)))
@@ -214,6 +213,19 @@
               (is (= (:total_overrides att)
                      0)))
             )))) 
+  )
+
+(deftest in-today-works
+  (do (db/sample-db)
+      (let [s (db/make-student "test")
+            sid (:_id s)]
+        (let [att (get-att sid s)]
+          (testing "in today is false"
+            (is (= false (:in_today att)))))
+        (db/swipe-in sid (t/now))
+        (let [att (get-att sid s)]
+          (testing "in today is true"
+            (is (= true (:in_today att)))))))
   )
 
 (deftest sign-out-without-in
