@@ -86,7 +86,7 @@
         swipes  (map #(assoc % :day (-> % :day make-date-string-without-timezone)) swipes)
         grouped-swipes (group-by :day swipes)
         summed-days (map #(append-validity student %) grouped-swipes)
-        summed-days (trace/trace "summed" (reverse summed-days))
+        summed-days  (reverse summed-days)
         today-string (today-string)
         absent_today (= today-string (make-date-string-without-timezone
                                       (:show_as_absent student)))

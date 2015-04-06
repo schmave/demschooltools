@@ -22,7 +22,8 @@
   :plugins [[cider/cider-nrepl "0.8.1"]
             [lein-ring "0.7.0"]
             [environ/environ.lein "0.2.1"]]
-  :test-selectors {:default (complement :integration)
+  :test-selectors {:default (and (complement :integration)
+                                 (complement :performance))
                    :integration :integration
                    :all (constantly true)}
   :hooks [environ.leiningen.hooks]
