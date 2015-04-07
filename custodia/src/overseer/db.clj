@@ -69,6 +69,7 @@
 ")
 
 (def pgdb (atom nil))
+;; (init-pg)
 (defn init-pg []
   (swap! pgdb (fn [old]
                 (dissoc (h/korma-connection-map (env :database-url))
@@ -212,7 +213,7 @@ order by days2.days
 ")
 
 ;; (map :days (get-school-days "2014-06-01 2015-06-01"))
-(trace/deftrace get-student-page [id year]
+(defn get-student-page [id year]
   (let [q (str "
 SELECT 
   schooldays.student_id
@@ -228,7 +229,7 @@ SELECT
                OR schooldays.olderdate > schooldays.days
                THEN 300 ELSE 330 END) as requiredmin
   , schooldays.days AS day
-    FROM (" school-days-fragment ") as schooldays
+    FROM (" school-days-fragment " where students._id = ?) as schooldays
     LEFT JOIN swipes s
       ON (
        ((schooldays.days = date(s.in_time at time zone 'America/New_York'))
@@ -242,7 +243,7 @@ SELECT
     where schooldays.days is not null
     and schooldays.student_id = ?;
 ")
-        report (jdbc/query @pgdb [q year id])
+        report (jdbc/query @pgdb [(trace/trace "q" q) year id id])
         ]
     report))
 
