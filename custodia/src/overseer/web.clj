@@ -30,7 +30,7 @@
                      :roles #{::admin ::user}}
             "super" {:username "super"
                      :password (creds/hash-bcrypt (env :admin))
-                     :roles #{::admin ::user}}
+                     :roles #{::admin ::user ::super}}
             "user" {:username "user"
                     :password (creds/hash-bcrypt (env :userpass))
                     :roles #{::user}}})
@@ -40,31 +40,18 @@
                     :current_year (dates/get-current-year-string years)})))
 
 (defn student-page-response [student-id]
-  (resp/response {:student (first (att/get-students-with-att
-                                   (dates/get-current-year-string (data/get-years))
-                                   student-id))
-                  :all []}))
-
-(defn get-all-student-data []
-  (let [year (dates/get-current-year-string (data/get-years))]
-    (att/get-students-with-att year)))
+  (resp/response {:student (first (att/get-student-with-att student-id))}))
 
 (defn parse-int [s]
   (Integer. (re-find  #"\d+" s )))
 
 (defroutes app
   (GET "/" [] (friend/authenticated (io/resource "index.html")))
-  (GET "/swipe/:sid" [sid year]
-       (friend/authorize #{::user}
-                         (let [s (data/get-students sid)]
-                           (resp/response (att/get-attendance year sid s)))))
   (GET "/resetdb" []
-       (friend/authorize #{::admin}
-                         ;; (db/reset-db)
+       (friend/authorize #{::super} ;; (db/reset-db)
                          (resp/redirect "/")))
   (GET "/sampledb" []
-       (friend/authorize #{::admin}
-                         ;; (data/sample-db true)
+       (friend/authorize #{::super} ;; (data/sample-db true)
                          (resp/redirect "/")))
   (POST "/excuse" [_id day]
         (friend/authorize #{::admin}
@@ -85,18 +72,13 @@
                                 (data/swipe-in _id))
                             (do (when missing (data/swipe-in _id missing))
                                 (data/swipe-out _id))))
-        (student-page-response _id))
-  (GET "/currentyear" [] (dates/get-current-year-string (data/get-years)))
+        (resp/response (att/get-student-list)))
   (GET "/year/all" []
        (friend/authorize #{::user} (year-resp)))
   (POST "/year/delete" [year]
         (friend/authorize #{::admin}
                           (data/delete-year year)
                           (year-resp)))
-  (POST "/student/all" [year]
-        (friend/authorize #{::user}
-                          (let [year (if year year (dates/get-current-year-string (data/get-years)))]
-                            (att/get-students-with-att year))))
   (GET "/student/:id" [id]
        (friend/authorize #{::user} (student-page-response (parse-int id))))
   (POST "/student/report" [year]
@@ -108,7 +90,8 @@
   (POST "/student/create" [name]
         (friend/authorize #{::admin}
                           (let [made? (data/make-student name)]
-                            (resp/response {:made made? :students (att/get-students-with-att)}))))
+                            (resp/response {:made made?
+                                            :students (att/get-student-list)}))))
   (POST "/student/togglehours" [_id]
         (friend/authorize #{::admin}
                           (do (data/toggle-student-older _id)

@@ -117,16 +117,12 @@
   (map :days (filter :days (db/get-school-days year))))
 ;; (get-school-days "2014-06-01 2015-06-01")
 
-(defn get-students-with-att
-  ([] (get-students-with-att (get-current-year-string (get-years)) nil))
-  ([year] (get-students-with-att year nil))
-  ([year id]
+(defn get-student-with-att
+  ([id] (get-student-with-att id (get-current-year-string (get-years))))
+  ([id year] 
      (sort-by :name
               (map #(get-attendance year (:_id %) %)
                     (get-students id)))))
-
-(defn get-student-attendence-this-year [id]
-  (get-students-with-att (get-current-year-string (get-years)) id))
 
 ;; (get-students-with-att)
 

@@ -242,15 +242,13 @@
 (deftest students-with-att
   (do (db/sample-db)
       (testing "students with att"
-        (is (not= '() (att/get-students-with-att))))
+        (is (not= '() (att/get-student-with-att 1))))
       (let [s (db/make-student "test")
             sid (:_id s)]
         (db/swipe-in sid basetime)
         (db/swipe-out sid (t/plus basetime (t/minutes 331)))
 
-        (let [att  (att/get-students-with-att
-                    (dates/get-current-year-string (db/get-years))
-                    sid)]
+        (let [att  (att/get-student-with-att sid)]
           (testing "has one valid"
             (is (=  (-> att first :total_days) 1 )))
           (testing "students with att doesn't throw exceptions"

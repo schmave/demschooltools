@@ -243,7 +243,7 @@ SELECT
     where schooldays.days is not null
     and schooldays.student_id = ?;
 ")
-        report (jdbc/query @pgdb [(trace/trace "q" q) year id id])
+        report (jdbc/query @pgdb [q year id id])
         ]
     report))
 

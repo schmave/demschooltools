@@ -13,15 +13,9 @@
             [clojure.pprint :refer :all]
             ))
 
-;; (pprint (d/get-student-page 1 "2014-06-01 2015-06-01"))
-;; (count (d/get-student-page 1 "2014-06-01 2015-06-01"))
-
 (deftest ^:performance massive-timing
   (sh/sh "make" "load-massive-dump")
-  (let [x (time (att/get-students-with-att))
-        stu (trace/trace "stud" (first x))]
-    (testing "" (is (= 80 (count x))))))
-
-;; (def x (time (do (trace/trace "Total") (att/get-student-attendence-this-year 1))))
-;; (d/get-student-page 1 "2014-06-01 2015-06-01")
+  (let [x (time (att/get-student-with-att 1))
+        stu (first x)]
+    (testing "days all came back" (is (= 199 (count (:days stu)))))))
 

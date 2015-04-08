@@ -29,7 +29,6 @@ angular.module('app').controller("MainController", function($scope, $http){
     $scope.showStudent = function(s) {
         $scope.screen = "loading";
         $scope.swipedWorked = false;
-        // update the student with the fresh day
         $scope.getStudent(s._id, function(s){
             $scope.backStudent();
             $scope.reloadStudentPage(s);
@@ -156,9 +155,7 @@ angular.module('app').controller("MainController", function($scope, $http){
         $scope.screen = "saving";
         $http.post('/swipe', {"_id":$scope.student._id, "direction": $scope.student.direction, "missing": $scope.student.missing}).
             success(function(data){
-                // $scope.loadStudentData(data);
-                $scope.student = data.student;
-                $scope.students[data.student._id] = data.student;
+                $scope.populateStudentsMap(data);
                 $scope.showHome($scope.student.name + " swiped successfully!");
             }). error(function(){});
     };
@@ -222,7 +219,7 @@ angular.module('app').controller("MainController", function($scope, $http){
         $scope.screen = "saving";
         $http.post('/student/create', {"name":name}).
             success(function(data){
-                $scope.populateStudentsMap(data.students);
+                $scope.populateStudentsMap(data);
                 
                 if(data.made) {
                     $scope.showHome(name + " created successfully!");
@@ -243,14 +240,10 @@ angular.module('app').controller("MainController", function($scope, $http){
                 $scope.screen = "student-totals";
             }). error(function(){});
     };
-    $scope.loadStudentData = function(data){
-        $scope.populateStudentsMap(data);
-        $scope.totals_students = data;
-    };
     $scope.getStudents = function(callback) {
         $http.get('/students').
             success(function(data){
-                $scope.loadStudentData(data);
+                $scope.populateStudentsMap(data);
                 if (callback) {callback();}
             }). error(function(){});
     };
