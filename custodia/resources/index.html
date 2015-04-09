@@ -62,7 +62,7 @@
           </div>
           <div class="row col-md-12 " ng-show="screen ==='home'">
             <div class="row-same-height col-top">
-              <div class="col-md-2 ins text-center col-top col-xs-height list-group">
+              <div id="absent-col" class="col-md-2 ins text-center col-top col-xs-height list-group">
                 <span class="col-md-12">Not Coming In</span>
                 <a class="list-group-item col-xs-12"
                    id="student-{{student._id}}"
@@ -71,7 +71,7 @@
                   {{student.name}}
                 </a>
               </div>
-              <div class="col-md-2 ins text-center col-top col-xs-height list-group">
+              <div id="not-in-col" class="col-md-2 ins text-center col-top col-xs-height list-group">
                 <span class="col-md-12">Not Yet In</span>
                 <a class="list-group-item col-xs-12" 
                    id="student-{{student._id}}"
@@ -80,7 +80,7 @@
                   {{student.name}}
                 </a>
               </div>
-              <div class="col-md-4 ins list-group text-center col-top col-xs-height">
+              <div id="in-col" class="col-md-4 ins list-group text-center col-top col-xs-height">
                 <span class="col-md-12">In</span>
                 <a class="list-group-item col-xs-6 col-top" 
                    id="student-{{student._id}}"
@@ -89,7 +89,7 @@
                   {{student.name}}</a>
                 <!-- {{student}} -->
               </div>
-              <div class="col-md-2 list-group text-center col-top col-xs-height">
+              <div id="out-col" class="col-md-2 list-group text-center col-top col-xs-height">
                 <span class="col-md-12">Out</span>
                 <a class="list-group-item col-xs-12 col-top" 
                    id="student-{{student._id}}"
@@ -116,7 +116,7 @@
         </div>
         <div class="lead form-group" ng-show="screen === 'student'">
           <div class="col-md-12">
-            <a type="href" ng-click="screen='home'">Back to student list</a>
+            <a type="href" id="back-main-page" ng-click="screen='home'">Back to student list</a>
           </div> 
           <div class="col-md-12">
             <h1 class="col-md-6">{{student.name}}</h1>
@@ -124,8 +124,8 @@
               (Requires {{requiredMinutes(student)}} minutes a day)
               <button class="btn" ng-click="toggleHours(student)">Toggle Hours</button>
             </span>
-            <div class="col-md-6" ng-hide="!isAdmin || student.absent_today" >
-              <button class="btn" ng-click="toggleAbsent(student)">{{absent_button_text(student)}}</button>
+            <div class="col-md-6" ng-hide="student.absent_today">
+              <button class="btn" id="absent-button" ng-click="toggleAbsent(student)">{{absent_button_text(student)}}</button>
             </div>
           </div>
           <div class="col-md-12" id="studenttotalrow" ng-show="isAdmin">
@@ -135,7 +135,7 @@
           <hr>
           <div class="col-md-6">
             <button type="button" id="sign-in" class="btn" ng-click="swipe('in')" ng-class="inButtonStyle()">Sign In</button>
-            <button type="button" class="btn" ng-click="swipe('out')" ng-class="outButtonStyle()">Sign Out</button>
+            <button type="button" id="sign-out" class="btn" ng-click="swipe('out')" ng-class="outButtonStyle()">Sign Out</button>
             <ul ng-show="isAdmin">
               <li ng-repeat="swipe in student.days" style="text-left">
                 <div>
@@ -165,7 +165,7 @@
               <tr ng-repeat="s in current_day.swipes | filter:{ type: 'swipe' }">
                 <td>{{s.nice_in_time}}</td>
                 <td>{{s.nice_out_time}}</td>
-                <td>{{Math.round(s.interval)}}</td>
+                <td>{{Math.round(s.intervalmin)}}</td>
                 <td ng-hide="!isAdmin" ng-click="deleteSwipe(s)">Delete</td>
               </tr>
             </table>

@@ -225,6 +225,8 @@ SELECT
   , o._id has_override
   , e._id has_excuse
   , schooldays.olderdate
+  , s._id
+  , (CASE WHEN s._id IS NOT NULL THEN 'swipes' ELSE '' END) as type
   , (CASE WHEN schooldays.olderdate IS NULL 
                OR schooldays.olderdate > schooldays.days
                THEN 300 ELSE 330 END) as requiredmin
@@ -241,7 +243,8 @@ SELECT
     LEFT JOIN excuses e 
       ON (schooldays.days = e.date AND e.student_id = schooldays.student_id)
     where schooldays.days is not null
-    and schooldays.student_id = ?;
+    and schooldays.student_id = ?
+    order by schooldays.days desc;
 ")
         report (jdbc/query @pgdb [q year id id])
         ]
