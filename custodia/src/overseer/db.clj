@@ -213,6 +213,8 @@ order by days2.days
 ")
 
 ;; (map :days (get-school-days "2014-06-01 2015-06-01"))
+;; (get-student-page 7 "2014-07-23 2015-06-17")
+
 (defn get-student-page [id year]
   (let [q (str "
 SELECT 

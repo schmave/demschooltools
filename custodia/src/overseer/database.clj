@@ -50,9 +50,10 @@
 
 (defn sanitize-out [swipe]
   (let [in (:in_time swipe)
-        in (when in (f/parse in))
+         in (when in (c/from-sql-time in))
         out (:out_time swipe)
-        out (when out (f/parse out))]
+        out (when out (c/from-sql-time out))
+             ]
     (if (and in out)
       (if (or (not (t/before? in out))
               (not (= (t/day in) (t/day out))))

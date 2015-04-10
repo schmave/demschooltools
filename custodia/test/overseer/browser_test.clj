@@ -39,9 +39,9 @@
 
 
 (deftest ^:integration absent-column
-  (sh/sh "make" "load-aliased-dump")
-  (set-driver! {:browser :firefox} "http://localhost:5000/login")
-  (login)
+  (do (sh/sh "make" "load-aliased-dump")
+      (set-driver! {:browser :firefox} "http://localhost:5000/login")
+      (login))
 
   (assert-student-in-not-in-col 7)
   (click-student 7)
@@ -57,6 +57,12 @@
   (click-student 8)
   (sign-out)
   (assert-student-in-out-col 8)
+
+  (assert-student-in-not-in-col 9)
+  (click-student 9)
+  (sign-out)
+  (clickw "#submit-missing")
+  (assert-student-in-out-col 9)
 
   (quit))
 
