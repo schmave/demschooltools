@@ -157,12 +157,12 @@ where y.name=? AND e.student_id =?
 select stu.name
   , stu._id
   , stu.show_as_absent
-    , CASE WHEN l.outs > l.ins=true THEN 'out'
+    , CASE WHEN l.outs >= l.ins=true THEN 'out'
       ELSE 'in'
-        END as last_swipe_type
-        , CASE WHEN l.outs > l.ins=true THEN l.outs
-          ELSE l.ins
-          END as last_swipe_date
+    END as last_swipe_type
+    , CASE WHEN l.outs > l.ins=true THEN l.outs
+      ELSE l.ins
+      END as last_swipe_date
 from students stu
 left join 
 (select 
