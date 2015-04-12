@@ -255,6 +255,21 @@
             (is (not= '() att))))))
   )
 
+(deftest student-list-when-last-swipe-sanitized
+  (db/sample-db)
+  (let [s (db/make-student "test")
+        sid (:_id s)
+        now (t/now)]
+    (db/swipe-in sid (t/plus now (t/hours 1)))
+    (db/swipe-out sid now)
+    (let [att  (att/get-student-list)
+          our-hero (filter #(= sid (:_id %)) att)]
+      (testing "Student Count"
+        (is (= (->> our-hero count) 1))
+        (is (= (->> our-hero first :last_swipe_type) "out"))
+        (is (= (->> our-hero first :in_today) true))
+        ))))
+
 (deftest absent-student-main-page
   (db/sample-db)
   (let [s (db/make-student "test")

@@ -160,7 +160,7 @@ select stu.name
     , CASE WHEN l.outs >= l.ins=true THEN 'out'
       ELSE 'in'
     END as last_swipe_type
-    , CASE WHEN l.outs > l.ins=true THEN l.outs
+    , CASE WHEN l.outs >= l.ins=true THEN l.outs
       ELSE l.ins
       END as last_swipe_date
 from students stu
