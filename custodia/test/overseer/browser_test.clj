@@ -1,6 +1,7 @@
 (ns overseer.browser-test
   (:require [clojure.test :refer :all]
             [clojure.java.shell :as sh]
+            [overseer.database :as data]
             [clj-webdriver.taxi :refer :all]))
 
 (defn click-student [id]
@@ -37,6 +38,40 @@
 (defn sign-in [] (clickw "#sign-in"))
 (defn sign-out [] (clickw "#sign-out"))
 
+(deftest ^:integration overrides-and-excuses
+  (do (data/sample-db)
+      (set-driver! {:browser :firefox} "http://localhost:5000/login")
+      (login))
+
+  (assert-student-in-not-in-col 1)
+  (click-student 1)
+  (sign-in)
+  (assert-student-in-in-col 1)
+
+  (click-student 2)
+  (clickw ".override")
+  (accept)
+  (testing "student page totals"
+    (is (= (text "#studenttotalrow")
+           "Attended: 1 - Absent: 0 - Excused: 0 - Overrides: 1 - Short: 0")))
+
+  (clickw "#back-main-page")
+  (assert-student-in-not-in-col 2)
+
+  (click-student 1)
+  (testing "student page totals"
+    (is (= (text "#studenttotalrow")
+           "Attended: 0 - Absent: 0 - Excused: 0 - Overrides: 0 - Short: 1")))
+  (sign-out)
+  (assert-student-in-out-col 1)
+  (click-student 1)
+
+  (wait-until #(visible? ".override"))
+  (testing "student page totals"
+    (is (= (text "#studenttotalrow")
+           "Attended: 0 - Absent: 0 - Excused: 0 - Overrides: 0 - Short: 1")))
+
+  (quit))
 
 (deftest ^:integration absent-column
   (do (sh/sh "make" "load-aliased-dump")

@@ -142,10 +142,11 @@
                   <label>
                     <span ng-class="{validday: swipe.valid}" style="width:50px" 
                           ng-click="setDay(swipe)"
+                          class="day"
                           ng-style="{'border':(swipe.day==current_day.day)?'1px solid black':''}">
                       {{swipe.day}} - {{Math.round(swipe.total_mins)}} minutes 
                       <span ng-show="swipe.override"> - Overridden</span>
-                      <a href="" ng-hide="(swipe.valid || swipe.excused) || !isAdmin" ng-click="override(student._id,swipe.day)"> Override</a>
+                      <a href="" class="override" ng-hide="(swipe.valid || swipe.excused) || !isAdmin" ng-click="override(student._id,swipe.day)"> Override</a>
                       <span ng-show="swipe.excused"> - Excused</span>
                       <a href="" ng-hide="(swipe.valid || swipe.excused) || !isAdmin" ng-click="excuse(student._id,swipe.day)"> Excuse</a>
                     </span>
