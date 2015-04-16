@@ -73,6 +73,10 @@
 
   (quit))
 
+;; Parousia
+;; Custodia
+;; Vigilia
+
 (deftest ^:integration absent-column
   (do (sh/sh "make" "load-aliased-dump")
       (set-driver! {:browser :firefox} "http://localhost:5000/login")
