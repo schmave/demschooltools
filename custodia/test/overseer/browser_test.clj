@@ -1,6 +1,7 @@
 (ns overseer.browser-test
   (:require [clojure.test :refer :all]
             [clojure.java.shell :as sh]
+            [clj-time.core :as t]
             [overseer.database :as data]
             [clj-webdriver.taxi :refer :all]))
 
@@ -37,6 +38,22 @@
 
 (defn sign-in [] (clickw "#sign-in"))
 (defn sign-out [] (clickw "#sign-out"))
+
+(deftest ^:integration filling-in-missing-swipes
+  (do (data/sample-db)
+      (set-driver! {:browser :firefox} "http://localhost:5000/login")
+      (login))
+
+  (data/swipe-in 1 (t/minus (t/now) (t/days 1)))
+  (assert-student-in-not-in-col 1)
+  (click-student 1)
+  (sign-in)
+  (clickw "#submit-missing")
+
+  (assert-student-in-in-col 1)
+
+
+  (quit))
 
 (deftest ^:integration overrides-and-excuses
   (do (data/sample-db)
