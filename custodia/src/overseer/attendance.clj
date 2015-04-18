@@ -62,8 +62,13 @@
         ]
     inout))  
 
+(defn days-with-swipes [days]
+  (filter (fn [d] (not (empty? (filter #(= "swipes" (:type %))
+                                     (:swipes d)))))
+          days))
+
 (defn get-last-swipe-type [summed-days]
-  (let [summed-days (filter #(not (nil? (:swipes %))) summed-days)]
+  (let [summed-days (days-with-swipes summed-days)]
     (let [day (-> summed-days first :day)
           records (-> summed-days first :swipes)
           swipes (only-swipes records)

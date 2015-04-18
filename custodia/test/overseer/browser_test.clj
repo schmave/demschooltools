@@ -6,9 +6,11 @@
             [clj-webdriver.taxi :refer :all]))
 
 (defn click-student [id]
+  (Thread/sleep 500)
   (wait-until #(visible? (str "a#student-" id)))
   (click (str "a#student-" id))
-  (wait-until #(visible? "#studenttotalrow")))
+  (wait-until #(visible? "#studenttotalrow"))
+  )
 
 (defn submit-missing []
   (wait-until #(visible? "#submit-missing"))
@@ -47,11 +49,11 @@
   (data/swipe-in 1 (t/minus (t/now) (t/days 1)))
   (assert-student-in-not-in-col 1)
   (click-student 1)
+(wait-until #(visible? "#studenttotalrow"))
   (sign-in)
   (clickw "#submit-missing")
 
   (assert-student-in-in-col 1)
-
 
   (quit))
 
@@ -109,6 +111,7 @@
   (assert-student-in-not-in-col 8)
   (click-student 8)
   (sign-in)
+  (submit-missing)
   (assert-student-in-in-col 8)
   (click-student 8)
   (sign-out)
@@ -122,18 +125,36 @@
 
   (quit))
 
+(deftest ^:integration missing-out-swipe
+  (do (sh/sh "make" "load-aliased-dump")
+      (set-driver! {:browser :firefox} "http://localhost:5000/login")
+      (login))
+  (click-student 40)
+  (testing "student page totals"
+    (is (= (text "#studenttotalrow")
+           "Attended: 9 - Absent: 3 - Excused: 0 - Overrides: 0 - Short: 2"
+           )))
+  (sign-in)
+  (submit-missing)
+
+  (click-student 40)
+
+  (testing "student page totals"
+    (is (= (text "#studenttotalrow")
+           "Attended: 9 - Absent: 3 - Excused: 0 - Overrides: 0 - Short: 3"
+           )))
+  (quit))
+
 (deftest ^:integration loggin-in
-  (sh/sh "make" "load-aliased-dump")
-  ;;(set-driver! {:browser :firefox} "http://shining-overseer-test.herokuapp.com/login")
-  (set-driver! {:browser :firefox} "http://localhost:5000/login")
-  (login)
+  (do (sh/sh "make" "load-aliased-dump")
+      (set-driver! {:browser :firefox} "http://localhost:5000/login")
+      (login))
   (click-student 7)
   (testing "student page totals"
     (is (= (text "#studenttotalrow")
            "Attended: 3 - Absent: 4 - Excused: 7 - Overrides: 0 - Short: 5")))
 
   (sign-in)
-  ;; (submit-missing)
   (click-student 7)
   (testing "student page totals"
     (is (= (text "#studenttotalrow")
