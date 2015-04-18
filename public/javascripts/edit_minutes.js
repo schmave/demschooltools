@@ -254,7 +254,7 @@ function Charge(charge_id, el) {
 
     this.saveIfNeeded = function() {
         window.setTimeout(self.saveIfNeeded, 5000);
-        if (!self.is_modified) {
+        if (self.is_removed || !self.is_modified) {
             return;
         }
 
@@ -308,6 +308,8 @@ function Charge(charge_id, el) {
     this.removeCharge = function() {
         self.el.remove();
         $.post("/removeCharge?id=" + charge_id);
+		self.is_removed = true;
+		// TODO: remove from Case.charges list
     }
 
     this.markAsModified = function() {
@@ -332,6 +334,7 @@ function Charge(charge_id, el) {
 
     self.el = el;
     self.is_modified = false;
+	self.is_removed = false;
     window.setTimeout(self.saveIfNeeded, 5000);
 
     self.remove_button = el.find("button")
