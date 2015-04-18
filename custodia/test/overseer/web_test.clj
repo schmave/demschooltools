@@ -71,22 +71,22 @@
         (is (= (-> result :out_time) nil)))) 
     (testing "sanitize swipe out with valid times does nothing"
       (let [passed (assoc (db/make-swipe 1)
-                     :in_time (str basetime)
-                     :out_time (str (t/plus basetime (t/minutes 5))))
+                     :in_time (c/to-sql-time basetime)
+                     :out_time (c/to-sql-time (t/plus basetime (t/minutes 5))))
             result (db/sanitize-out passed)]
         (is (= passed result)))) 
     (testing "sanitize swipe out with newer out time forces same out as in"
       (let [passed (assoc (db/make-swipe 1)
-                     :in_time (str basetime)
-                     :out_time (str (t/minus basetime (t/minutes 5))))
+                     :in_time (c/to-sql-time basetime)
+                     :out_time (c/to-sql-time (t/minus basetime (t/minutes 5))))
             result (db/sanitize-out passed)]
         (is (= (:in_time passed) (:in_time result)))
         (is (= (:in_time passed) (:out_time result)))
         ))
     (testing "sanitize swipe out with out in wrong day forces out to be same day"
       (let [passed (assoc (db/make-swipe 1)
-                     :in_time (str basetime)
-                     :out_time (str (t/plus basetime (t/minutes 5) (t/days 1))))
+                     :in_time (c/to-sql-time basetime)
+                     :out_time (c/to-sql-time (t/plus basetime (t/minutes 5) (t/days 1))))
             result (db/sanitize-out passed)]
         (is (= (:in_time passed) (:in_time result)))
         (is (= (:in_time passed) (:out_time result)))))

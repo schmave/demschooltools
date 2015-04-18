@@ -13,7 +13,7 @@
             [clojure.pprint :refer :all]
             ))
 
-(deftest ^:performance massive-timing
+#_(deftest ^:performance massive-timing
   (sh/sh "make" "load-massive-dump")
   (let [x (time (att/get-student-with-att 1))
         stu (first x)]
