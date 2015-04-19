@@ -19,7 +19,7 @@
                  [postgresql "9.1-901.jdbc4"]
                  [com.ashafa/clutch "0.4.0"]]
   :min-lein-version "2.0.0"
-  :plugins [[cider/cider-nrepl "0.8.1"]
+  :plugins [[cider/cider-nrepl "0.9.0-SNAPSHOT"]
             [lein-ring "0.7.0"]
             [environ/environ.lein "0.2.1"]]
   :test-selectors {:default (or (complement :integration)
