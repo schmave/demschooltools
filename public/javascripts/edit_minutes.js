@@ -308,6 +308,10 @@ function Charge(charge_id, el) {
     this.removeCharge = function() {
         self.el.remove();
         $.post("/removeCharge?id=" + charge_id);
+		// Don't try to save any remaining modifications if
+		// this charge has been removed.
+		self.is_modified = false;
+		// TODO: remove from Case.charges list
     }
 
     this.markAsModified = function() {
