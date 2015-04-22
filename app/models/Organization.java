@@ -8,6 +8,7 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.SqlQuery;
 import com.avaje.ebean.SqlRow;
 
+import play.Logger;
 import play.db.ebean.Model;
 import play.db.ebean.Model.Finder;
 import play.mvc.Http.Context;
@@ -42,6 +43,8 @@ public class Organization extends Model {
 
         if (result != null) {
             return find.byId(result.getInteger("organization_id"));
+        } else {
+            Logger.error("Unknown organization for host: " + host);
         }
 
         return null;
