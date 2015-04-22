@@ -14,3 +14,6 @@ dist
 /.settings
 *.vpwhist
 *.vtg
+fairhaven/*.txt
+fairhaven/*.csv
+
