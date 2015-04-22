@@ -102,3 +102,29 @@ class PhillyFreeSchool extends OrgConfig {
         return INSTANCE;
     }
 }
+
+class Fairhaven extends OrgConfig {
+    private static final Fairhaven INSTANCE = new Fairhaven();
+
+    public Fairhaven() {
+        name = "Fairhaven School";
+        short_name = "Fairhaven";
+        people_url = "http://fairhaven.demschooltools.com";
+
+        str_manual_title = "Lawbook";
+        str_manual_title_short = "Lawbook";
+        str_res_plan_short = "sentence";
+        str_res_plan = "sentence";
+        str_res_plan_cap = "Sentence";
+        str_res_plans = "sentences";
+        str_res_plans_cap = "Sentences";
+
+        use_minor_referrals = true;
+
+        OrgConfig.register(name, this);
+    }
+
+    public static Fairhaven getInstance() {
+        return INSTANCE;
+    }
+}
