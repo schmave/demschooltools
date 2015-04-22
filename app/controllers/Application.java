@@ -169,6 +169,7 @@ public class Application extends Controller {
             ManualChange.find.where()
                 .gt("date_entered", seven_days_before)
                 .eq("entry.section.chapter.organization", Organization.getByHost())
+                .order("date_entered DESC")
                 .findList();
         return ok(views.html.view_manual_changes.render(changes));
     }
