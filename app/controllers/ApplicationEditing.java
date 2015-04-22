@@ -203,7 +203,7 @@ public class ApplicationEditing extends Controller {
 			s = Section.create(form);
 		}
 
-		return redirect(routes.Application.viewChapter(s.chapter.id));
+		return redirect(routes.Application.viewChapter(s.chapter.id).url() + "#section_" + s.id);
 	}
 
 	public static Result addEntry(Integer sectionId) {
@@ -231,7 +231,7 @@ public class ApplicationEditing extends Controller {
 			e = Entry.create(form);
 		}
 
-		return redirect(routes.Application.viewChapter(e.section.chapter.id));
+		return redirect(routes.Application.viewChapter(e.section.chapter.id).url() + "#entry_" + e.id);
 	}
 
 }

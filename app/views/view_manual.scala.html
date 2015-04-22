@@ -15,10 +15,10 @@
 	<li><a href="@routes.Application.viewChapter(c.id)">@c.num @c.title</a>
 	<ul>
 	@for(section <- c.sections) {
-		<li>@c.num@section.num @section.title
+		<li><a href="@routes.Application.viewChapter(c.id)#section_@section.id">@c.num@section.num @section.title</a>
 		<ul>
 		@for(entry <- section.entries) {
-			<li>@c.num@(section.num).@entry.num @entry.title
+			<li><a href="@routes.Application.viewChapter(c.id)#entry_@entry.id">@c.num@(section.num).@entry.num @entry.title</a>
 		}
 		</ul>
 	}
