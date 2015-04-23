@@ -16,6 +16,7 @@ public class OrgConfig {
     public String str_res_plan_cap;
     public String str_res_plans;
     public String str_res_plans_cap;
+    public String str_committee_name = "Judicial Committee";
 
     public boolean show_no_contest_plea = false;
     public boolean show_severity = false;
@@ -64,6 +65,7 @@ class ThreeRiversVillageSchool extends OrgConfig {
         str_res_plan_cap = "Resolution plan";
         str_res_plans = "resolution plans";
         str_res_plans_cap = "Resolution plans";
+        str_committee_name = "Justice Committee";
 
         show_checkbox_for_res_plan = false;
 
