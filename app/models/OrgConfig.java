@@ -56,7 +56,7 @@ class ThreeRiversVillageSchool extends OrgConfig {
     public ThreeRiversVillageSchool() {
         name = "Three Rivers Village School";
         short_name = "TRVS";
-        people_url = "http://people.threeriversvillageschool.org";
+        people_url = "http://trvs.demschooltools.com";
 
         str_manual_title = "Management Manual";
         str_manual_title_short = "Manual";
@@ -83,7 +83,7 @@ class PhillyFreeSchool extends OrgConfig {
     public PhillyFreeSchool() {
         name = "Philly Free School";
         short_name = "PFS";
-        people_url = "http://people-pfs.threeriversvillageschool.org";
+        people_url = "http://pfs.demschooltools.com";
 
         str_manual_title = "Lawbook";
         str_manual_title_short = "Lawbook";
