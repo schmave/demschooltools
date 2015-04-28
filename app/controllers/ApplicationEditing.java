@@ -44,7 +44,12 @@ public class ApplicationEditing extends Controller {
         return editMinutes(the_meeting);
     }
 
-    public static Result createCase(Integer meeting_id) {
+    // This method is synchronized so that there is no race condition
+    // between the moment the new case number is generated and the moment
+    // the new case is persisted. If not synchronized, it is possible
+    // for two cases with the same ID to be generated, leading to an error when
+    // the second case is persisted because of a violated unique constraint.
+    public synchronized static Result createCase(Integer meeting_id) {
         Meeting m = Meeting.find.byId(meeting_id);
 
         String next_num = "" + (m.cases.size() + 1);
