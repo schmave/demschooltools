@@ -1,8 +1,8 @@
 package models;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -10,13 +10,13 @@ import java.util.*;
 
 import javax.persistence.*;
 
+import com.avaje.ebean.validation.NotNull;
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import controllers.Application;
 
-import com.avaje.ebean.validation.NotNull;
 import play.db.ebean.Model;
 import play.db.ebean.Model.Finder;
 import play.libs.Json;
@@ -109,7 +109,8 @@ public class Case extends Model implements Comparable<Case> {
         names = new HashSet<String>();
 
         try {
-            BufferedReader r = new BufferedReader(new FileReader(play.Play.application().getFile("app/assets/names.txt")));
+            BufferedReader r = new BufferedReader(new InputStreamReader(
+                play.Play.application().classloader().getResourceAsStream("names.txt")));
             while (true) {
                 String line = r.readLine();
                 if (line == null) {
