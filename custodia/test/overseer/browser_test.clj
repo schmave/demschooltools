@@ -49,7 +49,7 @@
   (data/swipe-in 1 (t/minus (t/now) (t/days 1)))
   (assert-student-in-not-in-col 1)
   (click-student 1)
-(wait-until #(visible? "#studenttotalrow"))
+  (wait-until #(visible? "#studenttotalrow"))
   (sign-in)
   (clickw "#submit-missing")
 

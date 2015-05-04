@@ -1,8 +1,47 @@
-// setTimeout(function() {
-//     window.location.reload(true);
-// }, 3 * 60 * 60 * 1000);
-
 angular.module('app', ['ui.bootstrap']);
+angular.module('app').directive("clickToEdit", function() {
+    var editorTemplate = '<h1 class="click-to-edit" class="col-md-6">' +
+        '<span ng-hide="view.editorEnabled">' +
+            '{{value}} ' +
+            '<a ng-click="enableEditor()">Edit</a>' +
+        '</span>' +
+        '<span ng-show="view.editorEnabled">' +
+            '<input ng-model="view.editableValue" ng-change="update()">' +
+            '<a href="#" ng-click="save()">Save</a>' +
+            ' or ' +
+            '<a ng-click="disableEditor()">cancel</a>.' +
+        '</span>' +
+    '</h1>';
+
+    return {
+        restrict: "A",
+        replace: true,
+        template: editorTemplate,
+        scope: {
+            value: "=clickToEdit",
+        },
+        controller: function($scope) {
+            $scope.view = {
+                editableValue: $scope.value,
+                editorEnabled: false
+            };
+
+            $scope.enableEditor = function() {
+                $scope.view.editorEnabled = true;
+                $scope.view.editableValue = $scope.value;
+            };
+
+            $scope.disableEditor = function() {
+                $scope.view.editorEnabled = false;
+            };
+
+            $scope.save = function() {
+                $scope.value = $scope.view.editableValue;
+                $scope.disableEditor();
+            };
+        }
+    };
+});
 angular.module('app').filter('orderObjectBy', function() {
     return function(items, field, reverse) {
         var filtered = [];
@@ -17,6 +56,9 @@ angular.module('app').filter('orderObjectBy', function() {
     };
 });
 angular.module('app').controller("MainController", function($scope, $http){
+    $scope.update = function(){
+        alert("test");
+    };
     $scope.students = {};
     $scope.screen = "home";
     $scope.current_totals_year = null;
@@ -220,7 +262,6 @@ angular.module('app').controller("MainController", function($scope, $http){
         $http.post('/student/create', {"name":name}).
             success(function(data){
                 $scope.populateStudentsMap(data);
-                
                 if(data.made) {
                     $scope.showHome(name + " created successfully!");
                     $scope.message = "";
@@ -271,6 +312,12 @@ angular.module('app').controller("MainController", function($scope, $http){
                     $scope.init();
                 }). error(function(){});
         }
+    };
+    $scope.editName = function() {
+        $http.post('/is-admin').
+            success(function(data){
+                $scope.isAdmin = true;
+            }).error(function(){});
     };
     $scope.isAdmin = false;
     $scope.checkRole = function() {
