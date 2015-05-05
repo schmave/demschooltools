@@ -59,8 +59,7 @@
         (student-page-response _id))
   (POST "/rename" [_id name]
         (friend/authorize #{::admin}
-                          (+ 1 1)
-                          #_(data/override-date _id day))
+                          (data/rename _id name))
         (student-page-response _id))
   (POST "/override" [_id day]
         (friend/authorize #{::admin}

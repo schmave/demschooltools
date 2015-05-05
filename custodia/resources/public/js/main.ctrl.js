@@ -128,8 +128,8 @@ angular.module('app').controller("MainController", function($scope, $http){
     $scope.saveName = function(name){
         $scope.screen = "loading";
         $http.post('/rename', {"_id":$scope.student._id, "name": name}).
-            success(function(d){
-                $scope.screen = "student";
+            success(function(data){
+                $scope.reloadStudentPage(data.student);
             }). error(function(){});
     };
 

@@ -88,6 +88,8 @@
   (when-let [year (first (get-years year))]
     (db/delete! year)))
 
+(trace/deftrace rename [_id name]
+  (db/update! :students _id {:name name}))
 
 (trace/deftrace excuse-date [id date-string]
   (db/persist! {:type :excuses
