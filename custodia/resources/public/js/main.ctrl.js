@@ -6,7 +6,7 @@ angular.module('app').directive("clickToEdit", function() {
             '<a ng-click="enableEditor()">Edit</a>' +
         '</span>' +
         '<span ng-show="view.editorEnabled">' +
-            '<input ng-model="view.editableValue" ng-change="update()">' +
+            '<input ng-model="view.editableValue">' +
             '<a href="#" ng-click="save()">Save</a>' +
             ' or ' +
             '<a ng-click="disableEditor()">cancel</a>.' +
@@ -21,6 +21,7 @@ angular.module('app').directive("clickToEdit", function() {
             value: "=clickToEdit",
         },
         controller: function($scope) {
+            $scope.saveName = $scope.$parent.saveName;
             $scope.view = {
                 editableValue: $scope.value,
                 editorEnabled: false
@@ -38,6 +39,7 @@ angular.module('app').directive("clickToEdit", function() {
             $scope.save = function() {
                 $scope.value = $scope.view.editableValue;
                 $scope.disableEditor();
+                $scope.saveName($scope.value);
             };
         }
     };
@@ -56,9 +58,6 @@ angular.module('app').filter('orderObjectBy', function() {
     };
 });
 angular.module('app').controller("MainController", function($scope, $http){
-    $scope.update = function(){
-        alert("test");
-    };
     $scope.students = {};
     $scope.screen = "home";
     $scope.current_totals_year = null;
@@ -76,7 +75,6 @@ angular.module('app').controller("MainController", function($scope, $http){
             $scope.reloadStudentPage(s);
         });
     };
-
     $scope.getStudent = function(_id, fn) {
         $http.get('/student/' + _id).
             success(function(data){
@@ -126,6 +124,15 @@ angular.module('app').controller("MainController", function($scope, $http){
                 }). error(function(){});
         }
     };
+
+    $scope.saveName = function(name){
+        $scope.screen = "loading";
+        $http.post('/rename', {"_id":$scope.student._id, "name": name}).
+            success(function(d){
+                $scope.screen = "student";
+            }). error(function(){});
+    };
+
     $scope.override = function(id, day) {
         if (confirm("Override " + day + "?")){
             $scope.screen = "saving";

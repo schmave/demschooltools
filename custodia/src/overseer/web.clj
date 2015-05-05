@@ -57,6 +57,11 @@
         (friend/authorize #{::admin}
                           (data/excuse-date _id day))
         (student-page-response _id))
+  (POST "/rename" [_id name]
+        (friend/authorize #{::admin}
+                          (+ 1 1)
+                          #_(data/override-date _id day))
+        (student-page-response _id))
   (POST "/override" [_id day]
         (friend/authorize #{::admin}
                           (data/override-date _id day))
