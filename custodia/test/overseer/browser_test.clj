@@ -46,6 +46,7 @@
       (set-driver! {:browser :firefox} "http://localhost:5000/login")
       (login))
 
+  ;; Edit then save name
   (click-student 1)
   (wait-until #(visible? "#studenttotalrow"))
   (clickw "#edit-name")
@@ -54,7 +55,17 @@
   (clickw "#save-name")
 
   (clickw "#back-main-page")
+  (assert-student-in-not-in-col 1)
+  (testing (is (= "newname" (text "a#student-1"))))
 
+  ;; Edit then cancel name
+  (click-student 1)
+  (clickw "#edit-name")
+  (clear "#new-name")
+  (input-text "#new-name" "othername")
+  (clickw "#cancel-name")
+
+  (clickw "#back-main-page")
   (assert-student-in-not-in-col 1)
   (testing (is (= "newname" (text "a#student-1"))))
 
