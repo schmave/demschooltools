@@ -41,6 +41,25 @@
 (defn sign-in [] (clickw "#sign-in"))
 (defn sign-out [] (clickw "#sign-out"))
 
+(deftest ^:integration edit-name
+  (do (data/sample-db)
+      (set-driver! {:browser :firefox} "http://localhost:5000/login")
+      (login))
+
+  (click-student 1)
+  (wait-until #(visible? "#studenttotalrow"))
+  (clickw "#edit-name")
+  (clear "#new-name")
+  (input-text "#new-name" "newname")
+  (clickw "#save-name")
+
+  (clickw "#back-main-page")
+
+  (assert-student-in-not-in-col 1)
+  (testing (is (= "newname" (text "a#student-1"))))
+
+  (quit))
+
 (deftest ^:integration filling-in-missing-swipes
   (do (data/sample-db)
       (set-driver! {:browser :firefox} "http://localhost:5000/login")

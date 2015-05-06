@@ -1,15 +1,15 @@
 angular.module('app', ['ui.bootstrap']);
 angular.module('app').directive("clickToEdit", function() {
-    var editorTemplate = '<h1 class="click-to-edit" class="col-md-6">' +
+    var editorTemplate = '<h1 class="click-to-edit col-md-6">' +
         '<span ng-hide="view.editorEnabled">' +
             '{{value}} ' +
-            '<a ng-click="enableEditor()">Edit</a>' +
+            '<a id="edit-name" ng-click="enableEditor()">Edit</a>' +
         '</span>' +
         '<span ng-show="view.editorEnabled">' +
-            '<input ng-model="view.editableValue">' +
-            '<a href="#" ng-click="save()">Save</a>' +
+            '<input id="new-name" ng-model="view.editableValue">' +
+            '<a id="save-name" href="#" ng-click="save()">Save</a>' +
             ' or ' +
-            '<a ng-click="disableEditor()">cancel</a>.' +
+            '<a id="cancel-name" ng-click="disableEditor()">Cancel</a>.' +
         '</span>' +
     '</h1>';
 

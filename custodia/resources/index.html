@@ -121,12 +121,9 @@
           <div class="col-md-12">
             <h1 click-to-edit="student.name">{{student.name}}</h1>
             <span class="col-md-6" ng-hide="!isAdmin" >
-              (Requires {{requiredMinutes(student)}} minutes a day)
-              <button class="btn" ng-click="toggleHours(student)">Toggle Hours</button>
+              Requires {{requiredMinutes(student)}} minutes
+              <button class="btn" ng-click="toggleHours(student)">Toggle Mins</button>
             </span>
-            <div class="col-md-6" ng-hide="student.absent_today">
-              <button class="btn" id="absent-button" ng-click="toggleAbsent(student)">{{absent_button_text(student)}}</button>
-            </div>
           </div>
           <div class="col-md-12" id="studenttotalrow" ng-show="isAdmin">
             Attended: {{student.total_days}} - Absent: {{student.total_abs}} - Excused: {{student.total_excused}} - Overrides: {{student.total_overrides}} - Short: {{student.total_short}}
@@ -136,6 +133,9 @@
           <div class="col-md-6">
             <button type="button" id="sign-in" class="btn" ng-click="swipe('in')" ng-class="inButtonStyle()">Sign In</button>
             <button type="button" id="sign-out" class="btn" ng-click="swipe('out')" ng-class="outButtonStyle()">Sign Out</button>
+            <span ng-hide="student.absent_today">
+              <button class="btn" id="absent-button" ng-click="toggleAbsent(student)">{{absent_button_text(student)}}</button>
+            </span>
             <ul ng-show="isAdmin">
               <li ng-repeat="swipe in student.days" style="text-left">
                 <div>
