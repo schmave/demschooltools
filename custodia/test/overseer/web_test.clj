@@ -9,7 +9,10 @@
             [overseer.attendance :as att]
             [overseer.helpers :as h]
             [overseer.dates :as dates]
+            [schema.test :as tests]
             ))
+
+
 ;; run test C-c M-,
 ;; run tests C-c ,
 (comment
@@ -377,7 +380,7 @@
   )
 
 (deftest swipe-attendence-shows-only-when-in
-  (do (db/sample-db)  
+  (do (db/sample-db)
       (let [s (db/make-student "test")
             sid (:_id s)]
         (db/swipe-in sid basetime)
@@ -388,5 +391,7 @@
           (testing "Last Swipe was an 'in'"
             (is (= (-> att :last_swipe_type)
                    "in")))
-          ))) 
+          )))
   )
+
+(use-fixtures :once schema.test/validate-schemas)
