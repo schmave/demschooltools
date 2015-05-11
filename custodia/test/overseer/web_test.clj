@@ -16,17 +16,17 @@
 ;; run test C-c M-,
 ;; run tests C-c ,
 (comment
-  (run-tests 'overseer.web-test)  
-  )  
+  (run-tests 'overseer.web-test)
+  )
 
-(def basetime (t/date-time 2014 10 14 14 9 27 246)) 
+(def basetime (t/date-time 2014 10 14 14 9 27 246))
 
 (defn get-att [id student]
   (let [year (dates/get-current-year-string (db/get-years))]
     (att/get-attendance year id student)))
 
 (deftest get-school-days
-  (db/sample-db true)  
+  (db/sample-db true)
   (let [year (dates/get-current-year-string (db/get-years))
         school-days (att/get-school-days year)]
     (testing "School days"
@@ -37,31 +37,31 @@
 
 (defn add-swipes [sid]
   ;; 14 hours in UTC is 9 Am here
-  ;; 10-14-2014 
+  ;; 10-14-2014
   (db/swipe-in sid basetime)
   (db/swipe-out sid (t/plus basetime (t/hours 6)))
 
   ;; good tomorrow
-  ;; 10-15-2014 
+  ;; 10-15-2014
 
   (db/swipe-in sid (t/plus basetime (t/days 1)))
   (db/swipe-out sid (t/plus basetime (t/days 1) (t/hours 6)))
 
   ;; short the next
-  ;; 10-16-2014 
+  ;; 10-16-2014
 
   (db/swipe-in sid (t/plus basetime (t/days 2)))
   (db/swipe-out sid (t/plus basetime (t/days 2) (t/hours 4)))
 
   ;; two short the next but long enough
-  ;; 10-17-2014 
+  ;; 10-17-2014
 
   (db/swipe-in sid (t/plus basetime (t/days 3)))
   (db/swipe-out sid (t/plus basetime (t/days 3) (t/hours 4)))
   (db/swipe-in sid (t/plus basetime (t/days 3) (t/hours 5)))
   (db/swipe-out sid (t/plus basetime (t/days 3) (t/hours 7)))
 
-  ;; short the next - 10-18-2014 
+  ;; short the next - 10-18-2014
   (db/swipe-in sid (t/plus basetime (t/days 4)))
   (db/swipe-out sid (t/plus basetime (t/days 4) (t/hours 4)))
   )
@@ -71,34 +71,34 @@
     (testing "sanitize swipe out no times"
       (let [result (db/sanitize-out (db/make-swipe 1))]
         (is (= (-> result :in_time) nil))
-        (is (= (-> result :out_time) nil)))) 
+        (is (= (-> result :out_time) nil))))
     (testing "sanitize swipe out with valid times does nothing"
       (let [passed (assoc (db/make-swipe 1)
-                     :in_time (c/to-sql-time basetime)
-                     :out_time (c/to-sql-time (t/plus basetime (t/minutes 5))))
+                          :in_time (c/to-sql-time basetime)
+                          :out_time (c/to-sql-time (t/plus basetime (t/minutes 5))))
             result (db/sanitize-out passed)]
-        (is (= passed result)))) 
+        (is (= passed result))))
     (testing "sanitize swipe out with newer out time forces same out as in"
       (let [passed (assoc (db/make-swipe 1)
-                     :in_time (c/to-sql-time basetime)
-                     :out_time (c/to-sql-time (t/minus basetime (t/minutes 5))))
+                          :in_time (c/to-sql-time basetime)
+                          :out_time (c/to-sql-time (t/minus basetime (t/minutes 5))))
             result (db/sanitize-out passed)]
         (is (= (:in_time passed) (:in_time result)))
         (is (= (:in_time passed) (:out_time result)))
         ))
     (testing "sanitize swipe out with out in wrong day forces out to be same day"
       (let [passed (assoc (db/make-swipe 1)
-                     :in_time (c/to-sql-time basetime)
-                     :out_time (c/to-sql-time (t/plus basetime (t/minutes 5) (t/days 1))))
+                          :in_time (c/to-sql-time basetime)
+                          :out_time (c/to-sql-time (t/plus basetime (t/minutes 5) (t/days 1))))
             result (db/sanitize-out passed)]
         (is (= (:in_time passed) (:in_time result)))
         (is (= (:in_time passed) (:out_time result)))))
-    )   
+    )
 
   )
 
 (deftest swipe-attendence-override-test
-  (do (db/sample-db)  
+  (do (db/sample-db)
       (let [s (db/make-student "test")
             sid (:_id s)]
         (db/swipe-in sid (str basetime))
@@ -117,11 +117,11 @@
           (testing "Override"
             (is (= (-> att :days first :override)
                    true)))
-          ))) 
+          )))
   )
 
 (deftest single-swipe-short-test
-  (do (db/sample-db)  
+  (do (db/sample-db)
       (let [s (db/make-student "test")
             sid (:_id s)]
         (db/swipe-in sid basetime)
@@ -150,9 +150,9 @@
 ;; 10-19-2014 - absent
 ;; 10-20-2014 - absent
 (deftest swipe-attendence-test
-  (do (db/sample-db)  
+  (do (db/sample-db)
       (let [s (db/make-student "test")
-            sid (:_id s) 
+            sid (:_id s)
             s2 (db/make-student "test2")
             sid2 (:_id s2)]
         ;; good today
@@ -215,7 +215,7 @@
             (testing "Total Overrides"
               (is (= (:total_overrides att)
                      0)))
-            )))) 
+            ))))
   )
 
 (deftest in-today-works
@@ -260,7 +260,7 @@
 
 
 (deftest student-list-when-last-swipe-sanitized
-  (let [res (att/get-last-swipe-type 
+  (let [res (att/get-last-swipe-type
              [{:swipes [{:day "2015-04-17", :nice_out_time nil, :type "", :nice_in_time nil, :has_override nil, :out_time nil, :in_time nil}]}
               {:swipes [{:day "2015-04-16",  :nice_out_time nil, :type "", :nice_in_time nil, :has_override nil, :out_time nil, :in_time nil}]}
               {:swipes [{:day "2015-04-15", :nice_out_time nil, :type "swipes", :nice_in_time "07:47:25", :out_time nil, :in_time "2015-04-15T11:47:25.516000000-00:00"}]}])]
@@ -277,19 +277,19 @@
     (db/swipe-in 1 (t/minus now (t/days 2)))
     (db/swipe-in 1 (t/minus now (t/days 1)))
     (db/swipe-in sid (t/minus now (t/days 3)))
-  (let [att (trace/trace "adf" (att/get-student-with-att sid))]
-    (testing "Student Att Count"
-      (is (= (->> att :last_swipe_type) "in"))
-      (is (= (->> att :in_today) false))
-      ))
+    (let [att (trace/trace "adf" (att/get-student-with-att sid))]
+      (testing "Student Att Count"
+        (is (= (->> att :last_swipe_type) "in"))
+        (is (= (->> att :in_today) false))
+        ))
 
-  (let [att  (att/get-student-list)
-        our-hero (filter #(= sid (:_id %)) att)]
-    (testing "Student Count"
-      (is (= (->> our-hero count) 1))
-      (is (= (->> our-hero first :last_swipe_type) "in"))
-      (is (= (->> our-hero first :in_today) false))
-      ))))
+    (let [att  (att/get-student-list)
+          our-hero (filter #(= sid (:_id %)) att)]
+      (testing "Student Count"
+        (is (= (->> our-hero count) 1))
+        (is (= (->> our-hero first :last_swipe_type) "in"))
+        (is (= (->> our-hero first :in_today) false))
+        ))))
 
 (deftest student-list-when-last-swipe-sanitized
   (db/sample-db)
@@ -345,7 +345,7 @@
            "2014-06-01 2015-06-01"))))
 
 (deftest excuse-today-is-today
-  (do (db/sample-db)  
+  (do (db/sample-db)
       (let [
             dummy (db/make-student "dummy")
             s (db/make-student "test")
@@ -359,11 +359,11 @@
             (is (= (:day today) today-string)))
           (testing "Today is excused"
             (is (= (:excused today) true)))
-          ))) 
+          )))
   )
 
 (deftest swipe-today-not-in-on-excused-or-override
-  (do (db/sample-db)  
+  (do (db/sample-db)
       (let [s (db/make-student "test")
             sid (:_id s)
             s2 (db/make-student "tests1")
@@ -376,7 +376,7 @@
             (is (= (:in_today att) false)))
           (testing "S2 not in today"
             (is (= (:in_today att2) false)))
-          ))) 
+          )))
   )
 
 (deftest swipe-attendence-shows-only-when-in
@@ -393,5 +393,32 @@
                    "in")))
           )))
   )
+
+#_{:valid missing-required-key
+ :total_short disallowed-key
+ :_id disallowed-key
+ :total_excused disallowed-key
+ :day missing-required-key
+ :short missing-required-key
+ :total_hours disallowed-key
+ :name disallowed-key
+ :last_swipe_type disallowed-key
+ :in_today disallowed-key
+ :today disallowed-key
+ :days disallowed-key
+ :total_abs disallowed-key
+ :type disallowed-key
+ :total_mins missing-required-key
+ :total_overrides disallowed-key
+ :show_as_absent disallowed-key
+ :absent missing-required-key
+ :total_days disallowed-key
+ :olderdate disallowed-key
+ :swipes missing-required-key
+ :absent_today disallowed-key
+ :override missing-required-key
+ :last_swipe_date disallowed-key
+ :excused missing-required-key
+ :inserted_date disallowed-key}
 
 (use-fixtures :once schema.test/validate-schemas)

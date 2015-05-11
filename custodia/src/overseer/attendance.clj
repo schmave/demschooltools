@@ -11,19 +11,19 @@
             [clj-time.coerce :as c]
             ))
 (def Swipe
-  {:_id s/Num
+  {:_id (s/maybe s/Num)
    :day s/Str
    :requiredmin s/Num
-   :has_excuse s/Bool
-   :nice_out_time s/Str
-   ;; :type "swipes"
-   :nice_in_time s/Str
-   :has_override s/Bool
-   :intervalmin s/Num
-   :olderdate s/Str
+   :has_excuse s/Any
+   :nice_out_time s/Any
+   :type s/Str
+   :nice_in_time (s/maybe s/Str)
+   :has_override s/Any
+   :intervalmin s/Any
+   :olderdate s/Any
    :student_id s/Num
-   :out_time s/Str
-   ;;:in_time #inst "2014-10-14T14:09:27.246000000-00:00"
+   :out_time s/Any
+   :in_time s/Any
    })
 (def StudentDay
   {:valid s/Bool
@@ -43,19 +43,19 @@
    :total_excused s/Num
    :total_hours s/Num
    :name s/Str
-   ;; :last_swipe_type "in"
+   :last_swipe_type (s/maybe s/Str)
    :in_today s/Bool
    :today s/Str
    :days [StudentDay]
    :total_abs s/Num
-   :type :students
+   :type s/Keyword
    :total_overrides s/Num
-   :show_as_absent nil
+   :show_as_absent s/Any
    :total_days s/Num
-   :olderdate nil
+   :olderdate s/Any
    :absent_today s/Bool
-   :last_swipe_date s/Str
-   ;; :inserted_date #inst "2015-05-11T15:44:00.930304000-00:00"
+   :last_swipe_date (s/maybe s/Str)
+   :inserted_date s/Any
    })
 
 (defn only-swipes [s]
@@ -134,7 +134,7 @@
                             (f/parse (:out_time %))))
             list)))
 
-(s/defn get-attendance :- StudentDay
+(s/defn get-attendance :- StudentPage
   [year id student]
   (let [swipes (db/get-student-page id year)
         swipes (map #(assoc % :day (-> % :day make-date-string-without-timezone)) swipes)
