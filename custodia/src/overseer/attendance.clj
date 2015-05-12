@@ -11,19 +11,19 @@
             [clj-time.coerce :as c]
             ))
 (def Swipe
-  {:_id (s/maybe s/Num)
+  {:_id s/Num
    :day s/Str
    :requiredmin s/Num
-   :has_excuse s/Any
-   :nice_out_time s/Any
+   :has_excuse s/Bool
+   :nice_out_time (s/maybe s/Str)
    :type s/Str
    :nice_in_time (s/maybe s/Str)
-   :has_override s/Any
-   :intervalmin s/Any
-   :olderdate s/Any
+   :has_override s/Bool
+   :intervalmin s/Num
+   :olderdate (s/maybe s/Str)
    :student_id s/Num
-   :out_time s/Any
-   :in_time s/Any
+   :out_time s/Str
+   :in_time s/Str
    })
 (def StudentDay
   {:valid s/Bool
@@ -137,7 +137,10 @@
 (s/defn get-attendance :- StudentPage
   [year id student]
   (let [swipes (db/get-student-page id year)
-        swipes (map #(assoc % :day (-> % :day make-date-string-without-timezone)) swipes)
+        swipes (map #(assoc % :day (-> % :day make-date-string-without-timezone)
+                            :has_override (boolean (:has_override %))
+                            :has_excuse (boolean (:has_excuse %)))
+                    swipes)
         grouped-swipes (group-by :day swipes)
         grouped-swipes (into (sorted-map) grouped-swipes)
         summed-days (map #(append-validity student %) grouped-swipes)

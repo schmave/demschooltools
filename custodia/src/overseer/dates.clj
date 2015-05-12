@@ -33,19 +33,8 @@
      (instance? java.lang.String d) (format-to-local date-format (f/parse d))
      :else (format-to-local date-format (c/from-sql-time d)))))
 
-(defn make-time-string [d]
-  (when d
-    (cond (instance? org.joda.time.DateTime d) (format-to-local time-format d)
-          (instance? java.lang.String d) (format-to-local time-format (f/parse d))
-          :else (format-to-local time-format (c/from-sql-time d)))))
-
 (defn today-string []
   (format-to-local date-format (t/now)))
-
-(defn clean-dates [swipe]
-  (?assoc swipe
-          :nice_in_time (make-time-string (:in_time swipe))
-          :nice_out_time (make-time-string (:out_time swipe))))
 
 (defn only-dates-between [list f dfrom dto]
   (filter #(t/within? (t/interval dfrom dto)

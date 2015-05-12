@@ -394,31 +394,4 @@
           )))
   )
 
-#_{:valid missing-required-key
- :total_short disallowed-key
- :_id disallowed-key
- :total_excused disallowed-key
- :day missing-required-key
- :short missing-required-key
- :total_hours disallowed-key
- :name disallowed-key
- :last_swipe_type disallowed-key
- :in_today disallowed-key
- :today disallowed-key
- :days disallowed-key
- :total_abs disallowed-key
- :type disallowed-key
- :total_mins missing-required-key
- :total_overrides disallowed-key
- :show_as_absent disallowed-key
- :absent missing-required-key
- :total_days disallowed-key
- :olderdate disallowed-key
- :swipes missing-required-key
- :absent_today disallowed-key
- :override missing-required-key
- :last_swipe_date disallowed-key
- :excused missing-required-key
- :inserted_date disallowed-key}
-
 (use-fixtures :once schema.test/validate-schemas)
