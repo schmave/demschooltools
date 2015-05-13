@@ -10,21 +10,39 @@
             [schema.core :as s]
             [clj-time.coerce :as c]
             ))
-(def Swipe
-  {:_id s/Num
+(def DayInformation
+  {:student_id s/Num
    :day s/Str
-   :requiredmin s/Num
+   :requiredmin (s/enum 300 330)
    :has_excuse s/Bool
-   :nice_out_time (s/maybe s/Str)
-   :type s/Str
-   :nice_in_time (s/maybe s/Str)
    :has_override s/Bool
-   :intervalmin s/Num
-   :olderdate (s/maybe s/Str)
-   :student_id s/Num
-   :out_time s/Str
-   :in_time s/Str
+   :type (s/eq "")
+   :nice_out_time (s/eq nil)
+   :nice_in_time (s/eq nil)
+   :intervalmin (s/eq nil)
+   :olderdate (s/eq nil)
+   :out_time (s/eq nil)
+   :in_time (s/eq nil)
+   :_id (s/eq nil)
    })
+
+(def Swipe
+  (merge DayInformation
+         {
+          :_id s/Num
+          :type (s/eq "swipes")
+          :nice_out_time (s/maybe s/Str)
+          :nice_in_time (s/maybe s/Str)
+          :intervalmin (s/maybe s/Num)
+          :olderdate (s/maybe java.sql.Date)
+          :out_time (s/maybe java.sql.Timestamp)
+          :in_time (s/maybe java.sql.Timestamp)
+          }))
+
+(def OverrideDay DayInformation)
+
+(def DayRecord (s/either OverrideDay Swipe))
+
 (def StudentDay
   {:valid s/Bool
    :short s/Bool
@@ -33,7 +51,7 @@
    :excused s/Bool
    :day s/Str
    :total_mins s/Num
-   :swipes [Swipe]}
+   :swipes [DayRecord]}
   )
 
 (def StudentPage
@@ -43,19 +61,19 @@
    :total_excused s/Num
    :total_hours s/Num
    :name s/Str
-   :last_swipe_type (s/maybe s/Str)
    :in_today s/Bool
    :today s/Str
    :days [StudentDay]
    :total_abs s/Num
    :type s/Keyword
    :total_overrides s/Num
-   :show_as_absent s/Any
    :total_days s/Num
-   :olderdate s/Any
    :absent_today s/Bool
+   :show_as_absent (s/maybe s/Bool)
+   :inserted_date (s/maybe java.sql.Timestamp)
+   :olderdate (s/maybe java.sql.Date)
+   :last_swipe_type (s/maybe s/Str)
    :last_swipe_date (s/maybe s/Str)
-   :inserted_date s/Any
    })
 
 (defn only-swipes [s]
