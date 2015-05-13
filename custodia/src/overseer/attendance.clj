@@ -23,25 +23,20 @@
    :olderdate (s/eq nil)
    :out_time (s/eq nil)
    :in_time (s/eq nil)
-   :_id (s/eq nil)
-   })
+   :_id (s/eq nil)})
 
 (def Swipe
   (merge DayInformation
-         {
-          :_id s/Num
+         {:_id s/Num
           :type (s/eq "swipes")
           :nice_out_time (s/maybe s/Str)
           :nice_in_time (s/maybe s/Str)
           :intervalmin (s/maybe s/Num)
           :olderdate (s/maybe java.sql.Date)
           :out_time (s/maybe java.sql.Timestamp)
-          :in_time (s/maybe java.sql.Timestamp)
-          }))
+          :in_time (s/maybe java.sql.Timestamp)}))
 
-(def OverrideDay DayInformation)
-
-(def DayRecord (s/either OverrideDay Swipe))
+(def DayRecord (s/either DayInformation Swipe))
 
 (def StudentDay
   {:valid s/Bool
@@ -69,8 +64,8 @@
    :total_overrides s/Num
    :total_days s/Num
    :absent_today s/Bool
+   :inserted_date java.sql.Timestamp
    :show_as_absent (s/maybe s/Bool)
-   :inserted_date (s/maybe java.sql.Timestamp)
    :olderdate (s/maybe java.sql.Date)
    :last_swipe_type (s/maybe s/Str)
    :last_swipe_date (s/maybe s/Str)
