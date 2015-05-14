@@ -15,15 +15,18 @@
    :day s/Str
    :requiredmin (s/enum 300 330)
    :has_excuse s/Bool
-   :has_override s/Bool
-   :type (s/eq "")
-   :nice_out_time (s/eq nil)
-   :nice_in_time (s/eq nil)
-   :intervalmin (s/eq nil)
-   :olderdate (s/eq nil)
-   :out_time (s/eq nil)
-   :in_time (s/eq nil)
-   :_id (s/eq nil)})
+   :has_override s/Bool})
+
+(def OverrideOrExcuse
+  (merge DayInformation
+         {:type (s/eq "")
+          :nice_out_time (s/eq nil)
+          :nice_in_time (s/eq nil)
+          :intervalmin (s/eq nil)
+          :olderdate (s/eq nil)
+          :out_time (s/eq nil)
+          :in_time (s/eq nil)
+          :_id (s/eq nil)}))
 
 (def Swipe
   (merge DayInformation
@@ -36,7 +39,7 @@
           :out_time (s/maybe java.sql.Timestamp)
           :in_time (s/maybe java.sql.Timestamp)}))
 
-(def DayRecord (s/either DayInformation Swipe))
+(def DayRecord (s/either OverrideOrExcuse Swipe))
 
 (def StudentDay
   {:valid s/Bool

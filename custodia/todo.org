@@ -6,13 +6,16 @@
   CLOSED: [2015-04-16 Thu 07:02]
 * DONE Remove today's attendance 
   CLOSED: [2015-04-16 Thu 07:02]
-* TODO Make student page single query
-* TODO New Relic tracing
+* DONE Make student page single query
+CLOSED: [2015-05-13 Wed 17:47]
+* DONE New Relic tracing
+CLOSED: [2015-05-13 Wed 17:47]
 * DONE Database stored sessions
   CLOSED: [2015-04-16 Thu 07:02]
 * DONE Web Drive Test Site
   CLOSED: [2015-04-16 Thu 07:02]
-* TODO Edit student
+* DONE Edit student
+CLOSED: [2015-05-13 Wed 17:47]
 * TODO Configurable passwords
 * TODO Hide student
 * DONE Create student
