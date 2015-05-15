@@ -310,6 +310,7 @@ a.edit_link {
 }
 
 .man-entry {
+    width: 7in;
 }
 
 .man-entry-num {
@@ -319,6 +320,17 @@ a.edit_link {
 .man-entry-content {
 	margin-left: 40px;
 	width: 6in;
+}
+
+.man-entry-change-history {
+    color: #999;
+}
+
+.man-last-modify-date {
+    color: #999;
+    font-weight: normal;
+    padding-left: 100px;
+    float: right;
 }
 
 .man-edit {

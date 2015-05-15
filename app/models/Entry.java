@@ -55,6 +55,13 @@ public class Entry extends Model implements Comparable<Entry> {
             .eq("id", id).findUnique();
     }
 
+    @JsonIgnore
+    public List<ManualChange> changes() {
+        return ManualChange.find.where()
+            .eq("entry", this)
+            .orderBy("date_entered ASC").findList();
+    }
+
     public String getNumber() {
         return section.getNumber() + "." + num;
     }
