@@ -307,10 +307,10 @@ a.edit_link {
 	font-size: 14px;
 	font-weight: bold;
 	border-bottom: 2px solid black;
+    width: 7in;
 }
 
 .man-entry {
-    width: 7in;
 }
 
 .man-entry-num {
