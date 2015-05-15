@@ -16,4 +16,4 @@ dist
 *.vtg
 fairhaven/*.txt
 fairhaven/*.csv
-
+*~
