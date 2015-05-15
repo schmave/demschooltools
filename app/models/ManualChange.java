@@ -165,4 +165,22 @@ public class ManualChange extends Model {
         }
         return null;
     }
+
+    public static Comparator<ManualChange> SORT_NUM_DATE = new Comparator<ManualChange>() {
+        @Override
+        public int compare(ManualChange c1, ManualChange c2) {
+            // I want to order the change records by the user visible num.
+            // However, when entries are created or deleted, the new_num
+            // or old_num, respectively, is null. Use the new_num if it
+            // is available, or old_num otherwise.
+            String num1 = (c1.new_num == null ? c1.old_num : c1.new_num);
+            String num2 = (c2.new_num == null ? c2.old_num : c2.new_num);
+
+            if (num1.equals(num2)) {
+                return c1.date_entered.compareTo(c2.date_entered);
+            } else {
+                return num1.compareTo(num2);
+            }
+        }
+    };
 }

@@ -162,16 +162,38 @@ public class Application extends Controller {
 		return ok(views.html.view_manual.render(Chapter.all()));
 	}
 
-    public static Result viewManualChanges() {
-        Date now = new Date();
-        Date seven_days_before = new Date(now.getTime() - 1000 * 60 * 60 * 24 * 7);
+    public static Result viewManualChanges(String begin_date_string) {
+        Date begin_date = null;
+
+        try {
+            begin_date = new SimpleDateFormat("yyyy-M-d").parse(begin_date_string);
+        } catch (ParseException e) {
+            begin_date = new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7);
+            begin_date.setHours(0);
+            begin_date.setMinutes(0);
+        }
+
         List<ManualChange> changes =
             ManualChange.find.where()
-                .gt("date_entered", seven_days_before)
+                .gt("date_entered", begin_date)
                 .eq("entry.section.chapter.organization", Organization.getByHost())
-                .order("date_entered DESC")
+                .orderBy("entry.id, date_entered ASC")
                 .findList();
-        return ok(views.html.view_manual_changes.render(changes));
+
+        List<ManualChange> changes_to_display = new ArrayList<ManualChange>();
+        int last_id = -1;
+        for (ManualChange c : changes) {
+            if (c.entry.id != last_id) {
+                changes_to_display.add(c);
+            }
+            last_id = c.entry.id;
+        }
+
+        Collections.sort(changes_to_display, ManualChange.SORT_NUM_DATE);
+
+        return ok(views.html.view_manual_changes.render(
+            new SimpleDateFormat("yyyy-MM-dd").format(begin_date),
+            changes_to_display));
     }
 
 	public static Result viewChapter(Integer id) {
