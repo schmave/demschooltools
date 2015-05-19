@@ -1,17 +1,17 @@
-angular.module('app', ['ui.bootstrap']);
+angular.module('app', ['ui.bootstrap', 'ngGrid']);
 angular.module('app').directive("clickToEdit", function() {
     var editorTemplate = '<h1 class="click-to-edit col-md-6">' +
         '<span ng-hide="view.editorEnabled">' +
-            '{{value}} ' +
-            '<a id="edit-name" ng-click="enableEditor()">Edit</a>' +
+        '{{value}} ' +
+        '<a id="edit-name" ng-click="enableEditor()">Edit</a>' +
         '</span>' +
         '<span ng-show="view.editorEnabled">' +
-            '<input id="new-name" ng-model="view.editableValue">' +
-            '<a id="save-name" href="#" ng-click="save()">Save</a>' +
-            ' or ' +
-            '<a id="cancel-name" ng-click="disableEditor()">Cancel</a>.' +
+        '<input id="new-name" ng-model="view.editableValue">' +
+        '<a id="save-name" href="#" ng-click="save()">Save</a>' +
+        ' or ' +
+        '<a id="cancel-name" ng-click="disableEditor()">Cancel</a>.' +
         '</span>' +
-    '</h1>';
+        '</h1>';
 
     return {
         restrict: "A",
@@ -102,6 +102,14 @@ angular.module('app').controller("MainController", function($scope, $http){
     $scope.setDay = function(s) {
         $scope.current_day = s;
     };
+    $scope.gridOptions = { data: 'totals_students',
+                           columnDefs: [{ field: 'name', displayName: 'Name'},
+                                        { field: 'good', displayName: 'Attended (Overrides)'},
+                                        { field: 'unexcused', displayName: 'Unexcused Absence'},
+                                        { field: 'excuses', displayName: 'Excused Absence'},
+                                        { field: 'short', displayName: 'Short'},
+                                        { field: 'student.total_hours', displayName: 'Total Hours'}
+                                       ]};
     $scope.reloadStudentPage = function(student){
         $scope.student = student;
         $scope.students[student._id] = student;
@@ -182,9 +190,9 @@ angular.module('app').controller("MainController", function($scope, $http){
         var d = new Date();
         if($scope.student.last_swipe_date) {
             d = new Date($scope.student.last_swipe_date + "T10:00:00");
-        } 
+        }
         $scope.missing_direction = ($scope.student.last_swipe_type =="in")?"out":"in";
-        if(!$scope.student.in_today 
+        if(!$scope.student.in_today
            // && $scope.student.last_swipe_type == "in"
            && $scope.student.direction == "out"){
             $scope.missing_direction = "in";
@@ -218,14 +226,14 @@ angular.module('app').controller("MainController", function($scope, $http){
     };
     $scope.swipe = function(direction) {
         $scope.student.direction = direction;
-        var missing_in = (($scope.student.last_swipe_type == "out" 
+        var missing_in = (($scope.student.last_swipe_type == "out"
                            || ($scope.student.last_swipe_type == "in" && !$scope.student.in_today)
-                           || !$scope.student.last_swipe_type) 
+                           || !$scope.student.last_swipe_type)
                           && direction == "out"),
-            missing_out = ($scope.student.last_swipe_type == "in" 
+            missing_out = ($scope.student.last_swipe_type == "in"
                            && direction == "in");
         if(missing_in || missing_out) {
-            $scope.get_missing_swipe(); 
+            $scope.get_missing_swipe();
         } else {
             $scope.makeSwipePost();
         }
@@ -286,6 +294,7 @@ angular.module('app').controller("MainController", function($scope, $http){
                 $scope.totals_students = data;
                 $scope.swipedWorked = false;
                 $scope.screen = "student-totals";
+                $(window).resize();
             }). error(function(){});
     };
     $scope.getStudents = function(callback) {

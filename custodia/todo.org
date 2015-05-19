@@ -18,6 +18,7 @@ CLOSED: [2015-05-13 Wed 17:47]
 CLOSED: [2015-05-13 Wed 17:47]
 * TODO Configurable passwords
 * TODO Hide student
+* TODO ng grid
 * DONE Create student
   CLOSED: [2014-12-23 Tue 12:03]
 * DONE swipe in 
