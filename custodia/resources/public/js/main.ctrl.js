@@ -108,7 +108,7 @@ angular.module('app').controller("MainController", function($scope, $http){
                                         { field: 'unexcused', displayName: 'Unexcused Absence'},
                                         { field: 'excuses', displayName: 'Excused Absence'},
                                         { field: 'short', displayName: 'Short'},
-                                        { field: 'student.total_hours', displayName: 'Total Hours'}
+                                        { field: 'total_hours', displayName: 'Total Hours', cellTemplate: '<div>{{Math.round(row.entity[col.field])}}</div>'}
                                        ]};
     $scope.reloadStudentPage = function(student){
         $scope.student = student;
