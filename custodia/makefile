@@ -22,6 +22,10 @@ deploy-test : unit-test
 sql-philly : 
 	heroku pg:psql --app shining-overseer
 
+sql-philly-backup : 
+	heroku pg:backups capture
+	curl -o latest.dump `heroku pg:backups public-url -a sushi`
+
 deploy-philly : unit-test
 	./prod-deploy.sh $(philly-prod-git) 
 
