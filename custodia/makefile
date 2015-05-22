@@ -18,6 +18,10 @@ hello :
 deploy-test : unit-test
 	git push $(web-test-git) master
 
+
+sql-philly : 
+	heroku pg:psql --app shining-overseer
+
 deploy-philly : unit-test
 	./prod-deploy.sh $(philly-prod-git) 
 
