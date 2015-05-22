@@ -9,6 +9,8 @@ T :
 	@echo drop-tables
 	@echo load-massive-dump
 	@echo load-aliased-dump
+	@echo sql-backup-local-restore
+	@echo sql-philly-backup 
 
 # example of ls and echo
 hello : 
@@ -24,7 +26,10 @@ sql-philly :
 
 sql-philly-backup : 
 	heroku pg:backups capture
-	curl -o latest.dump `heroku pg:backups public-url -a sushi`
+	curl -o latest.dump `heroku pg:backups public-url -a shining-overseer`
+
+sql-backup-local-restore :
+	pg_restore --verbose --clean --no-acl --no-owner -h localhost -U postgres -d swipes latest.dump
 
 deploy-philly : unit-test
 	./prod-deploy.sh $(philly-prod-git) 
