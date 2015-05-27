@@ -3,7 +3,7 @@
 @import helper._
 @import com.feth.play.module.pa.views.html._
 
-@main(OrgConfig.get().short_name + " Login", menu = "none") {
+@main(OrgConfig.get().short_name + " Login", "none") {
 
 	<div class="container" style="padding-top:100px;">
 	@if( notice != null ) { <div class="alert alert-warning"><strong>@notice</strong></div> }

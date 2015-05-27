@@ -3,7 +3,7 @@ minor_referral_destinations : List[ String ])
 
 @import helper._
 
-@main("Weekly report starting on " + Application.formatDateShort(start_date), "weekly_report", "jc") {
+@main("Weekly report starting on " + Application.formatDateShort(start_date), "jc", "weekly_report") {
 
 <h3> Weekly report </h3>
 <p><a href="@routes.Application.viewWeeklyReport(Application.yymmddDate(Application.addWeek(end_date, -1)))">&lt;&lt; Prev week</a>

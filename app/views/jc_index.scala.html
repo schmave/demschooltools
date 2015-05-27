@@ -3,7 +3,7 @@ rules : List[ Entry ])
 
 @import helper._
 
-@main("JC database", "home", "jc") {
+@main("JC database", "jc", "home") {
 
 <script type="text/javascript">
 
@@ -43,8 +43,6 @@ $(function() {
 	})
 });
 </script>
-
-<h3> Welcome to the JC database. Please fasten your seatbelt. </h3>
 
 @if( sm_charges.size() > 0 ) {
 	<h4>Charges referred to School Meeting</h4>

@@ -2,13 +2,13 @@
 
 @import helper._
 
-@main("" + chapter.num + " " + chapter.title, "view_manual", "jc") {
+@main("" + chapter.num + " " + chapter.title, "manual") {
 
 <div class="man-chapter">@chapter.num @chapter.title <a class="man-edit no-print" href="@routes.ApplicationEditing.editChapter(chapter.id)">Edit</a></div>
 <p><a class="no-print" href="@routes.ApplicationEditing.addSection(chapter.id)">Add section in @chapter.num @chapter.title</a>
 
 @for(section <- chapter.sections) {
-<div class="man-section"><a name="section_@section.id"></a>@section.getNumber() @section.title <a class="no-print man-edit" href="@routes.ApplicationEditing.editSection(section.id)">Edit</a></div>
+<div class="man-section"><a name="section_@section.id"></a>@section.getNumber() @section.title <a class="no-print man-edit" href="@routes.ApplicationEditing.editSection(section.id)">Edit</a>
 	<p><a class="no-print" href="@routes.ApplicationEditing.addEntry(section.id)">Add entry in @chapter.num@section.num @section.title</a>
 	@for(entry <- section.entries) {
 	<div class="man-entry">
@@ -41,6 +41,7 @@
 		</div>
 	</div>
 	}
+</div>
 }
 
 

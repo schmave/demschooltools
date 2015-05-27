@@ -2,7 +2,7 @@
 
 @import helper._
 
-@main("All people tagged " + tag.title) {
+@main("All people tagged " + tag.title, "crm") {
 <h1>@tag.title</h1>
 <p>@people.size() people</p>
 @if( tag.task_list != null ) {

@@ -1,3 +1,37 @@
+.subnav {
+    border-bottom: 1px rgb(166, 127, 250) solid;
+    border-left: 1px rgb(166, 127, 250) solid;
+    border-right: 1px rgb(166, 127, 250) solid;
+    padding: 5px;
+    background-color: rgb(235, 226, 255);
+}
+
+.subnav a {
+    padding: 0px 10px;
+    border-right: 1px black solid;
+}
+
+.subnav a.active {
+    background-color: yellow;
+}
+
+.nav {
+    background-color: #D6C9F4;
+    border-color: rgb(166, 127, 250);
+}
+
+.nav-tabs>li>a:hover, .nav-tabs>li>a:focus {
+    background-color: #f0eaff;
+    border-color: rgb(166, 127, 250);
+    border-bottom-color: transparent;
+}
+
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:hover, .nav-tabs>li.active>a:focus {
+    background-color: rgb(235, 226, 255);
+    border-color: rgb(166, 127, 250);
+    border-bottom-color: transparent;
+}
+
 #meeting .form-control
 {
     display:inline;

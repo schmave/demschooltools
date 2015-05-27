@@ -2,7 +2,7 @@
 
 @import helper._
 
-@main("List: " + list.title) {
+@main("List: " + list.title, "crm") {
 <h1>@list.title</h1>
 
 @defining(new HashSet[Person]()) { people_with_uncompleted_task =>

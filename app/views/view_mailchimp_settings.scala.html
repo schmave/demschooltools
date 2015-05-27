@@ -1,7 +1,7 @@
 @(form: Form[Organization], org : Organization, mc_syncs : List [ MailchimpSync ],
   mc_lists : Map [ String, com.ecwid.mailchimp.method.v2_0.lists.ListMethodResult.Data ])
 
-@main("Mailchimp Settings", menu = "crm") {
+@main("Mailchimp Settings", "settings") {
 
 <h3>MailChimp settings</h3>
 <p style="width: 400px">To connect your MailChimp account, go to your account page, then select "API keys"

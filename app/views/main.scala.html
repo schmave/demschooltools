@@ -1,4 +1,4 @@
-@(title: String, activeTab : String = "", menu : String = "crm")(content: Html)
+@(title: String, menu : String, selectedBtn : String = "")(content: Html)
 
 @import com.feth.play.module.pa.views.html._
 
@@ -23,21 +23,39 @@
 		<link rel="stylesheet" media="all" href="@routes.Assets.at("stylesheets/main.css")">
 		<link rel="stylesheet" media="print" href="@routes.Assets.at("stylesheets/print.css")">
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
-    </head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	</head>
     <body>
 		@ifAuth() { username =>
-			<ul class="nav nav-tabs no-print">
-			@if( menu.equals( "crm" ) ) {
-			<li class="dropdown">
+			<ul class="nav nav-tabs navbar-default no-print">
+			<li @if(menu.equals("crm")) { class="active" }>
+				<a href="@routes.CRM.people()">People</a>
+			</li>
+			<li @if(menu.equals("jc")) { class="active" }>
+				<a href="@routes.Application.index()">JC</a>
+			</li>
+			<li @if(menu.equals("manual")) { class="active" }>
+				<a href="@routes.Application.viewManual()">@OrgConfig.get().str_manual_title_short</a>
+			</li>
+			<li @if(menu.equals("settings")) { class="active" } class="dropdown">
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-				  People
+				  Settings
 				  <b class="caret"></b>
 				</a>
 					<ul class="dropdown-menu">
-					<li><a href="@routes.CRM.people()">Home</a></li>
-					<li><a href="@routes.CRM.newPerson()">Add a person</a></li>
+					<li><a href="@routes.CRM.viewMailchimpSettings()">Mailchimp</a></li>
 					</ul>
-			<li>
+			</li>
+			<li style="float:right;"><a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout">
+				@if(Application.isCurrentUserEditor()) {
+					Logout
+				} else { Login }
+					</a>
+			<li class="username"><a class="username">@username</a></li>
+			</ul>
+
+			@if(menu.equals("crm")) {
+			<li><a href="@routes.CRM.newPerson()">Add a person</a></li>
 			<li class="dropdown">
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 				  Tags
@@ -83,7 +101,7 @@
 						<li><a href="@routes.CRM.donationsNeedingIndiegogo()">need Indiegogo reward</a></li>
 					</ul>
 			@if(CRM.hasPendingEmail()) {
-				<li @if(activeTab.equals("email")) { class="active" } >
+				<li>
 					<a href="@routes.CRM.viewPendingEmail()">Pending Email <span class="label label-warning">1</span></a>
 				</li>
 			}
@@ -94,50 +112,21 @@
 			</div>
 			</form>
 			</li>
-			<li class="dropdown">
-				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-				  Settings
-				  <b class="caret"></b>
-				</a>
-					<ul class="dropdown-menu">
-					<li><a href="@routes.CRM.viewMailchimpSettings()">Mailchimp</a></li>
-					</ul>
-			<li>
 			}
-			@if( menu.equals("jc") ) {
-				<li><a href="@routes.CRM.people()">People</a></li>
-			}
-			<li class="dropdown">
-				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-				  JC
-				  <b class="caret"></b>
-				</a>
-					<ul class="dropdown-menu">
-			<li><a href="@routes.Application.index">Home</a>
-			<li><a href="@routes.Application.thisWeekReport">
-					Weekly Report
-				</a>
-			<li><a href="@routes.Application.viewSchoolMeetingDecisions">View S.M. decisions</a>
-			@if(Application.isCurrentUserEditor()) {
-			}
-					</ul>
-			</li>
 
 			@if( menu.equals("jc") ) {
-				<li><a href="@routes.ApplicationEditing.editTodaysMinutes">Edit today's minutes</a>
+			<div class="subnav">
+	  		<a @if(selectedBtn.equals("home")) { class="active" }
+				href="@routes.Application.index">Home</a>
+			<a href="@routes.ApplicationEditing.editTodaysMinutes">
+				Edit today's minutes</a>
+	  		<a @if(selectedBtn.equals("weekly_report")) { class="active" }
+				href="@routes.Application.thisWeekReport">Weekly Report</a>
+			<a @if(selectedBtn.equals("view_sm")) { class="active" }
+				href="@routes.Application.viewSchoolMeetingDecisions">
+				View S.M. decisions</a>
+			</div>
 			}
-			<li @if(activeTab.equals("view_manual")) { class="active" } ><a href="@routes.Application.viewManual">
-					@OrgConfig.get().str_manual_title_short
-				</a>
-
-			<li style="float:right;"><a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout">
-				@if(Application.isCurrentUserEditor()) {
-					Logout
-				} else { Login }
-					</a>
-			<li class="username"><a class="username">@username</a></li>
-
-		</ul>
 	}
 
 		@content

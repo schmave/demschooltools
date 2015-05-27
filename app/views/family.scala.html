@@ -2,7 +2,7 @@
 
 @import helper._
 
-@main(p.first_name + " " + p.last_name) {
+@main(p.first_name + " " + p.last_name, "crm") {
 
 @defining(if(family_members.size() >= 2){ "col-xs-6 col-md-3" } else {"col-xs-6 col-md-6"}) { size =>
 <div class="row">

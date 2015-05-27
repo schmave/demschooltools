@@ -1,6 +1,6 @@
 @(personForm: Form[Person])
 
-@main("Create a new person") {
+@main("Create a new person", "crm") {
 
     @person_form(personForm,
 		routes.CRM.savePersonEdits(),
