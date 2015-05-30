@@ -337,10 +337,13 @@ a.edit_link {
    font-weight: bold;
 }
 
-.man-section {
+.man-section-header {
 	font-size: 14px;
-	font-weight: bold;
 	border-bottom: 2px solid black;
+    font-weight: bold;
+}
+
+.man-section {
     width: 7in;
 }
 
