@@ -44,6 +44,13 @@ $(document).ready(function () {
             });
         }
     });
+
+    $("input.date").datepicker({
+        showOtherMonths: true,
+        selectOtherMonths: true,
+        changeMonth: true,
+        changeYear: true,
+        dateFormat: 'yy-mm-dd'});
 });
 
 function removeTag(el, person_id, tag_id)
