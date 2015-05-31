@@ -20,6 +20,7 @@ import play.mvc.*;
 import play.mvc.Http.Context;
 
 @Security.Authenticated(EditorSecured.class)
+@With(DumpOnError.class)
 public class ApplicationEditing extends Controller {
 
     public static Result editTodaysMinutes() {

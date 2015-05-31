@@ -27,6 +27,7 @@ import play.mvc.*;
 import play.mvc.Http.Context;
 
 @Security.Authenticated(Secured.class)
+@With(DumpOnError.class)
 public class Application extends Controller {
 
     public static Date getDateFromString(String date_string) {

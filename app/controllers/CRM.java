@@ -28,7 +28,9 @@ import play.libs.Json;
 import play.mvc.*;
 import play.mvc.Http.Context;
 
+
 @Security.Authenticated(EditorSecured.class)
+@With(DumpOnError.class)
 public class CRM extends Controller {
 
 	static Form<Person> personForm = Form.form(Person.class);
