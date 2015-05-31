@@ -419,7 +419,14 @@ public class CRM extends Controller {
     }
 
     public static Result savePersonEdits() {
-        return redirect(routes.CRM.person(Person.updateFromForm(personForm.bindFromRequest()).person_id));
+        Form<Person> filledForm = personForm.bindFromRequest();
+        if(filledForm.hasErrors()) {
+            return badRequest(
+                views.html.edit_person.render(filledForm)
+            );
+        }
+
+        return redirect(routes.CRM.person(Person.updateFromForm(filledForm).person_id));
     }
 
     public static String getInitials(Person p) {
