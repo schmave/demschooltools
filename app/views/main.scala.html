@@ -55,8 +55,9 @@
 			</ul>
 
 			@if(menu.equals("crm")) {
-			<li><a href="@routes.CRM.newPerson()">Add a person</a></li>
-			<li class="dropdown">
+			<div class="subnav">
+			<a href="@routes.CRM.newPerson()">Add a person</a>
+			<span class="dropdown">
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 				  Tags
 				  <b class="caret"></b>
@@ -79,8 +80,8 @@
 								}
 							}
 						}
-					</ul>
-			<li class="dropdown">
+					</ul></span>
+			<span class="dropdown">
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 				  Checklists
 				  <b class="caret"></b>
@@ -89,8 +90,8 @@
 						@for( l <- TaskList.find.where().eq("organization", Organization.getByHost()).findList() ) {
 							<li><a href="@routes.CRM.viewTaskList(l.id)">@l.title</a></li>
 							}
-					</ul>
-			<li class="dropdown">
+					</ul></span>
+			<span class="dropdown">
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 				  Donations
 				  <b class="caret"></b>
@@ -99,19 +100,15 @@
 					<li><a href="@routes.CRM.donations()">All</a></li>
 						<li><a href="@routes.CRM.donationsNeedingThankYou()">need thank you</a></li>
 						<li><a href="@routes.CRM.donationsNeedingIndiegogo()">need Indiegogo reward</a></li>
-					</ul>
+					</ul></span>
 			@if(CRM.hasPendingEmail()) {
-				<li>
+				
 					<a href="@routes.CRM.viewPendingEmail()">Pending Email <span class="label label-warning">1</span></a>
-				</li>
+				
 			}
-			<li>
-			<form class="navbar-form navbar-left">
-			<div class="form-group">
-			   <input id="navbar_people_search" type="Search" placeholder="Search people..." class="form-control" />
+			
+			   <input id="navbar_people_search" type="Search" placeholder="Search people..."/>
 			</div>
-			</form>
-			</li>
 			}
 
 			@if( menu.equals("jc") ) {

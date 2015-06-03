@@ -4,11 +4,12 @@
     border-right: 1px rgb(166, 127, 250) solid;
     padding: 5px;
     background-color: rgb(235, 226, 255);
+    margin-bottom: 5px;
 }
 
-.subnav a {
-    padding: 0px 10px;
-    border-right: 1px black solid;
+.subnav > a, .subnav > span > a {
+   padding: 0px 10px;
+   border-right: 1px black solid;
 }
 
 .subnav a.active {
