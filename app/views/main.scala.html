@@ -27,15 +27,16 @@
 	</head>
     <body>
 		@ifAuth() { username =>
+<div class="tabbable">
 			<ul class="nav nav-tabs navbar-default no-print">
 			<li @if(menu.equals("crm")) { class="active" }>
-				<a href="@routes.CRM.people()">People</a>
+				<a href="#people" data-toggle="tab">People</a>
 			</li>
 			<li @if(menu.equals("jc")) { class="active" }>
-				<a href="@routes.Application.index()">JC</a>
+				<a href="#jc" data-toggle="tab">JC</a>
 			</li>
 			<li @if(menu.equals("manual")) { class="active" }>
-				<a href="@routes.Application.viewManual()">@OrgConfig.get().str_manual_title_short</a>
+				<a href="#manual" data-toggle="tab">@OrgConfig.get().str_manual_title_short</a>
 			</li>
 			<li @if(menu.equals("settings")) { class="active" } class="dropdown">
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -54,8 +55,12 @@
 			<li class="username"><a class="username">@username</a></li>
 			</ul>
 
-			@if(menu.equals("crm")) {
+	  <div class="tab-content">
+		<div class="tab-pane @if(menu.equals("crm")) { active }" id="people">
 			<div class="subnav">
+			<a @if(selectedBtn.equals("crm_home")) { class="active" } 
+				href="@routes.CRM.people()">
+				Recent comments</a>
 			<a href="@routes.CRM.newPerson()">Add a person</a>
 			<span class="dropdown">
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -109,11 +114,11 @@
 			
 			   <input id="navbar_people_search" type="Search" placeholder="Search people..."/>
 			</div>
-			}
+		</div>
 
-			@if( menu.equals("jc") ) {
+		<div class="tab-pane @if(menu.equals("jc")) { active }" id="jc">
 			<div class="subnav">
-	  		<a @if(selectedBtn.equals("home")) { class="active" }
+	  		<a @if(selectedBtn.equals("jc_home")) { class="active" }
 				href="@routes.Application.index">Home</a>
 			<a href="@routes.ApplicationEditing.editTodaysMinutes">
 				Edit today's minutes</a>
@@ -123,7 +128,18 @@
 				href="@routes.Application.viewSchoolMeetingDecisions">
 				View S.M. decisions</a>
 			</div>
-			}
+		</div>
+		
+		<div class="tab-pane @if(menu.equals("manual")) { active }" id="manual">
+			<div class="subnav">
+	  		<a @if(selectedBtn.equals("toc")) { class="active" }
+				href="@routes.Application.viewManual()">Table of Contents</a>
+			<a @if(selectedBtn.equals("manual_changes")) { class="active" }
+				href="@routes.Application.viewManualChanges()">
+				Changes since a date</a>
+			</div>
+		</div>
+	</div>
 	}
 
 		@content
