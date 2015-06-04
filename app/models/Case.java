@@ -164,6 +164,6 @@ public class Case extends Model implements Comparable<Case> {
     }
 
     public int compareTo(Case other) {
-        return case_number.compareTo(other.case_number);
+        return meeting.date.compareTo(other.meeting.date);
     }
 }

@@ -253,6 +253,23 @@ public class Application extends Controller {
         return ok(views.html.view_person_history.render(p, new PersonHistory(p), getLastWeekCharges(p), redact_names));
     }
 
+    public static Result viewPersonsWriteups(Integer id) {
+        Person p = Person.findById(id);
+		
+		List<Case> cases_written_up = new ArrayList<Case>();
+		
+		for (PersonAtCase pac : p.cases_involved_in) {
+			if (pac.role == PersonAtCase.ROLE_WRITER) {
+				cases_written_up.add(pac.the_case);
+			}
+		}
+		
+		Collections.sort(cases_written_up);
+		Collections.reverse(cases_written_up);
+		
+        return ok(views.html.view_persons_writeups.render(p, cases_written_up));
+    }
+
     public static Result viewRuleHistory(Integer id) {
         Entry r = Entry.findById(id);
         return ok(views.html.view_rule_history.render(r, new RuleHistory(r), getRecentResolutionPlans(r)));

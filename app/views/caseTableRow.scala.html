@@ -1,9 +1,10 @@
-@(c : Case)
+@(c : Case, show_links: Boolean)
 
 @import helper._
 
 	<tr>
-	<td><h5>#@c.case_number</h5>
+	<td><h5>@if(show_links) {<a href="@routes.Application.viewMeeting(c.meeting.id)">}
+		#@c.case_number @if(show_links) {</a>}</h5>
 	<p>@if( c.date != null ) { @Application.formatDateShort(c.date)@if( !c.time.equals("") ){, @c.time}. }
 	<i>Writers</i>: @c.people_at_case.filter((p: PersonAtCase) => p.role == PersonAtCase.ROLE_WRITER).map {tr =>@tr.person.getDisplayName()}.mkString(", ").
 	<i>Location</i>: @if(!c.location.equals("")) {@c.location} else {unknown}.

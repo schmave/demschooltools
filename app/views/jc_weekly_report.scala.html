@@ -57,7 +57,7 @@ Period from Wed. @Application.formatDateShort(start_date) to Tue. @{Application.
 @caseTableOpen()
 @for(c <- cases) {
 	@if( !c.empty() && c.charges.size() == 0 ) {
-		@caseTableRow(c)
+		@caseTableRow(c, true)
 	}
 }
 </table>

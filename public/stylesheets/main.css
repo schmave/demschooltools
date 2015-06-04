@@ -41,6 +41,13 @@
     padding: 2px 4px;
 }
 
+.cases-written-link {
+    color: green;
+}
+
+.charges-link {
+    color: red;
+}
 .case .esm-form-label
 {
     text-align: right;

@@ -17,6 +17,7 @@ GET  /downloadMeetingResolutionPlans/:id	controllers.Application.downloadMeeting
 GET   /personHistory/:id    controllers.Application.getPersonHistory(id: Integer)
 GET   /ruleHistory/:id    controllers.Application.getRuleHistory(id: Integer)
 
+GET   /viewPersonsWriteups/:id    controllers.Application.viewPersonsWriteups(id: Integer)
 GET   /viewPersonHistory/:id    controllers.Application.viewPersonHistory(id: Integer, redact_names: Boolean ?= false)
 GET   /viewRuleHistory/:id    controllers.Application.viewRuleHistory(id: Integer)
 

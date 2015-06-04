@@ -57,7 +57,7 @@ Edit minutes</a>
 @caseTableOpen()
 @for(c <- m.cases) {
 	@if( !c.empty() ) {
-		@caseTableRow(c)
+		@caseTableRow(c, false)
 	}
 }
 </table>
