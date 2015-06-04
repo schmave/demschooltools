@@ -16,18 +16,18 @@
     background-color: yellow;
 }
 
-.nav {
+.dst-nav {
     background-color: #D6C9F4;
     border-color: rgb(166, 127, 250);
 }
 
-.nav-tabs>li>a:hover, .nav-tabs>li>a:focus {
+.dst-nav>li>a:hover, .dst-nav>li>a:focus {
     background-color: #f0eaff;
     border-color: rgb(166, 127, 250);
     border-bottom-color: transparent;
 }
 
-.nav-tabs>li.active>a, .nav-tabs>li.active>a:hover, .nav-tabs>li.active>a:focus {
+.dst-nav>li.active>a, .dst-nav>li.active>a:hover, .dst-nav>li.active>a:focus {
     background-color: rgb(235, 226, 255);
     border-color: rgb(166, 127, 250);
     border-bottom-color: transparent;
