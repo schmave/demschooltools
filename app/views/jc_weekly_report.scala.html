@@ -17,7 +17,7 @@ Period from Wed. @Application.formatDateShort(start_date) to Tue. @{Application.
 <p>@data.num_charges total charges.
 
 <div class="row">
-	<div class="col-xs-4">
+	<div class="col-sm-4">
         <h4>Charges per rule</h4>
 		<table class="table sortable">
 			<tr><th>Rule<th width=100># Charges</tr>
@@ -26,7 +26,7 @@ Period from Wed. @Application.formatDateShort(start_date) to Tue. @{Application.
 			}
 		</table>
 	</div>
-	<div class="col-xs-4">
+	<div class="col-sm-4">
         <h4>Charges per person</h4>
 		<table class="table sortable">
 		<tr><th>Person
@@ -43,7 +43,7 @@ Period from Wed. @Application.formatDateShort(start_date) to Tue. @{Application.
 			}
 		</table>
 	</div>
-	<div class="col-xs-4">
+	<div class="col-sm-4">
 		<h4>People with no charges this week</h4>
 		<ol>
 		@for( p <- data.uncharged_people) {
