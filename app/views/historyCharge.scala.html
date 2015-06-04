@@ -12,7 +12,7 @@
 	(@c.severity)
 }
 
-<i>Findings</i>: @if( redact_findings ) { @c.the_case.getRedactedFindings(c.person) } else { @c.the_case.findings }
+<i>@OrgConfig.get().str_findings</i>: @if( redact_findings ) { @c.the_case.getRedactedFindings(c.person) } else { @c.the_case.findings }
 
 @if( !c.plea.equals("Guilty") ) {
 	Plead <b>@c.plea</b>.

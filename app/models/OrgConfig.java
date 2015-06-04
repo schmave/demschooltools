@@ -17,6 +17,7 @@ public class OrgConfig {
     public String str_res_plans;
     public String str_res_plans_cap;
     public String str_committee_name = "Judicial Committee";
+	public String str_findings = "Findings";
 
     public boolean show_no_contest_plea = false;
     public boolean show_severity = false;
@@ -120,6 +121,7 @@ class Fairhaven extends OrgConfig {
         str_res_plan_cap = "Sentence";
         str_res_plans = "sentences";
         str_res_plans_cap = "Sentences";
+		str_findings = "JC Report";
 
         use_minor_referrals = true;
 
