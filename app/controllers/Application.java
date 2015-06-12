@@ -255,18 +255,18 @@ public class Application extends Controller {
 
     public static Result viewPersonsWriteups(Integer id) {
         Person p = Person.findById(id);
-		
+
 		List<Case> cases_written_up = new ArrayList<Case>();
-		
+
 		for (PersonAtCase pac : p.cases_involved_in) {
 			if (pac.role == PersonAtCase.ROLE_WRITER) {
 				cases_written_up.add(pac.the_case);
 			}
 		}
-		
+
 		Collections.sort(cases_written_up);
 		Collections.reverse(cases_written_up);
-		
+
         return ok(views.html.view_persons_writeups.render(p, cases_written_up));
     }
 
@@ -500,4 +500,11 @@ public class Application extends Controller {
 			return e.toString() + "<br><br>" + input;
 		}
 	}
+
+    public static Result renderMarkdown() {
+        Map<String, String[]> form_data = request().body().asFormUrlEncoded();
+
+        String markdown = form_data.get("markdown")[0];
+        return ok(markdown(markdown));
+    }
 }

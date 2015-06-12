@@ -1,5 +1,7 @@
 @(form: Form[Entry], section : Section, is_new : Boolean, chapters : List[Chapter])
 
+@implicitField = @{ helper.FieldConstructor(myConstructor.f) }
+
 @main("Edit an entry", "jc") {
 
 @if( is_new ) {
@@ -8,22 +10,23 @@
     <h2>Edit entry "@form("title").value()"</h2>
 }
 
-@helper.form(routes.ApplicationEditing.saveEntry(), 'class -> "form-horizontal") {
+@helper.form(routes.ApplicationEditing.saveEntry(), 'class -> "form-horizontal", 'role -> "form") {
 
 
 @if(form("id").value()) {
 	<input type="hidden" name="id" value="@form("id").value()"/>
 }
-	@helper.inputText(form("title"), '_label -> "Title", 'size -> 75)
-<dl class=" " id="num_field">
-    <dt><label for="num">Number</label></dt>
-    <dd>
-    @{section.getNumber()}.<input type="text" id="num" name="num" value="@form("num").value()" size="10">
-</dd>
-</dl>
-	@helper.checkbox(form("deleted"), '_label -> "Check this to delete -- careful, can only be undone by Evan")
 	@helper.select(form("section.id"), options = chapters.flatMap (c => c.sections.map(s => ("" + s.id, s.chapter.num + "" + s.num + " " + s.title))),
 		'_label -> "Section", 'class -> "form-control")
+<div class="form-group" id="num_field">
+    <label for="num" class="col-sm-3 control-label">Number</label>
+    <div class="col-sm-6">
+    @{section.getNumber()}.<input type="text" id="num" name="num" value="@form("num").value()" size="10">
+	</div>
+</div>
+	@helper.inputText(form("title"), '_label -> "Title", 'class -> "form-control")
+
+	@helper.checkbox(form("deleted"), '_label -> "Check this to delete")
 
 	<div class="markdown-guidelines">
 		<h4>Formatting help</h4>
@@ -37,12 +40,54 @@
 		<pre>1. the first
 1. the second
 1. the third</pre>
+	<p>If you want a nested list, or sub-list, put four spaces in front of the number or asterisk, like this:
+		<pre>1. the first
+    1. sub-item
+    2. second sub-item
+    3. third sub-item
+2. the second</pre>
+
 	</div>
 
 	<div class="entry-content-edit">
-	@helper.textarea(form("content"), '_label -> "Content", 'rows->12, 'class -> "form-control")
+	@helper.textarea(form("content"), '_label -> "Content (see preview below)", 'rows->12, 'class -> "form-control")
 	</div>
 
 	<input type="submit" value="Save">
+
+	<h3>Live Preview</h3>
+	<div id="markdown_preview"></div>
 }
+
+<script type="text/javascript">
+last_content = $("#content").val();
+needs_render = true
+
+$("#content").on(TEXT_AREA_EVENTS, contentChanged);
+window.setTimeout(renderContent, 3000);
+
+function contentChanged() {
+	new_content = $("#content").val();
+	if (new_content != last_content) {
+		last_content = new_content;
+		needs_render = true;
+    }
+}
+
+function renderContent() {
+    window.setTimeout(renderContent, 3000);
+
+    if (!needs_render) {
+		return;
+    }
+	needs_render = false;
+
+	$.post("/renderMarkdown",
+           {markdown : last_content},
+		   function(data) {
+		$("#markdown_preview").html(data);
+	});
+}
+</script>
+
 }

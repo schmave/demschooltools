@@ -1,5 +1,3 @@
-TEXT_AREA_EVENTS = "change keyup paste cut"
-
 function showSomethingInSidebar(url) {
     $("#sidebar").html("<h2>Loading...</h2>");
     $.get(url,

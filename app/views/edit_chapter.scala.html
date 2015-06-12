@@ -1,5 +1,7 @@
 @(form: Form[Chapter], is_new : Boolean)
 
+@implicitField = @{ helper.FieldConstructor(myConstructor.f) }
+
 @main("Edit a chapter", "jc") {
 
 @if( is_new ) {
@@ -14,9 +16,9 @@
 @if(form("id").value()) {
 	<input type="hidden" name="id" value="@form("id").value()"/>
 }
-        @helper.inputText(form("title"), '_label -> "Title", 'size -> 75)
-		@helper.checkbox(form("deleted"), '_label -> "Check this to delete -- careful, can only be undone by Evan")
-        @helper.inputText(form("num"), '_label -> "Number", 'size -> 10)
+        @helper.inputText(form("num"), '_label -> "Number")
+        @helper.inputText(form("title"), '_label -> "Title", 'class-> "form-control")
+		@helper.checkbox(form("deleted"), '_label -> "Check this to delete")
 
 		<input type="submit" value="Save">
 }

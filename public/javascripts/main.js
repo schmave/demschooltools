@@ -1,3 +1,7 @@
+// These events should capture all possible ways to change the text
+// in a textfield.
+TEXT_AREA_EVENTS = "change keyup paste cut"
+
 $(document).ready(function () {
     $( "#same_family_name" ).autocomplete({
         source: "/jsonPeople",

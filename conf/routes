@@ -62,6 +62,7 @@ POST /saveSection	controllers.ApplicationEditing.saveSection()
 GET /addEntry/:sectionId		controllers.ApplicationEditing.addEntry(sectionId : Integer)
 GET /editEntry/:id		controllers.ApplicationEditing.editEntry(id : Integer)
 POST /saveEntry		controllers.ApplicationEditing.saveEntry()
+POST /renderMarkdown	controllers.Application.renderMarkdown()
 
 
 GET     /jsonPeople               controllers.CRM.jsonPeople(term ?= "")
