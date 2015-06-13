@@ -5,15 +5,15 @@
 @main("JC minutes from " + Application.formatMeetingDate(m.date), "jc") {
 
 <h3>JC minutes from @Application.formatMeetingDate(m.date)</h3>
-<p><a href="javascript:print()" class="btn btn-success no-print">
+<p><a href="@routes.Application.printMeeting(m.id)" class="btn btn-success no-print">
 1. Print minutes</a>
 <a href="@routes.Application.viewMeetingResolutionPlans(m.id)"
 class="btn btn-success no-print" style="margin-left: 75px">
 2. Print @OrgConfig.get().str_res_plans</a>
 <span class="no-print">or <a href="@routes.Application.downloadMeetingResolutionPlans(m.id)">
-Download @OrgConfig.get().str_res_plans</a></span>
+Download @OrgConfig.get().str_res_plans</a></span></p>
 <p><a href="@routes.ApplicationEditing.editMeeting(m.id)" class="btn btn-warning no-print">
-Edit minutes</a>
+Edit minutes</a></p>
 
 
 <p><i>Committee</i>:
@@ -32,28 +32,28 @@ Edit minutes</a>
 )
 </p>
 
-<h4>&nbsp;<br>@OrgConfig.get().str_res_plans_cap</h4>
+<h4>&nbsp;<br/>@OrgConfig.get().str_res_plans_cap</h4>
 <table class="table resolution_plans">
-	<thead><th width="70">Case<th width="20">Person<th width="220">Entry<th>@OrgConfig.get().str_res_plan_cap</thead>
+	<thead><th width="70">Case</th><th width="20">Person</th><th width="220">Entry</th><th>@OrgConfig.get().str_res_plan_cap</th></thead>
 	@for(c <- m.cases) {
 		@for(charge <- c.charges) {
 			@if( charge.person != null && charge.rule != null ) {
-			<tr><td>@c.case_number<td>@charge.person.getDisplayName()
-				<td>@charge.rule.title
+			<tr><td>@c.case_number</td><td>@charge.person.getDisplayName()</td>
+				<td>@charge.rule.title</td>
 					<td>@charge.resolution_plan
 						@if( ! charge.plea.equals("Guilty") ) {
 							<i>(Plea: @charge.plea)</i>
 						}
 						@if( charge.referred_to_sm ) {
-							<br>*** Referred to School Meeting ***
+							<br/>*** Referred to School Meeting ***
 						}
-						</tr>
+						</td></tr>
 			}
 		}
 	}
 </table>
 
-<h4>&nbsp;<br>Case Notes</h4>
+<h4>&nbsp;<br/>Case Notes</h4>
 @caseTableOpen()
 @for(c <- m.cases) {
 	@if( !c.empty() ) {

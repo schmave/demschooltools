@@ -14,12 +14,11 @@
 /*      content: "Page " counter(page) " of " counter(pages);*/
         font-size: 10px;
     }
-}
-
-@page {
     @bottom-center {
         content: element(footer);
     }
+
+    margin: 40px 20px;
 }
 
 /* Override bootstrap rule that shows links when printing */
@@ -27,4 +26,12 @@ a[href]:after {
     content: none !important;
 }
 
+.case_notes tr {
+    page-break-inside: avoid;
+}
 
+/* Somebody -- twitter bootstrap? -- is leaving out the borders
+   when tables are printed. Put them back. */
+.table td {
+    border-top: 1px solid #ddd;
+}

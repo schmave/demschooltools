@@ -10,6 +10,8 @@ GET     /editToday                controllers.ApplicationEditing.editTodaysMinut
 
 
 GET  /viewMeeting/:id	controllers.Application.viewMeeting(id: Integer)
+GET  /printMeeting/:id	controllers.Application.printMeeting(id: Integer)
+GET  /printWeeklyMinutes/:start_date	controllers.Application.printWeeklyMinutes(start_date : String)
 GET  /editMeeting/:id	controllers.ApplicationEditing.editMeeting(id: Integer)
 GET  /viewMeetingResolutionPlans/:id	controllers.Application.viewMeetingResolutionPlans(id: Integer)
 GET  /downloadMeetingResolutionPlans/:id	controllers.Application.downloadMeetingResolutionPlans(id: Integer)

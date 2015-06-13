@@ -7,41 +7,44 @@
 		#@c.case_number @if(show_links) {</a>}</h5>
 	<p>@if( c.date != null ) { @Application.formatDateShort(c.date)@if( !c.time.equals("") ){, @c.time}. }
 	<i>Writers</i>: @c.people_at_case.filter((p: PersonAtCase) => p.role == PersonAtCase.ROLE_WRITER).map {tr =>@tr.person.getDisplayName()}.mkString(", ").
-	<i>Location</i>: @if(!c.location.equals("")) {@c.location} else {unknown}.
+	<i>Location</i>: @if(!c.location.equals("")) {@c.location} else {unknown}.</p></td>
 	<td><p>
 		<i>Testifiers</i>: @c.people_at_case.filter(_.role == PersonAtCase.ROLE_TESTIFIER).map {tr =>@tr.person.getDisplayName()}.mkString(", ")
-		<p>@c.findings
+		</p><p>@c.findings</p></td>
 	<td>@if( c.charges.size() > 0) {
 		<ol>
 			@for( charge <- c.charges ) {
 				@if( charge.person != null && charge.rule != null) {
 					<li>@charge.person.getDisplayName()&mdash;@charge.rule.title @if( !charge.severity.equals("")){(@charge.severity)}
-					@if( ! charge.plea.equals("Guilty") ) { <b>@charge.plea</b>. }
+					@if( ! charge.plea.equals("Guilty") ) { <b>@charge.plea</b>. }</li>
 				} else {
-					<li>Charge missing person and/or rule.
+					<li>Charge missing person and/or rule.</li>
 				}
 			}
 		</ol>
 	} else {
 		No charges.
-	}
+	}</td></tr>
 
 	@for( charge <- c.charges ) {
 		@if( charge.referred_to_sm && charge.sm_decision == null) {
-			<tr><td colspan=3 class="sm_decision">*** Awaiting School Meeting decision on charging
+			<tr><td colspan="3" class="sm_decision">*** Awaiting School Meeting decision on charging
 			@if(charge.person != null) { @charge.person.getDisplayName() } else { ??? } with
 			@charge.getRuleTitle().
+			</td></tr>
 		}
 		@if( !charge.minor_referral_destination.equals("")) {
-			<tr><td colspan=3 class="sm_decision">Charge against
+			<tr><td colspan="3" class="sm_decision">Charge against
 			@if(charge.person != null) { @charge.person.getDisplayName() } else { ??? } with
 			@charge.getRuleTitle() referred to
 				@{charge.minor_referral_destination}.
+			</td></tr>
 		}
 		@if( charge.sm_decision != null ) {
-			<tr><td colspan=3 class="sm_decision">School meeting decision on charging
+			<tr><td colspan="3" class="sm_decision">School meeting decision on charging
 				@if(charge.person != null) { @charge.person.getDisplayName() } else { ??? } with
 					@charge.getRuleTitle(): @charge.sm_decision
+			</td></tr>
 		}
 	}
 

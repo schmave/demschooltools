@@ -108,6 +108,13 @@ public class Application extends Controller {
         return ok(views.html.view_meeting.render(Meeting.findById(meeting_id)));
     }
 
+    public static Result printMeeting(int meeting_id) throws Exception {
+        response().setHeader("Content-Type", "application/pdf");
+        return ok(
+            renderToPDF(
+                views.html.view_meeting.render(Meeting.findById(meeting_id)).toString()));
+    }
+
     public static Result viewMeetingResolutionPlans(int meeting_id) {
         return ok(views.html.view_meeting_resolution_plans.render(Meeting.findById(meeting_id)));
     }
@@ -211,65 +218,88 @@ public class Application extends Controller {
             new FileOutputStream(html_file),
             Charset.forName("UTF-8"));
         orig_html = orig_html.replaceAll("/assets/", "");
-        // Flying saucer can't handle these special quote characters,
-        // so we have to convert them to regular quotes.
+        // XHTML can't handle HTML entities without some extra incantations,
+        // none of which I can get to work right now, so hence this ugliness.
         orig_html = orig_html.replaceAll("&ldquo;", "\"");
         orig_html = orig_html.replaceAll("&rdquo;", "\"");
         orig_html = orig_html.replaceAll("&mdash;", "\u2014");
+        orig_html = orig_html.replaceAll("&nbsp;", " ");
         writer.write(orig_html);
         writer.close();
 
         return html_file;
     }
 
-    public static Result printManualChapter(Integer id) throws Exception {
+    public static byte[] renderToPDF(String orig_html) throws Exception {
         File html_file = null;
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ITextRenderer renderer = new ITextRenderer();
 
-            if (id == -1) {
-                // Print TOC, then all manual chapters
-                html_file = prepareTempHTML(
-                    views.html.view_manual.render(Chapter.all()).toString());
-                renderer.setDocument(html_file);
-                renderer.layout();
-                renderer.createPDF(baos, false);
-                html_file.delete();
-                html_file = null;
+            html_file = prepareTempHTML(orig_html);
+            renderer.setDocument(html_file);
+            renderer.layout();
+            renderer.createPDF(baos);
 
-                for (Chapter chapter : Chapter.all()) {
-                    html_file = prepareTempHTML(
-                        views.html.view_chapter.render(chapter).toString());
-                    renderer.setDocument(html_file);
-                    renderer.layout();
-                    renderer.writeNextDocument();
-
-                    html_file.delete();
-                    html_file = null;
-                }
-                renderer.finishPDF();
-            } else {
-                if (id >= 0) {
-                    Chapter chapter = Chapter.findById(id);
-                    html_file = prepareTempHTML(
-                        views.html.view_chapter.render(chapter).toString());
-                } else if (id == -2) {
-                    html_file = prepareTempHTML(
-                        views.html.view_manual.render(Chapter.all()).toString());
-                }
-                renderer.setDocument(html_file);
-                renderer.layout();
-                renderer.createPDF(baos);
-            }
-
-
-            response().setHeader("Content-Type", "application/pdf");
-
-            return ok(baos.toByteArray());
+            return baos.toByteArray();
         } finally {
             if (html_file != null) {
                 html_file.delete();
+            }
+        }
+    }
+
+    public static byte[] renderToPDF(List<String> orig_htmls) throws Exception {
+        File html_file = null;
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ITextRenderer renderer = new ITextRenderer();
+
+            boolean first = true;
+            for(String orig_html : orig_htmls) {
+                html_file = prepareTempHTML(orig_html);
+                renderer.setDocument(html_file);
+                renderer.layout();
+                if (first) {
+                    renderer.createPDF(baos, false);
+                } else {
+                    renderer.writeNextDocument();
+                }
+                html_file.delete();
+                html_file = null;
+
+                first = false;
+            }
+
+            renderer.finishPDF();
+            return baos.toByteArray();
+        } finally {
+            if (html_file != null) {
+                html_file.delete();
+            }
+        }
+    }
+
+    public static Result printManualChapter(Integer id) throws Exception {
+        response().setHeader("Content-Type", "application/pdf");
+
+        if (id == -1) {
+            ArrayList<String> documents = new ArrayList<String>();
+            // render TOC
+            documents.add(views.html.view_manual.render(Chapter.all()).toString());
+            // then render all chapters
+            for (Chapter chapter : Chapter.all()) {
+                documents.add(views.html.view_chapter.render(chapter).toString());
+            }
+            return ok(renderToPDF(documents));
+        } else {
+            if (id == -2) {
+                return ok(renderToPDF(
+                    views.html.view_manual.render(Chapter.all()).toString()));
+            } else {
+                Chapter chapter = Chapter.findById(id);
+                return ok(renderToPDF(
+                    views.html.view_chapter.render(chapter).toString()));
             }
         }
     }
@@ -354,6 +384,34 @@ public class Application extends Controller {
 
     public static Result thisWeekReport() {
         return viewWeeklyReport("");
+    }
+
+    public static Result printWeeklyMinutes(String date_string) throws Exception {
+        Calendar start_date = new GregorianCalendar();
+        try {
+            Date parsed_date = new SimpleDateFormat("yyyy-M-d").parse(date_string);
+            if (parsed_date != null) {
+                start_date.setTime(parsed_date);
+            }
+        } catch (ParseException e) {
+            System.out.println("Failed to parse given date (" + date_string + "), using current");
+        }
+
+        Calendar end_date = (Calendar)start_date.clone();
+        end_date.add(GregorianCalendar.DATE, 6);
+
+        response().setHeader("Content-Type", "application/pdf");
+        ArrayList<String> documents = new ArrayList<String>();
+
+        List<Meeting> meetings = Meeting.find.where()
+            .eq("organization", Organization.getByHost())
+            .le("date", end_date.getTime())
+            .ge("date", start_date.getTime()).findList();
+        for (Meeting m : meetings) {
+            documents.add(views.html.view_meeting.render(m).toString());
+        }
+
+        return ok(renderToPDF(documents));
     }
 
     public static Result viewWeeklyReport(String date_string) {
