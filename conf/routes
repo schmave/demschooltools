@@ -49,6 +49,10 @@ GET /viewManual       controllers.Application.viewManual()
 GET /viewManualChanges       controllers.Application.viewManualChanges(begin_date : String ?= "")
 GET /viewChapter/:id       controllers.Application.viewChapter(id : Integer)
 
+GET /printManual	controllers.Application.printManual()
+GET /printManualChapter/:id	controllers.Application.printManualChapter(id : Integer)
+
+
 GET /thisWeekReport	controllers.Application.thisWeekReport()
 GET /viewWeeklyReport/:date	controllers.Application.viewWeeklyReport(date : String)
 

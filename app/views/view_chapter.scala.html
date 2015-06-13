@@ -4,15 +4,19 @@
 
 @main("" + chapter.num + " " + chapter.title, "manual") {
 
+<div id="footer">
+Printed on @Application.yymmddDate().
+</div>
+
 <div class="man-chapter">@chapter.num @chapter.title <a class="man-edit no-print" href="@routes.ApplicationEditing.editChapter(chapter.id)">Edit</a></div>
-<p><a class="no-print" href="@routes.ApplicationEditing.addSection(chapter.id)">Add section in @chapter.num @chapter.title</a>
+<p><a class="no-print" href="@routes.ApplicationEditing.addSection(chapter.id)">Add section in @chapter.num @chapter.title</a></p>
 
 @for(section <- chapter.sections) {
 <div class="man-section">
 	<div class="man-section-header">
 	  <a name="section_@section.id"></a>@section.getNumber() @section.title <a class="no-print man-edit" href="@routes.ApplicationEditing.editSection(section.id)">Edit</a>
 	</div>
-	<p><a class="no-print" href="@routes.ApplicationEditing.addEntry(section.id)">Add entry in @chapter.num@section.num @section.title</a>
+	<p><a class="no-print" href="@routes.ApplicationEditing.addEntry(section.id)">Add entry in @chapter.num@section.num @section.title</a></p>
 	@for(entry <- section.entries) {
 	<div class="man-entry">
 		<a name="entry_@entry.id"></a>

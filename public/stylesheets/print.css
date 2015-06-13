@@ -1,3 +1,30 @@
 .no-print {
     display: none;
 }
+
+#footer {
+    display: block;
+    position: running(footer);
+    font-size: 10px;
+    text-align: center;
+}
+
+@page {
+    @bottom-right {
+/*      content: "Page " counter(page) " of " counter(pages);*/
+        font-size: 10px;
+    }
+}
+
+@page {
+    @bottom-center {
+        content: element(footer);
+    }
+}
+
+/* Override bootstrap rule that shows links when printing */
+a[href]:after {
+    content: none !important;
+}
+
+

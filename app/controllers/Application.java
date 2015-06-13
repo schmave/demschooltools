@@ -20,6 +20,8 @@ import com.typesafe.plugin.*;
 
 import models.*;
 
+import org.xhtmlrenderer.pdf.ITextRenderer;
+
 import play.*;
 import play.data.*;
 import play.libs.Json;
@@ -195,6 +197,81 @@ public class Application extends Controller {
         return ok(views.html.view_manual_changes.render(
             new SimpleDateFormat("yyyy-MM-dd").format(begin_date),
             changes_to_display));
+    }
+
+    public static Result printManual() {
+        return ok(views.html.print_manual.render(Chapter.all()));
+    }
+
+    public static File prepareTempHTML(String orig_html) throws IOException {
+        File html_file = File.createTempFile("chapter", ".xhtml",
+            Play.application().getFile("public"));
+
+        OutputStreamWriter writer = new OutputStreamWriter(
+            new FileOutputStream(html_file),
+            Charset.forName("UTF-8"));
+        orig_html = orig_html.replaceAll("/assets/", "");
+        // Flying saucer can't handle these special quote characters,
+        // so we have to convert them to regular quotes.
+        orig_html = orig_html.replaceAll("&ldquo;", "\"");
+        orig_html = orig_html.replaceAll("&rdquo;", "\"");
+        orig_html = orig_html.replaceAll("&mdash;", "\u2014");
+        writer.write(orig_html);
+        writer.close();
+
+        return html_file;
+    }
+
+    public static Result printManualChapter(Integer id) throws Exception {
+        File html_file = null;
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ITextRenderer renderer = new ITextRenderer();
+
+            if (id == -1) {
+                // Print TOC, then all manual chapters
+                html_file = prepareTempHTML(
+                    views.html.view_manual.render(Chapter.all()).toString());
+                renderer.setDocument(html_file);
+                renderer.layout();
+                renderer.createPDF(baos, false);
+                html_file.delete();
+                html_file = null;
+
+                for (Chapter chapter : Chapter.all()) {
+                    html_file = prepareTempHTML(
+                        views.html.view_chapter.render(chapter).toString());
+                    renderer.setDocument(html_file);
+                    renderer.layout();
+                    renderer.writeNextDocument();
+
+                    html_file.delete();
+                    html_file = null;
+                }
+                renderer.finishPDF();
+            } else {
+                if (id >= 0) {
+                    Chapter chapter = Chapter.findById(id);
+                    html_file = prepareTempHTML(
+                        views.html.view_chapter.render(chapter).toString());
+                } else if (id == -2) {
+                    html_file = prepareTempHTML(
+                        views.html.view_manual.render(Chapter.all()).toString());
+                }
+                renderer.setDocument(html_file);
+                renderer.layout();
+                renderer.createPDF(baos);
+            }
+
+
+            response().setHeader("Content-Type", "application/pdf");
+
+            return ok(baos.toByteArray());
+        } finally {
+            if (html_file != null) {
+                html_file.delete();
+            }
+        }
     }
 
 	public static Result viewChapter(Integer id) {
@@ -449,9 +526,13 @@ public class Application extends Controller {
         return new SimpleDateFormat("EE--MMMM dd, yyyy").format(d);
     }
 
-	public static String yymmddDate(Date d ) {
+	public static String yymmddDate(Date d) {
 		return new SimpleDateFormat("yyyy-M-d").format(d);
 	}
+
+    public static String yymmddDate() {
+        return new SimpleDateFormat("yyyy-M-d").format(new Date());
+    }
 
     public static String currentUsername() {
         return Context.current().request().username();

@@ -1,3 +1,9 @@
+@media screen {
+  #footer {
+    display: none;
+  }
+}
+
 .subnav {
     border-bottom: 1px rgb(166, 127, 250) solid;
     border-left: 1px rgb(166, 127, 250) solid;
@@ -349,7 +355,18 @@ a.edit_link {
 	font-size: 14px;
 	border-bottom: 2px solid black;
     font-weight: bold;
+    page-break-after: avoid;
 }
+
+/* Experimenting with making TOC have columns. Unfortunately
+ flying saucer doesn't render columns.
+.toc-section-entries {
+    margin-bottom: 1em;
+    -webkit-column-count: 2;
+    -moz-column-count: 2;
+    column-count: 2;
+    background-color: #eee;
+} */
 
 .man-section {
     width: 7in;
@@ -363,6 +380,7 @@ a.edit_link {
 }
 
 .man-entry-content {
+    page-break-before: avoid;
 	margin-left: 40px;
 	width: 6in;
 }

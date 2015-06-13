@@ -10,20 +10,20 @@
 
         <script src="@routes.Assets.at("javascripts/jquery-1.9.0.min.js")" type="text/javascript"></script>
         <script src="@routes.Assets.at("javascripts/sorttable.js")" type="text/javascript"></script>
-		<link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css"></link>
+		<link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" />
 		<script type="text/javascript" src="http://code.jquery.com/ui/1.9.2/jquery-ui.min.js"></script>
 		<script src="http://malsup.github.io/jquery.form.js"></script>
 		<script src="@routes.Assets.at("javascripts/handlebars.js")" type="text/javascript"></script>
 
 		<script src="@routes.Assets.at("javascripts/main.js")" type="text/javascript"></script>
 		<script src="@routes.Assets.at("javascripts/bootstrap.min.js")" type="text/javascript"></script>
-		<link rel="stylesheet" media="all" href="@routes.Assets.at("stylesheets/bootstrap.min.css")">
+		<link rel="stylesheet" media="all" href="@routes.Assets.at("stylesheets/bootstrap.min.css")" />
 
 
-		<link rel="stylesheet" media="all" href="@routes.Assets.at("stylesheets/main.css")">
-		<link rel="stylesheet" media="print" href="@routes.Assets.at("stylesheets/print.css")">
-        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" media="all" href="@routes.Assets.at("stylesheets/main.css")" />
+		<link rel="stylesheet" media="print" href="@routes.Assets.at("stylesheets/print.css")" />
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
 	</head>
     <body>
 		@ifAuth() { username =>
@@ -51,14 +51,14 @@
 				@if(Application.isCurrentUserEditor()) {
 					Logout
 				} else { Login }
-					</a>
+					</a></li>
 			<li class="username"><a class="username">@username</a></li>
 			</ul>
 
-	  <div class="tab-content">
+	  <div class="tab-content no-print">
 		<div class="tab-pane @if(menu.equals("crm")) { active }" id="people">
 			<div class="subnav">
-			<a @if(selectedBtn.equals("crm_home")) { class="active" } 
+			<a @if(selectedBtn.equals("crm_home")) { class="active" }
 				href="@routes.CRM.people()">
 				Recent comments</a>
 			<a href="@routes.CRM.newPerson()">Add a person</a>
@@ -107,12 +107,12 @@
 						<li><a href="@routes.CRM.donationsNeedingIndiegogo()">need Indiegogo reward</a></li>
 					</ul></span>
 			@if(CRM.hasPendingEmail()) {
-				
+
 					<a href="@routes.CRM.viewPendingEmail()">Pending Email <span class="label label-warning">1</span></a>
-				
+
 			}
-			
-			   <input id="navbar_people_search" type="Search" placeholder="Search people..."/>
+
+			   <input id="navbar_people_search" type="search" placeholder="Search people..."/>
 			</div>
 		</div>
 
@@ -129,17 +129,20 @@
 				View S.M. decisions</a>
 			</div>
 		</div>
-		
+
 		<div class="tab-pane @if(menu.equals("manual")) { active }" id="manual">
 			<div class="subnav">
 	  		<a @if(selectedBtn.equals("toc")) { class="active" }
 				href="@routes.Application.viewManual()">Table of Contents</a>
+	  		<a @if(selectedBtn.equals("manual_print")) { class="active" }
+				href="@routes.Application.printManual()">Print</a>
 			<a @if(selectedBtn.equals("manual_changes")) { class="active" }
 				href="@routes.Application.viewManualChanges()">
 				Changes since a date</a>
 			</div>
 		</div>
 	</div>
+</div>
 	}
 
 		@content
