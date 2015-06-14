@@ -6,15 +6,18 @@ import javax.persistence.*;
 
 import play.data.*;
 import play.data.validation.Constraints.*;
-import play.db.ebean.*;
+import com.avaje.ebean.Model;
+
 
 @Entity
 public class PersonTag extends Model {
-    @Id
     public long tag_id;
-
-    @Id
     public long person_id;
+
+
+    //@EmbeddedId
+    //public PersonTagKey key;
+
     //@Id
     //@ManyToOne()
     //@JoinColumn(name="tag_id")
@@ -24,10 +27,6 @@ public class PersonTag extends Model {
     //@ManyToOne()
     //@JoinColumn(name="person_id")
     //public Person person;
-
-    public static Finder<Integer, PersonTag> find = new Finder(
-        Integer.class, PersonTag.class
-    );
 
     public static PersonTag create(Tag t, Person p) {
         PersonTag result = new PersonTag();

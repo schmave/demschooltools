@@ -18,7 +18,7 @@ import com.fasterxml.jackson.annotation.*;
 import play.data.*;
 import play.data.validation.Constraints.*;
 import play.data.validation.ValidationError;
-import play.db.ebean.*;
+import com.avaje.ebean.Model;
 import static play.libs.F.*;
 
 @Entity
@@ -49,7 +49,7 @@ public class Section extends Model {
 	@NotNull
 	public Boolean deleted;
 
-    public static Finder<Integer,Section> find = new Finder(
+    public static Finder<Integer,Section> find = new Finder<>(
         Integer.class, Section.class
     );
 

@@ -7,8 +7,8 @@ import java.util.TreeMap;
 
 import javax.persistence.*;
 
-import play.db.ebean.Model;
-import play.db.ebean.Model.Finder;
+import com.avaje.ebean.Model;
+import com.avaje.ebean.Model.Finder;
 
 @Entity
 public class Tag extends Model {
@@ -28,7 +28,7 @@ public class Tag extends Model {
     @OneToMany(mappedBy="tag")
     public List<MailchimpSync> syncs;
 
-    public static Finder<Integer, Tag> find = new Finder(
+    public static Finder<Integer, Tag> find = new Finder<>(
         Integer.class, Tag.class
     );
 

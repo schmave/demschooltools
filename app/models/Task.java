@@ -4,8 +4,8 @@ import java.util.List;
 
 import javax.persistence.*;
 
-import play.db.ebean.Model;
-import play.db.ebean.Model.Finder;
+import com.avaje.ebean.Model;
+import com.avaje.ebean.Model.Finder;
 
 @Entity
 public class Task extends Model {
@@ -25,7 +25,7 @@ public class Task extends Model {
     @OneToMany(mappedBy="task")
     public List<CompletedTask> completed_tasks;
 
-    public static Finder<Integer, Task> find = new Finder(
+    public static Finder<Integer, Task> find = new Finder<>(
         Integer.class, Task.class
     );
 

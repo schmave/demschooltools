@@ -8,7 +8,7 @@ import javax.persistence.*;
 
 import play.data.*;
 import play.data.validation.Constraints.*;
-import play.db.ebean.*;
+import com.avaje.ebean.Model;
 
 
 @Entity
@@ -27,7 +27,7 @@ public class PersonChange extends Model {
     @Column(insertable = false, updatable = false)
     public Date time;
 
-    public static Finder<Integer, PersonChange> find = new Finder(
+    public static Finder<Integer, PersonChange> find = new Finder<>(
         Integer.class, PersonChange.class
     );
 

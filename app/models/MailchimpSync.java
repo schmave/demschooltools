@@ -8,7 +8,7 @@ import javax.persistence.*;
 
 import play.data.*;
 import play.data.validation.Constraints.*;
-import play.db.ebean.*;
+import com.avaje.ebean.Model;
 
 
 @Entity
@@ -31,7 +31,7 @@ public class MailchimpSync extends Model {
 
     public boolean sync_local_removes;
 
-    public static Finder<Integer, MailchimpSync> find = new Finder(
+    public static Finder<Integer, MailchimpSync> find = new Finder<>(
         Integer.class, MailchimpSync.class
     );
 

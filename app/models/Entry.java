@@ -17,7 +17,7 @@ import controllers.*;
 import play.data.*;
 import play.data.validation.Constraints.*;
 import play.data.validation.ValidationError;
-import play.db.ebean.*;
+import com.avaje.ebean.Model;
 import static play.libs.F.*;
 
 @Entity
@@ -46,7 +46,7 @@ public class Entry extends Model implements Comparable<Entry> {
     @OrderBy("id DESC")
     public List<Charge> charges;
 
-    public static Finder<Integer,Entry> find = new Finder(
+    public static Finder<Integer,Entry> find = new Finder<>(
         Integer.class, Entry.class
     );
 

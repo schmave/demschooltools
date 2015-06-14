@@ -14,8 +14,8 @@ import com.avaje.ebean.validation.NotNull;
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import play.db.ebean.Model;
-import play.db.ebean.Model.Finder;
+import com.avaje.ebean.Model;
+import com.avaje.ebean.Model.Finder;
 
 @Entity
 @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
@@ -54,7 +54,7 @@ public class Charge extends Model implements Comparable<Charge> {
     @NotNull
     public String minor_referral_destination = "";
 
-    public static Finder<Integer, Charge> find = new Finder(
+    public static Finder<Integer, Charge> find = new Finder<>(
         Integer.class, Charge.class
     );
 

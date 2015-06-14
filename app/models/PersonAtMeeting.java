@@ -8,8 +8,8 @@ import java.util.TreeMap;
 
 import javax.persistence.*;
 
-import play.db.ebean.Model;
-import play.db.ebean.Model.Finder;
+import com.avaje.ebean.Model;
+import com.avaje.ebean.Model.Finder;
 
 @Entity
 public class PersonAtMeeting extends Model {

@@ -18,7 +18,7 @@ import controllers.*;
 import play.data.*;
 import play.data.validation.Constraints.*;
 import play.data.validation.ValidationError;
-import play.db.ebean.*;
+import com.avaje.ebean.Model;
 import static play.libs.F.*;
 
 @Entity
@@ -42,7 +42,7 @@ public class Chapter extends Model {
     @NotNull
 	public Boolean deleted;
 
-    public static Finder<Integer,Chapter> find = new Finder(
+    public static Finder<Integer,Chapter> find = new Finder<>(
         Integer.class, Chapter.class
     );
 

@@ -17,8 +17,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import controllers.Application;
 
-import play.db.ebean.Model;
-import play.db.ebean.Model.Finder;
+import com.avaje.ebean.Model;
+import com.avaje.ebean.Model.Finder;
 import play.libs.Json;
 
 @Entity
@@ -52,7 +52,7 @@ public class Case extends Model implements Comparable<Case> {
 
     static Set<String> names;
 
-    public static Finder<Integer, Case> find = new Finder(
+    public static Finder<Integer, Case> find = new Finder<>(
         Integer.class, Case.class
     );
 

@@ -6,7 +6,7 @@ import javax.persistence.*;
 
 import play.data.*;
 import play.data.validation.Constraints.*;
-import play.db.ebean.*;
+import com.avaje.ebean.Model;
 
 @Entity
 @Table(name = "comments")
@@ -31,7 +31,7 @@ public class Comment extends Model {
     @OneToMany(mappedBy="comment")
     public List<CompletedTask> completed_tasks;
 
-    public static Finder<Integer, Comment> find = new Finder(
+    public static Finder<Integer, Comment> find = new Finder<>(
         Integer.class, Comment.class
     );
 }

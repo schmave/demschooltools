@@ -8,7 +8,7 @@ import javax.persistence.*;
 
 import play.data.*;
 import play.data.validation.Constraints.*;
-import play.db.ebean.*;
+import com.avaje.ebean.Model;
 
 
 @Entity
@@ -38,7 +38,7 @@ public class PersonTagChange extends Model {
     @NotNull
     public boolean was_add;
 
-    public static Finder<Integer, PersonTagChange> find = new Finder(
+    public static Finder<Integer, PersonTagChange> find = new Finder<>(
         Integer.class, PersonTagChange.class
     );
 

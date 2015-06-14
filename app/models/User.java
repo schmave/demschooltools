@@ -8,7 +8,7 @@ import java.util.Set;
 
 import javax.persistence.*;
 
-import play.db.ebean.Model;
+import com.avaje.ebean.Model;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.ExpressionList;
@@ -47,7 +47,7 @@ public class User extends Model {
 	@OneToMany(cascade = CascadeType.ALL)
 	public List<LinkedAccount> linkedAccounts;
 
-	public static final Finder<Long, User> find = new Finder<Long, User>(
+	public static final Finder<Long, User> find = new Finder<>(
 			Long.class, User.class);
 
 	public static boolean existsByAuthUserIdentity(

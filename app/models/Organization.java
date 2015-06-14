@@ -11,8 +11,8 @@ import com.avaje.ebean.SqlRow;
 import com.fasterxml.jackson.annotation.*;
 
 import play.Logger;
-import play.db.ebean.Model;
-import play.db.ebean.Model.Finder;
+import com.avaje.ebean.Model;
+import com.avaje.ebean.Model.Finder;
 import play.mvc.Http.Context;
 
 @Entity
@@ -31,7 +31,7 @@ public class Organization extends Model {
 
     public String mailchimp_updates_email;
 
-    public static Finder<Integer, Organization> find = new Finder(
+    public static Finder<Integer, Organization> find = new Finder<>(
         Integer.class, Organization.class
     );
 

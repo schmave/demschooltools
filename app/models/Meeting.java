@@ -10,8 +10,8 @@ import java.util.TreeMap;
 
 import javax.persistence.*;
 
-import play.db.ebean.Model;
-import play.db.ebean.Model.Finder;
+import com.avaje.ebean.Model;
+import com.avaje.ebean.Model.Finder;
 import play.libs.Json;
 
 
@@ -33,7 +33,7 @@ public class Meeting extends Model {
     @OrderBy("case_number ASC")
     public List<Case> cases;
 
-    public static Finder<Integer, Meeting> find = new Finder(
+    public static Finder<Integer, Meeting> find = new Finder<>(
         Integer.class, Meeting.class
     );
 

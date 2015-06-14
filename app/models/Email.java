@@ -17,8 +17,8 @@ import javax.mail.*;
 import javax.mail.internet.*;
 import com.fasterxml.jackson.annotation.*;
 
-import play.db.ebean.Model;
-import play.db.ebean.Model.Finder;
+import com.avaje.ebean.Model;
+import com.avaje.ebean.Model.Finder;
 
 import play.Play;
 
@@ -35,7 +35,7 @@ public class Email extends Model {
 	public boolean sent;
 	public boolean deleted;
 
-    public static Finder<Integer, Email> find = new Finder(
+    public static Finder<Integer, Email> find = new Finder<>(
         Integer.class, Email.class
     );
 

@@ -8,8 +8,8 @@ import java.util.Map;
 
 import javax.persistence.*;
 
-import play.db.ebean.Model;
-import play.db.ebean.Model.Finder;
+import com.avaje.ebean.Model;
+import com.avaje.ebean.Model.Finder;
 
 @Entity
 public class Donation extends Model {
@@ -38,7 +38,7 @@ public class Donation extends Model {
     public User indiegogo_reward_by_user;
     public Date indiegogo_reward_given_time;
 
-    public static Finder<Integer, Donation> find = new Finder(
+    public static Finder<Integer, Donation> find = new Finder<>(
         Integer.class, Donation.class
     );
 

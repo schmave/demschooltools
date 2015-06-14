@@ -18,7 +18,7 @@ import play.Logger;
 import play.data.*;
 import play.data.validation.Constraints.*;
 import play.data.validation.ValidationError;
-import play.db.ebean.*;
+import com.avaje.ebean.Model;
 import static play.libs.F.*;
 
 @Entity
@@ -122,7 +122,7 @@ public class Person extends Model implements Comparable<Person> {
         fieldsToUpdateExplicitly.add("approximate_dob");
     }
 
-    public static Finder<Integer,Person> find = new Finder(
+    public static Finder<Integer,Person> find = new Finder<>(
         Integer.class, Person.class
     );
 
@@ -235,9 +235,7 @@ public class Person extends Model implements Comparable<Person> {
         }
 
         p.update();
-        // If fields get set to null by the user, eBean will not save them
-        // unless we explicitly mention their names.
-        Ebean.update(p, fieldsToUpdateExplicitly);
+        Ebean.update(p);
         return p;
     }
 
