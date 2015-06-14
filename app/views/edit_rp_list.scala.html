@@ -1,0 +1,54 @@
+@(active_rps : List[Charge], completed_rps : List[Charge])
+
+@import helper._
+
+@main("Edit " + OrgConfig.get().str_res_plans + " list", "jc", "rps") {
+
+<script src="@routes.Assets.at("javascripts/edit_rp_list.js")" type="text/javascript"></script>
+
+<script type="text/javascript">
+app = {};
+app.active_rps = [];
+app.completed_rps = [];
+
+app.initial_data = {
+	active_rps : [],
+	completed_rps : []
+}
+
+@for( c <- active_rps ) {
+	app.initial_data.active_rps.push( @Html(c.toJson()) );
+}
+
+@for( c <- completed_rps) {
+	app.initial_data.completed_rps.push( @Html(c.toJson()) );
+}
+
+config = @Html(OrgConfig.get().toJson());
+</script>
+
+<p><a href="javascript:print()" class="btn btn-success no-print">
+Print active @OrgConfig.get().str_res_plans</a></p>
+<h2>Active @OrgConfig.get().str_res_plans</h2>
+<table class="table active-rps printable-res-plans">
+</table>
+
+<h2 class="no-print">Recently completed @OrgConfig.get().str_res_plans</h2>
+<table class="table completed-rps printable-res-plans no-print">
+</table>
+
+
+<script id="rp-template" type="text/x-handlebars-template">
+<tr>
+	<td class="name col-xs-1">{{name}}
+	<td class="col-xs-3">{{case_number}}<br/>{{rule_title}}
+	<td class="col-xs-7">{{resolution_plan}}
+    {{#if sm_decision}}
+	<b>[Sch. Mtg. decided:</b> {{sm_decision}}<b>]</b>
+    {{/if}}
+	<td class="col-xs-1" style="vertical-align:middle;">
+    <input class="no-print" type="checkbox"/>
+</tr>
+</script>
+
+}

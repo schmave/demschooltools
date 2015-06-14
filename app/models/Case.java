@@ -23,6 +23,7 @@ import play.libs.Json;
 
 @Entity
 @Table(name="`case`")
+@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
 public class Case extends Model implements Comparable<Case> {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "case_id_seq")

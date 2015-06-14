@@ -8,6 +8,8 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.SqlQuery;
 import com.avaje.ebean.SqlRow;
 
+import com.fasterxml.jackson.annotation.*;
+
 import play.Logger;
 import play.db.ebean.Model;
 import play.db.ebean.Model.Finder;
@@ -21,6 +23,8 @@ public class Organization extends Model {
 
     public String name;
 
+    // Don't serialize this one by default because it is private.
+    @JsonIgnore
     public String mailchimp_api_key;
 
     public Date mailchimp_last_sync_person_changes;

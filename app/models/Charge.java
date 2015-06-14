@@ -1,5 +1,7 @@
 package models;
 
+import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -10,11 +12,13 @@ import javax.persistence.*;
 
 import com.avaje.ebean.validation.NotNull;
 import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import play.db.ebean.Model;
 import play.db.ebean.Model.Finder;
 
 @Entity
+@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
 public class Charge extends Model implements Comparable<Charge> {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "charge_id_seq")
@@ -30,7 +34,6 @@ public class Charge extends Model implements Comparable<Charge> {
 
     @ManyToOne
     @JoinColumn(name="case_id")
-    @JsonIgnore
     public Case the_case;
 
     static final String EMPTY_PLEA = "<no plea>";
@@ -40,6 +43,10 @@ public class Charge extends Model implements Comparable<Charge> {
     public boolean referred_to_sm;
     public String sm_decision;
     public Date sm_decision_date;
+
+    @NotNull
+    public boolean rp_complete = false;
+    public Date rp_complete_date = null;
 
     @NotNull
     public String severity = "";
@@ -117,6 +124,29 @@ public class Charge extends Model implements Comparable<Charge> {
             this.sm_decision = null;
         }
         this.sm_decision_date = date;
+    }
+
+    public String toJson() {
+        ObjectMapper m = new ObjectMapper();
+        m.setDateFormat(new SimpleDateFormat("yyyy-MM-dd"));
+        try
+        {
+            return m.writeValueAsString(this);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    public void setRPComplete(boolean complete) {
+        this.rp_complete = complete;
+        if (complete) {
+            this.rp_complete_date = new Date();
+        } else {
+            this.rp_complete_date = null;
+        }
+        this.save();
     }
 
     public String getRuleTitle() {

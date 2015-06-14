@@ -189,14 +189,6 @@ function RuleChooser(el, on_change) {
     }
 }
 
-function displayName(p) {
-	if (p.displayName) {
-		return p.displayName;
-	} else {
-		return p.first_name;
-	}
-}
-
 function Charge(charge_id, el) {
     var self = this;
 

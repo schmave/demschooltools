@@ -115,6 +115,29 @@ public class Application extends Controller {
                 views.html.view_meeting.render(Meeting.findById(meeting_id)).toString()));
     }
 
+    public static Result editResolutionPlanList() {
+        List<Charge> active_rps =
+            Charge.find.where()
+                .eq("person.organization", Organization.getByHost())
+                .ne("plea", "Not Guilty")
+                .or(Expr.eq("referred_to_sm", false),
+                    Expr.isNotNull("sm_decision"))
+                .eq("rp_complete", false)
+                .orderBy("id DESC").findList();
+
+        List<Charge> completed_rps =
+            Charge.find.where()
+                .eq("person.organization", Organization.getByHost())
+                .ne("plea", "Not Guilty")
+                .or(Expr.eq("referred_to_sm", false),
+                    Expr.isNotNull("sm_decision"))
+                .eq("rp_complete", true)
+                .orderBy("rp_complete_date DESC")
+                .setMaxRows(25).findList();
+
+        return ok(views.html.edit_rp_list.render(active_rps, completed_rps));
+    }
+
     public static Result viewMeetingResolutionPlans(int meeting_id) {
         return ok(views.html.view_meeting_resolution_plans.render(Meeting.findById(meeting_id)));
     }

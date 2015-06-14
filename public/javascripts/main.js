@@ -122,3 +122,12 @@ function enableNoPersonTagBox(input_box, destination_div, limit_one) {
         event.preventDefault();
     });
 }
+
+function displayName(person) {
+	if (person.displayName) {
+		return person.displayName;
+	} else {
+		return person.first_name;
+	}
+}
+

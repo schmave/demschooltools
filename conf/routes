@@ -13,8 +13,12 @@ GET  /viewMeeting/:id	controllers.Application.viewMeeting(id: Integer)
 GET  /printMeeting/:id	controllers.Application.printMeeting(id: Integer)
 GET  /printWeeklyMinutes/:start_date	controllers.Application.printWeeklyMinutes(start_date : String)
 GET  /editMeeting/:id	controllers.ApplicationEditing.editMeeting(id: Integer)
+
 GET  /viewMeetingResolutionPlans/:id	controllers.Application.viewMeetingResolutionPlans(id: Integer)
 GET  /downloadMeetingResolutionPlans/:id	controllers.Application.downloadMeetingResolutionPlans(id: Integer)
+GET  /editResolutionPlanList	controllers.Application.editResolutionPlanList()
+
+POST	/setResolutionPlanComplete	controllers.ApplicationEditing.setResolutionPlanComplete(id : Integer, complete : Boolean)
 
 GET   /personHistory/:id    controllers.Application.getPersonHistory(id: Integer)
 GET   /ruleHistory/:id    controllers.Application.getRuleHistory(id: Integer)

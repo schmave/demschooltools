@@ -188,6 +188,13 @@ body {
   overflow: hidden;
 }
 
+.completed-rps {
+    color: #999;
+}
+
+.rp-moved {
+    background-color: #ffc;
+}
 
 .resolution_plans tbody>tr>td {
     padding: 0px 2px;

@@ -130,6 +130,13 @@ public class ApplicationEditing extends Controller {
         return ok();
     }
 
+    public static Result setResolutionPlanComplete(Integer chargeId, Boolean complete) {
+        Charge c = Charge.findById(chargeId);
+        c.setRPComplete(complete);
+
+        return ok();
+    }
+
     public static Result removeCharge(int id) {
         Charge c = Charge.findById(id);
         c.delete();
