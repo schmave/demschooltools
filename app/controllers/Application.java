@@ -116,6 +116,9 @@ public class Application extends Controller {
     }
 
     public static Result editResolutionPlanList() {
+        response().setHeader("Cache-Control", "max-age=0, no-cache, no-store");
+        response().setHeader("Pragma", "no-cache");
+
         List<Charge> active_rps =
             Charge.find.where()
                 .eq("person.organization", Organization.getByHost())
