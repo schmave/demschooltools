@@ -51,15 +51,22 @@ function checkboxChanged(charge) {
                 login_message_shown = true;
                 return;
             }
-            charge.el.detach();
             charge.el.addClass("rp-moved");
             if (i >= 0) {
-                app.active_rps.splice(i, 1);
-                insertIntoSortedList(charge, app.completed_rps, $(".completed-rps"));
+                charge.el.fadeOut("slow", function() {
+                    charge.el.detach();
+                    app.active_rps.splice(i, 1);
+                    insertIntoSortedList(charge, app.completed_rps, $(".completed-rps"));
+                    charge.el.show();
+                });
             } else {
                 i = indexOfCharge(app.completed_rps, charge);
-                app.completed_rps.splice(i, 1);
-                insertIntoSortedList(charge, app.active_rps, $(".active-rps"));
+                charge.el.fadeOut("slow", function() {
+                    charge.el.detach();
+                    app.completed_rps.splice(i, 1);
+                    insertIntoSortedList(charge, app.active_rps, $(".active-rps"));
+                    charge.el.show();
+                });
             }
         })
         .fail(function() {
@@ -110,6 +117,7 @@ function addCharge(data, parent_el)
         app.rp_template({
             "name": displayName(data.person),
             "case_number": data.the_case.case_number,
+            "day_of_week": data.dayOfWeek,
             "rule_title": data.rule.title,
             "resolution_plan": data.resolution_plan,
             "sm_decision": data.sm_decision,

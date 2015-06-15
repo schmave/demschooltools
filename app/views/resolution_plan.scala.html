@@ -5,7 +5,7 @@
 
 			<tr>
 				<td class="name col-xs-1">@charge.person.getDisplayName()
-				<td class="col-xs-3">@charge.the_case.case_number (@if( charge.sm_decision_date != null ){@Application.formatDayOfWeek(charge.sm_decision_date)&mdash;SM} else {@Application.formatDayOfWeek(charge.the_case.meeting.date)})<br>
+				<td class="col-xs-3">@charge.the_case.case_number (@Html(charge.getDayOfWeek()))<br>
 					@charge.getRuleTitle()
 				<td class="col-xs-7">@charge.resolution_plan
 				@if(charge.sm_decision != null) { <b>[Sch. Mtg. decided:</b> @charge.sm_decision<b>]</b> }

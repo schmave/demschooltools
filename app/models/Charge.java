@@ -1,5 +1,7 @@
 package models;
 
+import controllers.*;
+
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -163,5 +165,13 @@ public class Charge extends Model implements Comparable<Charge> {
 			return the_case.meeting.date.compareTo(c2.the_case.meeting.date);
 		}
 		return 0;
+    }
+
+    public String getDayOfWeek() {
+        if (sm_decision_date != null) {
+            return Application.formatDayOfWeek(sm_decision_date) + "&mdash;SM";
+        } else {
+            return Application.formatDayOfWeek(the_case.meeting.date);
+        }
     }
 }

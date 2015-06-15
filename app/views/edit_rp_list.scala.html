@@ -41,7 +41,7 @@ Print active @OrgConfig.get().str_res_plans</a></p>
 <script id="rp-template" type="text/x-handlebars-template">
 <tr>
 	<td class="name col-xs-1">{{name}}
-	<td class="col-xs-3">{{case_number}}<br/>{{rule_title}}
+	<td class="col-xs-3">{{case_number}} ({{{day_of_week}}})<br/>{{rule_title}}
 	<td class="col-xs-7">{{resolution_plan}}
     {{#if sm_decision}}
 	<b>[Sch. Mtg. decided:</b> {{sm_decision}}<b>]</b>
