@@ -250,6 +250,7 @@ public class Application extends Controller {
         orig_html = orig_html.replaceAll("&rdquo;", "\"");
         orig_html = orig_html.replaceAll("&mdash;", "\u2014");
         orig_html = orig_html.replaceAll("&nbsp;", " ");
+        orig_html = orig_html.replaceAll("&hellip;", "\u2026");
         writer.write(orig_html);
         writer.close();
 
