@@ -5,12 +5,14 @@ T :
 	@echo deploy-test
 	@echo deploy-philly
 	@echo unit-test
+	@echo sql-philly
 	@echo webdriver-test
 	@echo drop-tables
 	@echo load-massive-dump
 	@echo load-aliased-dump
 	@echo sql-backup-local-restore
-	@echo sql-philly-backup 
+	@echo sql-philly-backup
+	@echo start
 
 # example of ls and echo
 hello : 
@@ -19,7 +21,6 @@ hello :
 
 deploy-test : unit-test
 	git push $(web-test-git) master
-
 
 sql-philly : 
 	heroku pg:psql --app shining-overseer
@@ -33,6 +34,9 @@ sql-backup-local-restore :
 
 deploy-philly : unit-test
 	./prod-deploy.sh $(philly-prod-git) 
+
+start :
+	lein run -m overseer.web
 
 unit-test :
 	lein test
