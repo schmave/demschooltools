@@ -36,16 +36,16 @@
 (defn delete-swipe [swipe]
   (db/delete! swipe))
 
-(defn make-timestamp [t] 
+(defn make-timestamp [t]
   (->> t str (f/parse) c/to-timestamp))
 
 ;; (make-sqldate "2015-03-30")
-(defn- make-sqldate [t] 
+(defn- make-sqldate [t]
   (->> t str (f/parse) c/to-sql-date))
 
 (trace/deftrace swipe-in
   ([id] (swipe-in id (t/now)))
-  ([id in-time] 
+  ([id in-time]
      (db/persist! (assoc (make-swipe id) :in_time (make-timestamp in-time)))))
 
 (defn sanitize-out [swipe]
@@ -61,14 +61,14 @@
         swipe)
       swipe)))
 
-;; (sample-db)   
+;; (sample-db)
 (trace/deftrace swipe-out
   ([id] (swipe-out id (t/now)))
   ([id out-time]
      (let [last-swipe (lookup-last-swipe-for-day id (make-date-string out-time))
            only-swiped-in? (only-swiped-in? last-swipe)
-           in-swipe (if only-swiped-in? 
-                      last-swipe 
+           in-swipe (if only-swiped-in?
+                      last-swipe
                       (make-swipe id))
            out-swipe (assoc in-swipe :out_time (make-timestamp out-time))
            out-swipe (sanitize-out out-swipe)]
@@ -106,7 +106,7 @@
   ([] (db/get-* "students"))
   ([id] (db/get-* "students" id "_id")))
 
-;; (get-years)    
+;; (get-years)
 (defn student-not-yet-created [name]
   (empty? (filter #(= name (:name %)) (get-students))))
 
@@ -119,13 +119,13 @@
 
 (trace/deftrace toggle-student-older [_id]
   (let [student (first (get-students _id))
-        student (assoc student :olderdate (toggle-date (:olderdate student)))] 
+        student (assoc student :olderdate (toggle-date (:olderdate student)))]
     (db/update! :students _id {:olderdate (:olderdate student)})
     student))
 
 (trace/deftrace toggle-student-absent [_id]
   (let [student (first (get-students _id))
-        student (assoc student :show_as_absent (make-sqldate (str (t/now))))] 
+        student (assoc student :show_as_absent (make-sqldate (str (t/now))))]
     (db/update! :students _id {:show_as_absent (:show_as_absent student)})
     student))
 
@@ -139,7 +139,7 @@
           :name name}
          db/persist!)))
 
-;; (sample-db true)   
+;; (sample-db true)
 (defn sample-db
   ([] (sample-db false))
   ([have-extra?]
@@ -153,7 +153,7 @@
        (when have-extra? (swipe-in (:_id s) (t/minus (t/now) (t/days 1) (t/hours 5))))))
   )
 
-;; (huge-sample-db) 
+;; (huge-sample-db)
 (defn huge-sample-db []
   (db/init-pg)
   (db/reset-db)
@@ -167,7 +167,7 @@
               (trace/trace (str "Id:" x " Num:" y " of:" (* 80 200)))
               (if (> y 200)
                 :done
-                (do 
+                (do
                   (swipe-in x (t/minus (t/now) (t/days y)))
                   (swipe-out x (t/minus (t/plus (t/now) (t/minutes 5))
                                         (t/days y)))

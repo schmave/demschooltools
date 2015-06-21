@@ -51,10 +51,11 @@
     swipe))
 
 (defn get-current-year-string [years]
-  (->> years
-       (filter #(t/within? (t/interval (c/from-sql-time (:from_date %))
-                                       (c/from-sql-time (:to_date %)))
-                           (t/now)))
-       first
-       :name))
-
+  (let [current_year (->> years
+                          (filter #(t/within? (t/interval (c/from-sql-time (:from_date %))
+                                                          (c/from-sql-time (:to_date %)))
+                                              (t/now)))
+                          first
+                          :name)]
+    (if current_year current_year
+        (-> years first :name))))
