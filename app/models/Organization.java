@@ -10,6 +10,7 @@ import com.avaje.ebean.SqlRow;
 
 import com.fasterxml.jackson.annotation.*;
 
+import play.cache.Cache;
 import play.Logger;
 import play.db.ebean.Model;
 import play.db.ebean.Model.Finder;
@@ -38,6 +39,13 @@ public class Organization extends Model {
     public static Organization getByHost() {
         String host = Context.current().request().host();
 
+        String cache_key = "Organization::getByHost::" + host;
+
+        Object cached_val = Cache.get(cache_key);
+        if (cached_val!= null) {
+            return (Organization)cached_val;
+        }
+
         String sql = "select organization_id from organization_hosts where host like :host";
         SqlQuery sqlQuery = Ebean.createSqlQuery(sql);
         sqlQuery.setParameter("host", host);
@@ -46,7 +54,9 @@ public class Organization extends Model {
         SqlRow result = sqlQuery.findUnique();
 
         if (result != null) {
-            return find.byId(result.getInteger("organization_id"));
+            Organization org_result = find.byId(result.getInteger("organization_id"));
+            Cache.set(cache_key, org_result, 60); // cache for 1 minute
+            return org_result;
         } else {
             Logger.error("Unknown organization for host: " + host);
         }

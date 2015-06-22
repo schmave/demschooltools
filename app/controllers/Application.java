@@ -11,6 +11,7 @@ import org.markdown4j.Markdown4jProcessor;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
 import com.avaje.ebean.Expression;
+import com.avaje.ebean.FetchConfig;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
 import com.avaje.ebean.SqlUpdate;
@@ -73,22 +74,42 @@ public class Application extends Controller {
             .eq("organization", Organization.getByHost())
             .findUnique();
 
-        List<Person> people = CRM.getPeopleForTag(cur_student_tag.id);
-        people.addAll(CRM.getPeopleForTag(staff_tag.id));
+        List<Person> people = new ArrayList<Person>(cur_student_tag.people);
+        people.addAll(staff_tag.people);
 		return people;
 	}
 
     public static Result index() {
         List<Meeting> meetings = Meeting.find
+            .fetch("cases")
             .where().eq("organization", Organization.getByHost())
             .orderBy("date DESC").findList();
 
         List<Charge> sm_charges = getActiveSchoolMeetingReferrals();
 
-        List<Person> people = allPeople();
+        Tag cur_student_tag = Tag.find.where()
+            .eq("title", "Current Student")
+            .eq("organization", Organization.getByHost())
+            .findUnique();
+        Tag staff_tag = Tag.find.where()
+            .eq("title", "Staff")
+            .eq("organization", Organization.getByHost())
+            .findUnique();
+
+        List<Person> people = Person.find
+            .fetch("charges")
+            .fetch("cases_involved_in", new FetchConfig().query())
+            .fetch("cases_involved_in.the_case", new FetchConfig().query())
+            .where()
+            .in("tags", cur_student_tag, staff_tag)
+            .findList();
+
         Collections.sort(people, Person.SORT_DISPLAY_NAME);
 
         List<Entry> entries = Entry.find
+            .fetch("charges")
+            .fetch("section")
+            .fetch("section.chapter")
             .where().eq("section.chapter.organization", Organization.getByHost())
             .findList();
         List<Entry> entries_with_charges = new ArrayList<Entry>();
@@ -129,7 +150,14 @@ public class Application extends Controller {
                 .orderBy("id DESC").findList();
 
         List<Charge> completed_rps =
-            Charge.find.where()
+            Charge.find
+                .fetch("the_case")
+                .fetch("the_case.meeting")
+                .fetch("person")
+                .fetch("rule")
+                .fetch("rule.section")
+                .fetch("rule.section.chapter")
+                .where()
                 .eq("person.organization", Organization.getByHost())
                 .ne("plea", "Not Guilty")
                 .or(Expr.eq("referred_to_sm", false),

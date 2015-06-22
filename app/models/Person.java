@@ -72,8 +72,8 @@ public class Person extends Model implements Comparable<Person> {
     @NotNull
 	public String school_district = "";
 
-    @Transient
     @JsonIgnore
+    @ManyToMany(mappedBy = "people")
     public List<Tag> tags;
 
     @OneToMany(mappedBy="person")
@@ -165,8 +165,14 @@ public class Person extends Model implements Comparable<Person> {
 
     @JsonIgnore
     public List<Case> getCasesWrittenUp() {
-        return Case.find.where().eq("people_at_case.role", 1)
-            .eq("people_at_case.person", this).findList();
+        List<Case> result = new ArrayList<Case>();
+        for (PersonAtCase pac : cases_involved_in) {
+            if (pac.role == PersonAtCase.ROLE_WRITER) {
+                result.add(pac.the_case);
+            }
+        }
+
+        return result;
     }
 
     public void attachToPersonAsFamily(String id_string) {

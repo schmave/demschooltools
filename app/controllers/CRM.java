@@ -12,6 +12,7 @@ import javax.mail.internet.*;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
 import com.avaje.ebean.Expression;
+import com.avaje.ebean.FetchConfig;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
 import com.avaje.ebean.SqlUpdate;
@@ -39,6 +40,9 @@ public class CRM extends Controller {
 
     public static Result people() {
         List<Comment> recent_comments = Comment.find
+            .fetch("person")
+            .fetch("completed_tasks", new FetchConfig().query())
+            .fetch("completed_tasks.task", new FetchConfig().query())
             .where().eq("person.organization", Organization.getByHost())
             .orderBy("created DESC").setMaxRows(20).findList();
 
@@ -163,7 +167,7 @@ public class CRM extends Controller {
     }
 
 	public static Collection<Person> getTagMembers(Integer tagId, String familyMode) {
-        List<Person> people = getPeopleForTag(tagId);
+        List<Person> people = Tag.findById(tagId).people;
 
         Set<Person> selected_people = new HashSet<Person>();
 
@@ -235,25 +239,14 @@ public class CRM extends Controller {
         return ok();
     }
 
-    public static List<Person> getPeopleForTag(Integer id) {
-        RawSql rawSql = RawSqlBuilder
-            .parse("SELECT person.person_id, person.first_name, person.last_name, person.display_name from "+
-                   "person join person_tag pt on person.person_id=pt.person_id "+
-                  "join tag on pt.tag_id=tag.id")
-            .columnMapping("person.person_id", "person_id")
-        .columnMapping("person.first_name", "first_name")
-        .columnMapping("person.last_name", "last_name")
-		.columnMapping("person.display_name", "display_name")
-            .create();
-
-        return Ebean.find(Person.class).setRawSql(rawSql).
-            where().eq("tag.id", id).orderBy("person.last_name, person.first_name").findList();
-    }
-
 	public static Result viewTag(Integer id) {
-        Tag the_tag = Tag.findById(id);
+        Tag the_tag = Tag.find
+            .fetch("people")
+            .fetch("people.phone_numbers", new FetchConfig().query())
+            .where().eq("organization", Organization.getByHost())
+            .eq("id", id).findUnique();
 
-        List<Person> people = getPeopleForTag(id);
+        List<Person> people = the_tag.people;
 
         Set<Person> people_with_family = new HashSet<Person>();
         for (Person p : people) {
@@ -313,7 +306,7 @@ public class CRM extends Controller {
         Tag staff_tag = Tag.find.where()
             .eq("organization", Organization.getByHost())
             .eq("title", "Staff").findUnique();
-        List<Person> people = getPeopleForTag(staff_tag.id);
+        List<Person> people = staff_tag.people;
 
         ArrayList<String> test_addresses = new ArrayList<String>();
         for (Person p : people) {
@@ -539,7 +532,9 @@ public class CRM extends Controller {
 
     public static Result donationsNeedingThankYou()
     {
-        List<Donation> donations = Donation.find.where()
+        List<Donation> donations = Donation.find
+            .fetch("person")
+            .where()
             .eq("person.organization", Organization.getByHost())
             .eq("thanked", false).orderBy("date DESC").findList();
 
@@ -548,7 +543,9 @@ public class CRM extends Controller {
 
     public static Result donationsNeedingIndiegogo()
     {
-        List<Donation> donations = Donation.find.where()
+        List<Donation> donations = Donation.find
+            .fetch("person")
+            .where()
             .eq("person.organization", Organization.getByHost())
             .eq("indiegogo_reward_given", false).orderBy("date DESC").findList();
 
@@ -558,7 +555,9 @@ public class CRM extends Controller {
     public static Result donations()
     {
         return ok(views.html.donation_list.render("All donations",
-            Donation.find.where()
+                Donation.find
+                .fetch("person")
+                .where()
                 .eq("person.organization", Organization.getByHost())
                 .orderBy("date DESC").findList()));
     }
@@ -603,7 +602,7 @@ public class CRM extends Controller {
 
     public static Result viewTaskList(Integer id) {
         TaskList list = TaskList.findById(id);
-        List<Person> people = getPeopleForTag(list.tag.id);
+        List<Person> people = list.tag.people;
 
         return ok(views.html.task_list.render(list, people));
     }

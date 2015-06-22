@@ -19,6 +19,12 @@ public class Tag extends Model {
 
     public boolean use_student_display;
 
+    @ManyToMany
+    @JoinTable(name="person_tag",
+        joinColumns=@JoinColumn(name="tag_id",referencedColumnName = "id"),
+        inverseJoinColumns = @JoinColumn(name="person_id", referencedColumnName="person_id"))
+    public List<Person> people;
+
     @ManyToOne()
     public Organization organization;
 
