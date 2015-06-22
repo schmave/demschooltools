@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.*;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
+import com.avaje.ebean.FetchConfig;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
 import com.avaje.ebean.validation.NotNull;
@@ -52,6 +53,20 @@ public class Entry extends Model implements Comparable<Entry> {
 
     public static Entry findById(int id) {
         return find.where().eq("section.chapter.organization", Organization.getByHost())
+            .eq("id", id).findUnique();
+    }
+
+    public static Entry findByIdWithJCData(int id) {
+        return find
+            .fetch("charges", new FetchConfig().query())
+            .fetch("charges.the_case", new FetchConfig().query())
+            .fetch("charges.the_case.meeting", new FetchConfig().query())
+            .fetch("charges.the_case.charges", new FetchConfig().query())
+            .fetch("charges.the_case.charges.person", new FetchConfig().query())
+            .fetch("charges.the_case.charges.rule", new FetchConfig().query())
+            .fetch("charges.the_case.charges.rule.section", new FetchConfig().query())
+            .fetch("charges.the_case.charges.rule.section.chapter", new FetchConfig().query())
+            .where().eq("section.chapter.organization", Organization.getByHost())
             .eq("id", id).findUnique();
     }
 

@@ -56,7 +56,13 @@ public class Application extends Controller {
 
     public static Result viewSchoolMeetingDecisions() {
         List<Charge> the_charges =
-            Charge.find.where()
+            Charge.find
+                .fetch("rule")
+                .fetch("rule.section")
+                .fetch("rule.section.chapter")
+                .fetch("person")
+                .fetch("the_case")
+                .where()
                 .eq("referred_to_sm", true)
                 .eq("person.organization", Organization.getByHost())
                 .isNotNull("sm_decision")
@@ -141,7 +147,14 @@ public class Application extends Controller {
         response().setHeader("Pragma", "no-cache");
 
         List<Charge> active_rps =
-            Charge.find.where()
+            Charge.find
+                .fetch("the_case")
+                .fetch("the_case.meeting")
+                .fetch("person")
+                .fetch("rule")
+                .fetch("rule.section")
+                .fetch("rule.section.chapter")
+                .where()
                 .eq("person.organization", Organization.getByHost())
                 .ne("plea", "Not Guilty")
                 .or(Expr.eq("referred_to_sm", false),
@@ -360,7 +373,15 @@ public class Application extends Controller {
     }
 
 	public static Result viewChapter(Integer id) {
-		return ok(views.html.view_chapter.render(Chapter.findById(id)));
+        Chapter c = Chapter.find
+            .fetch("sections", new FetchConfig().query())
+            .fetch("sections.entries", new FetchConfig().query())
+            .where().eq("organization", Organization.getByHost())
+            .eq("id", id).findUnique();
+
+        System.out.println("going into render\n\n\n");
+
+		return ok(views.html.view_chapter.render(c));
 	}
 
     static List<Charge> getLastWeekCharges(Person p) {
@@ -401,30 +422,24 @@ public class Application extends Controller {
     }
 
     public static Result getPersonHistory(Integer id) {
-        Person p = Person.findById(id);
+        Person p = Person.findByIdWithJCData(id);
         return ok(views.html.person_history.render(p, new PersonHistory(p, false), getLastWeekCharges(p), false));
     }
 
     public static Result getRuleHistory(Integer id) {
-        Entry r = Entry.findById(id);
+        Entry r = Entry.findByIdWithJCData(id);
         return ok(views.html.rule_history.render(r, new RuleHistory(r, false), getRecentResolutionPlans(r)));
     }
 
     public static Result viewPersonHistory(Integer id, Boolean redact_names) {
-        Person p = Person.findById(id);
+        Person p = Person.findByIdWithJCData(id);
         return ok(views.html.view_person_history.render(p, new PersonHistory(p), getLastWeekCharges(p), redact_names));
     }
 
     public static Result viewPersonsWriteups(Integer id) {
-        Person p = Person.findById(id);
+        Person p = Person.findByIdWithJCData(id);
 
-		List<Case> cases_written_up = new ArrayList<Case>();
-
-		for (PersonAtCase pac : p.cases_involved_in) {
-			if (pac.role == PersonAtCase.ROLE_WRITER) {
-				cases_written_up.add(pac.the_case);
-			}
-		}
+		List<Case> cases_written_up = new ArrayList<Case>(p.getCasesWrittenUp());
 
 		Collections.sort(cases_written_up);
 		Collections.reverse(cases_written_up);
@@ -433,7 +448,7 @@ public class Application extends Controller {
     }
 
     public static Result viewRuleHistory(Integer id) {
-        Entry r = Entry.findById(id);
+        Entry r = Entry.findByIdWithJCData(id);
         return ok(views.html.view_rule_history.render(r, new RuleHistory(r), getRecentResolutionPlans(r)));
 	}
 
@@ -492,6 +507,10 @@ public class Application extends Controller {
         end_date.add(GregorianCalendar.DATE, 6);
 
         List<Charge> all_charges = Charge.find
+            .fetch("the_case")
+            .fetch("person")
+            .fetch("rule")
+            .fetch("the_case.meeting", new FetchConfig().query())
             .where().eq("person.organization", Organization.getByHost())
             .findList();
         WeeklyStats result = new WeeklyStats();
@@ -525,6 +544,7 @@ public class Application extends Controller {
             .eq("organization", Organization.getByHost())
             .le("date", end_date.getTime())
             .ge("date", start_date.getTime()).findList();
+
         for (Meeting m : meetings) {
             for (Case c : m.cases) {
                 result.num_cases++;
