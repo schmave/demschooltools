@@ -65,6 +65,7 @@ public class Application extends Controller {
                 .where()
                 .eq("referred_to_sm", true)
                 .eq("person.organization", Organization.getByHost())
+                .gt("sm_decision_date", Application.getStartOfYear())
                 .isNotNull("sm_decision")
                 .orderBy("id DESC").findList();
         return ok(views.html.view_sm_decisions.render(the_charges));
@@ -104,8 +105,11 @@ public class Application extends Controller {
 
         List<Person> people = Person.find
             .fetch("charges")
+            .fetch("charges.the_case")
+            .fetch("charges.the_case.meeting")
             .fetch("cases_involved_in", new FetchConfig().query())
             .fetch("cases_involved_in.the_case", new FetchConfig().query())
+            .fetch("cases_involved_in.the_case.meeting", new FetchConfig().query())
             .where()
             .in("tags", cur_student_tag, staff_tag)
             .findList();
@@ -114,13 +118,15 @@ public class Application extends Controller {
 
         List<Entry> entries = Entry.find
             .fetch("charges")
+            .fetch("charges.the_case")
+            .fetch("charges.the_case.meeting")
             .fetch("section")
             .fetch("section.chapter")
             .where().eq("section.chapter.organization", Organization.getByHost())
             .findList();
         List<Entry> entries_with_charges = new ArrayList<Entry>();
         for (Entry e : entries) {
-            if (e.charges.size() > 0) {
+            if (e.getThisYearCharges().size() > 0) {
                 entries_with_charges.add(e);
             }
         }
@@ -436,21 +442,21 @@ public class Application extends Controller {
         return ok(views.html.view_person_history.render(p, new PersonHistory(p), getLastWeekCharges(p), redact_names));
     }
 
+    public static Result viewRuleHistory(Integer id) {
+        Entry r = Entry.findByIdWithJCData(id);
+        return ok(views.html.view_rule_history.render(r, new RuleHistory(r), getRecentResolutionPlans(r)));
+    }
+
     public static Result viewPersonsWriteups(Integer id) {
         Person p = Person.findByIdWithJCData(id);
 
-		List<Case> cases_written_up = new ArrayList<Case>(p.getCasesWrittenUp());
+		List<Case> cases_written_up = new ArrayList<Case>(p.getThisYearCasesWrittenUp());
 
 		Collections.sort(cases_written_up);
 		Collections.reverse(cases_written_up);
 
         return ok(views.html.view_persons_writeups.render(p, cases_written_up));
     }
-
-    public static Result viewRuleHistory(Integer id) {
-        Entry r = Entry.findByIdWithJCData(id);
-        return ok(views.html.view_rule_history.render(r, new RuleHistory(r), getRecentResolutionPlans(r)));
-	}
 
     public static Result thisWeekReport() {
         return viewWeeklyReport("");
@@ -512,6 +518,7 @@ public class Application extends Controller {
             .fetch("rule")
             .fetch("the_case.meeting", new FetchConfig().query())
             .where().eq("person.organization", Organization.getByHost())
+                .ge("the_case.meeting.date", getStartOfYear(start_date.getTime()))
             .findList();
         WeeklyStats result = new WeeklyStats();
         result.rule_counts = new TreeMap<Entry, Integer>();
@@ -645,6 +652,22 @@ public class Application extends Controller {
 
     private static <K, V> V getOrDefault(Map<K,V> map, K key, V defaultValue) {
         return map.containsKey(key) ? map.get(key) : defaultValue;
+    }
+
+    public static Date getStartOfYear() {
+        return getStartOfYear(new Date());
+    }
+
+    public static Date getStartOfYear(Date d) {
+        Date result = (Date)d.clone();
+
+        if (result.getMonth() < 7) { // july or earlier
+            result.setYear(result.getYear() - 1);
+        }
+        result.setMonth(7);
+        result.setDate(1);
+
+        return result;
     }
 
     public static String formatDayOfWeek(Date d) {

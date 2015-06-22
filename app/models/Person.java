@@ -181,6 +181,35 @@ public class Person extends Model implements Comparable<Person> {
     }
 
     @JsonIgnore
+    public List<Charge> getThisYearCharges() {
+        Date beginning_of_year = Application.getStartOfYear();
+
+        List<Charge> result = new ArrayList<Charge>();
+        for (Charge c : charges) {
+            if (c.the_case.meeting.date.after(beginning_of_year)) {
+                result.add(c);
+            }
+        }
+
+        return result;
+    }
+
+    @JsonIgnore
+    public List<Case> getThisYearCasesWrittenUp() {
+        Date beginning_of_year = Application.getStartOfYear();
+
+        List<Case> result = new ArrayList<Case>();
+        for (PersonAtCase pac : cases_involved_in) {
+            if (pac.role == PersonAtCase.ROLE_WRITER &&
+                pac.the_case.meeting.date.after(beginning_of_year)) {
+                result.add(pac.the_case);
+            }
+        }
+
+        return result;
+    }
+
+    @JsonIgnore
     public List<Charge> getChargesInDateOrder() {
         List<Charge> result = new ArrayList<Charge>(charges);
         Collections.sort(result, Collections.reverseOrder());

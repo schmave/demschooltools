@@ -71,6 +71,20 @@ public class Entry extends Model implements Comparable<Entry> {
     }
 
     @JsonIgnore
+    public List<Charge> getThisYearCharges() {
+        Date beginning_of_year = Application.getStartOfYear();
+
+        List<Charge> result = new ArrayList<Charge>();
+        for (Charge c : charges) {
+            if (c.the_case.meeting.date.after(beginning_of_year)) {
+                result.add(c);
+            }
+        }
+
+        return result;
+    }
+
+    @JsonIgnore
     public List<ManualChange> changes() {
         return ManualChange.find.where()
             .eq("entry", this)

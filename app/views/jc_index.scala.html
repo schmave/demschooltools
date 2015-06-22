@@ -34,8 +34,8 @@ function meetingSelected(str_date, datepicker) {
 
 $(function() {
 	$("#month-picker").datepicker({
-		minDate: new Date(2014, 7, 1),
-		maxDate: new Date(2015, 5, 30),
+		changeMonth: true,
+		changeYear: true,
 		dateFormat: 'yy-m-d',
 		constrainInput: true,
 		beforeShowDay: hasMeeting,
@@ -83,8 +83,8 @@ $(function() {
 <thead><th height=50 width=200>Person<th align=right width=50>Complaint count<th align=right width=50>Charge count</thead>
 @for( p <- people ) {
 	<tr><td width=200>@p.getDisplayName()
-	<td align=right width=50><a class="cases-written-link" href="@routes.Application.viewPersonsWriteups(p.person_id)">@p.getCasesWrittenUp().size()</a>
-	<td align=right width=50><a class="charges-link" href="@routes.Application.viewPersonHistory(p.person_id)">@p.charges.size()</a>
+	<td align=right width=50><a class="cases-written-link" href="@routes.Application.viewPersonsWriteups(p.person_id)">@p.getThisYearCasesWrittenUp().size()</a>
+	<td align=right width=50><a class="charges-link" href="@routes.Application.viewPersonHistory(p.person_id)">@p.getThisYearCharges().size()</a>
 }
 </table>
 </div>
@@ -97,7 +97,7 @@ $(function() {
 <thead><th height=50 width=250>Entry<th align=right width=50>Charge count</thead>
 @for( r <- rules ) {
 	<tr><td width=250><a href="@routes.Application.viewRuleHistory(r.id)">@r.getNumber() @r.title</a>
-	<td align=right width=50>@r.charges.size()
+	<td align=right width=50>@r.getThisYearCharges().size()
 }
 </table>
 </div>

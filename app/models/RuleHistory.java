@@ -2,6 +2,8 @@ package models;
 
 import java.util.*;
 
+import controllers.Application;
+
 public class RuleHistory {
 
     public class Record {
@@ -20,6 +22,7 @@ public class RuleHistory {
         HashMap<Person, Record> records = new HashMap<Person, Record>();
 
         Date today = new Date();
+        Date year_start = Application.getStartOfYear();
 
         Collections.sort(rule.charges);
         Collections.reverse(rule.charges);
@@ -28,8 +31,9 @@ public class RuleHistory {
             Record r = records.get(c.person);
 
             Date d = c.the_case.meeting.date;
-            if (!include_today && d.getDate() == today.getDate() &&
-                d.getMonth() == today.getMonth() && d.getYear() == today.getYear()) {
+            if (d.before(year_start) ||
+                (!include_today && d.getDate() == today.getDate() &&
+                 d.getMonth() == today.getMonth() && d.getYear() == today.getYear())) {
                 continue;
             }
 
