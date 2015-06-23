@@ -4,6 +4,10 @@
 #DELETE from charge ch using entry e, section s, chapter c
 #where ch.rule_id=e.id and s.id=e.section_id and c.id=s.chapter_id and c.organization_id=3;
 #
+#DELETE from charge ch using person p
+#where ch.person_id=p.person_id and p.organization_id=3;
+#
+#
 #DELETE from entry e using section s, chapter c
 #where s.id=e.section_id and c.id=s.chapter_id and c.organization_id=3;
 #
@@ -72,6 +76,7 @@ while True:
     if not row:
         break;
     id = str(row[0])
+
     nickname = row[1]
     chapter = row[2]
     section = row[3]
