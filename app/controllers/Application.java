@@ -291,33 +291,20 @@ public class Application extends Controller {
             print_temp_dir = Files.createTempDirectory("dst");
         }
 
-        ArrayList<Path> files = new ArrayList<Path>();
+        if (!Files.exists(print_temp_dir.resolve("stylesheets"))) {
+            Files.createDirectory(print_temp_dir.resolve("stylesheets"));
+        }
 
-        Path src_dir = Play.application().getFile("public").toPath();
+        String names[] = new String[] {
+            "main.css",
+            "print.css",
+            "bootstrap.min.css"
+        };
 
-        files.add(Paths.get("images"));
-        files.add(Paths.get("stylesheets"));
-
-        while (files.size() > 0) {
-            Path path = files.remove(files.size() - 1);
-
-            Path abs_path = src_dir.resolve(path);
-            File f = abs_path.toFile();
-            if (f.isDirectory()) {
-                String[] names = f.list();
-                for (String name : names) {
-                    files.add(path.resolve(name));
-                }
-                if (!Files.exists(print_temp_dir.resolve(path))){
-                    Files.createDirectory(print_temp_dir.resolve(path));
-                }
-            } else {
-                Files.copy(
-                    new FileInputStream(
-                        Play.application().getFile("public/" + path.toString())),
-                    print_temp_dir.resolve(path),
-                    StandardCopyOption.REPLACE_EXISTING);
-            }
+        for (String name : names) {
+            Files.copy(Play.application().resourceAsStream("public/stylesheets/" + name),
+                print_temp_dir.resolve("stylesheets").resolve(name),
+                StandardCopyOption.REPLACE_EXISTING);
         }
     }
 
