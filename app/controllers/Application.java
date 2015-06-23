@@ -322,6 +322,7 @@ public class Application extends Controller {
         // none of which I can get to work right now, so hence this ugliness.
         orig_html = orig_html.replaceAll("&ldquo;", "\"");
         orig_html = orig_html.replaceAll("&rdquo;", "\"");
+        orig_html = orig_html.replaceAll("&ndash;", "\u2013");
         orig_html = orig_html.replaceAll("&mdash;", "\u2014");
         orig_html = orig_html.replaceAll("&nbsp;", " ");
         orig_html = orig_html.replaceAll("&hellip;", "\u2026");
