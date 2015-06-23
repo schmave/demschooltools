@@ -34,7 +34,7 @@ Edit minutes</a></p>
 
 <h4>&nbsp;<br/>@OrgConfig.get().str_res_plans_cap</h4>
 <table class="table resolution_plans">
-	<thead><th width="70">Case</th><th width="20">Person</th><th width="220">Entry</th><th>@OrgConfig.get().str_res_plan_cap</th></thead>
+	<thead><th width="100">Case</th><th width="20">Person</th><th width="220">Entry</th><th>@OrgConfig.get().str_res_plan_cap</th></thead>
 	@for(c <- m.cases) {
 		@for(charge <- c.charges) {
 			@if( charge.person != null && charge.rule != null ) {
