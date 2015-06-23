@@ -32,7 +32,7 @@
 #where c.person_id=p.person_id and p.organization_id=3;
 #
 #DELETE from person where organization_id=3;
-
+#
 import psycopg2
 import sys
 import os
@@ -140,7 +140,11 @@ while True:
         break;
 
     new_cur.execute("""INSERT INTO person(last_name, first_name, dob, organization_id) VALUES
-        (%s, %s, %s, %s) returning person_id""", (row[2], row[3], row[4], ORG_ID))
+        (%s, %s, %s, %s) returning person_id""", (
+            row[2] if row[2] else "",
+            row[3] if row[3] else "",
+            row[4],
+            ORG_ID))
     new_id = personalid_to_id[row[5]] = int(new_cur.fetchone()[0])
 
     new_cur.execute("""INSERT INTO comments(person_id, user_id, message) VALUES
@@ -164,7 +168,8 @@ while True:
 
 old_cur.execute("""SELECT plaintiffid, ruleid, date, defendantid,
     what_happened, plea, verdict, sentence from grievances
-    WHERE defendantid is not null and plaintiffid is not null""")
+    WHERE defendantid is not null and plaintiffid is not null
+    ORDER BY date ASC""")
 
 last_date = None
 last_what_happened = None
@@ -216,6 +221,11 @@ while True:
 
     # New charge
     assert case_id
+
+    sm_decision = None
+    if row[5] != "Guilty":
+        sm_decision = row[6] if row[6] else "--"
+
     if personalid_to_id.has_key(defendantid) and ruleid_to_id.has_key(ruleid):
         new_cur.execute("""INSERT INTO charge(person_id, rule_id, plea, resolution_plan,
             referred_to_sm, sm_decision, sm_decision_date, case_id, rp_complete, rp_complete_date)
@@ -225,7 +235,7 @@ while True:
                 "Unknown" if not row[5] else row[5], #plea
                 "--" if not row[7] else row[7], #rp
                 row[5] != "Guilty", # referred to sm?
-                None if row[5] == "Guilty" else row[6], # sm decision
+                sm_decision,
                 None if row[5] == "Guilty" else last_date, # sm decision date
                 case_id,
                 True,
