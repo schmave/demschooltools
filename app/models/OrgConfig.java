@@ -132,3 +132,30 @@ class Fairhaven extends OrgConfig {
         return INSTANCE;
     }
 }
+
+class TheCircleSchool extends OrgConfig {
+    private static final TheCircleSchool INSTANCE = new TheCircleSchool();
+
+    public TheCircleSchool() {
+        name = "The Circle School";
+        short_name = "TCS";
+        people_url = "http://tcs.demschooltools.com";
+
+        str_manual_title = "Management Manual";
+        str_manual_title_short = "Mgmt. Man.";
+        str_res_plan_short = "sentence";
+        str_res_plan = "sentence";
+        str_res_plan_cap = "Sentence";
+        str_res_plans = "sentences";
+        str_res_plans_cap = "Sentences";
+		str_findings = "Findings";
+
+        use_minor_referrals = true;
+
+        OrgConfig.register(name, this);
+    }
+
+    public static TheCircleSchool getInstance() {
+        return INSTANCE;
+    }
+}
