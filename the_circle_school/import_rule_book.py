@@ -135,7 +135,8 @@ while True:
     text = unicode(text if text else '', encoding='utf-8')
     text = text.strip()
     text = text.replace("\\n", "\n")
-    text = text.replace(u"\u2022", "*")
+    text = text.replace(u"\u00B7", "* ") # middot
+    text = text.replace(u"\u2022", "* ") # bullet
 
     new_cur.execute("""INSERT into entry(num, title, section_id, content, deleted)
         VALUES (%s, %s, %s, %s, %s) returning id""", (
