@@ -14,6 +14,6 @@ dist
 /.settings
 *.vpwhist
 *.vtg
-fairhaven/*.txt
-fairhaven/*.csv
+fairhaven/*
+the_circle_school/*
 *~
