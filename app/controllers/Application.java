@@ -313,7 +313,8 @@ public class Application extends Controller {
                 }
             } else {
                 Files.copy(
-                    src_dir.resolve(path),
+                    new FileInputStream(
+                        Play.application().getFile("public/" + path.toString())),
                     print_temp_dir.resolve(path),
                     StandardCopyOption.REPLACE_EXISTING);
             }
