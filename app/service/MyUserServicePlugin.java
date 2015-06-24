@@ -4,6 +4,7 @@ import com.feth.play.module.pa.service.UserServicePlugin;
 import com.feth.play.module.pa.user.AuthUser;
 import com.feth.play.module.pa.user.AuthUserIdentity;
 import com.feth.play.module.pa.user.EmailIdentity;
+import com.google.inject.Inject;
 
 import models.LinkedAccount;
 import models.User;
@@ -13,6 +14,7 @@ import play.Logger;
 
 public class MyUserServicePlugin extends UserServicePlugin {
 
+    @Inject
 	public MyUserServicePlugin(final Application app) {
 		super(app);
 	}
