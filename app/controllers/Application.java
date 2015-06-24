@@ -137,6 +137,108 @@ public class Application extends Controller {
             entries_with_charges));
     }
 
+    public static Result downloadCharges() throws IOException {
+        response().setHeader("Content-Type", "text/csv; charset=utf-8");
+        response().setHeader("Content-Disposition",
+            "attachment; filename=All charges.csv");
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Charset charset = Charset.forName("UTF-8");
+        CsvWriter writer = new CsvWriter(baos, ',', charset);
+
+        writer.write("Name");
+        writer.write("Age");
+        writer.write("Gender");
+        writer.write("Date of event");
+        writer.write("Time of event");
+        writer.write("Location of event");
+        writer.write("Date of meeting");
+        writer.write("Case #");
+        writer.write(OrgConfig.get().str_findings);
+        writer.write("Rule");
+        writer.write("Plea");
+        writer.write(OrgConfig.get().str_res_plan_cap);
+        writer.write(OrgConfig.get().str_res_plan_cap + " complete?");
+        if (OrgConfig.get().show_severity) {
+            writer.write("Severity");
+        }
+        if (OrgConfig.get().use_minor_referrals) {
+            writer.write("Referred to");
+        }
+        writer.write("Referred to SM?");
+        writer.write("SM decision");
+        writer.write("SM decision date");
+        writer.endRecord();
+
+        List<Charge> charges = Charge.find
+            .fetch("the_case")
+            .fetch("person")
+            .fetch("rule")
+            .fetch("the_case.meeting", new FetchConfig().query())
+            .where().eq("person.organization", Organization.getByHost())
+                .ge("the_case.meeting.date", getStartOfYear())
+            .findList();
+        for (Charge c : charges) {
+            if (c.person != null) {
+                writer.write(c.person.getDisplayName());
+            } else {
+                writer.write("");
+            }
+
+            if (c.person.dob != null) {
+                writer.write("" + CRM.calcAge(c.person));
+            } else {
+                writer.write("");
+            }
+
+            writer.write(c.person.gender);
+            writer.write(yymmddDate(
+                c.the_case.date != null ? c.the_case.date : c.the_case.meeting.date));
+            writer.write(c.the_case.time);
+            writer.write(c.the_case.location);
+            writer.write(yymmddDate(c.the_case.meeting.date));
+
+            // Adding a space to the front of the case number prevents MS Excel
+            // from misinterpreting it as a date.
+            writer.write(" " + c.the_case.case_number, true);
+            writer.write(c.the_case.findings);
+
+            if (c.rule != null) {
+                writer.write(c.rule.getNumber() + " " + c.rule.title);
+            } else {
+                writer.write("");
+            }
+            writer.write(c.plea);
+            writer.write(c.resolution_plan);
+            writer.write("" + c.rp_complete);
+            if (OrgConfig.get().show_severity) {
+                writer.write(c.severity);
+            }
+
+            if (OrgConfig.get().use_minor_referrals) {
+                writer.write(c.minor_referral_destination);
+            }
+            writer.write("" + c.referred_to_sm);
+            if (c.sm_decision != null) {
+                writer.write(c.sm_decision);
+            } else {
+                writer.write("");
+            }
+            if (c.sm_decision_date != null) {
+                writer.write(Application.yymmddDate(c.sm_decision_date));
+            } else {
+                writer.write("");
+            }
+
+            writer.endRecord();
+        }
+        writer.close();
+
+        // Adding the BOM here causes Excel 2010 on Windows to realize
+        // that the file is Unicode-encoded.
+        return ok("\ufeff" + new String(baos.toByteArray(), charset));
+    }
+
     public static Result viewMeeting(int meeting_id) {
         return ok(views.html.view_meeting.render(Meeting.findById(meeting_id)));
     }
@@ -192,7 +294,7 @@ public class Application extends Controller {
         return ok(views.html.view_meeting_resolution_plans.render(Meeting.findById(meeting_id)));
     }
 
-    public static Result downloadMeetingResolutionPlans(int meeting_id) {
+    public static Result downloadMeetingResolutionPlans(int meeting_id) throws IOException {
         response().setHeader("Content-Type", "text/csv; charset=utf-8");
         response().setHeader("Content-Disposition", "attachment; filename=" + OrgConfig.get().str_res_plans + ".csv");
 
@@ -200,41 +302,37 @@ public class Application extends Controller {
         Charset charset = Charset.forName("UTF-8");
         CsvWriter writer = new CsvWriter(baos, ',', charset);
 
-        try {
-            writer.write("Person");
-            writer.write("Case #");
-            writer.write("Rule");
-            writer.write(OrgConfig.get().str_res_plan_cap);
-            writer.endRecord();
+        writer.write("Person");
+        writer.write("Case #");
+        writer.write("Rule");
+        writer.write(OrgConfig.get().str_res_plan_cap);
+        writer.endRecord();
 
-            Meeting m = Meeting.findById(meeting_id);
-            for (Case c : m.cases) {
-                for (Charge charge : c.charges) {
-                    if (charge.displayInResolutionPlanList() && !charge.referred_to_sm) {
-                        writer.write(charge.person.getDisplayName());
+        Meeting m = Meeting.findById(meeting_id);
+        for (Case c : m.cases) {
+            for (Charge charge : c.charges) {
+                if (charge.displayInResolutionPlanList() && !charge.referred_to_sm) {
+                    writer.write(charge.person.getDisplayName());
 
-                        // In case it's needed in the future, adding a space to
-                        // the front of the case number prevents MS Excel from
-                        // misinterpreting it as a date.
-                        //
-                        // writer.write(" " + charge.the_case.case_number,
-                        // true);
+                    // In case it's needed in the future, adding a space to
+                    // the front of the case number prevents MS Excel from
+                    // misinterpreting it as a date.
+                    //
+                    // writer.write(" " + charge.the_case.case_number,
+                    // true);
 
-                        writer.write(charge.the_case.case_number + " (" +
-                            (charge.sm_decision_date != null
-                                ? Application.formatDayOfWeek(charge.sm_decision_date) + "--SM"
-                                : Application.formatDayOfWeek(charge.the_case.meeting.date))
-                            + ")");
-                        writer.write(charge.rule.title);
-                        writer.write(charge.resolution_plan);
-                        writer.endRecord();
-                    }
+                    writer.write(charge.the_case.case_number + " (" +
+                        (charge.sm_decision_date != null
+                            ? Application.formatDayOfWeek(charge.sm_decision_date) + "--SM"
+                            : Application.formatDayOfWeek(charge.the_case.meeting.date))
+                        + ")");
+                    writer.write(charge.rule.title);
+                    writer.write(charge.resolution_plan);
+                    writer.endRecord();
                 }
             }
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+        writer.close();
 
         // Adding the BOM here causes Excel 2010 on Windows to realize
         // that the file is Unicode-encoded.
