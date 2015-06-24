@@ -77,7 +77,8 @@ POST /renderMarkdown	controllers.Application.renderMarkdown()
 
 
 GET     /jsonPeople               controllers.CRM.jsonPeople(term ?= "")
-GET     /people                   controllers.CRM.people()
+GET     /people                   controllers.CRM.recentComments()
+GET     /allPeople                controllers.CRM.allPeople()
 GET     /people/new               controllers.CRM.newPerson()
 GET     /people/:id               controllers.CRM.person(id: Integer)
 POST    /people                   controllers.CRM.makeNewPerson()

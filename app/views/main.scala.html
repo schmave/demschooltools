@@ -58,9 +58,11 @@
 		<div class="tab-pane @if(menu.equals("crm")) { active }" id="people">
 			<div class="subnav">
 			<a @if(selectedBtn.equals("crm_home")) { class="active" }
-				href="@routes.CRM.people()">
+				href="@routes.CRM.recentComments()">
 				Recent comments</a>
-			<a href="@routes.CRM.newPerson()">Add a person</a>
+			<a @if(selectedBtn.equals("all_people")) { class="active" }
+				href="@routes.CRM.allPeople()">
+				All people</a>
 			<span class="dropdown">
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 				  Tags
@@ -112,6 +114,8 @@
 			}
 
 			   <input id="navbar_people_search" type="search" placeholder="Search people..."/>
+			<a/>
+			<a href="@routes.CRM.newPerson()">Add a person</a>
 			</div>
 		</div>
 

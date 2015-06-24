@@ -37,7 +37,7 @@ public class CRM extends Controller {
     static Form<Comment> commentForm = Form.form(Comment.class);
     static Form<Donation> donationForm = Form.form(Donation.class);
 
-    public static Result people() {
+    public static Result recentComments() {
         List<Comment> recent_comments = Comment.find
             .fetch("person")
             .fetch("completed_tasks", new FetchConfig().query())
@@ -45,7 +45,7 @@ public class CRM extends Controller {
             .where().eq("person.organization", Organization.getByHost())
             .orderBy("created DESC").setMaxRows(20).findList();
 
-        return ok(views.html.people_index.render(Person.all(), recent_comments));
+        return ok(views.html.people_index.render(recent_comments));
     }
 
     public static Result person(Integer id) {
@@ -238,6 +238,10 @@ public class CRM extends Controller {
         return ok();
     }
 
+    public static Result allPeople() {
+        return ok(views.html.all_people.render(Person.all()));
+    }
+
 	public static Result viewTag(Integer id) {
         Tag the_tag = Tag.find
             .fetch("people")
@@ -299,7 +303,7 @@ public class CRM extends Controller {
 	public static Result viewPendingEmail() {
 		Email e = getPendingEmail();
 		if (e == null) {
-			return redirect(routes.CRM.people());
+			return redirect(routes.CRM.recentComments());
 		}
 
         Tag staff_tag = Tag.find.where()
@@ -403,7 +407,7 @@ public class CRM extends Controller {
 
     public static Result deletePerson(Integer id) {
         Person.delete(id);
-        return redirect(routes.CRM.people());
+        return redirect(routes.CRM.recentComments());
     }
 
     public static Result editPerson(Integer id) {
