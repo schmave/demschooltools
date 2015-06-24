@@ -57,10 +57,10 @@ public class ApplicationEditing extends Controller {
         if (next_num.length() == 1) {
             next_num = "0" + next_num;
         }
-        String case_num = m.getCaseNumberPrefix() + next_num;
+        String case_num = OrgConfig.get().getCaseNumberPrefix(m) + next_num;
 
         Case new_case = Case.create(case_num, m);
-        return ok("[" + new_case.id + ", '" + new_case.case_number + "']");
+        return ok("[" + new_case.id + ", \"" + new_case.case_number + "\"]");
     }
 
     public static Result continueCase(Integer meeting_id, Integer case_id) {

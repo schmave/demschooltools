@@ -1,6 +1,7 @@
 package models;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,6 +24,7 @@ public class OrgConfig {
     public boolean show_severity = false;
     public boolean use_minor_referrals = false;
     public boolean show_checkbox_for_res_plan = true;
+    public boolean track_writer = true;
 
     public Organization org;
 
@@ -48,6 +50,10 @@ public class OrgConfig {
             e.printStackTrace();
             return "";
         }
+    }
+
+    public String getCaseNumberPrefix(Meeting m) {
+        return new SimpleDateFormat("MM-dd-").format(m.date);
     }
 }
 
@@ -151,11 +157,17 @@ class TheCircleSchool extends OrgConfig {
 		str_findings = "Findings";
 
         use_minor_referrals = true;
+        track_writer = false;
 
         OrgConfig.register(name, this);
     }
 
     public static TheCircleSchool getInstance() {
         return INSTANCE;
+    }
+
+    @Override
+    public String getCaseNumberPrefix(Meeting m) {
+        return new SimpleDateFormat("yyyyMMdd").format(m.date);
     }
 }

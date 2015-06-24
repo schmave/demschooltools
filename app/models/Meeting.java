@@ -1,6 +1,5 @@
 package models;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -62,11 +61,6 @@ public class Meeting extends Model {
 
         return Json.stringify(Json.toJson(result));
     }
-
-	public String getCaseNumberPrefix()
-	{
-		return new SimpleDateFormat("MM-dd-").format(date);
-	}
 
     public static Meeting create(Date d)
     {

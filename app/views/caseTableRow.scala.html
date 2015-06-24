@@ -6,7 +6,11 @@
 	<td><h5>@if(show_links) {<a href="@routes.Application.viewMeeting(c.meeting.id)">}
 		#@c.case_number @if(show_links) {</a>} @if( c.date_closed == null ) { (OPEN) }</h5>
 	<p>@if( c.date != null ) { @Application.formatDateShort(c.date)@if( !c.time.equals("") ){, @c.time}. }
-	<i>Writers</i>: @c.people_at_case.filter((p: PersonAtCase) => p.role == PersonAtCase.ROLE_WRITER).map {tr =>@tr.person.getDisplayName()}.mkString(", ").
+	@if(OrgConfig.get().track_writer) {
+		<i>Writers</i>: @c.people_at_case.filter((p: PersonAtCase) =>
+			p.role == PersonAtCase.ROLE_WRITER).map { tr =>
+				@tr.person.getDisplayName()}.mkString(", ").
+	}
 	<i>Location</i>: @if(!c.location.equals("")) {@c.location} else {unknown}.</p></td>
 	<td><p>
 		<i>Testifiers</i>: @c.people_at_case.filter(_.role == PersonAtCase.ROLE_TESTIFIER).map {tr =>@tr.person.getDisplayName()}.mkString(", ")

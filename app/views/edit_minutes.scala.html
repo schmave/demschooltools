@@ -149,8 +149,10 @@ View printable minutes</a>
 <div class="panel-body">
 
 <table>
-<tr><td class="esm-form-label">Who wrote complaint:
-<td>{{render "people-chooser" clazz="writer"}}</tr>
+@if(OrgConfig.get().track_writer) {
+    <tr><td class="esm-form-label">Who wrote complaint:
+    <td>{{render "people-chooser" clazz="writer"}}</tr>
+}
 
 <tr><td class="esm-form-label">Location: <td><input class="form-control location" type="text"></tr>
 <tr><td class="esm-form-label">Date of event: <td><input class="date form-control" type="text">

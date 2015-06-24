@@ -451,17 +451,19 @@ function Case (id, el) {
 
     this.id = id;
     this.el = el;
-    this.writer_chooser = new PeopleChooser(el.find(".writer"),
-        function(person) {
-            $.post("/addPersonAtCase?case_id=" + id +
-                   "&person_id=" + person.id +
-                   "&role=" + app.ROLE_WRITER);
-        },
-        function(person) {
-            $.post("/removePersonAtCase?case_id=" + id +
-                   "&person_id=" + person.id +
-                   "&role=" + app.ROLE_WRITER);
-        });
+    if (config.track_writer) {
+        this.writer_chooser = new PeopleChooser(el.find(".writer"),
+            function(person) {
+                $.post("/addPersonAtCase?case_id=" + id +
+                       "&person_id=" + person.id +
+                       "&role=" + app.ROLE_WRITER);
+            },
+            function(person) {
+                $.post("/removePersonAtCase?case_id=" + id +
+                       "&person_id=" + person.id +
+                       "&role=" + app.ROLE_WRITER);
+            });
+    }
 
     this.testifier_chooser = new PeopleChooser(
         el.find(".testifier"),
