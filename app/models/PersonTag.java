@@ -15,15 +15,6 @@ public class PersonTag extends Model {
 
     @Id
     public long person_id;
-    //@Id
-    //@ManyToOne()
-    //@JoinColumn(name="tag_id")
-    //public Tag tag;
-    //
-    //@Id
-    //@ManyToOne()
-    //@JoinColumn(name="person_id")
-    //public Person person;
 
     public static Finder<Integer, PersonTag> find = new Finder(
         Integer.class, PersonTag.class
