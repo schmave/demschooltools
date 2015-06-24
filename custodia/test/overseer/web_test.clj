@@ -36,6 +36,8 @@
                           (dates/make-date-string (t/minus (t/now)
                                                            (t/days 1)))])))))
 
+;; (t/date-time 2015 4 14 4 3 27 456)
+
 (defn add-swipes [sid]
   ;; 14 hours in UTC is 9 Am here
   ;; 10-14-2014
@@ -339,11 +341,12 @@
             (is (= (-> att :total_days) 1))))))
   )
 
-(deftest get-current-year
-  (db/sample-db)
-  #_(testing "Getting current year"
-    (is (= (dates/get-current-year-string (db/get-years))
-           (str "2014-06-01 " (dates/today-string))))))
+(comment
+ (deftest get-current-year
+   (db/sample-db)
+   (testing "Getting current year"
+       (is (= (dates/get-current-year-string (db/get-years))
+              (str "2014-06-01 " (dates/today-string)))))))
 
 (deftest excuse-today-is-today
   (do (db/sample-db)
