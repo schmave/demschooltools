@@ -4,7 +4,7 @@
 
 @main("All people tagged " + tag.title, "crm") {
 <h1>@tag.title</h1>
-<p>@people.size() people</p>
+<p>@people.size() people. <a href="@routes.CRM.downloadTag(tag.id)">Download all as spreadsheet</a></p>
 @if( tag.task_list != null ) {
    <p>Also see task list: <a href="@routes.CRM.viewTaskList(tag.task_list.id)">@tag.task_list.title</a></p>
 }

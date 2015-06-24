@@ -1,7 +1,9 @@
 package controllers;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -16,6 +18,7 @@ import com.avaje.ebean.FetchConfig;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
 import com.avaje.ebean.SqlUpdate;
+import com.csvreader.CsvWriter;
 import com.ecwid.mailchimp.*;
 import com.ecwid.mailchimp.method.v2_0.lists.ListMethodResult;
 import com.feth.play.module.pa.PlayAuthenticate;
@@ -268,10 +271,89 @@ public class CRM extends Controller {
         }
     }
 
+    public static Result downloadTag(Integer id) throws IOException {
+        Tag the_tag = Tag.find
+            .fetch("people")
+            .fetch("people.phone_numbers", new FetchConfig().query())
+            .where().eq("organization", Organization.getByHost())
+            .eq("id", id).findUnique();
+
+        response().setHeader("Content-Type", "text/csv; charset=utf-8");
+        response().setHeader("Content-Disposition", "attachment; filename=" +
+            the_tag.title + ".csv");
+
+        List<Person> people = the_tag.people;
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Charset charset = Charset.forName("UTF-8");
+        CsvWriter writer = new CsvWriter(baos, ',', charset);
+
+        writer.write("First name");
+        writer.write("Last name");
+        writer.write("Display (JC) name");
+        writer.write("Gender");
+        writer.write("DOB");
+        writer.write("Email");
+        writer.write("Phone 1");
+        writer.write("Phone 1 comment");
+        writer.write("Phone 2");
+        writer.write("Phone 2 comment");
+        writer.write("Phone 3");
+        writer.write("Phone 3 comment");
+        writer.write("Neighborhood");
+        writer.write("Street");
+        writer.write("City");
+        writer.write("State");
+        writer.write("ZIP");
+        writer.write("Notes");
+        writer.write("Previous school");
+        writer.write("School district");
+        writer.write("Grade");
+        writer.endRecord();
+
+        for (Person p : people) {
+            writer.write(p.first_name);
+            writer.write(p.last_name);
+            writer.write(p.getDisplayName());
+            writer.write(p.gender);
+            if (p.dob != null) {
+                writer.write(Application.yymmddDate(p.dob));
+            } else {
+                writer.write("");
+            }
+            writer.write(p.email);
+            for (int i = 0; i < 3; i++) {
+                if (i < p.phone_numbers.size()) {
+                    writer.write(p.phone_numbers.get(i).number);
+                    writer.write(p.phone_numbers.get(i).comment);
+                } else {
+                    writer.write("");
+                    writer.write("");
+                }
+            }
+
+            writer.write(p.neighborhood);
+            writer.write(p.address);
+            writer.write(p.city);
+            writer.write(p.state);
+            writer.write(p.zip);
+            writer.write(p.notes);
+            writer.write(p.previous_school);
+            writer.write(p.school_district);
+            writer.write(p.grade);
+            writer.endRecord();
+        }
+
+        writer.close();
+        // Adding the BOM here causes Excel 2010 on Windows to realize
+        // that the file is Unicode-encoded.
+        return ok("\ufeff" + new String(baos.toByteArray(), charset));
+    }
+
     public static Result viewIntentToEnroll(Tag the_tag, List<Person> students,
         Set<Person> family_members)
     {
-        return ok(views.html.intent_to_enroll_tag.render(the_tag, students, family_members));
+        return ok(views.html.student_tag.render(the_tag, students, family_members));
     }
 
     public static Result newPerson() {

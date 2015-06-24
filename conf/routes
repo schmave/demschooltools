@@ -102,6 +102,7 @@ GET     /donations/indiegogo      controllers.CRM.donationsNeedingIndiegogo()
 GET     /donations                controllers.CRM.donations()
 
 GET     /viewTag/:id              controllers.CRM.viewTag(id: Integer)
+GET     /downloadTag/:id	  controllers.CRM.downloadTag(id: Integer)
 
 GET     /viewTaskList/:id         controllers.CRM.viewTaskList(id: Integer)
 
