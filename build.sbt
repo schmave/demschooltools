@@ -22,7 +22,8 @@ libraryDependencies ++= Seq(
   "com.feth"      %% "play-authenticate" % "0.7.0-SNAPSHOT",
   "com.typesafe.play" %% "play-mailer" % "3.0.1",
   "com.ecwid" % "ecwid-mailchimp" % "2.0.1.0",
-  "org.xhtmlrenderer" % "flying-saucer-pdf" % "9.0.7"
+  "org.xhtmlrenderer" % "flying-saucer-pdf" % "9.0.7",
+  "com.googlecode.usc" % "jdbcdslog" % "1.0.6.2"
 )
 
 resolvers += Resolver.sonatypeRepo("snapshots")
