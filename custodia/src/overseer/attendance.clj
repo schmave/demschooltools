@@ -2,7 +2,7 @@
   (:require [overseer.db :as db]
             [overseer.helpers :refer :all]
             [overseer.dates :refer :all]
-            [overseer.database :refer :all]
+            [overseer.database :as data]
             [clojure.tools.trace :as trace]
             [clj-time.format :as f]
             [clj-time.local :as l]
@@ -110,7 +110,7 @@
      :swipes records}))
 
 (defn get-year-from-to [year-string]
-  (let [year (first (get-years year-string))
+  (let [year (first (data/get-years year-string))
         from (f/parse (:from_date year))
         to (f/parse (:to_date year))]
     [from to]))
@@ -192,9 +192,9 @@
 ;; (get-school-days "2014-06-01 2015-06-01")
 
 (defn get-student-with-att
-  ([id] (get-student-with-att id (get-current-year-string (get-years))))
+  ([id] (get-student-with-att id (get-current-year-string (data/get-years))))
   ([id year]
    (map #(get-attendance year (:_id %) %)
-        (get-students id))))
+        (data/get-students id))))
 
 ;;(get-student-with-att 8)
