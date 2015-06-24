@@ -113,15 +113,14 @@
     top: 3px;
 }
 
-div.closed
+div.continued
 {
     float: right;
 }
 
-.closed :checked + span
+.continued :checked + span
 {
-    background-color: #FFFC00;
-    color: rgb(14, 65, 199);
+    background-color: #ff0;
 }
 
 span {}

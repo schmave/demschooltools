@@ -385,7 +385,8 @@ function Case (id, el) {
         url += "&findings=" + encodeURIComponent(self.el.find(".findings").val());
         url += "&date=" + encodeURIComponent(self.el.find(".date").val());
         url += "&time=" + encodeURIComponent(self.el.find(".time").val());
-        url += "&closed=" + encodeURIComponent(self.el.find("input.closed").prop("checked"));
+        url += "&closed=" + encodeURIComponent(
+            !self.el.find("input.continued").prop("checked"));
 
         $.post(url, function(data) {
             self.is_modified = false;
@@ -401,7 +402,7 @@ function Case (id, el) {
         el.find(".date").val(data.date);
         el.find(".time").val(data.time);
         el.find(".findings").val(data.findings);
-        el.find("input.closed").prop("checked", data.date_closed != null);
+        el.find("input.continued").prop("checked", data.date_closed == null);
 
         for (i in data.people_at_case) {
             pac = data.people_at_case[i];
@@ -482,7 +483,7 @@ function Case (id, el) {
     el.find(".findings").on(TEXT_AREA_EVENTS, self.checkText);
     el.find(".date").change(self.markAsModified);
     el.find(".time").change(self.markAsModified);
-    el.find("input.closed").change(self.markAsModified);
+    el.find("input.continued").change(self.markAsModified);
 
     el.find(".add-charges").click(self.addCharge);
 
