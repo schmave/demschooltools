@@ -8,7 +8,6 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
-import com.avaje.ebean.validation.NotNull;
 
 import controllers.*;
 
@@ -33,9 +32,7 @@ public class ManualChange extends Model {
     @ManyToOne()
     public Entry entry;
 
-    @NotNull
     public Boolean was_deleted = false;
-    @NotNull
     public Boolean was_created = false;
 
     @Column(columnDefinition = "TEXT")

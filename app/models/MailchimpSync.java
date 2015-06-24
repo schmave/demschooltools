@@ -1,7 +1,5 @@
 package models;
 
-import com.avaje.ebean.validation.NotNull;
-
 import java.util.*;
 
 import javax.persistence.*;
@@ -17,13 +15,11 @@ public class MailchimpSync extends Model {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mailchimp_sync_id_seq")
     public int id;
 
-    @NotNull
     @ManyToOne()
     @JoinColumn(name="tag_id")
     public Tag tag;
 
-    @NotNull
-    public String mailchimp_list_id;
+    public String mailchimp_list_id = "";
 
     public Date last_sync;
 

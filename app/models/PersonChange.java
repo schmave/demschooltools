@@ -1,7 +1,5 @@
 package models;
 
-import com.avaje.ebean.validation.NotNull;
-
 import java.util.*;
 
 import javax.persistence.*;
@@ -13,15 +11,12 @@ import com.avaje.ebean.Model;
 
 @Entity
 public class PersonChange extends Model {
-    @NotNull
     @OneToOne()
     @JoinColumn(name="person_id")
     public Person person;
 
-    @NotNull
     public String old_email="";
 
-    @NotNull
     public String new_email="";
 
     @Column(insertable = false, updatable = false)

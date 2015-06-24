@@ -9,7 +9,6 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
-import com.avaje.ebean.validation.NotNull;
 
 import controllers.*;
 
@@ -27,9 +26,7 @@ public class Section extends Model {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "section_id_seq")
     public Integer id;
 
-    @NotNull
     public String title = "";
-    @NotNull
 	public String num = "";
 
     @OneToMany(mappedBy="section")
@@ -46,7 +43,6 @@ public class Section extends Model {
     @ManyToOne()
     public Chapter chapter;
 
-	@NotNull
 	public Boolean deleted;
 
     public static Finder<Integer,Section> find = new Finder<>(

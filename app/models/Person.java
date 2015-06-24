@@ -10,7 +10,6 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
-import com.avaje.ebean.validation.NotNull;
 
 import controllers.*;
 
@@ -26,19 +25,15 @@ public class Person extends Model implements Comparable<Person> {
     @Id
     public Integer person_id;
 
-    @NotNull
     public String first_name="";
-    @NotNull
     public String last_name="";
 
     @Column(columnDefinition = "TEXT")
-    @NotNull
     public String notes="";
 
     @ManyToOne()
     public Organization organization;
 
-    @NotNull
     public String gender = "Unknown";
 
     // phone number references
@@ -46,30 +41,21 @@ public class Person extends Model implements Comparable<Person> {
     @JsonIgnore
     public List<PhoneNumber> phone_numbers;
 
-    @NotNull
     public String address="";
-    @NotNull
     public String city="";
-    @NotNull
     public String state="";
-    @NotNull
     public String zip="";
-    @NotNull
     public String neighborhood="";
 
     // email address
-    @NotNull
     public String email="";
 
     public Date dob;
     public Date approximate_dob;
 
-    @NotNull
 	public String display_name = "";
 
-    @NotNull
 	public String previous_school = "";
-    @NotNull
 	public String school_district = "";
 
     @Transient
@@ -91,7 +77,6 @@ public class Person extends Model implements Comparable<Person> {
 
     // is_family is true if this Person object represents
     // a family, not a single person.
-    @NotNull
     public boolean is_family;
 
     @OneToMany(mappedBy="person")
@@ -112,7 +97,6 @@ public class Person extends Model implements Comparable<Person> {
     @JsonIgnore
     public List<Person> family_members;
 
-    @NotNull
 	public String grade = "";
 
     static Set<String> fieldsToUpdateExplicitly = new HashSet<String>();

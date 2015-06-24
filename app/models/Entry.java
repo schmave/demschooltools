@@ -10,7 +10,6 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
-import com.avaje.ebean.validation.NotNull;
 
 import controllers.*;
 
@@ -26,19 +25,15 @@ public class Entry extends Model implements Comparable<Entry> {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "entry_id_seq")
     public Integer id;
 
-    @NotNull
     public String title = "";
-    @NotNull
 	public String num = "";
 
     @Column(columnDefinition = "TEXT")
-    @NotNull
     public String content = "";
 
     @ManyToOne()
     public Section section;
 
-	@NotNull
 	public boolean deleted;
 
 	@OneToMany(mappedBy="rule")

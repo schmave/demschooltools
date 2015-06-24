@@ -10,7 +10,6 @@ import java.util.*;
 
 import javax.persistence.*;
 
-import com.avaje.ebean.validation.NotNull;
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,7 +34,6 @@ public class Case extends Model implements Comparable<Case> {
     public String findings = "";
 
     public Date date;
-    @NotNull
     public String time = "";
 
     @ManyToOne

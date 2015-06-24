@@ -1,7 +1,5 @@
 package models;
 
-import com.avaje.ebean.validation.NotNull;
-
 import java.util.*;
 
 import javax.persistence.*;
@@ -17,17 +15,14 @@ public class PersonTagChange extends Model {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "person_tag_change_id_seq")
     public int id;
 
-    @NotNull
     @ManyToOne()
     @JoinColumn(name="tag_id")
     public Tag tag;
 
-    @NotNull
     @ManyToOne()
     @JoinColumn(name="person_id")
     public Person person;
 
-    @NotNull
     @ManyToOne()
     @JoinColumn(name="creator_id")
     public User creator;
@@ -35,7 +30,6 @@ public class PersonTagChange extends Model {
     @Column(insertable = false, updatable = false)
     public Date time;
 
-    @NotNull
     public boolean was_add;
 
     public static Finder<Integer, PersonTagChange> find = new Finder<>(

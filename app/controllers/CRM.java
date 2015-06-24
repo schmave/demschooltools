@@ -18,7 +18,6 @@ import com.avaje.ebean.SqlUpdate;
 import com.ecwid.mailchimp.*;
 import com.ecwid.mailchimp.method.v2_0.lists.ListMethodResult;
 import com.feth.play.module.pa.PlayAuthenticate;
-import com.typesafe.plugin.*;
 
 import models.*;
 

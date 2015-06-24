@@ -11,7 +11,6 @@ import com.avaje.ebean.Expr;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
 import com.avaje.ebean.annotation.Where;
-import com.avaje.ebean.validation.NotNull;
 
 import controllers.*;
 
@@ -27,9 +26,7 @@ public class Chapter extends Model {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "chapter_id_seq")
     public Integer id;
 
-    @NotNull
     public String title = "";
-    @NotNull
 	public String num = "";
 
     @OneToMany(mappedBy="chapter")
@@ -39,7 +36,6 @@ public class Chapter extends Model {
     @ManyToOne()
     public Organization organization;
 
-    @NotNull
 	public Boolean deleted;
 
     public static Finder<Integer,Chapter> find = new Finder<>(
