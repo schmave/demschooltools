@@ -34,6 +34,10 @@ public class Tag extends Model {
     @OneToMany(mappedBy="tag")
     public List<MailchimpSync> syncs;
 
+    @OneToMany(mappedBy="tag")
+    @OrderBy("time DESC")
+    public List<PersonTagChange> changes;
+
     public static Finder<Integer, Tag> find = new Finder<>(
         Integer.class, Tag.class
     );

@@ -261,14 +261,8 @@ public class CRM extends Controller {
             }
         }
 
-        if (the_tag.use_student_display)
-        {
-            return viewIntentToEnroll(the_tag, people, people_with_family);
-        }
-        else
-        {
-            return ok(views.html.tag.render(the_tag, people, people_with_family));
-        }
+        return ok(views.html.tag.render(
+            the_tag, people, people_with_family, the_tag.use_student_display));
     }
 
     public static Result downloadTag(Integer id) throws IOException {
@@ -348,12 +342,6 @@ public class CRM extends Controller {
         // Adding the BOM here causes Excel 2010 on Windows to realize
         // that the file is Unicode-encoded.
         return ok("\ufeff" + new String(baos.toByteArray(), charset));
-    }
-
-    public static Result viewIntentToEnroll(Tag the_tag, List<Person> students,
-        Set<Person> family_members)
-    {
-        return ok(views.html.student_tag.render(the_tag, students, family_members));
     }
 
     public static Result newPerson() {

@@ -1,17 +1,55 @@
-@(tag: Tag, people: List[Person], people_with_family: Collection[Person])
+@(tag: Tag, people: List[Person], people_with_family: Collection[Person], use_student_display: Boolean)
 
 @import helper._
 
 @main("All people tagged " + tag.title, "crm") {
-<h1>@tag.title</h1>
-<p>@people.size() people. <a href="@routes.CRM.downloadTag(tag.id)">Download all as spreadsheet</a></p>
+<h1>@tag.title
 @if( tag.task_list != null ) {
-   <p>Also see task list: <a href="@routes.CRM.viewTaskList(tag.task_list.id)">@tag.task_list.title</a></p>
+   <span class="view-task-list">Also see task list: <a href="@routes.CRM.viewTaskList(tag.task_list.id)">@tag.task_list.title</a></span>
 }
 
-@people_list(people)
+</h1>
+<p>@people.size() people. <a href="@routes.CRM.downloadTag(tag.id)">Download all as spreadsheet</a></p>
 
-@tag_extras(people, people_with_family)
+
+<div class="tabbable"> <!-- Only required for left/right tabs -->
+  <ul class="nav nav-tabs">
+    <li class="active"><a href="#tab1" data-toggle="tab">People</a></li>
+    <li><a href="#tab2" data-toggle="tab">History</a></li>
+  </ul>
+  <div class="tab-content">
+    <div class="tab-pane active" id="tab1">
+		@if(use_student_display) {
+			@student_list(people)
+		} else {
+			@people_list(people)
+		}
+
+		@tag_extras(people, people_with_family)
+	</div>
+    <div class="tab-pane" id="tab2">
+		<table class="table" style="width: 400px;">
+		<thead><th>Name<th>Date of change</thead><tbody>
+		@for( c <- tag.changes ) {
+			<tr><td>
+			@if( c.was_add ) {
+				<img height=18 src="@routes.Assets.at("images/plus.png")"/>
+			} else {
+				<img height=18 src="@routes.Assets.at("images/minus.png")"/>
+			}
+			<a href="@routes.CRM.person(c.person.person_id)">
+				@c.person.first_name @c.person.last_name
+			</a></td>
+			<td>@Application.yymmddDate(c.time)</td>
+			</tr>
+		}
+		</tbody></table>
+	</div>
+  </div>
+</div>
+
+
+
 
 }
 

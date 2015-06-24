@@ -340,6 +340,13 @@ a.edit_link {
     background: #ffff00;
 }
 
+.view-task-list
+{
+    font-size: 12px;
+    font-weight: normal;
+    padding-left: 50px;
+}
+
 /*********************************
  Twitter Bootstrap tweaks
  *********************************/
