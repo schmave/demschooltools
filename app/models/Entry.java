@@ -41,6 +41,11 @@ public class Entry extends Model implements Comparable<Entry> {
     @OrderBy("id DESC")
     public List<Charge> charges;
 
+    @JsonIgnore
+    @OneToMany(mappedBy="entry")
+    @OrderBy("date_entered ASC")
+    public List<ManualChange> changes;
+
     public static Finder<Integer,Entry> find = new Finder<>(
         Integer.class, Entry.class
     );
@@ -48,13 +53,6 @@ public class Entry extends Model implements Comparable<Entry> {
     public static Entry findById(int id) {
         return find.where().eq("section.chapter.organization", Organization.getByHost())
             .eq("id", id).findUnique();
-    }
-
-    @JsonIgnore
-    public List<ManualChange> changes() {
-        return ManualChange.find.where()
-            .eq("entry", this)
-            .orderBy("date_entered ASC").findList();
     }
 
     public String getNumber() {

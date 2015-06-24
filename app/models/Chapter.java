@@ -30,8 +30,10 @@ public class Chapter extends Model {
 	public String num = "";
 
     @OneToMany(mappedBy="chapter")
+    @OrderBy("num ASC")
+    @Where(clause = "${ta}.deleted = false")
     @JsonIgnore
-    private List<Section> sections;
+    public List<Section> sections;
 
     @ManyToOne()
     public Organization organization;
@@ -51,13 +53,6 @@ public class Chapter extends Model {
         return find.where()
             .eq("deleted", Boolean.FALSE)
             .eq("organization", Organization.getByHost())
-            .orderBy("num ASC").findList();
-    }
-
-    public List<Section> sections() {
-        return Section.find.where()
-            .eq("chapter", this)
-            .eq("deleted", Boolean.FALSE)
             .orderBy("num ASC").findList();
     }
 

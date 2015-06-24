@@ -30,15 +30,10 @@ public class Section extends Model {
 	public String num = "";
 
     @OneToMany(mappedBy="section")
-    // Doesn't seem to work in Play 2.3.7... I think it used to.
-    // See https://github.com/ebean-orm/avaje-ebeanorm/issues/154
-    //
-    // updated in ebean 4.1.x and beyond, which Play doesn't work with.
-    //
-    //@OrderBy("num ASC")
-	//@Where(clause = "${ta}.deleted = false")
+    @OrderBy("num ASC")
+	@Where(clause = "${ta}.deleted = false")
     @JsonIgnore
-    private List<Entry> entries;
+    public List<Entry> entries;
 
     @ManyToOne()
     public Chapter chapter;
@@ -52,13 +47,6 @@ public class Section extends Model {
     public static Section findById(int id) {
         return find.where().eq("chapter.organization", Organization.getByHost())
             .eq("id", id).findUnique();
-    }
-
-    public List<Entry> entries() {
-        return Entry.find.where()
-            .eq("section", this)
-            .eq("deleted", Boolean.FALSE)
-            .orderBy("num ASC").findList();
     }
 
     public String getNumber() {
