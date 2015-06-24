@@ -60,6 +60,16 @@ Edit minutes</a></p>
 		@caseTableRow(c, false)
 	}
 }
+
+@for(c <- m.additional_cases) {
+	<tr>
+	<td><h5>#@c.case_number	@if( c.date_closed == null ) { (OPEN) }</h5></td>
+	<td>Case discussed today, but kept open for further investigation. Latest notes available
+		in meeting held on <a href="@routes.Application.viewMeeting(c.meeting.id)">
+			@Application.yymmddDate(c.meeting.date)</a></td>
+	</tr>
+
+}
 </table>
 
 }

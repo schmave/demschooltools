@@ -10,6 +10,7 @@ import java.util.*;
 
 import javax.persistence.*;
 
+import com.avaje.ebean.Ebean;
 import com.avaje.ebean.validation.NotNull;
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.core.*;
@@ -20,6 +21,8 @@ import controllers.Application;
 import play.db.ebean.Model;
 import play.db.ebean.Model.Finder;
 import play.libs.Json;
+
+import org.postgresql.util.PSQLException;
 
 @Entity
 @Table(name="`case`")
@@ -43,6 +46,10 @@ public class Case extends Model implements Comparable<Case> {
     @JsonIgnore
     public Meeting meeting;
 
+    @JsonIgnore
+    @ManyToMany(mappedBy = "additional_cases")
+    public List<Meeting> additional_meetings;
+
     @OneToMany(mappedBy="the_case")
     public List<PersonAtCase> people_at_case;
 
@@ -51,6 +58,8 @@ public class Case extends Model implements Comparable<Case> {
     public List<Charge> charges;
 
     static Set<String> names;
+
+    public Date date_closed;
 
     public static Finder<Integer, Case> find = new Finder(
         Integer.class, Case.class
@@ -61,11 +70,20 @@ public class Case extends Model implements Comparable<Case> {
             .eq("id", id).findUnique();
     }
 
+    public static List<Case> getOpenCases() {
+        return find.where()
+            .eq("meeting.organization", Organization.getByHost())
+            .eq("date_closed", null)
+            .order("case_number ASC")
+            .findList();
+    }
+
     public static Case create(String number, Meeting m)
     {
         Case result = new Case();
         result.case_number = number;
         result.meeting = m;
+        result.date_closed = m.date; // closed by default
         result.save();
 
         return result;
@@ -84,6 +102,31 @@ public class Case extends Model implements Comparable<Case> {
         }
     }
 
+    public void continueInMeeting(Meeting m) {
+        try {
+            // remember the previous meeting
+            CaseMeeting.create(this, this.meeting);
+        }
+        catch (PersistenceException pe) {
+            PSQLException e = (PSQLException)pe.getCause();
+            if (e == null) {
+                throw pe;
+            }
+
+            // Throw the exception only if this is something other than a
+            // "unique_violation", meaning that this CaseMeeting already exists.
+            if (!e.getSQLState().equals("23505")) {
+                throw pe;
+            } else {
+                System.out.println("Ate a 23505 error in continueInMeeting");
+            }
+        }
+
+        this.meeting = m;
+
+        this.update();
+    }
+
     public void edit(Map<String, String[]> query_string) {
         findings = query_string.get("findings")[0];
         location = query_string.get("location")[0];
@@ -91,6 +134,14 @@ public class Case extends Model implements Comparable<Case> {
         String date_string = query_string.get("date")[0];
         date = controllers.Application.getDateFromString(date_string);
         time = query_string.get("time")[0];
+
+        System.out.println("closed: " + query_string.get("closed")[0]);
+        if (query_string.get("closed")[0].equals("true")) {
+            date_closed = meeting.date;
+        } else {
+            date_closed = null;
+        }
+        this.update();
     }
 
 	public boolean empty() {

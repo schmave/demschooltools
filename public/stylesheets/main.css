@@ -113,6 +113,19 @@
     top: 3px;
 }
 
+div.closed
+{
+    float: right;
+}
+
+.closed :checked + span
+{
+    background-color: #FFFC00;
+    color: rgb(14, 65, 199);
+}
+
+span {}
+
 .people_chooser .people {
     display: inline;
 }

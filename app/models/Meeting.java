@@ -33,6 +33,12 @@ public class Meeting extends Model {
     @OrderBy("case_number ASC")
     public List<Case> cases;
 
+    @ManyToMany
+    @JoinTable(name="case_meeting",
+        inverseJoinColumns=@JoinColumn(name="case_id",referencedColumnName = "id"),
+        joinColumns = @JoinColumn(name="meeting_id", referencedColumnName="id"))
+    public List<Case> additional_cases;
+
     public static Finder<Integer, Meeting> find = new Finder(
         Integer.class, Meeting.class
     );

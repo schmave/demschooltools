@@ -37,7 +37,7 @@ public class ApplicationEditing extends Controller {
     public static Result editMinutes(Meeting meeting) {
         response().setHeader("Cache-Control", "max-age=0, no-cache, no-store");
         response().setHeader("Pragma", "no-cache");
-        return ok(views.html.edit_minutes.render(meeting));
+        return ok(views.html.edit_minutes.render(meeting, Case.getOpenCases()));
     }
 
     public static Result editMeeting(int meeting_id) {
@@ -51,7 +51,7 @@ public class ApplicationEditing extends Controller {
     // for two cases with the same ID to be generated, leading to an error when
     // the second case is persisted because of a violated unique constraint.
     public synchronized static Result createCase(Integer meeting_id) {
-        Meeting m = Meeting.find.byId(meeting_id);
+        Meeting m = Meeting.findById(meeting_id);
 
         String next_num = "" + (m.cases.size() + 1);
         if (next_num.length() == 1) {
@@ -61,6 +61,19 @@ public class ApplicationEditing extends Controller {
 
         Case new_case = Case.create(case_num, m);
         return ok("[" + new_case.id + ", '" + new_case.case_number + "']");
+    }
+
+    public static Result continueCase(Integer meeting_id, Integer case_id) {
+        Meeting m = Meeting.findById(meeting_id);
+        Case c = Case.findById(case_id);
+
+        if (m == null || c == null || c.date_closed != null || c.meeting == m) {
+            System.out.println("Error in continueCase -- illegal access");
+            return unauthorized();
+        }
+
+        c.continueInMeeting(m);
+        return ok(c.toJson());
     }
 
     public static Result saveCase(Integer id) {

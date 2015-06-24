@@ -1,3 +1,5 @@
+SAVE_TIMEOUT = 2000
+
 function showSomethingInSidebar(url) {
     $("#sidebar").html("<h2>Loading...</h2>");
     $.get(url,
@@ -324,6 +326,14 @@ function Charge(charge_id, el) {
         self.checkReferralLabelHighlight();
     }
 
+    this.old_rp = null;
+    this.checkText = function() {
+        if (el.find(".resolution_plan").val() !== self.old_rp) {
+            self.markAsModified();
+            self.old_rp = el.find(".resolution_plan").val();
+        }
+    }
+
     self.el = el;
     self.is_modified = false;
     window.setTimeout(self.saveIfNeeded, 5000);
@@ -332,7 +342,7 @@ function Charge(charge_id, el) {
     self.remove_button.click(self.removeCharge);
 
     el.find(".resolution_plan").change(self.markAsModified);
-    el.find(".resolution_plan").on(TEXT_AREA_EVENTS, self.markAsModified);
+    el.find(".resolution_plan").on(TEXT_AREA_EVENTS, self.checkText);
     el.find(".plea-guilty").change(self.markAsModified);
     el.find(".plea-no-contest").change(self.markAsModified);
     el.find(".plea-not-guilty").change(self.markAsModified);
@@ -365,7 +375,7 @@ function Case (id, el) {
     var self = this;
 
     this.saveIfNeeded = function() {
-        window.setTimeout(self.saveIfNeeded, 5000);
+        window.setTimeout(self.saveIfNeeded, SAVE_TIMEOUT);
         if (!self.is_modified) {
             return;
         }
@@ -375,6 +385,7 @@ function Case (id, el) {
         url += "&findings=" + encodeURIComponent(self.el.find(".findings").val());
         url += "&date=" + encodeURIComponent(self.el.find(".date").val());
         url += "&time=" + encodeURIComponent(self.el.find(".time").val());
+        url += "&closed=" + encodeURIComponent(self.el.find("input.closed").prop("checked"));
 
         $.post(url, function(data) {
             self.is_modified = false;
@@ -390,6 +401,7 @@ function Case (id, el) {
         el.find(".date").val(data.date);
         el.find(".time").val(data.time);
         el.find(".findings").val(data.findings);
+        el.find("input.closed").prop("checked", data.date_closed != null);
 
         for (i in data.people_at_case) {
             pac = data.people_at_case[i];
@@ -427,6 +439,15 @@ function Case (id, el) {
         return new_charge;
     }
 
+    self.old_findings = null;
+
+    this.checkText = function() {
+        if (el.find(".findings").val() !== self.old_findings) {
+            self.markAsModified();
+            self.old_findings = el.find(".findings").val();
+        }
+    }
+
     this.id = id;
     this.el = el;
     this.writer_chooser = new PeopleChooser(el.find(".writer"),
@@ -458,13 +479,14 @@ function Case (id, el) {
 
     el.find(".location").change(self.markAsModified);
     el.find(".findings").change(self.markAsModified);
-    el.find(".findings").on(TEXT_AREA_EVENTS, self.markAsModified);
+    el.find(".findings").on(TEXT_AREA_EVENTS, self.checkText);
     el.find(".date").change(self.markAsModified);
     el.find(".time").change(self.markAsModified);
+    el.find("input.closed").change(self.markAsModified);
 
     el.find(".add-charges").click(self.addCharge);
 
-    window.setTimeout(self.saveIfNeeded, 5000);
+    window.setTimeout(self.saveIfNeeded, SAVE_TIMEOUT);
 }
 
 function addPersonAtMeeting(person, role) {
@@ -525,6 +547,23 @@ function checkDirties() {
     window.setTimeout(checkDirties, 1000);
 }
 
+function continueCase(event) {
+    var list_item = $(event.target).parent();
+    var id = list_item.prop("id");
+    var splits = id.split("-");
+    var case_id = splits[splits.length-1];
+
+    $.post("/continueCase?meeting_id=" + app.meeting_id
+             + "&case_id=" + case_id, "",
+           function(data, textStatus, jqXHR) {
+        var case_data = $.parseJSON(data);
+        var new_case = addCaseNoServer(case_data.id, case_data.case_number);
+        new_case.loadData(case_data);
+        $('body').animate({'scrollTop': new_case.el.offset().top + 500}, 'slow');
+        list_item.remove();
+    });
+}
+
 $(function () {
     Handlebars.registerHelper('render', function(partialId, options) {
       var selector = 'script[type="text/x-handlebars-template"]#' + partialId,
@@ -557,6 +596,8 @@ $(function () {
         makePeopleChooser(".sub", app.ROLE_JC_SUB);
 
     loadInitialData();
+
+    $(".continue-cases li").click(continueCase);
 
     window.onbeforeunload = function(e) {
         var dirty = false;
@@ -604,7 +645,7 @@ function addCase()
 {
     $.post("/newCase?meeting_id=" + app.meeting_id, "",
            function(data, textStatus, jqXHR) {
-        id_num_pair = eval(data);
+        id_num_pair = $.parseJSON(data);
         var new_case = addCaseNoServer(id_num_pair[0], id_num_pair[1]);
         $('body').animate({'scrollTop': new_case.el.offset().top + 500}, 'slow');
     });

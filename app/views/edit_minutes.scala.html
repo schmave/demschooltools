@@ -1,4 +1,4 @@
-@(meeting : Meeting)
+@(meeting : Meeting, open_cases: List[Case])
 
 @import helper._
 
@@ -140,7 +140,12 @@ View printable minutes</a>
 
 <script id="case-template" type="text/x-handlebars-template">
 <div class="case panel panel-info">
-<div class="panel-heading"><h4>Case #{{num}}</h4></div>
+<div class="panel-heading"><h4>Case #{{num}}
+    <div class="closed"><label>
+    <input type="checkbox" class="closed" checked><span>Closed</span></input>
+    </label></div>
+        </h4>
+    </div>
 <div class="panel-body">
 
 <table>
@@ -160,11 +165,25 @@ View printable minutes</a>
 </table>
 <div class="charges"></div>
 <button class="add-charges">Add charges</button>
+
 </div>
 </div>
 </script>
 
 <p><button onclick="javascript:addCase()">Add a case</button>
 
+@if( open_cases.size() > 0) {
+	<p>The following cases have not yet been closed. To edit them,
+	click the "continue" button next to the case you would like to edit.</p>
+	<ul class="continue-cases">
+		@for( c <- open_cases) {
+			@if( c.meeting != meeting) {
+				<li id="continue-case-@c.id">@c.case_number | @c.location | @c.findings.substring(0, scala.math.min(c.findings.length(), 50))...
+					<button>Continue</button>
+					</li>
+			}
+		}
+	</ul>
+}
 
 }
