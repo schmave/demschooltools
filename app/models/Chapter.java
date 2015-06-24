@@ -11,14 +11,13 @@ import com.avaje.ebean.Expr;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
 import com.avaje.ebean.annotation.Where;
-import com.avaje.ebean.validation.NotNull;
 
 import controllers.*;
 
 import play.data.*;
 import play.data.validation.Constraints.*;
 import play.data.validation.ValidationError;
-import play.db.ebean.*;
+import com.avaje.ebean.Model;
 import static play.libs.F.*;
 
 @Entity
@@ -27,22 +26,21 @@ public class Chapter extends Model {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "chapter_id_seq")
     public Integer id;
 
-    @NotNull
     public String title = "";
-    @NotNull
 	public String num = "";
 
     @OneToMany(mappedBy="chapter")
+    @OrderBy("num ASC")
+    @Where(clause = "${ta}.deleted = false")
     @JsonIgnore
-    private List<Section> sections;
+    public List<Section> sections;
 
     @ManyToOne()
     public Organization organization;
 
-    @NotNull
 	public Boolean deleted;
 
-    public static Finder<Integer,Chapter> find = new Finder(
+    public static Finder<Integer,Chapter> find = new Finder<>(
         Integer.class, Chapter.class
     );
 
@@ -55,13 +53,6 @@ public class Chapter extends Model {
         return find.where()
             .eq("deleted", Boolean.FALSE)
             .eq("organization", Organization.getByHost())
-            .orderBy("num ASC").findList();
-    }
-
-    public List<Section> sections() {
-        return Section.find.where()
-            .eq("chapter", this)
-            .eq("deleted", Boolean.FALSE)
             .orderBy("num ASC").findList();
     }
 

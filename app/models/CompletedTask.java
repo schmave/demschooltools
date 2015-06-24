@@ -2,8 +2,8 @@ package models;
 
 import javax.persistence.*;
 
-import play.db.ebean.Model;
-import play.db.ebean.Model.Finder;
+import com.avaje.ebean.Model;
+import com.avaje.ebean.Model.Finder;
 
 @Entity
 public class CompletedTask extends Model {
@@ -23,7 +23,7 @@ public class CompletedTask extends Model {
     @JoinColumn(name="comment_id")
     public Comment comment;
 
-    public static Finder<Integer, CompletedTask> find = new Finder(
+    public static Finder<Integer, CompletedTask> find = new Finder<>(
         Integer.class, CompletedTask.class
     );
 

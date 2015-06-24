@@ -11,14 +11,13 @@ import com.avaje.ebean.Expr;
 import com.avaje.ebean.FetchConfig;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
-import com.avaje.ebean.validation.NotNull;
 
 import controllers.*;
 
 import play.data.*;
 import play.data.validation.Constraints.*;
 import play.data.validation.ValidationError;
-import play.db.ebean.*;
+import com.avaje.ebean.Model;
 import static play.libs.F.*;
 
 @Entity
@@ -27,19 +26,15 @@ public class Entry extends Model implements Comparable<Entry> {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "entry_id_seq")
     public Integer id;
 
-    @NotNull
     public String title = "";
-    @NotNull
 	public String num = "";
 
     @Column(columnDefinition = "TEXT")
-    @NotNull
     public String content = "";
 
     @ManyToOne()
     public Section section;
 
-	@NotNull
 	public boolean deleted;
 
 	@OneToMany(mappedBy="rule")
@@ -47,7 +42,12 @@ public class Entry extends Model implements Comparable<Entry> {
     @OrderBy("id DESC")
     public List<Charge> charges;
 
-    public static Finder<Integer,Entry> find = new Finder(
+    @JsonIgnore
+    @OneToMany(mappedBy="entry")
+    @OrderBy("date_entered ASC")
+    public List<ManualChange> changes;
+
+    public static Finder<Integer,Entry> find = new Finder<>(
         Integer.class, Entry.class
     );
 
@@ -82,13 +82,6 @@ public class Entry extends Model implements Comparable<Entry> {
         }
 
         return result;
-    }
-
-    @JsonIgnore
-    public List<ManualChange> changes() {
-        return ManualChange.find.where()
-            .eq("entry", this)
-            .orderBy("date_entered ASC").findList();
     }
 
     public String getNumber() {

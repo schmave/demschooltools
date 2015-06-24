@@ -19,7 +19,6 @@ import com.avaje.ebean.SqlUpdate;
 import com.ecwid.mailchimp.*;
 import com.ecwid.mailchimp.method.v2_0.lists.ListMethodResult;
 import com.feth.play.module.pa.PlayAuthenticate;
-import com.typesafe.plugin.*;
 
 import models.*;
 
@@ -93,7 +92,7 @@ public class CRM extends Controller {
 				Expr.ilike("email", "%" + term + "%"));
 
 			people_matched_this_round =
-				Person.find.where(this_expr).where().eq("organization", Organization.getByHost())
+				Person.find.where().add(this_expr).eq("organization", Organization.getByHost())
                     .findList();
 
 			List<PhoneNumber> phone_numbers =

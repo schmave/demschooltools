@@ -1,14 +1,12 @@
 package models;
 
-import com.avaje.ebean.validation.NotNull;
-
 import java.util.*;
 
 import javax.persistence.*;
 
 import play.data.*;
 import play.data.validation.Constraints.*;
-import play.db.ebean.*;
+import com.avaje.ebean.Model;
 
 
 @Entity
@@ -17,13 +15,11 @@ public class MailchimpSync extends Model {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mailchimp_sync_id_seq")
     public int id;
 
-    @NotNull
     @ManyToOne()
     @JoinColumn(name="tag_id")
     public Tag tag;
 
-    @NotNull
-    public String mailchimp_list_id;
+    public String mailchimp_list_id = "";
 
     public Date last_sync;
 
@@ -31,7 +27,7 @@ public class MailchimpSync extends Model {
 
     public boolean sync_local_removes;
 
-    public static Finder<Integer, MailchimpSync> find = new Finder(
+    public static Finder<Integer, MailchimpSync> find = new Finder<>(
         Integer.class, MailchimpSync.class
     );
 

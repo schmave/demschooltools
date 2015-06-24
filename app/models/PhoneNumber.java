@@ -6,7 +6,7 @@ import javax.persistence.*;
 
 import play.data.*;
 import play.data.validation.Constraints.*;
-import play.db.ebean.*;
+import com.avaje.ebean.Model;
 
 @Entity
 @Table(name="phone_numbers")
@@ -21,7 +21,7 @@ public class PhoneNumber extends Model {
     @JoinColumn(name="person_id")
     public Person owner;
 
-    public static Finder<Integer, PhoneNumber> find = new Finder(
+    public static Finder<Integer, PhoneNumber> find = new Finder<>(
         Integer.class, PhoneNumber.class
     );
 

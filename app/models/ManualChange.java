@@ -8,7 +8,6 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
-import com.avaje.ebean.validation.NotNull;
 
 import controllers.*;
 
@@ -17,7 +16,7 @@ import com.fasterxml.jackson.annotation.*;
 import play.data.*;
 import play.data.validation.Constraints.*;
 import play.data.validation.ValidationError;
-import play.db.ebean.*;
+import com.avaje.ebean.Model;
 import static play.libs.F.*;
 
 @Entity
@@ -33,9 +32,7 @@ public class ManualChange extends Model {
     @ManyToOne()
     public Entry entry;
 
-    @NotNull
     public Boolean was_deleted = false;
-    @NotNull
     public Boolean was_created = false;
 
     @Column(columnDefinition = "TEXT")
@@ -51,7 +48,7 @@ public class ManualChange extends Model {
 
     public Date date_entered = new Date();
 
-    public static Finder<Integer,ManualChange> find = new Finder(
+    public static Finder<Integer,ManualChange> find = new Finder<>(
         Integer.class, ManualChange.class
     );
 

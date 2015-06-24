@@ -10,16 +10,14 @@ import java.util.*;
 
 import javax.persistence.*;
 
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.validation.NotNull;
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import controllers.Application;
 
-import play.db.ebean.Model;
-import play.db.ebean.Model.Finder;
+import com.avaje.ebean.Model;
+import com.avaje.ebean.Model.Finder;
 import play.libs.Json;
 
 import org.postgresql.util.PSQLException;
@@ -38,7 +36,6 @@ public class Case extends Model implements Comparable<Case> {
     public String findings = "";
 
     public Date date;
-    @NotNull
     public String time = "";
 
     @ManyToOne
@@ -61,7 +58,7 @@ public class Case extends Model implements Comparable<Case> {
 
     public Date date_closed;
 
-    public static Finder<Integer, Case> find = new Finder(
+    public static Finder<Integer, Case> find = new Finder<>(
         Integer.class, Case.class
     );
 

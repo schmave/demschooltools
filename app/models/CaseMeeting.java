@@ -10,15 +10,8 @@ import play.db.ebean.*;
 
 @Entity
 public class CaseMeeting extends Model {
-    @Id
     public int case_id;
-
-    @Id
     public int meeting_id;
-
-    public static Finder<Integer, CaseMeeting> find = new Finder(
-        Integer.class, CaseMeeting.class
-    );
 
     public static CaseMeeting create(Case c, Meeting m) {
         CaseMeeting result = new CaseMeeting();

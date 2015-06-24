@@ -4,7 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
-import play.db.ebean.Model;
+import com.avaje.ebean.Model;
 
 import com.feth.play.module.pa.user.AuthUser;
 
@@ -12,7 +12,7 @@ import com.feth.play.module.pa.user.AuthUser;
 public class LinkedAccount extends Model {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -25,7 +25,7 @@ public class LinkedAccount extends Model {
 	public String providerUserId;
 	public String providerKey;
 
-	public static final Finder<Long, LinkedAccount> find = new Finder<Long, LinkedAccount>(
+	public static final Finder<Long, LinkedAccount> find = new Finder<>(
 			Long.class, LinkedAccount.class);
 
 	public static LinkedAccount findByProviderKey(final User user, String key) {
@@ -38,7 +38,7 @@ public class LinkedAccount extends Model {
 		ret.update(authUser);
 		return ret;
 	}
-	
+
 	public void update(final AuthUser authUser) {
 		this.providerKey = authUser.getProvider();
 		this.providerUserId = authUser.getId();
