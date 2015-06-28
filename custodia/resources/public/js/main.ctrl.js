@@ -176,6 +176,9 @@ angular.module('app').controller("MainController", function($scope, $http){
                 }). error(function(){});
         }
     };
+    $scope.styleStudentCalendarDay = function(date, mode){
+        return "red";
+    };
     $scope.toggleHours = function(student) {
         if(confirm(student.olderdate ? "Mark student younger?":"Mark student as older starting today?")){
             student.olderdate = !!!student.olderdate;
