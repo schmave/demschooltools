@@ -158,7 +158,14 @@ public class CRM extends Controller {
             }
         }
 
-        if (personId >= 0) {
+        boolean tag_already_exists = false;
+        for (Tag t : selected_tags) {
+            if (t.title.toLowerCase().equals(term.toLowerCase())) {
+                tag_already_exists = true;
+            }
+        }
+
+        if (personId >= 0 && !tag_already_exists) {
             HashMap<String, String> values = new HashMap<String, String>();
             values.put("label", "Create new tag: " + term);
             values.put("id", "-1");
