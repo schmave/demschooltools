@@ -61,7 +61,7 @@ body {
     padding: 2px 15px;
 }
 
-.red { color: red; }
+.red { background-color: red; }
 
 @media (min-width: 768px) {
     .col-sm-height {

@@ -67,6 +67,15 @@ angular.module('app').controller("MainController", function($scope, $http){
         $scope.swipedWorked = false;
         $scope.screen = "student";
     };
+
+    $scope.styleStudentCalendarDay = function(date, mode){
+        if (mode ==="day") {
+            var dayToCheck = new Date(date).setHours(0,0,0,0);
+            if (dayToCheck === $scope.currentDay) {
+                return "red";
+            }
+        }
+    };
     $scope.showStudent = function(s) {
         $scope.screen = "loading";
         $scope.swipedWorked = false;
@@ -114,6 +123,7 @@ angular.module('app').controller("MainController", function($scope, $http){
         $scope.student = student;
         $scope.students[student._id] = student;
         $scope.current_day = student.days[0];
+        $scope.student_days = student.days
 
         if($scope.today !== student.today) {
             $scope.today = student.today;
@@ -175,9 +185,6 @@ angular.module('app').controller("MainController", function($scope, $http){
                     $scope.reloadStudentPage(data.student);
                 }). error(function(){});
         }
-    };
-    $scope.styleStudentCalendarDay = function(date, mode){
-        return "red";
     };
     $scope.toggleHours = function(student) {
         if(confirm(student.olderdate ? "Mark student younger?":"Mark student as older starting today?")){
