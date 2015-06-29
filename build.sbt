@@ -14,6 +14,10 @@ scalaVersion := "2.11.6"
 
 // javacOptions in Compile ++= Seq("-Xlint:unchecked", "-Xlint:deprecation")
 
+pipelineStages := Seq(rjs, digest, gzip)
+
+resolvers += Resolver.sonatypeRepo("snapshots")
+
 libraryDependencies ++= Seq(
   javaJdbc,
   evolutions,
@@ -25,6 +29,4 @@ libraryDependencies ++= Seq(
   "org.xhtmlrenderer" % "flying-saucer-pdf" % "9.0.7",
   "com.googlecode.usc" % "jdbcdslog" % "1.0.6.2"
 )
-
-resolvers += Resolver.sonatypeRepo("snapshots")
 

@@ -1,6 +1,6 @@
 // These events should capture all possible ways to change the text
 // in a textfield.
-TEXT_AREA_EVENTS = "change keyup paste cut"
+TEXT_AREA_EVENTS = "change keyup paste cut";
 
 $(document).ready(function () {
     $( "#same_family_name" ).autocomplete({
@@ -101,8 +101,8 @@ function enableNoPersonTagBox(input_box, destination_div, limit_one) {
             if (limit_one) {
                 $(input_box).show();
             }
-        }
-    }
+        };
+    };
 
     $(input_box).bind( "autocompleteselect", function(event, ui) {
         var new_tag_html =

@@ -1,5 +1,5 @@
 function insertIntoSortedList(charge, list, parent_el) {
-    if (list.length == 0) {
+    if (list.length === 0) {
         parent_el.append(charge.el);
         list.push(charge);
         return;
@@ -44,7 +44,7 @@ function checkboxChanged(charge) {
         .done(function(data) {
             // We expect an empty response. If it is not empty, the user
             // probably got redirected to the login page.
-            if (data != "") {
+            if (data !== "") {
                 if (!login_message_shown) {
                     alert("Your change was not saved. You may not be logged in.");
                 }
@@ -82,7 +82,7 @@ function Charge(data, el) {
     this.removeCharge = function() {
         self.el.remove();
         $.post("/removeCharge?id=" + self.id);
-    }
+    };
 
     self.id = data.id;
     self.el = el;
@@ -92,12 +92,12 @@ function Charge(data, el) {
     self.checkbox.prop("checked", data.rp_complete);
 
     self.checkbox.change(function() {
-        checkboxChanged(self)
+        checkboxChanged(self);
     });
 }
 
 function loadInitialData() {
-    for (i in app.initial_data.active_rps) {
+    for (var i in app.initial_data.active_rps) {
         insertIntoSortedList(
             addCharge(app.initial_data.active_rps[i], $(".active-rps")),
             app.active_rps,

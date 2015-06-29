@@ -1,4 +1,4 @@
-SAVE_TIMEOUT = 2000
+SAVE_TIMEOUT = 2000;
 
 function showSomethingInSidebar(url) {
     $("#sidebar").html("<h2>Loading...</h2>");
@@ -19,7 +19,7 @@ function showSomethingInSidebar(url) {
 }
 
 function showPersonHistoryInSidebar(person) {
-    showSomethingInSidebar("/personHistory/" + person.id)
+    showSomethingInSidebar("/personHistory/" + person.id);
 }
 
 function showRuleHistoryInSidebar(rule_id) {
@@ -38,7 +38,7 @@ function Person(id, name) {
 
     this.render = function() {
         return app.person_template({"name": name});
-    }
+    };
 
     // called by PeopleChooser after self.el has been
     // initialized.
@@ -48,7 +48,7 @@ function Person(id, name) {
                 showPersonHistoryInSidebar(self);
             }
         );
-    }
+    };
 }
 
 function PeopleChooser(el, on_add, on_remove) {
@@ -85,7 +85,7 @@ function PeopleChooser(el, on_add, on_remove) {
     this.addPerson = function(id, name) {
 
         // Don't add people who have already been added.
-        for (i in self.people) {
+        for (var i in self.people) {
             if (id == self.people[i].id) {
                 return;
             }
@@ -102,15 +102,15 @@ function PeopleChooser(el, on_add, on_remove) {
         p.el = self.el.find(".people").append(p.render()).children(":last-child");
         p.activateClick();
 
-        p.el.find("img").click(function() { self.removePerson(p) });
+        p.el.find("img").click(function() { self.removePerson(p); });
 
         return p;
-    }
+    };
 
     this.removePerson = function(person) {
         $(person.el).remove();
 
-        for (i in self.people) {
+        for (var i in self.people) {
             if (self.people[i] == person) {
                 self.people.splice(i, 1);
             }
@@ -124,18 +124,18 @@ function PeopleChooser(el, on_add, on_remove) {
         if (on_remove) {
             on_remove(person);
         }
-    }
+    };
 
     this.loadPeople = function(people) {
-        for (i in people) {
+        for (var i in people) {
             self.addPerson(people[i].id, people[i].name);
         }
-    }
+    };
 
     this.setOnePersonMode = function(one_person_mode) {
         self.one_person_mode = one_person_mode;
         return self;
-    }
+    };
 }
 
 function RuleChooser(el, on_change) {
@@ -170,10 +170,10 @@ function RuleChooser(el, on_change) {
             showRuleHistoryInSidebar(self.rule);
         });
 
-        self.rule_el.find("img").click(function() { self.unsetRule() });
+        self.rule_el.find("img").click(function() { self.unsetRule(); });
 
         selectNextInput(self.search_box);
-    }
+    };
 
     this.unsetRule = function() {
         $(self.rule_el).remove();
@@ -184,11 +184,11 @@ function RuleChooser(el, on_change) {
         self.search_box.show();
 
         if (on_change) { on_change(); }
-    }
+    };
 
     this.loadData = function(json) {
         self.setRule(json.id, json.title);
-    }
+    };
 }
 
 function Charge(charge_id, el) {
@@ -199,7 +199,7 @@ function Charge(charge_id, el) {
         "moderate" : "Moderate",
         "serious": "Serious",
         "severe": "Severe"
-    }
+    };
 
     this.checkReferralLabelHighlight = function() {
         if (el.find(".minor-referral-destination").val()) {
@@ -207,7 +207,7 @@ function Charge(charge_id, el) {
         } else {
             el.find(".minor-referral-label").removeClass("highlight");
         }
-    }
+    };
 
     this.loadData = function(json) {
         el.find(".resolution_plan").val(json.resolution_plan);
@@ -234,7 +234,7 @@ function Charge(charge_id, el) {
             el.find(".refer-to-sm").prop("checked", true);
         }
 
-        for (key in SEVERITIES) {
+        for (var key in SEVERITIES) {
             if (json.severity == SEVERITIES[key]) {
                 el.find(".severity-" + key).prop("checked", true);
             }
@@ -242,7 +242,7 @@ function Charge(charge_id, el) {
 
         el.find(".minor-referral-destination").val(json.minor_referral_destination);
         self.checkReferralLabelHighlight();
-    }
+    };
 
     this.saveIfNeeded = function() {
         window.setTimeout(self.saveIfNeeded, 5000);
@@ -258,7 +258,7 @@ function Charge(charge_id, el) {
 
         url += "&resolution_plan=" + encodeURIComponent(el.find(".resolution_plan").val());
 
-        for (key in SEVERITIES) {
+        for (var key in SEVERITIES) {
             if (el.find(".severity-" + key).prop("checked")) {
                 url += "&severity=" + SEVERITIES[key];
             }
@@ -295,7 +295,7 @@ function Charge(charge_id, el) {
         $.post(url, function(data) {
             self.is_modified = false;
         });
-    }
+    };
 
     this.removeCharge = function() {
         self.el.remove();
@@ -304,11 +304,11 @@ function Charge(charge_id, el) {
 		// this charge has been removed.
 		self.is_modified = false;
 		// TODO: remove from Case.charges list
-    }
+    };
 
     this.markAsModified = function() {
         self.is_modified = true;
-        if ((self.people_chooser.people.length == 0) ||
+        if ((self.people_chooser.people.length === 0) ||
             !self.rule_chooser.rule) {
             el.find(".last-rp").html("");
         }
@@ -324,7 +324,7 @@ function Charge(charge_id, el) {
         }
 
         self.checkReferralLabelHighlight();
-    }
+    };
 
     this.old_rp = null;
     this.checkText = function() {
@@ -332,13 +332,13 @@ function Charge(charge_id, el) {
             self.markAsModified();
             self.old_rp = el.find(".resolution_plan").val();
         }
-    }
+    };
 
     self.el = el;
     self.is_modified = false;
     window.setTimeout(self.saveIfNeeded, 5000);
 
-    self.remove_button = el.find("button")
+    self.remove_button = el.find("button");
     self.remove_button.click(self.removeCharge);
 
     el.find(".resolution_plan").change(self.markAsModified);
@@ -365,7 +365,7 @@ function Charge(charge_id, el) {
 
     // el.mouseleave(function() { self.remove_button.hide(); } );
     // el.mouseenter(function() { self.remove_button.show(); } );
-    for (key in SEVERITIES) {
+    for (var key in SEVERITIES) {
         el.find(".severity-" + key).change(self.markAsModified);
     }
     el.find(".severity[type=radio]").prop("name", "severity-" + charge_id);
@@ -391,20 +391,20 @@ function Case (id, el) {
         $.post(url, function(data) {
             self.is_modified = false;
         });
-    }
+    };
 
     this.markAsModified = function() {
         self.is_modified = true;
-    }
+    };
 
     this.loadData = function(data) {
         el.find(".location").val(data.location);
         el.find(".date").val(data.date);
         el.find(".time").val(data.time);
         el.find(".findings").val(data.findings);
-        el.find("input.continued").prop("checked", data.date_closed == null);
+        el.find("input.continued").prop("checked", data.date_closed === null);
 
-        for (i in data.people_at_case) {
+        for (var i in data.people_at_case) {
             pac = data.people_at_case[i];
             if (pac.role == app.ROLE_TESTIFIER) {
                 self.testifier_chooser.addPerson(
@@ -422,15 +422,15 @@ function Case (id, el) {
             new_charge = self.addChargeNoServer(ch.id);
             new_charge.loadData(ch);
         }
-    }
+    };
 
     this.addCharge = function() {
         $('body').animate({'scrollTop': $('body').scrollTop() + 100}, 'slow');
         $.post("/addCharge?case_id=" + id,
                function(data, textStatus, jqXHR) {
-            self.addChargeNoServer(parseInt(data))
+            self.addChargeNoServer(parseInt(data));
         } );
-    }
+    };
 
     this.addChargeNoServer = function(charge_id) {
         var new_charge_el = self.el.find(".charges").append(
@@ -438,7 +438,7 @@ function Case (id, el) {
         var new_charge = new Charge(charge_id, new_charge_el);
         self.charges.push(new_charge);
         return new_charge;
-    }
+    };
 
     self.old_findings = null;
 
@@ -447,7 +447,7 @@ function Case (id, el) {
             self.markAsModified();
             self.old_findings = el.find(".findings").val();
         }
-    }
+    };
 
     this.id = id;
     this.el = el;
@@ -493,22 +493,22 @@ function Case (id, el) {
 }
 
 function addPersonAtMeeting(person, role) {
-    $.post("/addPersonAtMeeting?meeting_id=" + app.meeting_id
-           + "&person_id=" + person.id +
+    $.post("/addPersonAtMeeting?meeting_id=" + app.meeting_id +
+           "&person_id=" + person.id +
            "&role=" + role );
 }
 
 function removePersonAtMeeting(person, role) {
-    $.post("/removePersonAtMeeting?meeting_id=" + app.meeting_id
-           + "&person_id=" + person.id +
+    $.post("/removePersonAtMeeting?meeting_id=" + app.meeting_id +
+           "&person_id=" + person.id +
            "&role=" + role );
 }
 
 function makePeopleChooser(selector, role) {
     return new PeopleChooser(
         $(selector),
-        function(person) { addPersonAtMeeting(person, role) },
-        function(person) { removePersonAtMeeting(person, role) });
+        function(person) { addPersonAtMeeting(person, role); },
+        function(person) { removePersonAtMeeting(person, role); });
 }
 
 function loadInitialData() {
@@ -517,7 +517,7 @@ function loadInitialData() {
     app.notetaker_chooser.loadPeople(app.initial_data.notetaker);
     app.sub_chooser.loadPeople(app.initial_data.sub);
 
-    for (i in app.initial_data.cases) {
+    for (var i in app.initial_data.cases) {
         data = app.initial_data.cases[i];
         new_case = addCaseNoServer(data.id, data.case_number);
         new_case.loadData(data);
@@ -527,13 +527,13 @@ function loadInitialData() {
 function checkDirties() {
     var num_dirty = 0;
 
-    for (i in app.cases) {
-        var c = app.cases[i]
+    for (var i in app.cases) {
+        var c = app.cases[i];
         if (c.is_modified) {
             num_dirty++;
         }
-        for (j in c.charges) {
-            var ch = c.charges[j]
+        for (var j in c.charges) {
+            var ch = c.charges[j];
             if (ch.is_modified) {
                 num_dirty++;
             }
@@ -556,8 +556,8 @@ function continueCase(event) {
     var splits = id.split("-");
     var case_id = splits[splits.length-1];
 
-    $.post("/continueCase?meeting_id=" + app.meeting_id
-             + "&case_id=" + case_id, "",
+    $.post("/continueCase?meeting_id=" + app.meeting_id +
+           "&case_id=" + case_id, "",
            function(data, textStatus, jqXHR) {
         var case_data = $.parseJSON(data);
         var new_case = addCaseNoServer(case_data.id, case_data.case_number);
@@ -604,13 +604,13 @@ $(function () {
 
     window.onbeforeunload = function(e) {
         var dirty = false;
-        for (i in app.cases) {
-            var c = app.cases[i]
+        for (var i in app.cases) {
+            var c = app.cases[i];
             if (c.is_modified) {
                 dirty = true;
             }
-            for (j in c.charges) {
-                var ch = c.charges[j]
+            for (var j in c.charges) {
+                var ch = c.charges[j];
                 if (ch.is_modified) {
                     dirty = true;
                 }
@@ -618,10 +618,10 @@ $(function () {
         }
 
         if (dirty) {
-            return "UNsaved changes! Please give me a few more seconds..."
+            return "UNsaved changes! Please give me a few more seconds...";
         }
         return null;
-    }
+    };
 
     checkDirties();
 });
