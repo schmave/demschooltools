@@ -394,8 +394,6 @@ public class Application extends Controller {
 
         String names[] = new String[] {
             "main.css",
-            "print.css",
-            "bootstrap.min.css"
         };
 
         for (String name : names) {

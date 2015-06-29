@@ -4,8 +4,6 @@
 
 @main("Edit " + OrgConfig.get().str_res_plans + " list", "jc", "rps") {
 
-<script src="@routes.Assets.at("javascripts/edit_rp_list.js")" type="text/javascript"></script>
-
 <script type="text/javascript">
 app = {};
 app.active_rps = [];
@@ -25,9 +23,11 @@ app.initial_data = {
 }
 
 config = @Html(OrgConfig.get().toJson());
+
+requirejs(['utils', 'edit_rp_list'], function() {});
 </script>
 
-<p><a href="javascript:print()" class="btn btn-success no-print">
+<p><a href="javascript:print()" class="no-print btn btn-success">
 Print active @OrgConfig.get().str_res_plans</a></p>
 <h2>Active @OrgConfig.get().str_res_plans</h2>
 <table class="table active-rps printable-res-plans">

@@ -13,12 +13,6 @@
 
 </p>
 </form>
-<script type="text/javascript">
-	$(".date").datepicker({
-		showOtherMonths: true,
-		selectOtherMonths: true,
-        dateFormat: 'yy-mm-dd'});
-</script>
 
 @for( i <- 0 to changes.size() - 1) {
 @if( i == 0 || (changes.get(i).entry != changes.get(i-1).entry)) {

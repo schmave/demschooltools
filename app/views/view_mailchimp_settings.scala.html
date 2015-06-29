@@ -70,7 +70,9 @@ When people are <select name="sync_type">
 </script>
 
 <script type="text/javascript">
-enableNoPersonTagBox("#tag-entry", "#tags-entered", false)
+requirejs(['utils'], function(utils) {
+    utils.enableNoPersonTagBox("#tag-entry", "#tags-entered", false);
+});
 </script>
 }
 

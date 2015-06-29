@@ -71,12 +71,20 @@
 			<label style="display:inline; padding-left: 25px"><input type="checkbox" name="send_email">Email note to staff@@trvs</label>
 			</div>
 			<script type="text/javascript">
-				$("#comment_form").ajaxForm({"complete" : function(response, status) {
-												 $("#comments").prepend(response.responseText);
-												 $("#new_comment textarea").val("");
-												 $("#new_comment").hide();
-												 $("#add_comment_p").show();
-												 }});
+                requirejs(['utils'], function() {
+                    $("#comment_form").ajaxForm({"complete" : function(response, status) {
+                                                     $("#comments").prepend(response.responseText);
+                                                     $("#new_comment textarea").val("");
+                                                     $("#new_comment").hide();
+                                                     $("#add_comment_p").show();
+                                                     }});
+                    $("#donation_form").ajaxForm({"complete" : function(response, status) {
+                                                     $("#donations").prepend("<tr>" + response.responseText + "</tr>");
+                                                     $("#new_donation textarea").val("");
+                                                     $("#new_donation").hide();
+                                                     $('#add_donation_p').show()
+                                                     }});
+                });
 			</script>
 		}
 		</div>
@@ -108,14 +116,6 @@
 			<br><label><input type="checkbox" name="needs_indiegogo_reward"> Needs Indiegogo reward</label>
 			<br><input type="submit" value="Save">
 			</div>
-			<script type="text/javascript">
-				$("#donation_form").ajaxForm({"complete" : function(response, status) {
-												 $("#donations").prepend("<tr>" + response.responseText + "</tr>");
-												 $("#new_donation textarea").val("");
-												 $("#new_donation").hide();
-                                                 $('#add_donation_p').show()
-												 }});
-			</script>
 		}
 
 	<table class="table" width="600px" id="donations">

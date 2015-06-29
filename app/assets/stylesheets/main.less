@@ -1,3 +1,12 @@
+/* Import bootstrap and jquery-ui first so that their rules
+   are overriden by what comes next. */
+@import (inline) "bootstrap.css";
+@import (inline) "jquery-ui.css";
+
+@media print {
+  @import (inline) "print.css";
+}
+
 @media screen {
   #footer {
     display: none;
