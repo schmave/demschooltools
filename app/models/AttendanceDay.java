@@ -73,4 +73,8 @@ public class AttendanceDay extends Model {
 
         this.update();
     }
+
+    public double getHours() {
+        return (end_time.getTime() - start_time.getTime()) / (1000.0 * 60 * 60);
+    }
 }

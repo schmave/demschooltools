@@ -25,7 +25,7 @@ public class AttendanceWeek extends Model {
     @JoinColumn(name="person_id")
     public Person person;
 
-    public int extra_hours = 0;
+    public double extra_hours = 0;
 
     public static Finder<Integer, AttendanceWeek> find = new Finder<>(
         Integer.class, AttendanceWeek.class

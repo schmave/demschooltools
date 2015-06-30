@@ -1,6 +1,8 @@
 package controllers;
 
 import java.io.*;
+import java.sql.Time;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import com.avaje.ebean.Ebean;
@@ -23,10 +25,44 @@ import play.mvc.Http.Context;
 @With(DumpOnError.class)
 public class Attendance extends Controller {
 
+    public static final String CACHE_INDEX = "Attendance-index-";
+
     static Form<AttendanceCode> code_form = Form.form(AttendanceCode.class);
 
+    // @OrgCached(CACHE_INDEX)
     public static Result index() {
-        return ok(views.html.attendance_index.render());
+        Map<Person, AttendanceStats> person_to_stats =
+            new HashMap<Person, AttendanceStats>();
+
+        Map<String, AttendanceCode> codes_map = getCodesMap();
+
+        List<AttendanceDay> days =
+            AttendanceDay.find.where()
+                .eq("person.organization", OrgConfig.get().org)
+                .ge("day", Application.getStartOfYear())
+                .findList();
+
+        for (AttendanceDay day : days) {
+            if (!person_to_stats.containsKey(day.person)) {
+                person_to_stats.put(day.person, new AttendanceStats());
+            }
+
+            AttendanceStats stats = person_to_stats.get(day.person);
+            if (day.code != null || day.start_time == null || day.end_time == null) {
+                stats.incrementCodeCount(codes_map.get(day.code));
+            } else {
+                stats.total_hours += day.getHours();
+                stats.days_present++;
+            }
+        }
+
+        List<Person> all_people = new ArrayList<Person>(person_to_stats.keySet());
+        Collections.sort(all_people, Person.SORT_DISPLAY_NAME);
+
+        List<String> all_codes = new ArrayList<String>(codes_map.keySet());
+
+        return ok(views.html.attendance_index.render(
+            all_people, person_to_stats, all_codes, codes_map));
     }
 
     public static Result viewWeek(String date) {
@@ -53,6 +89,7 @@ public class Attendance extends Controller {
                 : new ArrayList<AttendanceDay>();
 
             list.add(day);
+            person_to_days.put(day.person, list);
         }
 
         List<AttendanceWeek> weeks =
@@ -61,21 +98,44 @@ public class Attendance extends Controller {
                 .eq("monday", start_date.getTime())
                 .findList();
 
-        Map<Person, List<AttendanceWeek>> person_to_weeks =
-            new HashMap<Person, List<AttendanceWeek>>();
+        Map<Person, AttendanceWeek> person_to_week =
+            new HashMap<Person, AttendanceWeek>();
 
         for (AttendanceWeek week : weeks) {
-            List<AttendanceWeek> list = person_to_weeks.containsKey(week.person)
-                ? person_to_weeks.get(week.person)
-                : new ArrayList<AttendanceWeek>();
-
-            list.add(week);
+            person_to_week.put(week.person, week);
         }
 
+        List<Person> all_people = new ArrayList<Person>();
+        for (Person p : person_to_days.keySet()) {
+            if (!all_people.contains(p)) {
+                all_people.add(p);
+            }
+        }
+        for (Person p : person_to_week.keySet()) {
+            if (!all_people.contains(p)) {
+                all_people.add(p);
+            }
+        }
+        Collections.sort(all_people, Person.SORT_DISPLAY_NAME);
+
+        Map<String, AttendanceCode> codes = getCodesMap();
+
         return ok(views.html.attendance_week.render(
-            AttendanceCode.all(OrgConfig.get().org),
+            start_date.getTime(),
+            codes,
+            all_people,
             person_to_days,
-            person_to_weeks));
+            person_to_week));
+    }
+
+    public static Map<String, AttendanceCode> getCodesMap() {
+        Map<String, AttendanceCode> codes = new HashMap<String, AttendanceCode>();
+
+        for (AttendanceCode code : AttendanceCode.all(OrgConfig.get().org)) {
+            codes.put(code.code, code);
+        }
+
+        return codes;
     }
 
     public static Result viewCodes() {
@@ -105,5 +165,48 @@ public class Attendance extends Controller {
         ac.edit(filled_form);
 
         return redirect(routes.Attendance.viewCodes());
+    }
+
+    public static String formatTime(Time t) {
+        if (t != null) {
+            return new SimpleDateFormat("h:mm a").format(t);
+        } else {
+            return "---";
+        }
+    }
+
+    public static int getDaysPresent(List<AttendanceDay> days) {
+        int result = 0;
+        for (AttendanceDay day : days) {
+            if (day.code == null && day.start_time != null && day.end_time != null) {
+                result++;
+            }
+        }
+
+        return result;
+    }
+
+    public static double getTotalHours(List<AttendanceDay> days, AttendanceWeek week) {
+        double result = 0;
+        for (AttendanceDay day : days) {
+            if (day.code == null && day.start_time != null && day.end_time != null) {
+                result += day.getHours();
+            }
+        }
+
+        if (week != null) {
+            result += week.extra_hours;
+        }
+
+        return result;
+    }
+
+    public static double getAverageHours(List<AttendanceDay> days, AttendanceWeek week) {
+        int daysPresent = getDaysPresent(days);
+        if (daysPresent == 0) {
+            return 0;
+        }
+
+        return getTotalHours(days, week) / (double)daysPresent;
     }
 }
