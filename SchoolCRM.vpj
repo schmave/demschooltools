@@ -57,6 +57,54 @@
 				Recurse="1"
 				Refilter="0"
 				Excludes=""/>
+			<F N="app/controllers/Application.java"/>
+			<F N="app/controllers/ApplicationEditing.java"/>
+			<F N="test/ApplicationTest.java"/>
+			<F N="app/controllers/Attendance.java"/>
+			<F N="app/models/AttendanceCode.java"/>
+			<F N="app/models/AttendanceDay.java"/>
+			<F N="app/models/AttendanceWeek.java"/>
+			<F N="app/models/Case.java"/>
+			<F N="app/models/CaseMeeting.java"/>
+			<F N="app/models/Chapter.java"/>
+			<F N="app/models/Charge.java"/>
+			<F N="app/models/Comment.java"/>
+			<F N="app/models/CompletedTask.java"/>
+			<F N="app/controllers/CRM.java"/>
+			<F N="app/models/Donation.java"/>
+			<F N="app/controllers/DumpOnError.java"/>
+			<F N="app/controllers/EditorSecured.java"/>
+			<F N="app/models/Email.java"/>
+			<F N="app/models/Entry.java"/>
+			<F N="app/Global.java"/>
+			<F N="test/IntegrationTest.java"/>
+			<F N="app/models/LinkedAccount.java"/>
+			<F N="app/models/MailchimpSync.java"/>
+			<F N="app/models/MailChimpSyncInfo.java"/>
+			<F N="app/models/ManualChange.java"/>
+			<F N="app/models/Meeting.java"/>
+			<F N="app/service/MyUserServicePlugin.java"/>
+			<F N="app/models/OddOrEven.java"/>
+			<F N="app/models/Organization.java"/>
+			<F N="app/models/OrgConfig.java"/>
+			<F N="app/models/Person.java"/>
+			<F N="app/models/PersonAtCase.java"/>
+			<F N="app/models/PersonAtMeeting.java"/>
+			<F N="app/models/PersonChange.java"/>
+			<F N="app/models/PersonHistory.java"/>
+			<F N="app/models/PersonTag.java"/>
+			<F N="app/models/PersonTagChange.java"/>
+			<F N="app/models/PhoneNumber.java"/>
+			<F N="app/controllers/Public.java"/>
+			<F N="app/models/RuleHistory.java"/>
+			<F N="app/models/Section.java"/>
+			<F N="app/controllers/Secured.java"/>
+			<F N="app/models/Tag.java"/>
+			<F N="app/models/Task.java"/>
+			<F N="app/models/TaskList.java"/>
+			<F N="app/models/User.java"/>
+			<F N="app/controllers/Utils.java"/>
+			<F N="app/models/WeeklyStats.java"/>
 		</Folder>
 		<Folder
 			Name="Header Files"
@@ -76,6 +124,7 @@
 			<F N="/play-2.1.1/repository/local/org.avaje.ebeanorm/avaje-ebeanorm/3.1.2/jars/avaje-ebeanorm.jar"/>
 			<F N="/play-2.1.1/repository/cache/com.feth/play-authenticate_2.10/jars/play-authenticate_2.10-0.2.5-SNAPSHOT.jar"/>
 			<F N="/play-2.1.1/repository/cache/com.feth/play-easymail_2.10/jars/play-easymail_2.10-0.2-SNAPSHOT.jar"/>
+			<F N="/Documents and Settings/Evan Mallory/.ivy2/cache/com.typesafe.play/play_2.11/jars/play_2.11-2.4.1.jar"/>
 		</Folder>
 	</Files>
 </Project>
