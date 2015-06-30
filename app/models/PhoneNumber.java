@@ -17,7 +17,7 @@ public class PhoneNumber extends Model {
     public String number;
     public String comment;
 
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name="person_id")
     public Person owner;
 
