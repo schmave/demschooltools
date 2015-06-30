@@ -20,16 +20,16 @@
 <div class="tabbable">
 			<ul class="dst-nav nav nav-tabs navbar-default no-print">
 			<li @if(menu.equals("crm")) { class="active" }>
-				<a href="#people" data-toggle="tab">People</a>
+				<a href="@routes.CRM.recentComments()">People</a>
 			</li>
 			<li @if(menu.equals("attendance")) { class="active" }>
-				<a href="#attendance" data-toggle="tab">Attendance</a>
+				<a href="@routes.Attendance.index()">Attendance</a>
 			</li>
 			<li @if(menu.equals("jc")) { class="active" }>
-				<a href="#jc" data-toggle="tab">JC</a>
+				<a href="@routes.Application.index()">JC</a>
 			</li>
 			<li @if(menu.equals("manual")) { class="active" }>
-				<a href="#manual" data-toggle="tab">@OrgConfig.get().str_manual_title_short</a>
+				<a href="@routes.Application.viewManual()">@OrgConfig.get().str_manual_title_short</a>
 			</li>
 			<li @if(menu.equals("settings")) { class="active" } class="dropdown">
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
