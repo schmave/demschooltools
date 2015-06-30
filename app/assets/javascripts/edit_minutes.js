@@ -603,6 +603,7 @@ requirejs(['utils'], function(utils) {
         loadInitialData();
 
         $(".continue-cases li").click(continueCase);
+        $("button.add-case").click(addCase);
 
         window.onbeforeunload = function(e) {
             var dirty = false;
