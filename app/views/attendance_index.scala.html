@@ -6,42 +6,43 @@
 @main("Attendance", "attendance", "attendance_home") {
 
 
-<p>View/Edit attendance for week of: <input class="date" type="textfield"></input></p>
+<p>View/Edit attendance for week of: <input class="date" type="textfield"></input>
 
-<p><a href="">Download this year's attendance data</a></p>
+<a style="padding-left: 200px;" href="">Download this year's attendance data</a></p>
 
 
 <h3>Attendance Summary</h3>
-<table class="table sortable">
-<thead><th>Name</th>
+<p>Click on a column title to sort by that column.
+<table class="attendance-view table sortable">
+<thead><th width=200>Name</th>
 	@for( code <- codes ) {
-		<th class="attendance-code" style="background-color:@codes_map.get(code).color">
+		<th width=100 class="attendance-code" style="background-color:@codes_map.get(code).color">
 		@codes_map.get(code).description
 		</th>
 	}
-	<th class="attendance-code">Unknown/missing code</th>
-	<th>Days Present</th>
-	<th>Total hours</th>
-	<th>Average hours per day present</th>
+	<th width=100 class="attendance-code">Unknown/missing code</th>
+	<th width=100>Days Present</th>
+	<th width=100>Total hours</th>
+	<th width=100>Avg. hours per day</th>
 	</thead>
 
 @for( p <- people ) {
 <tr><td>@p.first_name @p.last_name</td>
 	@for( code <- codes ) {
-		<td>@if( person_to_stats.get(p).absence_counts.containsKey(codes_map.get(code)) ) {
-			@person_to_stats.get(p).absence_counts.get(codes_map.get(code))
+		@if( person_to_stats.get(p).absence_counts.containsKey(codes_map.get(code)) ) {
+			<td>@person_to_stats.get(p).absence_counts.get(codes_map.get(code))</td>
 		} else {
-			0
-		}</td>
+			<td class="empty">0</td>
+		}
 	}
-	<td>@if( person_to_stats.get(p).absence_counts.containsKey(null) ) {
-		@person_to_stats.get(p).absence_counts.get(null)
+	@if( person_to_stats.get(p).absence_counts.containsKey(null) ) {
+		<td>@person_to_stats.get(p).absence_counts.get(null)</td>
 	} else {
-		0
-	}</td>
+		<td class="empty">0</td>
+	}
 	<td>@person_to_stats.get(p).days_present</td>
-	<td>@person_to_stats.get(p).total_hours</td>
-	<td>@(person_to_stats.get(p).total_hours / person_to_stats.get(p).days_present)</td>
+	<td>@Attendance.format(person_to_stats.get(p).total_hours)</td>
+	<td>@Attendance.format(person_to_stats.get(p).total_hours / person_to_stats.get(p).days_present)</td>
 }
 
 </table>

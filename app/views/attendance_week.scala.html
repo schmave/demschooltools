@@ -14,15 +14,15 @@
 </p>
 
 <table class="attendance-view table">
-<tr><th>Name</th><th colspan=2>Monday</th>
+<tr><th width=200>Name</th><th colspan=2>Monday</th>
 	<th colspan=2>Tuesday</th>
 	<th colspan=2>Wednesday</th>
 	<th colspan=2>Thursday</th>
 	<th colspan=2>Friday</th>
-	<th>Extra hours</th>
-	<th>Days Present</th>
-	<th>Total hours</th>
-	<th>Average hours per day</th>
+	<th width=20>Extra hours</th>
+	<th width=20>Days Present</th>
+	<th width=20>Total hours</th>
+	<th width=20>Average hours per day</th>
 	</tr>
 
 @for( p <- people ) {
@@ -56,9 +56,9 @@
 		<td>0</td>
 	}
 
-	<td>@Attendance.getDaysPresent(days.get(p))</td>
-	<td>@Attendance.getTotalHours(days.get(p), weeks.get(p))</td>
-	<td>@Attendance.getAverageHours(days.get(p), weeks.get(p))</td>
+	<td>@Attendance.format(Attendance.getDaysPresent(days.get(p)))</td>
+	<td>@Attendance.format(Attendance.getTotalHours(days.get(p), weeks.get(p)))</td>
+	<td>@Attendance.format(Attendance.getAverageHours(days.get(p), weeks.get(p)))</td>
 	</tr>
 }
 </table>

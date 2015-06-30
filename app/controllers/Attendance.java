@@ -209,4 +209,8 @@ public class Attendance extends Controller {
 
         return getTotalHours(days, week) / (double)daysPresent;
     }
+
+    public static String format(double d) {
+        return String.format("%.1f", d);
+    }
 }
