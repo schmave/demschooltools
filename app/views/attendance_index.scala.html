@@ -6,10 +6,6 @@
 @main("Attendance", "attendance", "attendance_home") {
 
 
-<p>View/Edit attendance for week of: <input class="date" type="textfield"></input>
-
-<a style="padding-left: 200px;" href="">Download this year's attendance data</a></p>
-
 
 <h3>Attendance Summary</h3>
 <p>Click on a column title to sort by that column.
@@ -46,16 +42,5 @@
 }
 
 </table>
-
-
-<script type="text/javascript">
-requirejs(["utils"], function(utils) {
-    function dateSelected(str_date, datepicker) {
-		location.href = "@routes.Attendance.viewWeek()" + "?date=" + str_date;
-    }
-
-   	$("input.date").datepicker("option", "onSelect", dateSelected);
-});
-</script>
 
 }

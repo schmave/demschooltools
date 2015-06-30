@@ -8,7 +8,7 @@
 
 @main("Attendance data", "attendance") {
 
-<h3>Attendance data weekly report @Application.yymmddDate(monday)</h3>
+<h3>Attendance weekly report @Application.yymmddDate(monday)</h3>
 <p><a href="@routes.Attendance.viewWeek()?date=@Application.yymmddDate(Application.addWeek(monday, -1))">&lt;&lt; Prev week</a>
  @Application.yymmddDate(monday) <a href="@routes.Attendance.viewWeek()?date=@Application.yymmddDate(Application.addWeek(monday, 1))">Next week &gt;&gt;</a>
 </p>
