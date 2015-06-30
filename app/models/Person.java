@@ -296,7 +296,7 @@ public class Person extends Model implements Comparable<Person> {
     public boolean isStudent()
     {
         for (Tag t : tags) {
-            if (t.title.contains("Admit:")) {
+            if (t.title.contains("Admit:") || t.title.equals("Current Student")) {
                 return true;
             }
         }
