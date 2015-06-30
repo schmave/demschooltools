@@ -1,0 +1,19 @@
+@(codes : List[AttendanceCode], form : Form[AttendanceCode])
+
+@main("Attendance codes", "attendance", "attendance_codes") {
+
+<h3>Existing Attendance Codes</h3>
+
+<ul>
+@for( c <- codes ) {
+	<li style="font-weight: bold; color:@c.color;">@c.code&mdash;@c.description
+		<a class="edit_link" href="@routes.Attendance.editCode(c.id)">Edit</a></li>
+}
+</ul>
+
+<hr/>
+<h4>Create a new code</h4>
+@attendance_code_form(form, routes.Attendance.newCode, "Create")
+
+}
+

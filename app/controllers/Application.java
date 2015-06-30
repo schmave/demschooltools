@@ -614,23 +614,8 @@ public class Application extends Controller {
     }
 
     public static Result viewWeeklyReport(String date_string) {
-        Calendar start_date = new GregorianCalendar();
-
-        try {
-            Date parsed_date = new SimpleDateFormat("yyyy-M-d").parse(date_string);
-            if (parsed_date != null) {
-                start_date.setTime(parsed_date);
-            }
-        } catch (ParseException e) {
-            System.out.println("Failed to parse given date (" + date_string + "), using current");
-        }
-
-        int dow = start_date.get(Calendar.DAY_OF_WEEK);
-        if (dow >= Calendar.WEDNESDAY) {
-            start_date.add(GregorianCalendar.DATE, -(dow - Calendar.WEDNESDAY));
-        } else {
-            start_date.add(GregorianCalendar.DATE, Calendar.WEDNESDAY - dow - 7);
-        }
+        Calendar start_date = Utils.parseDateOrNow(date_string);
+        Utils.adjustToPreviousDay(start_date, Calendar.WEDNESDAY);
 
         Calendar end_date = (Calendar)start_date.clone();
         end_date.add(GregorianCalendar.DATE, 6);

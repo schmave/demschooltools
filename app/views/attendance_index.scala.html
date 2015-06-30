@@ -1,0 +1,24 @@
+@()
+
+@import helper._
+
+@main("Attendance", "attendance", "attendance_home") {
+
+
+<p>View/Edit attendance for date:<input class="date" type="textfield"></input></p>
+
+
+<p><a href="@routes.Application.downloadCharges()">Download this year's attendance data</a></p>
+
+
+<script type="text/javascript">
+requirejs(["utils"], function(utils) {
+    function dateSelected(str_date, datepicker) {
+		location.href = "@routes.Attendance.viewWeek()" + "?date=" + str_date;
+    }
+
+   	$("input.date").datepicker("option", "onSelect", dateSelected);
+});
+</script>
+
+}

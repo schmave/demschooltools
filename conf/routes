@@ -86,6 +86,13 @@ GET     /people/:id               controllers.CRM.person(id: Integer)
 POST    /people                   controllers.CRM.makeNewPerson()
 POST    /people/:id/delete        controllers.CRM.deletePerson(id: Integer)
 
+GET     /attendance		  controllers.Attendance.index()
+GET     /attendance/viewWeek	  controllers.Attendance.viewWeek(date : String ?= "")
+POST	/attendance/newCode        controllers.Attendance.newCode()
+GET	/attendance/editCode/:id   controllers.Attendance.editCode(id : Integer)
+POST	/attendance/saveCode      controllers.Attendance.saveCode()
+GET     /attendance/codes         controllers.Attendance.viewCodes()
+
 GET     /people/edit/:id          controllers.CRM.editPerson(id: Integer)
 POST    /people/edit              controllers.CRM.savePersonEdits()
 

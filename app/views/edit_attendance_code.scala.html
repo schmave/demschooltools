@@ -1,0 +1,11 @@
+@(form : Form[AttendanceCode])
+
+@main("Edit Attendance code", "attendance") {
+
+
+<h3>Edit Attendance Code</h3>
+
+@attendance_code_form(form, routes.Attendance.saveCode, "Save")
+
+}
+

@@ -22,6 +22,9 @@
 			<li @if(menu.equals("crm")) { class="active" }>
 				<a href="#people" data-toggle="tab">People</a>
 			</li>
+			<li @if(menu.equals("attendance")) { class="active" }>
+				<a href="#attendance" data-toggle="tab">Attendance</a>
+			</li>
 			<li @if(menu.equals("jc")) { class="active" }>
 				<a href="#jc" data-toggle="tab">JC</a>
 			</li>
@@ -107,6 +110,15 @@
 			   <input id="navbar_people_search" type="search" placeholder="Search people..."/>
 			<a/>
 			<a href="@routes.CRM.newPerson()">Add a person</a>
+			</div>
+		</div>
+
+		<div class="tab-pane @if(menu.equals("attendance")) { active }" id="attendance">
+			<div class="subnav">
+	  		<a @if(selectedBtn.equals("attendance_home")) { class="active" }
+				href="@routes.Attendance.index">Home</a>
+	  		<a @if(selectedBtn.equals("attendance_codes")) { class="active" }
+				href="@routes.Attendance.viewCodes">Codes</a>
 			</div>
 		</div>
 
