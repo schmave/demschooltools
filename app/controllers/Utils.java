@@ -28,7 +28,7 @@ public class Utils
         if (dow >= day_of_week) {
             date.add(GregorianCalendar.DATE, -(dow - day_of_week));
         } else {
-            date.add(GregorianCalendar.DATE, Calendar.WEDNESDAY - dow - 7);
+            date.add(GregorianCalendar.DATE, day_of_week - dow - 7);
         }
     }
 }
