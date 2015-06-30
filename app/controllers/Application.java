@@ -33,6 +33,9 @@ import play.mvc.Http.Context;
 @With(DumpOnError.class)
 public class Application extends Controller {
 
+    public static final String CACHE_INDEX = "Application-index-";
+    public static final String CACHE_MANUAL = "Application-viewManual-";
+
     public static Date getDateFromString(String date_string) {
         if (!date_string.equals("")) {
             try
@@ -86,6 +89,7 @@ public class Application extends Controller {
 		return people;
 	}
 
+    @OrgCached(key = CACHE_INDEX)
     public static Result index() {
         List<Meeting> meetings = Meeting.find
             .fetch("cases")
@@ -339,6 +343,7 @@ public class Application extends Controller {
         return ok("\ufeff" + new String(baos.toByteArray(), charset));
     }
 
+    @OrgCached(key = CACHE_MANUAL)
 	public static Result viewManual() {
 		return ok(views.html.view_manual.render(Chapter.all()));
 	}

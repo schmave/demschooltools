@@ -77,6 +77,7 @@ public class ApplicationEditing extends Controller {
     }
 
     public static Result saveCase(Integer id) {
+        OrgCachedAction.remove(Application.CACHE_INDEX);
         Case c = Case.findById(id);
 
         c.edit(request().queryString());
@@ -110,6 +111,7 @@ public class ApplicationEditing extends Controller {
 
     public static Result addPersonAtCase(Integer case_id, Integer person_id, Integer role)
     {
+        OrgCachedAction.remove(Application.CACHE_INDEX);
         PersonAtCase.create(Case.find.ref(case_id), Person.find.ref(person_id), role);
         return ok();
     }
@@ -135,6 +137,7 @@ public class ApplicationEditing extends Controller {
     }
 
     public static Result saveCharge(int id) {
+        OrgCachedAction.remove(Application.CACHE_INDEX);
         Charge c = Charge.findById(id);
 
         c.edit(request().queryString());
@@ -181,6 +184,7 @@ public class ApplicationEditing extends Controller {
     }
 
 	public static Result addChapter() {
+        OrgCachedAction.remove(Application.CACHE_MANUAL);
 		Form<Chapter> form = Form.form(Chapter.class);
 		return ok(views.html.edit_chapter.render(form, true));
 	}
@@ -191,6 +195,7 @@ public class ApplicationEditing extends Controller {
 	}
 
 	public static Result saveChapter() {
+        OrgCachedAction.remove(Application.CACHE_MANUAL);
 		Form<Chapter> form = new Form<Chapter>(Chapter.class).bindFromRequest();
 
 		Chapter c = null;
@@ -205,6 +210,7 @@ public class ApplicationEditing extends Controller {
 	}
 
 	public static Result addSection(Integer chapterId) {
+        OrgCachedAction.remove(Application.CACHE_MANUAL);
 		Form<Section> form = Form.form(Section.class);
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("chapter.id", "" + chapterId);
@@ -219,6 +225,7 @@ public class ApplicationEditing extends Controller {
 	}
 
 	public static Result saveSection() {
+        OrgCachedAction.remove(Application.CACHE_MANUAL);
 		Form<Section> form = new Form<Section>(Section.class).bindFromRequest();
 
 		Section s = null;
@@ -233,6 +240,7 @@ public class ApplicationEditing extends Controller {
 	}
 
 	public static Result addEntry(Integer sectionId) {
+        OrgCachedAction.remove(Application.CACHE_MANUAL);
 		Form<Entry> form = Form.form(Entry.class);
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("section.id", "" + sectionId);
@@ -247,6 +255,7 @@ public class ApplicationEditing extends Controller {
 	}
 
 	public static Result saveEntry() {
+        OrgCachedAction.remove(Application.CACHE_MANUAL);
 		Form<Entry> form = new Form<Entry>(Entry.class).bindFromRequest();
 
 		Entry e = null;

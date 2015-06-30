@@ -40,6 +40,9 @@ public class CRM extends Controller {
     static Form<Comment> commentForm = Form.form(Comment.class);
     static Form<Donation> donationForm = Form.form(Donation.class);
 
+    public static final String CACHE_RECENT_COMMENTS = "CRM-recentComments-";
+
+    @OrgCached(key = CACHE_RECENT_COMMENTS)
     public static Result recentComments() {
         List<Comment> recent_comments = Comment.find
             .fetch("person")
@@ -514,6 +517,7 @@ public class CRM extends Controller {
     }
 
     public static Result addComment() {
+        OrgCachedAction.remove(CACHE_RECENT_COMMENTS);
         Form<Comment> filledForm = commentForm.bindFromRequest();
         Comment new_comment = new Comment();
 
