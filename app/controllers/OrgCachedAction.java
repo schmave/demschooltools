@@ -18,7 +18,15 @@ public class OrgCachedAction extends Action<OrgCached> {
             F.Promise<Result> promise;
             if(result == null) {
                 promise = delegate.call(ctx);
-                promise.onRedeem(result1 -> Cache.set(key, result1, duration));
+                promise.onRedeem(new F.Callback<Result>() {
+                  @Override
+                  public void invoke(Result result1) throws Throwable {
+                      // Only cache successful responses -- no errors or redirects
+                      if (result1.status() == 200) {
+                          Cache.set(key, result1, duration);
+                      }
+                  }
+                });
             } else {
                 promise = F.Promise.pure(result);
             }
