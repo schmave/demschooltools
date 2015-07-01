@@ -68,14 +68,6 @@ angular.module('app').controller("MainController", function($scope, $http){
         $scope.screen = "student";
     };
 
-    $scope.styleStudentCalendarDay = function(date, mode){
-        if (mode ==="day") {
-            var dayToCheck = new Date(date).setHours(0,0,0,0);
-            if (dayToCheck === $scope.current_day) {
-                return "red";
-            }
-        }
-    };
     $scope.showStudent = function(s) {
         $scope.screen = "loading";
         $scope.swipedWorked = false;
@@ -123,10 +115,12 @@ angular.module('app').controller("MainController", function($scope, $http){
         $scope.student = student;
         $scope.students[student._id] = student;
         $scope.current_day = student.days[0];
+        // indexing the student days by JS date, for calendar lookup
         // $scope.student_days = [];
-        for (var i = 0, len = student.days.length; i < len; i++) {
-            student.days[i].day_date = new Date(student.days[i].day).setHours(0,0,0,0);
-        }
+        // for (var i = 0, len = student.days.length; i < len; i++) {
+        //     var thisdate = new Date(student.days[i].day).setHours(0,0,0,0);
+        //     $scope.student_days[thisdate] = student.days[i];
+        // }
 
         if($scope.today !== student.today) {
             $scope.today = student.today;

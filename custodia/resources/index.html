@@ -137,32 +137,24 @@
             <span ng-hide="student.absent_today">
               <button class="btn" id="absent-button" ng-click="toggleAbsent(student)">{{absent_button_text(student)}}</button>
             </span>
-
-          <div style="display:inline-block; min-height:290px;">
-            <datepicker ng-model="to_date"
-                        min-date="minDate"
-                        show-weeks="false"
-                        custom-class="styleStudentCalendarDay(date, mode)"
-                        class="well well-sm"></datepicker>
-          </div>
-            <!-- <ul ng-show="isAdmin"> -->
-            <!--   <li ng-repeat="swipe in student.days" style="text-left"> -->
-            <!--     <div> -->
-            <!--       <label> -->
-            <!--         <span ng-class="{validday: swipe.valid}" style="width:50px"  -->
-            <!--               ng-click="setDay(swipe)" -->
-            <!--               class="day" -->
-            <!--               ng-style="{'border':(swipe.day==current_day.day)?'1px solid black':''}"> -->
-            <!--           {{swipe.day}} - {{Math.round(swipe.total_mins)}} minutes  -->
-            <!--           <span ng-show="swipe.override"> - Overridden</span> -->
-            <!--           <a href="" class="override" ng-hide="(swipe.valid || swipe.excused) || !isAdmin" ng-click="override(student._id,swipe.day)"> Override</a> -->
-            <!--           <span ng-show="swipe.excused"> - Excused</span> -->
-            <!--           <a href="" ng-hide="(swipe.valid || swipe.excused) || !isAdmin" ng-click="excuse(student._id,swipe.day)"> Excuse</a> -->
-            <!--         </span> -->
-            <!--       </label> -->
-            <!--     </div> -->
-            <!--   </li> -->
-            <!-- </ul> -->
+            <ul ng-show="isAdmin">
+              <li ng-repeat="swipe in student.days" style="text-left">
+                <div>
+                  <label>
+                    <span ng-class="{validday: swipe.valid}" style="width:50px"
+                          ng-click="setDay(swipe)"
+                          class="day"
+                          ng-style="{'border':(swipe.day==current_day.day)?'1px solid black':''}">
+                      {{swipe.day}} - {{Math.round(swipe.total_mins)}} minutes
+                      <span ng-show="swipe.override"> - Overridden</span>
+                      <a href="" class="override" ng-hide="(swipe.valid || swipe.excused) || !isAdmin" ng-click="override(student._id,swipe.day)"> Override</a>
+                      <span ng-show="swipe.excused"> - Excused</span>
+                      <a href="" ng-hide="(swipe.valid || swipe.excused) || !isAdmin" ng-click="excuse(student._id,swipe.day)"> Excuse</a>
+                    </span>
+                  </label>
+                </div>
+              </li>
+            </ul>
           </div>
           <div class="col-md-6">
             <table class="table table-striped" ng-show="current_day">
