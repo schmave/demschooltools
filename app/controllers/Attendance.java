@@ -29,8 +29,14 @@ public class Attendance extends Controller {
 
     static Form<AttendanceCode> code_form = Form.form(AttendanceCode.class);
 
-    @OrgCached(key = CACHE_INDEX)
     public static Result index() {
+        return ok(views.html.cached_page.render(
+            new CachedPage(CACHE_INDEX,
+                "Attendance",
+                "attendance",
+                "attendance_home") {
+                @Override
+                String render() {
         Map<Person, AttendanceStats> person_to_stats =
             new HashMap<Person, AttendanceStats>();
 
@@ -63,8 +69,9 @@ public class Attendance extends Controller {
 
         List<String> all_codes = new ArrayList<String>(codes_map.keySet());
 
-        return ok(views.html.attendance_index.render(
-            all_people, person_to_stats, all_codes, codes_map));
+        return views.html.attendance_index.render(
+            all_people, person_to_stats, all_codes, codes_map).toString();
+                }}));
     }
 
     public static Result viewOrEditWeek(String date, boolean do_view) {
@@ -140,7 +147,7 @@ public class Attendance extends Controller {
     }
 
     public static Result createPersonWeek(int person_id, String monday) {
-        OrgCachedAction.remove(CACHE_INDEX);
+        CachedPage.remove(CACHE_INDEX);
 
         Calendar start_date = Utils.parseDateOrNow(monday);
         Calendar end_date = (Calendar)start_date.clone();
@@ -173,7 +180,7 @@ public class Attendance extends Controller {
     }
 
     public static Result deletePersonWeek(int person_id, String monday) {
-        OrgCachedAction.remove(CACHE_INDEX);
+        CachedPage.remove(CACHE_INDEX);
 
         Calendar start_date = Utils.parseDateOrNow(monday);
         Calendar end_date = (Calendar)start_date.clone();
@@ -212,7 +219,7 @@ public class Attendance extends Controller {
     }
 
     public static Result saveWeek(Integer week_id, Double extra_hours) {
-        OrgCachedAction.remove(CACHE_INDEX);
+        CachedPage.remove(CACHE_INDEX);
 
         AttendanceWeek.find.byId(week_id).edit(extra_hours);
         return ok();
@@ -220,7 +227,7 @@ public class Attendance extends Controller {
 
     public static Result saveDay(Integer day_id, String code,
         String start_time, String end_time) throws Exception {
-        OrgCachedAction.remove(CACHE_INDEX);
+        CachedPage.remove(CACHE_INDEX);
 
         AttendanceDay.find.byId(day_id).edit(code, start_time, end_time);
         return ok();

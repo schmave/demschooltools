@@ -89,8 +89,14 @@ public class Application extends Controller {
 		return people;
 	}
 
-    @OrgCached(key = CACHE_INDEX)
     public static Result index() {
+        return ok(views.html.cached_page.render(
+            new CachedPage(CACHE_INDEX,
+                "JC database",
+                "jc",
+                "jc_home") {
+                @Override
+                String render() {
         List<Meeting> meetings = Meeting.find
             .fetch("cases")
             .where().eq("organization", Organization.getByHost())
@@ -137,8 +143,9 @@ public class Application extends Controller {
 
         Collections.sort(entries_with_charges, Entry.SORT_NUMBER);
 
-        return ok(views.html.jc_index.render(meetings, sm_charges, people,
-            entries_with_charges));
+        return views.html.jc_index.render(meetings, sm_charges, people,
+            entries_with_charges).toString();
+                }}));
     }
 
     public static Result downloadCharges() throws IOException {
@@ -345,9 +352,17 @@ public class Application extends Controller {
         return ok("\ufeff" + new String(baos.toByteArray(), charset));
     }
 
-    @OrgCached(key = CACHE_MANUAL)
 	public static Result viewManual() {
-		return ok(views.html.view_manual.render(Chapter.all()));
+        return ok(views.html.cached_page.render(
+            new CachedPage(CACHE_MANUAL,
+                OrgConfig.get().str_manual_title,
+                "manual",
+                "toc") {
+                @Override
+                String render() {
+                    return views.html.view_manual.render(Chapter.all()).toString();
+                }
+            }));
 	}
 
     public static Result viewManualChanges(String begin_date_string) {

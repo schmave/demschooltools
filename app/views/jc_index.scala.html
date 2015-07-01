@@ -3,8 +3,6 @@ rules : List[ Entry ])
 
 @import helper._
 
-@main("JC database", "jc", "jc_home") {
-
 <script type="text/javascript">
 requirejs(["utils"], function(utils) {
     var meeting_info = [ @Html(
@@ -114,5 +112,3 @@ requirejs(["utils"], function(utils) {
 </div>
 
 <p><a href="@routes.Application.downloadCharges()">Download this year's charges</a></p>
-
-}

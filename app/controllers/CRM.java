@@ -42,16 +42,24 @@ public class CRM extends Controller {
 
     public static final String CACHE_RECENT_COMMENTS = "CRM-recentComments-";
 
-    @OrgCached(key = CACHE_RECENT_COMMENTS)
     public static Result recentComments() {
-        List<Comment> recent_comments = Comment.find
-            .fetch("person")
-            .fetch("completed_tasks", new FetchConfig().query())
-            .fetch("completed_tasks.task", new FetchConfig().query())
-            .where().eq("person.organization", Organization.getByHost())
-            .orderBy("created DESC").setMaxRows(20).findList();
+        return ok(views.html.cached_page.render(
+            new CachedPage(CACHE_RECENT_COMMENTS,
+                "All people",
+                "crm",
+                "recent_comments") {
+                @Override
+                String render() {
+                    List<Comment> recent_comments = Comment.find
+                        .fetch("person")
+                        .fetch("completed_tasks", new FetchConfig().query())
+                        .fetch("completed_tasks.task", new FetchConfig().query())
+                        .where().eq("person.organization", Organization.getByHost())
+                        .orderBy("created DESC").setMaxRows(20).findList();
 
-        return ok(views.html.people_index.render(recent_comments));
+                    return views.html.people_index.render(recent_comments).toString();
+                }
+            }));
     }
 
     public static Result person(Integer id) {
@@ -517,7 +525,7 @@ public class CRM extends Controller {
     }
 
     public static Result addComment() {
-        OrgCachedAction.remove(CACHE_RECENT_COMMENTS);
+        CachedPage.remove(CACHE_RECENT_COMMENTS);
         Form<Comment> filledForm = commentForm.bindFromRequest();
         Comment new_comment = new Comment();
 
