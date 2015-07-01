@@ -110,6 +110,9 @@ def processFile(datafile, start_date):
                     VALUES (%s, %s, %s, %s, %s)""",
                     (date, person_id, None, None, None))
 
+        cur.execute("""INSERT INTO attendance_week(monday, person_id, extra_hours)
+            VALUES (%s, %s, %s)""",
+            (start_date, person_id, 0))
 
 for arg in sys.argv[1:]:
     if len(sys.argv) == 2 and arg == "delete":
