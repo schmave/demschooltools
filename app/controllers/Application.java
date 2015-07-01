@@ -269,6 +269,7 @@ public class Application extends Controller {
                 .where()
                 .eq("person.organization", Organization.getByHost())
                 .ne("plea", "Not Guilty")
+                .ne("person", null)
                 .or(Expr.eq("referred_to_sm", false),
                     Expr.isNotNull("sm_decision"))
                 .eq("rp_complete", false)
@@ -285,6 +286,7 @@ public class Application extends Controller {
                 .where()
                 .eq("person.organization", Organization.getByHost())
                 .ne("plea", "Not Guilty")
+                .ne("person", null)
                 .or(Expr.eq("referred_to_sm", false),
                     Expr.isNotNull("sm_decision"))
                 .eq("rp_complete", true)
