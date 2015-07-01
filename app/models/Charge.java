@@ -124,19 +124,6 @@ public class Charge extends Model implements Comparable<Charge> {
         this.sm_decision_date = date;
     }
 
-    public String toJson() {
-        ObjectMapper m = new ObjectMapper();
-        m.setDateFormat(new SimpleDateFormat("yyyy-MM-dd"));
-        try
-        {
-            return m.writeValueAsString(this);
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-            return "";
-        }
-    }
-
     public void setRPComplete(boolean complete) {
         this.rp_complete = complete;
         if (complete) {

@@ -73,7 +73,7 @@ public class ApplicationEditing extends Controller {
         }
 
         c.continueInMeeting(m);
-        return ok(c.toJson());
+        return ok(Utils.toJson(c));
     }
 
     public static Result saveCase(Integer id) {

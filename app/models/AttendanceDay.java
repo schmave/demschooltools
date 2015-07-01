@@ -2,12 +2,14 @@ package models;
 
 import java.io.*;
 import java.sql.Time;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import javax.persistence.*;
 
 import com.avaje.ebean.Model;
 import com.avaje.ebean.Model.Finder;
+import com.fasterxml.jackson.annotation.*;
 
 import controllers.Application;
 
@@ -44,36 +46,29 @@ public class AttendanceDay extends Model {
         return result;
     }
 
-    public static Time parseTime(String time_string) {
-        if (time_string.equals("")) {
+    public static Time parseTime(String time_string) throws Exception {
+        if (time_string == null || time_string.equals("")) {
             return null;
         }
 
-        return Time.valueOf(time_string);
+        Date d = new SimpleDateFormat("h:mm a").parse(time_string);
+        return new Time(d.getTime());
     }
 
-    public void edit(Map<String, String[]> query_string) {
-        if (query_string.containsKey("code")) {
-            code = query_string.get("code")[0];
+    public void edit(String code, String start_time, String end_time) throws Exception {
+        if (code.equals("")) {
+            this.code = null;
         } else {
-            code = null;
+            this.code = code;
         }
 
-        if (query_string.containsKey("start_time")) {
-            start_time = parseTime(query_string.get("start_time")[0]);
-        } else {
-            start_time = null;
-        }
-
-        if (query_string.containsKey("end_time")) {
-            end_time = parseTime(query_string.get("end_time")[0]);
-        } else {
-            end_time = null;
-        }
+        this.start_time = parseTime(start_time);
+        this.end_time = parseTime(end_time);
 
         this.update();
     }
 
+    @JsonIgnore
     public double getHours() {
         return (end_time.getTime() - start_time.getTime()) / (1000.0 * 60 * 60);
     }

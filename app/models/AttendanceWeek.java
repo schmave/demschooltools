@@ -41,13 +41,8 @@ public class AttendanceWeek extends Model {
         return result;
     }
 
-    public void edit(Map<String, String[]> query_string) {
-        if (query_string.containsKey("extra_hours")) {
-            extra_hours = Integer.valueOf(query_string.get("extra_hours")[0]);
-        } else {
-            extra_hours = 0;
-        }
-
+    public void edit(double extra_hours) {
+        this.extra_hours = extra_hours;
         this.update();
     }
 }

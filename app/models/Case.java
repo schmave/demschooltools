@@ -86,19 +86,6 @@ public class Case extends Model implements Comparable<Case> {
         return result;
     }
 
-    public String toJson() {
-        ObjectMapper m = new ObjectMapper();
-        m.setDateFormat(new SimpleDateFormat("yyyy-MM-dd"));
-        try
-        {
-            return m.writeValueAsString(this);
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-            return "";
-        }
-    }
-
     public void continueInMeeting(Meeting m) {
         try {
             // remember the previous meeting

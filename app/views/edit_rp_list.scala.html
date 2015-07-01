@@ -10,19 +10,11 @@ app.active_rps = [];
 app.completed_rps = [];
 
 app.initial_data = {
-	active_rps : [],
-	completed_rps : []
+	active_rps : @Html(Utils.toJson(active_rps)),
+	completed_rps : @Html(Utils.toJson(completed_rps))
 }
 
-@for( c <- active_rps ) {
-	app.initial_data.active_rps.push( @Html(c.toJson()) );
-}
-
-@for( c <- completed_rps) {
-	app.initial_data.completed_rps.push( @Html(c.toJson()) );
-}
-
-config = @Html(OrgConfig.get().toJson());
+config = @Html(Utils.toJson(OrgConfig.get()));
 
 requirejs(['utils', 'edit_rp_list'], function() {});
 </script>

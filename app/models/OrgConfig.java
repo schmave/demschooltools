@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 public class OrgConfig {
     public String name;
     public String short_name;
@@ -38,18 +36,6 @@ public class OrgConfig {
     static HashMap<String, OrgConfig> configs = new HashMap<String, OrgConfig>();
     static void register(String name, OrgConfig config) {
         configs.put(name, config);
-    }
-
-    public String toJson() {
-        ObjectMapper m = new ObjectMapper();
-        try
-        {
-            return m.writeValueAsString(this);
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-            return "";
-        }
     }
 
     public String getCaseNumberPrefix(Meeting m) {

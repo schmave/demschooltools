@@ -29,7 +29,7 @@ public class Attendance extends Controller {
 
     static Form<AttendanceCode> code_form = Form.form(AttendanceCode.class);
 
-    // @OrgCached(CACHE_INDEX)
+    @OrgCached(key = CACHE_INDEX)
     public static Result index() {
         Map<Person, AttendanceStats> person_to_stats =
             new HashMap<Person, AttendanceStats>();
@@ -48,7 +48,9 @@ public class Attendance extends Controller {
             }
 
             AttendanceStats stats = person_to_stats.get(day.person);
-            if (day.code != null || day.start_time == null || day.end_time == null) {
+            if (day.code != null && day.code.equals("_NS_")) {
+                // special no school day code, do nothing.
+            } else if (day.code != null || day.start_time == null || day.end_time == null) {
                 stats.incrementCodeCount(codes_map.get(day.code));
             } else {
                 stats.total_hours += day.getHours();
@@ -65,7 +67,7 @@ public class Attendance extends Controller {
             all_people, person_to_stats, all_codes, codes_map));
     }
 
-    public static Result viewWeek(String date) {
+    public static Result viewOrEditWeek(String date, boolean do_view) {
         Calendar start_date = Utils.parseDateOrNow(date);
         Utils.adjustToPreviousDay(start_date, Calendar.MONDAY);
 
@@ -105,12 +107,7 @@ public class Attendance extends Controller {
             person_to_week.put(week.person, week);
         }
 
-        List<Person> all_people = new ArrayList<Person>();
-        for (Person p : person_to_days.keySet()) {
-            if (!all_people.contains(p)) {
-                all_people.add(p);
-            }
-        }
+        List<Person> all_people = new ArrayList<Person>(person_to_days.keySet());
         for (Person p : person_to_week.keySet()) {
             if (!all_people.contains(p)) {
                 all_people.add(p);
@@ -120,12 +117,113 @@ public class Attendance extends Controller {
 
         Map<String, AttendanceCode> codes = getCodesMap();
 
-        return ok(views.html.attendance_week.render(
-            start_date.getTime(),
-            codes,
-            all_people,
-            person_to_days,
-            person_to_week));
+        if (do_view) {
+            return ok(views.html.attendance_week.render(
+                start_date.getTime(),
+                codes,
+                all_people,
+                person_to_days,
+                person_to_week));
+        } else {
+            List<Person> additional_people = Application.allPeople();
+            additional_people.removeAll(all_people);
+            Collections.sort(additional_people, Person.SORT_DISPLAY_NAME);
+
+            return ok(views.html.edit_attendance_week.render(
+                start_date.getTime(),
+                codes,
+                all_people,
+                additional_people,
+                person_to_days,
+                person_to_week));
+        }
+    }
+
+    public static Result createPersonWeek(int person_id, String monday) {
+        OrgCachedAction.remove(CACHE_INDEX);
+
+        Calendar start_date = Utils.parseDateOrNow(monday);
+        Calendar end_date = (Calendar)start_date.clone();
+        Person p = Person.findById(person_id);
+
+        AttendanceWeek.create(start_date.getTime(), p);
+
+        // look up our newly-created object so that we get the ID
+        Map<String, Object> result = new HashMap<String, Object>();
+        result.put("week", AttendanceWeek.find.where()
+            .eq("person", p)
+            .eq("monday", start_date.getTime())
+            .findUnique());
+
+        for (int i = 0; i < 5; i++) {
+            AttendanceDay.create(end_date.getTime(), p);
+            end_date.add(Calendar.DAY_OF_MONTH, 1);
+        }
+
+        result.put("days",
+            AttendanceDay.find.where()
+            .eq("person", p)
+            .ge("day", start_date.getTime())
+            .le("day", end_date.getTime())
+            .order("day ASC")
+            .setMaxRows(5)
+            .findList());
+
+        return ok(Utils.toJson(result));
+    }
+
+    public static Result deletePersonWeek(int person_id, String monday) {
+        OrgCachedAction.remove(CACHE_INDEX);
+
+        Calendar start_date = Utils.parseDateOrNow(monday);
+        Calendar end_date = (Calendar)start_date.clone();
+        end_date.add(Calendar.DAY_OF_MONTH, 5);
+
+        Person p = Person.findById(person_id);
+
+        List<AttendanceDay> days = AttendanceDay.find.where()
+            .eq("person", p)
+            .ge("day", start_date.getTime())
+            .le("day", end_date.getTime())
+            .findList();
+
+        for (AttendanceDay day : days) {
+            day.delete();
+        }
+
+        List<AttendanceWeek> weeks = AttendanceWeek.find.where()
+            .eq("person", p)
+            .eq("monday", start_date.getTime())
+            .findList();
+
+        for (AttendanceWeek week : weeks) {
+            week.delete();
+        }
+
+        return ok();
+    }
+
+    public static Result viewWeek(String date) {
+        return viewOrEditWeek(date, true);
+    }
+
+    public static Result editWeek(String date) {
+        return viewOrEditWeek(date, false);
+    }
+
+    public static Result saveWeek(Integer week_id, Double extra_hours) {
+        OrgCachedAction.remove(CACHE_INDEX);
+
+        AttendanceWeek.find.byId(week_id).edit(extra_hours);
+        return ok();
+    }
+
+    public static Result saveDay(Integer day_id, String code,
+        String start_time, String end_time) throws Exception {
+        OrgCachedAction.remove(CACHE_INDEX);
+
+        AttendanceDay.find.byId(day_id).edit(code, start_time, end_time);
+        return ok();
     }
 
     public static Map<String, AttendanceCode> getCodesMap() {

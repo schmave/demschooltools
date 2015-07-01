@@ -36,10 +36,10 @@ app.initial_data = {
 }
 
 @for( c <- meeting.cases ) {
-	app.initial_data.cases.push( @Html(c.toJson()) );
+	app.initial_data.cases.push( @Html(Utils.toJson(c)) );
 }
 
-config = @Html(OrgConfig.get().toJson());
+config = @Html(Utils.toJson(OrgConfig.get()));
 </script>
 
 <div id="meeting">
