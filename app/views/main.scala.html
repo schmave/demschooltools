@@ -51,7 +51,7 @@
 	  <div class="tab-content no-print">
 		<div class="tab-pane @if(menu.equals("crm")) { active }" id="people">
 			<div class="subnav">
-			<a @if(selectedBtn.equals("crm_home")) { class="active" }
+			<a @if(selectedBtn.equals("recent_comments")) { class="active" }
 				href="@routes.CRM.recentComments()">
 				Recent comments</a>
 			<a @if(selectedBtn.equals("all_people")) { class="active" }
@@ -117,8 +117,6 @@
 			<div class="subnav">
 	  		<a @if(selectedBtn.equals("attendance_home")) { class="active" }
 				href="@routes.Attendance.index">Home</a>
-	  		<a @if(selectedBtn.equals("attendance_codes")) { class="active" }
-				href="@routes.Attendance.viewCodes">Absence codes</a>
 			<a>View/edit week of: <input class="date" type="textfield"></input></a>
 			<script type="text/javascript">
 			requirejs(["utils"], function(utils) {
@@ -130,6 +128,8 @@
 			});
 			</script>
 			<a>Download data to spreadsheet</a>
+	  		<a @if(selectedBtn.equals("attendance_codes")) { class="active" }
+				href="@routes.Attendance.viewCodes">Absence codes</a>
 			</div>
 		</div>
 
