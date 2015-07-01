@@ -114,20 +114,44 @@ requirejs(['utils'], function(utils) {
         return new module.Charge(data, new_charge_el);
     };
 
+    var id_to_charge = {};
+    var id_to_case = {};
+
+    function loadCharge(charge_data, list, parent_el) {
+        // If there are multiple charges in the same case, a charge will be
+        // given as an ID number the second time it is listed. If this is an
+        // ID number instead of an object, look it up in the map of charges
+        // we have kept.
+        if (typeof charge_data === 'number') {
+            charge_data = id_to_charge[charge_data];
+        }
+
+        if (typeof charge_data.the_case === 'object') {
+            id_to_case[charge_data.the_case.id] = charge_data.the_case;
+
+            for (var i in charge_data.the_case.charges) {
+                var c2_data = charge_data.the_case.charges[i];
+                if (typeof c2_data === 'object') {
+                    id_to_charge[c2_data.id] = c2_data;
+                }
+            }
+        } else {
+            charge_data.the_case = id_to_case[charge_data.the_case];
+        }
+
+        module.insertIntoSortedList(
+            module.addCharge(charge_data, parent_el),
+            list,
+            parent_el);
+    }
 
     app.rp_template = Handlebars.compile($("#rp-template").html());
 
     for (var i in app.initial_data.active_rps) {
-        module.insertIntoSortedList(
-            module.addCharge(app.initial_data.active_rps[i], $(".active-rps")),
-            app.active_rps,
-            $(".active-rps"));
+        loadCharge(app.initial_data.active_rps[i], app.active_rps, $(".active-rps"));
     }
     for (i in app.initial_data.completed_rps) {
-        module.insertIntoSortedList(
-            module.addCharge(app.initial_data.completed_rps[i], $(".completed-rps")),
-            app.completed_rps,
-            $(".completed-rps"));
+        loadCharge(app.initial_data.completed_rps[i], app.completed_rps, $(".completed-rps"));
     }
 });
 
