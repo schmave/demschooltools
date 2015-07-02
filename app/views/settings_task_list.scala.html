@@ -1,0 +1,70 @@
+@(list: TaskList, listForm : Form[TaskList], taskForm : Form[Task])
+
+@import helper._
+@implicitField = @{ FieldConstructor(myConstructor.f) }
+
+@main("Settings for " + list.title, "settings") {
+
+<h3>@list.title settings</h3>
+
+<p>You can view <a href="@routes.CRM.viewTaskList(list.id)">the checklist</a>
+ or its associated tag <a href="@routes.CRM.viewTag(list.tag.id)">
+		<label class="label label-success">@list.tag.title</label></a>.</p>
+
+<table class="table" style="width: 400px;">
+<thead><th>Task</th><th>Sort order</th><th></th></thead>
+<tbody>
+@for( task <- list.tasks ) {
+	<tr><td>
+		@if(!task.enabled) {<strike>}
+		@task.title
+		@if(!task.enabled) {</strike>}
+	</td><td>
+		@if(!task.enabled) {<strike>}
+		@task.sort_order
+		@if(!task.enabled) {</strike>}
+	</td>
+	<td><a class="edit-link" href="@routes.Settings.editTask(task.id)">Edit</a></td>
+	</tr>
+}
+</tbody>
+</table>
+
+}
+
+<hr/>
+<div class="row">
+<div class="col-sm-6" style="border-right: 1px solid #999;">
+<h4>Add a new task in this list</h4>
+
+@form(routes.Settings.newTask(), 'class -> "form-horizontal", 'role -> "form") {
+
+	@inputText(taskForm("title"), '_label -> "Title", 'class -> "form-control")
+	@inputText(taskForm("sort_order"), '_label -> "Sort order", 'class -> "form-control")
+	<input type="hidden" name="task_list.id" value="@list.id"/>
+
+	<input type="submit" value="New task">
+}
+
+
+</div><div class="col-sm-6">
+	<h4>Modify this list</h4>
+
+@form(routes.Settings.saveTaskList(), 'class -> "form-horizontal", 'role -> "form") {
+
+	<input type="hidden" name="id" value="@listForm("id").value()"/>
+	@inputText(listForm("title"), '_label -> "Title", 'class -> "form-control")
+
+	<div class="form-group"><label class="col-sm-3 control-label">Tag</label>
+	<div class="col-sm-6" id="tags-entered"><input type="text" id="tag-entry"></div></div>
+
+	<input type="submit" value="Update">
+}
+</div></div>
+
+<script type="text/javascript">
+requirejs(['utils'], function(utils) {
+    utils.enableNoPersonTagBox("#tag-entry", "#tags-entered", true);
+});
+</script>
+

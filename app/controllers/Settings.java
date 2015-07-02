@@ -26,6 +26,9 @@ import play.mvc.Http.Context;
 @With(DumpOnError.class)
 public class Settings extends Controller {
 
+    static Form<Task> task_form = Form.form(Task.class);
+    static Form<TaskList> list_form = Form.form(TaskList.class);
+
     public static Result viewNotifications() {
         List<NotificationRule> rules = NotificationRule.find.where()
             .eq("organization", OrgConfig.get().org)
@@ -67,5 +70,67 @@ public class Settings extends Controller {
         return redirect(routes.Settings.viewNotifications());
     }
 
+    public static Result viewTaskLists() {
+        return ok(views.html.view_task_lists.render(TaskList.allForOrg(), list_form));
+    }
+
+    public static Result viewTaskList(Integer id) {
+        TaskList list = TaskList.findById(id);
+        return ok(views.html.settings_task_list.render(
+            list, list_form.fill(list), task_form));
+    }
+
+    public static Result newTask() {
+        Task t = task_form.bindFromRequest().get();
+        t.enabled = true;
+        t.save();
+
+        return redirect(routes.Settings.viewTaskList(t.task_list.id));
+    }
+
+    public static Result newTaskList() {
+        TaskList list = list_form.bindFromRequest().get();
+        list.organization = OrgConfig.get().org;
+
+        Map<String, String[]> form_data = request().body().asFormUrlEncoded();
+        list.tag = Tag.findById(Integer.parseInt(form_data.get("tag_id")[0]));
+
+        list.save();
+        list.refresh();
+
+        return redirect(routes.Settings.viewTaskList(list.id));
+    }
+
+    public static Result editTask(Integer id) {
+        Form<Task> filled_form = task_form.fill(Task.findById(id));
+
+        return ok(views.html.edit_task.render(filled_form,
+            TaskList.allForOrg()));
+    }
+
+    public static Result saveTask() {
+        Form<Task> filled_form = task_form.bindFromRequest();
+        Task t = filled_form.get();
+        if (filled_form.apply("enabled").value().equals("false")) {
+            t.enabled = false;
+        }
+        t.update();
+
+        return redirect(routes.Settings.viewTaskList(t.task_list.id));
+    }
+
+    public static Result saveTaskList() {
+        Form<TaskList> filled_form = list_form.bindFromRequest();
+        TaskList list = filled_form.get();
+
+        Map<String, String[]> form_data = request().body().asFormUrlEncoded();
+        if (form_data.containsKey("tag_id")) {
+            list.tag = Tag.findById(Integer.parseInt(form_data.get("tag_id")[0]));
+        }
+
+        list.update();
+
+        return redirect(routes.Settings.viewTaskList(list.id));
+    }
 }
 

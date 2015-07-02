@@ -4,8 +4,12 @@
 
 @main("All people tagged " + tag.title, "crm") {
 <h1>@tag.title
-@if( tag.task_list != null ) {
-   <span class="view-task-list">Also see task list: <a href="@routes.CRM.viewTaskList(tag.task_list.id)">@tag.task_list.title</a></span>
+@if( tag.task_lists.size() > 0 ) {
+   <span class="view-task-list">Also see task list:
+   @for( task_list <- tag.task_lists ) {
+    <a href="@routes.CRM.viewTaskList(task_list.id)">@task_list.title</a>
+   }
+   </span>
 }
 
 </h1>

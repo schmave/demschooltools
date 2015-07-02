@@ -22,10 +22,10 @@
 @form(routes.CRM.addComment(), args = 'id -> "comment_form") {
 <div class="row">
 @for( tag <- p.tags ) {
-	@if( tag.task_list != null ) {
+	@for( task_list <- tag.task_lists ) {
 		<div class="col-xs-4">
-		<h4><a href="@routes.CRM.viewTaskList(tag.task_list.id)">@tag.task_list.title</a></h4>
-		@for( task <- tag.task_list.tasks ) {
+		<h4><a href="@routes.CRM.viewTaskList(task_list.id)">@task_list.title</a></h4>
+		@for( task <- task_list.tasks ) {
 			@if( task.enabled ) {
 			@defining( p.completedTask(task) ) { ct =>
 				@if( ct != null ) {

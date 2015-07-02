@@ -1,0 +1,24 @@
+@(taskForm:Form[Task], list_options : List[TaskList])
+
+@import helper._
+@implicitField = @{ FieldConstructor(myConstructor.f) }
+
+@main("Edit task", "settings") {
+
+<h3>Edit task</h3>
+
+	@form(routes.Settings.saveTask(), 'class -> "form-horizontal", 'role -> "form") {
+
+		<input type="hidden" name="id" value="@taskForm("id").value()"/>
+
+		@helper.select(taskForm("task_list.id"), options =
+			list_options.map (l => ("" + l.id, l.title)), '_label -> "Checklist",
+			'class -> "form-control")
+		@inputText(taskForm("title"), '_label -> "Title", 'class -> "form-control")
+		@inputText(taskForm("sort_order"), '_label -> "Sort order", 'class -> "form-control")
+		@checkbox(taskForm("enabled"), '_label -> "Enabled")
+
+		<input type="submit" value="Save">
+	}
+}
+

@@ -28,8 +28,8 @@ public class Tag extends Model {
     @ManyToOne()
     public Organization organization;
 
-    @OneToOne(mappedBy="tag")
-    public TaskList task_list;
+    @OneToMany(mappedBy="tag")
+    public List<TaskList> task_lists;
 
     @OneToMany(mappedBy="tag")
     public List<MailchimpSync> syncs;

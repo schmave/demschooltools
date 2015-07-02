@@ -136,6 +136,14 @@ GET	/syncMailchimp		controllers.Public.syncMailchimp()
 GET     /settings/notifications controllers.Settings.viewNotifications()
 POST    /settings/notifications controllers.Settings.editNotifications()
 
+GET     /settings/checklists    controllers.Settings.viewTaskLists()
+POST    /settings/newChecklist  controllers.Settings.newTaskList()
+GET     /settings/checklist/:id controllers.Settings.viewTaskList(id : Integer)
+POST    /settings/saveList      controllers.Settings.saveTaskList()
+GET     /settings/task/:id      controllers.Settings.editTask(id : Integer)
+POST    /settings/task          controllers.Settings.saveTask()
+POST    /settings/task/new      controllers.Settings.newTask()
+
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

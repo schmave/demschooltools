@@ -160,7 +160,9 @@
 			<div class="subnav">
 	  		<a @if(selectedBtn.equals("settings_notifications")) { class="active" }
 				href="@routes.Settings.viewNotifications()">Notifications</a>
-			@* <li><a href="@routes.CRM.viewMailchimpSettings()">Mailchimp</a></li> *@
+			@* <a href="@routes.CRM.viewMailchimpSettings()">Mailchimp</a> *@
+	  		<a @if(selectedBtn.equals("settings_checklists")) { class="active" }
+				href="@routes.Settings.viewTaskLists()">Checklists</a>
 			</div>
 		</div>
 	</div>

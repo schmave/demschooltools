@@ -34,5 +34,11 @@ public class TaskList extends Model {
             .eq("id", id).findUnique();
     }
 
+    public static List<TaskList> allForOrg() {
+        return TaskList.find
+            .where().eq("organization", OrgConfig.get().org)
+            .order("title ASC")
+            .findList();
+    }
 }
 

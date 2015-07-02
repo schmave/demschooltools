@@ -1,0 +1,39 @@
+@(lists: List[TaskList], listForm : Form[TaskList])
+
+@import helper._
+@implicitField = @{ FieldConstructor(myConstructor.f) }
+
+@main("All Checklists", "settings", "settings_checklists") {
+
+<h3>All Checklists</h3>
+
+<p>Click on the name of a checklist in order to view or edit its component tasks.</p>
+
+<ul>
+@for( list <- lists ) {
+	<li><a href="@routes.Settings.viewTaskList(list.id)">@list.title</a>
+		<a href="@routes.CRM.viewTag(list.tag.id)">
+		<label class="label label-success">@list.tag.title</label></a></li>
+}
+</ul>
+
+<hr/>
+<h4>Create a new checklist</h4>
+@form(routes.Settings.newTaskList(), 'class -> "form-horizontal", 'role -> "form") {
+
+	@inputText(listForm("title"), '_label -> "Title", 'class -> "form-control")
+
+	<div class="form-group"><label class="col-sm-3 control-label">Tag</label>
+	<div class="col-sm-6" id="tags-entered"><input type="text" id="tag-entry"></div></div>
+
+	<input type="submit" value="New Checklist">
+}
+
+<script type="text/javascript">
+requirejs(['utils'], function(utils) {
+    utils.enableNoPersonTagBox("#tag-entry", "#tags-entered", true);
+});
+</script>
+
+
+}
