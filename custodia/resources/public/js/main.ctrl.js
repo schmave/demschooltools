@@ -104,12 +104,16 @@ angular.module('app').controller("MainController", function($scope, $http){
         $scope.current_day = s;
     };
     $scope.gridOptions = { data: 'totals_students',
-                           columnDefs: [{ field: 'name', displayName: 'Name'},
+                           enableRowSelection: false,
+                           columnDefs: [{ field: 'name', displayName: 'Name',
+                                          cellTemplate: '<div class="ngCellText" ng-class="col.colIndex()"><span ng-cell-text><a href="" ng-click="showStudent(row.entity)">{{row.entity[col.field]}}</a></span></div>'},
                                         { field: 'good', displayName: 'Attended (Overrides)'},
                                         { field: 'unexcused', displayName: 'Unexcused Absence'},
                                         { field: 'excuses', displayName: 'Excused Absence'},
                                         { field: 'short', displayName: 'Short'},
-                                        { field: 'total_hours', displayName: 'Total Hours', cellTemplate: '<div>{{Math.round(row.entity[col.field])}}</div>'}
+                                        { field: 'total_hours',
+                                          displayName: 'Total Hours',
+                                          cellTemplate: '<div class="ngCellText" ng-class="col.colIndex()"><span ng-cell-text>{{Math.round(row.entity[col.field])}}</span></div>'}
                                        ]};
     $scope.reloadStudentPage = function(student){
         $scope.student = student;
