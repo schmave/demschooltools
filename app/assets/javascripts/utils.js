@@ -113,9 +113,14 @@ define (['jquery', 'jquery-ui', 'jquery-form', 'handlebars', 'sorttable', 'boots
         });
     };
 
+    var tag_template = Handlebars.compile('\
+        <span id="tag-{{num}}" style="white-space: nowrap;"><input type=hidden name=tag_id value={{tag_id}}><span \
+            class="label label-success">{{name}} \
+           </span><a class="tag_x"><img src="/assets/images/x.png"></a> \
+                </span>');
+
     module.enableNoPersonTagBox = function(input_box, destination_div, limit_one) {
         var self = this;
-        self.tag_template = Handlebars.compile($("#tag-template").html());
         self.tag_count = 0;
 
         $(input_box).autocomplete({
@@ -135,7 +140,7 @@ define (['jquery', 'jquery-ui', 'jquery-form', 'handlebars', 'sorttable', 'boots
         $(input_box).bind( "autocompleteselect", function(event, ui) {
             var new_tag_html =
                 $(destination_div).append(
-                    self.tag_template({"name": ui.item.label,
+                    tag_template({"name": ui.item.label,
                         "num": self.tag_count++,
                         "tag_id": ui.item.id}))
                     .children(":last-child");

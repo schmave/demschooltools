@@ -3,6 +3,8 @@
 
 @main("Mailchimp Settings", "settings") {
 
+<h1>MailChimp integration is disabled.</h1>
+
 <h3>MailChimp settings</h3>
 <p style="width: 400px">To connect your MailChimp account, go to your account page, then select "API keys"
 from the extras menu. Click on the "Create A Key" button, then copy and paste the key
@@ -61,13 +63,6 @@ When people are <select name="sync_type">
 </select>
 
 <input type="submit" value="Add new sync rule">
-
-<script id="tag-template" type="text/x-handlebars-template">
- <span id="tag-{{num}}" style="white-space: nowrap;"><input type=hidden name=tag_id value={{tag_id}}><span
-     class="label label-success">{{name}}
-    </span><a class="tag_x"><img src="/assets/images/x.png"></a>
-         </span>
-</script>
 
 <script type="text/javascript">
 requirejs(['utils'], function(utils) {
