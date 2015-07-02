@@ -127,7 +127,7 @@
 				$("input.date").datepicker("option", "onSelect", dateSelected);
 			});
 			</script>
-			<a>Download data to spreadsheet</a>
+			<a href="@routes.Attendance.download">Download data to spreadsheet</a>
 	  		<a @if(selectedBtn.equals("attendance_codes")) { class="active" }
 				href="@routes.Attendance.viewCodes">Absence codes</a>
 			</div>

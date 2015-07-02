@@ -1,6 +1,7 @@
 package controllers;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -62,6 +63,21 @@ public class Attendance extends Controller {
                 stats.total_hours += day.getHours();
                 stats.days_present++;
             }
+        }
+
+        List<AttendanceWeek> weeks =
+            AttendanceWeek.find.where()
+                .eq("person.organization", OrgConfig.get().org)
+                .ge("monday", Application.getStartOfYear())
+                .findList();
+
+        for (AttendanceWeek week : weeks) {
+            if (!person_to_stats.containsKey(week.person)) {
+                person_to_stats.put(week.person, new AttendanceStats());
+            }
+
+            AttendanceStats stats = person_to_stats.get(week.person);
+            stats.total_hours += week.extra_hours;
         }
 
         List<Person> all_people = new ArrayList<Person>(person_to_stats.keySet());
@@ -208,6 +224,67 @@ public class Attendance extends Controller {
         }
 
         return ok();
+    }
+
+    public static Result download() throws IOException {
+        response().setHeader("Content-Type", "text/csv; charset=utf-8");
+        response().setHeader("Content-Disposition",
+            "attachment; filename=Attendance.csv");
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Charset charset = Charset.forName("UTF-8");
+        CsvWriter writer = new CsvWriter(baos, ',', charset);
+
+        writer.write("Name");
+        writer.write("Day");
+        writer.write("Absence code");
+        writer.write("Arrival time");
+        writer.write("Departure time");
+        writer.write("Extra hours");
+        writer.endRecord();
+
+        List<AttendanceDay> days =
+            AttendanceDay.find.where()
+                .eq("person.organization", OrgConfig.get().org)
+                .ge("day", Application.getStartOfYear())
+                .findList();
+
+        for (AttendanceDay day : days) {
+            writer.write(day.person.first_name + " " + day.person.last_name);
+            writer.write(Application.yymmddDate(day.day));
+            if (day.code != null) {
+                writer.write(day.code);
+                writer.write(""); // empty start_time and end_time
+                writer.write("");
+            } else {
+                writer.write("");
+                writer.write(day.start_time != null ? day.start_time.toString() : "");
+                writer.write(day.end_time != null ? day.end_time.toString() : "");
+            }
+            writer.write(""); // no extra hours
+            writer.endRecord();
+        }
+
+        List<AttendanceWeek> weeks =
+            AttendanceWeek.find.where()
+                .eq("person.organization", OrgConfig.get().org)
+                .ge("monday", Application.getStartOfYear())
+                .findList();
+
+        for (AttendanceWeek week : weeks) {
+            writer.write(week.person.first_name + " " + week.person.last_name);
+            writer.write(Application.yymmddDate(week.monday));
+            for (int i = 0; i < 3; i++) {
+                writer.write("");
+            }
+            writer.write("" + week.extra_hours);
+            writer.endRecord();
+        }
+
+        writer.close();
+        // Adding the BOM here causes Excel 2010 on Windows to realize
+        // that the file is Unicode-encoded.
+        return ok("\ufeff" + new String(baos.toByteArray(), charset));
     }
 
     public static Result viewWeek(String date) {
