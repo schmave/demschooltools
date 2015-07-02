@@ -130,8 +130,12 @@ POST	/sendEmail				  controllers.CRM.sendEmail()
 
 GET     /mailchimpSettings	controllers.CRM.viewMailchimpSettings()
 POST	/mailchimpSettings	controllers.CRM.saveMailchimpSettings()
-
 GET	/syncMailchimp		controllers.Public.syncMailchimp()
+
+
+GET     /settings/notifications controllers.Settings.viewNotifications()
+POST    /settings/notifications controllers.Settings.editNotifications()
+
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

@@ -38,6 +38,9 @@ public class Tag extends Model {
     @OrderBy("time DESC")
     public List<PersonTagChange> changes;
 
+    @OneToMany(mappedBy="tag")
+    public List<NotificationRule> notification_rules;
+
     public static Finder<Integer, Tag> find = new Finder<>(
         Integer.class, Tag.class
     );

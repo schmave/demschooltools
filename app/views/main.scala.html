@@ -32,13 +32,7 @@
 				<a href="@routes.Application.viewManual()">@OrgConfig.get().str_manual_title_short</a>
 			</li>
 			<li @if(menu.equals("settings")) { class="active" } class="dropdown">
-				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-				  Settings
-				  <b class="caret"></b>
-				</a>
-					<ul class="dropdown-menu">
-					<li><a href="@routes.CRM.viewMailchimpSettings()">Mailchimp</a></li>
-					</ul>
+				<a href="@routes.Settings.viewNotifications()">Settings</a>
 			</li>
 			<li style="float:right;"><a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout">
 				@if(Application.isCurrentUserEditor()) {
@@ -159,6 +153,14 @@
 			<a @if(selectedBtn.equals("manual_changes")) { class="active" }
 				href="@routes.Application.viewManualChanges()">
 				Changes since a date</a>
+			</div>
+		</div>
+
+		<div class="tab-pane @if(menu.equals("settings")) { active }" id="settings">
+			<div class="subnav">
+	  		<a @if(selectedBtn.equals("settings_notifications")) { class="active" }
+				href="@routes.Settings.viewNotifications()">Notifications</a>
+			@* <li><a href="@routes.CRM.viewMailchimpSettings()">Mailchimp</a></li> *@
 			</div>
 		</div>
 	</div>

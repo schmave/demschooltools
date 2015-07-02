@@ -81,10 +81,24 @@ public class CRM extends Controller {
         List<Donation> all_donations = Donation.find.where().in("person_id", family_ids).
             order("date DESC").findList();
 
+        String comment_destination = "<No email set>";
+        boolean first = true;
+        for (NotificationRule rule :
+                NotificationRule.findByType(NotificationRule.TYPE_COMMENT)) {
+            if (first) {
+                comment_destination = rule.email;
+                first = false;
+            } else {
+                comment_destination += ", " + rule.email;
+            }
+        }
+
+
         return ok(views.html.family.render(
             the_person,
             family_members,
             all_comments,
+            comment_destination,
             all_donations));
     }
 
@@ -243,20 +257,43 @@ public class CRM extends Controller {
             true);
 
         p.tags.add(the_tag);
+
+        notifyAboutTag(the_tag, p, true);
+
         return ok(views.html.tag_fragment.render(the_tag, p));
     }
 
     public static Result removeTag(Integer person_id, Integer tag_id) {
+        Tag t = Tag.findById(tag_id);
+        Person p = Person.findById(person_id);
+
         if (Ebean.createSqlUpdate("DELETE from person_tag where person_id=" + person_id +
             " AND tag_id=" + tag_id).execute() == 1) {
             PersonTagChange ptc = PersonTagChange.create(
-                Tag.find.ref(tag_id),
-                Person.findById(person_id),
+                t,
+                p,
                 Application.getCurrentUser(),
                 false);
         }
 
+        notifyAboutTag(t, p, false);
+
         return ok();
+    }
+
+    public static void notifyAboutTag(Tag t, Person p, boolean was_add) {
+        for (NotificationRule rule : t.notification_rules) {
+            play.libs.mailer.Email mail = new play.libs.mailer.Email();
+            if (was_add) {
+                mail.setSubject(getInitials(p) + " added to tag " + t.title);
+            } else {
+                mail.setSubject(getInitials(p) + " removed from tag " + t.title);
+            }
+            mail.addTo(rule.email);
+            mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
+            mail.setBodyHtml(views.html.tag_email.render(t, p, was_add).toString());
+            play.libs.mailer.MailerPlugin.send(mail);
+        }
     }
 
     public static Result allPeople() {
@@ -549,12 +586,15 @@ public class CRM extends Controller {
             }
 
             if (filledForm.field("send_email").value() != null) {
-                play.libs.mailer.Email mail = new play.libs.mailer.Email();
-                mail.setSubject("Papal comment: " + new_comment.user.name + " & " + getInitials(new_comment.person));
-                mail.addTo("TRVS Staff <staff@threeriversvillageschool.org>");
-                mail.setFrom("Papal DB <noreply@threeriversvillageschool.org>");
-                mail.setBodyHtml(views.html.comment_email.render(Comment.find.byId(new_comment.id)).toString());
-                play.libs.mailer.MailerPlugin.send(mail);
+                for (NotificationRule rule :
+                        NotificationRule.findByType(NotificationRule.TYPE_COMMENT)) {
+                    play.libs.mailer.Email mail = new play.libs.mailer.Email();
+                    mail.setSubject("DemSchoolTools comment: " + new_comment.user.name + " & " + getInitials(new_comment.person));
+                    mail.addTo(rule.email);
+                    mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
+                    mail.setBodyHtml(views.html.comment_email.render(Comment.find.byId(new_comment.id)).toString());
+                    play.libs.mailer.MailerPlugin.send(mail);
+                }
             }
 
             return ok(views.html.comment_fragment.render(Comment.find.byId(new_comment.id), false));
@@ -596,6 +636,16 @@ public class CRM extends Controller {
         }
 
         new_donation.save();
+
+        for (NotificationRule rule :
+                NotificationRule.findByType(NotificationRule.TYPE_DONATION)) {
+            play.libs.mailer.Email mail = new play.libs.mailer.Email();
+            mail.setSubject("Donation recorded from " + new_donation.person.first_name + " " + new_donation.person.last_name);
+            mail.addTo(rule.email);
+            mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
+            mail.setBodyHtml(views.html.donation_email.render(new_donation).toString());
+            play.libs.mailer.MailerPlugin.send(mail);
+        }
 
         return ok(views.html.donation_fragment.render(Donation.find.byId(new_donation.id)));
     }

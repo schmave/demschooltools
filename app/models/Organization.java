@@ -32,6 +32,9 @@ public class Organization extends Model {
 
     public String mailchimp_updates_email;
 
+    @OneToMany(mappedBy="organization")
+    public List<NotificationRule> notification_rules;
+
     public static Finder<Integer, Organization> find = new Finder<>(
         Integer.class, Organization.class
     );

@@ -1,4 +1,5 @@
-@(p : Person, family_members: List[Person], comments: List[Comment], donations: List[Donation])
+@(p : Person, family_members: List[Person], comments: List[Comment],
+  comment_email : String, donations: List[Donation])
 
 @import helper._
 
@@ -68,7 +69,7 @@
 			<br>
 
 			<input type="submit" value="Save Comment">
-			<label style="display:inline; padding-left: 25px"><input type="checkbox" name="send_email">Email note to staff@@trvs</label>
+			<label style="display:inline; padding-left: 25px"><input type="checkbox" name="send_email">Email note to @comment_email</label>
 			</div>
 			<script type="text/javascript">
                 requirejs(['utils'], function() {
