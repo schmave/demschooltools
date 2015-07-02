@@ -157,6 +157,11 @@ public class Public extends Controller {
     }
 
     public static Result syncMailchimp() {
+        // Disable mailchimp integration for now.
+        if (1 == 1) {
+            return ok("");
+        }
+
         MailChimpClient client = new MailChimpClient();
 
         for (Organization org : Organization.find.all()) {
