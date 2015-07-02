@@ -1,4 +1,7 @@
-This is your new Play 2.1 application
+DemSchoolTools
 =====================================
 
-This file will be packaged with your application, when using `play dist`.
+DemSchoolTools is a database that excels at managing Judicial Committee records for [Sudbury](http://sudval.org/)-inspired schools. In addition, it does a satisfactory job of tracking people (students, parents, donors, and others), student attendance, and the management manual.
+
+See [the wiki](https://bitbucket.org/schmave/demschooltools/wiki/Home) for more information.
+
