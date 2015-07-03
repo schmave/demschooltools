@@ -144,6 +144,13 @@ GET     /settings/task/:id      controllers.Settings.editTask(id : Integer)
 POST    /settings/task          controllers.Settings.saveTask()
 POST    /settings/task/new      controllers.Settings.newTask()
 
+GET     /settings/access        controllers.Settings.viewAccess()
+POST    /settings/access        controllers.Settings.saveAccess()
+GET     /settings/access/editUser/:id controllers.Settings.editUser(id : Integer)
+POST     /settings/access/newUser controllers.Settings.newUser()
+POST     /settings/access/saveUser controllers.Settings.saveUser()
+
+
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

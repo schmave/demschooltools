@@ -1,33 +1,26 @@
 package controllers;
 
 import java.io.*;
-import java.nio.charset.Charset;
-import java.sql.Time;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import com.avaje.ebean.Ebean;
-import com.avaje.ebean.Expr;
-import com.avaje.ebean.Expression;
-import com.avaje.ebean.FetchConfig;
-import com.avaje.ebean.RawSql;
-import com.avaje.ebean.RawSqlBuilder;
+import com.avaje.ebean.SqlQuery;
+import com.avaje.ebean.SqlRow;
 import com.avaje.ebean.SqlUpdate;
-import com.csvreader.CsvWriter;
 
 import models.*;
 
 import play.*;
 import play.data.*;
 import play.mvc.*;
-import play.mvc.Http.Context;
 
-@Security.Authenticated(EditorSecured.class)
+@Secured.Auth(UserRole.ROLE_ALL_ACCESS)
 @With(DumpOnError.class)
 public class Settings extends Controller {
 
     static Form<Task> task_form = Form.form(Task.class);
     static Form<TaskList> list_form = Form.form(TaskList.class);
+    static Form<User> user_form = Form.form(User.class);
 
     public static Result viewNotifications() {
         List<NotificationRule> rules = NotificationRule.find.where()
@@ -131,6 +124,95 @@ public class Settings extends Controller {
         list.update();
 
         return redirect(routes.Settings.viewTaskList(list.id));
+    }
+
+    public static Result viewAccess() {
+        Organization org = OrgConfig.get().org;
+        List<User> users =
+            User.find.where().eq("organization", org)
+            .order("name ASC")
+            .findList();
+
+        String allowed_ip = "";
+        String sql = "select ip from allowed_ips where organization_id=:org_id";
+        SqlQuery sqlQuery = Ebean.createSqlQuery(sql);
+        sqlQuery.setParameter("org_id", org.id);
+        List<SqlRow> result = sqlQuery.findList();
+        if (result.size() > 0) {
+            allowed_ip = result.get(0).getString("ip");
+        }
+
+        return ok(views.html.view_access.render(users, allowed_ip, user_form));
+    }
+
+    public static Result saveAccess() {
+        Map<String, String[]> form_data = request().body().asFormUrlEncoded();
+        Organization org = OrgConfig.get().org;
+
+        if (form_data.containsKey("allowed_ip")) {
+            String sql = "DELETE from allowed_ips where organization_id=:org_id";
+            SqlUpdate update = Ebean.createSqlUpdate(sql);
+            update.setParameter("org_id", org.id);
+            update.execute();
+
+            sql = "INSERT into allowed_ips (ip, organization_id) VALUES(:ip, :org_id)";
+            update = Ebean.createSqlUpdate(sql);
+            update.setParameter("org_id", org.id);
+            update.setParameter("ip", form_data.get("allowed_ip")[0]);
+            update.execute();
+        }
+
+        return redirect(routes.Settings.viewAccess());
+    }
+
+    public static Result editUser(Integer id) {
+        User u = User.findById(id);
+
+        return ok(views.html.edit_user.render(u, user_form.fill(u)));
+    }
+
+    public static Result saveUser() {
+        Form<User> filled_form = user_form.bindFromRequest();
+        User u = filled_form.get();
+        Map<String, String[]> form_data = request().body().asFormUrlEncoded();
+
+        User orig_user = User.findById(u.id);
+
+        for (UserRole r : orig_user.roles) {
+            r.delete();
+        }
+
+        for (String role : UserRole.ALL_ROLES) {
+            if (form_data.containsKey(role) && form_data.get(role)[0].equals("true")) {
+                UserRole.create(u, role);
+            }
+        }
+
+        if (filled_form.apply("active").value().equals("false")) {
+            u.active = false;
+            Ebean.delete(orig_user.linkedAccounts);
+        }
+
+        if (!orig_user.email.equals(u.email)) {
+            Ebean.delete(orig_user.linkedAccounts);
+        }
+
+        u.update();
+
+        return redirect(routes.Settings.viewAccess());
+    }
+
+    public static Result newUser() {
+        Map<String, String[]> form_data = request().body().asFormUrlEncoded();
+
+        User u = User.create(
+            form_data.get("email")[0].trim(),
+            form_data.get("name")[0].trim(),
+            OrgConfig.get().org);
+
+        UserRole.create(u, UserRole.ROLE_VIEW_JC);
+
+        return redirect(routes.Settings.viewAccess());
     }
 }
 

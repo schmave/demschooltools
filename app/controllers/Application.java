@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import org.markdown4j.Markdown4jProcessor;
+import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
@@ -21,15 +22,13 @@ import com.feth.play.module.pa.PlayAuthenticate;
 
 import models.*;
 
-import org.xhtmlrenderer.pdf.ITextRenderer;
-
 import play.*;
 import play.data.*;
 import play.libs.Json;
 import play.mvc.*;
 import play.mvc.Http.Context;
 
-@Security.Authenticated(Secured.class)
+@Secured.Auth(UserRole.ROLE_VIEW_JC)
 @With(DumpOnError.class)
 public class Application extends Controller {
 

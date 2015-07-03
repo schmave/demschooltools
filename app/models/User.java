@@ -8,10 +8,9 @@ import java.util.Set;
 
 import javax.persistence.*;
 
-import com.avaje.ebean.Model;
-
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.ExpressionList;
+import com.avaje.ebean.Model;
 import com.feth.play.module.pa.user.AuthUser;
 import com.feth.play.module.pa.user.AuthUserIdentity;
 import com.feth.play.module.pa.user.EmailIdentity;
@@ -20,33 +19,59 @@ import com.feth.play.module.pa.user.NameIdentity;
 @Entity
 @Table(name = "users")
 public class User extends Model {
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = 1L;
 
     @ManyToOne()
     public Organization organization;
 
 	@Id
-	public Long id;
+	public Integer id;
 
-	// if you make this unique, keep in mind that users *must* merge/link their
-	// accounts then on signup with additional provider
-    @Column(unique = true)
 	public String email;
-
 	public String name;
 
 	public boolean active;
-
 	public boolean emailValidated;
+
+    @OneToMany(mappedBy="user")
+    public List<UserRole> roles;
 
 	@OneToMany(cascade = CascadeType.ALL)
 	public List<LinkedAccount> linkedAccounts;
 
-	public static final Finder<Long, User> find = new Finder<>(
-			Long.class, User.class);
+	public static final Finder<Integer, User> find = new Finder<>(
+			Integer.class, User.class);
+
+    public static User findById(Integer id) {
+        return find.where().eq("organization", OrgConfig.get().org)
+            .eq("id", id)
+            .findUnique();
+    }
+
+    public static User create(String email, String name, Organization org) {
+        User result = new User();
+
+        result.email = email;
+        result.name = name;
+        result.organization = org;
+        result.active = true;
+        result.emailValidated = true;
+
+        result.save();
+
+        return result;
+    }
+
+    public boolean hasRole(String role) {
+        for (UserRole r : roles) {
+            if (r.role.equals(role) ||
+                UserRole.includes(r.role, role)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 	public static boolean existsByAuthUserIdentity(
 			final AuthUserIdentity identity) {
@@ -128,15 +153,13 @@ public class User extends Model {
             final AuthUserIdentity identity) {
         return find.where().eq("active", true)
                 .eq("linkedAccounts.providerUserId", identity.getId())
-                .eq("linkedAccounts.providerKey", identity.getProvider())
-                .eq("organization", Organization.getByHost());
+                .eq("linkedAccounts.providerKey", identity.getProvider());
     }
 
 	private static ExpressionList<User> getEmailUserFind(final String email) {
 		return find.where()
                 .eq("active", true)
-                .eq("email", email)
-                .eq("organization", Organization.getByHost());
+                .eq("email", email);
 	}
 
 	public LinkedAccount getAccountByProvider(final String providerKey) {

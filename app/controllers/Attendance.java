@@ -22,7 +22,7 @@ import play.data.*;
 import play.mvc.*;
 import play.mvc.Http.Context;
 
-@Security.Authenticated(EditorSecured.class)
+@Secured.Auth(UserRole.ROLE_ALL_ACCESS)
 @With(DumpOnError.class)
 public class Attendance extends Controller {
 

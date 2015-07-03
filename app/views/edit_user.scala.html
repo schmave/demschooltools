@@ -1,0 +1,26 @@
+@(u : User, userForm : Form[User])
+@import helper._
+@implicitField = @{ FieldConstructor(myConstructor.f) }
+
+
+@main("Edit user " + u.name, "settings") {
+
+<h3>Edit user</h3>
+
+@form(routes.Settings.saveUser(), 'class -> "form-horizontal", 'role -> "form") {
+	<input type="hidden" name="id" value="@u.id"/>
+	@inputText(userForm("name"), '_label -> "Name", 'class -> "form-control")
+	@inputText(userForm("email"), '_label -> "Email", 'class -> "form-control")
+	@checkbox(userForm("active"), '_label -> "Active")
+<hr/>
+	@for( role <- UserRole.ALL_ROLES ) {
+		@simpleCheckbox(role,
+			UserRole.getDescription(role),
+			u.hasRole(role))
+	}
+<input type="submit" value="Save"/>
+}
+
+}
+
+

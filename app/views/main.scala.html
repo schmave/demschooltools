@@ -107,7 +107,8 @@
 			</div>
 		</div>
 
-		<div class="tab-pane @if(menu.equals("attendance")) { active }" id="attendance">
+		@if(menu.equals("attendance")) {
+		<div class="tab-pane active" id="attendance">
 			<div class="subnav">
 	  		<a @if(selectedBtn.equals("attendance_home")) { class="active" }
 				href="@routes.Attendance.index">Home</a>
@@ -126,8 +127,10 @@
 				href="@routes.Attendance.viewCodes">Absence codes</a>
 			</div>
 		</div>
+		}
 
-		<div class="tab-pane @if(menu.equals("jc")) { active }" id="jc">
+		@if(menu.equals("jc")) {
+		<div class="tab-pane  active" id="jc">
 			<div class="subnav">
 	  		<a @if(selectedBtn.equals("jc_home")) { class="active" }
 				href="@routes.Application.index">Home</a>
@@ -143,8 +146,10 @@
 				View S.M. decisions</a>
 			</div>
 		</div>
+		}
 
-		<div class="tab-pane @if(menu.equals("manual")) { active }" id="manual">
+		@if(menu.equals("manual")) {
+		<div class="tab-pane active" id="manual">
 			<div class="subnav">
 	  		<a @if(selectedBtn.equals("toc")) { class="active" }
 				href="@routes.Application.viewManual()">Table of Contents</a>
@@ -155,16 +160,22 @@
 				Changes since a date</a>
 			</div>
 		</div>
+		}
 
-		<div class="tab-pane @if(menu.equals("settings")) { active }" id="settings">
+		@if(menu.equals("settings")) {
+		<div class="tab-pane active" id="settings">
 			<div class="subnav">
 	  		<a @if(selectedBtn.equals("settings_notifications")) { class="active" }
 				href="@routes.Settings.viewNotifications()">Notifications</a>
 			@* <a href="@routes.CRM.viewMailchimpSettings()">Mailchimp</a> *@
 	  		<a @if(selectedBtn.equals("settings_checklists")) { class="active" }
 				href="@routes.Settings.viewTaskLists()">Checklists</a>
+	  		<a @if(selectedBtn.equals("settings_access")) { class="active" }
+				href="@routes.Settings.viewAccess()">Users & Access</a>
 			</div>
 		</div>
+		}
+
 	</div>
 </div>
 	}

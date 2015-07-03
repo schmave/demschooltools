@@ -1,0 +1,9 @@
+@(name : String, label : String, checked : Boolean)
+
+<div class="form-group">
+    <label class="col-sm-3 control-label">@label</label>
+	<div class="col-sm-6">
+		<input type="checkbox" value="true" name="@name" @if( checked ) { checked }/>
+	</div>
+ </div>
+

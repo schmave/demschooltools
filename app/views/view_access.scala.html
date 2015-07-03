@@ -1,0 +1,65 @@
+@(users : List[User], allowed_ip : String, userForm : Form[User])
+
+@import helper._
+@implicitField = @{ FieldConstructor(myConstructor.f) }
+
+
+@main("Users & Access", "settings", "settings_access") {
+
+<h3>Current users</h3>
+
+<table class="table" style="width: 400px">
+<thead><th>Name</th><th>Email</th>
+	@for( role <- UserRole.ALL_ROLES ) {
+		<th>@UserRole.getDescription(role)</th>
+	}
+<th></th></thead>
+@for( u <- users ) { @if( u.active ) {
+<tr><td>@u.name</td><td>@u.email</td>
+@for( role <- UserRole.ALL_ROLES ) {
+	<td>@if( u.hasRole(role) ) {
+	<img height=18 src="@routes.Assets.at("images/check.png")"/>
+		 } else {
+	<img height=18 src="@routes.Assets.at("images/x-check.png")"/>
+		}</td>
+}
+<td><a class="edit-link" href="@routes.Settings.editUser(u.id)">Edit</a></td>
+</tr>
+}}
+</table>
+
+<p class=>Access at the "@UserRole.getDescription(UserRole.ROLE_VIEW_JC)" level is available
+for all traffic from a particular IP address. This can be used to give read-only
+access to JC records and the @OrgConfig.get().str_manual_title to anyone connecting
+through your school's internet connection. Enter an IP address to allow below to enable this feature.</p>
+
+@form(routes.Settings.saveAccess()) {
+<p>Allow read-only access, as described above, from this IP address:
+<input type="textfield" name="allowed_ip" value="@allowed_ip"/>
+<input type="submit" value="Save"/>
+}
+
+<hr/>
+<h3>Add a new user</h3>
+
+@form(routes.Settings.newUser(), 'class -> "form-horizontal", 'role -> "form") {
+	@inputText(userForm("name"), '_label -> "Name", 'class -> "form-control")
+	@inputText(userForm("email"), '_label -> "Email", 'class -> "form-control")
+<input type="submit" value="Add new user"/>
+}
+
+<hr/>
+
+<h3>Inactive users (can't log in)</h3>
+
+<table class="table" style="width: 400px">
+<thead><th>Name</th><th>Email</th><th></th></thead>
+
+@for( u <- users ) { @if( !u.active ) {
+<tr><td>@u.name</td><td>@u.email</td>
+<td><a class="edit-link" href="@routes.Settings.editUser(u.id)">Edit</a></td>
+</tr>
+}}
+
+}
+
