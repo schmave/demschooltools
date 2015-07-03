@@ -352,16 +352,7 @@ public class Application extends Controller {
     }
 
 	public static Result viewManual() {
-        return ok(views.html.cached_page.render(
-            new CachedPage(CACHE_MANUAL,
-                OrgConfig.get().str_manual_title,
-                "manual",
-                "toc") {
-                @Override
-                String render() {
-                    return views.html.view_manual.render(Chapter.all()).toString();
-                }
-            }));
+        return ok(renderManualTOC());
 	}
 
     public static Result viewManualChanges(String begin_date_string) {
@@ -498,13 +489,26 @@ public class Application extends Controller {
         }
     }
 
+    static play.twirl.api.Html renderManualTOC() {
+        return views.html.cached_page.render(
+            new CachedPage(CACHE_MANUAL,
+                OrgConfig.get().str_manual_title,
+                "manual",
+                "toc") {
+                @Override
+                String render() {
+                    return views.html.view_manual.render(Chapter.all()).toString();
+                }
+            });
+    }
+
     public static Result printManualChapter(Integer id) throws Exception {
         response().setHeader("Content-Type", "application/pdf");
 
         if (id == -1) {
             ArrayList<String> documents = new ArrayList<String>();
             // render TOC
-            documents.add(views.html.view_manual.render(Chapter.all()).toString());
+            documents.add(renderManualTOC().toString());
             // then render all chapters
             for (Chapter chapter : Chapter.all()) {
                 documents.add(views.html.view_chapter.render(chapter).toString());
@@ -512,8 +516,7 @@ public class Application extends Controller {
             return ok(renderToPDF(documents));
         } else {
             if (id == -2) {
-                return ok(renderToPDF(
-                    views.html.view_manual.render(Chapter.all()).toString()));
+                return ok(renderToPDF(renderManualTOC().toString()));
             } else {
                 Chapter chapter = Chapter.findById(id);
                 return ok(renderToPDF(
