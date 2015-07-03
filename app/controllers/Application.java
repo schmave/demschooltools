@@ -28,8 +28,8 @@ import play.libs.Json;
 import play.mvc.*;
 import play.mvc.Http.Context;
 
-@Secured.Auth(UserRole.ROLE_VIEW_JC)
 @With(DumpOnError.class)
+@Secured.Auth(UserRole.ROLE_VIEW_JC)
 public class Application extends Controller {
 
     public static final String CACHE_INDEX = "Application-index-";

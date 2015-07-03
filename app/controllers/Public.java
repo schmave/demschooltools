@@ -25,6 +25,7 @@ import play.mvc.Http.Context;
 
 import views.html.*;
 
+@With(DumpOnError.class)
 public class Public extends Controller {
 
 	public static Result postEmail() {
