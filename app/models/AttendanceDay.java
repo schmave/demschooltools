@@ -2,6 +2,7 @@ package models;
 
 import java.io.*;
 import java.sql.Time;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -50,9 +51,18 @@ public class AttendanceDay extends Model {
         if (time_string == null || time_string.equals("")) {
             return null;
         }
+		
+		String[] formats = {"h:mm a", "h:mma"};
 
-        Date d = new SimpleDateFormat("h:mm a").parse(time_string);
-        return new Time(d.getTime());
+		for (String format : formats) {
+			try {
+				Date d = new SimpleDateFormat(format).parse(time_string);
+				return new Time(d.getTime());
+			} catch (ParseException e) {
+			}
+		}		
+		
+		return null;
     }
 
     public void edit(String code, String start_time, String end_time) throws Exception {
