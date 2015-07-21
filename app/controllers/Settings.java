@@ -82,8 +82,17 @@ public class Settings extends Controller {
     public static Result newTaskList() {
         TaskList list = list_form.bindFromRequest().get();
         list.organization = OrgConfig.get().org;
+		
+		list.title = list.title.trim();
+		if (list.title.equals("")) {
+			list.title = "Untitled checklist";
+		}
 
         Map<String, String[]> form_data = request().body().asFormUrlEncoded();
+		if (form_data.get("tag_id") == null) {
+			flash("error", "No tag specified for checklist. No checklist was created.");
+			return redirect(routes.Settings.viewTaskLists());
+		}
         list.tag = Tag.findById(Integer.parseInt(form_data.get("tag_id")[0]));
 
         list.save();
