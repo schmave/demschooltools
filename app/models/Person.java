@@ -253,6 +253,20 @@ public class Person extends Model implements Comparable<Person> {
             }
         }
     }
+	
+	public void trimSpaces() {
+		first_name = first_name.trim();
+		last_name = last_name.trim();
+		address = address.trim();
+		city = city.trim();
+		state = state.trim();
+		zip = zip.trim();
+		neighborhood = neighborhood.trim();
+		email = email.trim();
+		display_name = display_name.trim();
+		previous_school = previous_school.trim();
+		school_district = school_district.trim();
+	}
 
     public static Person create(Form<Person> form) {
         java.util.Map<java.lang.String,java.lang.String> data = form.data();
@@ -260,6 +274,7 @@ public class Person extends Model implements Comparable<Person> {
         person.is_family = false;
         person.attachToPersonAsFamily(form.field("same_family_id").value());
         person.organization = Organization.getByHost();
+		person.trimSpaces();
         person.save();
 
         person.addPhoneNumbers(form);
@@ -284,6 +299,7 @@ public class Person extends Model implements Comparable<Person> {
             PersonChange.create(old_p, p.email);
         }
 
+		p.trimSpaces();
         p.update();
         Ebean.update(p);
         return p;
