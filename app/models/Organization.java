@@ -62,7 +62,9 @@ public class Organization extends Model {
             Cache.set(cache_key, org_result, 60); // cache for 1 minute
             return org_result;
         } else {
-            Logger.error("Unknown organization for host: " + host);
+			if (host.matches("[a-z]")) {
+				Logger.error("Unknown organization for host: " + host);
+			}
         }
 
         return null;
