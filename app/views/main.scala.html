@@ -180,6 +180,10 @@
 	</div>
 </div>
 	}
+	
+	@if(flash.containsKey("error")) {
+		<div class="flash-error">@flash.get("error")</div>
+	}
 
 		@content
     </body>
