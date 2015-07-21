@@ -609,7 +609,12 @@ public class CRM extends Controller {
 
         new_donation.person = Person.findById(Integer.parseInt(filledForm.field("person").value()));
         new_donation.description = filledForm.field("description").value();
-        new_donation.dollar_value = Float.parseFloat(filledForm.field("dollar_value").value());
+		
+		String dollar_value = filledForm.field("dollar_value").value();
+		if (dollar_value.charAt(0) == '$') {
+			dollar_value = dollar_value.substring(1);
+		}
+        new_donation.dollar_value = Float.parseFloat(dollar_value);
 
         try
         {
