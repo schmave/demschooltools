@@ -334,6 +334,9 @@ public class Public extends Controller {
 
     public static Result index()
     {
+		if (Organization.getByHost() == null) {
+			return unauthorized("Unknown organization");
+		}
         return ok(views.html.login.render(flash("notice")));
     }
 

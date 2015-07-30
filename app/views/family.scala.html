@@ -73,14 +73,14 @@
 			</div>
 			<script type="text/javascript">
                 requirejs(['utils'], function() {
-                    $("#comment_form").ajaxForm({"complete" : function(response, status) {
-                                                     $("#comments").prepend(response.responseText);
+                    $("#comment_form").ajaxForm({"success" : function(response, status) {
+                                                     $("#comments").prepend(response);
                                                      $("#new_comment textarea").val("");
                                                      $("#new_comment").hide();
                                                      $("#add_comment_p").show();
                                                      }});
-                    $("#donation_form").ajaxForm({"complete" : function(response, status) {
-                                                     $("#donations").prepend("<tr>" + response.responseText + "</tr>");
+                    $("#donation_form").ajaxForm({"success" : function(response, status) {
+                                                     $("#donations").prepend("<tr>" + response + "</tr>");
                                                      $("#new_donation textarea").val("");
                                                      $("#new_donation").hide();
                                                      $('#add_donation_p').show()
@@ -111,7 +111,7 @@
 			Description: <textarea name="description" style="width: 400px;" rows=5 ></textarea>
 			<br><label><input type="radio" name="donation_type" value="Cash" checked> Cash</label> <i>or</i>
 				<label><input type="radio" name="donation_type" value="Non_cash"> Materials/Time</label>
-			<br>Cash value: <input type="textbox" name="dollar_value">
+			<br>Cash value: $<input type="textbox" name="dollar_value">
 			<br>Date (leave blank if today is the day): <input type="date" name="date">
 			<br><label><input type="checkbox" name="needs_thank_you" checked> Needs thank you</label>
 			<br><label><input type="checkbox" name="needs_indiegogo_reward"> Needs Indiegogo reward</label>

@@ -133,7 +133,7 @@ public class Secured {
             }
 
             // If we don't have a logged-in user, try going by IP address.
-            if (allow_ip) {
+            if (allow_ip && Organization.getByHost() != null) {
                 String sql = "select ip from allowed_ips where ip like :ip and organization_id=:org_id";
                 SqlQuery sqlQuery = Ebean.createSqlQuery(sql);
                 String address = Application.getRemoteIp();

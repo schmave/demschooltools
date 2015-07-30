@@ -37,29 +37,27 @@ public class Settings extends Controller {
         if (values.containsKey("remove_notification_id")) {
             NotificationRule.findById(
                 Integer.parseInt(values.get("remove_notification_id")[0])).delete();
-        }
+        } else {
+			String email = values.get("email")[0];
+			if (!email.matches("^\\S+@\\S+.\\S+$")) {
+				flash("error", "'" + email + "' does not seem to be a valid email address. Notification not created.");
+				return redirect(routes.Settings.viewNotifications());
+			}
 
-        if (values.containsKey("tag_id")) {
-            NotificationRule.create(
-                NotificationRule.TYPE_TAG,
-                Tag.findById(Integer.parseInt(values.get("tag_id")[0])),
-                values.get("email")[0]);
-        }
+			if (values.containsKey("tag_id")) {
+				Tag t = Tag.findById(Integer.parseInt(values.get("tag_id")[0]));
+				NotificationRule.create(NotificationRule.TYPE_TAG, t, email);
+			}
 
-        if (values.containsKey("comment")) {
-            NotificationRule.create(
-                NotificationRule.TYPE_COMMENT,
-                null,
-                values.get("email")[0]);
-        }
+			if (values.containsKey("comment")) {
+				NotificationRule.create(NotificationRule.TYPE_COMMENT, null, email);
+			}
 
-        if (values.containsKey("donation")) {
-            NotificationRule.create(
-                NotificationRule.TYPE_DONATION,
-                null,
-                values.get("email")[0]);
-        }
-
+			if (values.containsKey("donation")) {
+				NotificationRule.create(NotificationRule.TYPE_DONATION, null, email);
+			}
+		}
+		
         return redirect(routes.Settings.viewNotifications());
     }
 
@@ -84,8 +82,17 @@ public class Settings extends Controller {
     public static Result newTaskList() {
         TaskList list = list_form.bindFromRequest().get();
         list.organization = OrgConfig.get().org;
+		
+		list.title = list.title.trim();
+		if (list.title.equals("")) {
+			list.title = "Untitled checklist";
+		}
 
         Map<String, String[]> form_data = request().body().asFormUrlEncoded();
+		if (form_data.get("tag_id") == null) {
+			flash("error", "No tag specified for checklist. No checklist was created.");
+			return redirect(routes.Settings.viewTaskLists());
+		}
         list.tag = Tag.findById(Integer.parseInt(form_data.get("tag_id")[0]));
 
         list.save();

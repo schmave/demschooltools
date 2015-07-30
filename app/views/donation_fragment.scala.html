@@ -17,10 +17,12 @@
 			@form(routes.CRM.donationThankYou(d.id), args = 'id -> ("thank_you_form_" + d.id)) {
 				<input type="submit" value="Thank You complete">
 			<script type="text/javascript">
-				$("#thank_you_form_@d.id").ajaxForm({"complete" : function(response, status) {
-							 $("#needs_thank_you_@d.id").html("<b>Thanked.</b>");
-                             $("#thank_you_form_@d.id").hide();
-							 }});
+                requirejs(['utils'], function() {
+					$("#thank_you_form_@d.id").ajaxForm({"complete" : function(response, status) {
+								 $("#needs_thank_you_@d.id").html("<b>Thanked.</b>");
+								 $("#thank_you_form_@d.id").hide();
+								 }});
+				});
 			</script>
 		}
 }

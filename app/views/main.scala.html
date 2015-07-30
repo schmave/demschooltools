@@ -143,6 +143,8 @@
 			<a @if(selectedBtn.equals("view_sm")) { class="active" }
 				href="@routes.Application.viewSchoolMeetingDecisions">
 				View S.M. decisions</a>
+			<a href="@routes.Application.downloadCharges()">
+				Download charges</a>
 			</div>
 		</div>
 		}
@@ -177,6 +179,10 @@
 
 	</div>
 </div>
+	}
+	
+	@if(flash.containsKey("error")) {
+		<div class="flash-error">@flash.get("error")</div>
 	}
 
 		@content
