@@ -52,3 +52,6 @@ load-massive-dump : drop-tables
 
 load-aliased-dump : drop-tables
 	psql swipes < dumps/migrated-students-aliased.dump
+
+js :
+    browserify -t reactify /src/js/app.jsx > /resources/js/gen/app.js
