@@ -9,6 +9,7 @@
                  [org.clojure/tools.nrepl "0.2.5"]
                  [org.clojure/data.json "0.2.5"]
                  [com.cemerick/friend "0.2.1" :exclusions [xerces/xercesImpl]]
+		 [org.clojure/tools.trace "0.7.8"]
                  [environ "1.0.0"]
                  [ring/ring-json "0.3.1"]
                  [jdbc-ring-session "0.2"]

@@ -1,0 +1,22 @@
+{
+  "name": "overseer",
+  "version": "13.0.0",
+  "description": "Classroom attendance management.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thedreadpirate/overseer.git"
+  },
+  "author": "Steven Shogren, Keith O'Brien",
+  "license": "Proprietary",
+  "bugs": {
+    "url": "https://github.com/thedreadpirate/overseer/issues"
+  },
+  "homepage": "https://github.com/thedreadpirate/overseer"
+}
