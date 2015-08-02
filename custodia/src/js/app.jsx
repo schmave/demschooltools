@@ -1,4 +1,4 @@
-var react = require('react'),
-    Nav = require('nav');
+var React = require('react'),
+    Nav = require('./nav.jsx');
 
-react.render(<Nav />, document.getElementById('nav'));
+React.render(<Nav />, document.getElementById('nav'));

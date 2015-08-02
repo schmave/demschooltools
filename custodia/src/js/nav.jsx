@@ -1,29 +1,28 @@
-var react = require('react');
+var React = require('react');
 
-module.exports = reach.createClass({
+module.exports = React.createClass({
     render: function () {
-        return <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-            <div class="container">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+        return <nav className="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div className="container">
+                <div className="navbar-header">
+                    <button type="button" className="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
                             aria-expanded="false" aria-controls="navbar">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
+                        <span className="sr-only">Toggle navigation</span>
+                        <span className="icon-bar"></span>
+                        <span className="icon-bar"></span>
+                        <span className="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="/">Overseer</a>
+                    <a className="navbar-brand" href="/">Overseer</a>
                 </div>
-                <div id="navbar" class="collapse navbar-collapse">
-                    <ul class="nav navbar-nav">
-                        <li class="{{(screen==='home')?'active':''}}"><a href="#" ng-click="showHome()">Home</a></li>
-                        <li class="{{(screen==='student-totals')?'active':''}}"><a href="#" ng-show="isAdmin"
+                <div id="navbar" className="collapse navbar-collapse">
+                    <ul className="nav navbar-nav">
+                        <li className="{{(screen==='home')?'active':''}}"><a href="#" ng-click="showHome()">Home</a></li>
+                        <li className="{{(screen==='student-totals')?'active':''}}"><a href="#" ng-show="isAdmin"
                                                                                    ng-click="showStudents()">Student
                             Totals</a></li>
                         <li><a href="/logout">Logout</a></li>
                     </ul>
                 </div>
-                <!--/.nav-collapse -->
             </div>
         </nav>;
     }

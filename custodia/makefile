@@ -54,4 +54,8 @@ load-aliased-dump : drop-tables
 	psql swipes < dumps/migrated-students-aliased.dump
 
 js :
-    browserify -t reactify /src/js/app.jsx > /resources/js/gen/app.js
+	browserify -t reactify ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
+
+watch :
+	watchify -v -t reactify ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
+
