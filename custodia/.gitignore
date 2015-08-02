@@ -13,3 +13,4 @@ pom.xml
 /profiles.clj
 *.iml
 .idea/
+/node_modules/
