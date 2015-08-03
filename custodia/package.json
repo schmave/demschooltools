@@ -25,6 +25,7 @@
     "marmottajax": "^2.0.2",
     "object-assign": "^3.0.0",
     "react": "^0.13.3",
+    "react-router": "^0.13.3",
     "reactify": "^1.1.1",
     "watchify": "^3.3.1"
   }

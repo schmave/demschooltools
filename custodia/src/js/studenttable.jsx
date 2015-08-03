@@ -1,4 +1,6 @@
 var React = require('react'),
+    Router = require('react-router'),
+    Link = Router.Link,
     studentStore = require('./StudentStore');
 
 module.exports = React.createClass({
@@ -16,7 +18,10 @@ module.exports = React.createClass({
             outCol = [];
 
         var rows = this.state.students.map(function (student) {
-            if(student.absent_today) absentCol.push(<span className="student-listing col-sm-4">{student.name}</span>);
+            var link = 'students/' + student._id;
+            if(student.absent_today) absentCol.push(<span className="student-listing col-sm-4">
+                <Link to="students" params={{studentId: student._id}}>{student.name}</Link>
+            </span>);
             if(!student.in_today && !student.absent_today) notYetInCol.push(<span className="student-listing col-sm-4">{student.name}</span>);
             if(student.in_today) inCol.push(<span className="student-listing col-sm-4">{student.name}</span>);
             if(student.absent_today) outCol.push(<span className="student-listing col-sm-4">{student.name}</span>);
