@@ -10,27 +10,24 @@ module.exports = React.createClass({
         this.setState({students: studentStore.getStudents()});
     },
     render: function () {
+        var absentCol = [],
+            notYetInCol = [],
+            inCol = [],
+            outCol = [];
+
         var rows = this.state.students.map(function (student) {
-            return <tr>
-                <td>{student.absent_today ? student.name : ''}</td>
-                <td>{!student.in_today && !student.absent_today ? student.name : ''}</td>
-                <td>{student.in_today ? student.name : ''}</td>
-                <td>{student.absent_today ? student.name : ''}</td>
-            </tr>;
+            if(student.absent_today) absentCol.push(<span className="col-sm-4">{student.name}</span>);
+            if(!student.in_today && !student.absent_today) notYetInCol.push(<span className="col-sm-4">{student.name}</span>);
+            if(student.in_today) inCol.push(<span className="col-sm-4">{student.name}</span>);
+            if(student.absent_today) outCol.push(<span className="col-sm-4">{student.name}</span>);
         });
-        return <table className="table">
-            <thead>
-                <tr>
-                    <th>Not Coming In</th>
-                    <th>Not Yet In</th>
-                    <th>In</th>
-                    <th>Out</th>
-                </tr>
-            </thead>
-            <tbody>
-                {rows}
-            </tbody>
-        </table>;
+
+        return <div className="row">
+                   <div className="col-sm-3"><h2>Not Coming In</h2><div className="row">{absentCol}</div></div>
+                   <div className="col-sm-3"><h2>Not Yet In</h2><div className="row">{notYetInCol}</div></div>
+                   <div className="col-sm-3"><h2>In</h2><div className="row">{inCol}</div></div>
+                   <div className="col-sm-3"><h2>Out</h2><div className="row">{outCol}</div></div>
+            </div>;
     },
     _onChange: function () {
         this.setState({students: studentStore.getStudents()});
