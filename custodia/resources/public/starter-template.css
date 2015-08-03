@@ -86,3 +86,8 @@ body {
         width: 1300px;
     }
 }
+
+.student-listing{
+    font-size: 1.5em;
+    padding: 7px;
+}

@@ -16,10 +16,10 @@ module.exports = React.createClass({
             outCol = [];
 
         var rows = this.state.students.map(function (student) {
-            if(student.absent_today) absentCol.push(<span className="col-sm-4">{student.name}</span>);
-            if(!student.in_today && !student.absent_today) notYetInCol.push(<span className="col-sm-4">{student.name}</span>);
-            if(student.in_today) inCol.push(<span className="col-sm-4">{student.name}</span>);
-            if(student.absent_today) outCol.push(<span className="col-sm-4">{student.name}</span>);
+            if(student.absent_today) absentCol.push(<span className="student-listing col-sm-4">{student.name}</span>);
+            if(!student.in_today && !student.absent_today) notYetInCol.push(<span className="student-listing col-sm-4">{student.name}</span>);
+            if(student.in_today) inCol.push(<span className="student-listing col-sm-4">{student.name}</span>);
+            if(student.absent_today) outCol.push(<span className="student-listing col-sm-4">{student.name}</span>);
         });
 
         return <div className="row">
