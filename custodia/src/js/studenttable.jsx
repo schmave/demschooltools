@@ -18,13 +18,19 @@ module.exports = React.createClass({
             outCol = [];
 
         var rows = this.state.students.map(function (student) {
-            var link = 'students/' + student._id;
+            var link = <Link to="students" params={{studentId: student._id}}>{student.name}</Link>;
             if(student.absent_today) absentCol.push(<span className="student-listing col-sm-4">
-                <Link to="students" params={{studentId: student._id}}>{student.name}</Link>
+                {link}
             </span>);
-            if(!student.in_today && !student.absent_today) notYetInCol.push(<span className="student-listing col-sm-4">{student.name}</span>);
-            if(student.in_today) inCol.push(<span className="student-listing col-sm-4">{student.name}</span>);
-            if(student.absent_today) outCol.push(<span className="student-listing col-sm-4">{student.name}</span>);
+            if(!student.in_today && !student.absent_today) notYetInCol.push(<span className="student-listing col-sm-4">
+                {link}
+            </span>);
+            if(student.in_today) inCol.push(<span className="student-listing col-sm-4">
+                {link}
+            </span>);
+            if(student.absent_today) outCol.push(<span className="student-listing col-sm-4">
+                {link}
+            </span>);
         });
 
         return <div className="row student-listing-table">

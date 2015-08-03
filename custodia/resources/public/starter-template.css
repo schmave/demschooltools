@@ -96,7 +96,12 @@ body {
     text-align: center;
 }
 
-#content{
+.content{
     padding: 15px;
     padding-left: 25px;
 }
+
+.margined{
+    margin: .5em !important;
+}
+
