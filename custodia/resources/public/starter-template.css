@@ -91,3 +91,12 @@ body {
     font-size: 1.5em;
     padding: 7px;
 }
+
+.student-listing-table{
+    text-align: center;
+}
+
+#content{
+    padding: 15px;
+    padding-left: 25px;
+}

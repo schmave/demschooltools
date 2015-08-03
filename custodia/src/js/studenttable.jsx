@@ -22,7 +22,7 @@ module.exports = React.createClass({
             if(student.absent_today) outCol.push(<span className="student-listing col-sm-4">{student.name}</span>);
         });
 
-        return <div className="row">
+        return <div className="row student-listing-table">
                    <div className="col-sm-3"><h2>Not Coming In</h2><div className="row">{absentCol}</div></div>
                    <div className="col-sm-3"><h2>Not Yet In</h2><div className="row">{notYetInCol}</div></div>
                    <div className="col-sm-3"><h2>In</h2><div className="row">{inCol}</div></div>
