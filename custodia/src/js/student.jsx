@@ -8,8 +8,18 @@ var exports = React.createClass({
     getInitialState: function () {
         return {studentId: this.context.router.getCurrentParams().studentId};
     },
+    componentDidMount: function () {
+        studentStore.addChangeListener(this._onChange)
+        studentStore.getStudent(this.state.studentId);
+    },
     render: function () {
-        return <div>a student lives here: {this.state.studentId}</div>;
+        return <div>a student lives here: {this.state.student}</div>;
+    },
+    _onChange: function () {
+        this.setState({
+            student: studentStore.getStudent(this.state.studentId),
+            studentId: this.state.studentId
+        })
     }
 });
 

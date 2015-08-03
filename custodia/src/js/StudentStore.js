@@ -7,6 +7,7 @@ var EventEmitter = require('events').EventEmitter,
 var CHANGE_EVENT = 'change';
 
 var students;
+var studentDetails = {};
 
 function getStudents(){
     if(students){
@@ -16,8 +17,19 @@ function getStudents(){
         return [];
     }
 }
+
+function getStudent(id){
+    if(studentDetails[id]){
+        return studentDetails[id];
+    }else{
+        actionCreator.loadStudent(id);
+        return null;
+    }
+}
+
 var exports = assign({}, EventEmitter.prototype, {
     getStudents: getStudents,
+    getStudent: getStudent,
     emitChange: function(){
         this.emit(CHANGE_EVENT);
     },
@@ -30,6 +42,10 @@ dispatcher.register(function(action){
     switch(action.type){
         case constants.studentEvents.LOADED:
             students = action.data;
+            exports.emitChange();
+            break;
+        case constants.studentEvents.STUDENT_LOADED:
+            studentDetails[action.data._id] = action.data;
             exports.emitChange();
             break;
     }
