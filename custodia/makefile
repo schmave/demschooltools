@@ -58,4 +58,3 @@ js :
 
 watch :
 	watchify -v -t reactify ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
-
