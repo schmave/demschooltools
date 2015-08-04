@@ -1,4 +1,5 @@
 var React = require('react'),
+    actionCreator= require('./studentactioncreator'),
     studentStore = require('./StudentStore');
 
 var exports = React.createClass({
@@ -14,6 +15,12 @@ var exports = React.createClass({
     },
     componentWillUnmount: function(){
         studentStore.removeChangeListener(this._onChange);
+    },
+    signIn: function(){
+        actionCreator.swipeStudent(this.state.student, 'in');
+    },
+    signOut: function(){
+        actionCreator.swipeStudent(this.state.student, 'out');
     },
     render: function () {
         if (this.state.student) {
@@ -37,8 +44,8 @@ var exports = React.createClass({
                         <div className="panel-body">
                             <div className="row">
                                 <div className="col-sm-3">
-                                    <button type="button" className="btn btn-sm btn-info margined">Sign In</button>
-                                    <button type="button" className="btn btn-sm btn-info margined">Sign Out</button>
+                                    <button type="button" onClick={this.signIn} className="btn btn-sm btn-info margined">Sign In</button>
+                                    <button type="button" onClick={this.signOut} className="btn btn-sm btn-info margined">Sign Out</button>
                                     <button type="button" className="btn btn-sm btn-info margined">Absent</button>
                                 </div>
                             </div>

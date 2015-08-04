@@ -1,13 +1,11 @@
 var eventEmitter = require('events').EventEmitter,
     constants = require('./appconstants'),
-    ajax = require('marmottajax'),
     dispatcher = require('./appdispatcher');
 
 var exports = {
     loadStudents: function () {
-        ajax({
-            url: '/students',
-            json: true
+        $.ajax({
+            url: '/students'
         }).then(function (data) {
             dispatcher.dispatch({
                 type: constants.studentEvents.LOADED,
@@ -16,14 +14,28 @@ var exports = {
         });
     },
     loadStudent: function (id) {
-        ajax({
-            url: '/student/' + id,
-            json: true
+        $.ajax({
+            url: '/student/' + id
         }).then(function (data) {
             dispatcher.dispatch({
                 type: constants.studentEvents.STUDENT_LOADED,
                 data: data.student
             });
+        });
+    },
+    swipeStudent: function (student, direction) {
+        $.ajax({
+            url: '/swipe',
+            method: 'POST',
+            data: {
+                _id: student._id,
+                direction: direction
+            }
+        }).then(function (data) {
+            dispatcher.dispatch({
+                type: constants.studentEvents.STUDENT_SWIPED,
+                data: data
+            })
         });
     }
 };
