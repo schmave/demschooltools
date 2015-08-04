@@ -48,6 +48,7 @@ dispatcher.register(function(action){
             exports.emitChange();
             break;
         case constants.studentEvents.STUDENT_LOADED:
+        case constants.studentEvents.MARKED_ABSENT:
             studentDetails[action.data._id] = action.data;
             exports.emitChange();
             break;

@@ -31,6 +31,16 @@ var exports = {
                     data: data
                 })
             });
+    },
+    markAbsent: function (student) {
+        ajax.post('/student/toggleabsent', {_id: student._id})
+            .then(function (data) {
+                dispatcher.dispatch({
+                    type: constants.studentEvents.MARKED_ABSENT,
+                    data: data.student
+                });
+            });
+
     }
 };
 

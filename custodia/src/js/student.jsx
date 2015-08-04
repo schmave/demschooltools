@@ -1,5 +1,5 @@
 var React = require('react'),
-    actionCreator= require('./studentactioncreator'),
+    actionCreator = require('./studentactioncreator'),
     studentStore = require('./StudentStore');
 
 var exports = React.createClass({
@@ -13,14 +13,17 @@ var exports = React.createClass({
         studentStore.addChangeListener(this._onChange)
         studentStore.getStudent(this.state.studentId);
     },
-    componentWillUnmount: function(){
+    componentWillUnmount: function () {
         studentStore.removeChangeListener(this._onChange);
     },
-    signIn: function(){
+    signIn: function () {
         actionCreator.swipeStudent(this.state.student, 'in');
     },
-    signOut: function(){
+    signOut: function () {
         actionCreator.swipeStudent(this.state.student, 'out');
+    },
+    markAbsent: function () {
+        actionCreator.markAbsent(this.state.student);
     },
     render: function () {
         if (this.state.student) {
@@ -30,7 +33,10 @@ var exports = React.createClass({
                     <div className="panel panel-info">
                         <div className="panel-heading">
                             <div className="row">
-                                <div className="col-sm-8"><h1>{this.state.student.name}</h1></div>
+                                <div className="col-sm-8">
+                                    <h1 className="pull-left">{this.state.student.name} </h1>
+                                    <h2 className="pull-left label label-danger">{this.state.student.absent_today ? 'Absent' : ''}</h2>
+                                </div>
                                 <div className="col-sm-4">
                                     <div className="col-sm-6"><b>Attended:</b> {this.state.student.total_days}</div>
                                     <div className="col-sm-6"><b>Absent:</b> {this.state.student.total_abs}</div>
@@ -44,9 +50,15 @@ var exports = React.createClass({
                         <div className="panel-body">
                             <div className="row">
                                 <div className="col-sm-3">
-                                    <button type="button" onClick={this.signIn} className="btn btn-sm btn-info margined">Sign In</button>
-                                    <button type="button" onClick={this.signOut} className="btn btn-sm btn-info margined">Sign Out</button>
-                                    <button type="button" className="btn btn-sm btn-info margined">Absent</button>
+                                    <button type="button" onClick={this.signIn}
+                                            className="btn btn-sm btn-info margined">Sign In
+                                    </button>
+                                    <button type="button" onClick={this.signOut}
+                                            className="btn btn-sm btn-info margined">Sign Out
+                                    </button>
+                                    <button type="button" onClick={this.markAbsent}
+                                            className="btn btn-sm btn-info margined">Absent
+                                    </button>
                                 </div>
                             </div>
                         </div>
