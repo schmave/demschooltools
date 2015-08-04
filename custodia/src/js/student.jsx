@@ -35,6 +35,7 @@ var exports = React.createClass({
                             <div className="row">
                                 <div className="col-sm-8">
                                     <h1 className="pull-left">{this.state.student.name} </h1>
+
                                     <h2 className="pull-left label label-danger">{this.state.student.absent_today ? 'Absent' : ''}</h2>
                                 </div>
                                 <div className="col-sm-4">
@@ -56,9 +57,12 @@ var exports = React.createClass({
                                     <button type="button" onClick={this.signOut}
                                             className="btn btn-sm btn-info margined">Sign Out
                                     </button>
-                                    <button type="button" onClick={this.markAbsent}
-                                            className="btn btn-sm btn-info margined">Absent
-                                    </button>
+                                    <span>
+                                        {!this.state.student.absent_today ?
+                                            <button type="button" onClick={this.markAbsent}
+                                                           className="btn btn-sm btn-info margined">Absent
+                                            </button> : <span></span>}
+                                        </span>
                                 </div>
                             </div>
                         </div>
