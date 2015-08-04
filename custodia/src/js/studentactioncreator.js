@@ -1,5 +1,6 @@
 var eventEmitter = require('events').EventEmitter,
     constants = require('./appconstants'),
+    ajax = require('./ajaxhelper'),
     dispatcher = require('./appdispatcher');
 
 var exports = {
@@ -14,29 +15,22 @@ var exports = {
         });
     },
     loadStudent: function (id) {
-        $.ajax({
-            url: '/student/' + id
-        }).then(function (data) {
-            dispatcher.dispatch({
-                type: constants.studentEvents.STUDENT_LOADED,
-                data: data.student
+        ajax.get('/student/' + id)
+            .then(function (data) {
+                dispatcher.dispatch({
+                    type: constants.studentEvents.STUDENT_LOADED,
+                    data: data.student
+                });
             });
-        });
     },
     swipeStudent: function (student, direction) {
-        $.ajax({
-            url: '/swipe',
-            method: 'POST',
-            data: {
-                _id: student._id,
-                direction: direction
-            }
-        }).then(function (data) {
-            dispatcher.dispatch({
-                type: constants.studentEvents.STUDENT_SWIPED,
-                data: data
-            })
-        });
+        ajax.post('/swipe', {_id: student._id, direction: direction})
+            .then(function (data) {
+                dispatcher.dispatch({
+                    type: constants.studentEvents.STUDENT_SWIPED,
+                    data: data
+                })
+            });
     }
 };
 
