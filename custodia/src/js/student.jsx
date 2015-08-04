@@ -12,6 +12,9 @@ var exports = React.createClass({
         studentStore.addChangeListener(this._onChange)
         studentStore.getStudent(this.state.studentId);
     },
+    componentWillUnmount: function(){
+        studentStore.removeChangeListener(this._onChange);
+    },
     render: function () {
         if (this.state.student) {
             return <div className="content row">

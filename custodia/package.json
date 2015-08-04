@@ -28,5 +28,8 @@
     "react-router": "^0.13.3",
     "reactify": "^1.1.1",
     "watchify": "^3.3.1"
+  },
+  "devDependencies": {
+    "uglifyify": "^3.0.1"
   }
 }

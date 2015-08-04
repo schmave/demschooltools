@@ -11,6 +11,9 @@ module.exports = React.createClass({
         studentStore.addChangeListener(this._onChange);
         this.setState({students: studentStore.getStudents()});
     },
+    componentWillUnmount: function(){
+        studentStore.removeChangeListener(this._onChange);
+    },
     render: function () {
         var absentCol = [],
             notYetInCol = [],
