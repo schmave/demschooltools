@@ -81,7 +81,7 @@ while True:
 
 		# check to see if person exists or not
 		new_cur.execute("""SELECT p.person_id from person p join comments c on p.person_id=c.person_id
-		   where c.message like '%%Id: %s%%,'""", (person[20],))
+		   where c.message like '%%Id: %s,%%'""", (person[20],))
 		  
 		result = new_cur.fetchone()
 		existing_person_id = None
