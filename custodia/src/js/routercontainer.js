@@ -1,3 +1,4 @@
-var exports = {};
+var _router = null;
 
-module.exports = exports;
+exports.set(router => _router = router);
+exports.get(() => _router);

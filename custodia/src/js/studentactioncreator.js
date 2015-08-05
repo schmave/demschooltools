@@ -1,6 +1,7 @@
 var eventEmitter = require('events').EventEmitter,
     constants = require('./appconstants'),
     ajax = require('./ajaxhelper'),
+    Router = require('react-router'),
     dispatcher = require('./appdispatcher');
 
 var exports = {
@@ -29,7 +30,7 @@ var exports = {
                 dispatcher.dispatch({
                     type: constants.studentEvents.STUDENT_SWIPED,
                     data: data
-                })
+                });
             });
     },
     markAbsent: function (student) {

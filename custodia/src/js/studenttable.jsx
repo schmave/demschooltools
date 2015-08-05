@@ -20,7 +20,7 @@ module.exports = React.createClass({
             inCol = [],
             outCol = [];
 
-        var rows = this.state.students.map(function (student) {
+        this.state.students.map(function (student) {
             var link = <Link to="students" params={{studentId: student._id}}>{student.name}</Link>;
             if (student.absent_today) {
                 absentCol.push(<span className="student-listing col-sm-4">
@@ -45,20 +45,19 @@ module.exports = React.createClass({
         });
 
         return <div className="row student-listing-table">
-            <div className="col-sm-3"><h2>Not Coming In</h2>
-
+            <div className="col-sm-2"><h2>Not Coming In</h2>
                 <div className="row">{absentCol}</div>
             </div>
-            <div className="col-sm-3"><h2>Not Yet In</h2>
-
+            <div className="col-sm-1"></div>
+            <div className="col-sm-2"><h2>Not Yet In</h2>
                 <div className="row">{notYetInCol}</div>
             </div>
-            <div className="col-sm-3"><h2>In</h2>
-
+            <div className="col-sm-1"></div>
+            <div className="col-sm-2"><h2>In</h2>
                 <div className="row">{inCol}</div>
             </div>
-            <div className="col-sm-3"><h2>Out</h2>
-
+            <div className="col-sm-1"></div>
+            <div className="col-sm-2"><h2>Out</h2>
                 <div className="row">{outCol}</div>
             </div>
         </div>;
@@ -66,5 +65,4 @@ module.exports = React.createClass({
     _onChange: function () {
         this.setState({students: studentStore.getStudents()});
     }
-})
-;
+});

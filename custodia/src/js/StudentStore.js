@@ -19,10 +19,10 @@ function getStudents(){
 }
 
 function getStudent(id){
+    actionCreator.loadStudent(id);
     if(studentDetails[id]){
         return studentDetails[id];
     }else{
-        actionCreator.loadStudent(id);
         return null;
     }
 }
@@ -46,6 +46,9 @@ dispatcher.register(function(action){
         case constants.studentEvents.LOADED:
             students = action.data;
             exports.emitChange();
+            break;
+        case constants.studentEvents.STUDENT_SWIPED:
+            actionCreator.loadStudents();
             break;
         case constants.studentEvents.STUDENT_LOADED:
         case constants.studentEvents.MARKED_ABSENT:

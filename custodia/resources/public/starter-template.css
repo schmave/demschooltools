@@ -61,6 +61,11 @@ body {
     padding: 2px 15px;
 }
 
+.badge-red {
+    background-color: red !important;
+    color: white !important;
+}
+
 .red { background-color: red; }
 
 @media (min-width: 768px) {
