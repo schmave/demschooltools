@@ -1,7 +1,7 @@
 var eventEmitter = require('events').EventEmitter,
     constants = require('./appconstants'),
     ajax = require('./ajaxhelper'),
-    Router = require('react-router'),
+    router = require('./routercontainer'),
     dispatcher = require('./appdispatcher');
 
 var exports = {
@@ -31,7 +31,9 @@ var exports = {
                     type: constants.studentEvents.STUDENT_SWIPED,
                     data: data
                 });
-            });
+                this.loadStudents();
+                router.get().transitionTo('students');
+            }.bind(this));
     },
     markAbsent: function (student) {
         ajax.post('/student/toggleabsent', {_id: student._id})

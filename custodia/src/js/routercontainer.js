@@ -1,4 +1,10 @@
 var _router = null;
 
-exports.set(router => _router = router);
-exports.get(() => _router);
+module.exports = {
+    set: function(router){
+        _router = router;
+    },
+    get: function(){
+        return _router;
+    }
+}

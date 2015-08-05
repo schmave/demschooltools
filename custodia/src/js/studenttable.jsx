@@ -21,7 +21,7 @@ module.exports = React.createClass({
             outCol = [];
 
         this.state.students.map(function (student) {
-            var link = <Link to="students" params={{studentId: student._id}}>{student.name}</Link>;
+            var link = <Link to="student" params={{studentId: student._id}}>{student.name}</Link>;
             if (student.absent_today) {
                 absentCol.push(<span className="student-listing col-sm-4">
                 {link}

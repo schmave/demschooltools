@@ -1,5 +1,6 @@
 var React = require('react'),
     Router = require('react-router'),
+    routerContainer = require('./routercontainer'),
     Nav = require('./nav.jsx'),
     Student = require('./student.jsx'),
     StudentTable = require('./studenttable.jsx');
@@ -22,12 +23,14 @@ var App = React.createClass({
 
 var routes = (
   <Route path="/" handler={App}>
-    <Route path="students" handler={StudentTable}/>
-    <Route name="students" path="students/:studentId" handler={Student}/>
+    <Route name="students" path="students" handler={StudentTable}/>
+    <Route name="student" path="students/:studentId" handler={Student}/>
     <DefaultRoute handler={StudentTable}/>
   </Route>
 );
 
-Router.run(routes, function (Handler) {
+router = Router.create(routes);
+routerContainer.set(router);
+router.run(function (Handler) {
   React.render(<Handler />, document.body);
 });
