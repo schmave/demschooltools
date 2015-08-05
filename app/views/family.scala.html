@@ -5,6 +5,10 @@
 
 @main(p.first_name + " " + p.last_name, "crm") {
 
+@if(p.family != null && (!p.family.first_name.equals("") || !p.family.last_name.equals(""))) {
+	<span class="family-name">@p.family.first_name @p.family.last_name</span>
+}
+
 @defining(if(family_members.size() >= 2){ "col-xs-6 col-md-3" } else {"col-xs-6 col-md-6"}) { size =>
 <div class="row">
 	<div class="@size">
