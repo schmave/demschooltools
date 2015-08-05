@@ -1,7 +1,6 @@
 var React = require('react'),
     actionCreator = require('./studentactioncreator'),
-    studentStore = require('./StudentStore'),
-    AdminWrapper = require('./adminwrapper.jsx');
+    studentStore = require('./StudentStore');
 
 var exports = React.createClass({
     contextTypes: {
@@ -40,9 +39,9 @@ var exports = React.createClass({
             </button>);
         }
         if(!this.state.student.absent_today){
-            buttons.push(<AdminWrapper><button type="button" onClick={this.markAbsent}
+            buttons.push(<button type="button" onClick={this.markAbsent}
                                  className="btn btn-sm btn-info margined">Absent
-            </button></AdminWrapper>);
+            </button>);
         }
 
         return buttons;
@@ -50,7 +49,7 @@ var exports = React.createClass({
     todaysSwipes: function(){
         var swipes = [];
         this.state.student.days[0].swipes.map(function(swipe){
-            swipes.push(<tr><td>{swipe.nice_in_time}</td><td>{swipe.nice_out_time}</td><td></td></tr>)
+            swipes.push(<tr><td>{swipe.nice_in_time}</td><td>{swipe.nice_out_time}</td></tr>)
         })
         return swipes;
     },
@@ -83,13 +82,12 @@ var exports = React.createClass({
                                         {this.getActionButtons()}
                                     </div>
                                 </div>
-                                <div className="col-sm-5">
-                                    <table className="table table-striped">
+                                <div className="col-sm-2">
+                                    <table className="table table-striped center">
                                         <thead>
                                             <tr>
-                                                <th>In Time</th>
-                                                <th>Out Time</th>
-                                                <th>Minutes</th>
+                                                <th className="center">In Time</th>
+                                                <th className="center">Out Time</th>
                                             </tr>
                                         </thead>
                                         <tbody>

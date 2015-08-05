@@ -1,4 +1,5 @@
-var React = require('react');
+var React = require('react'),
+    AdminWrapper = require('./adminwrapper.jsx');
 
 module.exports = React.createClass({
     render: function () {
@@ -17,9 +18,9 @@ module.exports = React.createClass({
                 <div id="navbar" className="collapse navbar-collapse">
                     <ul className="nav navbar-nav">
                         <li className="{{(screen==='home')?'active':''}}"><a href="#" ng-click="showHome()">Home</a></li>
-                        <li className="{{(screen==='student-totals')?'active':''}}"><a href="#" ng-show="isAdmin"
+                        <AdminWrapper><li className="{{(screen==='student-totals')?'active':''}}"><a href="#" ng-show="isAdmin"
                                                                                    ng-click="showStudents()">Student
-                            Totals</a></li>
+                            Totals</a></li></AdminWrapper>
                         <li><a href="/logout">Logout</a></li>
                     </ul>
                 </div>

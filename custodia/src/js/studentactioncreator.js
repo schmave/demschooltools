@@ -25,17 +25,19 @@ var exports = {
             });
     },
     swipeStudent: function (student, direction) {
+        var student = student;
         ajax.post('/swipe', {_id: student._id, direction: direction})
             .then(function (data) {
                 dispatcher.dispatch({
                     type: constants.studentEvents.STUDENT_SWIPED,
-                    data: data
+                    data: {students: data}
                 });
+                this.loadStudent(student._id);
                 dispatcher.dispatch({
                     type: constants.systemEvents.FLASH,
                     message: student.name + ' swiped successfully!'
                 });
-                this.loadStudents();
+                student = null;
                 router.get().transitionTo('students');
             }.bind(this));
     },

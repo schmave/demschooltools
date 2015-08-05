@@ -61,6 +61,10 @@ body {
     padding: 2px 15px;
 }
 
+.center{
+    text-align: center;
+}
+
 .badge-red {
     background-color: red !important;
     color: white !important;

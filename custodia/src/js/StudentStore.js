@@ -48,7 +48,7 @@ dispatcher.register(function(action){
             exports.emitChange();
             break;
         case constants.studentEvents.STUDENT_SWIPED:
-            actionCreator.loadStudents();
+            students = action.data.students;
             break;
         case constants.studentEvents.STUDENT_LOADED:
         case constants.studentEvents.MARKED_ABSENT:
