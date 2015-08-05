@@ -32,8 +32,8 @@ import play.mvc.*;
 import play.mvc.Http.Context;
 
 
-@Secured.Auth(UserRole.ROLE_ALL_ACCESS)
 @With(DumpOnError.class)
+@Secured.Auth(UserRole.ROLE_ALL_ACCESS)
 public class CRM extends Controller {
 
 	static Form<Person> personForm = Form.form(Person.class);

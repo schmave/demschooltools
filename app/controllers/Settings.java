@@ -14,8 +14,8 @@ import play.*;
 import play.data.*;
 import play.mvc.*;
 
-@Secured.Auth(UserRole.ROLE_ALL_ACCESS)
 @With(DumpOnError.class)
+@Secured.Auth(UserRole.ROLE_ALL_ACCESS)
 public class Settings extends Controller {
 
     static Form<Task> task_form = Form.form(Task.class);
