@@ -19,7 +19,7 @@ hello :
 	ls
 	@echo Done
 
-deploy-test : unit-test
+deploy-test : 
 	git push $(web-test-git) master
 
 sql-philly : 
