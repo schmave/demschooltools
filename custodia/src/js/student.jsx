@@ -1,6 +1,7 @@
 var React = require('react'),
     actionCreator = require('./studentactioncreator'),
-    studentStore = require('./StudentStore');
+    studentStore = require('./StudentStore'),
+    AdminWrapper = require('./adminwrapper.jsx');
 
 var exports = React.createClass({
     contextTypes: {
@@ -39,9 +40,9 @@ var exports = React.createClass({
             </button>);
         }
         if(!this.state.student.absent_today){
-            buttons.push(<button type="button" onClick={this.markAbsent}
+            buttons.push(<AdminWrapper><button type="button" onClick={this.markAbsent}
                                  className="btn btn-sm btn-info margined">Absent
-            </button>);
+            </button></AdminWrapper>);
         }
 
         return buttons;

@@ -19,10 +19,10 @@ function getStudents(){
 }
 
 function getStudent(id){
-    actionCreator.loadStudent(id);
     if(studentDetails[id]){
         return studentDetails[id];
     }else{
+        actionCreator.loadStudent(id);
         return null;
     }
 }
