@@ -2,8 +2,10 @@ var React = require('react'),
     Router = require('react-router'),
     routerContainer = require('./routercontainer'),
     Nav = require('./nav.jsx'),
+    Flash = require('./flashnotification.jsx');
     Student = require('./student.jsx'),
     StudentTable = require('./studenttable.jsx');
+
 
 var DefaultRoute = Router.DefaultRoute;
 var Link = Router.Link;
@@ -15,6 +17,7 @@ var App = React.createClass({
     return (
         <div>
             <Nav />
+            <Flash />
             <RouteHandler />
         </div>
     );

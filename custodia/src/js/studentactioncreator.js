@@ -31,6 +31,10 @@ var exports = {
                     type: constants.studentEvents.STUDENT_SWIPED,
                     data: data
                 });
+                dispatcher.dispatch({
+                    type: constants.systemEvents.FLASH,
+                    message: student.name + ' swiped successfully!'
+                });
                 this.loadStudents();
                 router.get().transitionTo('students');
             }.bind(this));
