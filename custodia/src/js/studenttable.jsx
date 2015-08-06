@@ -2,7 +2,7 @@ var React = require('react'),
     Router = require('react-router'),
     Link = Router.Link,
     AdminItem = require('./adminwrapper.jsx'),
-    actionCreator  = require('./studentactioncreator'),
+    actionCreator = require('./studentactioncreator'),
     studentStore = require('./StudentStore');
 
 module.exports = React.createClass({
@@ -47,23 +47,38 @@ module.exports = React.createClass({
         });
 
         return <div className="row student-listing-table">
-            <div className="col-sm-2 column"><h2>Not Coming In</h2>
-                <div className="row">{absentCol}</div>
+            <div className="col-sm-2 column">
+                <div className="panel panel-info">
+                    <div className="panel-heading"><b>Not Coming In</b></div>
+                    <div className="panel-body row">{absentCol}</div>
+                </div>
             </div>
-            <div className="col-sm-3 column"><h2>Not Yet In</h2>
-                <div className="row">{notYetInCol}</div>
+            <div className="col-sm-3 column">
+                <div className="panel panel-info">
+                    <div className="panel-heading">Not Yet In</div>
+                    <div className="panel-body row">{notYetInCol}</div>
+                </div>
             </div>
-            <div className="col-sm-2 column"><h2>In</h2>
-                <div className="row">{inCol}</div>
+            <div className="col-sm-2 column">
+                <div className="panel panel-info">
+                    <div className="panel-heading">In</div>
+                    <div className="panel-body row">{inCol}</div>
+                </div>
             </div>
-            <div className="col-sm-2 column"><h2>Out</h2>
-
-                <div className="row">{outCol}</div>
+            <div className="col-sm-2 column">
+                <div className="panel panel-info">
+                    <div className="panel-heading">Out</div>
+                    <div className="panel-body row">{outCol}</div>
+                </div>
             </div>
             <AdminItem>
                 <div className="col-sm-1 column">
-                    <h2>Administration</h2>
-                    <Link to="create">Add Student</Link>
+                    <div className="panel panel-info">
+                        <div className="panel-heading">Administration</div>
+                        <div className="panel-body row">
+                            <Link to="create">Add Student</Link>
+                        </div>
+                    </div>
                 </div>
             </AdminItem>
         </div>;
