@@ -40,6 +40,18 @@ var exports = {
             });
         });
     },
+    updateStudent: function (id, name) {
+        ajax.post('/rename', {
+            _id: id,
+            name: name
+        }).then(function (data) {
+            this.loadStudents();
+            dispatcher.dispatch({
+                type: constants.studentEvents.STUDENT_LOADED,
+                data: data.student
+            });
+        }.bind(this));
+    },
     swipeStudent: function (student, direction) {
         var student = student;
         ajax.post('/swipe', {_id: student._id, direction: direction})
