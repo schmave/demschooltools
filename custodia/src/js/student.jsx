@@ -55,7 +55,7 @@ var exports = React.createClass({
     },
     render: function () {
         if (this.state.student) {
-            return <div className="content row">
+            return <div className="row">
                 <div className="col-sm-1"></div>
                 <div className="col-sm-10">
                     <div className="panel panel-info">

@@ -24,6 +24,22 @@ var exports = {
                 });
             });
     },
+    createStudent: function (name) {
+        ajax.post('/student/create', {
+            name: name
+        }).then(function (data) {
+            dispatcher.dispatch({
+                type: constants.systemEvents.FLASH,
+                message: 'Successfully created ' + data.made.name + '.'
+            });
+            router.get().transitionTo('students');
+        }, function (error) {
+            dispatcher.dispatch({
+                type: constants.systemEvents.FLASH,
+                message: 'An error occurred during creation.'
+            });
+        });
+    },
     swipeStudent: function (student, direction) {
         var student = student;
         ajax.post('/swipe', {_id: student._id, direction: direction})

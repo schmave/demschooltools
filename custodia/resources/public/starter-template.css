@@ -105,6 +105,13 @@ body {
     text-align: center;
 }
 
+.student-listing-table .column{
+    margin-left: 20px;
+    border-left-width: 2px;
+    border-left-style: solid;
+    border-left-color: #c2c0c4;
+}
+
 .content{
     padding: 15px;
     padding-left: 25px;
