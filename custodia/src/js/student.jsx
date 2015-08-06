@@ -25,6 +25,9 @@ var exports = React.createClass({
     markAbsent: function () {
         actionCreator.markAbsent(this.state.student);
     },
+    selectDay: function(node, event){
+        console.log('day', node, event);
+    },
     getActionButtons: function () {
         var buttons = [];
 
@@ -45,6 +48,11 @@ var exports = React.createClass({
         }
 
         return buttons;
+    },
+    getPreviousDays: function(){
+      return this.state.student.days.map(function(day){
+          return <tr onClick={this.selectDay}><td>{day.day}</td></tr>;
+      })
     },
     todaysSwipes: function () {
         var swipes = [];
@@ -102,6 +110,18 @@ var exports = React.createClass({
                                     <div className="col-sm-5">
                                         {this.getActionButtons()}
                                     </div>
+                                </div>
+                                <div className="col-sm-2">
+                                    <table className="table table-striped center">
+                                        <thead>
+                                        <tr>
+                                            <th className="center">Attendance</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                            {this.getPreviousDays()}
+                                        </tbody>
+                                    </table>
                                 </div>
                                 <div className="col-sm-2">
                                     <table className="table table-striped center">
