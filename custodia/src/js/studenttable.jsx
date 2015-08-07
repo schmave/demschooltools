@@ -55,26 +55,26 @@ module.exports = React.createClass({
             </div>
             <div className="col-sm-3 column">
                 <div className="panel panel-info">
-                    <div className="panel-heading">Not Yet In</div>
+                    <div className="panel-heading"><b>Not Yet In</b></div>
                     <div className="panel-body row">{notYetInCol}</div>
                 </div>
             </div>
             <div className="col-sm-2 column">
                 <div className="panel panel-info">
-                    <div className="panel-heading">In</div>
+                    <div className="panel-heading"><b>In</b></div>
                     <div className="panel-body row">{inCol}</div>
                 </div>
             </div>
             <div className="col-sm-2 column">
                 <div className="panel panel-info">
-                    <div className="panel-heading">Out</div>
+                    <div className="panel-heading"><b>Out</b></div>
                     <div className="panel-body row">{outCol}</div>
                 </div>
             </div>
             <AdminItem>
                 <div className="col-sm-1 column">
                     <div className="panel panel-info">
-                        <div className="panel-heading">Administration</div>
+                        <div className="panel-heading"><b>Administration</b></div>
                         <div className="panel-body row">
                             <Link to="create">Add Student</Link>
                         </div>

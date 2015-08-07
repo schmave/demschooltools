@@ -28,12 +28,13 @@ var exports = {
         ajax.post('/student/create', {
             name: name
         }).then(function (data) {
+            this.loadStudents();
             dispatcher.dispatch({
                 type: constants.systemEvents.FLASH,
                 message: 'Successfully created ' + data.made.name + '.'
             });
             router.get().transitionTo('students');
-        }, function (error) {
+        }.bind(this), function (error) {
             dispatcher.dispatch({
                 type: constants.systemEvents.FLASH,
                 message: 'An error occurred during creation.'
