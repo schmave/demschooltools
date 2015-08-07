@@ -61,6 +61,15 @@ body {
     padding: 2px 15px;
 }
 
+.center{
+    text-align: center;
+}
+
+.badge-red {
+    background-color: red !important;
+    color: white !important;
+}
+
 .red { background-color: red; }
 
 @media (min-width: 768px) {
@@ -86,3 +95,32 @@ body {
         width: 1300px;
     }
 }
+
+.student-listing{
+    font-size: 1.5em;
+    padding: 7px;
+}
+
+.student-listing-table{
+    text-align: center;
+}
+
+.student-listing-table .panel{
+    /*margin-left: 20px;*/
+    overflow-x: hidden;
+}
+
+.edit-student{
+    margin-top: 24px;
+    margin-left: 3px;
+}
+
+.content{
+    padding: 15px;
+    padding-left: 25px;
+}
+
+.margined{
+    margin: .5em !important;
+}
+

@@ -112,9 +112,9 @@
        (io/resource "login.html"))
   (GET "/logout" req
        (friend/logout* (resp/redirect (str (:context req) "/"))))
-  (GET "/is-user" req
+  (GET "/user/is-user" req
        (friend/authorize #{::user} "You're a user!"))
-  (POST "/is-admin" req
+  (GET "/user/is-admin" req
         (friend/authorize #{::admin} (resp/response {:admin true})))
   (route/resources "/")
   (ANY "*" []
