@@ -154,24 +154,6 @@ public class Person extends Model implements Comparable<Person> {
     }
 
     @JsonIgnore
-    public Map<Entry, List<Charge>> getChargesByRule() {
-        Map<Entry, List<Charge>> result = new TreeMap<Entry, List<Charge>>();
-        Collections.sort(charges);
-        for (Charge c : charges) {
-            if (c.rule != null) {
-                List<Charge> cur_list = result.get(c.rule);
-                if (cur_list == null) {
-                    cur_list = new ArrayList<Charge>();
-                    result.put(c.rule, cur_list);
-                }
-                cur_list.add(c);
-            }
-        }
-
-        return result;
-    }
-
-    @JsonIgnore
     public List<Charge> getThisYearCharges() {
         Date beginning_of_year = Application.getStartOfYear();
 
@@ -197,13 +179,6 @@ public class Person extends Model implements Comparable<Person> {
             }
         }
 
-        return result;
-    }
-
-    @JsonIgnore
-    public List<Charge> getChargesInDateOrder() {
-        List<Charge> result = new ArrayList<Charge>(charges);
-        Collections.sort(result, Collections.reverseOrder());
         return result;
     }
 

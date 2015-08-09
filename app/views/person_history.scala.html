@@ -2,7 +2,8 @@
 
 @import helper._
 
-<h3>@p.getDisplayName()'s recent @OrgConfig.get().str_res_plans</h3>
+<h3>@p.getDisplayName()'s JC history, @Application.yymmddDate(history.start_date) to @Application.yymmddDate(history.end_date)</h3>
+<h4>Recent @OrgConfig.get().str_res_plans</h4>
 
 @if( recent_rps.size() == 0 ) {
 <p>None. Go @p.getDisplayName()!
@@ -19,7 +20,7 @@
 </table>
 }
 
-<h3>Rule violation counts</h3>
+<h4>Rule violation counts</h4>
 <table class="table sortable">
 <thead><tr><th width=50% class="sorttable_alpha">Entry<th width=25% class="sorttable_school_mmdd">Most Recent Violation<th class="sorttable_numeric"># of violations</tr></thead>
 <tbody>
@@ -34,11 +35,19 @@
 </tbody>
 </table>
 
-<h3>Case Details...</h3>
+<h4>Case Details...</h4>
 @if(redact_names) {
-<p>Names have been removed. <a nosidebar href="@routes.Application.viewPersonHistory(p.person_id, false)">View with names.</a>
+<p>Names have been removed. <a nosidebar href="@routes.Application.viewPersonHistory(
+	p.person_id, 
+	false, 
+	Application.yymmddDate(history.start_date),
+	Application.yymmddDate(history.end_date))">View with names.</a>
 } else {
-<p>Names are intact. <a nosidebar href="@routes.Application.viewPersonHistory(p.person_id, true)">Remove names.</a>
+<p>Names are intact. <a nosidebar href="@routes.Application.viewPersonHistory(
+	p.person_id, 
+	true, 
+	Application.yymmddDate(history.start_date),
+	Application.yymmddDate(history.end_date))">Remove names.</a>
 }
 <ul class="nav nav-tabs">
   <li class="active"><a href="#byrule" data-toggle="tab">... by Entry</a></li>
@@ -48,24 +57,20 @@
 <!-- Tab panes -->
 <div class="tab-content">
   <div class="tab-pane active" id="byrule">
-	@defining( p.getChargesByRule() ) { charges_by_rule =>
-		@for( (rule, charges) <- charges_by_rule ) {
-			@if( rule != null ) {
-				<h4 style="margin-top: 2em;">@rule.title</h4>
-			}
-			@for( c <- charges) {
-				@historyCharge(c, false, false, redact_names)
-			}
+	@for( (rule, charges) <- history.charges_by_rule ) {
+		@if( rule != null ) {
+			<h4 style="margin-top: 2em;">@rule.title</h4>
+		}
+		@for( c <- charges) {
+			@historyCharge(c, false, false, redact_names)
 		}
 	}
 	</div>
 
 	<div class="tab-pane" id="bydate">
 	<p>&nbsp;</p>
-	@defining( p.getChargesInDateOrder() ) { charges =>
-		@for( c <- charges) {
-			@historyCharge(c, false, true, redact_names)
-		}
+	@for( c <- history.charges_by_date) {
+		@historyCharge(c, false, true, redact_names)
 	}
 	</div>
 </div>

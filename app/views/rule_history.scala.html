@@ -2,7 +2,7 @@
 
 @import helper._
 
-<h3>@r.title</h3>
+<h3>@r.title, @Application.yymmddDate(history.start_date) to @Application.yymmddDate(history.end_date)</h3>
 
 <h4>Recent interesting @OrgConfig.get().str_res_plans</h4>
 
@@ -32,7 +32,7 @@
 
 <hr>
 
-@for( c <- r.charges) {
+@for( c <- history.charges) {
 	@historyCharge(c, true, false, false)
 }
 

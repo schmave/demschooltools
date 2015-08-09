@@ -576,22 +576,54 @@ public class Application extends Controller {
 
     public static Result getPersonHistory(Integer id) {
         Person p = Person.findByIdWithJCData(id);
-        return ok(views.html.person_history.render(p, new PersonHistory(p, false), getLastWeekCharges(p), false));
+        return ok(views.html.person_history.render(
+			p, 
+			new PersonHistory(p, false, getStartOfYear(), null), 
+			getLastWeekCharges(p), 
+			false));
+    }
+
+    public static Result viewPersonHistory(Integer id, Boolean redact_names, String start_date_str, String end_date_str) {
+		Date start_date = getStartOfYear();
+		Date end_date = null;
+		
+        try {
+            start_date = new SimpleDateFormat("yyyy-M-d").parse(start_date_str);
+            end_date = new SimpleDateFormat("yyyy-M-d").parse(end_date_str);
+        } catch (ParseException e) {
+		}
+
+        Person p = Person.findByIdWithJCData(id);
+        return ok(views.html.view_person_history.render(
+			p, 
+			new PersonHistory(p, true, start_date, end_date), 
+			getLastWeekCharges(p), 
+			redact_names));
     }
 
     public static Result getRuleHistory(Integer id) {
         Entry r = Entry.findByIdWithJCData(id);
-        return ok(views.html.rule_history.render(r, new RuleHistory(r, false), getRecentResolutionPlans(r)));
+        return ok(views.html.rule_history.render(
+			r, 
+			new RuleHistory(r, false, getStartOfYear(), null), 
+			getRecentResolutionPlans(r)));
     }
 
-    public static Result viewPersonHistory(Integer id, Boolean redact_names) {
-        Person p = Person.findByIdWithJCData(id);
-        return ok(views.html.view_person_history.render(p, new PersonHistory(p), getLastWeekCharges(p), redact_names));
-    }
+    public static Result viewRuleHistory(Integer id, String start_date_str, String end_date_str) {
+		Date start_date = getStartOfYear();
+		Date end_date = null;
+		
+        try {
+            start_date = new SimpleDateFormat("yyyy-M-d").parse(start_date_str);
+            end_date = new SimpleDateFormat("yyyy-M-d").parse(end_date_str);
+        } catch (ParseException e) {
+		}
 
-    public static Result viewRuleHistory(Integer id) {
         Entry r = Entry.findByIdWithJCData(id);
-        return ok(views.html.view_rule_history.render(r, new RuleHistory(r), getRecentResolutionPlans(r)));
+        return ok(views.html.view_rule_history.render(
+			r, 
+			new RuleHistory(r, true, start_date, end_date),
+			getRecentResolutionPlans(r)));
     }
 
     public static Result viewPersonsWriteups(Integer id) {

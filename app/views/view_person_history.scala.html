@@ -14,6 +14,14 @@ $(function() {
 });
 </script>
 
+<form method="GET">
+<p>Show history from
+<input class="date" type="text" name="start_date" value="@Application.yymmddDate(history.start_date)"> to 
+<input class="date" type="text" name="end_date" value="@Application.yymmddDate(history.end_date)">
+<input type="submit">
+</p>
+</form>
+
 @person_history(p, history, recent_rps, redact_names)
 
 }
