@@ -34,9 +34,6 @@ var exports = React.createClass({
     markAbsent: function () {
         actionCreator.markAbsent(this.state.student);
     },
-    selectDay: function (item) {
-        this.setState({selectedDaySwipes: item.swipes})
-    },
     getActionButtons: function () {
         var buttons = [];
 
@@ -60,7 +57,7 @@ var exports = React.createClass({
     },
     getPreviousDays: function () {
         return this.state.student.days.map(function (day, i) {
-            return <tr>
+            return <tr className={day.day === this.context.router.getCurrentParams().day ? "selected" : ""}>
                 <td><Link to="swipes" params={{studentId: this.state.studentId, day: day.day}}>{day.day}</Link></td>
             </tr>;
         }.bind(this))
