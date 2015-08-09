@@ -207,10 +207,12 @@ while True:
 
     if not case_id or row[4] != last_what_happened:
         # New case
-        new_cur.execute("""INSERT INTO "case"(meeting_id, case_number, findings)
-            VALUES (%s, %s, %s) returning id""",
-            (meeting_id, str(last_date) + "-" + str(case_counter),
-                "--" if not row[4] else row[4] # findings
+        new_cur.execute("""INSERT INTO "case"(meeting_id, case_number, findings, date_closed)
+            VALUES (%s, %s, %s, %s) returning id""",
+            (meeting_id, 
+			str(last_date) + "-" + ("%02d" % case_counter),
+                "--" if not row[4] else row[4], # findings
+			last_date
         ))
         case_id = int(new_cur.fetchone()[0])
 
