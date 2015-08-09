@@ -1,13 +1,18 @@
 var React = require('react'),
     actionCreator = require('./studentactioncreator'),
-    studentStore = require('./StudentStore');
+    studentStore = require('./StudentStore'),
+    SwipeListing = require('./swipeslisting.jsx');
 
 var exports = React.createClass({
     contextTypes: {
         router: React.PropTypes.func
     },
     getInitialState: function () {
-        return {studentId: this.context.router.getCurrentParams().studentId, editing: false};
+        return {
+            studentId: this.context.router.getCurrentParams().studentId,
+            selectedDaySwipes: [],
+            editing: false
+        };
     },
     componentDidMount: function () {
         studentStore.addChangeListener(this._onChange)
@@ -25,8 +30,8 @@ var exports = React.createClass({
     markAbsent: function () {
         actionCreator.markAbsent(this.state.student);
     },
-    selectDay: function(node, event){
-        console.log('day', node, event);
+    selectDay: function (item) {
+        this.setState({selectedDaySwipes: item.swipes})
     },
     getActionButtons: function () {
         var buttons = [];
@@ -49,25 +54,17 @@ var exports = React.createClass({
 
         return buttons;
     },
-    getPreviousDays: function(){
-      return this.state.student.days.map(function(day){
-          return <tr onClick={this.selectDay}><td>{day.day}</td></tr>;
-      })
-    },
-    todaysSwipes: function () {
-        var swipes = [];
-        this.state.student.days[0].swipes.map(function (swipe) {
-            swipes.push(<tr>
-                <td>{swipe.nice_in_time}</td>
-                <td>{swipe.nice_out_time}</td>
-            </tr>)
-        })
-        return swipes;
+    getPreviousDays: function () {
+        return this.state.student.days.map(function (day, i) {
+            return <tr onClick={this.selectDay.bind(this, day)}>
+                <td>{day.day}</td>
+            </tr>;
+        }.bind(this))
     },
     toggleEdit: function () {
         this.setState({editing: !this.state.editing});
     },
-    saveChange: function(){
+    saveChange: function () {
         actionCreator.updateStudent(this.state.student._id, this.refs.name.getDOMNode().value);
         this.toggleEdit();
     },
@@ -82,15 +79,19 @@ var exports = React.createClass({
                                 {!this.state.editing ?
                                     <div className="col-sm-8">
                                         <span><h1 className="pull-left">{this.state.student.name}</h1> <span
-                                            onClick={this.toggleEdit} className="fa fa-pencil edit-student"></span></span>
+                                            onClick={this.toggleEdit}
+                                            className="fa fa-pencil edit-student"></span></span>
 
                                         <h2 className="badge badge-red">{this.state.student.absent_today ? 'Absent' : ''}</h2>
-                                    </div>:
+                                    </div> :
                                     <div className="col-sm-8 row">
                                         <div className="col-sm-3">
-                                            <input ref="name" className="form-control" id="studentName" defaultValue={this.state.student.name}/>
-                                            <button onClick={this.saveChange} className="btn btn-success"><i className="fa fa-check icon-large"></i></button>
-                                            <button onClick={this.toggleEdit} className="btn btn-danger"><i className="fa fa-times"></i></button>
+                                            <input ref="name" className="form-control" id="studentName"
+                                                   defaultValue={this.state.student.name}/>
+                                            <button onClick={this.saveChange} className="btn btn-success"><i
+                                                className="fa fa-check icon-large"></i></button>
+                                            <button onClick={this.toggleEdit} className="btn btn-danger"><i
+                                                className="fa fa-times"></i></button>
                                         </div>
                                     </div>
                                 }
@@ -119,22 +120,12 @@ var exports = React.createClass({
                                         </tr>
                                         </thead>
                                         <tbody>
-                                            {this.getPreviousDays()}
+                                        {this.getPreviousDays()}
                                         </tbody>
                                     </table>
                                 </div>
                                 <div className="col-sm-2">
-                                    <table className="table table-striped center">
-                                        <thead>
-                                        <tr>
-                                            <th className="center">In Time</th>
-                                            <th className="center">Out Time</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        {this.todaysSwipes()}
-                                        </tbody>
-                                    </table>
+                                    <SwipeListing swipes={this.state.selectedDaySwipes}/>
                                 </div>
                             </div>
                         </div>
@@ -150,8 +141,8 @@ var exports = React.createClass({
     _onChange: function () {
         this.setState({
             student: studentStore.getStudent(this.state.studentId),
-            studentId: this.state.studentId
-        })
+            selectedDaySwipes: studentStore.getStudent(this.state.studentId).days[0].swipes
+        });
     }
 });
 

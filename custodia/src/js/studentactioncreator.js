@@ -77,7 +77,8 @@ var exports = {
                     type: constants.studentEvents.MARKED_ABSENT,
                     data: data.student
                 });
-            });
+                this.loadStudents();
+            }.bind(this));
 
     }
 };
