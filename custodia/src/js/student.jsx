@@ -1,7 +1,11 @@
 var React = require('react'),
     actionCreator = require('./studentactioncreator'),
     studentStore = require('./StudentStore'),
+    Router = require('react-router'),
+    Link = Router.Link,
     SwipeListing = require('./swipeslisting.jsx');
+
+var RouteHandler = Router.RouteHandler;
 
 var exports = React.createClass({
     contextTypes: {
@@ -56,8 +60,8 @@ var exports = React.createClass({
     },
     getPreviousDays: function () {
         return this.state.student.days.map(function (day, i) {
-            return <tr onClick={this.selectDay.bind(this, day)}>
-                <td>{day.day}</td>
+            return <tr>
+                <td><Link to="swipes" params={{studentId: this.state.studentId, day: day.day}}>{day.day}</Link></td>
             </tr>;
         }.bind(this))
     },
@@ -125,7 +129,7 @@ var exports = React.createClass({
                                     </table>
                                 </div>
                                 <div className="col-sm-2">
-                                    <SwipeListing swipes={this.state.selectedDaySwipes}/>
+                                    <RouteHandler />
                                 </div>
                             </div>
                         </div>
