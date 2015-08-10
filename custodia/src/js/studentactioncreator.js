@@ -80,6 +80,14 @@ var exports = {
                 this.loadStudents();
             }.bind(this));
     },
+    deleteSwipe: function(swipe, student){
+        ajax.post('/swipe/delete', {swipe: swipe, _id: student._id}).then(function(data){
+            dispatcher.dispatch({
+                type: constants.studentEvents.STUDENT_LOADED,
+                data: data.student
+            })
+        });
+    },
     excuse: function(studentId, day){
         ajax.post('/excuse',{_id: studentId, day: day})
             .then(function(data){
