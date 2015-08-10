@@ -14,7 +14,6 @@ var exports = React.createClass({
     getInitialState: function () {
         return {
             studentId: this.context.router.getCurrentParams().studentId,
-            selectedDaySwipes: [],
             editing: false
         };
     },
@@ -55,10 +54,19 @@ var exports = React.createClass({
 
         return buttons;
     },
+    getDayStatus: function(day){
+        if(day.excused){
+            return '(Excused)';
+        }else if(day.override){
+            return '(Overidden)';
+        }else{
+            return '';
+        }
+    },
     getPreviousDays: function () {
         return this.state.student.days.map(function (day, i) {
             return <tr className={day.day === this.context.router.getCurrentParams().day ? "selected" : ""}>
-                <td><Link to="swipes" params={{studentId: this.state.studentId, day: day.day}}>{day.day}</Link></td>
+                <td><Link to="swipes" params={{studentId: this.state.studentId, day: day.day}}>{day.day} {this.getDayStatus(day)}</Link></td>
             </tr>;
         }.bind(this))
     },
@@ -141,8 +149,7 @@ var exports = React.createClass({
     },
     _onChange: function () {
         this.setState({
-            student: studentStore.getStudent(this.state.studentId),
-            selectedDaySwipes: studentStore.getStudent(this.state.studentId).days[0].swipes
+            student: studentStore.getStudent(this.state.studentId)
         });
     }
 });

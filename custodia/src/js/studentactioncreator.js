@@ -79,7 +79,18 @@ var exports = {
                 });
                 this.loadStudents();
             }.bind(this));
-
+    },
+    excuse: function(studentId, day){
+        ajax.post('/excuse',{_id: studentId, day: day})
+            .then(function(data){
+                this.loadStudent(studentId);
+            }.bind(this));
+    },
+    override: function(studentId, day){
+        ajax.post('/override',{_id: studentId, day: day})
+            .then(function(data){
+                this.loadStudent(studentId);
+            }.bind(this));
     }
 };
 
