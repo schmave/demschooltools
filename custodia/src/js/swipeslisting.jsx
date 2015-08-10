@@ -7,6 +7,9 @@ var exports = React.createClass({
     contextTypes: {
         router: React.PropTypes.func
     },
+    componentWillUnmount: function () {
+        studentStore.removeChangeListener(this._onChange);
+    },
     loadDataFromUrl: function(){
         var student = studentStore.getStudent(this.context.router.getCurrentParams().studentId);
 
