@@ -128,3 +128,8 @@ body {
     background-color: lightblue !important;
 }
 
+.action-buttons{
+    border-top: solid lightgray 1px;
+    padding-top: 5px;
+}
+

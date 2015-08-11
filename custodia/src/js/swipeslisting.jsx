@@ -33,9 +33,13 @@ var exports = React.createClass({
     deleteSwipe: function (swipe) {
         actionCreator.deleteSwipe(swipe, this.state.student);
     },
+    swipesAreEmpty: function(swipes){
+        return swipes.length === 0 ||
+            (swipes.length === 1 && swipes[0].in_time === null && swipes[0].out_time === null);
+    },
     getSwipesForDay: function () {
         var swipeRows = [];
-        if (this.state.day && this.state.day.swipes) {
+        if (this.state.day && this.state.day.swipes && !this.swipesAreEmpty(this.state.day.swipes)) {
             this.state.day.swipes.map(function (swipe) {
                 if (swipe.nice_in_time || swipe.nice_out_time) {
                     swipeRows.push(<tr>
@@ -45,6 +49,8 @@ var exports = React.createClass({
                     </tr>)
                 }
             }.bind(this))
+        }else{
+            return <td colSpan="2">No swipes available.</td>;
         }
         return swipeRows;
     },
@@ -68,7 +74,7 @@ var exports = React.createClass({
                 {this.getSwipesForDay()}
                 </tbody>
             </table>
-            {!this.state.day.override && !this.state.day.excused ? <div>
+            {!this.state.day.override && !this.state.day.excused ? <div className="action-buttons">
                 <div className="pull-left">
                     <button type="button" onClick={this.override} className="btn btn-sm btn-info">
                         Override
