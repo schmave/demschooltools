@@ -39,7 +39,7 @@ var exports = React.createClass({
     },
     getSwipesForDay: function () {
         var swipeRows = [];
-        if (this.state.day && this.state.day.swipes && !this.swipesAreEmpty(this.state.day.swipes)) {
+        if (this.state.day && this.state.day && this.state.day.swipes && !this.swipesAreEmpty(this.state.day.swipes)) {
             this.state.day.swipes.map(function (swipe) {
                 if (swipe.nice_in_time || swipe.nice_out_time) {
                     swipeRows.push(<tr>
@@ -74,7 +74,7 @@ var exports = React.createClass({
                 {this.getSwipesForDay()}
                 </tbody>
             </table>
-            {!this.state.day.override && !this.state.day.excused ? <div className="action-buttons">
+            {this.state.day && !this.state.day.override && !this.state.day.excused ? <div className="action-buttons">
                 <div className="pull-left">
                     <button type="button" onClick={this.override} className="btn btn-sm btn-info">
                         Override
