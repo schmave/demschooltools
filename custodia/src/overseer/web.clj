@@ -85,7 +85,7 @@
                           (year-resp)))
   (GET "/student/:id" [id]
        (friend/authorize #{::user} (student-page-response (parse-int id))))
-  (POST "/student/report" [year]
+  (GET "/student/report/:year" [year]
         (friend/authorize #{::admin}
                           (resp/response (db/get-report year))))
   (GET "/students" []

@@ -8,6 +8,10 @@ var exports = {
     },
     systemEvents: {
         FLASH: 'SYSTEMEVENTS.FLASH'
+    },
+    reportEvents: {
+        YEARS_LOADED: 'REPORTEVENTS.YEARSLOADED',
+        REPORT_LOADED: 'REPORTEVENT.REPORTLOADED'
     }
 };
 

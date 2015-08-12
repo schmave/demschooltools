@@ -21,9 +21,11 @@
   "homepage": "https://github.com/thedreadpirate/overseer",
   "dependencies": {
     "flux": "^2.0.3",
+    "griddle-react": "^0.2.13",
     "object-assign": "^3.0.0",
     "react": "^0.13.3",
-    "react-router": "^0.13.3"
+    "react-router": "^0.13.3",
+    "underscore": "^1.8.3"
   },
   "devDependencies": {
     "browserify": "^11.0.1",

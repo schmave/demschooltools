@@ -6,6 +6,7 @@ var React = require('react'),
     Student = require('./student.jsx'),
     CreateStudent = require('./createstudent.jsx'),
     SwipeListing = require('./swipeslisting.jsx'),
+    StudentReports = require('./studentreports.jsx'),
     StudentTable = require('./studenttable.jsx');
 
 
@@ -35,6 +36,7 @@ var routes = (
         <Route name="student" path="students/:studentId" handler={Student}>
             <Route name="swipes" path=":day" handler={SwipeListing} />
         </Route>
+        <Route name="reports" path="reports" handler={StudentReports} />
         <DefaultRoute handler={StudentTable}/>
     </Route>
 );
