@@ -3,30 +3,26 @@ var reportStore = require('./reportstore'),
     Griddle = require('griddle-react');
 
 // Table data as a list of array.
-var rows = [
-    ['a1', 'b1', 'c1'],
-    ['a2', 'b3', 'c2'],
-    ['a3', 'b3', 'c3'],
-];
+var rows = [];
 
 function rowGetter(rowIndex) {
     return rows[rowIndex];
 }
 
 var exports = React.createClass({
-    getInitialState: function(){
+    getInitialState: function () {
         return {rows: rows};
     },
-    componentDidMount: function(){
-        this.setState({years:reportStore.getSchoolYears()});
+    componentDidMount: function () {
+        this.setState({years: reportStore.getSchoolYears()});
         reportStore.addChangeListener(this._onChange);
     },
-    _onChange: function(){
+    _onChange: function () {
         var years = reportStore.getSchoolYears();
-        var currentYear = this.state.currentYear || years.currentYear;
+        var currentYear = this.state.currentYear || years.current_year;
         this.setState({years: years, currentYear: currentYear, rows: reportStore.getReport(currentYear)});
     },
-    yearSelected: function(event){
+    yearSelected: function (event) {
         var currentYear = event.target.value;
         reportStore.getReport(currentYear);
         this.setState({currentYear: currentYear});
@@ -34,11 +30,19 @@ var exports = React.createClass({
     render: function () {
         return <div>
             <select onChange={this.yearSelected} value={this.state.currentYear}>
-                {this.state.years ? this.state.years.years.map(function(year){
+                {this.state.years ? this.state.years.years.map(function (year) {
                     return <option>{year}</option>;
                 }) : ""}
             </select>
-            <Griddle results={this.state.rows}/>
+            <Griddle results={this.state.rows} resultsPerPage="50"
+                     columns={['name', 'overrides', 'unexcused', 'excuses', 'short', 'total_hours']}
+                     columnMetadata={[{displayName: 'Name', columnName: 'name'},
+                     {displayName: 'Attended (Overrides)', columnName: 'overrides'},
+                     {displayName: 'Excused Absence', columnName: 'excuses'},
+                     {displayName: 'Short', columnName: 'short'},
+                     {displayName: 'Total Hours', columnName: 'total_hours'}
+                     ]}/>
+
         </div>;
     }
 });
