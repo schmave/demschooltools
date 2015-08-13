@@ -9,12 +9,18 @@ function rowGetter(rowIndex) {
     return rows[rowIndex];
 }
 
+function loadState(){
+
+}
+
 var exports = React.createClass({
     getInitialState: function () {
         return {rows: rows};
     },
     componentDidMount: function () {
-        this.setState({years: reportStore.getSchoolYears()});
+        var years = reportStore.getSchoolYears();
+        var currentYear = this.state.currentYear || (years ? years.current_year : null);
+        this.setState({years: years, currentYear: currentYear, rows: reportStore.getReport(currentYear)});
         reportStore.addChangeListener(this._onChange);
     },
     _onChange: function () {
@@ -24,15 +30,15 @@ var exports = React.createClass({
     },
     yearSelected: function (event) {
         var currentYear = event.target.value;
-        reportStore.getReport(currentYear);
-        this.setState({currentYear: currentYear});
+        var report = reportStore.getReport(currentYear);
+        this.setState({currentYear: currentYear, rows: report});
     },
     render: function () {
         return <div>
             <select onChange={this.yearSelected} value={this.state.currentYear}>
                 {this.state.years ? this.state.years.years.map(function (year) {
-                    return <option>{year}</option>;
-                }) : ""}
+                    return <option value={year}>{year === this.state.years.current_year ? year + " (Current)" : year}</option>;
+                }.bind(this)) : ""}
             </select>
             <Griddle results={this.state.rows} resultsPerPage="50"
                      columns={['name', 'overrides', 'unexcused', 'excuses', 'short', 'total_hours']}

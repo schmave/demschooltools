@@ -21,7 +21,7 @@ var exports = {
         }).then(function(data){
             dispatcher.dispatch({
                 type: constants.reportEvents.REPORT_LOADED,
-                data: data
+                data: {year: year, report: data}
             });
         });
     }

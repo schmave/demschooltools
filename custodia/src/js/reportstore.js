@@ -7,7 +7,8 @@ var EventEmitter = require('events').EventEmitter,
 
 var isAdmin;
 var CHANGE_EVENT = "CHANGE!";
-var schoolYears, report, currentYear, loading;
+var reports = {};
+var schoolYears;
 
 var exports = assign({}, EventEmitter.prototype, {
     getSchoolYears: function(){
@@ -18,12 +19,11 @@ var exports = assign({}, EventEmitter.prototype, {
         }
     },
     getReport: function(year){
-        if(currentYear === year && report){
-            return report;
-        }else if(!loading){
-            report = null;
-            loading = true;
-            currentYear = year;
+        if(!year) return [];
+        if(reports[year]){
+            return reports[year];
+        }else if(!reports[year] || reports[year] === 'loading'){
+            reports[year] = 'loading'
             actionCreator.loadReport(year);
         }
         return [];
@@ -46,8 +46,7 @@ dispatcher.register(function(action){
             exports.emitChange();
             break;
         case constants.reportEvents.REPORT_LOADED:
-            report = action.data;
-            loading = false;
+            reports[action.data.year] = action.data.report;
             exports.emitChange();
             break;
     }
