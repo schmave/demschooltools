@@ -1,15 +1,15 @@
 var EventEmitter = require('events').EventEmitter,
     dispatcher = require('./appdispatcher'),
-    assign = require('object-assign'),
     constants = require('./appconstants'),
+    base = require('./storebase'),
     actionCreator = require('./studentactioncreator');
-
-var CHANGE_EVENT = 'change';
 
 var students;
 var studentDetails = {};
 
-function getStudents(){
+var exports = Object.create(base);
+
+exports.getStudents = function(){
     if(students){
         return students;
     }else{
@@ -18,7 +18,7 @@ function getStudents(){
     }
 }
 
-function getStudent(id){
+exports.getStudent = function(id){
     if(studentDetails[id]){
         return studentDetails[id];
     }else{
@@ -26,20 +26,6 @@ function getStudent(id){
         return null;
     }
 }
-
-var exports = assign({}, EventEmitter.prototype, {
-    getStudents: getStudents,
-    getStudent: getStudent,
-    emitChange: function(){
-        this.emit(CHANGE_EVENT);
-    },
-    addChangeListener: function(callback){
-        this.on(CHANGE_EVENT, callback);
-    },
-    removeChangeListener: function(callback){
-        this.removeListener(CHANGE_EVENT, callback);
-    }
-});
 
 dispatcher.register(function(action){
     switch(action.type){
