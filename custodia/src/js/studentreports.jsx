@@ -23,6 +23,9 @@ var exports = React.createClass({
         this.setState({years: years, currentYear: currentYear, rows: reportStore.getReport(currentYear)});
         reportStore.addChangeListener(this._onChange);
     },
+    componentWillUnmount: function(){
+        reportStore.removeChangeListener(this._onChange);
+    },
     _onChange: function () {
         var years = reportStore.getSchoolYears();
         var currentYear = this.state.currentYear || years.current_year;

@@ -23,7 +23,7 @@ var exports = assign({}, EventEmitter.prototype, {
         if(reports[year]){
             return reports[year];
         }else if(!reports[year] || reports[year] === 'loading'){
-            reports[year] = 'loading'
+            reports[year] = 'loading';
             actionCreator.loadReport(year);
         }
         return [];
@@ -36,6 +36,9 @@ var exports = assign({}, EventEmitter.prototype, {
     },
     removeChangeListener: function(callback){
         this.removeListener(CHANGE_EVENT, callback);
+        if(this.listeners(CHANGE_EVENT).length == 0){
+            reports = {};
+        }
     }
 });
 
