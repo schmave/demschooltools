@@ -121,7 +121,7 @@ a {
 .student-listing-table {
     text-align: center;
 }
-@media (min-width: 950px) {
+@media (min-width: 1000px) {
     .student-listing-table .student-listing:nth-child(odd) {
         float: left;
     }
