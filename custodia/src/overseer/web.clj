@@ -50,6 +50,8 @@
   (GET "/resetdb" []
        (friend/authorize #{::super} ;; (db/reset-db)
                          (resp/redirect "/")))
+
+  (GET "/dates/today" [] (dates/today-string))
   (GET "/sampledb" []
        (friend/authorize #{::super} ;; (data/sample-db true)
                          (resp/redirect "/")))

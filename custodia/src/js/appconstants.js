@@ -7,6 +7,7 @@ var exports = {
         EXCUSED: 'STUDENTEVENTS.EXCUSED'
     },
     systemEvents: {
+        TODAY_LOADED: 'SYSTEMEVENTS.TODAYLOADED',
         FLASH: 'SYSTEMEVENTS.FLASH'
     },
     reportEvents: {
