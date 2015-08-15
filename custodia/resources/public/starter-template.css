@@ -1,5 +1,5 @@
 body {
-  padding-top: 50px;
+    padding-top: 50px;
 }
 
 a {
@@ -7,45 +7,50 @@ a {
 }
 
 .gridStyle {
-    border: 1px solid rgb(212,212,212);
+    border: 1px solid rgb(212, 212, 212);
     width: 100%;
     height: 100%;
 }
-.ngViewport.ng-scope{
+
+.ngViewport.ng-scope {
     height: auto !important;
     overflow-y: hidden;
 }
 
-.ngTopPanel.ng-scope, .ngHeaderContainer{
+.ngTopPanel.ng-scope, .ngHeaderContainer {
     width: auto !important;
 }
+
 .starter-template {
-  padding: 40px 0px;
-  // text-align: center;
+    padding: 40px 0px;
+/ / text-align : center;
 }
 
 .validday {
     color: #73B88A;
 }
+
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak],
 .ng-cloak, .x-ng-cloak,
 .ng-hide {
     display: none !important;
 }
 
-
 .ins {
     border-right: 5px solid gray;
     height: 100%;
 }
+
 .row-same-height {
     display: table;
     width: 100%;
 }
+
 .col-xs-height {
     display: table-cell;
     float: none !important;
 }
+
 /* firefox fix */
 .img-responsive {
     width: 100%;
@@ -53,20 +58,22 @@ a {
 
 /* vertical alignment styles */
 .col-top {
-    vertical-align:top;
+    vertical-align: top;
 }
+
 .col-middle {
-    vertical-align:middle;
+    vertical-align: middle;
 }
+
 .col-bottom {
-    vertical-align:bottom;
+    vertical-align: bottom;
 }
 
 .list-group-item {
     padding: 2px 15px;
 }
 
-.center{
+.center {
     text-align: center;
 }
 
@@ -75,7 +82,9 @@ a {
     color: white !important;
 }
 
-.red { background-color: red; }
+.red {
+    background-color: red;
+}
 
 @media (min-width: 768px) {
     .col-sm-height {
@@ -83,56 +92,68 @@ a {
         float: none !important;
     }
 }
+
 @media (min-width: 992px) {
     .col-md-height {
         display: table-cell;
         float: none !important;
     }
 }
+
 @media (min-width: 1200px) {
     .col-lg-height {
         display: table-cell;
         float: none !important;
     }
 }
+
 @media (min-width: 1300px) {
     .width {
         width: 1300px;
     }
 }
 
-.student-listing{
+.student-listing {
     font-size: 1.5em;
     padding: 7px;
 }
 
-.student-listing-table{
+.student-listing-table {
     text-align: center;
 }
+@media (min-width: 950px) {
+    .student-listing-table .student-listing:nth-child(odd) {
+        float: left;
+    }
 
-.student-listing-table .panel{
-    margin-left: 5px;
+    .student-listing-table .student-listing:nth-child(even) {
+        float: right;
+    }
+}
+
+.student-listing-table .panel {
+    margin: 5px;
     overflow-x: hidden;
 }
 
-.edit-student{
+.edit-student {
     margin-top: 24px;
     margin-left: 3px;
 }
 
-.content{
+.content {
     padding: 15px 15px 15px 25px;
 }
 
-.margined{
+.margined {
     margin: .5em !important;
 }
 
-.selected{
+.selected {
     background-color: lightblue !important;
 }
 
-.action-buttons{
+.action-buttons {
     border-top: solid lightgray 1px;
     padding-top: 5px;
 }
