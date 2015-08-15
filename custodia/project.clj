@@ -33,5 +33,6 @@
   ;; :main overseer.web
   :uberjar-name "overseer-standalone.jar"
   :profiles {:test {:dependencies [[clj-webdriver "0.6.1"]]}
+  	     :debug { :jvm-opts ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"]}
              :production {:env {:production true}}
              :uberjar {:main overseer.web :aot :all}})

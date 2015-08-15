@@ -38,6 +38,9 @@ deploy-philly : unit-test
 start :
 	lein run -m overseer.web
 
+debug :
+	lein with-profile debug run -m overseer.web
+
 unit-test :
 	lein test
 
