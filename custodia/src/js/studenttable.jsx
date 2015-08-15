@@ -5,6 +5,8 @@ var React = require('react'),
     actionCreator = require('./studentactioncreator'),
     studentStore = require('./StudentStore');
 
+var today = studentStore.getToday();
+
 module.exports = React.createClass({
     getInitialState: function () {
         return {students: []};
@@ -16,6 +18,32 @@ module.exports = React.createClass({
     componentWillUnmount: function () {
         studentStore.removeChangeListener(this._onChange);
     },
+    signIn: function(student){
+        actionCreator.swipeStudent(student, 'in');
+    },
+    signOut: function(student){
+        actionCreator.swipeStudent(student, 'out');
+    },
+    isSigningIn: function(student) {
+        return !student.last_swipe_date || student.last_swipe_type === 'out' || !student.last_swipe_date.startsWith(studentStore.getToday())
+    },
+    getSwipeButton:  function(student){
+        if(this.isSigningIn(student)) {
+            return <button onClick={this.signIn.bind(this, student)} className="btn btn-sm btn-primary"><i className="fa fa-sign-in">&nbsp;</i></button>;
+        }else{
+            return <button onClick={this.signOut.bind(this, student)} className="btn btn-sm btn-info"><i className="fa fa-sign-out">&nbsp;</i></button>;
+        }
+    },
+    getStudent: function(student){
+        var link = <Link to="student" params={{studentId: student._id}}>{student.name}</Link>;
+        var button = this.getSwipeButton(student);
+            return <div className="panel panel-info student-listing col-sm-5">
+                <div>{link}</div>
+                <div className="attendance-button">
+                    {button}
+                </div>
+            </div>;
+    },
     render: function () {
         var absentCol = [],
             notYetInCol = [],
@@ -23,49 +51,40 @@ module.exports = React.createClass({
             outCol = [];
 
         this.state.students.map(function (student) {
-            var link = <Link to="student" params={{studentId: student._id}}>{student.name}</Link>;
             if (student.absent_today) {
-                absentCol.push(<span className="student-listing col-sm-6">
-                {link}
-            </span>);
+                absentCol.push(this.getStudent(student));
             }
             else if (!student.in_today && !student.absent_today) {
-                notYetInCol.push(<span className="student-listing col-sm-6">
-                {link}
-            </span>);
+                notYetInCol.push(this.getStudent(student));
             }
             else if (student.in_today && student.last_swipe_type === 'in') {
-                inCol.push(<span className="student-listing col-sm-6">
-                {link}
-            </span>);
+                inCol.push(this.getStudent(student));
             }
             else if (student.in_today && student.last_swipe_type === 'out') {
-                outCol.push(<span className="student-listing col-sm-6">
-                {link}
-            </span>);
+                outCol.push(this.getStudent(student));
             }
-        });
+        }.bind(this));
 
         return <div className="row student-listing-table">
             <div className="col-sm-2 column">
                 <div className="panel panel-info">
-                    <div className="panel-heading"><b>Not Coming In</b></div>
+                    <div className="panel-heading absent"><b>Not Coming In</b></div>
                     <div className="panel-body row">{absentCol}</div>
                 </div>
             </div>
-            <div className="col-sm-3 column">
+            <div className="col-sm-3 column not-in">
                 <div className="panel panel-info">
                     <div className="panel-heading"><b>Not Yet In</b></div>
                     <div className="panel-body row">{notYetInCol}</div>
                 </div>
             </div>
-            <div className="col-sm-2 column">
+            <div className="col-sm-2 column in">
                 <div className="panel panel-info">
                     <div className="panel-heading"><b>In</b></div>
                     <div className="panel-body row">{inCol}</div>
                 </div>
             </div>
-            <div className="col-sm-2 column">
+            <div className="col-sm-2 column out">
                 <div className="panel panel-info">
                     <div className="panel-heading"><b>Out</b></div>
                     <div className="panel-body row">{outCol}</div>

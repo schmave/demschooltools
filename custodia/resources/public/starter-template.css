@@ -136,6 +136,18 @@ a {
     overflow-x: hidden;
 }
 
+.not-in .student-listing .attendance-button,
+.in .student-listing .attendance-button,
+.out .student-listing a{
+    float: right;
+}
+
+.not-in .student-listing a,
+.in .student-listing a,
+.out .student-listing .attendance-button{
+    float: left;
+}
+
 .edit-student {
     margin-top: 24px;
     margin-left: 3px;
