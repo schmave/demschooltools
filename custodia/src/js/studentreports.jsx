@@ -1,5 +1,4 @@
 var reportStore = require('./reportstore'),
-    FixedDataTable = require('fixed-data-table'),
     Griddle = require('griddle-react');
 
 // Table data as a list of array.
