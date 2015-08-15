@@ -67,7 +67,7 @@ module.exports = React.createClass({
 
         return <div className="row student-listing-table">
             <div className="col-sm-2 column">
-                <div className="panel panel-info">
+                <div className="panel panel-info absent">
                     <div className="panel-heading absent"><b>Not Coming In ({absentCol.length})</b></div>
                     <div className="panel-body row">{absentCol}</div>
                 </div>

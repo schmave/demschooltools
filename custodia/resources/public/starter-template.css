@@ -137,12 +137,14 @@ a {
 }
 
 .not-in .student-listing .attendance-button,
+.absent .student-listing .attendance-button,
 .in .student-listing .attendance-button,
 .out .student-listing a{
     float: right;
 }
 
 .not-in .student-listing a,
+.absent .student-listing a,
 .in .student-listing a,
 .out .student-listing .attendance-button{
     float: left;
