@@ -68,30 +68,30 @@ module.exports = React.createClass({
         return <div className="row student-listing-table">
             <div className="col-sm-2 column">
                 <div className="panel panel-info">
-                    <div className="panel-heading absent"><b>Not Coming In</b></div>
+                    <div className="panel-heading absent"><b>Not Coming In ({absentCol.length})</b></div>
                     <div className="panel-body row">{absentCol}</div>
                 </div>
             </div>
             <div className="col-sm-3 column not-in">
                 <div className="panel panel-info">
-                    <div className="panel-heading"><b>Not Yet In</b></div>
+                    <div className="panel-heading"><b>Not Yet In ({notYetInCol.length})</b></div>
                     <div className="panel-body row">{notYetInCol}</div>
                 </div>
             </div>
             <div className="col-sm-2 column in">
                 <div className="panel panel-info">
-                    <div className="panel-heading"><b>In</b></div>
+                    <div className="panel-heading"><b>In ({inCol.length})</b></div>
                     <div className="panel-body row">{inCol}</div>
                 </div>
             </div>
             <div className="col-sm-2 column out">
                 <div className="panel panel-info">
-                    <div className="panel-heading"><b>Out</b></div>
+                    <div className="panel-heading"><b>Out ({outCol.length})</b></div>
                     <div className="panel-body row">{outCol}</div>
                 </div>
             </div>
             <AdminItem>
-                <div className="col-sm-1 column">
+                <div className="col-sm-2 column">
                     <div className="panel panel-info">
                         <div className="panel-heading"><b>Administration</b></div>
                         <div className="panel-body row">
