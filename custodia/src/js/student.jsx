@@ -1,4 +1,5 @@
 var React = require('react'),
+    Heatmap = require('./heatmap.jsx'),
     actionCreator = require('./studentactioncreator'),
     studentStore = require('./StudentStore'),
     Router = require('react-router'),
@@ -120,6 +121,7 @@ var exports = React.createClass({
                                     <div className="col-sm-5">
                                         {this.getActionButtons()}
                                     </div>
+                                    <Heatmap days={this.state.student.days} />
                                 </div>
                                 <div className="col-sm-2">
                                     <table className="table table-striped center">
