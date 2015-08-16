@@ -27,3 +27,15 @@ if (!String.prototype.startsWith) {
     return this.indexOf(searchString, position) === position;
   };
 }
+
+Array.prototype.partition = function (size)
+{
+    var output = [];
+
+    for (var i = 0; i < this.length; i += size)
+    {
+        output[output.length] = this.slice(i, i + size);
+    }
+
+    return output;
+}
