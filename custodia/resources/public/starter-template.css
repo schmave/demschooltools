@@ -172,3 +172,11 @@ a {
     padding-top: 5px;
 }
 
+.cal-heatmap-container rect.highlight,
+.cal-heatmap-container rect.now{
+    stroke: lightblue;
+}
+
+.cal-heatmap-container text.now{
+    fill: #0086b3;
+}

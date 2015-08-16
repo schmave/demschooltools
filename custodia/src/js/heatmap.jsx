@@ -26,8 +26,9 @@ module.exports = React.createClass({
             legendMargin: [0, 10, 0, 0],
             subDomain: 'x_day',
             subDomainTextFormat: "%d",
-            considerMissingDataAsZero: true,
             range: 6,
+            legend: [2, 4, 6, 8],
+            highlight: ['now'],
             cellSize: 15
         });
     },
