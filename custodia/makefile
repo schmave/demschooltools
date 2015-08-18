@@ -13,6 +13,9 @@ T :
 	@echo sql-backup-local-restore
 	@echo sql-philly-backup
 	@echo start
+	@echo minify 
+	@echo js 
+	@echo watch 
 
 # example of ls and echo
 hello : 
