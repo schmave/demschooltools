@@ -140,7 +140,9 @@ var exports = React.createClass({
                                     </table>
                                 </div>
                                 <div className="col-sm-2">
-                                    {this.context.router.getCurrentParams().day && this.state.student ? <Swipes student={this.state.student} />: ''}
+                                    {this.context.router.getCurrentParams().day && this.state.student
+                                        ? <Swipes student={this.state.student} day={this.context.router.getCurrentParams().day} />
+                                        : ''}
                                 </div>
                             </div>
                         </div>

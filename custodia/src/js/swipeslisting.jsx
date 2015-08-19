@@ -14,7 +14,7 @@ var exports = React.createClass({
         var student = this.props.student;
         if(student) {
             var day = student.days.find(function (day) {
-                return day.day === this.context.router.getCurrentParams().day;
+                return day.day === this.props.day;
             }.bind(this));
             var date = this.context.router.getCurrentParams().day;
             return {student: student, day: day, date: date};
