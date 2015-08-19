@@ -1,44 +1,28 @@
 var React = require('react'),
     heatmap = require('cal-heatmap'),
-    moment = require('moment');
+    Heatmapmonth = require('./heatmapmonth.jsx');
 
-var map;
+var groupingFunc = function (data) {
+    return data.day.split('-')[0] + '-' + data.day.split('-')[1] + '-' + '01';
+};
+
 module.exports = React.createClass({
-    formatDays: function (days) {
-        var formatted = {};
-        days.forEach(function (day) {
-            formatted[moment(day.day).unix()] = day.total_mins;
+    loadHeatmaps: function () {
+        var groupedDays = this.props.days.groupBy(groupingFunc);
+        var sortedDates = Object.keys(groupedDays).sort();
+
+        var maps = sortedDates.map(function(date, idx){
+            return <Heatmapmonth index={idx} days={groupedDays[date]}></Heatmapmonth>;
         });
-        return formatted;
-    },
-    loadHeatmap: function () {
-        $('#heatmap').empty();
-        var data = this.formatDays(this.props.days);
-        if(map){
-            map = map.destroy();
-        }
-        map = new heatmap();
-        map.init({
-            itemSelector: '#heatmap',
-            data: data, domain: 'month',
-            legendVerticalPosition: "center",
-            legendOrientation: "vertical",
-            legendMargin: [0, 10, 0, 0],
-            subDomain: 'x_day',
-            subDomainTextFormat: "%d",
-            range: 6,
-            legend: [2, 4, 6, 8],
-            highlight: ['now'],
-            cellSize: 15
-        });
+        return maps;
     },
     render: function () {
-        return <div id="heatmap" className="col-sm-12">asfd</div>;
+        return <div className="row">{this.loadHeatmaps()}</div>;
     },
     componentDidMount: function () {
-        this.loadHeatmap();
+        //this.loadHeatmap();
     },
     componentDidUpdate: function () {
-        this.loadHeatmap();
+        //this.loadHeatmap();
     }
 });

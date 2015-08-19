@@ -3,7 +3,6 @@ var React = require('react'),
     actionCreator = require('./studentactioncreator'),
     studentStore = require('./StudentStore'),
     Router = require('react-router'),
-    routerc = require('./routercontainer'),
     Link = Router.Link,
     SwipeListing = require('./swipeslisting.jsx');
 
@@ -68,7 +67,7 @@ var exports = React.createClass({
     getPreviousDays: function () {
         var selectedDay = this.context.router.getCurrentParams().day;
         if (!selectedDay && this.state.day) {
-            routerc.get().transitionTo('swipes', {studentId :this.state.studentId, day: this.state.day});
+            //routerc.get().transitionTo('swipes', {studentId :this.state.studentId, day: this.state.day});
         }
         return this.state.student.days.map(function (day, i) {
             return <tr className={day.day === this.context.router.getCurrentParams().day ? "selected" : ""}>
@@ -123,7 +122,7 @@ var exports = React.createClass({
                         <div className="panel-body">
                             <div className="row">
                                 <div className="col-sm-7">
-                                    <div className="col-sm-5">
+                                    <div className="row">
                                         {this.getActionButtons()}
                                     </div>
                                     <Heatmap days={this.state.student.days} />
@@ -159,7 +158,7 @@ var exports = React.createClass({
 
         var selectedDay = this.context.router.getCurrentParams().day;
         if (!selectedDay && s && s.days[0].day) {
-            routerc.get().transitionTo('swipes', {studentId :this.state.studentId, day: s.days[0].day});
+            //routerc.get().transitionTo('swipes', {studentId :this.state.studentId, day: s.days[0].day});
         }
         this.setState({
             student: s,
