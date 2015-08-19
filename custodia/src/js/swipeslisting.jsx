@@ -11,14 +11,16 @@ var exports = React.createClass({
         studentStore.removeChangeListener(this._onChange);
     },
     loadDataFromUrl: function () {
-        var student = studentStore.getStudent(this.context.router.getCurrentParams().studentId);
-
-        var student = studentStore.getStudent(this.context.router.getCurrentParams().studentId);
-        var day = student.days.find(function (day) {
-            return day.day === this.context.router.getCurrentParams().day;
-        }.bind(this));
-        var date = this.context.router.getCurrentParams().day;
-        return {student: student, day: day, date: date};
+        var student = this.props.student;
+        if(student) {
+            var day = student.days.find(function (day) {
+                return day.day === this.context.router.getCurrentParams().day;
+            }.bind(this));
+            var date = this.context.router.getCurrentParams().day;
+            return {student: student, day: day, date: date};
+        }else{
+            return {};
+        }
     },
     getInitialState: function () {
         store.addChangeListener(this._onChange);

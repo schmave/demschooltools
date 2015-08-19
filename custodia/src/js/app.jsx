@@ -33,9 +33,7 @@ var routes = (
     <Route path="/" handler={App}>
         <Route name="students" path="students" handler={StudentTable}/>
         <Route name="create" path="students/new" handler={CreateStudent}/>
-        <Route name="student" path="students/:studentId" handler={Student}>
-            <Route name="swipes" path=":day" handler={SwipeListing} />
-        </Route>
+        <Route name="student" path="students/:studentId/:day?" handler={Student} />
         <Route name="reports" path="reports" handler={StudentReports} />
         <DefaultRoute handler={StudentTable}/>
     </Route>
