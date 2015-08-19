@@ -40,9 +40,6 @@ var exports = React.createClass({
     },
     componentDidMount: function () {
         this.loadHeatmap();
-    },
-    componentDidUpdate: function () {
-        this.loadHeatmap();
     }
 });
 
