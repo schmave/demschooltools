@@ -19,7 +19,7 @@ var exports = React.createClass({
         };
     },
     componentDidMount: function () {
-        studentStore.addChangeListener(this._onChange)
+        studentStore.addChangeListener(this._onChange);
         this.setState({student: studentStore.getStudent(this.state.studentId)});
     },
     componentWillUnmount: function () {
@@ -70,7 +70,7 @@ var exports = React.createClass({
             //routerc.get().transitionTo('swipes', {studentId :this.state.studentId, day: this.state.day});
         }
         return this.state.student.days.map(function (day, i) {
-            return <tr className={day.day === this.context.router.getCurrentParams().day ? "selected" : ""}>
+            return <tr className={day.day === this.getActiveDay(this.state.student) ? "selected" : ""}>
                 <td><Link to="student" params={{studentId: this.state.studentId, day: day.day}}>{day.day} {this.getDayStatus(day)}</Link></td>
             </tr>;
         }.bind(this))
@@ -82,8 +82,18 @@ var exports = React.createClass({
         actionCreator.updateStudent(this.state.student._id, this.refs.name.getDOMNode().value);
         this.toggleEdit();
     },
+    getActiveDay: function(student){
+        if(this.context.router.getCurrentParams().day){
+            return this.context.router.getCurrentParams().day;
+        }else if(this.state.student){
+            return student.days[0].day;
+        }else{
+            return '';
+        }
+    },
     render: function () {
         if (this.state.student) {
+            var activeDate = this.getActiveDay(this.state.student);
             return <div className="row">
                 <div className="col-sm-1"></div>
                 <div className="col-sm-10">
@@ -140,8 +150,8 @@ var exports = React.createClass({
                                     </table>
                                 </div>
                                 <div className="col-sm-2">
-                                    {this.context.router.getCurrentParams().day && this.state.student
-                                        ? <Swipes student={this.state.student} day={this.context.router.getCurrentParams().day} />
+                                    {activeDate && this.state.student
+                                        ? <Swipes student={this.state.student} day={activeDate} />
                                         : ''}
                                 </div>
                             </div>
@@ -158,13 +168,10 @@ var exports = React.createClass({
     _onChange: function () {
         var s = studentStore.getStudent(this.state.studentId);
 
-        var selectedDay = this.context.router.getCurrentParams().day;
-        if (!selectedDay && s && s.days[0].day) {
-            //routerc.get().transitionTo('swipes', {studentId :this.state.studentId, day: s.days[0].day});
-        }
+        var activeDay = this.getActiveDay(s);
         this.setState({
             student: s,
-            day: (s) ? s.days[0].day : null
+            activeDay: activeDay
         });
     }
 });
