@@ -51,7 +51,7 @@ module.exports = React.createClass({
             outCol = [];
 
         this.state.students.map(function (student) {
-            if (student.absent_today) {
+            if (!student.in_today && student.absent_today) {
                 absentCol.push(this.getStudent(student));
             }
             else if (!student.in_today && !student.absent_today) {
