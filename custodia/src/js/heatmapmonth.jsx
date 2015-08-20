@@ -28,6 +28,10 @@ var exports = React.createClass({
             subDomainTextFormat: "%d",
             range: 1,
             legend: [75, 150, 225, 300],
+            legendVerticalPosition: 'center',
+            legendCellSize: 8,
+            itemName: ['minute', 'minutes'],
+            legendOrientation: 'vertical',
             highlight: ['now'],
             cellSize: 15
         });
