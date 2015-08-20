@@ -7,31 +7,24 @@ var exports = React.createClass({
     contextTypes: {
         router: React.PropTypes.func
     },
-    componentWillUnmount: function () {
-        studentStore.removeChangeListener(this._onChange);
+    getCurrentDay: function (student, dayString) {
+        if(student) {
+            var day = student.days.find(function (day) {
+                return day.day === dayString;
+            }.bind(this));
+            return day;
+        }else{
+            return {};
+        }
     },
-    loadDataFromUrl: function () {
-        var student = studentStore.getStudent(this.context.router.getCurrentParams().studentId);
-
-        var student = studentStore.getStudent(this.context.router.getCurrentParams().studentId);
-        var day = student.days.find(function (day) {
-            return day.day === this.context.router.getCurrentParams().day;
-        }.bind(this));
-        var date = this.context.router.getCurrentParams().day;
-        return {student: student, day: day, date: date};
+    componentWillReceiveProps: function(newProps){
+      this.setState({day: this.getCurrentDay(newProps.student, newProps.day)});
     },
-    getInitialState: function () {
-        store.addChangeListener(this._onChange);
-        return this.loadDataFromUrl();
-    },
-    _onChange: function () {
-        this.setState(this.loadDataFromUrl());
-    },
-    componentWillReceiveProps: function () {
-        this.setState(this.loadDataFromUrl());
+    getInitialState: function(){
+        return {day: this.getCurrentDay(this.props.student, this.props.day)};
     },
     deleteSwipe: function (swipe) {
-        actionCreator.deleteSwipe(swipe, this.state.student);
+        actionCreator.deleteSwipe(swipe, this.props.student);
     },
     swipesAreEmpty: function(swipes){
         return swipes.length === 0 ||
@@ -39,7 +32,7 @@ var exports = React.createClass({
     },
     getSwipesForDay: function () {
         var swipeRows = [];
-        if (this.state.day && this.state.day && this.state.day.swipes && !this.swipesAreEmpty(this.state.day.swipes)) {
+        if (this.state.day && !this.swipesAreEmpty(this.state.day.swipes)) {
             this.state.day.swipes.map(function (swipe) {
                 if (swipe.nice_in_time || swipe.nice_out_time) {
                     swipeRows.push(<tr>
@@ -55,10 +48,10 @@ var exports = React.createClass({
         return swipeRows;
     },
     excuse: function (swipe) {
-        actionCreator.excuse(this.state.student._id, this.state.date);
+        actionCreator.excuse(this.props.student._id, this.props.day);
     },
     override: function () {
-        actionCreator.override(this.state.student._id, this.state.date);
+        actionCreator.override(this.props.student._id, this.props.day);
     },
     render: function () {
 
