@@ -24,13 +24,10 @@ var exports = React.createClass({
             data: data,
             start: moment(this.props.days[0].day).startOf('month').toDate(),
             domain: 'month',
-            legendVerticalPosition: "center",
-            legendOrientation: "vertical",
-            legendMargin: [0, 10, 0, 0],
             subDomain: 'x_day',
             subDomainTextFormat: "%d",
             range: 1,
-            legend: [2, 80, 160, 300],
+            legend: [75, 150, 225, 300],
             highlight: ['now'],
             cellSize: 15
         });
