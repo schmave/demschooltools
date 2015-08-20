@@ -34,15 +34,18 @@ var exports = React.createClass({
     markAbsent: function () {
         actionCreator.markAbsent(this.state.student);
     },
+    studentInToday: function() {
+        return this.state.student.last_swipe_date == this.state.student.today;
+    },
     getActionButtons: function () {
         var buttons = [];
 
-        if (this.state.student.last_swipe_date !== this.state.student.today || this.state.student.last_swipe_type === 'out') {
+        if (!this.studentInToday() || this.state.student.last_swipe_type === 'out') {
             buttons.push(<button type="button" onClick={this.signIn}
                                  className="btn btn-sm btn-info margined">Sign In
             </button>);
         }
-        if (this.state.student.last_swipe_date !== this.state.student.today || this.state.student.last_swipe_type === 'in') {
+        if (!this.studentInToday() || this.state.student.last_swipe_type === 'in') {
             buttons.push(<button type="button" onClick={this.signOut}
                                  className="btn btn-sm btn-info margined">Sign Out
             </button>);
@@ -92,11 +95,11 @@ var exports = React.createClass({
                             <div className="row">
                                 {!this.state.editing ?
                                     <div className="col-sm-8">
-                                        <span><h1 className="pull-left">{this.state.student.name}</h1> <span
-                                            onClick={this.toggleEdit}
-                                            className="fa fa-pencil edit-student"></span></span>
-
-                                        <h2 className="badge badge-red">{this.state.student.absent_today ? 'Absent' : ''}</h2>
+                                       <span onClick={this.toggleEdit}>
+                                           <h1 className="pull-left" >{this.state.student.name}</h1>
+                                           <span className="fa fa-pencil edit-student"></span>
+                                       </span>
+                                 <h2 className="badge badge-red">{(!this.studentInToday() && this.state.student.absent_today) ? 'Absent' : ''}</h2>
                                     </div> :
                                     <div className="col-sm-8 row">
                                         <div className="col-sm-3">
