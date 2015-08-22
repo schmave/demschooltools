@@ -27,6 +27,8 @@
     "object-assign": "^3.0.0",
     "react": "^0.13.3",
     "react-router": "^0.13.3",
+    "react-skylight": "^0.2.0",
+    "react-widgets": "^2.8.0",
     "underscore": "^1.8.3"
   },
   "devDependencies": {

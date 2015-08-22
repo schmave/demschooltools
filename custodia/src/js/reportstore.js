@@ -10,8 +10,8 @@ var schoolYears;
 
 var exports = Object.create(base);
 
-exports.getSchoolYears = function () {
-    if (!schoolYears) {
+exports.getSchoolYears = function (force) {
+    if (!schoolYears || force) {
         actionCreator.loadSchoolYears();
     } else {
         return schoolYears;
@@ -45,6 +45,9 @@ dispatcher.register(function (action) {
         case constants.reportEvents.REPORT_LOADED:
             reports[action.data.year] = action.data.report;
             exports.emitChange();
+            break;
+        case constants.reportEvents.PERIOD_CREATED:
+            exports.getSchoolYears(true);
             break;
     }
 });
