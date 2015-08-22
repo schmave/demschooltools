@@ -80,6 +80,16 @@ var exports = {
                 router.get().transitionTo('students');
             }.bind(this));
     },
+    toggleHours: function (student) {
+        ajax.post('/student/togglehours', {_id: student._id})
+            .then(function (data) {
+                dispatcher.dispatch({
+                    type: constants.studentEvents.STUDENT_LOADED,
+                    data: data.student
+                });
+                this.loadStudents();
+            }.bind(this));
+    },
     markAbsent: function (student) {
         ajax.post('/student/toggleabsent', {_id: student._id})
             .then(function (data) {

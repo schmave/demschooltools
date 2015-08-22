@@ -94,7 +94,11 @@ var exports = React.createClass({
             return '';
         }
     },
-    uneditedStudentName: function() {
+    toggleHours : function() {
+        this.state.student.olderdate = !!!this.state.student.olderdate;
+        actionCreator.toggleHours(this.state.student._id);
+    },
+    showingStudentName: function() {
         return <div className="col-sm-8">
                   <span onClick={this.toggleEdit}>
                     <h1 className="pull-left" >{this.state.student.name}</h1>
@@ -103,18 +107,21 @@ var exports = React.createClass({
                   <h2 className="badge badge-red">{(!this.studentInToday() && this.state.student.absent_today) ? 'Absent' : ''}</h2>
                </div>;
     },
-    editedStudentName: function() {
+    editingStudentName: function() {
         return <div className="col-sm-8 row">
                  <div className="col-sm-3">
                    <input ref="name" className="form-control" id="studentName"
                           defaultValue={this.state.student.name}/>
-            <button onClick={this.saveChange} className="btn btn-success">
-                  <i className="fa fa-check icon-large"></i></button>
-            <button onClick={this.toggleEdit} className="btn btn-danger">
-            <i className="fa fa-times"></i></button>
-            </div>
-            </div>
-;
+                   <button onClick={this.saveChange} className="btn btn-success">
+                      <i className="fa fa-check icon-large">Save</i></button>
+                   <button onClick={this.toggleEdit} className="btn btn-danger">
+                      <i className="fa fa-times"></i></button>
+                 </div>
+                 <div>
+            <div><input type="radio" name="older" onChange={this.toggleHours} checked={!this.state.student.olderdate}/> 300 Minutes</div>
+            <div><input type="radio" name="older" onChange={this.toggleHours} checked={this.state.student.olderdate}/> 330 Minutes</div>
+                 </div>
+               </div>;
     },
     render: function () {
         if (this.state.student) {
@@ -125,7 +132,7 @@ var exports = React.createClass({
                     <div className="panel panel-info">
                         <div className="panel-heading">
                             <div className="row">
-                {!this.state.editing ? this.uneditedStudentName() : editedStudentName()}
+                {!this.state.editing ? this.showingStudentName() : this.editingStudentName()}
                                 <div className="col-sm-4">
                                     <div className="col-sm-6"><b>Attended:</b> {this.state.student.total_days}</div>
                                     <div className="col-sm-6"><b>Absent:</b> {this.state.student.total_abs}</div>
@@ -133,6 +140,7 @@ var exports = React.createClass({
                                     <div className="col-sm-6"><b>Gave Attendence:</b> {this.state.student.total_overrides}
                                     </div>
                                     <div className="col-sm-6"><b>Short:</b> {this.state.student.total_short}</div>
+                                    <div className="col-sm-6"><b>Required Minutes:</b> {this.state.student.olderdate ? 330 : 300}</div>
                                 </div>
                             </div>
                         </div>
