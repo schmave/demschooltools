@@ -94,6 +94,28 @@ var exports = React.createClass({
             return '';
         }
     },
+    uneditedStudentName: function() {
+        return <div className="col-sm-8">
+                  <span onClick={this.toggleEdit}>
+                    <h1 className="pull-left" >{this.state.student.name}</h1>
+                    <span className="fa fa-pencil edit-student"></span>
+                  </span>
+                  <h2 className="badge badge-red">{(!this.studentInToday() && this.state.student.absent_today) ? 'Absent' : ''}</h2>
+               </div>;
+    },
+    editedStudentName: function() {
+        return <div className="col-sm-8 row">
+                 <div className="col-sm-3">
+                   <input ref="name" className="form-control" id="studentName"
+                          defaultValue={this.state.student.name}/>
+            <button onClick={this.saveChange} className="btn btn-success">
+                  <i className="fa fa-check icon-large"></i></button>
+            <button onClick={this.toggleEdit} className="btn btn-danger">
+            <i className="fa fa-times"></i></button>
+            </div>
+            </div>
+;
+    },
     render: function () {
         if (this.state.student) {
             var activeDate = this.getActiveDay(this.state.student);
@@ -103,25 +125,7 @@ var exports = React.createClass({
                     <div className="panel panel-info">
                         <div className="panel-heading">
                             <div className="row">
-                                {!this.state.editing ?
-                                    <div className="col-sm-8">
-                                       <span onClick={this.toggleEdit}>
-                                           <h1 className="pull-left" >{this.state.student.name}</h1>
-                                           <span className="fa fa-pencil edit-student"></span>
-                                       </span>
-                                 <h2 className="badge badge-red">{(!this.studentInToday() && this.state.student.absent_today) ? 'Absent' : ''}</h2>
-                                    </div> :
-                                    <div className="col-sm-8 row">
-                                        <div className="col-sm-3">
-                                            <input ref="name" className="form-control" id="studentName"
-                                                   defaultValue={this.state.student.name}/>
-                                            <button onClick={this.saveChange} className="btn btn-success"><i
-                                                className="fa fa-check icon-large"></i></button>
-                                            <button onClick={this.toggleEdit} className="btn btn-danger"><i
-                                                className="fa fa-times"></i></button>
-                                        </div>
-                                    </div>
-                                }
+                {!this.state.editing ? this.uneditedStudentName() : editedStudentName()}
                                 <div className="col-sm-4">
                                     <div className="col-sm-6"><b>Attended:</b> {this.state.student.total_days}</div>
                                     <div className="col-sm-6"><b>Absent:</b> {this.state.student.total_abs}</div>
