@@ -24,6 +24,9 @@ var exports = {
                 data: {year: year, report: data}
             });
         });
+    },
+    createPeriod: function(start, end){
+        console.log('need to create period for: ', start, end);
     }
 };
 
