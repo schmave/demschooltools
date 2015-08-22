@@ -15,18 +15,29 @@ var exports = {
             });
         });
     },
-    loadReport: function(year){
+    loadReport: function (year) {
         $.ajax({
             url: '/student/report/' + encodeURIComponent(year)
-        }).then(function(data){
+        }).then(function (data) {
             dispatcher.dispatch({
                 type: constants.reportEvents.REPORT_LOADED,
                 data: {year: year, report: data}
             });
         });
     },
-    createPeriod: function(start, end){
-        console.log('need to create period for: ', start, end);
+    createPeriod: function (start, end) {
+        ajax.post('/year', {from_date: start, to_date: end})
+            .then(function (data) {
+                var period = data.made.name.split(' ');
+                dispatcher.dispatch({
+                    type: constants.systemEvents.FLASH,
+                    message: 'Successfully created period from ' + period[0] + ' to ' + period[1]
+                });
+                dispatcher.dispatch({
+                    type: constants.reportEvents.PERIOD_CREATED,
+                    data: data
+                });
+            });
     }
 };
 

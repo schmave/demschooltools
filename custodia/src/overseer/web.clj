@@ -106,7 +106,7 @@
         (friend/authorize #{::admin}
                           (do (data/toggle-student-absent _id)
                               (student-page-response _id))))
-  (POST "/year/create" [from_date to_date]
+  (POST "/year" [from_date to_date]
         (friend/authorize #{::admin}
                           (let [made? (data/make-year from_date to_date)]
                             (resp/response {:made made?}))))

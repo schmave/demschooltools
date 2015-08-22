@@ -5,6 +5,9 @@ module.exports = React.createClass({
     show: function () {
         this.refs.modal.show();
     },
+    hide: function(){
+        this.refs.modal.hide();
+    },
     render: function () {
         return <Skylight ref="modal">
             <div className="panel panel-primary" style={{height: '95%'}}>

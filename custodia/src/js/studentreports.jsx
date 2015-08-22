@@ -29,6 +29,7 @@ var exports = React.createClass({
         reportStore.removeChangeListener(this._onChange);
     },
     _onChange: function () {
+        this.refs.newSchoolYear.hide();
         var years = reportStore.getSchoolYears();
         var currentYear = this.state.currentYear || years.current_year;
         this.setState({years: years, currentYear: currentYear, rows: reportStore.getReport(currentYear)});
@@ -66,10 +67,10 @@ var exports = React.createClass({
             <Modal ref="newSchoolYear" title="Create new period">
                 <form className="form-inline">
                     <div className="form-group">
-                        <label for="startDate">Start:</label> <DatePicker id="startDate" ref="newPeriodStartDate" onChange={this.newPeriodDateSelected} time={false}/>
-                        <label for="endDate">End:</label> <DatePicker ref="newPeriodEndDate" id="endDate" time={false}/>
+                        <label htmlFor="startDate">Start:</label> <DatePicker id="startDate" ref="newPeriodStartDate" onChange={this.newPeriodDateSelected} time={false}/>
+                        <label htmlFor="endDate">End:</label> <DatePicker ref="newPeriodEndDate" id="endDate" time={false}/>
                     </div>
-                    <div className="formGroup">
+                    <div className="form-group" style={{marginLeft: '2em'}}>
                         <button className="btn btn-sm btn-primary" onClick={this.createPeriod}>Create Period</button>
                     </div>
                 </form>
