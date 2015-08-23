@@ -44,7 +44,8 @@
 
 (deftest swipe-attendence-test
   (do (data/sample-db)  
-      (let [s (data/make-student "test")
+      (let [today-str (dates/get-current-year-string (data/get-years))
+            s (data/make-student "test")
             sid (:_id s) 
             s2 (data/make-student "test2")
             sid2 (:_id s2)]
@@ -55,7 +56,7 @@
         (data/swipe-in sid2 (t/plus basetime (t/days 5)))
         (data/swipe-in sid2 (t/plus basetime (t/days 6)))
 
-        (let [att (db/get-report "2014-06-01 2015-06-01")
+        (let [att (db/get-report today-str)
               student1 (first (filter #(= (:_id s) (:_id %)) att))
               student2 (first (filter #(= (:_id s2) (:_id %)) att))]
           (testing "Total Valid Day Count"
