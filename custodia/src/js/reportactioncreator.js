@@ -7,7 +7,7 @@ var eventEmitter = require('events').EventEmitter,
 var exports = {
     loadSchoolYears: function () {
         $.ajax({
-            url: '/year/all'
+            url: '/reports/years'
         }).then(function (data) {
             dispatcher.dispatch({
                 type: constants.reportEvents.YEARS_LOADED,
@@ -17,7 +17,7 @@ var exports = {
     },
     loadReport: function (year) {
         $.ajax({
-            url: '/student/report/' + encodeURIComponent(year)
+            url: '/reports/' + encodeURIComponent(year)
         }).then(function (data) {
             dispatcher.dispatch({
                 type: constants.reportEvents.REPORT_LOADED,
@@ -26,7 +26,7 @@ var exports = {
         });
     },
     createPeriod: function (start, end) {
-        ajax.post('/year', {from_date: start, to_date: end})
+        ajax.post('/reports/years', {from_date: start, to_date: end})
             .then(function (data) {
                 var period = data.made.name.split(' ');
                 dispatcher.dispatch({

@@ -124,19 +124,22 @@
         (resp/response (att/get-student-list)))
 
 
-  (GET "/reports/:year" [year]
-    (friend/authorize #{::admin}
-                      (resp/response (db/get-report year))))
-  (GET "/year/all" []
+  (GET "/reports/years" []
        (friend/authorize #{::user} (year-resp)))
-  (POST "/year/delete" [year]
+
+  (DELETE "/reports/years/:year" [year]
         (friend/authorize #{::admin}
                           (data/delete-year year)
                           (year-resp)))
-  (POST "/year" [from_date to_date]
+  (POST "/reports/years" [from_date to_date]
         (friend/authorize #{::admin}
                           (let [made? (data/make-year from_date to_date)]
                             (resp/response {:made made?}))))
+
+  (GET "/reports/:year" [year]
+        (friend/authorize #{::admin}
+                          (resp/response (db/get-report year))))
+
   (GET "/login" req
        (io/resource "login.html"))
   (GET "/logout" req
