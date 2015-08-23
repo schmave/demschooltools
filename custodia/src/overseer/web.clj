@@ -14,6 +14,7 @@
             [ring.util.response :as resp]
             [clojure.tools.trace :as trace]
             [overseer.db :as db]
+            [clojure.pprint :as pp]
             [overseer.database :as data]
             [overseer.dates :as dates]
             [overseer.attendance :as att]
@@ -45,6 +46,18 @@
 (defn parse-int [s]
   (Integer. (re-find  #"\d+" s )))
 
+(defn build-route-macro [type route params body]
+  `(~type ~route ~params
+       (let [~'id (~parse-int ~'id)]
+         ~@body)))
+(defmacro GETI [route params & body]
+  (build-route-macro 'GET route params body))
+(defmacro POSTI [route params & body]
+  (build-route-macro 'POST route params body))
+
+(comment (pp/pprint (macroexpand-1 '(GETI "/students/:id" [id]
+                                          (friend/authorize #{::user} (student-page-response  id))))))
+
 (defroutes app
   (GET "/" [] (friend/authenticated (io/resource "index.html")))
   (GET "/resetdb" []
@@ -60,8 +73,8 @@
     (friend/authorize #{::user}
                       (resp/response (att/get-student-list))))
 
-  (GET "/students/:id" [id]
-    (friend/authorize #{::user} (student-page-response (parse-int id))))
+  (GETI "/students/:id" [id]
+     (friend/authorize #{::user} (student-page-response id)))
 
   (POST "/students" [name]
     (friend/authorize #{::admin}
