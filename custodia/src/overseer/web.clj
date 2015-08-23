@@ -46,17 +46,18 @@
 (defn parse-int [s]
   (Integer. (re-find  #"\d+" s )))
 
-(defn build-route-macro [type route params body]
-  `(~type ~route ~params
-       (let [~'id (~parse-int ~'id)]
-         ~@body)))
-(defmacro GETI [route params & body]
-  (build-route-macro 'GET route params body))
-(defmacro POSTI [route params & body]
-  (build-route-macro 'POST route params body))
+(defn should-cast [s]
+  (re-find  #"-int" (str s)))
 
-(comment (pp/pprint (macroexpand-1 '(GETI "/students/:id" [id]
-                                          (friend/authorize #{::user} (student-page-response  id))))))
+(defmacro RT [type route params & body]
+  (let [casts (filter should-cast params)]
+    `(~type ~route ~params
+            (let [~@(mapcat (fn [cast] `(~cast (parse-int ~cast))) casts)]
+              ~@body))))
+
+(comment (pp/pprint (macroexpand-1 '(RT GET "/students/:id-int" [id-int]
+                                        (friend/authorize #{::user} (student-page-response id-int))))))
+
 
 (defroutes app
   (GET "/" [] (friend/authenticated (io/resource "index.html")))
@@ -73,8 +74,8 @@
     (friend/authorize #{::user}
                       (resp/response (att/get-student-list))))
 
-  (GETI "/students/:id" [id]
-     (friend/authorize #{::user} (student-page-response id)))
+  (RT GET "/students/:id-int" [id-int]
+     (friend/authorize #{::user} (student-page-response id-int)))
 
   (POST "/students" [name]
     (friend/authorize #{::admin}
