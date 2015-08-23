@@ -26,6 +26,7 @@
     "moment": "^2.10.6",
     "object-assign": "^3.0.0",
     "react": "^0.13.3",
+    "react-notification-system": "^0.1.14",
     "react-router": "^0.13.3",
     "react-skylight": "^0.2.0",
     "react-widgets": "^2.8.0",

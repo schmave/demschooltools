@@ -1,31 +1,27 @@
 var React = require('react'),
     store = require('./flashnotificationstore'),
+    Notification = require('react-notification-system'),
     constants = require('./appconstants');
 
 var exports = React.createClass({
     componentDidMount: function(){
         store.addChangeListener(this._onChange);
+        this.notifications = this.refs.notifications;
     },
     _onChange: function(){
         var message = store.getLatest();
         if(message){
-            this.setState({showing: true, message: message});
+            this.notifications.addNotification({
+                message: message,
+                level: 'success'
+            });
         }
-        window.setTimeout(function(){
-            this.setState({showing: false});
-        }.bind(this), 3000);
     },
     getInitialState: function(){
         return {showing: false};
     },
     render: function(){
-        if(this.state.showing){
-            return <div className="alert alert-success collapsable ng-binding" role="alert" ng-show="swipedWorked">
-                {this.state.message}
-            </div>;
-        }else{
-            return <span style={{display:'none'}}></span>;
-        }
+        return <Notification ref="notifications" />;
     }
 });
 
