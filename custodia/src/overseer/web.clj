@@ -79,18 +79,18 @@
                       (do (data/toggle-student-older id)
                           (student-page-response id))))
 
-  (POST "/students/:id/absent" [id :<<as-int]
+  (POST "/students/:id/absent" [id]
     (friend/authorize #{::admin}
                       (do (data/toggle-student-absent id)
                           (student-page-response id))))
 
 
-  (POST "students/:id/excuse" [id :<<as-int day]
+  (POST "students/:id/excuse" [id day]
         (friend/authorize #{::admin}
                           (data/excuse-date id day))
         (student-page-response id))
 
-  (POST "/students/:id/override" [id :<<as-int day]
+  (POST "/students/:id/override" [id day]
         (friend/authorize #{::admin}
                           (data/override-date id day))
         (student-page-response id))
