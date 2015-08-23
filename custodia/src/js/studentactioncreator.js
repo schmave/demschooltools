@@ -26,7 +26,7 @@ var exports = {
         });
     },
     loadStudent: function (id) {
-        ajax.get('/student/' + id)
+        ajax.get('/students/' + id)
             .then(function (data) {
                 dispatcher.dispatch({
                     type: constants.studentEvents.STUDENT_LOADED,
@@ -35,7 +35,7 @@ var exports = {
             });
     },
     createStudent: function (name) {
-        ajax.post('/student/create', {
+        ajax.post('/students', {
             name: name
         }).then(function (data) {
             this.loadStudents();
@@ -52,8 +52,7 @@ var exports = {
         });
     },
     updateStudent: function (id, name) {
-        ajax.post('/rename', {
-            _id: id,
+        ajax.put('/students/' + id, {
             name: name
         }).then(function (data) {
             this.loadStudents();
@@ -65,7 +64,7 @@ var exports = {
     },
     swipeStudent: function (student, direction) {
         var student = student;
-        ajax.post('/swipe', {_id: student._id, direction: direction})
+        ajax.post('students/' + student._id + '/swipe', {direction: direction})
             .then(function (data) {
                 dispatcher.dispatch({
                     type: constants.studentEvents.STUDENT_SWIPED,
@@ -81,7 +80,7 @@ var exports = {
             }.bind(this));
     },
     toggleHours: function (student) {
-        ajax.post('/student/togglehours', {_id: student._id})
+        ajax.post('/students/' + id + '/togglehours')
             .then(function (data) {
                 dispatcher.dispatch({
                     type: constants.studentEvents.STUDENT_LOADED,
@@ -91,7 +90,7 @@ var exports = {
             }.bind(this));
     },
     markAbsent: function (student) {
-        ajax.post('/student/toggleabsent', {_id: student._id})
+        ajax.post('/students/' + student._id + '/absent')
             .then(function (data) {
                 dispatcher.dispatch({
                     type: constants.studentEvents.MARKED_ABSENT,
@@ -101,7 +100,7 @@ var exports = {
             }.bind(this));
     },
     deleteSwipe: function(swipe, student){
-        ajax.post('/swipe/delete', {swipe: swipe, _id: student._id}).then(function(data){
+        ajax.post('/students/' + student._id + '/swipe/delete', {swipe: swipe}).then(function(data){
             dispatcher.dispatch({
                 type: constants.studentEvents.STUDENT_LOADED,
                 data: data.student
@@ -109,13 +108,13 @@ var exports = {
         });
     },
     excuse: function(studentId, day){
-        ajax.post('/excuse',{_id: studentId, day: day})
+        ajax.post('students/' + studentId + '/excuse',{day: day})
             .then(function(data){
                 this.loadStudent(studentId);
             }.bind(this));
     },
     override: function(studentId, day){
-        ajax.post('/override',{_id: studentId, day: day})
+        ajax.post('/students/' + studentId + '/override',{day: day})
             .then(function(data){
                 this.loadStudent(studentId);
             }.bind(this));

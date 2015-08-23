@@ -8,7 +8,7 @@
             [compojure.route :as route]
             [clojure.java.io :as io]
             [clojure.tools.nrepl.server :as nrepl-server]
-            [jdbc-ring-session.core :refer [jdbc-store]] 
+            [jdbc-ring-session.core :refer [jdbc-store]]
             [cider.nrepl :refer (cider-nrepl-handler)]
             [ring.adapter.jetty :as jetty]
             [ring.util.response :as resp]
@@ -55,57 +55,71 @@
   (GET "/sampledb" []
        (friend/authorize #{::super} ;; (data/sample-db true)
                          (resp/redirect "/")))
-  (POST "/excuse" [_id day]
+
+  (GET "/students" []
+    (friend/authorize #{::user}
+                      (resp/response (att/get-student-list))))
+
+  (GET "/students/:id" [id]
+    (friend/authorize #{::user} (student-page-response (parse-int id))))
+
+  (POST "/students" [name]
+    (friend/authorize #{::admin}
+                      (let [made? (data/make-student name)]
+                        (resp/response {:made made?
+                                        :students (att/get-student-list)}))))
+
+  (PUT "/students/:id" [id name]
         (friend/authorize #{::admin}
-                          (data/excuse-date _id day))
-        (student-page-response _id))
-  (POST "/rename" [_id name]
+                          (data/rename id name))
+        (student-page-response id))
+
+  (POST "/students/:id/togglehours" [id]
+    (friend/authorize #{::admin}
+                      (do (data/toggle-student-older id)
+                          (student-page-response id))))
+
+  (POST "/students/:id/absent" [id :<<as-int]
+    (friend/authorize #{::admin}
+                      (do (data/toggle-student-absent id)
+                          (student-page-response id))))
+
+
+  (POST "students/:id/excuse" [id :<<as-int day]
         (friend/authorize #{::admin}
-                          (data/rename _id name))
-        (student-page-response _id))
-  (POST "/override" [_id day]
+                          (data/excuse-date id day))
+        (student-page-response id))
+
+  (POST "/students/:id/override" [id :<<as-int day]
         (friend/authorize #{::admin}
-                          (data/override-date _id day))
-        (student-page-response _id))
-  (POST "/swipe/delete" [swipe _id]
+                          (data/override-date id day))
+        (student-page-response id))
+
+  (POST "/students/:id/swipe/delete" [id swipe]
         (friend/authorize #{::admin}
                           (data/delete-swipe swipe)
-                          (student-page-response _id)))
-  (POST "/swipe" [direction _id missing]
+                          (student-page-response id)))
+
+  (POST "/students/:id/swipe" [id direction  missing]
         (friend/authorize #{::user}
-                          (if (= direction "in")
-                            (do (when missing (data/swipe-out _id missing))
-                                (data/swipe-in _id))
-                            (do (when missing (data/swipe-in _id missing))
-                                (data/swipe-out _id))))
+                          (let [id (Integer/parseInt id)]
+                            (if (= direction "in")
+                              (do (when missing (data/swipe-out id missing))
+                                  (data/swipe-in id))
+                              (do (when missing (data/swipe-in id missing))
+                                  (data/swipe-out id)))))
         (resp/response (att/get-student-list)))
+
+
+  (GET "/reports/:year" [year]
+    (friend/authorize #{::admin}
+                      (resp/response (db/get-report year))))
   (GET "/year/all" []
        (friend/authorize #{::user} (year-resp)))
   (POST "/year/delete" [year]
         (friend/authorize #{::admin}
                           (data/delete-year year)
                           (year-resp)))
-  (GET "/student/:id" [id]
-       (friend/authorize #{::user} (student-page-response (parse-int id))))
-  (GET "/student/report/:year" [year]
-        (friend/authorize #{::admin}
-                          (resp/response (db/get-report year))))
-  (GET "/students" []
-       (friend/authorize #{::user}
-                         (resp/response (att/get-student-list))))
-  (POST "/student/create" [name]
-        (friend/authorize #{::admin}
-                          (let [made? (data/make-student name)]
-                            (resp/response {:made made?
-                                            :students (att/get-student-list)}))))
-  (POST "/student/togglehours" [_id]
-        (friend/authorize #{::admin}
-                          (do (data/toggle-student-older _id)
-                              (student-page-response _id))))
-  (POST "/student/toggleabsent" [_id]
-        (friend/authorize #{::admin}
-                          (do (data/toggle-student-absent _id)
-                              (student-page-response _id))))
   (POST "/year" [from_date to_date]
         (friend/authorize #{::admin}
                           (let [made? (data/make-year from_date to_date)]
