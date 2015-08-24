@@ -25,12 +25,43 @@ var exports = React.createClass({
     componentWillUnmount: function () {
         studentStore.removeChangeListener(this._onChange);
     },
-    signIn: function () {
-        actionCreator.swipeStudent(this.state.student, 'in');
+    getMissingSwipe: function(){
+        var d = new Date();
+        if(this.state.student.last_swipe_date) {
+            d = new Date(this.state.student.last_swipe_date + "T10:00:00");
+        }
+        this.state.missing_direction = (this.state.student.last_swipe_type =="in")?"out":"in";
+        if(!this.state.student.in_today
+           // && this.state.student.last_swipe_type == "in"
+           && this.state.student.direction == "out"){
+            this.state.missing_direction = "in";
+            d = new Date();
+        }
+        d.setHours((this.state.missing_direction =="in")?8:15);
+        d.setMinutes( 0 );
+        //$scope.missing_swipe = d;
+        //$scope.screen = "get-swipe-time";
+
+        //router.get().transitionTo('get-swipe-time');
     },
-    signOut: function () {
-        actionCreator.swipeStudent(this.state.student, 'out');
+    validateSignDirection: function(direction) {
+        this.state.student.direction = direction;
+        var missing_in = ((this.state.student.last_swipe_type == "out"
+                           || (this.state.student.last_swipe_type == "in" && !this.state.student.in_today)
+                           || !this.state.student.last_swipe_type)
+                          && direction == "out"),
+        missing_out = (this.state.student.last_swipe_type == "in"
+                       && direction == "in");
+
+        if(missing_in || missing_out) {
+            this.get_missing_swipe();
+        } else {
+            actionCreator.swipeStudent(this.state.student, direction);
+        }
     },
+    signIn: function () {validateSignDirection('in');},
+    signOut: function () {validateSignDirection('out');},
+
     markAbsent: function () {
         actionCreator.markAbsent(this.state.student);
     },
