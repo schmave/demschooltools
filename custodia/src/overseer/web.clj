@@ -140,13 +140,13 @@
         (friend/authorize #{::admin}
                           (resp/response (db/get-report year))))
 
-  (GET "/login" req
+  (GET "/users/login" req
        (io/resource "login.html"))
-  (GET "/logout" req
+  (GET "/users/logout" req
        (friend/logout* (resp/redirect (str (:context req) "/"))))
-  (GET "/user/is-user" req
+  (GET "/users/is-user" req
        (friend/authorize #{::user} "You're a user!"))
-  (GET "/user/is-admin" req
+  (GET "/users/is-admin" req
         (friend/authorize #{::admin} (resp/response {:admin true})))
   (route/resources "/")
   (ANY "*" []
@@ -156,7 +156,7 @@
   (-> #'app
       (friend/authenticate {:credential-fn (partial creds/bcrypt-credential-fn users)
                             :allow-anon? true
-                            :login-uri "/login"
+                            :login-uri "/users/login"
                             :default-landing-uri "/"
                             :workflows [(workflows/interactive-form)]})
       (wrap-session {:store (jdbc-store @db/pgdb)

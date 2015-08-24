@@ -24,7 +24,7 @@ module.exports = React.createClass({
                         <AdminWrapper>
                             <li><Link to="reports">Student Totals</Link></li>
                         </AdminWrapper>
-                        <li><a href="/logout">Logout</a></li>
+                        <li><a href="/users/logout">Logout</a></li>
                     </ul>
                 </div>
             </div>
