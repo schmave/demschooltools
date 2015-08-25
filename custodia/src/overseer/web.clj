@@ -6,6 +6,7 @@
             [compojure.handler :refer [site]]
             [carica.core :as c]
             [compojure.route :as route]
+            [compojure.coercions :refer [as-int]]
             [clojure.java.io :as io]
             [clojure.tools.nrepl.server :as nrepl-server]
             [jdbc-ring-session.core :refer [jdbc-store]]
@@ -43,22 +44,6 @@
 (defn student-page-response [student-id]
   (resp/response {:student (first (att/get-student-with-att student-id))}))
 
-(defn parse-int [s]
-  (Integer. (re-find  #"\d+" s )))
-
-(defn should-cast [s]
-  (re-find  #"-int" (str s)))
-
-(defmacro RT [type route params & body]
-  (let [casts (filter should-cast params)]
-    `(~type ~route ~params
-            (let [~@(mapcat (fn [cast] `(~cast (parse-int ~cast))) casts)]
-              ~@body))))
-
-(comment (pp/pprint (macroexpand-1 '(RT GET "/students/:id-int" [id-int]
-                                        (friend/authorize #{::user} (student-page-response id-int))))))
-
-
 (defroutes app
   (GET "/" [] (friend/authenticated (io/resource "index.html")))
   (GET "/resetdb" []
@@ -74,8 +59,8 @@
     (friend/authorize #{::user}
                       (resp/response (att/get-student-list))))
 
-  (RT GET "/students/:id-int" [id-int]
-     (friend/authorize #{::user} (student-page-response id-int)))
+  (GET "/students/:id" [id :<< as-int]
+     (friend/authorize #{::user} (student-page-response id)))
 
   (POST "/students" [name]
     (friend/authorize #{::admin}
@@ -83,44 +68,43 @@
                         (resp/response {:made made?
                                         :students (att/get-student-list)}))))
 
-  (RT PUT "/students/:id-int" [id-int name]
+  (PUT "/students/:id" [id :<< as-int name]
         (friend/authorize #{::admin}
-                          (data/rename id-int name))
-        (student-page-response id-int))
+                          (data/rename id name))
+        (student-page-response id))
 
-  (RT POST "/students/:id-int/togglehours" [id-int]
+  (POST "/students/:id/togglehours" [id :<< as-int]
     (friend/authorize #{::admin}
-                      (do (data/toggle-student-older id-int)
-                          (student-page-response id-int))))
+                      (do (data/toggle-student-older id)
+                          (student-page-response id))))
 
-  (RT POST "/students/:id-int/absent" [id-int]
+  (POST "/students/:id/absent" [id :<< as-int]
     (friend/authorize #{::admin}
-                      (do (data/toggle-student-absent id-int)
-                          (student-page-response id-int))))
+                      (do (data/toggle-student-absent id)
+                          (student-page-response id))))
 
-
-  (RT POST "/students/:id-int/excuse" [id-int day]
+  (POST "/students/:id/excuse" [id :<< as-int day]
         (friend/authorize #{::admin}
-                          (data/excuse-date id-int day))
-        (student-page-response id-int))
+                          (data/excuse-date id day))
+        (student-page-response id))
 
-  (RT POST "/students/:id-int/override" [id-int day]
+  (POST "/students/:id/override" [id :<< as-int  day]
         (friend/authorize #{::admin}
-                          (data/override-date id-int day))
-        (student-page-response id-int))
+                          (data/override-date id day))
+        (student-page-response id))
 
-  (RT POST "/students/:id-int/swipe/delete" [id-int swipe]
+  (POST "/students/:id/swipe/delete" [id :<< as-int  swipe]
         (friend/authorize #{::admin}
                           (data/delete-swipe swipe)
-                          (student-page-response id-int)))
+                          (student-page-response id)))
 
-  (RT POST "/students/:id-int/swipe" [id-int direction  missing]
+  (POST "/students/:id/swipe" [id :<< as-int  direction  missing]
         (friend/authorize #{::user}
                           (if (= direction "in")
-                            (do (when missing (data/swipe-out id-int missing))
-                                (data/swipe-in id-int))
-                            (do (when missing (data/swipe-in id-int missing))
-                                (data/swipe-out id-int))))
+                            (do (when missing (data/swipe-out id missing))
+                                (data/swipe-in id))
+                            (do (when missing (data/swipe-in id missing))
+                                (data/swipe-out id))))
         (resp/response (att/get-student-list)))
 
 
