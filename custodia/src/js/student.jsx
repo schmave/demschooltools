@@ -43,12 +43,12 @@ var exports = React.createClass({
         d.setMinutes( 0 );
 
         this.setState({missingswipe: d, missingdirection: missingdirection});
-        this.refs.missingSwipeCollector.show()
+        this.refs.missingSwipeCollector.show();
     },
     swipeWithMissing: function(missing){
-        var student = this.state.student;
-        student.missing = this.refs.missing_swiperef.state.value;
-        actionCreator.swipeStudent(student, student.direction);
+        var student = this.state.student,
+            missing = this.refs.missing_swiperef.state.value;
+        actionCreator.swipeStudent(student, student.direction, missing);
     },
     validateSignDirection: function(direction) {
         this.state.student.direction = direction;
@@ -169,7 +169,7 @@ var exports = React.createClass({
                     <form className="form-inline">
                         <div className="form-group">
                 <label htmlFor="missing">What time did you sign {this.state.missingdirection}?</label>
-                <DateTimePicker  id="missing" defaultValue={this.state.missingswipe} ref="missing_swiperef" calendar={false}/>
+                <DateTimePicker id="missing" defaultValue={this.state.missingswipe} ref="missing_swiperef" calendar={false}/>
                         </div>
                         <div className="form-group" style={{marginLeft: '2em'}}>
                 <button className="btn btn-sm btn-primary" onClick={this.swipeWithMissing}>Sign {this.state.missingdirection} </button>

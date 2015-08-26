@@ -62,9 +62,9 @@ var exports = {
             });
         }.bind(this));
     },
-    swipeStudent: function (student, direction) {
+    swipeStudent: function (student, direction, missing) {
         var student = student;
-        ajax.post('students/' + student._id + '/swipe', {direction: direction})
+        ajax.post('students/' + student._id + '/swipe', {direction: direction, missing:missing})
             .then(function (data) {
                 dispatcher.dispatch({
                     type: constants.studentEvents.STUDENT_SWIPED,

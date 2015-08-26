@@ -98,7 +98,7 @@
                           (data/delete-swipe swipe)
                           (student-page-response id)))
 
-  (POST "/students/:id/swipe" [id :<< as-int  direction  missing]
+  (POST "/students/:id/swipe" [id :<< as-int direction  missing]
         (friend/authorize #{::user}
                           (if (= direction "in")
                             (do (when missing (data/swipe-out id missing))
