@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,7 @@
     "cal-heatmap": "^3.5.2",
     "flux": "^2.0.3",
     "griddle-react": "^0.2.13",
+    "jest-cli": "^0.5.0",
     "moment": "^2.10.6",
     "object-assign": "^3.0.0",
     "react": "^0.13.3",
@@ -34,8 +35,9 @@
   },
   "devDependencies": {
     "browserify": "^11.0.1",
+    "jest-cli": "^0.5.0",
     "reactify": "^1.1.1",
-    "watchify": "^3.3.1",
-    "uglifyify": "^3.0.1"
+    "uglifyify": "^3.0.1",
+    "watchify": "^3.3.1"
   }
 }
