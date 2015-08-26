@@ -21,7 +21,7 @@ var exports = assign({}, EventEmitter.prototype, {
     }
 });
 
-ajax.get('/user/is-admin').then(function (data) {
+ajax.get('/users/is-admin').then(function (data) {
     isAdmin = true;
     exports.emitChange();
 }, function (data) {
