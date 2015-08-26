@@ -1,5 +1,7 @@
 var React = require('react'),
     Heatmap = require('./heatmap.jsx'),
+    Modal = require('./modal.jsx'),
+    DateTimePicker = require('react-widgets').DateTimePicker,
     actionCreator = require('./studentactioncreator'),
     studentStore = require('./StudentStore'),
     Router = require('react-router'),
@@ -30,19 +32,23 @@ var exports = React.createClass({
         if(this.state.student.last_swipe_date) {
             d = new Date(this.state.student.last_swipe_date + "T10:00:00");
         }
-        this.state.missing_direction = (this.state.student.last_swipe_type =="in")?"out":"in";
+        var missingdirection = (this.state.student.last_swipe_type =="in")?"out":"in";
         if(!this.state.student.in_today
            // && this.state.student.last_swipe_type == "in"
            && this.state.student.direction == "out"){
-            this.state.missing_direction = "in";
+            missingdirection = "in";
             d = new Date();
         }
-        d.setHours((this.state.missing_direction =="in")?8:15);
+        d.setHours((missingdirection =="in")?8:15);
         d.setMinutes( 0 );
-        //$scope.missing_swipe = d;
-        //$scope.screen = "get-swipe-time";
 
-        //router.get().transitionTo('get-swipe-time');
+        this.setState({missingswipe: d, missingdirection: missingdirection});
+        this.refs.missingSwipeCollector.show()
+    },
+    swipeWithMissing: function(missing){
+        var student = this.state.student;
+        student.missing = this.refs.missing_swiperef.state.value;
+        actionCreator.swipeStudent(student, student.direction);
     },
     validateSignDirection: function(direction) {
         this.state.student.direction = direction;
@@ -54,13 +60,14 @@ var exports = React.createClass({
                        && direction == "in");
 
         if(missing_in || missing_out) {
-            this.get_missing_swipe();
+            this.getMissingSwipe();
         } else {
             actionCreator.swipeStudent(this.state.student, direction);
         }
     },
-    signIn: function () {validateSignDirection('in');},
-    signOut: function () {validateSignDirection('out');},
+
+    signIn: function () {this.validateSignDirection('in');},
+    signOut: function () {this.validateSignDirection('out');},
 
     markAbsent: function () {
         actionCreator.markAbsent(this.state.student);
@@ -158,6 +165,17 @@ var exports = React.createClass({
         if (this.state.student) {
             var activeDate = this.getActiveDay(this.state.student);
             return <div className="row">
+                <Modal ref="missingSwipeCollector" title={"What time did you sign " + this.state.missingdirection + "?"}>
+                    <form className="form-inline">
+                        <div className="form-group">
+                <label htmlFor="missing">What time did you sign {this.state.missingdirection}?</label>
+                <DateTimePicker  id="missing" defaultValue={this.state.missingswipe} ref="missing_swiperef" calendar={false}/>
+                        </div>
+                        <div className="form-group" style={{marginLeft: '2em'}}>
+                <button className="btn btn-sm btn-primary" onClick={this.swipeWithMissing}>Sign {this.state.missingdirection} </button>
+                        </div>
+                    </form>
+                </Modal>
                 <div className="col-sm-1"></div>
                 <div className="col-sm-10">
                     <div className="panel panel-info">
@@ -206,12 +224,17 @@ var exports = React.createClass({
                 </div>
                 <div className="col-sm-1"></div>
             </div>;
+
         }
 
         return <div></div>
             ;
     },
     _onChange: function () {
+
+        if(this.refs.missingSwipeCollector){
+            this.refs.missingSwipeCollector.hide();
+        }
         var s = studentStore.getStudent(this.state.studentId);
 
         var activeDay = this.getActiveDay(s);
