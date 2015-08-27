@@ -28,21 +28,14 @@ var exports = React.createClass({
         studentStore.removeChangeListener(this._onChange);
     },
     getMissingSwipe: function () {
-        var d = new Date();
-        if (this.state.student.last_swipe_date) {
-            d = new Date(this.state.student.last_swipe_date + "T10:00:00");
-        }
         var missingdirection = (this.state.student.last_swipe_type == "in") ? "out" : "in";
         if (!this.state.student.in_today
                 // && this.state.student.last_swipe_type == "in"
             && this.state.student.direction == "out") {
             missingdirection = "in";
-            d = new Date();
         }
-        d.setHours((missingdirection == "in") ? 8 : 15);
-        d.setMinutes(0);
 
-        this.setState({missingswipe: d, missingdirection: missingdirection});
+        this.setState({missingdirection: missingdirection});
         this.refs.missingSwipeCollector.show();
     },
     swipeWithMissing: function (missing) {
@@ -172,6 +165,19 @@ var exports = React.createClass({
             </div>
         </div>;
     },
+    getMissingTime: function() {
+        var d = new Date();
+        if (this.state.student.last_swipe_date) {
+            d = new Date(this.state.student.last_swipe_date + "T10:00:00");
+        }
+        if (!this.state.student.in_today
+            && this.state.student.direction == "out") {
+            d = new Date();
+        }
+        d.setHours((this.state.missingdirection == "in") ? 8 : 15);
+        d.setMinutes(0);
+        return d;
+    },
     render: function () {
         if (this.state.student) {
             var activeDate = this.getActiveDay(this.state.student);
@@ -181,9 +187,7 @@ var exports = React.createClass({
                     <form className="form-inline">
                         <div className="form-group">
                             <label htmlFor="missing">What time did you sign {this.state.missingdirection}?</label>
-                            <div>MissingSwipe no work: {this.state.missingswipe}</div>
-                            <div>MissingSwipe work: {this.state.missingswipe? this.state.missingswipe.toDateString() : ''}</div>
-                            <DateTimePicker id="missing" defaultValue={this.state.missingswipe} ref="missing_swiperef"
+                <DateTimePicker id="missing" defaultValue={this.getMissingTime()} ref="missing_swiperef"
                                             calendar={false}/>
                         </div>
                         <div className="form-group" style={{marginLeft: '2em'}}>
