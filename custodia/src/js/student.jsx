@@ -174,8 +174,12 @@ var exports = React.createClass({
             && this.state.student.direction == "out") {
             d = new Date();
         }
-        d.setHours((this.state.missingdirection == "in") ? 8 : 15);
+        d.setHours((this.state.missingdirection == "in") ? 9 : 15);
         d.setMinutes(0);
+
+        if(this.refs.missing_swiperef) {
+            this.refs.missing_swiperef.state.value = d;
+        }
         return d;
     },
     render: function () {
