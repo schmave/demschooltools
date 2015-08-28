@@ -125,7 +125,7 @@ var exports = React.createClass({
     getActiveDay: function (student) {
         if (this.context.router.getCurrentParams().day) {
             return this.context.router.getCurrentParams().day;
-        } else if (this.state.student) {
+        } else if (student && student.days[0]) {
             return student.days[0].day;
         } else {
             return '';
