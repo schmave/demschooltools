@@ -21,7 +21,6 @@
 
 (def basetime (t/date-time 2014 10 14 14 9 27 246))
 
-
 (defn get-att [id student]
   (let [year (dates/get-current-year-string (db/get-years))]
     (att/get-attendance year id student)))

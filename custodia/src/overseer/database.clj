@@ -61,6 +61,16 @@
         swipe)
       swipe)))
 
+
+(def nine-am (t/today-at 13 0))
+(def four-pm (t/today-at 20 0))
+
+(defn round-swipe-in-time [time]
+  (if (t/after? time nine-am) time nine-am))
+
+(defn round-swipe-out-time [time]
+  (if (t/before? time four-pm) time four-pm))
+
 ;; (sample-db)
 (trace/deftrace swipe-out
   ([id] (swipe-out id (t/now)))
