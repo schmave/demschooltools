@@ -331,6 +331,8 @@ public class Attendance extends Controller {
         Form<AttendanceCode> filled_form = code_form.bindFromRequest();
         ac.edit(filled_form);
 
+        CachedPage.remove(CACHE_INDEX);
+
         return redirect(routes.Attendance.viewCodes());
     }
 
@@ -345,6 +347,8 @@ public class Attendance extends Controller {
         AttendanceCode ac = AttendanceCode.findById(
             Integer.parseInt(filled_form.field("id").value()));
         ac.edit(filled_form);
+
+        CachedPage.remove(CACHE_INDEX);
 
         return redirect(routes.Attendance.viewCodes());
     }
