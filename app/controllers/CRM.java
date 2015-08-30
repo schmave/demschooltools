@@ -611,7 +611,7 @@ public class CRM extends Controller {
 
         new_donation.person = Person.findById(Integer.parseInt(filledForm.field("person").value()));
         new_donation.description = filledForm.field("description").value();
-		
+
 		String dollar_value = filledForm.field("dollar_value").value();
 		if (dollar_value.charAt(0) == '$') {
 			dollar_value = dollar_value.substring(1);
@@ -719,7 +719,7 @@ public class CRM extends Controller {
 		if (p.dob == null) {
 			return -1;
 		}
-        return (int)((new Date(114, 7, 25).getTime() - p.dob.getTime()) / 1000 / 60 / 60 / 24 / 365.25);
+        return (int)((Application.getStartOfYear().getTime() - p.dob.getTime()) / 1000 / 60 / 60 / 24 / 365.25);
     }
 
     public static String formatDob(Date d) {
