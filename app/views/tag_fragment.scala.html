@@ -4,6 +4,6 @@
 <span style="white-space: nowrap;"><a
 	href="@routes.CRM.viewTag(t.id)"><span
 		class="label label-success">@t.title</span></a><a class="tag_x"
-		href="javascript:removeTag($('#@{p.person_id}_@t.id'),@p.person_id, @t.id)"
+		href="#" onclick="removeTag($('#@{p.person_id}_@t.id'),@p.person_id, @t.id); return false;"
 id="@{p.person_id}_@t.id"><img src="/assets/images/x.png"></a></span>
 

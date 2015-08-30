@@ -24,7 +24,7 @@
 			personForm("state").value() ||
 			personForm("zip").value()) { has_address =>
 			@if( !has_address ) {
-				<a id="address_controller" href="javascript:$('#address_stuff').show();$('#address_controller').hide();">
+				<a id="address_controller" href="#" onclick="$('#address_stuff').show();$('#address_controller').hide();return false;">
 					  Add address
 				</a>
 				<div id="address_stuff" style="display:none">
@@ -45,7 +45,7 @@
 			personForm("number_3").value()) { has_phones =>
 		@for( i <- 1 to 3 ) {
 			@if( i == 2 && !has_phones ) {
-				<a id="phone_controller" href="javascript:$('#phone_stuff').show();$('#phone_controller').hide();">
+				<a id="phone_controller" href="#" onclick="$('#phone_stuff').show();$('#phone_controller').hide();return false;">
 					  Add phone(s)
 				</a>
 				<div id="phone_stuff" style="display:none">

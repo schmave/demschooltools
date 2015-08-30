@@ -62,7 +62,7 @@
     <div class="tab-pane active" id="tab1">
 		<div class="row">
 		<div class="col-md-9">
-		<p id="add_comment_p"><a href="javascript:void(0)" onclick="javascript:$('#new_comment').show();$('#add_comment_p').hide();">Add a comment</a>
+		<p id="add_comment_p"><a href="#" onclick="javascript:$('#new_comment').show();$('#add_comment_p').hide();return false;">Add a comment</a>
 		<div id="new_comment" style="display: none;">
 			<div style="float:left">I talked with
 			<input type=hidden name="person" value="@p.person_id" />@p.first_name @p.last_name
@@ -109,7 +109,7 @@
 		</div>
     <div class="tab-pane" id="tab2">
 		@form(routes.CRM.addDonation(), args = 'id -> "donation_form") {
-		<p id="add_donation_p"><a href="javascript:void(0)" onclick="javascript:$('#new_donation').show();$('#add_donation_p').hide()">Add a donation</a>
+		<p id="add_donation_p"><a href="#" onclick="javascript:$('#new_donation').show();$('#add_donation_p').hide();return false;">Add a donation</a>
 		<div id="new_donation" style="display: none;">
 			<input type=hidden name="person" value="@p.person_id" />
 			Description: <textarea name="description" style="width: 400px;" rows=5 ></textarea>

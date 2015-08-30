@@ -26,7 +26,7 @@
   }
   @if( person.tags.size() > 0 ) { <br> }
 <a id="add_tag_a_@person.person_id"
-	href="javascript:$('#add_tag_@person.person_id').show();$('#add_tag_@person.person_id input').focus();$('#add_tag_a_@person.person_id').hide();">Add tag</a>
+	href="#" onclick="$('#add_tag_@person.person_id').show();$('#add_tag_@person.person_id input').focus();$('#add_tag_a_@person.person_id').hide();return false;">Add tag</a>
 </div>
 <br>
 <span id="add_tag_@person.person_id" style="display:none;">

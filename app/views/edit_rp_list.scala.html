@@ -19,7 +19,7 @@ config = @Html(Utils.toJson(OrgConfig.get()));
 requirejs(['utils', 'edit_rp_list'], function() {});
 </script>
 
-<p><a href="javascript:print()" class="no-print btn btn-success">
+<p><a href="#" onclick="print();return false;" class="no-print btn btn-success">
 Print active @OrgConfig.get().str_res_plans</a></p>
 <h2>Active @OrgConfig.get().str_res_plans</h2>
 <table class="table active-rps printable-res-plans">
