@@ -37,6 +37,8 @@ var exports = React.createClass({
 
         this.setState({missingdirection: missingdirection});
         this.refs.missingSwipeCollector.show();
+        // use ComponentDidUpdate to check the states then change them
+        // use the onChange for the datepicker to mutate setState
     },
     swipeWithMissing: function (missing) {
         var student = this.state.student,

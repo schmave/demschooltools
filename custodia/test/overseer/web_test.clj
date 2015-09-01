@@ -123,22 +123,42 @@
   )
 
 (def _840am (t/minus basetime (t/minutes 90)))
-(def _340pm (t/plus basetime (t/minutes 331)))
+(def _339pm (t/plus basetime (t/minutes 330)))
 
-(deftest swipe-outside-9-to-4-test
+(deftest swipe-before-9-test
   (do (db/sample-db)
       (let [s (db/make-student "test")
             sid (:_id s)]
         ;; only count minutes from 9-4
         (db/swipe-in sid _840am)
-        (db/swipe-out sid _340pm)
+        (db/swipe-out sid _339pm)
         (let [att (get-att sid s)]
           (testing "Total Valid Day Count"
             (is (= (:total_days att)
                    0)))
-          (testing "Total Short Day Count"
+          (testing "Total Minute Count"
             (is (= (-> att :days first :total_mins)
-                   401)))
+                   399.4541)))
+
+          ))))
+
+(def _900am (t/date-time 2014 10 14 13 0))
+(def _500pm (t/date-time 2014 10 14 21 0))
+
+(deftest swipe-after-4-test
+  (do (db/sample-db)
+      (let [s (db/make-student "test")
+            sid (:_id s)]
+        ;; only count minutes from 9-4
+        (db/swipe-in sid (t/plus _900am (t/hours 3)))
+        (db/swipe-out sid _500pm)
+        (let [att (get-att sid s)]
+          (testing "Total Valid Day Count"
+            (is (= (:total_days att)
+                   0)))
+          (testing "Total Minute Count"
+            (is (= (-> att :days first :total_mins)
+                   240.0)))
 
           ))))
 
