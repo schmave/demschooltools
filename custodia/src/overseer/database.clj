@@ -64,7 +64,7 @@
   ([id] (swipe-in id (t/now)))
   ([id in-time]
    (db/persist! (assoc (make-swipe id)
-                       :in_time (make-timestamp (round-swipe-in-time in-time))))))
+                       :in_time (make-timestamp  in-time)))))
 
 (defn sanitize-out [swipe]
   (let [in (:in_time swipe)
@@ -88,7 +88,7 @@
            in-swipe (if only-swiped-in?
                       last-swipe
                       (make-swipe id))
-           out-swipe (assoc in-swipe :out_time (make-timestamp (round-swipe-out-time out-time)))
+         out-swipe (assoc in-swipe :out_time (make-timestamp  out-time))
            out-swipe (sanitize-out out-swipe)]
        (if only-swiped-in?
          (db/update! :swipes (:_id out-swipe) out-swipe)

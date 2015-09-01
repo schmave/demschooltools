@@ -215,13 +215,26 @@ order by days2.days
 ;; (map :days (get-school-days "2014-06-01 2015-06-01"))
 ;; (get-student-page 7 "2014-07-23 2015-06-17")
 
+(def swipes-select "
+  (select
+      _id
+     , (CASE WHEN EXTRACT(HOURS FROM s.in_time) < 13
+          THEN date_trunc('day', s.in_time) + interval '13 hours'
+          ELSE s.in_time END) as in_time
+     , (CASE WHEN EXTRACT(HOURS FROM s.out_time) >= 20
+          THEN date_trunc('day', s.out_time) + interval '20 hours'
+          ELSE s.out_time END) as out_time
+     , student_id
+   from swipes as s)
+  ")
+
 (defn get-student-page [id year]
   (let [q (str "
-SELECT 
+SELECT
   schooldays.student_id
   , to_char(s.in_time at time zone 'America/New_York', 'HH:MI:SS') as nice_in_time
   , to_char(s.out_time at time zone 'America/New_York', 'HH:MI:SS') as nice_out_time
-  , s.out_time 
+  , s.out_time
   , s.in_time
   , extract(EPOCH FROM (s.out_time - s.in_time)::INTERVAL)/60 as intervalmin
   , o._id has_override
@@ -229,12 +242,12 @@ SELECT
   , schooldays.olderdate
   , s._id
   , (CASE WHEN s._id IS NOT NULL THEN 'swipes' ELSE '' END) as type
-  , (CASE WHEN schooldays.olderdate IS NULL 
+  , (CASE WHEN schooldays.olderdate IS NULL
                OR schooldays.olderdate > schooldays.days
                THEN 300 ELSE 330 END) as requiredmin
   , schooldays.days AS day
     FROM (" school-days-fragment " where students._id = ?) as schooldays
-    LEFT JOIN swipes s
+    LEFT JOIN " swipes-select "  s
       ON (
        ((schooldays.days = date(s.in_time at time zone 'America/New_York'))
        OR
