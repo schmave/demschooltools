@@ -39,22 +39,8 @@
 (defn delete-swipe [swipe]
   (db/delete! swipe))
 
-(defn nine-am [date]
-   (t/date-time (t/year date) (t/month date) (t/day date) 13 0))
-
-(defn four-pm [date]
-  (t/date-time (t/year date) (t/month date) (t/day date) 20 0))
-
-(s/defn round-swipe-in-time :- DateTime [time]
-  (let [nine-am (nine-am time)]
-    (if (t/after? time nine-am) time nine-am)))
-
-(s/defn round-swipe-out-time :- DateTime [time]
-  (let [four-pm (four-pm time)]
-    (if (t/before? time four-pm) time four-pm)))
-
-(s/defn make-timestamp :- java.sql.Timestamp [t :- DateTime]
-  (c/to-timestamp t))
+(s/defn make-timestamp :- java.sql.Timestamp
+  [t :- DateTime] (c/to-timestamp t))
 
 ;; (make-sqldate "2015-03-30")
 (defn- make-sqldate [t]
@@ -64,7 +50,7 @@
   ([id] (swipe-in id (t/now)))
   ([id in-time]
    (db/persist! (assoc (make-swipe id)
-                       :in_time (make-timestamp  in-time)))))
+                       :in_time (make-timestamp in-time)))))
 
 (defn sanitize-out [swipe]
   (let [in (:in_time swipe)
@@ -88,7 +74,7 @@
            in-swipe (if only-swiped-in?
                       last-swipe
                       (make-swipe id))
-         out-swipe (assoc in-swipe :out_time (make-timestamp  out-time))
+         out-swipe (assoc in-swipe :out_time (make-timestamp out-time))
            out-swipe (sanitize-out out-swipe)]
        (if only-swiped-in?
          (db/update! :swipes (:_id out-swipe) out-swipe)

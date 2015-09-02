@@ -103,8 +103,8 @@
   (do (db/sample-db)
       (let [s (db/make-student "test")
             sid (:_id s)]
-        (db/swipe-in sid (str basetime))
-        (db/swipe-out sid (str (t/plus basetime (t/hours 4))))
+        (db/swipe-in sid  basetime)
+        (db/swipe-out sid  (t/plus basetime (t/hours 4)))
         (db/override-date sid "2014-10-14")
         (let [att (get-att sid s)]
           (testing "Total Valid Day Count"
@@ -135,7 +135,7 @@
         (let [att (get-att sid s)]
           (testing "Total Valid Day Count"
             (is (= (:total_days att)
-                   0)))
+                   1)))
           (testing "Total Minute Count"
             (is (= (-> att :days first :total_mins)
                    399.4541)))
@@ -153,6 +153,7 @@
         (db/swipe-in sid (t/plus _900am (t/hours 3)))
         (db/swipe-out sid _500pm)
         (let [att (get-att sid s)]
+          (trace/trace att)
           (testing "Total Valid Day Count"
             (is (= (:total_days att)
                    0)))
@@ -181,8 +182,6 @@
             (is (= (:total_overrides att)
                    0)))
           ))))
-
-
 
 ;; 10-14-2014 - good
 ;; 10-15-2014 - good
@@ -301,7 +300,7 @@
   )
 
 
-(deftest student-list-when-last-swipe-sanitized
+(deftest student-list-when-last-swipe-sanitized1
   (let [res (att/get-last-swipe-type
              [{:swipes [{:day "2015-04-17", :nice_out_time nil, :type "", :nice_in_time nil, :has_override nil, :out_time nil, :in_time nil}]}
               {:swipes [{:day "2015-04-16",  :nice_out_time nil, :type "", :nice_in_time nil, :has_override nil, :out_time nil, :in_time nil}]}
@@ -309,44 +308,45 @@
     (testing "Can get last swipe type"
       (is (not= nil res)))))
 
-(deftest student-list-when-last-swipe-sanitized
-  (db/sample-db)
-  (let [s (db/make-student "test")
-        sid (:_id s)
-        now (t/now)]
-    ;; has an in, then missed two days, next in should
-    ;; show a last swipe type
-    (db/swipe-in 1 (t/minus now (t/days 2)))
-    (db/swipe-in 1 (t/minus now (t/days 1)))
-    (db/swipe-in sid (t/minus now (t/days 3)))
-    (let [att (trace/trace "adf" (att/get-student-with-att sid))]
-      (testing "Student Att Count"
-        (is (= (->> att :last_swipe_type) "in"))
-        (is (= (->> att :in_today) false))
-        ))
+(deftest student-list-when-last-swipe-sanitized2
+  (do (db/sample-db)
+      (let [s (db/make-student "test")
+            sid (:_id s)
+            now (t/today-at 15 0)]
+        ;; has an in, then missed two days, next in should
+        ;; show a last swipe type
+        (db/swipe-in 1 (t/minus now (t/days 2)))
+        (db/swipe-in 1 (t/minus now (t/days 1)))
+        (db/swipe-in sid (t/minus now (t/days 3)))
+        (let [att (first (att/get-student-with-att sid))]
+          (testing "Student Att Count"
+            (is (= (->> att :last_swipe_type) "in"))
+            (is (= (->> att :in_today) false))
+            ))
 
-    (let [att  (att/get-student-list)
-          our-hero (filter #(= sid (:_id %)) att)]
-      (testing "Student Count"
-        (is (= (->> our-hero count) 1))
-        (is (= (->> our-hero first :last_swipe_type) "in"))
-        (is (= (->> our-hero first :in_today) false))
-        ))))
+        (let [att  (att/get-student-list)
+              our-hero (filter #(= sid (:_id %)) att)]
+          (testing "Student Count"
+            (is (= (->> our-hero count) 1))
+            (is (= (->> our-hero first :last_swipe_type) "in"))
+            (is (= (->> our-hero first :in_today) false))
+            )))))
 
-(deftest student-list-when-last-swipe-sanitized
-  (db/sample-db)
-  (let [s (db/make-student "test")
-        sid (:_id s)
-        now (t/now)]
-    (db/swipe-in sid (t/plus now (t/hours 1)))
-    (db/swipe-out sid now)
-    (let [att  (att/get-student-list)
-          our-hero (filter #(= sid (:_id %)) att)]
-      (testing "Student Count"
-        (is (= (->> our-hero count) 1))
-        (is (= (->> our-hero first :last_swipe_type) "out"))
-        (is (= (->> our-hero first :in_today) true))
-        ))))
+(deftest student-list-when-last-swipe-sanitized3
+  (do (db/sample-db)
+      (let [s (db/make-student "test")
+            sid (:_id s)
+            now (t/today-at 15 0)]
+        (db/swipe-in sid (t/plus now (t/hours 1)))
+        (db/swipe-out sid now)
+        (let [att  (att/get-student-list)
+              our-hero (filter #(= sid (:_id %)) att)]
+          (trace/trace our-hero)
+          (testing "Student Count"
+            (is (= (->> our-hero count) 1))
+            (is (= (->> our-hero first :last_swipe_type) "out"))
+            (is (= (->> our-hero first :in_today) true))
+            )))))
 
 (deftest absent-student-main-page
   (db/sample-db)
@@ -366,8 +366,8 @@
             sid (:_id s)
             s (db/toggle-student-older sid)
             s (first (db/get-students sid))
-            tomorrow (-> (t/today-at 8 0) (t/plus (t/days 1)))
-            day-after-next (-> (t/today-at 8 0) (t/plus (t/days 2)))
+            tomorrow (-> (t/today-at 13 0) (t/plus (t/days 1)))
+            day-after-next (-> (t/today-at 13 0) (t/plus (t/days 2)))
             ]
         (db/swipe-in sid tomorrow)
         (db/swipe-out sid (t/plus tomorrow (t/minutes 331)))

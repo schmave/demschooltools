@@ -110,6 +110,19 @@
     (first (map #(assoc % :type table)
                 (jdbc/insert! @pgdb table doc)))))
 
+(def swipes-select "
+  (select
+      _id
+     , (CASE WHEN EXTRACT(HOURS FROM s.in_time at time zone 'Z') < 13
+          THEN date_trunc('day', s.in_time at time zone 'Z') + interval '13 hours'
+          ELSE s.in_time at time zone 'Z' END) as in_time
+     , (CASE WHEN EXTRACT(HOURS FROM s.out_time at time zone 'Z') >= 20
+          THEN date_trunc('day', s.out_time at time zone 'Z') + interval '20 hours'
+          ELSE s.out_time at time zone 'Z' END) as out_time
+     , student_id
+   from swipes as s)
+  ")
+
 ;; (jdbc/query @pgdb ["select * from students"])
 ;; (jdbc/query @pgdb ["select * from students where id in (?)" "1"])
 ;; (persist! {:type :students :name "steve" :olderdate nil})
@@ -129,7 +142,7 @@ where y.name=? AND e.student_id =?
 
 (defn lookup-last-swipe [student-id]
   (let [q (str "
-select * 
+select *
 from swipes s
 where s.student_id =? and s.in_time is not null
 order by s.in_time desc
@@ -143,7 +156,7 @@ limit 1;
 select e.*
        ,'excuses' as type
 from excuses e
-inner join years y 
+inner join years y
 ON (e.date BETWEEN y.from_date AND y.to_date)
 where y.name=? AND e.student_id =?
 ")]
@@ -164,12 +177,12 @@ select stu.name
       ELSE l.ins
       END as last_swipe_date
 from students stu
-left join 
-(select 
+left join
+(select
          max(s.in_time) as ins
         , max(s.out_time) as outs
         , s.student_id
-from swipes s
+from " swipes-select " s
 group by s.student_id
 order by ins, outs) as l on (l.student_id = stu._id)
 ")]
@@ -185,8 +198,8 @@ select distinct days2.days
 from (select
        to_char(s.in_time at time zone 'America/New_York', 'YYYY-MM-DD') as days
        , s.in_time
-from swipes s
-inner join years y 
+from " swipes-select " s
+inner join years y
   ON ((s.out_time BETWEEN y.from_date AND y.to_date)
       OR (s.in_time BETWEEN y.from_date AND y.to_date))
 where y.name=?) days2
@@ -198,35 +211,23 @@ order by days2.days
   )
 
 (def school-days-fragment
-  " SELECT a.days, students._id student_id, students.olderdate FROM (SELECT DISTINCT days2.days
+  (str " SELECT a.days, students._id student_id, students.olderdate FROM (SELECT DISTINCT days2.days
   FROM (SELECT
-  (CASE WHEN date(s.in_time at time zone 'America/New_York')  IS NULL 
+  (CASE WHEN date(s.in_time at time zone 'America/New_York')  IS NULL
   THEN date(s.out_time at time zone 'America/New_York')
   ELSE date(s.in_time at time zone 'America/New_York') END) as days
-  FROM swipes s
-  INNER JOIN years y 
+  FROM " swipes-select " s
+  INNER JOIN years y
   ON ((s.out_time BETWEEN y.from_date AND y.to_date)
   OR (s.in_time BETWEEN y.from_date AND y.to_date))
   WHERE y.name=?) days2
   ORDER BY days2.days) as a
   JOIN students on (1=1)
-")
+"))
 
 ;; (map :days (get-school-days "2014-06-01 2015-06-01"))
 ;; (get-student-page 7 "2014-07-23 2015-06-17")
 
-(def swipes-select "
-  (select
-      _id
-     , (CASE WHEN EXTRACT(HOURS FROM s.in_time) < 13
-          THEN date_trunc('day', s.in_time) + interval '13 hours'
-          ELSE s.in_time END) as in_time
-     , (CASE WHEN EXTRACT(HOURS FROM s.out_time) >= 20
-          THEN date_trunc('day', s.out_time) + interval '20 hours'
-          ELSE s.out_time END) as out_time
-     , student_id
-   from swipes as s)
-  ")
 
 (defn get-student-page [id year]
   (let [q (str "
@@ -252,10 +253,10 @@ SELECT
        ((schooldays.days = date(s.in_time at time zone 'America/New_York'))
        OR
         (schooldays.days = date(s.out_time at time zone 'America/New_York')))
-        AND schooldays.student_id = s.student_id) 
-    LEFT JOIN overrides o 
+        AND schooldays.student_id = s.student_id)
+    LEFT JOIN overrides o
       ON (schooldays.days = o.date AND o.student_id = schooldays.student_id)
-    LEFT JOIN excuses e 
+    LEFT JOIN excuses e
       ON (schooldays.days = e.date AND e.student_id = schooldays.student_id)
     where schooldays.days is not null
     and schooldays.student_id = ?
@@ -268,44 +269,44 @@ SELECT
 (defn get-report [year-name]
   (let [q (str "
 select
-  stu.student_id 
+  stu.student_id
     , stu.student_id as _id
     , (select s.name from students s where s._id = stu.student_id) as name
     , sum(CASE WHEN oid IS NOT NULL THEN stu.requiredmin/60 ELSE stu.intervalmin/60 END) as total_hours
-    , sum(CASE WHEN oid IS NOT NULL 
+    , sum(CASE WHEN oid IS NOT NULL
                OR stu.intervalmin >= stu.requiredmin
           THEN 1 ELSE 0 END) as good
-    , sum(CASE WHEN (oid IS NULL 
+    , sum(CASE WHEN (oid IS NULL
                      AND eid IS NULL)
-              AND (stu.intervalmin < stu.requiredmin 
+              AND (stu.intervalmin < stu.requiredmin
                    AND stu.intervalmin IS NOT NULL)
           THEN 1 ELSE 0 END) as short
     , sum(CASE WHEN oid IS NOT NULL THEN 1 ELSE 0 END) as overrides
     , sum(CASE WHEN eid IS NOT NULL THEN 1 ELSE 0 END) as excuses
-    , sum(CASE WHEN anyswipes IS NULL 
+    , sum(CASE WHEN anyswipes IS NULL
                    AND eid IS NULL
                    AND oid IS NULL
            THEN 1 ELSE 0 END) as unexcused
 from (
-      SELECT 
+      SELECT
         schooldays.student_id
         , max(s._id) anyswipes
         , max(o._id) oid
         , max(e._id) eid
         , schooldays.olderdate
-        , (CASE WHEN schooldays.olderdate IS NULL 
+        , (CASE WHEN schooldays.olderdate IS NULL
                      OR schooldays.olderdate > schooldays.days
                      THEN 300 ELSE 330 END) as requiredmin
         , sum(extract(EPOCH FROM (s.out_time - s.in_time)::INTERVAL)/60) AS intervalmin
          , schooldays.days AS day
 
       FROM ( " school-days-fragment " ) as schooldays
-      LEFT JOIN swipes s
+      LEFT JOIN " swipes-select " s
                 ON (schooldays.days = date(s.in_time at time zone 'America/New_York')
-                    AND schooldays.student_id = s.student_id) 
-      LEFT JOIN overrides o 
+                    AND schooldays.student_id = s.student_id)
+      LEFT JOIN overrides o
            ON (schooldays.days = o.date AND o.student_id = schooldays.student_id)
-      LEFT JOIN excuses e 
+      LEFT JOIN excuses e
            ON (schooldays.days = e.date AND e.student_id = schooldays.student_id)
       where schooldays.days is not null
       GROUP BY schooldays.student_id, day, schooldays.olderdate
@@ -338,11 +339,11 @@ select s.*
   , extract(EPOCH FROM (s.out_time - s.in_time)::INTERVAL)/60 as interval
   , to_char(s.in_time at time zone 'America/New_York', 'HH:MI:SS') as nice_in_time
   , to_char(s.out_time at time zone 'America/New_York', 'HH:MI:SS') as nice_out_time
-from swipes s
-inner join years y 
+from " swipes-select " s
+inner join years y
 ON ((s.out_time BETWEEN y.from_date AND y.to_date)
     OR (s.in_time BETWEEN y.from_date AND y.to_date))
-where y.name=? AND s.student_id =? 
+where y.name=? AND s.student_id =?
 ")]
     (jdbc/query
      @pgdb

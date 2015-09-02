@@ -6,7 +6,7 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [compojure "1.4.0"]
                  [ring/ring-jetty-adapter "1.2.2"]
-                 [org.clojure/tools.nrepl "0.2.5"]
+                 [org.clojure/tools.nrepl "0.2.7"]
                  [org.clojure/data.json "0.2.5"]
                  [com.cemerick/friend "0.2.1" :exclusions [xerces/xercesImpl]]
 		 [org.clojure/tools.trace "0.7.8"]
@@ -21,9 +21,8 @@
                  [postgresql "9.1-901.jdbc4"]
                  [org.clojure/tools.trace "0.7.8"]
                  [com.ashafa/clutch "0.4.0"]]
-  :jvm-opts ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"]
   :min-lein-version "2.0.0"
-  :plugins [[cider/cider-nrepl "0.9.0-SNAPSHOT"]
+  :plugins [[cider/cider-nrepl "0.10.0-SNAPSHOT"]
             [lein-ring "0.7.0"]
             [environ/environ.lein "0.2.1"]]
   :test-selectors {:default (or (complement :integration)

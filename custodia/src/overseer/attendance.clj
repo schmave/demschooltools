@@ -150,7 +150,7 @@
                             (f/parse (:out_time %))))
             list)))
 
-(s/defn get-attendance :- StudentPage
+(defn get-attendance 
   [year id student]
   (let [swipes (db/get-student-page id year)
         swipes (map #(assoc % :day (-> % :day make-date-string-without-timezone)
@@ -161,9 +161,9 @@
         grouped-swipes (into (sorted-map) grouped-swipes)
         summed-days (map #(append-validity student %) grouped-swipes)
         summed-days (reverse summed-days)
-        today-string (trace/trace "today" (today-string))
-        absent_today (= today-string (trace/trace "absent" (make-date-string-without-timezone
-                                                            (:show_as_absent student))))
+        today-string  (today-string)
+        absent_today (= today-string  (make-date-string-without-timezone
+                                                             (:show_as_absent student)))
         in_today (and (= today-string
                          (-> summed-days first :day))
                       (-> summed-days first :swipes only-swipes count (> 0)))
