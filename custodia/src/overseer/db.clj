@@ -113,12 +113,12 @@
 (def swipes-select "
   (select
       _id
-     , (CASE WHEN EXTRACT(HOURS FROM s.in_time at time zone 'Z') < 13
+     , ((CASE WHEN EXTRACT(HOURS FROM s.in_time at time zone 'Z') < 13
           THEN date_trunc('day', s.in_time at time zone 'Z') + interval '13 hours'
-          ELSE s.in_time at time zone 'Z' END) as in_time
-     , (CASE WHEN EXTRACT(HOURS FROM s.out_time at time zone 'Z') >= 20
+          ELSE s.in_time at time zone 'Z' END) at time zone 'Z') as in_time
+     , ((CASE WHEN EXTRACT(HOURS FROM s.out_time at time zone 'Z') >= 20
           THEN date_trunc('day', s.out_time at time zone 'Z') + interval '20 hours'
-          ELSE s.out_time at time zone 'Z' END) as out_time
+          ELSE s.out_time at time zone 'Z' END) at time zone 'Z') as out_time
      , student_id
    from swipes as s)
   ")

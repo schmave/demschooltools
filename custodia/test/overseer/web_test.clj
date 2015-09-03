@@ -45,9 +45,17 @@
 
   ;; good tomorrow
   ;; 10-15-2014
-
   (db/swipe-in sid (t/plus basetime (t/days 1)))
   (db/swipe-out sid (t/plus basetime (t/days 1) (t/hours 6)))
+
+  (comment (do (db/sample-db)
+               (let [s (db/make-student "test")
+                     sid (:_id s)]
+                 (db/swipe-in sid (t/plus basetime (t/days 1)))
+                 (db/swipe-out sid (t/plus basetime (t/days 1) (t/hours 6)))
+                 (att/get-student-with-att sid)
+
+                 )))
 
   ;; short the next
   ;; 10-16-2014
@@ -60,8 +68,8 @@
 
   (db/swipe-in sid (t/plus basetime (t/days 3)))
   (db/swipe-out sid (t/plus basetime (t/days 3) (t/hours 4)))
-  (db/swipe-in sid (t/plus basetime (t/days 3) (t/hours 5)))
-  (db/swipe-out sid (t/plus basetime (t/days 3) (t/hours 7)))
+  (db/swipe-in sid (t/plus basetime (t/days 3) (t/hours 4.1)))
+  (db/swipe-out sid (t/plus basetime (t/days 3) (t/hours 6.1)))
 
   ;; short the next - 10-18-2014
   (db/swipe-in sid (t/plus basetime (t/days 4)))
@@ -230,7 +238,7 @@
                    1)))
           (testing "Total Hours"
             (is (= (:total_hours att)
-                   27.0)))
+                   26.527295000000002)))
           (testing "Days sorted correctly"
             (is (= (-> att :days first :day)
                    "2014-10-20")))
@@ -256,7 +264,7 @@
             (testing "Total Overrides"
               (is (= (:total_overrides att)
                      0)))
-            ))))
+            ))))  
   )
 
 (deftest in-today-works
