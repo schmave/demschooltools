@@ -33,8 +33,8 @@
   
   (data/swipe-in sid (t/plus basetime (t/days 3)))
   (data/swipe-out sid (t/plus basetime (t/days 3) (t/hours 4)))
-  (data/swipe-in sid (t/plus basetime (t/days 3) (t/hours 5)))
-  (data/swipe-out sid (t/plus basetime (t/days 3) (t/hours 7)))
+  (data/swipe-in sid (t/plus basetime (t/days 3) (t/hours 4.1)))
+  (data/swipe-out sid (t/plus basetime (t/days 3) (t/hours 6)))
 
   ;; short the next - 10-18-2014 
   
@@ -76,7 +76,7 @@
                    1)))
           (testing "Total Hours"
             (is (= (:total_hours student1)
-                   27.0)))
+                   26.527295000000002)))
           (testing "Total short count student 2"
             ;; TODO - determine correct short count (otherwise 2)
             (is (= (:short student2)
