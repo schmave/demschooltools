@@ -152,23 +152,43 @@
 
 (def _900am (t/date-time 2014 10 14 13 0))
 (def _500pm (t/date-time 2014 10 14 21 0))
+(def _330pm (t/date-time 2014 10 14 19 30))
 
-(deftest swipe-after-4-test
+(deftest swipe-roundings-after-4
   (do (db/sample-db)
       (let [s (db/make-student "test")
             sid (:_id s)]
-        ;; only count minutes from 9-4
+
+        ;; round after 4 back to 4
         (db/swipe-in sid (t/plus _900am (t/hours 3)))
         (db/swipe-out sid _500pm)
-        (let [att (get-att sid s)]
-          (trace/trace att)
-          (testing "Total Valid Day Count"
-            (is (= (:total_days att)
-                   0)))
-          (testing "Total Minute Count"
-            (is (= (-> att :days first :total_mins)
-                   240.0)))
 
+        ;; round before 9 up to 9
+        (db/swipe-in sid (t/plus _840am (t/days 1)))
+        (db/swipe-out sid (t/plus _330pm (t/days 1)))
+
+        (let [att (get-att sid s)
+              _10-15 (-> att :days first)
+              _10-14 (-> att :days second)]
+          (trace/trace att)
+          (testing "10/15 has no out rounding"
+            (is (= (-> _10-15 :swipes first :nice_out_time)
+                   "03:30:00")))
+          (testing "10/15 has in rounding"
+            (is (= (-> _10-15 :swipes first :nice_in_time)
+                   "09:00:00")))
+          (testing "10/15 minutes" (is (= (-> _10-15 :total_mins) 390.0)))
+          (testing "10/15 valid" (is (= (-> _10-15 :valid) true)))
+          (testing "10/14 has out rounding"
+            (is (= (-> _10-14 :swipes first :nice_out_time)
+                   "04:00:00")))
+          (testing "10/14 has no in rounding"
+            (is (= (-> _10-14 :swipes first :nice_in_time)
+                   "12:00:00")))
+          (testing "10/14 minutes" (is (= (-> _10-14 :total_mins) 240.0)))
+          (testing "10/14 not valid" (is (= (-> _10-14 :valid) false)))
+          (testing "One short" (is (= (:total_short att) 1)))
+          (testing "One attendance" (is (= (:total_days att) 1)))
           ))))
 
 (deftest single-swipe-short-test
