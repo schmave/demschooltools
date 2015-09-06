@@ -35,7 +35,7 @@ sql-philly-backup :
 sql-backup-local-restore :
 	pg_restore --verbose --clean --no-acl --no-owner -h localhost -U postgres -d swipes latest.dump
 
-deploy-philly : unit-test
+deploy-philly :
 	./prod-deploy.sh $(philly-prod-git) 
 
 start :
