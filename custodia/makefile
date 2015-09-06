@@ -1,21 +1,23 @@
 philly-prod-git := git@heroku.com:shining-overseer.git
 web-test-git := git@heroku.com:shining-overseer-test.git
 
-T : 
+T :
 	@echo deploy-test
 	@echo deploy-philly
 	@echo unit-test
-	@echo sql-philly
+	@echo "sql-philly - connect to philly postgres prod database"
 	@echo webdriver-test
 	@echo drop-tables
 	@echo load-massive-dump
 	@echo load-aliased-dump
 	@echo sql-backup-local-restore
-	@echo sql-philly-backup
-	@echo start
-	@echo minify 
-	@echo js 
-	@echo watch 
+	@echo "sql-philly-backup - make backup of philly prod database"
+	@echo "start - start a running overseer site"
+	@echo minify
+	@echo js
+	@echo watch
+	@echo sjs
+	@echo sjswatch
 
 # example of ls and echo
 hello : 
@@ -67,3 +69,9 @@ js :
 
 watch :
 	watchify -v -t reactify ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
+
+sjs :
+	nodejs /usr/local/bin/browserify -t reactify ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
+
+sjswatch :
+	nodejs /usr/local/bin/watchify -t reactify ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
