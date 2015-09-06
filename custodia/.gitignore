@@ -14,4 +14,3 @@ pom.xml
 *.iml
 .idea/
 /node_modules/
-/resources/public/js/gen/
