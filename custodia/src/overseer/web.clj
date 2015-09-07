@@ -79,7 +79,7 @@
                           (student-page-response id))))
 
   (POST "/students/:id/absent" [id :<< as-int]
-    (friend/authorize #{::admin}
+    (friend/authorize #{::user}
                       (do (data/toggle-student-absent id)
                           (student-page-response id))))
 

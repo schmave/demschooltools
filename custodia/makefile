@@ -53,7 +53,7 @@ webdriver-test :
 	lein test :integration
 
 drop-tables :
-	psql -d swipes -c "drop table if exists session_store; drop table if exists students; drop table if exists excuses; drop table if exists overrides; drop table if exists years; drop table if exists swipes;"
+	psql -d swipes -c "DROP FUNCTION IF EXISTS school_days(text); DROP VIEW IF EXISTS roundedswipes; drop table if exists session_store; drop table if exists students; drop table if exists excuses; drop table if exists overrides; drop table if exists years; drop table if exists swipes;"
 
 load-massive-dump : drop-tables
 	psql swipes < massive.dump

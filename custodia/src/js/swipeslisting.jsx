@@ -1,5 +1,6 @@
 var React = require('react'),
     store = require('./StudentStore'),
+    AdminItem = require('./adminwrapper.jsx'),
     actionCreator = require('./studentactioncreator'),
     studentStore = require('./StudentStore');
 
@@ -38,7 +39,9 @@ var exports = React.createClass({
                     swipeRows.push(<tr>
                         <td>{swipe.nice_in_time}</td>
                         <td>{swipe.nice_out_time}</td>
-                        <td onClick={this.deleteSwipe.bind(this, swipe)}><a>Delete</a></td>
+                        <AdminItem>
+                          <td onClick={this.deleteSwipe.bind(this, swipe)}><a>Delete</a></td>
+                        </AdminItem>
                     </tr>)
                 }
             }.bind(this))
@@ -69,15 +72,20 @@ var exports = React.createClass({
             </table>
             {this.state.day && !this.state.day.override && !this.state.day.excused ? <div className="action-buttons">
                 <div className="pull-left">
+                  <AdminItem>
                     <button type="button" onClick={this.override} className="btn btn-sm btn-info">
                         Give Attendence
                     </button>
+                  </AdminItem>
                 </div>
                 <div className="pull-right">
+                  <AdminItem>
                     <button type="button" onClick={this.excuse} className="btn btn-sm btn-info">Excuse</button>
+                  </AdminItem>
                 </div>
             </div> : ''}
-        </span>;
+          </span>
+            ;
     },
 
 

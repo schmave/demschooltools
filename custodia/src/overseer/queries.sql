@@ -125,7 +125,7 @@ FROM (
          , schooldays.days AS day
 
       FROM school_days(:year_name) as schooldays
-      LEFT JOIN " swipes-select " s
+      LEFT JOIN roundedswipes s
                 ON (schooldays.days = date(s.in_time AT TIME ZONE 'America/New_York')
                     AND schooldays.student_id = s.student_id)
       LEFT JOIN overrides o
