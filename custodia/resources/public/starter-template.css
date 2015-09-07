@@ -115,24 +115,24 @@ a {
 
 .student-listing {
     font-size: 1.5em;
-    padding: 7px;
+    padding: 0px 15px 0px 15px;
 }
 
 .student-listing-table {
     text-align: center;
 }
 @media (min-width: 1000px) {
-    .student-listing-table .student-listing:nth-child(odd) {
-        float: left;
-    }
+    /* .student-listing-table .student-listing:nth-child(odd) { */
+    /*     float: left; */
+    /* } */
 
-    .student-listing-table .student-listing:nth-child(even) {
-        float: right;
-    }
+    /* .student-listing-table .student-listing:nth-child(even) { */
+    /*     float: right; */
+    /* } */
 }
 
 .student-listing-table .panel {
-    margin: 5px;
+    margin: 0px 0px 0px 10px;
     overflow-x: hidden;
 }
 
