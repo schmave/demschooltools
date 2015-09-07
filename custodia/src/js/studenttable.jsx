@@ -53,17 +53,30 @@ module.exports = React.createClass({
         this.state.students.map(function (student) {
             if (!student.in_today && student.absent_today) {
                 absentCol.push(this.getStudent(student));
+                absentCol.sort(function (a, b) {
+                    return (a['name'] > b['name'] ? -1 : 1);
+                });
             }
             else if (!student.in_today && !student.absent_today) {
                 notYetInCol.push(this.getStudent(student));
+                notYetInCol.sort(function (a, b) {
+                    return (a['name'] > b['name'] ? -1 : 1);
+                });
             }
             else if (student.in_today && student.last_swipe_type === 'in') {
                 inCol.push(this.getStudent(student));
+                inCol.sort(function (a, b) {
+                    return (a['name'] > b['name'] ? -1 : 1);
+                });
             }
             else if (student.in_today && student.last_swipe_type === 'out') {
                 outCol.push(this.getStudent(student));
+                outCol.sort(function (a, b) {
+                    return (a['name'] > b['name'] ? -1 : 1);
+                });
             }
         }.bind(this));
+
 
         return <div className="row student-listing-table">
             <div className="col-sm-2 column">
