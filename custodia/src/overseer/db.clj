@@ -43,10 +43,10 @@ $func$
 LANGUAGE sql;
   ")
 
-(def create-rounded-swipes-view
-  "
+(comment "
+ -- broken till otherwise noted
   CREATE VIEW roundedswipes AS
-SELECT
+  SELECT
      _id
      , ((CASE WHEN (EXTRACT(HOURS FROM s.in_time AT TIME ZONE 'America/New_York') < 9
                   AND EXTRACT(HOURS FROM s.in_time AT TIME ZONE 'America/New_York') < 16)
@@ -61,6 +61,11 @@ SELECT
           ELSE s.out_time END)) AS out_time
      , student_id
    FROM swipes s;
+")
+(def create-rounded-swipes-view
+  "
+  CREATE OR REPLACE VIEW roundedswipes AS
+  SELECT _id, in_time, out_time, student_id FROM swipes;
   ")
 
 (def create-students-table-sql
