@@ -27,16 +27,20 @@ module.exports = React.createClass({
     isSigningIn: function(student) {
         return !student.last_swipe_date || student.last_swipe_type === 'out' || !student.last_swipe_date.startsWith(studentStore.getToday())
     },
-    getSwipeButton:  function(student){
+    getSwipeButton:  function(student, way){
+        var buttonIcon = 'fa-arrow-right';
+        if (way === 'out') {
+            buttonIcon = 'fa-arrow-left';
+        }
         if(this.isSigningIn(student)) {
-            return <button onClick={this.signIn.bind(this, student)} className="btn btn-sm btn-primary"><i className="fa fa-sign-in">&nbsp;</i></button>;
+            return <button onClick={this.signIn.bind(this, student)} className="btn btn-sm btn-primary"><i className={"fa "+buttonIcon}>&nbsp;</i></button>;
         }else{
-            return <button onClick={this.signOut.bind(this, student)} className="btn btn-sm btn-info"><i className="fa fa-sign-out">&nbsp;</i></button>;
+            return <button onClick={this.signOut.bind(this, student)} className="btn btn-sm btn-info"><i className={"fa "+buttonIcon}>&nbsp;</i></button>;
         }
     },
-    getStudent: function(student){
+    getStudent: function(student, way){
         var link = <Link to="student" params={{studentId: student._id}}>{student.name}</Link>;
-        var button = this.getSwipeButton(student);
+        var button = this.getSwipeButton(student, way);
             return <div className="panel panel-info student-listing col-sm-11">
                 <div>{link}</div>
                 <div className="attendance-button">
@@ -56,22 +60,22 @@ module.exports = React.createClass({
         });
         students.map(function (student) {
             if (!student.in_today && student.absent_today) {
-                absentCol.push(this.getStudent(student));
+                absentCol.push(this.getStudent(student, 'absent'));
             }
             else if (!student.in_today && !student.absent_today) {
-                notYetInCol.push(this.getStudent(student));
+                notYetInCol.push(this.getStudent(student, 'notYetIn'));
             }
             else if (student.in_today && student.last_swipe_type === 'in') {
-                inCol.push(this.getStudent(student));
+                inCol.push(this.getStudent(student, 'in'));
             }
             else if (student.in_today && student.last_swipe_type === 'out') {
-                outCol.push(this.getStudent(student));
+                outCol.push(this.getStudent(student, 'out'));
             }
         }.bind(this));
 
 
         return <div className="row student-listing-table">
-            <div className="col-sm-2 column">
+            <div className="col-sm-3 column">
                 <div className="panel panel-info absent">
                     <div className="panel-heading absent"><b>Not Coming In ({absentCol.length})</b></div>
                     <div className="panel-body row">{absentCol}</div>
@@ -83,28 +87,18 @@ module.exports = React.createClass({
                     <div className="panel-body row">{notYetInCol}</div>
                 </div>
             </div>
-            <div className="col-sm-2 column in">
+            <div className="col-sm-3 column in">
                 <div className="panel panel-info">
                     <div className="panel-heading"><b>In ({inCol.length})</b></div>
                     <div className="panel-body row">{inCol}</div>
                 </div>
             </div>
-            <div className="col-sm-2 column out">
+            <div className="col-sm-3 column out">
                 <div className="panel panel-info">
                     <div className="panel-heading"><b>Out ({outCol.length})</b></div>
                     <div className="panel-body row">{outCol}</div>
                 </div>
             </div>
-            <AdminItem>
-                <div className="col-sm-2 column">
-                    <div className="panel panel-info">
-                        <div className="panel-heading"><b>Administration</b></div>
-                        <div className="panel-body row">
-                            <Link to="create">Add Student</Link>
-                        </div>
-                    </div>
-                </div>
-            </AdminItem>
         </div>;
     },
     _onChange: function () {

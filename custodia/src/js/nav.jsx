@@ -16,14 +16,18 @@ module.exports = React.createClass({
                         <span className="icon-bar"></span>
                         <span className="icon-bar"></span>
                     </button>
-                    <a className="navbar-brand" href="/">Overseer</a>
+                    <a className="navbar-brand" href="/">Custodia</a>
                 </div>
                 <div id="navbar" className="collapse navbar-collapse">
                     <ul className="nav navbar-nav">
-                        <li><Link to="students">Home</Link></li>
                         <AdminWrapper>
                             <li><Link to="reports">Student Totals</Link></li>
                         </AdminWrapper>
+                        <AdminWrapper>
+                            <li><Link to="create">Add Student</Link> </li>
+                        </AdminWrapper>
+                    </ul>
+                    <ul className="nav navbar-nav navbar-right">
                         <li><a href="/users/logout">Logout</a></li>
                     </ul>
                 </div>
