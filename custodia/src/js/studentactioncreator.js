@@ -79,7 +79,7 @@ var exports = {
                 router.get().transitionTo('students');
             }.bind(this));
     },
-    toggleHours: function (student) {
+    toggleHours: function (id) {
         ajax.post('/students/' + id + '/togglehours')
             .then(function (data) {
                 dispatcher.dispatch({
