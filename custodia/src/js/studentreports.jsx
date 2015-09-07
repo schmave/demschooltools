@@ -55,13 +55,14 @@ var exports = React.createClass({
                         onClick={function(){this.refs.newSchoolYear.show();}.bind(this)}>New Period
                 </button>
             </div>
-            <Griddle results={this.state.rows} resultsPerPage="50"
+            <Griddle results={this.state.rows} resultsPerPage="200"
                      columns={['name', 'overrides', 'unexcused', 'excuses', 'short', 'total_hours']}
                      columnMetadata={[{displayName: 'Name', columnName: 'name'},
-                     {displayName: 'Attended (Overrides)', columnName: 'overrides'},
-                     {displayName: 'Excused Absence', columnName: 'excuses'},
-                     {displayName: 'Short', columnName: 'short'},
-                     {displayName: 'Total Hours', columnName: 'total_hours'}
+                                      {displayName: 'Attended (Overrides)', columnName: 'overrides'},
+                                      {displayName: 'Unexcused', columnName: 'unexcused'},
+                                      {displayName: 'Excused Absence', columnName: 'excuses'},
+                                      {displayName: 'Short', columnName: 'short'},
+                                      {displayName: 'Total Hours', columnName: 'total_hours'}
                      ]}/>
 
             <Modal ref="newSchoolYear" title="Create new period">

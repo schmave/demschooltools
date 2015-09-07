@@ -12,6 +12,9 @@
             [schema.test :as tests]
             ))
 
+(defn today-at-utc [h m]
+  (t/plus (t/today-at h m) (t/hours 4)))
+
 
 ;; run test C-c M-,
 ;; run tests C-c ,
@@ -129,6 +132,28 @@
                    true)))
           )))
   )
+
+(def _801pm (today-at-utc 20 1))
+
+(deftest swipe-in-and-out-at-8pm-with-rounding-test
+  (do (db/sample-db)
+      (let [s (db/make-student "test")
+            sid (:_id s)]
+        (db/swipe-in sid _801pm)
+        (db/swipe-out sid (t/plus _801pm (t/minutes 5)))
+        (let [att (get-att sid s)
+              _10-14 (-> att :days first)
+              first-swipe (-> _10-14 :swipes first)]
+          (testing "swipe info"
+            (is (= "04:00:00" (:nice_out_time first-swipe)))
+            (is (= "04:00:00" (:nice_in_time first-swipe))))
+
+          (testing "att stuff"
+            (is (= (:total_mins _10-14) 0.0))
+            (is (= (:total_days att) 0))
+            (is (= true (:in_today att))))
+
+          ))))
 
 (def _840am (t/minus basetime (t/minutes 90)))
 (def _339pm (t/plus basetime (t/minutes 330)))
@@ -340,7 +365,7 @@
   (do (db/sample-db)
       (let [s (db/make-student "test")
             sid (:_id s)
-            now (t/today-at 15 0)]
+            now (today-at-utc 15 0)]
         ;; has an in, then missed two days, next in should
         ;; show a last swipe type
         (db/swipe-in 1 (t/minus now (t/days 2)))
@@ -364,7 +389,7 @@
   (do (db/sample-db)
       (let [s (db/make-student "test")
             sid (:_id s)
-            now (t/today-at 15 0)]
+            now (today-at-utc 15 0)]
         (db/swipe-in sid (t/plus now (t/hours 1)))
         (db/swipe-out sid now)
         (let [att  (att/get-student-list)
@@ -394,8 +419,8 @@
             sid (:_id s)
             s (db/toggle-student-older sid)
             s (first (db/get-students sid))
-            tomorrow (-> (t/today-at 13 0) (t/plus (t/days 1)))
-            day-after-next (-> (t/today-at 13 0) (t/plus (t/days 2)))
+            tomorrow (-> (today-at-utc 9 0) (t/plus (t/days 1)))
+            day-after-next (-> (today-at-utc 9 0) (t/plus (t/days 2)))
             ]
         (db/swipe-in sid tomorrow)
         (db/swipe-out sid (t/plus tomorrow (t/minutes 331)))
