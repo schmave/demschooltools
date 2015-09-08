@@ -133,6 +133,16 @@
           )))
   )
 
+(deftest archive-student
+  (do (db/sample-db)
+      (let [s (db/make-student "test")
+            sid (:_id s)]
+        (db/toggle-student-archived sid)
+        (let [list (att/get-student-list)]
+          (testing "Archived missing"
+            (is (= 0 (count list)))
+            )))))
+
 (def _801pm (today-at-utc 20 1))
 
 (deftest swipe-in-and-out-at-8pm-with-rounding-test

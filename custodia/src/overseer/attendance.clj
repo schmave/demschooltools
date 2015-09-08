@@ -115,7 +115,7 @@
         to (f/parse (:to_date year))]
     [from to]))
 
-(defn get-student-list []
+(defn get-student-list [show-archived]
   (let [today-string (make-date-string (t/now))
         inout (db/get-student-list-in-out)
         inout (map #(assoc %

@@ -44,6 +44,13 @@
 (defn student-page-response [student-id]
   (resp/response {:student (first (att/get-student-with-att student-id))}))
 
+(trace/deftrace show-archived? []
+  (let [{roles :roles} (friend/current-authentication)]
+    (contains? roles ::admin)))
+
+(defn get-student-list []
+  (att/get-student-list (show-archived?)))
+
 (defroutes app
   (GET "/" [] (friend/authenticated (io/resource "index.html")))
   (GET "/resetdb" []
@@ -55,18 +62,18 @@
        (friend/authorize #{::super} ;; (data/sample-db true)
                          (resp/redirect "/")))
 
-  (GET "/students" []
-    (friend/authorize #{::user}
-                      (resp/response (att/get-student-list))))
+  (GET "/students" req
+       (friend/authorize #{::user}
+                         (resp/response (get-student-list))))
 
   (GET "/students/:id" [id :<< as-int]
      (friend/authorize #{::user} (student-page-response id)))
 
   (POST "/students" [name]
-    (friend/authorize #{::admin}
-                      (let [made? (data/make-student name)]
-                        (resp/response {:made made?
-                                        :students (att/get-student-list)}))))
+        (friend/authorize #{::admin}
+                          (let [made? (data/make-student name)]
+                            (resp/response {:made made?
+                                            :students (get-student-list)}))))
 
   (PUT "/students/:id" [id :<< as-int name]
         (friend/authorize #{::admin}
@@ -105,7 +112,7 @@
                                 (data/swipe-in id))
                             (do (when missing (data/swipe-in id missing))
                                 (data/swipe-out id))))
-        (resp/response (att/get-student-list)))
+        (resp/response (get-student-list)))
 
 
   (GET "/reports/years" []
@@ -153,4 +160,3 @@
   (nrepl-server/start-server :port 7888 :handler cider-nrepl-handler)
   (let [port (Integer. (or port (env :port) 5000))]
     (jetty/run-jetty (site (tapp)) {:port port :join? false})))
-
