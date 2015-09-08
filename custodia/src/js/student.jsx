@@ -214,7 +214,7 @@ var exports = React.createClass({
                                     <div className="col-sm-6"><b>Absent:</b> {this.state.student.total_abs}</div>
                                     <div className="col-sm-6"><b>Excused:</b> {this.state.student.total_excused}</div>
                                     <div className="col-sm-6"><b>Gave
-                                        Attendence:</b> {this.state.student.total_overrides}
+                                        Attendance:</b> {this.state.student.total_overrides}
                                     </div>
                                     <div className="col-sm-6"><b>Short:</b> {this.state.student.total_short}</div>
                                     <div className="col-sm-6"><b>Required

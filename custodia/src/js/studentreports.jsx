@@ -56,9 +56,10 @@ var exports = React.createClass({
                 </button>
             </div>
             <Griddle results={this.state.rows} resultsPerPage="200"
-                     columns={['name', 'overrides', 'unexcused', 'excuses', 'short', 'total_hours']}
+                     columns={['name', 'good', 'overrides', 'unexcused', 'excuses', 'short', 'total_hours']}
                      columnMetadata={[{displayName: 'Name', columnName: 'name'},
-                                      {displayName: 'Attended (Overrides)', columnName: 'overrides'},
+                                      {displayName: 'Attended', columnName: 'good'},
+                                      {displayName: 'Gave Attendance', columnName: 'overrides'},
                                       {displayName: 'Unexcused', columnName: 'unexcused'},
                                       {displayName: 'Excused Absence', columnName: 'excuses'},
                                       {displayName: 'Short', columnName: 'short'},
