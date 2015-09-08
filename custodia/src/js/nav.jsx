@@ -16,7 +16,7 @@ module.exports = React.createClass({
                         <span className="icon-bar"></span>
                         <span className="icon-bar"></span>
                     </button>
-                    <a className="navbar-brand" href="/">Custodia</a>
+                    <Link to="students" className="navbar-brand">Custodia</Link>
                 </div>
                 <div id="navbar" className="collapse navbar-collapse">
                     <ul className="nav navbar-nav">
@@ -28,7 +28,7 @@ module.exports = React.createClass({
                         </AdminWrapper>
                     </ul>
                     <ul className="nav navbar-nav navbar-right">
-                        <li><a href="/users/logout">Logout</a></li>
+                        <li><a href="./users/logout">Logout</a></li>
                     </ul>
                 </div>
             </div>
