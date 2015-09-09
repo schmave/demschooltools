@@ -7,6 +7,7 @@
             [cemerick.url :as url]
             [clojure.tools.trace :as trace]
             [heroku-database-url-to-jdbc.core :as h]
+            [migratus.core :as migratus]
             [com.ashafa.clutch :as couch]
             [environ.core :refer [env]]
             [clj-time.coerce :as timec]
@@ -15,6 +16,7 @@
             ))
 
 (defqueries "overseer/queries.sql")
+
 
 (extend-type Date
   jdbc/ISQLParameter
@@ -125,6 +127,16 @@ LANGUAGE sql;
   (swap! pgdb (fn [old]
                 (dissoc (h/korma-connection-map (env :database-url))
                         :classname))))
+
+(defn mconfig []
+  {:store                :database
+   :migration-dir        "migrations"
+   :migration-table-name "swipes"
+   :db @pgdb})
+
+;;(migratus/migrate (mconfig))   
+;; (migratus/up (mconfig) 20150908103000)  
+;; (migratus/create (mconfig) "create-user")
 
 (defn create-all-tables []
   (jdbc/execute! @pgdb [create-session-store-sql])
