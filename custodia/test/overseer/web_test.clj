@@ -135,13 +135,12 @@
 
 (deftest archive-student
   (do (db/sample-db)
+      (testing "starts 2" (is (= 2 (count (att/get-student-list false)))))
       (let [s (db/make-student "test")
             sid (:_id s)]
         (db/toggle-student-archived sid)
-        (let [list (att/get-student-list)]
-          (testing "Archived missing"
-            (is (= 0 (count list)))
-            )))))
+        (testing "Archived missing" (is (= 2 (count (att/get-student-list false)))))
+        (testing "Archived missing" (is (= 3 (count (att/get-student-list true))))))))
 
 (def _801pm (today-at-utc 20 1))
 
@@ -412,16 +411,16 @@
             )))))
 
 (deftest absent-student-main-page
-  (db/sample-db)
-  (let [s (db/make-student "test")
-        sid (:_id s)
-        s (db/toggle-student-absent sid)
-        att (trace/trace "att" (att/get-student-list))]
-    (testing "Student Count"
-      (is (= (-> att count) 3))
-      (is (= (->> att (filter :absent_today) count) 1))
-      (is (= (->> att (filter (complement :in_today)) count) 3))
-      )))
+  (do (db/sample-db)
+      (let [s (db/make-student "test")
+            sid (:_id s)
+            s (db/toggle-student-absent sid)
+            att (trace/trace "att" (att/get-student-list))]
+        (testing "Student Count"
+          (is (= (-> att count) 3))
+          (is (= (->> att (filter :absent_today) count) 1))
+          (is (= (->> att (filter (complement :in_today)) count) 3))
+          ))))
 
 (deftest older-student-required-minutes
   (do (db/sample-db)

@@ -25,9 +25,9 @@
 (def create-school-days-function
   "
 CREATE OR REPLACE FUNCTION school_days(year_name text)
-  RETURNS TABLE (days date, student_id BIGINT, olderdate date) AS
+  RETURNS TABLE (days date, student_id BIGINT, archived boolean, olderdate date) AS
 $func$
-  SELECT a.days, students._id student_id, students.olderdate FROM (SELECT DISTINCT days2.days
+  SELECT a.days, students._id student_id, students.archived, students.olderdate FROM (SELECT DISTINCT days2.days
   FROM (SELECT
         (CASE WHEN date(s.in_time at time zone 'America/New_York')  IS NULL
               THEN date(s.out_time at time zone 'America/New_York')
@@ -74,7 +74,8 @@ LANGUAGE sql;
   name varchar(255),
   inserted_date timestamp default now(),
   olderdate date,
-  show_as_absent date
+  show_as_absent date,
+  archived BOOLEAN NOT NULL DEFAULT FALSE
   );")
 (def create-swipes-table-sql
   "create table swipes(
@@ -178,8 +179,8 @@ LANGUAGE sql;
 (defn get-excuses-in-year [year-name student-id]
   (get-excuses-in-year-y @pgdb year-name student-id))
 
-(defn get-student-list-in-out []
-  (student-list-in-out-y @pgdb))
+(defn get-student-list-in-out [show-archived]
+  (student-list-in-out-y @pgdb show-archived))
 
 ;; (map :student_id (get-student-list-in-out))
 

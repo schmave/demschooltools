@@ -137,6 +137,10 @@ var exports = React.createClass({
         this.state.student.olderdate = !!!this.state.student.olderdate;
         actionCreator.toggleHours(this.state.student._id);
     },
+    toggleArchived: function () {
+        this.state.student.archived = !!!this.state.student.archived;
+        actionCreator.toggleArchived(this.state.student._id);
+    },
     showingStudentName: function () {
         return <div className="col-sm-8">
                   <span onClick={this.toggleEdit}>
@@ -145,6 +149,7 @@ var exports = React.createClass({
                   </span>
 
             <h2 className="badge badge-red">{(!this.studentInToday() && this.state.student.absent_today) ? 'Absent' : ''}</h2>
+            <h2 className="badge badge-red">{(this.state.student.archived) ? 'Archived' : ''}</h2>
         </div>;
     },
     editingStudentName: function () {
@@ -158,6 +163,10 @@ var exports = React.createClass({
                     <i className="fa fa-times"></i></button>
             </div>
             <div>
+
+            <div><input type="checkbox" name="archived" onChange={this.toggleArchived}
+        checked={this.state.student.archived}/> Archive (Hide from front page)
+            </div>
                 <div><input type="radio" name="older" onChange={this.toggleHours}
                             checked={!this.state.student.olderdate}/> 300 Minutes
                 </div>

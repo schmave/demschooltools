@@ -115,16 +115,18 @@
         to (f/parse (:to_date year))]
     [from to]))
 
-(defn get-student-list [show-archived]
-  (let [today-string (make-date-string (t/now))
-        inout (db/get-student-list-in-out)
-        inout (map #(assoc %
-                           :in_today (= today-string
-                                        (make-date-string (:last_swipe_date %)))
-                           :absent_today (= today-string
-                                            (make-date-string-without-timezone (:show_as_absent %)))) inout)
-        ]
-    inout))
+(defn get-student-list
+  ([] (get-student-list false))
+  ([show-archived]
+   (let [today-string (make-date-string (t/now))
+         inout (db/get-student-list-in-out show-archived)
+         inout (map #(assoc %
+                            :in_today (= today-string
+                                         (make-date-string (:last_swipe_date %)))
+                            :absent_today (= today-string
+                                             (make-date-string-without-timezone (:show_as_absent %)))) inout)
+         ]
+     inout)))
 
 (defn days-with-swipes [days]
   (filter (fn [d] (not (empty? (filter #(= "swipes" (:type %))
@@ -150,7 +152,7 @@
                             (f/parse (:out_time %))))
             list)))
 
-(defn get-attendance 
+(defn get-attendance
   [year id student]
   (let [swipes (db/get-student-page id year)
         swipes (map #(assoc % :day (-> % :day make-date-string-without-timezone)
@@ -163,7 +165,7 @@
         summed-days (reverse summed-days)
         today-string  (today-string)
         absent_today (= today-string  (make-date-string-without-timezone
-                                                             (:show_as_absent student)))
+                                       (:show_as_absent student)))
         in_today (and (= today-string
                          (-> summed-days first :day))
                       (-> summed-days first :swipes only-swipes count (> 0)))
@@ -199,4 +201,3 @@
 
 ;;(get-student-with-att 8)
 ;; (get-current-year-string (data/get-years))
-

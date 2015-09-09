@@ -44,7 +44,7 @@
 (defn student-page-response [student-id]
   (resp/response {:student (first (att/get-student-with-att student-id))}))
 
-(trace/deftrace show-archived? []
+(defn show-archived? []
   (let [{roles :roles} (friend/current-authentication)]
     (contains? roles ::admin)))
 
@@ -79,6 +79,11 @@
         (friend/authorize #{::admin}
                           (data/rename id name))
         (student-page-response id))
+
+  (POST "/students/:id/togglearchived" [id :<< as-int]
+        (friend/authorize #{::admin}
+                          (do (data/toggle-student-archived id)
+                              (student-page-response id))))
 
   (POST "/students/:id/togglehours" [id :<< as-int]
     (friend/authorize #{::admin}

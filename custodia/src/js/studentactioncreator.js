@@ -79,6 +79,16 @@ var exports = {
                 router.get().transitionTo('students');
             }.bind(this));
     },
+    toggleArchived: function (id) {
+        ajax.post('/students/' + id + '/togglearchived')
+            .then(function (data) {
+                dispatcher.dispatch({
+                    type: constants.studentEvents.STUDENT_LOADED,
+                    data: data.student
+                });
+                this.loadStudents();
+            }.bind(this));
+    },
     toggleHours: function (id) {
         ajax.post('/students/' + id + '/togglehours')
             .then(function (data) {

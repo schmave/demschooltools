@@ -40,6 +40,7 @@ SELECT
   , e._id has_excuse
   , schooldays.olderdate
   , s._id
+  , schooldays.archived
   , (CASE WHEN s._id IS NOT NULL THEN 'swipes' ELSE '' END) as type
   , (CASE WHEN schooldays.olderdate IS NULL
                OR schooldays.olderdate > schooldays.days
@@ -64,6 +65,7 @@ SELECT
 select stu.name
        , stu._id
        , stu.show_as_absent
+       , stu.archived
        , CASE WHEN l.outs >= l.ins THEN 'out'
          ELSE 'in'
          END AS last_swipe_type
@@ -78,6 +80,8 @@ LEFT JOIN (SELECT max(s.in_time) as ins
            GROUP BY s.student_id
            ORDER BY ins, outs) as l
      ON (l.student_id = stu._id)
+WHERE stu.archived = :show_archived
+      OR stu.archived = false;
 
 -- name: get-school-days-y
 SELECT DISTINCT days2.days
