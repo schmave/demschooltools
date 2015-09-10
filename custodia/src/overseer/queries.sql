@@ -153,3 +153,12 @@ INNER JOIN years y
           OR (s.in_time BETWEEN y.from_date AND y.to_date))
 WHERE y.name= :year_name
   AND s.student_id = :student_id
+
+-- name: activate-school-year-y
+-- Set a single year to be active, and unactivate all others
+UPDATE school_years SET active = (name = :name);
+
+-- name: delete-student-from-school-year-y
+DELETE FROM school_years_X_students
+WHERE student_id = :student_id
+      AND school_year_id = :school_years_id

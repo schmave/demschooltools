@@ -17,10 +17,10 @@
                  [sonian/carica "1.1.0" :exclusions [[cheshire]]]
                  [clj-time "0.8.0"]
                  [heroku-database-url-to-jdbc "0.2.2"]
-                 [org.clojure/java.jdbc "0.3.2"]
+                 [org.clojure/java.jdbc "0.4.1"]
                  [prismatic/schema "0.4.2"]
                  [migratus "0.8.4"]
-                 [postgresql "9.1-901.jdbc4"]
+                 [org.postgresql/postgresql "9.4-1201-jdbc41"]
                  [org.clojure/tools.trace "0.7.8"]
                  [com.ashafa/clutch "0.4.0"]]
   :min-lein-version "2.0.0"

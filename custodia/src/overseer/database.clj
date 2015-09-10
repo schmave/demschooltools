@@ -111,9 +111,27 @@
   ([] (db/get-* "students"))
   ([id] (db/get-* "students" id "_id")))
 
+(defn get-school-years
+  ([] (db/get-* "school_years"))
+  ([id] (db/get-* "school_years" id "_id")))
+
+(defn thing-not-yet-created [name getter]
+  (empty? (filter #(= name (:name %)) (getter))))
+
 ;; (get-years)
 (defn student-not-yet-created [name]
-  (empty? (filter #(= name (:name %)) (get-students))))
+  (thing-not-yet-created name (get-students)))
+
+(defn school-year-not-yet-created [name]
+  (thing-not-yet-created name (get-school-years)))
+
+(trace/deftrace make-school-year [name]
+  (when (student-not-yet-created name)
+    (db/persist! {:type :school_years :name name :active false})))
+
+(trace/deftrace add-student-to-school-year [student-id school-year-id]
+  (db/persist! {:type :school_years_X_students :student_id student-id :school_year_id school-year-id})
+  )
 
 (trace/deftrace make-student [name]
   (when (student-not-yet-created name)

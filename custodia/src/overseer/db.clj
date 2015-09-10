@@ -17,7 +17,6 @@
 
 (defqueries "overseer/queries.sql")
 
-
 (extend-type Date
   jdbc/ISQLParameter
   (set-parameter [val ^PreparedStatement stmt ix]
@@ -113,7 +112,8 @@ LANGUAGE sql;
   );")
 
 (def create-session-store-sql
-  " CREATE TABLE session_store (
+  "
+  CREATE TABLE session_store (
   session_id VARCHAR(36) NOT NULL PRIMARY KEY,
   idle_timeout BIGINT,
   absolute_timeout BIGINT,
@@ -128,15 +128,6 @@ LANGUAGE sql;
                 (dissoc (h/korma-connection-map (env :database-url))
                         :classname))))
 
-(defn mconfig []
-  {:store                :database
-   :migration-dir        "migrations"
-   :migration-table-name "swipes"
-   :db @pgdb})
-
-;;(migratus/migrate (mconfig))   
-;; (migratus/up (mconfig) 20150908103000)  
-;; (migratus/create (mconfig) "create-user")
 
 (defn create-all-tables []
   (jdbc/execute! @pgdb [create-session-store-sql])
@@ -178,6 +169,12 @@ LANGUAGE sql;
     (first (map #(assoc % :type table)
                 (jdbc/insert! @pgdb table doc)))))
 
+(defn activate-school-year [name]
+  (activate-school-year-y @pgdb name))
+
+(defn delete-student-from-school-year [student-id school-year-id]
+  (delete-student-from-school-year-y @pgdb student-id school-year-id))
+
 ;; (jdbc/query @pgdb ["select * from students"])
 ;; (jdbc/query @pgdb ["select * from students where id in (?)" "1"])
 ;; (persist! {:type :students :name "steve" :olderdate nil})
@@ -208,15 +205,8 @@ LANGUAGE sql;
 (defn get-report [year-name]
   (student-report-y @pgdb year-name))
 
-;; (get-overrides-in-year "2014-06-01 2015-06-01" 3 )
-;; (get-report "2014-06-01 2015-06-01" )  
-;;  (count (get-school-days "2014-06-01 2015-06-01" ))  
-;; (def t (get-report "2014-06-01 2015-06-01" ))
-;; (count t)
-
 (defn get-swipes-in-year [year-name student-id]
-  (swipes-in-year-y @pgdb year-name student-id)
-  )
+  (swipes-in-year-y @pgdb year-name student-id))
 
 ;; (get-swipes-in-year "2014-06-01 2015-06-01" 1)
 
