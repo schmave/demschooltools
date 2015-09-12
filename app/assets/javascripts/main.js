@@ -1,2 +1,0 @@
-requirejs(['utils'], function() {});
-

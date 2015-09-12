@@ -8,11 +8,11 @@ requirejs.config({
         },
         'jquery-ui': {
             deps: ['jquery'],
-            exports: 'jquery-ui'
+            exports: 'jquery_ui'
         },
         'jquery-form': {
             deps: ['jquery'],
-            exports: 'jquery-form'
+            exports: 'jquery_form'
         }
     }
 });
