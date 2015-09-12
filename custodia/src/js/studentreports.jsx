@@ -31,7 +31,8 @@ var exports = React.createClass({
     _onChange: function () {
         this.refs.newSchoolYear.hide();
         var years = reportStore.getSchoolYears();
-        var currentYear = this.state.currentYear || years.current_year;
+        var yearExists = years.years.indexOf(this.state.currentYear) !== -1;
+        var currentYear = (yearExists && this.state.currentYear) ? this.state.currentYear : years.current_year;
         this.setState({years: years, currentYear: currentYear, rows: reportStore.getReport(currentYear)});
     },
     yearSelected: function (event) {
@@ -42,6 +43,9 @@ var exports = React.createClass({
     createPeriod: function(){
         actionCreator.createPeriod(this.refs.newPeriodStartDate.state.value, this.refs.newPeriodEndDate.state.value);
     },
+    deletePeriod: function(){
+        actionCreator.deletePeriod(this.state.currentYear);
+    },
     render: function () {
         return <div>
             <div className="row margined">
@@ -51,6 +55,7 @@ var exports = React.createClass({
                             value={year}>{year === this.state.years.current_year ? year + " (Current)" : year}</option>;
                     }.bind(this)) : ""}
                 </select>
+                <button className="pull-left delete-button btn btn-small btn-danger fa fa-trash-o" onClick={this.deletePeriod}></button>
                 <button className="pull-right btn btn-small btn-success"
                         onClick={function(){this.refs.newSchoolYear.show();}.bind(this)}>New Period
                 </button>

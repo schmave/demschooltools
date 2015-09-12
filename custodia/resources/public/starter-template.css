@@ -51,6 +51,11 @@ a {
     float: none !important;
 }
 
+.delete-button {
+    padding: 5px;
+    margin-left: 8px;
+}
+
 /* firefox fix */
 .img-responsive {
     width: 100%;

@@ -6,7 +6,7 @@ var eventEmitter = require('events').EventEmitter,
 
 var exports = {
     loadSchoolYears: function () {
-        $.ajax({
+        ajax.get({
             url: '/reports/years'
         }).then(function (data) {
             dispatcher.dispatch({
@@ -16,7 +16,7 @@ var exports = {
         });
     },
     loadReport: function (year) {
-        $.ajax({
+        ajax.get({
             url: '/reports/' + encodeURIComponent(year)
         }).then(function (data) {
             dispatcher.dispatch({
@@ -38,6 +38,19 @@ var exports = {
                     data: data
                 });
             });
+    },
+    deletePeriod: function(period){
+        ajax.delete('/reports/years/' + encodeURIComponent(period))
+        .then(function(data){
+            dispatcher.dispatch({
+                type: constants.systemEvents.FLASH,
+                message: 'Deleted period ' + period
+            });
+            dispatcher.dispatch({
+                type: constants.reportEvents.PERIOD_DELETED,
+                data: data
+            })
+        });
     }
 };
 

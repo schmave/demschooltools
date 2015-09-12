@@ -49,6 +49,10 @@ dispatcher.register(function (action) {
         case constants.reportEvents.PERIOD_CREATED:
             exports.getSchoolYears(true);
             break;
+        case constants.reportEvents.PERIOD_DELETED:
+            schoolYears = action.data;
+            exports.emitChange();
+            break;
     }
 });
 
