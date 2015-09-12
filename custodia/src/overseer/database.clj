@@ -40,28 +40,6 @@
 (defn delete-swipe [swipe]
   (db/delete! swipe))
 
-(defn nine-am [date]
-  (let [local-date (f/parse (format-to-local date-format date))]
-    (l/to-local-date-time (t/date-time (t/year local-date) (t/month local-date) (t/day local-date) 9 0)))
-  )
-
-(defn four-pm [date]
-  (let [date (f/parse (format-to-local date-format date))]
-    (l/to-local-date-time (t/date-time (t/year date) (t/month date) (t/day date) 16 0)))
-   ;;(t/today-at 16 0)
-  )
-
-(s/defn round-swipe-time :- DateTime [time]
-  (let [nine-am (nine-am time)
-        four-pm (four-pm time)
-        time (if (t/after? time nine-am) time nine-am)
-        time (if (t/before? time four-pm) time four-pm)]
-    (trace/trace nine-am)
-    time
-
-    ))
-
- 
 
 (s/defn make-timestamp :- java.sql.Timestamp
   [t :- DateTime] (c/to-timestamp t))
@@ -74,8 +52,9 @@
 (trace/deftrace swipe-in
   ([id] (swipe-in id (t/now)))
   ([id in-time]
-   (db/persist! (assoc (make-swipe id)
-                       :in_time (make-timestamp in-time)))))
+   (let [in-time (round-swipe-time in-time)]
+     (db/persist! (assoc (make-swipe id)
+                         :in_time (make-timestamp in-time))))))
 
 (defn sanitize-out [swipe]
   (let [in (:in_time swipe)
@@ -94,7 +73,8 @@
 (trace/deftrace swipe-out
   ([id] (swipe-out id (t/now)))
   ([id out-time]
-   (let [last-swipe (lookup-last-swipe-for-day id (make-date-string out-time))
+   (let [out-time (round-swipe-time out-time)
+         last-swipe (lookup-last-swipe-for-day id (make-date-string out-time))
          only-swiped-in? (only-swiped-in? last-swipe)
          in-swipe (if only-swiped-in?
                     last-swipe

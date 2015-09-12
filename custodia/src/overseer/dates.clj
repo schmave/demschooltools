@@ -7,7 +7,10 @@
             [clj-time.local :as l]
             [clj-time.core :as t]
             [clj-time.coerce :as c]
+            [schema.core :as s]
             ))
+
+(def DateTime org.joda.time.DateTime)
 
 (def date-format (f/formatter "yyyy-MM-dd"))
 (def time-format (f/formatter "hh:mm:ss"))
@@ -40,6 +43,22 @@
   (filter #(t/within? (t/interval dfrom dto)
                       (f/parse (f %)))
           list))
+
+(defn in-local-time-at-hour [date hour]
+  (let [local-date (f/parse (format-to-local date-format date))]
+    (l/to-local-date-time (t/date-time (t/year local-date) (t/month local-date) (t/day local-date) hour 0))))
+
+
+(defn nine-am [date] (in-local-time-at-hour date 9))
+
+(defn four-pm [date] (in-local-time-at-hour date 16))
+
+(s/defn round-swipe-time :- DateTime [time]
+  (let [nine-am (nine-am time)
+        four-pm (four-pm time)
+        time (if (t/after? time nine-am) time nine-am)
+        time (if (t/before? time four-pm) time four-pm)]
+    time))
 
 (defn append-interval [swipe]
   (if (and (:in_time swipe)
