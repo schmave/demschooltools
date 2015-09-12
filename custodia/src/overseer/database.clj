@@ -16,7 +16,7 @@
 (defn get-swipes
   ([] (db/get-* "swipes"))
   ([id]
-     (db/get-* "swipes" id "student_id")))
+   (db/get-* "swipes" id "student_id")))
 
 (defn get-overrides [id]
   (db/get-* "overrides" id "student_id"))
@@ -40,8 +40,32 @@
 (defn delete-swipe [swipe]
   (db/delete! swipe))
 
+(defn nine-am [date]
+  (let [local-date (f/parse (format-to-local date-format date))]
+    (l/to-local-date-time (t/date-time (t/year local-date) (t/month local-date) (t/day local-date) 9 0)))
+  )
+
+(defn four-pm [date]
+  (let [date (f/parse (format-to-local date-format date))]
+    (l/to-local-date-time (t/date-time (t/year date) (t/month date) (t/day date) 16 0)))
+   ;;(t/today-at 16 0)
+  )
+
+(s/defn round-swipe-time :- DateTime [time]
+  (let [nine-am (nine-am time)
+        four-pm (four-pm time)
+        time (if (t/after? time nine-am) time nine-am)
+        time (if (t/before? time four-pm) time four-pm)]
+    (trace/trace nine-am)
+    time
+
+    ))
+
+ 
+
 (s/defn make-timestamp :- java.sql.Timestamp
   [t :- DateTime] (c/to-timestamp t))
+
 
 ;; (make-sqldate "2015-03-30")
 (defn- make-sqldate [t]
@@ -55,10 +79,10 @@
 
 (defn sanitize-out [swipe]
   (let [in (:in_time swipe)
-         in (when in (c/from-sql-time in))
+        in (when in (c/from-sql-time in))
         out (:out_time swipe)
         out (when out (c/from-sql-time out))
-             ]
+        ]
     (if (and in out)
       (if (or (not (t/before? in out))
               (not (= (t/day in) (t/day out))))
@@ -71,23 +95,23 @@
   ([id] (swipe-out id (t/now)))
   ([id out-time]
    (let [last-swipe (lookup-last-swipe-for-day id (make-date-string out-time))
-           only-swiped-in? (only-swiped-in? last-swipe)
-           in-swipe (if only-swiped-in?
-                      last-swipe
-                      (make-swipe id))
+         only-swiped-in? (only-swiped-in? last-swipe)
+         in-swipe (if only-swiped-in?
+                    last-swipe
+                    (make-swipe id))
          out-swipe (assoc in-swipe :out_time (make-timestamp out-time))
-           out-swipe (sanitize-out out-swipe)]
-       (if only-swiped-in?
-         (db/update! :swipes (:_id out-swipe) out-swipe)
-         (db/persist! out-swipe))
-       out-swipe)))
+         out-swipe (sanitize-out out-swipe)]
+     (if only-swiped-in?
+       (db/update! :swipes (:_id out-swipe) out-swipe)
+       (db/persist! out-swipe))
+     out-swipe)))
 
 ;; TODO - make multimethod on type
 ;; (get-years)
 (defn get-years
   ([] (db/get-* "years"))
   ([names]
-     (db/get-* "years" names "name")))
+   (db/get-* "years" names "name")))
 
 (trace/deftrace delete-year [year]
   (when-let [year (first (get-years year))]
@@ -111,26 +135,29 @@
   ([] (db/get-* "students"))
   ([id] (db/get-* "students" id "_id")))
 
-(defn get-school-years
-  ([] (db/get-* "school_years"))
-  ([id] (db/get-* "school_years" id "_id")))
+(defn get-class-by-name
+  ([name] (first (db/get-* "classes" name "name"))))
+
+(defn get-classes
+  ([] (db/get-* "classes"))
+  ([id] (db/get-* "classes" id "_id")))
 
 (defn thing-not-yet-created [name getter]
   (empty? (filter #(= name (:name %)) (getter))))
 
 ;; (get-years)
 (defn student-not-yet-created [name]
-  (thing-not-yet-created name (get-students)))
+  (thing-not-yet-created name get-students))
 
-(defn school-year-not-yet-created [name]
-  (thing-not-yet-created name (get-school-years)))
+(defn class-not-yet-created [name]
+  (thing-not-yet-created name get-classes))
 
-(trace/deftrace make-school-year [name]
-  (when (student-not-yet-created name)
-    (db/persist! {:type :school_years :name name :active false})))
+(trace/deftrace make-class [name]
+  (when (class-not-yet-created name)
+    (db/persist! {:type :classes :name name :active false})))
 
-(trace/deftrace add-student-to-school-year [student-id school-year-id]
-  (db/persist! {:type :school_years_X_students :student_id student-id :school_year_id school-year-id})
+(trace/deftrace add-student-to-class [student-id class-id]
+  (db/persist! {:type :classes_X_students :student_id student-id :class_id class-id})
   )
 
 (trace/deftrace make-student [name]
@@ -171,14 +198,20 @@
 (defn sample-db
   ([] (sample-db false))
   ([have-extra?]
-     (db/init-pg)
-     (db/reset-db)
+   (db/init-pg)
+   (db/reset-db)
+   (let [{class-id :_id} (make-class "2014-2015")]
+     (db/activate-class class-id)
      (make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 2))))
      (make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
-     (let [s (make-student "jim")]
-       (when have-extra? (swipe-in (:_id s) (t/minus (t/now) (t/days 2)))))
-     (let [s (make-student "steve")]
-       (when have-extra? (swipe-in (:_id s) (t/minus (t/now) (t/days 1) (t/hours 5))))))
+     (let [s (make-student "jim")
+           {sid :_id} s]
+       (add-student-to-class sid class-id)
+       (when have-extra? (swipe-in sid (t/minus (t/now) (t/days 2)))))
+     (let [s (make-student "steve")
+           {sid :_id} s]
+       (add-student-to-class sid class-id)
+       (when have-extra? (swipe-in sid (t/minus (t/now) (t/days 1) (t/hours 5)))))))
   )
 
 ;; (huge-sample-db)

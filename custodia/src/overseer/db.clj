@@ -13,6 +13,7 @@
             [clj-time.coerce :as timec]
             [clj-time.format :as timef]
             [clojure.java.jdbc :as jdbc]
+            [overseer.migrations :as migrations]
             ))
 
 (defqueries "overseer/queries.sql")
@@ -23,104 +24,6 @@
     (let [cal (Calendar/getInstance (TimeZone/getTimeZone "UTC"))]
       (.setTimestamp stmt ix (timec/to-timestamp val) cal))))
 
-(def create-school-days-function
-  "
-CREATE OR REPLACE FUNCTION school_days(year_name text)
-  RETURNS TABLE (days date, student_id BIGINT, archived boolean, olderdate date) AS
-$func$
-  SELECT a.days, students._id student_id, students.archived, students.olderdate FROM (SELECT DISTINCT days2.days
-  FROM (SELECT
-        (CASE WHEN date(s.in_time at time zone 'America/New_York')  IS NULL
-              THEN date(s.out_time at time zone 'America/New_York')
-         ELSE date(s.in_time at time zone 'America/New_York') END) as days
-        FROM roundedswipes s
-        INNER JOIN years y
-                ON ((s.out_time BETWEEN y.from_date AND y.to_date)
-                    OR (s.in_time BETWEEN y.from_date AND y.to_date))
-        WHERE y.name= $1) days2
-  ORDER BY days2.days) as a
-  JOIN students on (1=1)
-$func$
-LANGUAGE sql;
-  ")
-
-(comment "
- -- broken till otherwise noted
-  CREATE VIEW roundedswipes AS
-  SELECT
-     _id
-     , ((CASE WHEN (EXTRACT(HOURS FROM s.in_time AT TIME ZONE 'America/New_York') < 9
-                  AND EXTRACT(HOURS FROM s.in_time AT TIME ZONE 'America/New_York') < 16)
-              THEN (date_trunc('day', s.in_time AT TIME ZONE 'America/New_York') + interval '9 hours')
-              WHEN (EXTRACT(HOURS FROM s.in_time AT TIME ZONE 'America/New_York') >= 16)
-              THEN (date_trunc('day', s.in_time AT TIME ZONE 'America/New_York') + interval '16 hours')
-          ELSE s.in_time END)) as in_time
-     , ((CASE WHEN (EXTRACT(HOURS FROM s.out_time AT TIME ZONE 'America/New_York') >= 16)
-              THEN (date_trunc('day', s.out_time AT TIME ZONE 'America/New_York') + interval '16 hours') 
-              WHEN (EXTRACT(HOURS FROM s.out_time AT TIME ZONE 'America/New_York') < 9)
-              THEN (date_trunc('day', s.out_time AT TIME ZONE 'America/New_York') + interval '9 hours')
-          ELSE s.out_time END)) AS out_time
-     , student_id
-   FROM swipes s;
-")
-(def create-rounded-swipes-view
-  "
-  CREATE OR REPLACE VIEW roundedswipes AS
-  SELECT _id, in_time, out_time, student_id FROM swipes;
-  ")
-
-(def create-students-table-sql
-  "create table students(
-  _id bigserial primary key,
-  name varchar(255),
-  inserted_date timestamp default now(),
-  olderdate date,
-  show_as_absent date,
-  archived BOOLEAN NOT NULL DEFAULT FALSE
-  );")
-(def create-swipes-table-sql
-  "create table swipes(
-  _id bigserial primary key,
-  student_id bigserial,
-  in_time timestamp  with time zone,
-  inserted_date timestamp default now(),
-  out_time timestamp with time zone
-  );")
-(def create-years-table-sql
-  "create table years(
-  _id bigserial primary key,
-  from_date timestamp  with time zone,
-  to_date timestamp  with time zone,
-  inserted_date timestamp default now(),
-  name varchar(255)
-  );")
-
-(def create-override-table-sql
-  "create table overrides(
-  _id bigserial primary key,
-  student_id bigserial,
-  inserted_date timestamp default now(),
-  date date
-  );")
-
-(def create-excuses-table-sql
-  "create table excuses(
-  _id bigserial primary key,
-  student_id bigserial,
-  inserted_date timestamp default now(),
-  date date
-  );")
-
-(def create-session-store-sql
-  "
-  CREATE TABLE session_store (
-  session_id VARCHAR(36) NOT NULL PRIMARY KEY,
-  idle_timeout BIGINT,
-  absolute_timeout BIGINT,
-  value BYTEA
-  );
-")
-
 (def pgdb (atom nil))
 ;; (init-pg)
 (defn init-pg []
@@ -128,27 +31,22 @@ LANGUAGE sql;
                 (dissoc (h/korma-connection-map (env :database-url))
                         :classname))))
 
-
 (defn create-all-tables []
-  (jdbc/execute! @pgdb [create-session-store-sql])
-  (jdbc/execute! @pgdb [create-swipes-table-sql])
-  (jdbc/execute! @pgdb [create-override-table-sql])
-  (jdbc/execute! @pgdb [create-excuses-table-sql])
-  (jdbc/execute! @pgdb [create-years-table-sql])
-  (jdbc/execute! @pgdb [create-students-table-sql])
-  (jdbc/execute! @pgdb [create-rounded-swipes-view])
-  (jdbc/execute! @pgdb [create-school-days-function])
-  )
+  (jdbc/execute! @pgdb [migrations/initialize-prod-database]))
+
 (defn drop-all-tables []
-  (jdbc/execute! @pgdb ["DROP FUNCTION IF EXISTS school_days(text);"])
-  (jdbc/execute! @pgdb ["DROP VIEW IF EXISTS roundedswipes;"])
-  (jdbc/execute! @pgdb ["DROP TABLE IF EXISTS swipes;"])
-  (jdbc/execute! @pgdb ["DROP TABLE IF EXISTS session_store;"])
-  (jdbc/execute! @pgdb ["DROP TABLE IF EXISTS students;"])
-  (jdbc/execute! @pgdb ["DROP TABLE IF EXISTS excuses;"])
-  (jdbc/execute! @pgdb ["DROP TABLE IF EXISTS overrides;"])
-  (jdbc/execute! @pgdb ["DROP TABLE IF EXISTS years;"])
-  )
+  (jdbc/execute! @pgdb ["
+    DROP TABLE IF EXISTS classes_X_students;
+    DROP TABLE IF EXISTS classes;
+    DROP FUNCTION IF EXISTS school_days(text);
+    DROP VIEW IF EXISTS roundedswipes;
+    DROP TABLE IF EXISTS swipes;
+    DROP TABLE IF EXISTS session_store;
+    DROP TABLE IF EXISTS students;
+    DROP TABLE IF EXISTS excuses;
+    DROP TABLE IF EXISTS overrides;
+    DROP TABLE IF EXISTS years;
+"]))
 
 (defn reset-db []
   (drop-all-tables) 
@@ -169,11 +67,14 @@ LANGUAGE sql;
     (first (map #(assoc % :type table)
                 (jdbc/insert! @pgdb table doc)))))
 
-(defn activate-school-year [name]
-  (activate-school-year-y @pgdb name))
+(defn activate-class [id]
+  (activate-class-y! @pgdb id))
 
-(defn delete-student-from-school-year [student-id school-year-id]
-  (delete-student-from-school-year-y @pgdb student-id school-year-id))
+(defn delete-student-from-class [student-id class-id]
+  (delete-student-from-class-y! @pgdb student-id class-id))
+
+(defn get-students-for-class [class-id]
+  (get-classes-and-students-y @pgdb class-id))
 
 ;; (jdbc/query @pgdb ["select * from students"])
 ;; (jdbc/query @pgdb ["select * from students where id in (?)" "1"])

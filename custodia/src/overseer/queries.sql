@@ -9,7 +9,7 @@ SELECT e.*
 FROM overrides e
 INNER JOIN years y
       ON (e.date BETWEEN y.from_date AND y.to_date)
-WHERE y.name= :year_name AND e.student_id = :student_id
+WHERE y.name= :year_name AND e.student_id = :student_id;
 
 -- name: lookup-last-swipe-y
 -- Get a student's last swipe
@@ -26,7 +26,7 @@ SELECT e.*
 FROM excuses e
 INNER JOIN years y
       ON (e.date BETWEEN y.from_date AND y.to_date)
-WHERE y.name= :year_name AND e.student_id = :student_id
+WHERE y.name= :year_name AND e.student_id = :student_id;
 
 -- name: get-student-page-y
 SELECT
@@ -93,7 +93,7 @@ FROM (SELECT
              ON ((s.out_time BETWEEN y.from_date AND y.to_date)
                  OR (s.in_time BETWEEN y.from_date AND y.to_date))
       WHERE y.name = :year_name) days2
-ORDER BY days2.days
+ORDER BY days2.days;
 
 -- name: student-report-y
 SELECT
@@ -152,13 +152,20 @@ INNER JOIN years y
       ON ((s.out_time BETWEEN y.from_date AND y.to_date)
           OR (s.in_time BETWEEN y.from_date AND y.to_date))
 WHERE y.name= :year_name
-  AND s.student_id = :student_id
+  AND s.student_id = :student_id;
 
--- name: activate-school-year-y
--- Set a single year to be active, and unactivate all others
-UPDATE school_years SET active = (name = :name);
+-- name: activate-class-y!
+-- Set a single class to be active, and unactivate all others
+UPDATE classes SET active = (_id = :id);
 
--- name: delete-student-from-school-year-y
-DELETE FROM school_years_X_students
+-- name: delete-student-from-class-y!
+DELETE FROM classes_X_students
 WHERE student_id = :student_id
-      AND school_year_id = :school_years_id
+      AND class_id = :class_id;
+
+-- name: get-classes-and-students-y
+SELECT s._id as student_id
+       , cXs.class_id
+FROM students s
+LEFT JOIN classes_X_students cXs
+   ON (cXs.student_id = s._id AND cXs.class_id = :class_id) ;
