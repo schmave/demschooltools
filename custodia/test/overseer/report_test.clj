@@ -42,6 +42,61 @@
   (data/swipe-out sid (t/plus basetime (t/days 4) (t/hours 4)))
   )
 
+(defn get-class-id-by-name [name]
+  (:_id (data/get-class-by-name name)))
+
+;; TODO
+;; make report only select students from class
+;; migrate old reports to all have class
+;; migrate db to have a class
+;; remove "absent" stats from student page, show total for all time
+;; get student list from active class only
+;; remove "archive" feature
+;; make reports have a class
+(deftest swipe-attendence-with-class-test
+  (do (data/sample-db)
+      (let [class-id (get-class-id-by-name "2014-2015")
+            today-str (dates/get-current-year-string (data/get-years))
+            s (data/make-student "test")
+            sid (:_id s)
+            s2 (data/make-student "test2")
+            sid2 (:_id s2)]
+        (data/add-student-to-class sid class-id)
+        (add-swipes sid)
+        (data/override-date sid "2014-10-18")
+        (data/excuse-date sid "2014-10-20")
+        (data/swipe-in sid2 (t/plus basetime (t/days 5)))
+        (data/swipe-in sid2 (t/plus basetime (t/days 6)))
+
+        (let [att (db/get-report today-str)
+              student1 (first (filter #(= (:_id s) (:_id %)) att))
+              student2 (first (filter #(= (:_id s2) (:_id %)) att))]
+          (testing "Total Valid Day Count"
+            (is (= (:good student1)
+                   4)))
+          (testing "Total Short Day Count"
+            (is (= (:short student1)
+                   1)))
+          (testing "Total Excused Count"
+            (is (= (:excuses student1)
+                   1)))
+          (testing "Total Abs Count"
+            (is (= (:unexcused student1)
+                   1)))
+          (testing "Total Overrides"
+            (is (= (:overrides student1)
+                   1)))
+          (testing "Total Hours"
+            (is (= (int (:total_hours student1))
+                   26)))
+          (testing "Student 2 doesn't even show up"
+            (is (= student2 nil)))
+          )
+        (testing "an older date string shows no attendance in that time"
+          (is (= '() (db/get-report "06-01-2013 05-01-2014")))))) 
+  )
+
+
 (deftest swipe-attendence-test
   (do (data/sample-db)  
       (let [today-str (dates/get-current-year-string (data/get-years))

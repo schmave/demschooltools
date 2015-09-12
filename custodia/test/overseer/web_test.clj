@@ -142,7 +142,7 @@
   )
 
 (defn get-class-id-by-name [name]
-  (:_id (data/get-class-by-name "2014-2015")))
+  (:_id (data/get-class-by-name name)))
 
 (deftest class-and-adding-students
   (do (data/sample-db)

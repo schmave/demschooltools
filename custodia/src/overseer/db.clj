@@ -67,6 +67,12 @@
     (first (map #(assoc % :type table)
                 (jdbc/insert! @pgdb table doc)))))
 
+(defn get-active-class []
+  (-> @pgdb
+      get-active-class-y
+      first
+      :_id))
+
 (defn activate-class [id]
   (activate-class-y! @pgdb id))
 

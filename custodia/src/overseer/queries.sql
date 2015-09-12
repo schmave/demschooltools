@@ -169,3 +169,6 @@ SELECT s._id as student_id
 FROM students s
 LEFT JOIN classes_X_students cXs
    ON (cXs.student_id = s._id AND cXs.class_id = :class_id) ;
+
+-- name: get-active-class-y
+SELECT _id from classes where active = true;
