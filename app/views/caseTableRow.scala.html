@@ -19,7 +19,7 @@
 		<ol>
 			@for( charge <- c.charges ) {
 				@if( charge.person != null && charge.rule != null) {
-					<li>@charge.person.getDisplayName()&mdash;@charge.rule.title @if( !charge.severity.equals("")){(@charge.severity)}
+					<li>@charge.person.getDisplayName()&mdash;@charge.rule.getNumber() @charge.rule.title @if( !charge.severity.equals("")){(@charge.severity)}
 					@if( ! charge.plea.equals("Guilty") ) { <b>@charge.plea</b>. }</li>
 				} else {
 					<li>Charge missing person and/or rule.</li>

@@ -2,7 +2,7 @@
 
 @import helper._
 
-@main("History of " + r.title, "jc") {
+@main("History of " + r.getNumber() + " " + r.title, "jc") {
 
 <script type="text/javascript">
 $(function() {
@@ -15,7 +15,7 @@ $(function() {
 
 <form method="GET">
 <p>Show history from
-<input class="date" type="text" name="start_date" value="@Application.yymmddDate(history.start_date)"> to 
+<input class="date" type="text" name="start_date" value="@Application.yymmddDate(history.start_date)"> to
 <input class="date" type="text" name="end_date" value="@Application.yymmddDate(history.end_date)">
 <input type="submit">
 </p>

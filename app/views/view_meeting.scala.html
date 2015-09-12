@@ -39,7 +39,7 @@ Edit minutes</a></p>
 		@for(charge <- c.charges) {
 			@if( charge.person != null && charge.rule != null ) {
 			<tr><td>@c.case_number</td><td>@charge.person.getDisplayName()</td>
-				<td>@charge.rule.title</td>
+				<td>@charge.rule.getNumber() @charge.rule.title</td>
 					<td>@charge.resolution_plan
 						@if( ! charge.plea.equals("Guilty") ) {
 							<i>(Plea: @charge.plea)</i>
