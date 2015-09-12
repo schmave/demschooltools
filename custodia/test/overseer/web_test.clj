@@ -25,8 +25,7 @@
 (def basetime (t/date-time 2014 10 14 14 9 27 246))
 
 (defn get-att [id student]
-  (let [year (dates/get-current-year-string (data/get-years))]
-    (att/get-attendance year id student)))
+  (first (att/get-student-with-att id)))
 
 (deftest rounder
   (testing "rounding!"
@@ -48,8 +47,6 @@
                                                            (t/days 2)))
                           (dates/make-date-string (t/minus (t/now)
                                                            (t/days 1)))])))))
-
-;; (t/date-time 2015 4 14 4 3 27 456)
 
 (defn add-swipes [sid]
   ;; 14 hours in UTC is 9 Am here

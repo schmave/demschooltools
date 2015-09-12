@@ -75,8 +75,8 @@
             (is (= (:overrides student1)
                    1)))
           (testing "Total Hours"
-            (is (= (:total_hours student1)
-                   26.527295000000002)))
+            (is (= (int (:total_hours student1))
+                   26)))
           (testing "Total short count student 2"
             ;; TODO - determine correct short count (otherwise 2)
             (is (= (:short student2)
