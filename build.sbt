@@ -1,3 +1,6 @@
+import RjsKeys._
+import WebJs._
+
 name := "DemSchoolTools"
 
 version := "1.1"
@@ -16,7 +19,9 @@ scalaVersion := "2.11.6"
 
 pipelineStages := Seq(rjs, digest, gzip)
 
-resolvers += Resolver.sonatypeRepo("snapshots")
+RjsKeys.mainModule := "utils"
+
+resolvers += Resolver.sonatypeRepo("public")
 
 libraryDependencies ++= Seq(
   javaJdbc,
