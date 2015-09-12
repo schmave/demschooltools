@@ -16,7 +16,6 @@
 (defn today-at-utc [h m]
   (t/plus (t/today-at h m) (t/hours 4)))
 
-
 ;; run test C-c M-,
 ;; run tests C-c ,
 (comment
@@ -31,11 +30,11 @@
 
 (deftest rounder
   (testing "rounding!"
-    (let [_1am_ninth (data/round-swipe-time (t/date-time 2015 10 9 5))]
+    (let [_1am_ninth (dates/round-swipe-time (t/date-time 2015 10 9 5))]
       (is (= 9 (t/hour _1am_ninth)))
       (is (= 9 (t/day _1am_ninth)))
       )
-    (let [_10pm_ninth (data/round-swipe-time (t/date-time 2015 10 10 1))]
+    (let [_10pm_ninth (dates/round-swipe-time (t/date-time 2015 10 10 1))]
       (is (= 16 (t/hour _10pm_ninth)))
       (is (= 9 (t/day _10pm_ninth)))
       )))

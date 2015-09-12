@@ -11,8 +11,6 @@
             [schema.core :as s]
             ))
 
-(def DateTime org.joda.time.DateTime)
-
 (defn get-swipes
   ([] (db/get-* "swipes"))
   ([id]
@@ -23,7 +21,6 @@
 
 (defn get-excuses [id]
   (db/get-* "excuses" id "student_id"))
-
 
 (trace/deftrace lookup-last-swipe-for-day [id day]
   (let [last (db/lookup-last-swipe id)]
