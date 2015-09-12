@@ -238,6 +238,9 @@ public class CRM extends Controller {
 	}
 
     public static Result addTag(Integer tagId, String title, Integer personId) {
+        CachedPage.remove(Application.CACHE_INDEX);
+        CachedPage.remove(Attendance.CACHE_INDEX);
+
         Person p = Person.findById(personId);
         if (p == null) {
             return badRequest();
@@ -542,6 +545,9 @@ public class CRM extends Controller {
     }
 
     public static Result savePersonEdits() {
+        CachedPage.remove(Application.CACHE_INDEX);
+        CachedPage.remove(Attendance.CACHE_INDEX);
+
         Form<Person> filledForm = personForm.bindFromRequest();
         if(filledForm.hasErrors()) {
             return badRequest(
