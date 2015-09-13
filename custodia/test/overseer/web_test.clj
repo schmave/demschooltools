@@ -100,7 +100,7 @@
       (let [class-id (get-class-id-by-name "2014-2015")
             {student-id :_id} (data/make-student "Jimmy Hotel")]
         (db/activate-class class-id)
-        (let [classes (data/get-classes)
+        (let [classes (db/get-classes)
               students (db/get-students-for-class class-id)]
           (testing "class creation"
             (is (= 1 (count classes)))
@@ -117,6 +117,7 @@
       (testing "starts 2" (is (= 2 (count (att/get-student-list false)))))
       (let [s (data/make-student "test")
             sid (:_id s)]
+        (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
         (data/toggle-student-archived sid)
         (testing "Archived missing" (is (= 2 (count (att/get-student-list false)))))
         (testing "Archived missing" (is (= 3 (count (att/get-student-list true))))))))
@@ -407,6 +408,7 @@
             now (today-at-utc 15 0)]
         (data/swipe-in sid (t/plus now (t/hours 1)))
         (data/swipe-out sid now)
+        (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
         (let [att  (att/get-student-list)
               our-hero (filter #(= sid (:_id %)) att)]
           (trace/trace our-hero)
@@ -420,8 +422,10 @@
   (do (data/sample-db)
       (let [s (data/make-student "test")
             sid (:_id s)
+            x (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
             s (data/toggle-student-absent sid)
             att (trace/trace "att" (att/get-student-list))]
+
         (testing "Student Count"
           (is (= (-> att count) 3))
           (is (= (->> att (filter :absent_today) count) 1))
