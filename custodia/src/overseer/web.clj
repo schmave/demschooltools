@@ -122,6 +122,10 @@
   (GET "/classes" []
        (friend/authorize #{::admin}
                          (resp/response (db/get-classes))))
+  (POST "/classes" [name]
+       (friend/authorize #{::admin}
+                         (data/make-class name)
+                         (resp/response (db/get-classes))))
 
   (POST "/classes/:cid/student/:sid/add" [cid :<< as-int sid :<< as-int]
         (friend/authorize #{::admin}
