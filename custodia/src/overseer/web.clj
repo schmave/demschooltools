@@ -100,12 +100,12 @@
                           (data/excuse-date id day))
         (student-page-response id))
 
-  (POST "/students/:id/override" [id :<< as-int  day]
+  (POST "/students/:id/override" [id :<< as-int day]
         (friend/authorize #{::admin}
                           (data/override-date id day))
         (student-page-response id))
 
-  (POST "/students/:id/swipe/delete" [id :<< as-int  swipe]
+  (POST "/students/:id/swipe/delete" [id :<< as-int swipe]
         (friend/authorize #{::admin}
                           (data/delete-swipe swipe)
                           (student-page-response id)))
@@ -119,6 +119,24 @@
                                 (data/swipe-out id))))
         (resp/response (get-student-list)))
 
+  (GET "/classes" []
+       (friend/authorize #{::admin}
+                         (resp/response (db/get-classes))))
+
+  (POST "/classes/:cid/student/:sid/add" [cid :<< as-int sid :<< as-int]
+        (friend/authorize #{::admin}
+                          (data/add-student-to-class sid cid)
+                          (resp/response (db/get-classes))))
+
+  (POST "/classes/:cid/student/:sid/delete" [cid :<< as-int sid :<< as-int]
+        (friend/authorize #{::admin}
+                          (db/delete-student-from-class sid cid)
+                          (resp/response (db/get-classes))))
+
+  (POST "/classes/:cid/activate" [cid :<< as-int]
+        (friend/authorize #{::admin}
+                          (db/activate-class cid)
+                          (resp/response (db/get-classes))))
 
   (GET "/reports/years" []
        (friend/authorize #{::user} (year-resp)))

@@ -25,12 +25,10 @@
 
 (deftest swipe-attendence-with-class-test
   (do (data/sample-db)
-      (let [
-            class-id (get-class-id-by-name "2014-2015")
+      (let [class-id (get-class-id-by-name "2014-2015")
             today-str (dates/get-current-year-string (data/get-years))
             {sid :_id} (data/make-student "test")
-            {sid2 :_id} (data/make-student "test2")
-           ]
+            {sid2 :_id} (data/make-student "test2")]
         (data/add-student-to-class sid class-id)
         (add-3good-2short-swipes sid)
         (data/swipe-in sid2 _10-19)

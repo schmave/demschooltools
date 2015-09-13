@@ -262,6 +262,10 @@
         ;; 10/20
         (data/swipe-in sid2 _10-20)
 
+        (testing "getting classes"
+          (let [cls (first (db/get-classes))]
+            (is (= 4 (-> cls :students count)))))
+
         (testing "School year is list of days with swipes"
           (is (= (att/get-school-days (dates/get-current-year-string (data/get-years)))
                  (list "2014-10-14" "2014-10-15" "2014-10-16" "2014-10-17" "2014-10-18" "2014-10-19" "2014-10-20"))))

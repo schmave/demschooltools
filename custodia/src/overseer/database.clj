@@ -115,10 +115,6 @@
 (defn get-class-by-name
   ([name] (first (db/get-* "classes" name "name"))))
 
-(defn get-classes
-  ([] (db/get-* "classes"))
-  ([id] (db/get-* "classes" id "_id")))
-
 (defn thing-not-yet-created [name getter]
   (empty? (filter #(= name (:name %)) (getter))))
 
@@ -127,15 +123,14 @@
   (thing-not-yet-created name get-students))
 
 (defn class-not-yet-created [name]
-  (thing-not-yet-created name get-classes))
+  (thing-not-yet-created name db/get-classes))
 
 (trace/deftrace make-class [name]
   (when (class-not-yet-created name)
     (db/persist! {:type :classes :name name :active false})))
 
 (trace/deftrace add-student-to-class [student-id class-id]
-  (db/persist! {:type :classes_X_students :student_id student-id :class_id class-id})
-  )
+  (db/persist! {:type :classes_X_students :student_id student-id :class_id class-id}))
 
 (trace/deftrace make-student [name]
   (when (student-not-yet-created name)

@@ -87,8 +87,6 @@ WHERE (stu.archived = :show_archived
 AND c.active = TRUE
 ;
 
-
-
 -- name: get-school-days-y
 SELECT DISTINCT days2.days
 FROM (SELECT
@@ -178,6 +176,11 @@ LEFT JOIN classes_X_students cXs
 
 -- name: get-active-class-y
 SELECT _id from classes where active = true;
+
+-- name: get-classes-y
+SELECT c.name, c._id, c.active, cXs.student_id
+FROM classes c
+JOIN classes_X_students cXs ON (cXs.class_id = c._id);
 
 -- name: school-days-for-class-year
 SELECT a.days, s._id student_id, s.archived, s.olderdate

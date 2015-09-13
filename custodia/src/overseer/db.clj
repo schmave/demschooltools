@@ -73,6 +73,15 @@
       first
       :_id))
 
+(defn get-classes []
+  (let [classes (get-classes-y @pgdb)
+        grouped (vals (group-by :name classes))]
+    (map (fn [class-group]
+           (let [base (dissoc (first class-group) :student_id)
+                 students (map :student_id class-group)]
+             (assoc base :students students)))
+         grouped)))
+
 (defn activate-class [id]
   (activate-class-y! @pgdb id))
 
