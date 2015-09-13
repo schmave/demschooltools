@@ -3,7 +3,7 @@
 @import helper._
 @import com.feth.play.module.pa.views.html._
 
-@main(OrgConfig.get().short_name + " Login", "none") {
+@main("DemSchoolTools login (" + OrgConfig.get().short_name + ")", "none") {
 
 	<div class="container" style="padding-top:100px;">
 	@if( notice != null ) { <div class="alert alert-warning"><strong>@notice</strong></div> }
@@ -13,6 +13,17 @@
 	<hr>
 	<h3>OR</h3>
 	<hr>
+
+	<p class="login-instructions"><b>Warning:</b> If you log in with your Facebook or Google account and do not log
+		out of that account (easy to do),
+	   future users of this computer will have access to your status, email, and calendars, as well as DemSchoolTools.
+	   </p><p class="login-instructions"> If you are using <b>a shared computer</b>,
+		   DemSchoolTools recommends that you <b>enable private
+		browsing</b>. Here are instructions for recent versions of
+		<a href="https://support.mozilla.org/en-US/kb/private-browsing-use-firefox-without-history">Firefox</a>,
+		<a href="https://support.apple.com/kb/PH19216?locale=en_US">Safari</a>, and
+		<a href="https://support.google.com/chrome/answer/95464?hl=en">Chrome</a>.
+	</p>
 
 	@forProviders() { p =>
 		<a href="@p.getUrl()" class="btn btn-large btn-primary" style="color:white;">

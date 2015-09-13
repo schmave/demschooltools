@@ -344,4 +344,8 @@ public class Public extends Controller {
         session("timeout", "" + System.currentTimeMillis());
         return com.feth.play.module.pa.controllers.Authenticate.authenticate(provider);
     }
+
+    public static Result loggedOut() {
+        return ok(views.html.logged_out.render());
+    }
 }

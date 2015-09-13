@@ -158,5 +158,6 @@ GET     /assets/*file               controllers.Assets.at(path="/public", file)
 
 
 GET     /logout                     com.feth.play.module.pa.controllers.Authenticate.logout
+GET     /out		            controllers.Public.loggedOut
 GET     /authenticate/:provider     controllers.Public.authenticate(provider: String)
 GET     /authenticate/:provider/denied     controllers.Public.oAuthDenied(provider: String)

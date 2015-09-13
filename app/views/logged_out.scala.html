@@ -1,0 +1,19 @@
+@import helper._
+@import com.feth.play.module.pa.views.html._
+
+@main("DemSchoolTools login (" + OrgConfig.get().short_name + ")", "none") {
+
+	<h3>You are logged out of DemSchoolTools</h3>
+
+	<p><a href="/">Let me back in...</a>
+
+	<h4>But there's one more step</h4>
+	<p class="login-instructions">
+	You are likely still logged in to your Facebook or Google account.
+	If you are using a shared computer, you should log out:</p>
+
+	<a href="https://www.facebook.com/" class="btn btn-large btn-primary" style="color:white;">
+	Go to facebook to logout</a>
+	<a href="https://www.google.com/accounts/Logout" class="btn btn-large btn-primary" style="color:white;">
+	Logout of google</a>
+}

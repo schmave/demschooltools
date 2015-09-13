@@ -31,7 +31,7 @@ public class Global extends GlobalSettings {
 
 			@Override
 			public Call afterLogout() {
-				return routes.Public.index();
+				return routes.Public.loggedOut();
 			}
 
 			@Override
