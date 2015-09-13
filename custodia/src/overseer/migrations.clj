@@ -1,5 +1,6 @@
 (ns overseer.migrations
-  (:require [migratus.core :as migratus]))
+  (:require [environ.core :refer [env]]
+            [migratus.core :as migratus]))
 
 (comment "
  -- broken till otherwise noted
@@ -108,30 +109,16 @@ JOIN students s ON (s._id = cXs.student_id)
 WHERE y.name = $1
 $func$
 LANGUAGE sql;
-
-
-
   ")
 
 
-(defn mconfig []
-  {:store                :database
-   :migration-dir        "migrations"
-   :migration-table-name "swipes"
-   :db {:connection-uri "jdbc:postgresql://localhost:5432/swipes?user=postgres&password=changeme"}
+(def mconfig
+  {:store :database
+   :db  (env :database-url)
    })
 
-(defn mconfig []
-  {:store                :database
-   :migration-dir        "migrations"
-   :migration-table-name "swipes"
-   :db {:classname "org.postgresql.Driver",
-        :subprotocol "postgresql",
-        :user "postgres",
-        :password "changeme",
-        :subname "//localhost:5432/swipes"}
-   })
+;; (migratus/create (mconfig) "test")
+;;(migratus/migrate mconfig)
+;; (migratus/rollback mconfig)
+;; (migratus/down mconfig 20150908103000 20150909070853 20150913085152)
 
-
-;; (migratus/create (mconfig) "add-class-to-year")
-;; (migratus/migrate (mconfig))  
