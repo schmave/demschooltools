@@ -36,6 +36,7 @@
 
 (defn drop-all-tables []
   (jdbc/execute! @pgdb ["
+    DROP TABLE IF EXISTS years;
     DROP TABLE IF EXISTS classes_X_students;
     DROP TABLE IF EXISTS classes;
     DROP FUNCTION IF EXISTS school_days(text);
@@ -45,7 +46,6 @@
     DROP TABLE IF EXISTS students;
     DROP TABLE IF EXISTS excuses;
     DROP TABLE IF EXISTS overrides;
-    DROP TABLE IF EXISTS years;
 "]))
 
 (defn reset-db []

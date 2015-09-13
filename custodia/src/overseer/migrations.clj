@@ -40,13 +40,6 @@
     out_time timestamp with time zone
   );
 
-  create table years(
-    _id bigserial primary key,
-    from_date timestamp  with time zone,
-    to_date timestamp  with time zone,
-    inserted_date timestamp default now(),
-    name varchar(255)
-  );
    create table overrides(
     _id bigserial primary key,
     student_id bigserial,
@@ -70,25 +63,6 @@
   CREATE OR REPLACE VIEW roundedswipes AS
   SELECT _id, in_time, out_time, student_id FROM swipes;
 
-CREATE OR REPLACE FUNCTION school_days(year_name text)
-  RETURNS TABLE (days date, student_id BIGINT, archived boolean, olderdate date) AS
-$func$
-  SELECT a.days, students._id student_id, students.archived, students.olderdate FROM (SELECT DISTINCT days2.days
-  FROM (SELECT
-        (CASE WHEN date(s.in_time at time zone 'America/New_York')  IS NULL
-              THEN date(s.out_time at time zone 'America/New_York')
-         ELSE date(s.in_time at time zone 'America/New_York') END) as days
-        FROM roundedswipes s
-        INNER JOIN years y
-                ON ((s.out_time BETWEEN y.from_date AND y.to_date)
-                    OR (s.in_time BETWEEN y.from_date AND y.to_date))
-        WHERE y.name= $1) days2
-  ORDER BY days2.days) as a
-  JOIN students on (1=1)
-$func$
-LANGUAGE sql;
-
-
   CREATE TABLE classes(
        _id BIGSERIAL PRIMARY KEY,
        name VARCHAR(255),
@@ -101,19 +75,55 @@ LANGUAGE sql;
        student_id BIGINT NOT NULL REFERENCES students(_id)
   );
 
+  create table years(
+    _id bigserial primary key,
+    from_date timestamp  with time zone,
+    to_date timestamp  with time zone,
+    inserted_date timestamp default now(),
+    class_id BIGINT NOT NULL REFERENCES classes(_id),
+    name varchar(255)
+  );
+
+CREATE OR REPLACE FUNCTION school_days(year_name text)
+  RETURNS TABLE (days date, student_id BIGINT, archived boolean, olderdate date) AS
+$func$
+
+SELECT a.days, s._id student_id, s.archived, s.olderdate
+FROM (SELECT DISTINCT days2.days
+    FROM (SELECT
+            (CASE WHEN date(s.in_time AT TIME ZONE 'America/New_York')  IS NULL
+            THEN date(s.out_time AT TIME ZONE 'America/New_York')
+            ELSE date(s.in_time AT TIME ZONE 'America/New_York') END) AS days
+         FROM roundedswipes s
+         INNER JOIN years y
+            ON ((s.out_time BETWEEN y.from_date AND y.to_date)
+            OR (s.in_time BETWEEN y.from_date AND y.to_date))
+         JOIN classes_X_students cXs ON (cXs.class_id = y.class_id
+                                         AND s.student_id = cXs.student_id)
+         WHERE y.name = $1) days2
+         ORDER BY days2.days) AS a
+JOIN years y ON (1=1)
+JOIN classes_X_students cXs ON (cXs.class_id = y.class_id)
+JOIN students s ON (s._id = cXs.student_id)
+WHERE y.name = $1
+$func$
+LANGUAGE sql;
+
+
+
   ")
 
 
 (defn mconfig []
   {:store                :database
-   :migration-dir        "migrations2"
+   :migration-dir        "migrations"
    :migration-table-name "swipes"
    :db {:connection-uri "jdbc:postgresql://localhost:5432/swipes?user=postgres&password=changeme"}
    })
 
 (defn mconfig []
   {:store                :database
-   :migration-dir        "migrations2"
+   :migration-dir        "migrations"
    :migration-table-name "swipes"
    :db {:classname "org.postgresql.Driver",
         :subprotocol "postgresql",
@@ -123,5 +133,5 @@ LANGUAGE sql;
    })
 
 
-;; (migratus/create (mconfig) "create-school-year")
+;; (migratus/create (mconfig) "add-class-to-year")
 ;; (migratus/migrate (mconfig))  

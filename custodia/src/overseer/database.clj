@@ -168,6 +168,7 @@
          to (f/parse to)
          name (str (f/unparse date-format from) " "  (f/unparse date-format to))]
      (->> {:type :years
+           :class_id class-id
            :from_date (make-timestamp from)
            :to_date (make-timestamp to)
            :name name}
