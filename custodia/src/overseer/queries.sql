@@ -73,15 +73,21 @@ select stu.name
          ELSE l.ins
          END AS last_swipe_date
 FROM students stu
-LEFT JOIN (SELECT max(s.in_time) as ins
-            , max(s.out_time) as outs
-            , s.student_id
+LEFT JOIN (SELECT max(s.in_time) AS ins
+                , max(s.out_time) AS outs
+                , s.student_id
            FROM roundedswipes s
            GROUP BY s.student_id
-           ORDER BY ins, outs) as l
+           ORDER BY ins, outs) AS l
      ON (l.student_id = stu._id)
-WHERE stu.archived = :show_archived
-      OR stu.archived = false;
+INNER JOIN classes c ON (1=1)
+INNER JOIN classes_X_students cXs ON (cXs.student_id = stu._id AND cXs.class_id = c._id)
+WHERE (stu.archived = :show_archived
+       OR stu.archived = FALSE)
+AND c.active = TRUE
+;
+
+
 
 -- name: get-school-days-y
 SELECT DISTINCT days2.days

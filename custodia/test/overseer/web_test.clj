@@ -1,5 +1,6 @@
 (ns overseer.web-test
   (:require [clojure.test :refer :all]
+            [overseer.helpers-test :refer :all]
             [clj-time.format :as f]
             [clj-time.local :as l]
             [clj-time.core :as t]
@@ -8,13 +9,9 @@
             [overseer.database :as data]
             [overseer.db :as db]
             [overseer.attendance :as att]
-            [overseer.helpers :as h]
             [overseer.dates :as dates]
             [schema.test :as tests]
             ))
-
-(defn today-at-utc [h m]
-  (t/plus (t/today-at h m) (t/hours 4)))
 
 ;; run test C-c M-,
 ;; run tests C-c ,
@@ -22,10 +19,6 @@
   (run-tests 'overseer.web-test)
   )
 
-(def basetime (t/date-time 2014 10 14 14 9 27 246))
-
-(defn get-att [id student]
-  (first (att/get-student-with-att id)))
 
 (deftest rounder
   (testing "rounding!"
@@ -48,45 +41,6 @@
                           (dates/make-date-string (t/minus (t/now)
                                                            (t/days 1)))])))))
 
-(defn add-swipes [sid]
-  ;; 14 hours in UTC is 9 Am here
-  ;; 10-14-2014
-  (data/swipe-in sid basetime)
-  (data/swipe-out sid (t/plus basetime (t/hours 6)))
-
-  ;; good tomorrow
-  ;; 10-15-2014
-  (data/swipe-in sid (t/plus basetime (t/days 1)))
-  (data/swipe-out sid (t/plus basetime (t/days 1) (t/hours 6)))
-
-  (comment (do (data/sample-db)
-               (let [s (data/make-student "test")
-                     sid (:_id s)]
-                 (data/swipe-in sid (t/plus basetime (t/days 1)))
-                 (data/swipe-out sid (t/plus basetime (t/days 1) (t/hours 6)))
-                 (att/get-student-with-att sid)
-
-                 )))
-
-  ;; short the next
-  ;; 10-16-2014
-
-  (data/swipe-in sid (t/plus basetime (t/days 2)))
-  (data/swipe-out sid (t/plus basetime (t/days 2) (t/hours 4)))
-
-  ;; two short the next but long enough
-  ;; 10-17-2014
-
-  (data/swipe-in sid (t/plus basetime (t/days 3)))
-  (data/swipe-out sid (t/plus basetime (t/days 3) (t/hours 4)))
-  (data/swipe-in sid (t/plus basetime (t/days 3) (t/hours 4.1)))
-  (data/swipe-out sid (t/plus basetime (t/days 3) (t/hours 6.1)))
-
-  ;; short the next - 10-18-2014
-  (data/swipe-in sid (t/plus basetime (t/days 4)))
-  (data/swipe-out sid (t/plus basetime (t/days 4) (t/hours 4)))
-  )
-
 (deftest make-swipe-out
   (testing "sanitize"
     (testing "sanitize swipe out no times"
@@ -95,22 +49,22 @@
         (is (= (-> result :out_time) nil))))
     (testing "sanitize swipe out with valid times does nothing"
       (let [passed (assoc (data/make-swipe 1)
-                          :in_time (c/to-sql-time basetime)
-                          :out_time (c/to-sql-time (t/plus basetime (t/minutes 5))))
+                          :in_time (c/to-sql-time _10-14_9-14am)
+                          :out_time (c/to-sql-time (t/plus _10-14_9-14am (t/minutes 5))))
             result (data/sanitize-out passed)]
         (is (= passed result))))
     (testing "sanitize swipe out with newer out time forces same out as in"
       (let [passed (assoc (data/make-swipe 1)
-                          :in_time (c/to-sql-time basetime)
-                          :out_time (c/to-sql-time (t/minus basetime (t/minutes 5))))
+                          :in_time (c/to-sql-time _10-14_9-14am)
+                          :out_time (c/to-sql-time (t/minus _10-14_9-14am (t/minutes 5))))
             result (data/sanitize-out passed)]
         (is (= (:in_time passed) (:in_time result)))
         (is (= (:in_time passed) (:out_time result)))
         ))
     (testing "sanitize swipe out with out in wrong day forces out to be same day"
       (let [passed (assoc (data/make-swipe 1)
-                          :in_time (c/to-sql-time basetime)
-                          :out_time (c/to-sql-time (t/plus basetime (t/minutes 5) (t/days 1))))
+                          :in_time (c/to-sql-time _10-14_9-14am)
+                          :out_time (c/to-sql-time (t/plus _10-14_9-14am (t/minutes 5) (t/days 1))))
             result (data/sanitize-out passed)]
         (is (= (:in_time passed) (:in_time result)))
         (is (= (:in_time passed) (:out_time result)))))
@@ -120,12 +74,12 @@
 
 (deftest swipe-attendence-override-test
   (do (data/sample-db)
-      (let [s (data/make-student "test")
-            sid (:_id s)]
-        (data/swipe-in sid  basetime)
-        (data/swipe-out sid  (t/plus basetime (t/hours 4)))
+      (let [{sid :_id} (data/make-student "test")]
+        (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
+        (data/swipe-in sid  _10-14_9-14am)
+        (data/swipe-out sid  (t/plus _10-14_9-14am (t/hours 4)))
         (data/override-date sid "2014-10-14")
-        (let [att (get-att sid s)]
+        (let [att (get-att sid)]
           (testing "Total Valid Day Count"
             (is (= (:total_days att)
                    1)))
@@ -140,9 +94,6 @@
                    true)))
           )))
   )
-
-(defn get-class-id-by-name [name]
-  (:_id (data/get-class-by-name name)))
 
 (deftest class-and-adding-students
   (do (data/sample-db)
@@ -176,9 +127,11 @@
   (do (data/sample-db)
       (let [s (data/make-student "test")
             sid (:_id s)]
+
+        (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
         (data/swipe-in sid _801pm)
         (data/swipe-out sid (t/plus _801pm (t/minutes 5)))
-        (let [att (get-att sid s)
+        (let [att (get-att sid)
               _10-14 (-> att :days first)
               first-swipe (-> _10-14 :swipes first)]
           (testing "swipe info"
@@ -192,17 +145,19 @@
 
           ))))
 
-(def _840am (t/minus basetime (t/minutes 90)))
-(def _339pm (t/plus basetime (t/minutes 330)))
+(def _840am (t/minus _10-14_9-14am (t/minutes 90)))
+(def _339pm (t/plus _10-14_9-14am (t/minutes 330)))
 
 (deftest swipe-before-9-test
   (do (data/sample-db)
       (let [s (data/make-student "test")
             sid (:_id s)]
+
+        (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
         ;; only count minutes from 9-4
         (data/swipe-in sid _840am)
         (data/swipe-out sid _339pm)
-        (let [att (get-att sid s)]
+        (let [att (get-att sid)]
           (testing "Total Valid Day Count"
             (is (= (:total_days att)
                    1)))
@@ -221,6 +176,8 @@
       (let [s (data/make-student "test")
             sid (:_id s)]
 
+        (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
+
         ;; round after 4 back to 4
         (data/swipe-in sid (t/plus _900am (t/hours 3)))
         (data/swipe-out sid _500pm)
@@ -229,7 +186,7 @@
         (data/swipe-in sid (t/plus _840am (t/days 1)))
         (data/swipe-out sid (t/plus _330pm (t/days 1)))
 
-        (let [att (get-att sid s)
+        (let [att (get-att sid)
               _10-15 (-> att :days first)
               _10-14 (-> att :days second)]
           (trace/trace att)
@@ -257,8 +214,10 @@
   (do (data/sample-db)
       (let [s (data/make-student "test")
             sid (:_id s)]
-        (data/swipe-in sid basetime)
-        (let [att (get-att sid s)]
+
+        (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
+        (data/swipe-in sid _10-14_9-14am)
+        (let [att (get-att sid)]
           (testing "Total Valid Day Count"
             (is (= (:total_days att)
                    0)))
@@ -286,23 +245,30 @@
             sid (:_id s)
             s2 (data/make-student "test2")
             sid2 (:_id s2)]
-        ;; good today
-        (add-swipes sid)
+
+        (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
+        (data/add-student-to-class sid2 (get-class-id-by-name "2014-2015"))
+
+        (add-3good-2short-swipes sid)
+
+        ;; student not added to year doesn't show up
+        (data/make-student "test3")
+
         (data/override-date sid "2014-10-18")
         (data/excuse-date sid "2014-10-20")
 
         ;; 10/19
-        (data/swipe-in sid2 (t/plus basetime (t/days 5)))
+        (data/swipe-in sid2 _10-19)
         ;; 10/20
-        (data/swipe-in sid2 (t/plus basetime (t/days 6)))
+        (data/swipe-in sid2 _10-20)
 
         (testing "School year is list of days with swipes"
           (is (= (att/get-school-days (dates/get-current-year-string (data/get-years)))
                  (list "2014-10-14" "2014-10-15" "2014-10-16" "2014-10-17" "2014-10-18" "2014-10-19" "2014-10-20"))))
         (testing "Student Front Page Count"
           (is (= (-> (att/get-student-list) count) 4)))
-        (let [att (get-att sid s)
-              att2 (get-att sid2 s2)]
+        (let [att (get-att sid)
+              att2 (get-att sid2)]
           (testing "Total Valid Day Count"
             (is (= (:total_days  att)
                    4)))
@@ -353,11 +319,13 @@
   (do (data/sample-db)
       (let [s (data/make-student "test")
             sid (:_id s)]
-        (let [att (get-att sid s)]
+
+        (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
+        (let [att (get-att sid)]
           (testing "in today is false"
             (is (= false (:in_today att)))))
         (data/swipe-in sid (t/now))
-        (let [att (get-att sid s)]
+        (let [att (get-att sid)]
           (testing "in today is true"
             (is (= true (:in_today att)))))))
   )
@@ -366,9 +334,11 @@
   (do (data/sample-db)
       (let [s (data/make-student "test")
             sid (:_id s)]
-        (data/swipe-in sid basetime)
-        (data/swipe-out sid (t/plus basetime (t/days 1) (t/minutes 331)))
-        (let [att (get-att sid s)]
+
+        (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
+        (data/swipe-in sid _10-14_9-14am)
+        (data/swipe-out sid (t/plus _10-14_9-14am (t/days 1) (t/minutes 331)))
+        (let [att (get-att sid)]
           (testing "swiping out on another day just is an out"
             (is (= 2 (-> att :days count)))))))
   )
@@ -379,8 +349,10 @@
         (is (not= '() (att/get-student-with-att 1))))
       (let [s (data/make-student "test")
             sid (:_id s)]
-        (data/swipe-in sid basetime)
-        (data/swipe-out sid (t/plus basetime (t/minutes 331)))
+
+        (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
+        (data/swipe-in sid _10-14_9-14am)
+        (data/swipe-out sid (t/plus _10-14_9-14am (t/minutes 331)))
 
         (let [att  (att/get-student-with-att sid)]
           (testing "has one valid"
@@ -403,6 +375,8 @@
       (let [s (data/make-student "test")
             sid (:_id s)
             now (today-at-utc 15 0)]
+
+        (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
         ;; has an in, then missed two days, next in should
         ;; show a last swipe type
         (data/swipe-in 1 (t/minus now (t/days 2)))
@@ -459,13 +433,15 @@
             tomorrow (-> (today-at-utc 9 0) (t/plus (t/days 1)))
             day-after-next (-> (today-at-utc 9 0) (t/plus (t/days 2)))
             ]
+
+        (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
         (data/swipe-in sid tomorrow)
         (data/swipe-out sid (t/plus tomorrow (t/minutes 331)))
 
         (data/swipe-in sid (t/plus tomorrow (t/days 2)))
         (data/swipe-out sid (t/plus tomorrow (t/days 2) (t/minutes 329)))
 
-        (let [att (get-att sid s)]
+        (let [att (get-att sid)]
           (testing "Total Valid Day Count"
             (is (= (-> att :total_days) 1))))))
   )
@@ -484,9 +460,12 @@
             s (data/make-student "test")
             sid (:_id s)
             today-string (dates/today-string)]
+
+        (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
+        (data/add-student-to-class (:_id dummy) (get-class-id-by-name "2014-2015"))
         (data/swipe-in (:_id dummy))
         (data/excuse-date sid today-string)
-        (let [att  (get-att sid s)
+        (let [att  (get-att sid)
               today (-> att :days first)]
           (testing "First day is today string"
             (is (= (:day today) today-string)))
@@ -501,10 +480,12 @@
             sid (:_id s)
             s2 (data/make-student "tests1")
             sid2 (:_id s2)]
+
+        (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
         (data/override-date sid (dates/today-string))
         (data/excuse-date sid2 (dates/today-string))
-        (let [att (get-att sid s)
-              att2 (get-att sid2 s2)]
+        (let [att (get-att sid)
+              att2 (get-att sid2)]
           (testing "S1 not in today"
             (is (= (:in_today att) false)))
           (testing "S2 not in today"
@@ -516,8 +497,10 @@
   (do (data/sample-db)
       (let [s (data/make-student "test")
             sid (:_id s)]
-        (data/swipe-in sid basetime)
-        (let [att (get-att sid s)]
+
+        (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
+        (data/swipe-in sid _10-14_9-14am)
+        (let [att (get-att sid)]
           (testing "Total Valid Day Count"
             (is (= (-> att :days first :day)
                    "2014-10-14")))
