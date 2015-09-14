@@ -19,8 +19,11 @@
             [overseer.database :as data]
             [overseer.dates :as dates]
             [overseer.attendance :as att]
+            [overseer.classes :refer [class-routes]]
+            [overseer.reports :refer [report-routes]]
             [clojure.data.json :as json]
             [clj-time.core :as t]
+            [overseer.roles :as roles]
             [cemerick.friend :as friend]
             (cemerick.friend [workflows :as workflows]
                              [credentials :as creds])
@@ -29,24 +32,20 @@
 
 (def users {"admin" {:username "admin"
                      :password (creds/hash-bcrypt (env :admin))
-                     :roles #{::admin ::user}}
+                     :roles #{roles/admin roles/user}}
             "super" {:username "super"
                      :password (creds/hash-bcrypt (env :admin))
-                     :roles #{::admin ::user ::super}}
+                     :roles #{roles/admin roles/user roles/super}}
             "user" {:username "user"
                     :password (creds/hash-bcrypt (env :userpass))
-                    :roles #{::user}}})
-(defn year-resp []
-  (let [years (data/get-years)]
-    (resp/response {:years (map :name years)
-                    :current_year (dates/get-current-year-string years)})))
+                    :roles #{roles/user}}})
 
 (defn student-page-response [student-id]
   (resp/response {:student (first (att/get-student-with-att student-id))}))
 
 (defn show-archived? []
   (let [{roles :roles} (friend/current-authentication)]
-    (contains? roles ::admin)))
+    (contains? roles roles/admin)))
 
 (defn get-student-list []
   (att/get-student-list (show-archived?)))
@@ -54,64 +53,64 @@
 (defroutes app
   (GET "/" [] (friend/authenticated (io/resource "index.html")))
   (GET "/resetdb" []
-       (friend/authorize #{::super} ;; (db/reset-db)
+       (friend/authorize #{roles/super} ;; (db/reset-db)
                          (resp/redirect "/")))
 
   (GET "/dates/today" [] (dates/today-string))
   (GET "/sampledb" []
-       (friend/authorize #{::super} ;; (data/sample-db true)
+       (friend/authorize #{roles/super} ;; (data/sample-db true)
                          (resp/redirect "/")))
 
   (GET "/students" req
-       (friend/authorize #{::user}
+       (friend/authorize #{roles/user}
                          (resp/response (get-student-list))))
 
   (GET "/students/:id" [id :<< as-int]
-     (friend/authorize #{::user} (student-page-response id)))
+     (friend/authorize #{roles/user} (student-page-response id)))
 
   (POST "/students" [name]
-        (friend/authorize #{::admin}
+        (friend/authorize #{roles/admin}
                           (let [made? (data/make-student name)]
                             (resp/response {:made made?
                                             :students (get-student-list)}))))
 
   (PUT "/students/:id" [id :<< as-int name]
-        (friend/authorize #{::admin}
+        (friend/authorize #{roles/admin}
                           (data/rename id name))
         (student-page-response id))
 
   (POST "/students/:id/togglearchived" [id :<< as-int]
-        (friend/authorize #{::admin}
+        (friend/authorize #{roles/admin}
                           (do (data/toggle-student-archived id)
                               (student-page-response id))))
 
   (POST "/students/:id/togglehours" [id :<< as-int]
-    (friend/authorize #{::admin}
+    (friend/authorize #{roles/admin}
                       (do (data/toggle-student-older id)
                           (student-page-response id))))
 
   (POST "/students/:id/absent" [id :<< as-int]
-    (friend/authorize #{::user}
+    (friend/authorize #{roles/user}
                       (do (data/toggle-student-absent id)
                           (student-page-response id))))
 
   (POST "/students/:id/excuse" [id :<< as-int day]
-        (friend/authorize #{::admin}
+        (friend/authorize #{roles/admin}
                           (data/excuse-date id day))
         (student-page-response id))
 
   (POST "/students/:id/override" [id :<< as-int day]
-        (friend/authorize #{::admin}
+        (friend/authorize #{roles/admin}
                           (data/override-date id day))
         (student-page-response id))
 
   (POST "/students/:id/swipe/delete" [id :<< as-int swipe]
-        (friend/authorize #{::admin}
+        (friend/authorize #{roles/admin}
                           (data/delete-swipe swipe)
                           (student-page-response id)))
 
   (POST "/students/:id/swipe" [id :<< as-int direction  missing]
-        (friend/authorize #{::user}
+        (friend/authorize #{roles/user}
                           (if (= direction "in")
                             (do (when missing (data/swipe-out id missing))
                                 (data/swipe-in id))
@@ -119,53 +118,17 @@
                                 (data/swipe-out id))))
         (resp/response (get-student-list)))
 
-  (GET "/classes" []
-       (friend/authorize #{::admin}
-                         (resp/response (db/get-classes))))
-  (POST "/classes" [name]
-       (friend/authorize #{::admin}
-                         (data/make-class name)
-                         (resp/response (db/get-classes))))
-
-  (POST "/classes/:cid/student/:sid/add" [cid :<< as-int sid :<< as-int]
-        (friend/authorize #{::admin}
-                          (data/add-student-to-class sid cid)
-                          (resp/response (db/get-classes))))
-
-  (POST "/classes/:cid/student/:sid/delete" [cid :<< as-int sid :<< as-int]
-        (friend/authorize #{::admin}
-                          (db/delete-student-from-class sid cid)
-                          (resp/response (db/get-classes))))
-
-  (POST "/classes/:cid/activate" [cid :<< as-int]
-        (friend/authorize #{::admin}
-                          (db/activate-class cid)
-                          (resp/response (db/get-classes))))
-
-  (GET "/reports/years" []
-       (friend/authorize #{::user} (year-resp)))
-
-  (DELETE "/reports/years/:year" [year]
-        (friend/authorize #{::admin}
-                          (data/delete-year year)
-                          (year-resp)))
-  (POST "/reports/years" [from_date to_date]
-        (friend/authorize #{::admin}
-                          (let [made? (data/make-year from_date to_date)]
-                            (resp/response {:made made?}))))
-
-  (GET "/reports/:year" [year]
-        (friend/authorize #{::admin}
-                          (resp/response (db/get-report year))))
+  class-routes
+  report-routes
 
   (GET "/users/login" req
        (io/resource "login.html"))
   (GET "/users/logout" req
        (friend/logout* (resp/redirect (str (:context req) "/"))))
   (GET "/users/is-user" req
-       (friend/authorize #{::user} "You're a user!"))
+       (friend/authorize #{roles/user} "You're a user!"))
   (GET "/users/is-admin" req
-        (friend/authorize #{::admin} (resp/response {:admin true})))
+        (friend/authorize #{roles/admin} (resp/response {:admin true})))
   (route/resources "/")
   (ANY "*" []
        (route/not-found (slurp (io/resource "404.html")))))
