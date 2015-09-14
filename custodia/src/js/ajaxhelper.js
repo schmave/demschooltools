@@ -19,6 +19,12 @@ var exports = {
     },
     get: function(url){
         return $.ajax(url);
+    },
+    delete: function(url){
+        return $.ajax({
+            url: url,
+            method: 'DELETE',
+        });
     }
 };
 
