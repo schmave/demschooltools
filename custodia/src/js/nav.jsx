@@ -26,6 +26,9 @@ module.exports = React.createClass({
                         <AdminWrapper>
                             <li><Link to="create">Add Student</Link> </li>
                         </AdminWrapper>
+                        <AdminWrapper>
+                            <li><Link to="classes">Classes</Link> </li>
+                        </AdminWrapper>
                     </ul>
                     <ul className="nav navbar-nav navbar-right">
                         <li><a href="./users/logout">Logout</a></li>

@@ -178,9 +178,10 @@ LEFT JOIN classes_X_students cXs
 SELECT _id from classes where active = true;
 
 -- name: get-classes-y
-SELECT c.name, c._id, c.active, cXs.student_id
+SELECT c.name, c._id, c.active, cXs.student_id, s.name student_name
 FROM classes c
-JOIN classes_X_students cXs ON (cXs.class_id = c._id);
+LEFT JOIN classes_X_students cXs ON (cXs.class_id = c._id)
+LEFT JOIN students s ON (cXs.student_id = s._id);
 
 -- name: school-days-for-class-year
 SELECT a.days, s._id student_id, s.archived, s.olderdate

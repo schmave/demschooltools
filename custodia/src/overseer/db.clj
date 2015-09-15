@@ -73,12 +73,15 @@
       first
       :_id))
 
+;; (get-classes)
 (defn get-classes []
   (let [classes (get-classes-y @pgdb)
         grouped (vals (group-by :name classes))]
     (map (fn [class-group]
-           (let [base (dissoc (first class-group) :student_id)
-                 students (map :student_id class-group)]
+           (let [base (dissoc (first class-group) :student_id :student_name)
+                 ids (filter (comp not nil?) (map :student_id class-group))
+                 names (filter (comp not nil?) (map :student_name class-group))
+                 students (map (fn [id name] {:student_id id :name name}) ids names)]
              (assoc base :students students)))
          grouped)))
 

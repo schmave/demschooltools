@@ -2,16 +2,16 @@ var EventEmitter = require('events').EventEmitter,
     dispatcher = require('./appdispatcher'),
     base = require('./storebase'),
     constants = require('./appconstants'),
-    actionCreator = require('./reportactioncreator');
+    actionCreator = require('./classactioncreator');
 
 var isAdmin;
-var classes = {};
+var classes = [];
 var schoolYears;
 
 var exports = Object.create(base);
 
 exports.getClasses = function (force) {
-    if (!classes || force) {
+    if (classes[0] == null) {
         actionCreator.loadClasses();
     } else {
         return classes;
@@ -21,21 +21,22 @@ exports.getClasses = function (force) {
 exports.removeChangeListener = function (callback) {
     this.removeListener(this.CHANGE_EVENT, callback);
     if (this.listeners(this.CHANGE_EVENT).length == 0) {
-        classes = {};
+        classes = [];
     }
 };
 
 dispatcher.register(function (action) {
     switch (action.type) {
         case constants.classEvents.CLASSES_LOADED:
-            classes[action.data.year] = action.data.report;
+            classes = action.data;
             exports.emitChange();
             break;
         case constants.classEvents.CLASS_CREATED:
-            exports.getSchoolYears(true);
+            classes = action.data;
+            exports.emitChange();
             break;
         case constants.classEvents.CLASS_DELETED:
-            schoolYears = action.data;
+            classes = action.data;
             exports.emitChange();
             break;
     }
