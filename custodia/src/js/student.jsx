@@ -9,7 +9,6 @@ var React = require('react'),
     Swipes = require('./swipeslisting.jsx'),
     SwipeListing = require('./swipeslisting.jsx');
 
-
 var exports = React.createClass({
     contextTypes: {
         router: React.PropTypes.func

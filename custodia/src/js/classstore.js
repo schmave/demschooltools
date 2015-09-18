@@ -10,18 +10,12 @@ var schoolYears;
 
 var exports = Object.create(base);
 
-exports.getClasses = function (force) {
-    if (classes[0] == null) {
+exports.getClasses = function () {
+    if (classes.length == 0) {
         actionCreator.loadClasses();
+        return [];
     } else {
         return classes;
-    }
-};
-
-exports.removeChangeListener = function (callback) {
-    this.removeListener(this.CHANGE_EVENT, callback);
-    if (this.listeners(this.CHANGE_EVENT).length == 0) {
-        classes = [];
     }
 };
 

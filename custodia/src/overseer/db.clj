@@ -73,6 +73,7 @@
       first
       :_id))
 
+
 ;; (get-classes)
 (defn get-classes []
   (let [classes (get-classes-y @pgdb)
@@ -84,6 +85,13 @@
                  students (map (fn [id name] {:student_id id :name name}) ids names)]
              (assoc base :students students)))
          grouped)))
+
+(defn get-all-classes-and-students []
+  {:classes (get-classes)
+   :students (map (fn [s] {:name (:name s) :_id (:_id s)})
+                  (get-* "students"))}
+  )
+;; (get-all-classes-and-students)
 
 (defn activate-class [id]
   (activate-class-y! @pgdb id))

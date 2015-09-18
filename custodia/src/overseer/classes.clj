@@ -13,24 +13,24 @@
 (defroutes class-routes
   (GET "/classes" []
        (friend/authorize #{roles/admin}
-                         (resp/response (db/get-classes))))
+                         (resp/response (db/get-all-classes-and-students))))
   (POST "/classes" [name]
         (friend/authorize #{roles/admin}
                           (data/make-class name)
-                          (resp/response (db/get-classes))))
+                          (resp/response (db/get-all-classes-and-students))))
 
   (POST "/classes/:cid/student/:sid/add" [cid :<< as-int sid :<< as-int]
         (friend/authorize #{roles/admin}
                           (data/add-student-to-class sid cid)
-                          (resp/response (db/get-classes))))
+                          (resp/response (db/get-all-classes-and-students))))
 
   (POST "/classes/:cid/student/:sid/delete" [cid :<< as-int sid :<< as-int]
         (friend/authorize #{roles/admin}
                           (db/delete-student-from-class sid cid)
-                          (resp/response (db/get-classes))))
+                          (resp/response (db/get-all-classes-and-students))))
 
   (POST "/classes/:cid/activate" [cid :<< as-int]
         (friend/authorize #{roles/admin}
                           (db/activate-class cid)
-                          (resp/response (db/get-classes)))))
+                          (resp/response (db/get-all-classes-and-students)))))
 
