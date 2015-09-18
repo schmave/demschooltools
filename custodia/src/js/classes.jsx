@@ -29,7 +29,7 @@ var classStore = require('./classstore'),
 
 var exports = React.createClass({
     getInitialState: function () {
-        return {classes:[], students: []};
+        return {classes:[], students: [], selectedClassId: 1};
     },
     componentDidMount: function () {
         classStore.getClasses();
@@ -43,50 +43,46 @@ var exports = React.createClass({
             classes = both ? both.classes : [],
             students = both ? both.students : [];
         this.setState({classes: classes,
-                       selectedClass: (classes)?classes[0]:null,
+                       selectedClassId: (classes)?classes[0]._id:null,
                        students: students});
     },
-    classSelected: function (classval) {
-        this.setState({selectedClass: classval});
+    classSelected: function (classId) {
+        this.setState({selectedClassId: classId});
     },
     createClass: function(){
         actionCreator.createClass("test class");
     },
+    getSelectedClass : function(){
+        var id = this.state.selectedClassId;
+        var selectedClass = this.state.classes.filter(function(cls){
+            return cls._id === id;})[0];
+        return selectedClass ? selectedClass : {students:[]};
+
+    },
     getStudentRowsInCurrentClass : function(){
-        var rows = [];
-        if(this.state.selectedClass && this.state.selectedClass.students) {
-            this.state.selectedClass.students.map(function (stu, i) {
-                rows.push(<tr key={stu.student_id}> <td>{stu.name}</td> </tr>);
-            }.bind(this));
-        }
-        return rows;
+        return this.getSelectedClass().students.map(function (stu) {
+            return <tr key={stu.student_id}> <td>{stu.name}</td> </tr>;
+        });
     },
     classRows : function(){
-        if(this.state.classes && this.state.classes.length !== 0) {
-            return this.state.classes.map(function (classval, i) {
-                var boundClick = this.classSelected.bind(this, classval);
-                return <tr key={classval._id} onClick={boundClick} className={(classval._id === this.state.selectedClass._id)  ? "selected" : ""}>
-                        <td>{classval.name}</td>
-                    </tr>;
-            }.bind(this));
-        }
+        return this.state.classes.map(function (classval, i) {
+            var boundClick = this.classSelected.bind(this, classval._id);
+            return <tr key={classval._id}
+                       onClick={boundClick}
+                       className={(classval._id === this.state.selectedClassId)  ? "selected" : ""}>
+                <td>{classval.name}</td></tr>;
+        }.bind(this));
     },
     selectedStudentContains: function(stu) {
-        if(this.state.selectedClass && this.state.selectedClass.students) {
-            var t = this.state.selectedClass.students.some(function(istu){
-                return istu.student_id === stu._id;
-            });
-            return !t;
-        }
-        return false;
+        return !this.getSelectedClass().students.some(function(istu){
+            return istu.student_id === stu._id;
+        });
     },
     getStudentRowsNotInCurrentClass : function() {
-        if(this.state.students && this.state.students.length !== 0) {
-            var filtered = this.state.students.filter(this.selectedStudentContains);
-            return filtered.map(function (stu, i) {
-                return <tr key={stu._id}> <td>{stu.name} - {stu._id}</td> </tr>;
-            }.bind(this));
-        }
+        var filtered = this.state.students.filter(this.selectedStudentContains);
+        return filtered.map(function (stu) {
+            return <tr key={stu._id}> <td>{stu.name} - {stu._id}</td> </tr>;
+        });
     },
     render: function () {
         return <div>
@@ -118,7 +114,7 @@ var exports = React.createClass({
                                 <th className="center">Students Not In Class</th>
                             </tr>
                         </thead>
-         <tbody> {this.getStudentRowsNotInCurrentClass()} </tbody>
+            <tbody> {this.getStudentRowsNotInCurrentClass()} </tbody>
                     </table>
                 </div>
             </div>
