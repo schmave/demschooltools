@@ -5,8 +5,13 @@
 
 @main(p.first_name + " " + p.last_name, "crm") {
 
-@if(p.family != null && (!p.family.first_name.equals("") || !p.family.last_name.equals(""))) {
-	<span class="family-name">@p.family.first_name @p.family.last_name</span>
+@if(p.family != null) {
+	<p class="family-info">
+	@if(!p.family.first_name.equals("") || !p.family.last_name.equals("")) {
+		<span class="family-name">@p.family.first_name @p.family.last_name</span>
+	}
+    <span class="family-id">Family ID #@p.family.person_id</span>
+	</p>
 }
 
 @defining(if(family_members.size() >= 2){ "col-xs-6 col-md-3" } else {"col-xs-6 col-md-6"}) { size =>
