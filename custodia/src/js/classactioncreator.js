@@ -30,10 +30,6 @@ var exports = {
     deleteStudentFromClass: function (studentId, classId) {
         ajax.post('/classes/'+classId+'/student/'+studentId+'/delete', {})
             .then(function (data) {
-                // dispatcher.dispatch({
-                //     type: constants.systemEvents.FLASH,
-                //     message: 'Removed student'
-                // });
                 dispatcher.dispatch({
                     type: constants.classEvents.CLASS_STUDENT_DELETED,
                     data: data
@@ -43,10 +39,6 @@ var exports = {
     addStudentToClass: function (studentId, classId) {
         ajax.post('/classes/'+classId+'/student/'+studentId+'/add', {})
             .then(function (data) {
-                // dispatcher.dispatch({
-                //     type: constants.systemEvents.FLASH,
-                //     message: 'Added student'
-                // });
                 dispatcher.dispatch({
                     type: constants.classEvents.CLASS_STUDENT_ADDED,
                     data: data

@@ -25,11 +25,11 @@ dispatcher.register(function (action) {
             classes = action.data;
             exports.emitChange();
             break;
-        case constants.classEvents.CLASS_CREATED:
+        case constants.classEvents.CLASS_STUDENT_ADDED:
             classes = action.data;
             exports.emitChange();
             break;
-        case constants.classEvents.CLASS_DELETED:
+        case constants.classEvents.CLASS_STUDENT_DELETED:
             classes = action.data;
             exports.emitChange();
             break;

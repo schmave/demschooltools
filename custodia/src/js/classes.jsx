@@ -25,6 +25,7 @@ if (!Array.prototype.some) {
 }
 
 var classStore = require('./classstore'),
+    actionCreator = require('./classactioncreator')
     studentStore = require('./StudentStore');
 
 var exports = React.createClass({
@@ -42,8 +43,14 @@ var exports = React.createClass({
         var both = classStore.getClasses(),
             classes = both ? both.classes : [],
             students = both ? both.students : [];
+        var selectedClass = this.state.selectedClass;
+        if(selectedClass) {
+            var id = selectedClass._id,
+                matching = classes.filter(function(cls) {return cls._id === id;});
+            selectedClass = (matching[0]) ? matching[0] : classes[0];
+        }
         this.setState({classes: classes,
-                       selectedClass: (classes)?classes[0]:null,
+                       selectedClass: (selectedClass)?selectedClass:null,
                        students: students});
     },
     classSelected: function (classval) {
@@ -51,13 +58,6 @@ var exports = React.createClass({
     },
     createClass: function(){
         actionCreator.createClass("test class");
-    },
-    getStudentRowsInCurrentClass : function(){
-        var t = this.state.selectedClass.students.map(function (stu) {
-            return <tr key={stu.student_id}> <td>{stu.name}</td> </tr>;
-        });
-        if (t.length == 0) {return undefined;}
-        return <tbody> {t} </tbody>;
     },
     classRows : function(){
         return this.state.classes.map(function (classval, i) {
@@ -73,13 +73,42 @@ var exports = React.createClass({
             return istu.student_id === stu._id;
         });
     },
+    deleteFromClass:function(student) {
+        actionCreator.deleteStudentFromClass(student.student_id, this.state.selectedClass._id);
+    },
+    addToClass:function(student) {
+        actionCreator.addStudentToClass(student._id, this.state.selectedClass._id);
+    },
+    getStudentRowsInCurrentClass : function(){
+        var t = this.state.selectedClass.students.map(function (stu) {
+            return <div key={"t" + this.state.selectedClass._id + "-" + stu.student_id}  className="panel panel-info student-listing col-sm-11">
+                <div>
+                <span className="attendance-button">
+                {stu.name}
+            </span>
+                <span className="attendance-button">
+                <button onClick={this.deleteFromClass.bind(this, stu)} className="btn btn-sm btn-primary"><i className={"fa fa fa-arrow-right"}>&nbsp;</i></button>
+            </span>
+            </div>
+                </div>;
+        }.bind(this));
+        return t;
+    },
     getStudentRowsNotInCurrentClass : function() {
         var filtered = this.state.students.filter(this.selectedStudentContains);
         var t = filtered.map(function (stu) {
-            return <tr key={stu._id}> <td>{stu.name} - {stu._id}</td> </tr>;
-        });
-        if (t.length == 0) {return undefined;}
-        return <tbody> {t} </tbody>;
+            return <div key={"NOTCLASS-" + stu._id} className="panel panel-info student-listing col-sm-11">
+                <div>
+                <span className="attendance-button">
+                <button onClick={this.addToClass.bind(this, stu)} className="btn btn-sm btn-primary"><i className={"fa fa-arrow-left"}>&nbsp;</i></button>
+                </span>
+                <span>
+            {stu.name}
+            </span>
+            </div>
+                </div>;
+        }.bind(this));
+        return t;
     },
     render: function () {
         return <div>
@@ -95,24 +124,16 @@ var exports = React.createClass({
                     </table>
                 </div>
                 <div className="col-sm-2 column">
-                    <table className="table table-striped center">
-                        <thead>
-                            <tr>
-                                <th className="center">Students</th>
-                            </tr>
-                        </thead>
+                   <div className="panel-body row">
+                        <div className="panel-heading absent"><b>In Class</b></div>
                         {this.getStudentRowsInCurrentClass()}
-                    </table>
+                    </div>
                 </div>
                 <div className="col-sm-2 column">
-                    <table className="table table-striped center">
-                        <thead>
-                            <tr>
-                                <th className="center">Students Not In Class</th>
-                            </tr>
-                        </thead>
+                    <div className="panel-body row">
+                       <div className="panel-heading absent"><b>Not In Class</b></div>
                         {this.getStudentRowsNotInCurrentClass()}
-                    </table>
+                    </div>
                 </div>
             </div>
         </div>;
