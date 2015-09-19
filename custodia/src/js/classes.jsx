@@ -24,8 +24,11 @@ if (!Array.prototype.some) {
     };
 }
 
-var classStore = require('./classstore'),
-    actionCreator = require('./classactioncreator')
+var React = require('react'),
+    Router = require('react-router'),
+    classStore = require('./classstore'),
+    actionCreator = require('./classactioncreator'),
+    Link = Router.Link,
     studentStore = require('./StudentStore');
 
 var exports = React.createClass({
@@ -58,9 +61,6 @@ var exports = React.createClass({
     },
     classSelected: function (classval) {
         this.setState({selectedClass: classval});
-    },
-    createClass: function(){
-        actionCreator.createClass("test class");
     },
     classRows : function(){
         return this.state.classes.map(function (classval, i) {
@@ -137,6 +137,12 @@ var exports = React.createClass({
                        <div className="panel-heading absent"><b>Not In Class</b></div>
                         {this.getStudentRowsNotInCurrentClass()}
                     </div>
+                </div>
+                <div className="col-sm-2 column">
+                    <div className="panel-body row">
+                       <div className="panel-heading absent"><b>Create Class</b></div>
+                    </div>
+                    <Link to="createaclass">Create Class</Link>
                 </div>
             </div>
         </div>;

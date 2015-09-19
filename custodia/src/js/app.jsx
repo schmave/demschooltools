@@ -5,6 +5,7 @@ var React = require('react'),
     Flash = require('./flashnotification.jsx'),
     Student = require('./student.jsx'),
     CreateStudent = require('./createstudent.jsx'),
+    CreateAClass = require('./createaclass.jsx'),
     SwipeListing = require('./swipeslisting.jsx'),
     StudentReports = require('./studentreports.jsx'),
     Classes = require('./classes.jsx'),
@@ -37,6 +38,8 @@ var routes = (
         <Route name="student" path="students/:studentId/:day?" handler={Student} />
         <Route name="reports" path="reports" handler={StudentReports} />
         <Route name="classes" path="classes" handler={Classes} />
+        <Route name="createaclass" path="class/new" handler={CreateAClass} />
+
         <DefaultRoute handler={StudentTable}/>
     </Route>
 );
