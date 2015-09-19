@@ -101,7 +101,7 @@ var exports = React.createClass({
                                 <th className="center">Students</th>
                             </tr>
                         </thead>
-             {this.getStudentRowsInCurrentClass()}
+                        {this.getStudentRowsInCurrentClass()}
                     </table>
                 </div>
                 <div className="col-sm-2 column">
@@ -111,7 +111,7 @@ var exports = React.createClass({
                                 <th className="center">Students Not In Class</th>
                             </tr>
                         </thead>
-             {this.getStudentRowsNotInCurrentClass()}
+                        {this.getStudentRowsNotInCurrentClass()}
                     </table>
                 </div>
             </div>
