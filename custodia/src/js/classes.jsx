@@ -32,17 +32,10 @@ var exports = React.createClass({
     getInitialState: function () {
         return {classes:[], students: [], selectedClass: {students:[]}};
     },
-    componentDidMount: function () {
-        classStore.getClasses();
-        classStore.addChangeListener(this._onChange);
-    },
-    componentWillUnmount: function () {
-        classStore.removeChangeListener(this._onChange);
-    },
-    _onChange: function () {
-        var both = classStore.getClasses(),
-            classes = both ? both.classes : [],
-            students = both ? both.students : [];
+    setupState: function (state) {
+        var both = state,
+            classes = both.classes ? both.classes : [],
+            students = both.students ? both.students : [];
         var selectedClass = this.state.selectedClass;
         if(selectedClass) {
             var id = selectedClass._id,
@@ -50,8 +43,18 @@ var exports = React.createClass({
             selectedClass = (matching[0]) ? matching[0] : classes[0];
         }
         this.setState({classes: classes,
-                       selectedClass: (selectedClass)?selectedClass:null,
+                       selectedClass: (selectedClass)?selectedClass:{students:[]},
                        students: students});
+    },
+    componentDidMount: function () {
+        this.setupState(classStore.getClasses());
+        classStore.addChangeListener(this._onChange);
+    },
+    componentWillUnmount: function () {
+        classStore.removeChangeListener(this._onChange);
+    },
+    _onChange: function () {
+        this.setupState(classStore.getClasses());
     },
     classSelected: function (classval) {
         this.setState({selectedClass: classval});
