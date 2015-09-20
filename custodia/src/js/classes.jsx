@@ -64,11 +64,15 @@ var exports = React.createClass({
     },
     classRows : function(){
         return this.state.classes.map(function (classval, i) {
-            var boundClick = this.classSelected.bind(this, classval);
+            var boundClick = this.classSelected.bind(this, classval),
+            selected = (classval._id === this.state.selectedClass._id)  ? "selected" : "";
             return <tr key={classval._id}
                        onClick={boundClick}
-                       className={(classval._id === this.state.selectedClass._id)  ? "selected" : ""}>
-                <td>{classval.name}</td></tr>;
+                       className={selected}>
+                <td>
+                {classval.name}
+                <span className="margined badge badge-green">{classval.active ? "Active" : ""}</span>
+                </td></tr>;
         }.bind(this));
     },
     selectedStudentContains: function(stu) {
@@ -81,6 +85,9 @@ var exports = React.createClass({
     },
     addToClass:function(student) {
         actionCreator.addStudentToClass(student._id, this.state.selectedClass._id);
+    },
+    activateClass:function() {
+        actionCreator.activateClass(this.state.selectedClass._id);
     },
     getStudentRowsInCurrentClass : function(){
         var t = this.state.selectedClass.students.map(function (stu) {
@@ -114,6 +121,9 @@ var exports = React.createClass({
         return t;
     },
     render: function () {
+        var classActivateButton = (this.state.selectedClass.active !== true)
+            ? <span><button className="btn btn-sm btn-primary" onClick={this.activateClass}>Activate Class</button></span>
+            : <span></span>;
         return <div>
             <div className="row margined">
                 <div className="col-sm-2 column">
@@ -125,6 +135,12 @@ var exports = React.createClass({
                         </thead>
                        <tbody> {this.classRows()} </tbody>
                     </table>
+                </div>
+                <div className="col-sm-2 column">
+                    <div className="panel-body row">
+                       <div className="panel-heading absent"><b>Manage Class</b></div>
+                    </div>
+            {classActivateButton}
                 </div>
                 <div className="col-sm-2 column">
                    <div className="panel-body row">

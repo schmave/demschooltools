@@ -38,6 +38,15 @@ var exports = {
                 });
             });
     },
+    activateClass: function (classId) {
+        ajax.post('/classes/'+classId+'/activate', {})
+            .then(function (data) {
+                dispatcher.dispatch({
+                    type: constants.classEvents.CLASS_CHANGED,
+                    data: data
+                });
+            });
+    },
     addStudentToClass: function (studentId, classId) {
         ajax.post('/classes/'+classId+'/student/'+studentId+'/add', {})
             .then(function (data) {
