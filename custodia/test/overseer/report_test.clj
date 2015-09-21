@@ -14,21 +14,26 @@
             ))
 
 ;; TODO
-;; D make report only select students from class
+;; D CRUD classes and students to them
 ;; D migrate old reports to all have class
 ;; D migrate db to have a class
 ;; remove "absent" stats from student page, show total for all time
-;; get student list from active class only
+;; D get student list from active class only
 ;; remove "archive" feature
-;; D make reports have a class db
+;; make reports have a class db
+;; make report only select students from class
 ;; make reports have a class UI
 
 (deftest swipe-attendence-with-class-test
+  "Report is defined with a class, and will always use that even if its not active"
   (do (data/sample-db)
       (let [class-id (get-class-id-by-name "2014-2015")
+            other-class (data/make-class "test")
+            activated (db/activate-class (:_id other-class))
             today-str (dates/get-current-year-string (data/get-years))
             {sid :_id} (data/make-student "test")
             {sid2 :_id} (data/make-student "test2")]
+        (data/make-year )
         (data/add-student-to-class sid class-id)
         (add-3good-2short-swipes sid)
         (data/swipe-in sid2 _10-19)
