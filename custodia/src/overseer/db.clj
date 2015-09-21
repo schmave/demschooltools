@@ -137,11 +137,15 @@
 ;; (map :days (get-school-days "2014-06-01 2015-06-01"))
 ;; (get-student-page 7 "2014-07-23 2015-06-17")
 
-(defn get-student-page [id year]
-  (get-student-page-y @pgdb year id))
+(defn get-student-page
+  ([student-id year] (get-student-page student-id year (get-active-class)))
+  ([student-id year class-id]
+   (get-student-page-y @pgdb year student-id class-id)))
 
-(defn get-report [year-name]
-  (student-report-y @pgdb year-name))
+(defn get-report
+  ([year-name] (get-report year-name (get-active-class)))
+  ([year-name class-id]
+   (student-report-y @pgdb year-name class-id)))
 
 (defn get-swipes-in-year [year-name student-id]
   (swipes-in-year-y @pgdb year-name student-id))

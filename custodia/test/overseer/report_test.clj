@@ -25,7 +25,7 @@
 ;; make reports have a class UI
 
 (deftest swipe-attendence-with-class-test
-  "Report is defined with a class, and will always use that even if its not active"
+  "Report is defined without a class but will use the default one"
   (do (data/sample-db)
       (let [class-id (get-class-id-by-name "2014-2015")
             other-class (data/make-class "test")
@@ -33,13 +33,12 @@
             today-str (dates/get-current-year-string (data/get-years))
             {sid :_id} (data/make-student "test")
             {sid2 :_id} (data/make-student "test2")]
-        (data/make-year )
         (data/add-student-to-class sid class-id)
         (add-3good-2short-swipes sid)
         (data/swipe-in sid2 _10-19)
         (data/swipe-in sid2 _10-20)
 
-        (let [att (db/get-report today-str)
+        (let [att (db/get-report today-str class-id)
               student1 (first (filter #(= sid (:_id %)) att))
               student2 (first (filter #(= sid2 (:_id %)) att))]
           (testing "Student 1 Counts"

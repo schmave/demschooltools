@@ -19,6 +19,9 @@
   (run-tests 'overseer.web-test)
   )
 
+(defn get-school-days [year]
+  (map :days (filter :days (db/get-school-days year))))
+;; (get-school-days "2014-06-01 2015-06-01")
 
 (deftest rounder
   (testing "rounding!"
@@ -31,10 +34,10 @@
       (is (= 9 (t/day _10pm_ninth)))
       )))
 
-(deftest get-school-days
+(deftest get-school-days-test
   (data/sample-db true)
   (let [year (dates/get-current-year-string (data/get-years))
-        school-days (att/get-school-days year)]
+        school-days (get-school-days year)]
     (testing "School days"
       (is (= school-days [(dates/make-date-string (t/minus (t/now)
                                                            (t/days 2)))
@@ -268,7 +271,7 @@
             (is (= 4 (-> cls :students count)))))
 
         (testing "School year is list of days with swipes"
-          (is (= (att/get-school-days (dates/get-current-year-string (data/get-years)))
+          (is (= (get-school-days (dates/get-current-year-string (data/get-years)))
                  (list "2014-10-14" "2014-10-15" "2014-10-16" "2014-10-17" "2014-10-18" "2014-10-19" "2014-10-20"))))
         (testing "Student Front Page Count"
           (is (= (-> (att/get-student-list) count) 4)))
@@ -463,12 +466,10 @@
 
 (deftest excuse-today-is-today
   (do (data/sample-db)
-      (let [
-            dummy (data/make-student "dummy")
+      (let [dummy (data/make-student "dummy")
             s (data/make-student "test")
             sid (:_id s)
             today-string (dates/today-string)]
-
         (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
         (data/add-student-to-class (:_id dummy) (get-class-id-by-name "2014-2015"))
         (data/swipe-in (:_id dummy))

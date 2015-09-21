@@ -189,10 +189,6 @@
                     :last_swipe_date last-swipe-date
                     :days summed-days})))
 
-(defn get-school-days [year]
-  (map :days (filter :days (db/get-school-days year))))
-;; (get-school-days "2014-06-01 2015-06-01")
-
 (defn get-student-with-att
   ([id] (get-student-with-att id (get-current-year-string (data/get-years))))
   ([id year]

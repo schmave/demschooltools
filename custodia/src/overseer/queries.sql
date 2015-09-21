@@ -46,7 +46,7 @@ SELECT
                OR schooldays.olderdate > schooldays.days
                THEN 300 ELSE 330 END) as requiredmin
   , schooldays.days AS day
-    FROM school_days(:year_name) AS schooldays
+    FROM school_days(:year_name, :class_id) AS schooldays
     LEFT JOIN roundedswipes s
       ON (
        ((schooldays.days = date(s.in_time AT TIME ZONE 'America/New_York'))
@@ -132,7 +132,7 @@ FROM (
         , sum(extract(EPOCH FROM (s.out_time - s.in_time)::INTERVAL)/60) AS intervalmin
          , schooldays.days AS day
 
-      FROM school_days(:year_name) as schooldays
+      FROM school_days(:year_name, :class_id) as schooldays
       LEFT JOIN roundedswipes s
                 ON (schooldays.days = date(s.in_time AT TIME ZONE 'America/New_York')
                     AND schooldays.student_id = s.student_id)

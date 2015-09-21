@@ -85,7 +85,7 @@
     name varchar(255)
   );
 
-CREATE OR REPLACE FUNCTION school_days(year_name text)
+CREATE OR REPLACE FUNCTION school_days(year_name TEXT, class_id BIGINT)
   RETURNS TABLE (days date, student_id BIGINT, archived boolean, olderdate date) AS
 $func$
 
@@ -103,10 +103,9 @@ FROM (SELECT DISTINCT days2.days
                                          AND s.student_id = cXs.student_id)
          WHERE y.name = $1) days2
          ORDER BY days2.days) AS a
-JOIN years y ON (1=1)
-JOIN classes_X_students cXs ON (cXs.class_id = y.class_id)
+JOIN classes_X_students cXs ON (1=1)
 JOIN students s ON (s._id = cXs.student_id)
-WHERE y.name = $1
+WHERE cXs.class_id = $2
 $func$
 LANGUAGE sql;
   ")

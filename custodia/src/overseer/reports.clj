@@ -27,9 +27,9 @@
                           (let [made? (data/make-year from_date to_date)]
                             (resp/response {:made made?}))))
 
-  (GET "/reports/:year" [year]
+  (GET "/reports/:year/:class" [year class]
        (friend/authorize #{roles/admin}
-                         (resp/response (db/get-report year))))
+                         (resp/response (db/get-report year class))))
 
   )
 

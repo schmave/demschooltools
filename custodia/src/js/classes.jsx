@@ -121,6 +121,7 @@ var exports = React.createClass({
         return t;
     },
     render: function () {
+
         var classActivateButton = (this.state.selectedClass.active !== true)
             ? <span><button className="btn btn-sm btn-primary" onClick={this.activateClass}>Activate Class</button></span>
             : <span></span>;
