@@ -1,3 +1,8 @@
+ALTER TABLE years
+DROP COLUMN class_id;
+
+--;;
+
 DROP FUNCTION school_days(text);
 
 --;;
@@ -16,7 +21,8 @@ FROM (SELECT DISTINCT days2.days
          INNER JOIN years y
             ON ((s.out_time BETWEEN y.from_date AND y.to_date)
             OR (s.in_time BETWEEN y.from_date AND y.to_date))
-         JOIN classes_X_students cXs ON (cXs.class_id = y.class_id
+         JOIN classes c ON (c.active = true)
+         JOIN classes_X_students cXs ON (cXs.class_id = c._id
                                          AND s.student_id = cXs.student_id)
          WHERE y.name = $1) days2
          ORDER BY days2.days) AS a
@@ -25,3 +31,4 @@ JOIN students s ON (s._id = cXs.student_id)
 WHERE cXs.class_id = $2
 $func$
 LANGUAGE sql;
+

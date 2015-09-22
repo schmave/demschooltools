@@ -26,3 +26,13 @@ JOIN students s ON (s._id = cXs.student_id)
 WHERE y.name = $1
 $func$
 LANGUAGE sql;
+
+--;;
+
+ALTER TABLE years
+ADD COLUMN class_id BIGINT NOT NULL REFERENCES classes(_id) DEFAULT 1;
+
+--;;
+
+ALTER TABLE years
+ALTER COLUMN class_id DROP DEFAULT;

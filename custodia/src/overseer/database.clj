@@ -156,18 +156,15 @@
     (db/update! :students _id {:show_as_absent (:show_as_absent student)})
     student))
 
-(trace/deftrace make-year
-  ([from to] (make-year from to (db/get-active-class)))
-  ([from to class-id]
-   (let [from (f/parse from)
-         to (f/parse to)
-         name (str (f/unparse date-format from) " "  (f/unparse date-format to))]
-     (->> {:type :years
-           :class_id class-id
-           :from_date (make-timestamp from)
-           :to_date (make-timestamp to)
-           :name name}
-          db/persist!))))
+(trace/deftrace make-year [from to] 
+  (let [from (f/parse from)
+        to (f/parse to)
+        name (str (f/unparse date-format from) " "  (f/unparse date-format to))]
+    (->> {:type :years
+          :from_date (make-timestamp from)
+          :to_date (make-timestamp to)
+          :name name}
+         db/persist!)))
 
 ;; (sample-db true)
 (defn sample-db
