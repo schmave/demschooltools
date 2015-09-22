@@ -9,8 +9,8 @@ var studentDetails = {};
 
 var exports = Object.create(base);
 
-exports.getStudents = function(){
-    if(students){
+exports.getStudents = function(force){
+    if(!force && students){
         return students;
     }else{
         actionCreator.loadStudents();

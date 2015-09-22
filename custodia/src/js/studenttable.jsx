@@ -13,7 +13,7 @@ module.exports = React.createClass({
     },
     componentDidMount: function () {
         studentStore.addChangeListener(this._onChange);
-        this.setState({students: studentStore.getStudents()});
+        this.setState({students: studentStore.getStudents(true)});
     },
     componentWillUnmount: function () {
         studentStore.removeChangeListener(this._onChange);
