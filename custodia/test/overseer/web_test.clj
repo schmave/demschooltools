@@ -115,16 +115,6 @@
             )
           ))))
 
-(deftest archive-student
-  (do (data/sample-db)
-      (testing "starts 2" (is (= 2 (count (att/get-student-list false)))))
-      (let [s (data/make-student "test")
-            sid (:_id s)]
-        (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
-        (data/toggle-student-archived sid)
-        (testing "Archived missing" (is (= 2 (count (att/get-student-list false)))))
-        (testing "Archived missing" (is (= 3 (count (att/get-student-list true))))))))
-
 (def _801pm (today-at-utc 20 1))
 
 (deftest swipe-in-and-out-at-8pm-with-rounding-test

@@ -43,7 +43,6 @@ module.exports = React.createClass({
         var button = this.getSwipeButton(student, way);
             return <div className="panel panel-info student-listing col-sm-11">
             <div >{link}</div>
-                <span className="badge badge-red">{student.archived ? "A" : ""}</span>
                 <div className="attendance-button">
                     {button}
                 </div>

@@ -145,11 +145,6 @@
     (db/update! :students _id {:olderdate (:olderdate student)})
     student))
 
-(trace/deftrace toggle-student-archived [_id]
-  (if-let [student (first (get-students _id))]
-    (do (db/update! :students _id {:archived (not (:archived student))})
-        student)))
-
 (trace/deftrace toggle-student-absent [_id]
   (let [student (first (get-students _id))
         student (assoc student :show_as_absent (make-sqldate (str (t/now))))]

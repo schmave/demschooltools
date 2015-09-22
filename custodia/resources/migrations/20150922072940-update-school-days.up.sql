@@ -32,3 +32,6 @@ WHERE cXs.class_id = $2
 $func$
 LANGUAGE sql;
 
+--;;
+
+UPDATE students set archived=false where archived = true;
