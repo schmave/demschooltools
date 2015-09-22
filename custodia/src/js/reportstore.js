@@ -18,13 +18,13 @@ exports.getSchoolYears = function (force) {
     }
 };
 
-exports.getReport = function (year) {
+exports.getReport = function (year, classId) {
     if (!year) return [];
-    if (reports[year]) {
-        return reports[year];
-    } else if (!reports[year] || reports[year] === 'loading') {
-        reports[year] = 'loading';
-        actionCreator.loadReport(year);
+    if (reports[year+classId]) {
+        return reports[year+classId];
+    } else if (!reports[year+classId] || reports[year+classId] === 'loading') {
+        reports[year+classId] = 'loading';
+        actionCreator.loadReport(year, classId);
     }
     return [];
 };
@@ -43,7 +43,7 @@ dispatcher.register(function (action) {
             exports.emitChange();
             break;
         case constants.reportEvents.REPORT_LOADED:
-            reports[action.data.year] = action.data.report;
+            reports[action.data.year+action.data.classId] = action.data.report;
             exports.emitChange();
             break;
         case constants.reportEvents.PERIOD_CREATED:

@@ -1,4 +1,5 @@
 var reportStore = require('./reportstore'),
+    classStore = require('./classstore'),
     Modal = require('./modal.jsx'),
     DatePicker = require('react-widgets').DateTimePicker,
     actionCreator = require('./reportactioncreator'),
@@ -7,26 +8,38 @@ var reportStore = require('./reportstore'),
 // Table data as a list of array.
 var rows = [];
 
-function rowGetter(rowIndex) {
-    return rows[rowIndex];
-}
-
-function loadState() {
-
-}
-
 var exports = React.createClass({
     getInitialState: function () {
-        return {rows: rows};
+        return {rows: rows, classes: [],selectedClass: {students:[]}};
+    },
+    setupClassState: function (state) {
+        var both = state,
+            classes = both.classes ? both.classes : [];
+        var selectedClass = this.state.selectedClass;
+        if(selectedClass) {
+            var id = selectedClass._id,
+                matching = classes.filter(function(cls) {return cls._id === id;});
+            selectedClass = (matching[0]) ? matching[0] : classes[0];
+        }
+        this.setState({classes: classes,
+                       selectedClass: (selectedClass)?selectedClass:{students:[]},
+                       });
     },
     componentDidMount: function () {
+        this.setupClassState(classStore.getClasses());
         var years = reportStore.getSchoolYears();
         var currentYear = this.state.currentYear || (years ? years.current_year : null);
-        this.setState({years: years, currentYear: currentYear, rows: reportStore.getReport(currentYear)});
+        var currentClassId = this.state.selectedClass ? this.state.selectedClass._id : null;
+        this.setState({years: years, currentYear: currentYear, rows: reportStore.getReport(currentYear, currentClassId)});
         reportStore.addChangeListener(this._onChange);
+        classStore.addChangeListener(this._onClassChange);
     },
     componentWillUnmount: function () {
         reportStore.removeChangeListener(this._onChange);
+        classStore.removeChangeListener(this._onClassChange);
+    },
+    _onClassChange : function() {
+        this.setupClassState(classStore.getClasses());
     },
     _onChange: function () {
         this.refs.newSchoolYear.hide();
@@ -34,6 +47,13 @@ var exports = React.createClass({
         var yearExists = years.years.indexOf(this.state.currentYear) !== -1;
         var currentYear = (yearExists && this.state.currentYear) ? this.state.currentYear : years.current_year;
         this.setState({years: years, currentYear: currentYear, rows: reportStore.getReport(currentYear)});
+    },
+    classSelected: function (event) {
+        var currentClassId = event.target.value;
+        var report = reportStore.getReport(this.state.currentYear, currentClassId);
+        var matching = this.state.classes.filter(function(cls) {return cls._id == currentClassId;});
+        var selectedClass = (matching[0]) ? matching[0] : this.state.classes[0];
+        this.setState({selectedClass: selectedClass, rows: report});
     },
     yearSelected: function (event) {
         var currentYear = event.target.value;
@@ -49,6 +69,11 @@ var exports = React.createClass({
     render: function () {
         return <div>
             <div className="row margined">
+                 <select className="pull-left" onChange={this.classSelected} value={this.state.selectedClass._id}>
+            {this.state.classes ? this.state.classes.map(function (cls) {
+                return <option value={cls._id}>{cls.name}</option>;
+            }.bind(this)) : ""}
+                </select>
                 <select className="pull-left" onChange={this.yearSelected} value={this.state.currentYear}>
                     {this.state.years ? this.state.years.years.map(function (year) {
                         return <option

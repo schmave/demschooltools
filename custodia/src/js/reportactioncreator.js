@@ -15,13 +15,14 @@ var exports = {
             });
         });
     },
-    loadReport: function (year) {
+    loadReport: function (year, classId) {
+        var classId = (classId) ? '/' + classId : "";
         ajax.get({
-            url: '/reports/' + encodeURIComponent(year)
+            url: '/reports/' + encodeURIComponent(year) + classId
         }).then(function (data) {
             dispatcher.dispatch({
                 type: constants.reportEvents.REPORT_LOADED,
-                data: {year: year, report: data}
+                data: {year: year, report: data, classId: classId}
             });
         });
     },
