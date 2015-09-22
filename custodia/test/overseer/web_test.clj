@@ -19,10 +19,6 @@
   (run-tests 'overseer.web-test)
   )
 
-(defn get-school-days [year]
-  (map :days (filter :days (db/get-school-days year))))
-;; (get-school-days "2014-06-01 2015-06-01")
-
 (deftest rounder
   (testing "rounding!"
     (let [_1am_ninth (dates/round-swipe-time (t/date-time 2015 10 9 5))]
@@ -33,6 +29,10 @@
       (is (= 16 (t/hour _10pm_ninth)))
       (is (= 9 (t/day _10pm_ninth)))
       )))
+
+(defn get-school-days [year]
+  (map :days (filter :days (db/get-school-days year))))
+;; (get-school-days "2014-06-01 2015-06-01")
 
 (deftest get-school-days-test
   (data/sample-db true)
@@ -466,16 +466,18 @@
 
 (deftest excuse-today-is-today
   (do (data/sample-db)
-      (let [dummy (data/make-student "dummy")
-            s (data/make-student "test")
-            sid (:_id s)
+      (let [
+            {dummy-id :_id} (data/make-student "dummy")
+            {sid :_id} (data/make-student "test")
             today-string (dates/today-string)]
+
         (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
-        (data/add-student-to-class (:_id dummy) (get-class-id-by-name "2014-2015"))
-        (data/swipe-in (:_id dummy))
+        (data/add-student-to-class dummy-id (get-class-id-by-name "2014-2015"))
+        (data/swipe-in dummy-id)
         (data/excuse-date sid today-string)
         (let [att  (get-att sid)
               today (-> att :days first)]
+          (trace/trace att)
           (testing "First day is today string"
             (is (= (:day today) today-string)))
           (testing "Today is excused"

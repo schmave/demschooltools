@@ -189,6 +189,8 @@
                     :last_swipe_date last-swipe-date
                     :days summed-days})))
 
+
+
 (defn get-student-with-att
   ([id] (get-student-with-att id (get-current-year-string (data/get-years))))
   ([id year]

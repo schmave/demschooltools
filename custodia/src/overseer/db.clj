@@ -140,7 +140,7 @@
 (defn get-student-page
   ([student-id year] (get-student-page student-id year (get-active-class)))
   ([student-id year class-id]
-   (get-student-page-y @pgdb year student-id class-id)))
+   (get-student-page-y @pgdb year class-id student-id)))
 
 (defn get-report
   ([year-name] (get-report year-name (get-active-class)))
