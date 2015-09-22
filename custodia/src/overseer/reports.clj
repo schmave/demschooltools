@@ -29,7 +29,7 @@
   (GET "/reports/:year" [year]
        (friend/authorize #{roles/admin}
                          (resp/response (db/get-report year))))
-  (GET "/reports/:year/:class" [year class]
+  (GET "/reports/:year/:class" [year class :<< as-int]
        (friend/authorize #{roles/admin}
                          (resp/response (db/get-report year class))))
 

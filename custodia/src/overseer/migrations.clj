@@ -116,7 +116,7 @@ LANGUAGE sql;
    :db  (env :database-url)
    })
 
-;; (migratus/create (mconfig) "test")
+;; (migratus/create mconfig "UpdateSchoolDays")
 ;;(migratus/migrate mconfig)
 ;; (migratus/rollback mconfig)
 ;; (migratus/down mconfig 20150908103000 20150909070853 20150913085152)

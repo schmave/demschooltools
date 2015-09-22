@@ -26,27 +26,25 @@ var exports = React.createClass({
                        });
     },
     componentDidMount: function () {
-        this.setupClassState(classStore.getClasses());
-        var years = reportStore.getSchoolYears();
-        var currentYear = this.state.currentYear || (years ? years.current_year : null);
-        var currentClassId = this.state.selectedClass ? this.state.selectedClass._id : null;
-        this.setState({years: years, currentYear: currentYear, rows: reportStore.getReport(currentYear, currentClassId)});
-        reportStore.addChangeListener(this._onChange);
+        reportStore.addChangeListener(this._onReportChange);
         classStore.addChangeListener(this._onClassChange);
+        this.setupClassState(classStore.getClasses());
+        reportStore.getSchoolYears(true);
     },
     componentWillUnmount: function () {
-        reportStore.removeChangeListener(this._onChange);
+        reportStore.removeChangeListener(this._onReportChange);
         classStore.removeChangeListener(this._onClassChange);
     },
     _onClassChange : function() {
         this.setupClassState(classStore.getClasses());
     },
-    _onChange: function () {
+    _onReportChange: function () {
         this.refs.newSchoolYear.hide();
         var years = reportStore.getSchoolYears();
         var yearExists = years.years.indexOf(this.state.currentYear) !== -1;
         var currentYear = (yearExists && this.state.currentYear) ? this.state.currentYear : years.current_year;
-        this.setState({years: years, currentYear: currentYear, rows: reportStore.getReport(currentYear)});
+        var currentClassId = this.state.selectedClass ? this.state.selectedClass._id : null;
+        this.setState({years: years, currentYear: currentYear, rows: reportStore.getReport(currentYear, currentClassId)});
     },
     classSelected: function (event) {
         var currentClassId = event.target.value;
@@ -57,7 +55,8 @@ var exports = React.createClass({
     },
     yearSelected: function (event) {
         var currentYear = event.target.value;
-        var report = reportStore.getReport(currentYear);
+        var currentClassId = this.state.selectedClass ? this.state.selectedClass._id : null;
+        var report = reportStore.getReport(currentYear, currentClassId);
         this.setState({currentYear: currentYear, rows: report});
     },
     createPeriod: function(){

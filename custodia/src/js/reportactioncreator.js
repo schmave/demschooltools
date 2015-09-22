@@ -16,9 +16,9 @@ var exports = {
         });
     },
     loadReport: function (year, classId) {
-        var classId = (classId) ? '/' + classId : "";
+        var classRouteId = (classId) ? '/' + classId : "";
         ajax.get({
-            url: '/reports/' + encodeURIComponent(year) + classId
+            url: '/reports/' + encodeURIComponent(year) + classRouteId
         }).then(function (data) {
             dispatcher.dispatch({
                 type: constants.reportEvents.REPORT_LOADED,

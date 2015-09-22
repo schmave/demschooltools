@@ -19,7 +19,7 @@ exports.getSchoolYears = function (force) {
 };
 
 exports.getReport = function (year, classId) {
-    if (!year) return [];
+    if (!year || !classId) return [];
     if (reports[year+classId]) {
         return reports[year+classId];
     } else if (!reports[year+classId] || reports[year+classId] === 'loading') {
@@ -43,6 +43,7 @@ dispatcher.register(function (action) {
             exports.emitChange();
             break;
         case constants.reportEvents.REPORT_LOADED:
+            reports = {};
             reports[action.data.year+action.data.classId] = action.data.report;
             exports.emitChange();
             break;
