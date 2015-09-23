@@ -63,7 +63,6 @@
                           (student-page-response id)))
 
   (POST "/students/:id/swipe" [id :<< as-int direction  missing]
-        (trace/trace "Posted" [id direction missing])
         (friend/authorize #{roles/user}
                           (if (= direction "in")
                             (do (when missing (data/swipe-out id missing))
