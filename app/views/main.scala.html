@@ -22,7 +22,7 @@
 
   ga('create', 'UA-68148060-1', 'auto');
   @if(Application.getCurrentUser() != null) {
-      ga('set', '&uid', '@Application.getCurrentUser().id');
+      ga('set', String.fromCharCode(26) + 'uid', '@Application.getCurrentUser().id');
   }
   ga('send', 'pageview');
 window.onerror = function(message, file, line) {
