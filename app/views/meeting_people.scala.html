@@ -1,0 +1,12 @@
+@(people : List[PersonAtMeeting], role: Integer)
+
+@defining(people.filter(_.role == role)) { selected_people =>
+	@if( selected_people.size() > 0) {
+		@Html(selected_people.map { p =>
+			p.person.getDisplayName()
+		}.mkString(", "));
+	} else {
+		<i>None</i>;
+	}
+}
+

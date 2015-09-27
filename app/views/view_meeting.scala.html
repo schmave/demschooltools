@@ -16,20 +16,17 @@ Download @OrgConfig.get().str_res_plans</a></span></p>
 Edit minutes</a></p>
 
 
-<p><i>Committee</i>:
-@Html(
-	m.people_at_meeting.map { p =>
-		if(p.role == PersonAtMeeting.ROLE_JC_CHAIR) {
-			"<b>" + p.person.getDisplayName() + "</b>"
-		} else if(p.role == PersonAtMeeting.ROLE_JC_MEMBER) {
-			p.person.getDisplayName()
-		} else if(p.role == PersonAtMeeting.ROLE_JC_SUB) {
-			"(" + p.person.getDisplayName() + ")"
-		} else if(p.role == PersonAtMeeting.ROLE_NOTE_TAKER) {
-			p.person.getDisplayName() + "*"
-		}
-	}.mkString(", ")
-)
+<p><b>Chair:</b>
+@meeting_people(m.people_at_meeting, PersonAtMeeting.ROLE_JC_CHAIR)
+
+<b>Notetaker:</b>
+@meeting_people(m.people_at_meeting, PersonAtMeeting.ROLE_NOTE_TAKER)
+
+<b>Committee members: </b>
+@meeting_people(m.people_at_meeting, PersonAtMeeting.ROLE_JC_MEMBER)
+
+<b>Subs: </b>
+@meeting_people(m.people_at_meeting, PersonAtMeeting.ROLE_JC_SUB)
 </p>
 
 <h4>&nbsp;<br/>@OrgConfig.get().str_res_plans_cap</h4>
