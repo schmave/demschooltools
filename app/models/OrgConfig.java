@@ -80,7 +80,7 @@ class PhillyFreeSchool extends OrgConfig {
 
         str_manual_title = "Lawbook";
         str_manual_title_short = "Lawbook";
-        str_res_plan_short = "sentence";
+        str_res_plan_short = "Sentence";
         str_res_plan = "sentence";
         str_res_plan_cap = "Sentence";
         str_res_plans = "sentences";
@@ -108,7 +108,7 @@ class Fairhaven extends OrgConfig {
 
         str_manual_title = "Lawbook";
         str_manual_title_short = "Lawbook";
-        str_res_plan_short = "sentence";
+        str_res_plan_short = "Sentence";
         str_res_plan = "sentence";
         str_res_plan_cap = "Sentence";
         str_res_plans = "sentences";
@@ -135,7 +135,7 @@ class TheCircleSchool extends OrgConfig {
 
         str_manual_title = "Management Manual";
         str_manual_title_short = "Mgmt. Man.";
-        str_res_plan_short = "sentence";
+        str_res_plan_short = "Sentence";
         str_res_plan = "sentence";
         str_res_plan_cap = "Sentence";
         str_res_plans = "sentences";

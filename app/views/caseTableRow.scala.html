@@ -2,8 +2,8 @@
 
 @import helper._
 
-	<tr>
-	<td><h5>@if(show_links) {<a href="@routes.Application.viewMeeting(c.meeting.id)">}
+	<tr valign="top">
+	<td valign="top"><h5>@if(show_links) {<a href="@routes.Application.viewMeeting(c.meeting.id)">}
 		#@c.case_number @if(show_links) {</a>} @if( c.date_closed == null ) { (OPEN) }</h5>
 	<p>@if( c.date != null ) { @Application.formatDateShort(c.date)@if( !c.time.equals("") ){, @c.time}. }
 	@if(OrgConfig.get().track_writer) {
@@ -12,23 +12,30 @@
 				@tr.person.getDisplayName()}.mkString(", ").
 	}
 	<i>Location</i>: @if(!c.location.equals("")) {@c.location} else {unknown}.</p></td>
-	<td><p>
+	<td valign="top"><p>
 		<i>Testifiers</i>: @c.people_at_case.filter(_.role == PersonAtCase.ROLE_TESTIFIER).map {tr =>@tr.person.getDisplayName()}.mkString(", ")
 		</p><p>@c.findings</p></td>
-	<td>@if( c.charges.size() > 0) {
-		<ol>
+	<td valign="top">
+		@if( c.charges.size() > 0) {
+			<ol>
 			@for( charge <- c.charges ) {
-				@if( charge.person != null && charge.rule != null) {
-					<li>@charge.person.getDisplayName()&mdash;@charge.rule.getNumber() @charge.rule.title @if( !charge.severity.equals("")){(@charge.severity)}
-					@if( ! charge.plea.equals("Guilty") ) { <b>@charge.plea</b>. }</li>
-				} else {
-					<li>Charge missing person and/or rule.</li>
+				<li>
+				@if( charge.person != null) {
+					@charge.person.getDisplayName():
 				}
+				@if( charge.rule != null) {
+					@charge.rule.getNumber() @charge.rule.title.
+					@if( !charge.severity.equals("")){(@charge.severity)}
+					@if( !charge.plea.equals("Guilty") ) { <b>@charge.plea.</b> }
+				}
+				<b>@OrgConfig.get().str_res_plan_short:</b> @charge.resolution_plan.
+				</li>
 			}
-		</ol>
-	} else {
-		No charges.
-	}</td></tr>
+			</ol>
+		} else {
+			No charges.
+		}
+	</td></tr>
 
 	@for( charge <- c.charges ) {
 		@if( charge.referred_to_sm && charge.sm_decision == null) {
