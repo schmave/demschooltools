@@ -106,7 +106,7 @@ requirejs(['utils'], function(utils) {
                 "name": utils.displayName(data.person),
                 "case_number": data.the_case.case_number,
                 "day_of_week": data.dayOfWeek,
-                "rule_title": data.rule.title,
+                "rule_title": data.rule ? data.rule.title : "<No rule>",
                 "resolution_plan": data.resolution_plan,
                 "sm_decision": data.sm_decision,
                 })).children(":last-child");

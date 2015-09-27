@@ -157,6 +157,9 @@ define (['jquery', 'jquery-ui', 'jquery-form', 'handlebars', 'sorttable', 'boots
     };
 
     module.displayName = function(person) {
+        if (!person) {
+            return "<No name>";
+        }
     	if (person.displayName) {
     		return person.displayName;
     	} else {
