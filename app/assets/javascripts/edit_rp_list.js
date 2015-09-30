@@ -109,6 +109,7 @@ requirejs(['utils'], function(utils) {
                 "rule_title": data.rule ? data.rule.title : "<No rule>",
                 "resolution_plan": data.resolution_plan,
                 "sm_decision": data.sm_decision,
+                "referred_to_sm": data.referred_to_sm
                 })).children(":last-child");
 
         return new module.Charge(data, new_charge_el);

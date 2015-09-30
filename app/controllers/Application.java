@@ -274,10 +274,9 @@ public class Application extends Controller {
                 .fetch("rule.section.chapter")
                 .where()
                 .eq("person.organization", Organization.getByHost())
-                .ne("plea", "Not Guilty")
-                .ne("person", null)
-                .or(Expr.eq("referred_to_sm", false),
+                .or(Expr.ne("plea", "Not Guilty"),
                     Expr.isNotNull("sm_decision"))
+                .ne("person", null)
                 .eq("rp_complete", false)
                 .orderBy("id DESC").findList();
 
@@ -291,10 +290,7 @@ public class Application extends Controller {
                 .fetch("rule.section.chapter")
                 .where()
                 .eq("person.organization", Organization.getByHost())
-                .ne("plea", "Not Guilty")
                 .ne("person", null)
-                .or(Expr.eq("referred_to_sm", false),
-                    Expr.isNotNull("sm_decision"))
                 .eq("rp_complete", true)
                 .orderBy("rp_complete_date DESC")
                 .setMaxRows(25).findList();
@@ -577,16 +573,16 @@ public class Application extends Controller {
     public static Result getPersonHistory(Integer id) {
         Person p = Person.findByIdWithJCData(id);
         return ok(views.html.person_history.render(
-			p, 
-			new PersonHistory(p, false, getStartOfYear(), null), 
-			getLastWeekCharges(p), 
+			p,
+			new PersonHistory(p, false, getStartOfYear(), null),
+			getLastWeekCharges(p),
 			false));
     }
 
     public static Result viewPersonHistory(Integer id, Boolean redact_names, String start_date_str, String end_date_str) {
 		Date start_date = getStartOfYear();
 		Date end_date = null;
-		
+
         try {
             start_date = new SimpleDateFormat("yyyy-M-d").parse(start_date_str);
             end_date = new SimpleDateFormat("yyyy-M-d").parse(end_date_str);
@@ -595,24 +591,24 @@ public class Application extends Controller {
 
         Person p = Person.findByIdWithJCData(id);
         return ok(views.html.view_person_history.render(
-			p, 
-			new PersonHistory(p, true, start_date, end_date), 
-			getLastWeekCharges(p), 
+			p,
+			new PersonHistory(p, true, start_date, end_date),
+			getLastWeekCharges(p),
 			redact_names));
     }
 
     public static Result getRuleHistory(Integer id) {
         Entry r = Entry.findByIdWithJCData(id);
         return ok(views.html.rule_history.render(
-			r, 
-			new RuleHistory(r, false, getStartOfYear(), null), 
+			r,
+			new RuleHistory(r, false, getStartOfYear(), null),
 			getRecentResolutionPlans(r)));
     }
 
     public static Result viewRuleHistory(Integer id, String start_date_str, String end_date_str) {
 		Date start_date = getStartOfYear();
 		Date end_date = null;
-		
+
         try {
             start_date = new SimpleDateFormat("yyyy-M-d").parse(start_date_str);
             end_date = new SimpleDateFormat("yyyy-M-d").parse(end_date_str);
@@ -621,7 +617,7 @@ public class Application extends Controller {
 
         Entry r = Entry.findByIdWithJCData(id);
         return ok(views.html.view_rule_history.render(
-			r, 
+			r,
 			new RuleHistory(r, true, start_date, end_date),
 			getRecentResolutionPlans(r)));
     }

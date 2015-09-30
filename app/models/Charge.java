@@ -116,6 +116,10 @@ public class Charge extends Model implements Comparable<Charge> {
 
     public void updateSchoolMeetingDecision(String decision, Date date) {
         decision = decision.trim();
+        if (!decision.equals(this.sm_decision)) {
+            this.rp_complete = false;
+            this.rp_complete_date = null;
+        }
         if (!decision.equals("")) {
             this.sm_decision = decision;
         } else {

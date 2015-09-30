@@ -35,8 +35,12 @@ Print active @OrgConfig.get().str_res_plans</a></p>
 	<td class="name col-xs-1">{{name}}
 	<td class="col-xs-3">{{case_number}} ({{{day_of_week}}})<br/>{{rule_title}}
 	<td class="col-xs-7">{{resolution_plan}}
-    {{#if sm_decision}}
-	<b>[Sch. Mtg. decided:</b> {{sm_decision}}<b>]</b>
+    {{#if referred_to_sm}}
+        {{#if sm_decision}}
+            <b>[Sch. Mtg. decided:</b> {{sm_decision}}<b>]</b>
+        {{else}}
+            <br/><b>[Referred to Sch. Mtg.]</b>
+        {{/if}}
     {{/if}}
 	<td class="col-xs-1" style="vertical-align:middle;">
     <input class="no-print" type="checkbox"/>
