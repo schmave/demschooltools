@@ -136,11 +136,15 @@ a {
     /* } */
 }
 
-.student-listing-table .panel {
+.class-listing .panel,
+.student-listing-table .panel
+{
     margin: 0px 0px 0px 5px;
     overflow-x: hidden;
 }
 
+.in-class .attendance-button,
+.out-class .name,
 .not-in .student-listing .attendance-button,
 .absent .student-listing .attendance-button,
 .in .student-listing .attendance-button,
@@ -148,6 +152,8 @@ a {
     float: right;
 }
 
+.out-class .attendance-button,
+.in-class .name,
 .not-in .student-listing a,
 .absent .student-listing a,
 .in .student-listing a,

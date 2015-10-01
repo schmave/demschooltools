@@ -91,14 +91,12 @@ var exports = React.createClass({
     },
     getStudentRowsInCurrentClass : function(){
         var t = this.state.selectedClass.students.map(function (stu) {
-            return <div key={"t" + this.state.selectedClass._id + "-" + stu.student_id}  className="panel panel-info student-listing col-sm-11">
+            return <div key={"t" + this.state.selectedClass._id + "-" + stu.student_id}  className="in-class panel panel-info student-listing col-sm-11">
                 <div>
-                <span className="attendance-button">
-                {stu.name}
-            </span>
-                <span className="attendance-button">
-                <button onClick={this.deleteFromClass.bind(this, stu)} className="btn btn-sm btn-primary"><i className={"fa fa fa-arrow-right"}>&nbsp;</i></button>
-            </span>
+                <div className="name"> {stu.name} </div>
+                <div className="attendance-button">
+                <button onClick={this.deleteFromClass.bind(this, stu)} className="btn btn-sm btn-primary"><i className="fa fa-arrow-right">&nbsp;</i></button>
+            </div>
             </div>
                 </div>;
         }.bind(this));
@@ -107,26 +105,23 @@ var exports = React.createClass({
     getStudentRowsNotInCurrentClass : function() {
         var filtered = this.state.students.filter(this.selectedStudentContains);
         var t = filtered.map(function (stu) {
-            return <div key={"NOTCLASS-" + stu._id} className="panel panel-info student-listing col-sm-11">
+            return <div key={"NOTCLASS-" + stu._id} className="out-class panel panel-info student-listing col-sm-11">
                 <div>
-                <span className="attendance-button">
-                <button onClick={this.addToClass.bind(this, stu)} className="btn btn-sm btn-primary"><i className={"fa fa-arrow-left"}>&nbsp;</i></button>
-                </span>
-                <span>
-            {stu.name}
-            </span>
+                <div className="attendance-button">
+                <button onClick={this.addToClass.bind(this, stu)} className="btn btn-sm btn-primary"><i className="fa fa-arrow-left">&nbsp;</i></button>
+                </div>
+                <div className="name"> {stu.name} </div>
             </div>
                 </div>;
         }.bind(this));
         return t;
     },
     render: function () {
-
         var classActivateButton = (this.state.selectedClass.active !== true)
             ? <span><button className="btn btn-sm btn-primary" onClick={this.activateClass}>Activate Class</button></span>
             : <span></span>;
         return <div>
-            <div className="row margined">
+            <div className="row margined class-listing">
                 <div className="col-sm-2 column">
                     <table className="table table-striped center">
                         <thead>
@@ -138,28 +133,30 @@ var exports = React.createClass({
                     </table>
                 </div>
                 <div className="col-sm-2 column">
-                    <div className="panel-body row">
+                    <div className="panel panel-info">
                        <div className="panel-heading absent"><b>Manage Class</b></div>
+                       {classActivateButton}
                     </div>
-            {classActivateButton}
                 </div>
                 <div className="col-sm-2 column">
-                   <div className="panel-body row">
+                   <div className="panel panel-info">
                         <div className="panel-heading absent"><b>In Class</b></div>
                         {this.getStudentRowsInCurrentClass()}
                     </div>
                 </div>
                 <div className="col-sm-2 column">
-                    <div className="panel-body row">
+                    <div className="panel panel-info">
                        <div className="panel-heading absent"><b>Not In Class</b></div>
                         {this.getStudentRowsNotInCurrentClass()}
                     </div>
                 </div>
                 <div className="col-sm-2 column">
-                    <div className="panel-body row">
+                    <div className="panel panel-info">
                        <div className="panel-heading absent"><b>Create Class</b></div>
+                        <div className="out-class panel panel-info student-listing col-sm-11">
+                            <Link to="createaclass">Create Class</Link>
+                        </div>
                     </div>
-                    <Link to="createaclass">Create Class</Link>
                 </div>
             </div>
         </div>;

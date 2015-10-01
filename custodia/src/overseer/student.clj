@@ -39,11 +39,6 @@
                          (data/rename id name))
        (student-page-response id))
 
-  (POST "/students/:id/togglearchived" [id :<< as-int]
-        (friend/authorize #{roles/admin}
-                          (do (data/toggle-student-archived id)
-                              (student-page-response id))))
-
   (POST "/students/:id/togglehours" [id :<< as-int]
         (friend/authorize #{roles/admin}
                           (do (data/toggle-student-older id)
