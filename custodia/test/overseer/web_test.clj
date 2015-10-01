@@ -328,6 +328,24 @@
             (is (= true (:in_today att)))))))
   )
 
+(deftest swiped-in-yesterday-no-exception-test
+  (do (data/sample-db)
+      (let [s (data/make-student "test")
+            sid (:_id s)]
+
+        (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
+        (data/swipe-in sid  (t/minus (t/today-at 9 0 0) (t/days 1)))
+        (data/swipe-out 3  (f/unparse (f/formatters :date-time)
+                                      (t/minus (t/today-at 19 0 0) (t/days 1))))
+        )))
+
+(deftest swiped-out-without-in-no-exception-test
+  (do (data/sample-db)
+      (let [s (data/make-student "test")
+            sid (:_id s)]
+        (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
+        )))
+
 (deftest sign-out-without-in
   (do (data/sample-db)
       (let [s (data/make-student "test")

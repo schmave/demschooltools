@@ -23,6 +23,11 @@
 (defn parse-date-string [d]
   (f/parse date-format d))
 
+(defn cond-parse-date-string [d]
+  (if (instance? java.lang.String d)
+    (f/parse (f/formatters :date-time) d)
+    d))
+
 (defn make-date-string-without-timezone [d]
   (when d
     (if (instance? org.joda.time.DateTime d)
@@ -45,7 +50,7 @@
           list))
 
 (defn in-local-time-at-hour [date hour]
-  (let [local-date (f/parse (format-to-local date-format date))]
+  (let [local-date (f/parse (make-date-string date))]
     (l/to-local-date-time (t/date-time (t/year local-date) (t/month local-date) (t/day local-date) hour 0))))
 
 
@@ -54,7 +59,8 @@
 (defn four-pm [date] (in-local-time-at-hour date 16))
 
 (s/defn round-swipe-time :- DateTime [time]
-  (let [nine-am (nine-am time)
+  (let [time (cond-parse-date-string time)
+        nine-am (nine-am time)
         four-pm (four-pm time)
         time (if (t/after? time nine-am) time nine-am)
         time (if (t/before? time four-pm) time four-pm)]

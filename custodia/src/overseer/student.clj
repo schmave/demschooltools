@@ -13,9 +13,7 @@
 (defn student-page-response [student-id]
   (resp/response {:student (first (att/get-student-with-att student-id))}))
 
-(defn show-archived? []
-  (let [{roles :roles} (friend/current-authentication)]
-    (contains? roles roles/admin)))
+(defn show-archived? [] true)
 
 (defn get-student-list []
   (att/get-student-list (show-archived?)))
