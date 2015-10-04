@@ -81,7 +81,7 @@ public class Attendance extends Controller {
         }
 
         List<Person> all_people = new ArrayList<Person>(person_to_stats.keySet());
-        Collections.sort(all_people, Person.SORT_DISPLAY_NAME);
+        Collections.sort(all_people, Person.SORT_FIRST_NAME);
 
         List<String> all_codes = new ArrayList<String>(codes_map.keySet());
 
@@ -136,7 +136,7 @@ public class Attendance extends Controller {
                 all_people.add(p);
             }
         }
-        Collections.sort(all_people, Person.SORT_DISPLAY_NAME);
+        Collections.sort(all_people, Person.SORT_FIRST_NAME);
 
         Map<String, AttendanceCode> codes = getCodesMap();
 

@@ -228,7 +228,7 @@ public class Person extends Model implements Comparable<Person> {
             }
         }
     }
-	
+
 	public void trimSpaces() {
 		first_name = first_name.trim();
 		last_name = last_name.trim();
@@ -435,6 +435,17 @@ public class Person extends Model implements Comparable<Person> {
             @Override
             public int compare(Person o1, Person o2) {
                 return o1.getDisplayName().compareTo(o2.getDisplayName());
+            }
+        };
+
+    public static Comparator<Person> SORT_FIRST_NAME = new Comparator<Person>() {
+            @Override
+            public int compare(Person o1, Person o2) {
+                int first_name_compare = o1.first_name.compareTo(o2.first_name);
+                if (first_name_compare == 0) {
+                    return o1.last_name.compareTo(o2.first_name);
+                }
+                return first_name_compare;
             }
         };
 }
