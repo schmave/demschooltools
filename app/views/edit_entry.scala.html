@@ -60,34 +60,36 @@
 }
 
 <script type="text/javascript">
-last_content = $("#content").val();
-needs_render = true
+requirejs(['utils'], function(utils) {
+	last_content = $("#content").val();
+	needs_render = true
 
-$("#content").on(TEXT_AREA_EVENTS, contentChanged);
-window.setTimeout(renderContent, 3000);
+	$("#content").on(utils.TEXT_AREA_EVENTS, contentChanged);
+	window.setTimeout(renderContent, 3000);
 
-function contentChanged() {
-	new_content = $("#content").val();
-	if (new_content != last_content) {
-		last_content = new_content;
-		needs_render = true;
-    }
-}
+	function contentChanged() {
+		new_content = $("#content").val();
+		if (new_content != last_content) {
+			last_content = new_content;
+			needs_render = true;
+		}
+	}
 
-function renderContent() {
-    window.setTimeout(renderContent, 3000);
+	function renderContent() {
+		window.setTimeout(renderContent, 3000);
 
-    if (!needs_render) {
-		return;
-    }
-	needs_render = false;
+		if (!needs_render) {
+			return;
+		}
+		needs_render = false;
 
-	$.post("/renderMarkdown",
-           {markdown : last_content},
-		   function(data) {
-		$("#markdown_preview").html(data);
-	});
-}
+		$.post("/renderMarkdown",
+			   {markdown : last_content},
+			   function(data) {
+			$("#markdown_preview").html(data);
+		});
+	}
+});
 </script>
 
 }

@@ -5,8 +5,10 @@
 @main("JC " + OrgConfig.get().str_res_plans + " from " + Application.formatMeetingDate(m.date), "jc") {
 
 <script>
-$(function() {
-	print();
+requirejs(['utils'], function() {
+	$(function() {
+		print();
+	});
 });
 </script>
 
