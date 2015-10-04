@@ -28,6 +28,7 @@ public class ApplicationEditing extends Controller {
             .eq("organization", Organization.getByHost())
             .eq("date", new Date()).findUnique();
         if (the_meeting == null) {
+            CachedPage.remove(Application.CACHE_INDEX);
             the_meeting = Meeting.create(new Date());
             the_meeting.save();
         }
@@ -211,6 +212,7 @@ public class ApplicationEditing extends Controller {
 
     @Secured.Auth(UserRole.ROLE_EDIT_RECENT_JC)
     public static Result saveSchoolMeetingDecisions() {
+        CachedPage.remove(Application.CACHE_INDEX);
         Map<String, String[]> form_data = request().body().asFormUrlEncoded();
 
         Integer charge_id = Integer.parseInt(form_data.get("charge_id")[0]);

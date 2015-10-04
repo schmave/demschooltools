@@ -120,12 +120,19 @@ public class Charge extends Model implements Comparable<Charge> {
             this.rp_complete = false;
             this.rp_complete_date = null;
         }
+
+        this.sm_decision_date = date;
+
         if (!decision.equals("")) {
             this.sm_decision = decision;
+            // If a decision is recorded, assume it was done today
+            // if not otherwise specified.
+            if (this.sm_decision_date == null) {
+                this.sm_decision_date = new Date();
+            }
         } else {
             this.sm_decision = null;
         }
-        this.sm_decision_date = date;
     }
 
     public void setRPComplete(boolean complete) {
