@@ -793,6 +793,7 @@ public class Application extends Controller {
         List<Charge> charges = Charge.find.where().eq("person", p)
                 .eq("rule_id", ruleId)
                 .lt("the_case.meeting.date", now)
+                .ge("the_case.meeting.date", Application.getStartOfYear())
                 .orderBy("the_case.meeting.date DESC")
                 .findList();
 
