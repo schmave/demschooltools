@@ -25,8 +25,12 @@
       ga('set', String.fromCharCode(26) + 'uid', '@Application.getCurrentUser().id');
   }
   ga('send', 'pageview');
-window.onerror = function(message, file, line) {
-  ga('send', 'event', "Global", "Exception", file + "(" + line + "): " + message)
+window.onerror = function(message, file, line, col, error) {
+    var info = file + "(" + line + "): " + info;
+    if (error && error.stack) {
+		info += "; stack=" + error.stack;
+    }
+    ga('send', 'event', "Global", "Exception", info)
 }
 
 </script>
