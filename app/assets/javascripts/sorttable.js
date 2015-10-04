@@ -41,6 +41,10 @@ sorttable = {
   },
 
   makeSortable: function(table) {
+       // ESM
+       if (!table.tBodies || !table.tBodies[0] || !table.tBodies[0].rows) {
+           return;
+       }
     if (table.getElementsByTagName('thead').length == 0) {
       // table doesn't have a tHead. Since it should have, create one and
       // put the first table row in it.
