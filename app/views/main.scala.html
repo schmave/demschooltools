@@ -27,8 +27,10 @@
   ga('send', 'pageview');
 window.onerror = function(message, file, line, col, error) {
     var info = file + "(" + line + "): " + info;
-    if (error && error.stack) {
-		info += "; stack=" + error.stack;
+    if (error) {
+        if (error.stack) {
+            info += "; stack=" + error.stack;
+        }
     }
     ga('send', 'event', "Global", "Exception", info)
 }
