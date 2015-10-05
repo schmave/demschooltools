@@ -20,17 +20,17 @@ T :
 	@echo sjswatch
 
 # example of ls and echo
-hello : 
+hello :
 	ls
 	@echo Done
 
-deploy-test : 
+deploy-test :
 	git push $(web-test-git) master
 
-sql-philly : 
+sql-philly :
 	heroku pg:psql --app shining-overseer
 
-sql-philly-backup : 
+sql-philly-backup :
 	heroku pg:backups capture
 	curl -o latest.dump `heroku pg:backups public-url -a shining-overseer`
 
@@ -38,7 +38,7 @@ sql-backup-local-restore :
 	pg_restore --verbose --clean --no-acl --no-owner -h localhost -U postgres -d swipes latest.dump
 
 deploy-philly :
-	./prod-deploy.sh $(philly-prod-git) 
+	./prod-deploy.sh $(philly-prod-git)
 
 start :
 	lein run -m overseer.web

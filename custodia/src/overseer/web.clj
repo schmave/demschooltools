@@ -38,7 +38,8 @@
 
 
 (defroutes app
-  (GET "/" [] (friend/authenticated (io/resource "index.html")))
+  (GET "/" []
+       (friend/authenticated (io/resource "index.html")))
   (GET "/resetdb" []
        (friend/authorize #{roles/super} ;; (db/reset-db)
                          (resp/redirect "/")))
@@ -55,7 +56,7 @@
   (GET "/users/login" req
        (io/resource "login.html"))
   (GET "/users/logout" req
-       (friend/logout* (resp/redirect (str (:context req) "/"))))
+       (friend/logout* (resp/redirect (trace/trace "Logout: " "/users/login"))))
   (GET "/users/is-user" req
        (friend/authorize #{roles/user} "You're a user!"))
   (GET "/users/is-admin" req
