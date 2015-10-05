@@ -49,7 +49,7 @@
 "]))
 
 (defn reset-db []
-  (drop-all-tables) 
+  (drop-all-tables)
   (create-all-tables))
 
 (defn delete! [doc]

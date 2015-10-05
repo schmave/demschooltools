@@ -31,7 +31,7 @@ sql-philly :
 	heroku pg:psql --app shining-overseer
 
 sql-philly-backup :
-	heroku pg:backups capture
+	heroku pg:backups capture --app shining-overseer
 	curl -o latest.dump `heroku pg:backups public-url -a shining-overseer`
 
 sql-backup-local-restore :
