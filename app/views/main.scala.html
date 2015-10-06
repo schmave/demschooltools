@@ -26,7 +26,7 @@
   }
   ga('send', 'pageview');
 window.onerror = function(message, file, line, col, error) {
-    var info = file + "(" + line + "): " + info;
+    var info = file + "(" + line + "): " + message;
     if (error) {
         if (error.stack) {
             info += "; stack=" + error.stack;
