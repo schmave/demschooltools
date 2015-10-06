@@ -1,4 +1,4 @@
-var userStore = require('./userstore')
+var userStore = require('./userstore'),
 React = require('react');
 
 var exports = React.createClass({

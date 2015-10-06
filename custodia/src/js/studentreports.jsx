@@ -3,6 +3,7 @@ var reportStore = require('./reportstore'),
     Modal = require('./modal.jsx'),
     DatePicker = require('react-widgets').DateTimePicker,
     actionCreator = require('./reportactioncreator'),
+    React = require('react'),
     Griddle = require('griddle-react');
 
 // Table data as a list of array.

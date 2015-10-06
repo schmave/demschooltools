@@ -65,10 +65,10 @@ minify :
 	browserify -t reactify -t uglifyify ./src/js/app.jsx -o ./resources/public/js/gen/app.js
 
 js :
-	browserify -t reactify ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
+	browserify -t babelify ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
 
 watch :
-	watchify -v -t reactify ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
+	watchify -v -t babelify ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
 
 sjs :
 	nodejs /usr/local/bin/browserify -t reactify ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug

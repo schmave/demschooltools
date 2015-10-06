@@ -44,7 +44,7 @@ var routes = (
     </Route>
 );
 
-router = Router.create(routes);
+var router = Router.create(routes);
 routerContainer.set(router);
 router.run(function (Handler) {
     React.render(<Handler />, document.body);
