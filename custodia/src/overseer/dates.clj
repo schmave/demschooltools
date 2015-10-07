@@ -51,8 +51,8 @@
 
 (defn in-local-time-at-hour [date hour]
   (let [local-date (f/parse (make-date-string date))]
-    (l/to-local-date-time (t/date-time (t/year local-date) (t/month local-date) (t/day local-date) hour 0))))
-
+    (-> (t/date-time (t/year local-date) (t/month local-date) (t/day local-date) hour 0)
+        (t/from-time-zone local-time-zone-id))))
 
 (defn nine-am [date] (in-local-time-at-hour date 9))
 

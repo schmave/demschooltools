@@ -71,7 +71,7 @@ watch :
 	watchify -v -t babelify ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
 
 sjs :
-	nodejs /usr/local/bin/browserify -t reactify ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
+	nodejs /usr/local/bin/browserify -t babelify ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
 
 sjswatch :
-	nodejs /usr/local/bin/watchify -t reactify ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
+	nodejs /usr/local/bin/watchify -t babelify ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
