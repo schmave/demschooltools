@@ -138,7 +138,7 @@ var exports = React.createClass({
     },
     showingStudentName: function () {
         return <div className="col-sm-8">
-                  <span onClick={this.toggleEdit}>
+                  <span id="edit-name" onClick={this.toggleEdit}>
                     <h1 className="pull-left">{this.state.student.name}</h1>
                     <span className="fa fa-pencil edit-student"></span>
                   </span>
@@ -152,9 +152,9 @@ var exports = React.createClass({
                 <input ref="name" className="form-control" id="studentName"
                        defaultValue={this.state.student.name}/>
                 <button onClick={this.saveChange} className="btn btn-success">
-                    <i className="fa fa-check icon-large">Save</i></button>
+                    <i id="save-name" className="fa fa-check icon-large">Save</i></button>
                 <button onClick={this.toggleEdit} className="btn btn-danger">
-                    <i className="fa fa-times"></i></button>
+                    <i id="cancel-name" className="fa fa-times"></i></button>
             </div>
             <div>
                 <div><input type="radio" name="older" onChange={this.toggleHours}

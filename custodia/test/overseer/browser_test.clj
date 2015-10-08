@@ -27,16 +27,16 @@
   (submit "#password"))
 
 (defn assert-student-in-in-col [id]
-  (wait-until #(visible? (str "#in-col a#student-" id))))
+  (wait-until #(visible? (str ".in a#student-" id))))
 
 (defn assert-student-in-abs-col [id]
-  (wait-until #(visible? (str "#absent-col a#student-" id))))
+  (wait-until #(visible? (str ".absent a#student-" id))))
 
 (defn assert-student-in-out-col [id]
-  (wait-until #(visible? (str "#out-col a#student-" id))))
+  (wait-until #(visible? (str ".out a#student-" id))))
 
 (defn assert-student-in-not-in-col [id]
-  (wait-until #(visible? (str "#not-in-col a#student-" id))))
+  (wait-until #(visible? (str ".not-in a#student-" id))))
 
 (defn sign-in [] (clickw "#sign-in"))
 (defn sign-out [] (clickw "#sign-out"))
@@ -54,7 +54,7 @@
   (input-text "#new-name" "newname")
   (clickw "#save-name")
 
-  (clickw "#back-main-page")
+  (clickw "#home")
   (assert-student-in-not-in-col 1)
   (testing (is (= "newname" (text "a#student-1"))))
 
@@ -65,7 +65,7 @@
   (input-text "#new-name" "othername")
   (clickw "#cancel-name")
 
-  (clickw "#back-main-page")
+  (clickw "#home")
   (assert-student-in-not-in-col 1)
   (testing (is (= "newname" (text "a#student-1"))))
 
