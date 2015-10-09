@@ -5,10 +5,12 @@
             [overseer.database :as data]
             [clj-webdriver.taxi :refer :all]))
 
+(defn student-id [id] (str "a#student-" id))
+
 (defn click-student [id]
   (Thread/sleep 500)
-  (wait-until #(visible? (str "a#student-" id)))
-  (click (str "a#student-" id))
+  (wait-until #(visible? (student-id id)))
+  (click (student-id id))
   (wait-until #(visible? "#studenttotalrow"))
   )
 
@@ -27,16 +29,16 @@
   (submit "#password"))
 
 (defn assert-student-in-in-col [id]
-  (wait-until #(visible? (str ".in a#student-" id))))
+  (wait-until #(visible? (str ".in " (student-id id)))))
 
 (defn assert-student-in-abs-col [id]
-  (wait-until #(visible? (str ".absent a#student-" id))))
+  (wait-until #(visible? (str ".absent " (student-id id)))))
 
 (defn assert-student-in-out-col [id]
-  (wait-until #(visible? (str ".out a#student-" id))))
+  (wait-until #(visible? (str ".out " (student-id id)))))
 
 (defn assert-student-in-not-in-col [id]
-  (wait-until #(visible? (str ".not-in a#student-" id))))
+  (wait-until #(visible? (str ".not-in " (student-id id)))))
 
 (defn sign-in [] (clickw "#sign-in"))
 (defn sign-out [] (clickw "#sign-out"))
@@ -56,7 +58,7 @@
 
   (clickw "#home")
   (assert-student-in-not-in-col 1)
-  (testing (is (= "newname" (text "a#student-1"))))
+  (testing (is (= "newname" (text (student-id 1)))))
 
   ;; Edit then cancel name
   (click-student 1)
@@ -67,7 +69,7 @@
 
   (clickw "#home")
   (assert-student-in-not-in-col 1)
-  (testing (is (= "newname" (text "a#student-1"))))
+  (testing (is (= "newname" (text (student-id 1)))))
 
   (quit))
 
