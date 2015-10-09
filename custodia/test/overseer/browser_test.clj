@@ -8,10 +8,10 @@
 (defn student-id [id] (str "a#student-" id))
 
 (defn click-student [id]
-  (Thread/sleep 500)
+  ;; (Thread/sleep 500)
   (wait-until #(visible? (student-id id)))
   (click (student-id id))
-  (wait-until #(visible? "#studenttotalrow"))
+  (wait-until #(visible? "#studentName"))
   )
 
 (defn submit-missing []
@@ -43,17 +43,21 @@
 (defn sign-in [] (clickw "#sign-in"))
 (defn sign-out [] (clickw "#sign-out"))
 
+(defn login-to-site []
+  (do (set-driver! {:browser :firefox} "http://localhost:5000/users/login")
+      (login)))
+
+
 (deftest ^:integration edit-name
-  (do (data/sample-db)
-      (set-driver! {:browser :firefox} "http://localhost:5000/login")
-      (login))
+  (data/sample-db)
+  (login-to-site)
 
   ;; Edit then save name
   (click-student 1)
-  (wait-until #(visible? "#studenttotalrow"))
+  ;;(wait-until #(visible? "#studenttotalrow"))
   (clickw "#edit-name")
-  (clear "#new-name")
-  (input-text "#new-name" "newname")
+  (clear "#studentName")
+  (input-text "#studentName" "newname")
   (clickw "#save-name")
 
   (clickw "#home")
@@ -63,8 +67,8 @@
   ;; Edit then cancel name
   (click-student 1)
   (clickw "#edit-name")
-  (clear "#new-name")
-  (input-text "#new-name" "othername")
+  (clear "#studentName")
+  (input-text "#studentName" "othername")
   (clickw "#cancel-name")
 
   (clickw "#home")
@@ -74,9 +78,8 @@
   (quit))
 
 (deftest ^:integration filling-in-missing-swipes
-  (do (data/sample-db)
-      (set-driver! {:browser :firefox} "http://localhost:5000/login")
-      (login))
+  (data/sample-db)
+  (login-to-site)
 
   (data/swipe-in 1 (t/minus (t/now) (t/days 1)))
   (assert-student-in-not-in-col 1)
@@ -90,9 +93,8 @@
   (quit))
 
 (deftest ^:integration overrides-and-excuses
-  (do (data/sample-db)
-      (set-driver! {:browser :firefox} "http://localhost:5000/login")
-      (login))
+  (data/sample-db)
+  (login-to-site)
 
   (assert-student-in-not-in-col 1)
   (click-student 1)
@@ -129,9 +131,8 @@
 ;; Vigilia
 
 (deftest ^:integration absent-column
-  (do (sh/sh "make" "load-aliased-dump")
-      (set-driver! {:browser :firefox} "http://localhost:5000/login")
-      (login))
+  (sh/sh "make" "load-aliased-dump")
+  (login-to-site)
 
   (assert-student-in-not-in-col 7)
   (click-student 7)
@@ -158,9 +159,9 @@
   (quit))
 
 (deftest ^:integration missing-out-swipe
-  (do (sh/sh "make" "load-aliased-dump")
-      (set-driver! {:browser :firefox} "http://localhost:5000/login")
-      (login))
+  (sh/sh "make" "load-aliased-dump")
+  (login-to-site)
+  
   (click-student 40)
   (testing "student page totals"
     (is (= (text "#studenttotalrow")

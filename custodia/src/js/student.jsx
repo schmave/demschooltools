@@ -137,7 +137,7 @@ var exports = React.createClass({
         actionCreator.toggleHours(this.state.student._id);
     },
     showingStudentName: function () {
-        return <div className="col-sm-8">
+        return <div className="col-sm-8" id="studentName">
                   <span id="edit-name" onClick={this.toggleEdit}>
                     <h1 className="pull-left">{this.state.student.name}</h1>
                     <span className="fa fa-pencil edit-student"></span>
@@ -148,13 +148,13 @@ var exports = React.createClass({
     },
     editingStudentName: function () {
         return <div className="col-sm-8 row">
-            <div className="col-sm-3">
+            <div className="col-sm-3" id="nameRow">
                 <input ref="name" className="form-control" id="studentName"
                        defaultValue={this.state.student.name}/>
                 <button onClick={this.saveChange} className="btn btn-success">
                     <i id="save-name" className="fa fa-check icon-large">Save</i></button>
-                <button onClick={this.toggleEdit} className="btn btn-danger">
-                    <i id="cancel-name" className="fa fa-times"></i></button>
+                <button id="cancel-name" onClick={this.toggleEdit} className="btn btn-danger">
+                    <i className="fa fa-times"></i></button>
             </div>
             <div>
                 <div><input type="radio" name="older" onChange={this.toggleHours}
