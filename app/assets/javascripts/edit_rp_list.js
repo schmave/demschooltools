@@ -49,10 +49,10 @@ requirejs(['utils'], function(utils) {
                 // We expect an empty response. If it is not empty, the user
                 // probably got redirected to the login page.
                 if (data !== "") {
-                    if (!login_message_shown) {
+                    if (!module.login_message_shown) {
                         alert("Your change was not saved. You may not be logged in.");
                     }
-                    login_message_shown = true;
+                    module.login_message_shown = true;
                     return;
                 }
                 charge.el.addClass("rp-moved");
