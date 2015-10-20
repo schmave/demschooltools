@@ -77,12 +77,12 @@ var exports = React.createClass({
         var buttons = [];
 
         if (!this.studentInToday() || this.state.student.last_swipe_type === 'out') {
-            buttons.push(<button type="button" onClick={this.signIn}
+            buttons.push(<button type="button" id="sign-in" onClick={this.signIn}
                                  className="btn btn-sm btn-info margined">Sign In
             </button>);
         }
         if (!this.studentInToday() || this.state.student.last_swipe_type === 'in') {
-            buttons.push(<button type="button" onClick={this.signOut}
+            buttons.push(<button type="button" id="sign-out" onClick={this.signOut}
                                  className="btn btn-sm btn-info margined">Sign Out
             </button>);
         }
@@ -196,7 +196,7 @@ var exports = React.createClass({
                                             calendar={false}/>
                         </div>
                         <div className="form-group" style={{marginLeft: '2em'}}>
-                            <button className="btn btn-sm btn-primary" onClick={this.swipeWithMissing}>
+                            <button id="submit-missing" className="btn btn-sm btn-primary" onClick={this.swipeWithMissing}>
                                 Sign {this.state.missingdirection} </button>
                         </div>
                     </form>
