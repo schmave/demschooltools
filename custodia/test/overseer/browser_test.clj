@@ -42,11 +42,21 @@
 
 (defn sign-in [] (clickw "#sign-in"))
 (defn sign-out [] (clickw "#sign-out"))
+(defn override [] (clickw "#override"))
 
 (defn login-to-site []
   (do (set-driver! {:browser :firefox} "http://localhost:5000/users/login")
       (login)))
 
+(defn assert-total-header [att abs ex over short id]
+  (testing (str "student page totals: " id)
+    (wait-until #(visible? "#hd-attended"))
+    (is (= (text "#hd-attended") (str "Attended: " att)))
+    (is (= (text "#hd-absent") (str "Absent: " abs)))
+    (is (= (text "#hd-excused") (str "Excused: " ex)))
+    (is (= (text "#hd-given") (str "Gave Attendance: " over)))
+    (is (= (text "#hd-short") (str "Short: " short))))
+    )
 
 (deftest ^:integration edit-name
   (data/sample-db)
@@ -54,7 +64,7 @@
 
   ;; Edit then save name
   (click-student 1)
-  ;;(wait-until #(visible? "#studenttotalrow"))
+
   (clickw "#edit-name")
   (clear "#studentName")
   (input-text "#studentName" "newname")
@@ -93,6 +103,7 @@
 
 (deftest ^:integration overrides-and-excuses
   (data/sample-db)
+
   (login-to-site)
 
   (assert-student-in-not-in-col 1)
@@ -101,27 +112,24 @@
   (assert-student-in-in-col 1)
 
   (click-student 2)
-  (clickw ".override")
-  (accept)
-  (testing "student page totals"
-    (is (= (text "#studenttotalrow")
-           "Attended: 1 - Absent: 0 - Excused: 0 - Overrides: 1 - Short: 0")))
+  (override)
 
-  (clickw "#back-main-page")
+  (assert-total-header 1 0 0 1 0 "first")
+
+  (clickw "#home")
+
   (assert-student-in-not-in-col 2)
 
   (click-student 1)
-  (testing "student page totals"
-    (is (= (text "#studenttotalrow")
-           "Attended: 0 - Absent: 0 - Excused: 0 - Overrides: 0 - Short: 1")))
+
+  (assert-total-header 0 0 0 0 1 "second")
+
   (sign-out)
   (assert-student-in-out-col 1)
   (click-student 1)
 
-  (wait-until #(visible? ".override"))
-  (testing "student page totals"
-    (is (= (text "#studenttotalrow")
-           "Attended: 0 - Absent: 0 - Excused: 0 - Overrides: 0 - Short: 1")))
+
+  (assert-total-header 0 0 0 0 1 "third")
 
   (quit))
 
@@ -137,7 +145,7 @@
   (click-student 7)
   (clickw "#absent-button")
   (accept)
-  (clickw "#back-main-page")
+  (clickw "#home")
   (assert-student-in-abs-col 7)
 
   (assert-student-in-not-in-col 8)

@@ -73,7 +73,7 @@ var exports = React.createClass({
             {this.state.day && !this.state.day.override && !this.state.day.excused ? <div className="action-buttons">
                 <div className="pull-left">
                   <AdminItem>
-                    <button type="button" onClick={this.override} className="btn btn-sm btn-info">
+                    <button type="button" id="override" onClick={this.override} className="btn btn-sm btn-info">
                         Give Attendence
                     </button>
                   </AdminItem>

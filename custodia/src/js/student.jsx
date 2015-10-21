@@ -209,14 +209,14 @@ var exports = React.createClass({
                             <div className="row">
                                 {!this.state.editing ? this.showingStudentName() : this.editingStudentName()}
                                 <div className="col-sm-4">
-                                    <div className="col-sm-6"><b>Attended:</b> {this.state.student.total_days}</div>
-                                    <div className="col-sm-6"><b>Absent:</b> {this.state.student.total_abs}</div>
-                                    <div className="col-sm-6"><b>Excused:</b> {this.state.student.total_excused}</div>
-                                    <div className="col-sm-6"><b>Gave
+                                    <div id="hd-attended" className="col-sm-6"><b>Attended:</b> {this.state.student.total_days}</div>
+                                    <div id="hd-absent" className="col-sm-6"><b>Absent:</b> {this.state.student.total_abs}</div>
+                                    <div id="hd-excused" className="col-sm-6"><b>Excused:</b> {this.state.student.total_excused}</div>
+                                    <div id="hd-given" className="col-sm-6"><b>Gave
                                         Attendance:</b> {this.state.student.total_overrides}
                                     </div>
-                                    <div className="col-sm-6"><b>Short:</b> {this.state.student.total_short}</div>
-                                    <div className="col-sm-6"><b>Required
+                                    <div id="hd-short" className="col-sm-6"><b>Short:</b> {this.state.student.total_short}</div>
+                                    <div id="hd-required-mins" className="col-sm-6"><b>Required
                                         Minutes:</b> {this.state.student.olderdate ? 330 : 300}</div>
                                 </div>
                             </div>
