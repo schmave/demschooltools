@@ -10,6 +10,7 @@ T :
 	@echo drop-tables
 	@echo load-massive-dump
 	@echo load-aliased-dump
+	@echo backup-aliased-dump "for backing up a database after migrating"
 	@echo sql-backup-local-restore
 	@echo "sql-philly-backup - make backup of philly prod database"
 	@echo "start - start a running overseer site"
@@ -52,14 +53,21 @@ unit-test :
 webdriver-test :
 	lein test :integration
 
+# createuser jack -U postgres
+# grant all privileges on database swipes to jack;
+# ALTER USER jack WITH SUPERUSER;
+# insert into classes_X_students (class_id, student_id) select 1, _id from students;
 drop-tables :
-	psql -d swipes -c "DROP FUNCTION IF EXISTS school_days(text); DROP VIEW IF EXISTS roundedswipes; drop table if exists session_store; drop table if exists students; drop table if exists excuses; drop table if exists overrides; drop table if exists years; drop table if exists swipes;"
+	psql -d swipes -c " DROP TABLE IF EXISTS years; DROP TABLE IF EXISTS classes_X_students; DROP TABLE IF EXISTS classes; DROP FUNCTION IF EXISTS school_days(text); DROP VIEW IF EXISTS roundedswipes; DROP TABLE IF EXISTS swipes; DROP TABLE IF EXISTS session_store; DROP TABLE IF EXISTS students; DROP TABLE IF EXISTS excuses; DROP TABLE IF EXISTS overrides; "
 
 load-massive-dump : drop-tables
 	psql swipes < massive.dump
 
 load-aliased-dump : drop-tables
-	psql swipes < dumps/migrated-students-aliased.dump
+	psql swipes < dumps/updated-students-aliased.dump
+
+backup-aliased-dump:
+  pg_dump swipes > dumps/updated-students-aliased.dump
 
 minify :
 	browserify -t reactify -t uglifyify ./src/js/app.jsx -o ./resources/public/js/gen/app.js

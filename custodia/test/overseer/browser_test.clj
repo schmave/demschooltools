@@ -61,7 +61,6 @@
 (deftest ^:integration edit-name
   (data/sample-db)
   (login-to-site)
-
   ;; Edit then save name
   (click-student 1)
 
@@ -114,7 +113,7 @@
   (click-student 2)
   (override)
 
-  (assert-total-header 1 0 0 1 0 "first")
+  (assert-total-header 1 0 0 1 0 "Empty Bug!!")
 
   (clickw "#home")
 
