@@ -66,8 +66,8 @@ load-massive-dump : drop-tables
 load-aliased-dump : drop-tables
 	psql swipes < dumps/updated-students-aliased.dump
 
-backup-aliased-dump:
-  pg_dump swipes > dumps/updated-students-aliased.dump
+backup-aliased-dump :
+	pg_dump swipes > dumps/updated-students-aliased.dump
 
 minify :
 	browserify -t reactify -t uglifyify ./src/js/app.jsx -o ./resources/public/js/gen/app.js

@@ -5,7 +5,7 @@
             [overseer.database :as data]
             [clj-webdriver.taxi :refer :all]))
 
-(defn student-id [id] (str "a#student-" id))
+(defn student-id [id] (str "#student-" id))
 
 (defn click-student [id]
   ;; (Thread/sleep 500)
@@ -102,7 +102,6 @@
 
 (deftest ^:integration overrides-and-excuses
   (data/sample-db)
-
   (login-to-site)
 
   (assert-student-in-not-in-col 1)
@@ -112,24 +111,18 @@
 
   (click-student 2)
   (override)
-
   (assert-total-header 1 0 0 1 0 "Empty Bug!!")
 
   (clickw "#home")
-
   (assert-student-in-not-in-col 2)
-
   (click-student 1)
-
   (assert-total-header 0 0 0 0 1 "second")
 
   (sign-out)
   (assert-student-in-out-col 1)
   (click-student 1)
 
-
   (assert-total-header 0 0 0 0 1 "third")
-
   (quit))
 
 ;; Parousia
