@@ -9,9 +9,10 @@
 
 (defn click-student [id]
   ;; (Thread/sleep 500)
-  (wait-until #(visible? (student-id id)))
-  (click (student-id id))
-  (wait-until #(visible? "#studentName"))
+  (wait-until #(visible? (student-id id)) 1000)
+  #_(click (student-id id))
+  (to (str "http://localhost:5000/#/students/" id "/"))
+  #_(wait-until #(visible? "#studentName") 10000)
   )
 
 (defn submit-missing []
@@ -111,7 +112,8 @@
 
   (click-student 2)
   (override)
-  (assert-total-header 1 0 0 1 0 "Empty Bug!!")
+  (Thread/sleep 200)
+  (assert-total-header 1 0 0 1 0 "First")
 
   (clickw "#home")
   (assert-student-in-not-in-col 2)
@@ -136,14 +138,14 @@
   (assert-student-in-not-in-col 7)
   (click-student 7)
   (clickw "#absent-button")
-  (accept)
+  #_(accept)
   (clickw "#home")
   (assert-student-in-abs-col 7)
 
   (assert-student-in-not-in-col 8)
   (click-student 8)
   (sign-in)
-  (submit-missing)
+  #_(submit-missing)
   (assert-student-in-in-col 8)
   (click-student 8)
   (sign-out)
@@ -162,7 +164,9 @@
   (login-to-site)
   
   (click-student 40)
-  (testing "student page totals"
+
+  (assert-total-header 9 3 0 0 2 "")
+  #_(testing "student page totals"
     (is (= (text "#studenttotalrow")
            "Attended: 9 - Absent: 3 - Excused: 0 - Overrides: 0 - Short: 2"
            )))
@@ -171,7 +175,8 @@
 
   (click-student 40)
 
-  (testing "student page totals"
+  (assert-total-header 9 3 0 0 3 "")
+  #_(testing "student page totals"
     (is (= (text "#studenttotalrow")
            "Attended: 9 - Absent: 3 - Excused: 0 - Overrides: 0 - Short: 3"
            )))

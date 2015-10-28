@@ -87,7 +87,7 @@ var exports = React.createClass({
             </button>);
         }
         if (!this.state.student.absent_today) {
-            buttons.push(<button type="button" onClick={this.markAbsent}
+            buttons.push(<button id="absent-button" type="button" onClick={this.markAbsent}
                                  className="btn btn-sm btn-info margined">Absent
             </button>);
         }
