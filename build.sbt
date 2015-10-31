@@ -21,14 +21,12 @@ pipelineStages := Seq(rjs, digest, gzip)
 
 RjsKeys.mainModule := "utils"
 
-resolvers += Resolver.sonatypeRepo("public")
-
 libraryDependencies ++= Seq(
   javaJdbc,
   evolutions,
   cache,
   "org.postgresql" % "postgresql" % "9.4-1201-jdbc41",
-  "com.feth"      %% "play-authenticate" % "0.7.0-SNAPSHOT",
+  "com.feth"      %% "play-authenticate" % "0.7.0",
   "com.typesafe.play" %% "play-mailer" % "3.0.1",
   "com.ecwid" % "ecwid-mailchimp" % "2.0.1.0",
   "org.xhtmlrenderer" % "flying-saucer-pdf" % "9.0.7",
