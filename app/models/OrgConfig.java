@@ -23,6 +23,7 @@ public class OrgConfig {
     public boolean use_minor_referrals = false;
     public boolean show_checkbox_for_res_plan = true;
     public boolean track_writer = true;
+    public boolean filter_no_charge_cases = false;
 
     public Organization org;
 
@@ -144,6 +145,7 @@ class TheCircleSchool extends OrgConfig {
 
         use_minor_referrals = true;
         track_writer = false;
+        filter_no_charge_cases = true;
 
         OrgConfig.register(name, this);
     }

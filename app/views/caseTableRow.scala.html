@@ -13,7 +13,12 @@
 	}
 	<i>Location</i>: @if(!c.location.equals("")) {@c.location} else {unknown}.</p></td>
 	<td valign="top"><p>
-		<i>Testifiers</i>: @c.people_at_case.filter(_.role == PersonAtCase.ROLE_TESTIFIER).map {tr =>@tr.person.getDisplayName()}.mkString(", ")
+		<i>Testifiers</i>:
+		@if( c.charges.size() == 0 && OrgConfig.get().filter_no_charge_cases ) {
+			@c.people_at_case.filter(_.role == PersonAtCase.ROLE_TESTIFIER).size() people testified.
+		} else {
+			@c.people_at_case.filter(_.role == PersonAtCase.ROLE_TESTIFIER).map {tr =>@tr.person.getDisplayName()}.mkString(", ")
+		}
 		</p><p>@c.findings</p></td>
 	<td valign="top">
 		@if( c.charges.size() > 0) {
