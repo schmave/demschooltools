@@ -1,0 +1,51 @@
+@(person : Person, days : List[AttendanceDay], weeks: Map[Date, AttendanceWeek],
+  codes : List[String], codes_map : Map[String, AttendanceCode])
+
+@import helper._
+
+@main(person.first_name + " attendance", "attendance") {
+
+<h3>@person.first_name @person.last_name attendance</h3>
+<table class="attendance-view table" style="max-width: 700px;">
+<thead><th width=100>Date</th>
+	<th width=50>Hours</th>
+	<th width=75>Arrival time</th>
+	<th width=75>Departure time</th>
+	<th width=100>Absence code</th>
+	<th width=100>Extra hours (weekly)</th>
+	</thead>
+
+@for( d <- days ) {
+<tr><td>@Application.formatDayOfWeek(d.day) @Application.formatDateShort(d.day)</td>
+	<td>@if(d.start_time != null && d.end_time != null) {
+			@Attendance.format(d.getHours())
+		} else {
+			--
+		}
+	</td>
+	<td>@Attendance.formatTime(d.start_time)</td>
+	<td>@Attendance.formatTime(d.end_time)</td>
+	@if(d.code != null) {
+		@if(codes_map.contains(d.code)) {
+			<td class="attendance-code" style="background-color:@codes_map.get(d.code).color">
+				@codes_map.get(d.code).description
+			</td>
+		} else {
+			<td>Unknown/missing code</td>
+		}
+	} else {
+		<td>
+			@if(d.start_time == null || d.end_time == null) { -- }
+		</td>
+	}
+	<td>
+		@if( weeks.contains(d.day) ) {
+			@Attendance.format(weeks.get(d.day).extra_hours)
+		}
+	</td>
+}
+
+</table>
+
+}
+

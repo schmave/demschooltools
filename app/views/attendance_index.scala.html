@@ -20,7 +20,7 @@
 	</thead>
 
 @for( p <- people ) {
-<tr><td>@p.first_name @p.last_name</td>
+<tr><td><a href="@routes.Attendance.viewPersonReport(p.person_id)">@p.first_name @p.last_name</a></td>
 	@for( code <- codes ) {
 		@if( person_to_stats.get(p).absence_counts.containsKey(codes_map.get(code)) ) {
 			<td>@person_to_stats.get(p).absence_counts.get(codes_map.get(code))</td>

@@ -94,6 +94,7 @@ GET	/attendance/editCode/:id   controllers.Attendance.editCode(id : Integer)
 POST	/attendance/saveCode      controllers.Attendance.saveCode()
 GET     /attendance/codes         controllers.Attendance.viewCodes()
 GET     /attendance/download      controllers.Attendance.download()
+GET     /attendance/forPerson/:id controllers.Attendance.viewPersonReport(id : Integer)
 
 POST    /attendance/createPersonWeek  controllers.Attendance.createPersonWeek(person_id : Integer, monday : String)
 POST    /attendance/deletePersonWeek  controllers.Attendance.deletePersonWeek(person_id : Integer, monday : String)

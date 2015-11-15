@@ -41,12 +41,13 @@ public class Attendance extends Controller {
         Map<Person, AttendanceStats> person_to_stats =
             new HashMap<Person, AttendanceStats>();
 
-        Map<String, AttendanceCode> codes_map = getCodesMap();
+        Map<String, AttendanceCode> codes_map = getCodesMap(false);
 
         List<AttendanceDay> days =
             AttendanceDay.find.where()
                 .eq("person.organization", OrgConfig.get().org)
                 .ge("day", Application.getStartOfYear())
+                .le("day", new GregorianCalendar().getTime())
                 .findList();
 
         for (AttendanceDay day : days) {
@@ -138,7 +139,7 @@ public class Attendance extends Controller {
         }
         Collections.sort(all_people, Person.SORT_FIRST_NAME);
 
-        Map<String, AttendanceCode> codes = getCodesMap();
+        Map<String, AttendanceCode> codes = getCodesMap(do_view);
 
         if (do_view) {
             return ok(views.html.attendance_week.render(
@@ -160,6 +161,41 @@ public class Attendance extends Controller {
                 person_to_days,
                 person_to_week));
         }
+    }
+
+    public static Result viewPersonReport(Integer person_id) {
+        Person p = Person.findById(person_id);
+
+        Calendar now = new GregorianCalendar();
+
+        List<AttendanceDay> days =
+            AttendanceDay.find.where()
+                .eq("person", p)
+                .ge("day", Application.getStartOfYear())
+                .le("day", now.getTime())
+                .order("day ASC")
+                .findList();
+
+        List<AttendanceWeek> weeks =
+            AttendanceWeek.find.where()
+                .eq("person", p)
+                .ge("monday", Application.getStartOfYear())
+                .le("monday", now.getTime())
+                .findList();
+
+        Map<String, AttendanceCode> codes = getCodesMap(true);
+
+        Map<Date, AttendanceWeek> day_to_week = new HashMap<Date, AttendanceWeek>();
+        for (AttendanceWeek w : weeks) {
+            day_to_week.put(w.monday, w);
+        }
+
+        return ok(views.html.attendance_person.render(
+            p,
+            days,
+            day_to_week,
+            new ArrayList<String>(codes.keySet()),
+            codes));
     }
 
     public static Result createPersonWeek(int person_id, String monday) {
@@ -310,11 +346,18 @@ public class Attendance extends Controller {
         return ok();
     }
 
-    public static Map<String, AttendanceCode> getCodesMap() {
+    public static Map<String, AttendanceCode> getCodesMap(boolean include_no_school) {
         Map<String, AttendanceCode> codes = new HashMap<String, AttendanceCode>();
 
         for (AttendanceCode code : AttendanceCode.all(OrgConfig.get().org)) {
             codes.put(code.code, code);
+        }
+
+        if (include_no_school) {
+            AttendanceCode no_school = new AttendanceCode();
+            no_school.description = "No school";
+            no_school.color = "#cc9";
+            codes.put("_NS_", no_school);
         }
 
         return codes;
