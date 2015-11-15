@@ -15,7 +15,9 @@
 	<td valign="top"><p>
 		<i>Testifiers</i>:
 		@if( c.charges.size() == 0 && OrgConfig.get().filter_no_charge_cases ) {
-			@c.people_at_case.filter(_.role == PersonAtCase.ROLE_TESTIFIER).size() people testified.
+			@defining( c.people_at_case.filter(_.role == PersonAtCase.ROLE_TESTIFIER).size() ) { num =>
+				@num @if(num==1) { person } else { people } testified.
+			}
 		} else {
 			@c.people_at_case.filter(_.role == PersonAtCase.ROLE_TESTIFIER).map {tr =>@tr.person.getDisplayName()}.mkString(", ")
 		}
