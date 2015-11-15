@@ -5,10 +5,12 @@
 @main("History of " + r.getNumber() + " " + r.title, "jc") {
 
 <script type="text/javascript">
-$(function() {
-	$("table.sortable").each(function (i) {
-        sorttable.init();
-		sorttable.innerSortFunction.apply($(this).find("th")[1], []);
+requirejs(['utils'], function(utils) {
+	$(function() {
+		$("table.sortable").each(function (i) {
+			sorttable.init();
+			sorttable.innerSortFunction.apply($(this).find("th")[1], []);
+		});
 	});
 });
 </script>
