@@ -145,7 +145,7 @@
   (assert-student-in-not-in-col 8)
   (click-student 8)
   (sign-in)
-  #_(submit-missing)
+  (submit-missing)
   (assert-student-in-in-col 8)
   (click-student 8)
   (sign-out)
@@ -162,38 +162,26 @@
 (deftest ^:integration missing-out-swipe
   (sh/sh "make" "load-aliased-dump")
   (login-to-site)
-  
+
   (click-student 40)
 
-  (assert-total-header 9 3 0 0 2 "")
-  #_(testing "student page totals"
-    (is (= (text "#studenttotalrow")
-           "Attended: 9 - Absent: 3 - Excused: 0 - Overrides: 0 - Short: 2"
-           )))
+  (assert-total-header 9 4 0 0 2 "")
   (sign-in)
   (submit-missing)
 
   (click-student 40)
 
-  (assert-total-header 9 3 0 0 3 "")
-  #_(testing "student page totals"
-    (is (= (text "#studenttotalrow")
-           "Attended: 9 - Absent: 3 - Excused: 0 - Overrides: 0 - Short: 3"
-           )))
+  (assert-total-header 9 4 0 0 3 "")
   (quit))
 
 (deftest ^:integration loggin-in
-  (do (sh/sh "make" "load-aliased-dump")
-      (set-driver! {:browser :firefox} "http://localhost:5000/login")
-      (login))
+  (sh/sh "make" "load-aliased-dump")
+  (login-to-site)
+
   (click-student 7)
-  (testing "student page totals"
-    (is (= (text "#studenttotalrow")
-           "Attended: 3 - Absent: 4 - Excused: 7 - Overrides: 0 - Short: 5")))
+  (assert-total-header 3 5 7 0 5 "")
 
   (sign-in)
   (click-student 7)
-  (testing "student page totals"
-    (is (= (text "#studenttotalrow")
-           "Attended: 3 - Absent: 4 - Excused: 7 - Overrides: 0 - Short: 6")))
+  (assert-total-header 3 5 7 0 6 "")
   (quit))
