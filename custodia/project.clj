@@ -42,14 +42,17 @@
             [lein-cljsbuild "1.1.1"]
             [environ/environ.lein "0.2.1"]]
   :resource-paths ["resources" "target/cljsbuild"]
+  :clean-targets ^{:protect false} [:target-path [:cljsbuild :builds :app :compiler :output-dir]
+                                    [:cljsbuild :builds :app :compiler :output-to]]
   :cljsbuild
-  {:builds {:app {:source-paths ["src-cljs"]
-                  :compiler {:output-to     "target/cljsbuild/public/js/app.js"
-                             :output-dir    "target/cljsbuild/public/js/out"
-                             :source-map    true
-                             :externs       ["react/externs/react.js"]
-                             :optimizations :none
-                             :pretty-print  true}}}}
+  {:builds
+   {:app
+    {:source-paths ["src-cljs"]
+     :compiler
+     {:output-to "target/cljsbuild/public/js/app.js"
+      :output-dir "target/cljsbuild/public/js/out"
+      :externs ["react/externs/react.js"]
+      :pretty-print true}}}}
   :test-selectors {:default (or (complement :integration)
                                 (complement :performance))
                    :integration :integration
@@ -57,14 +60,13 @@
   :hooks [environ.leiningen.hooks]
   ;; :main overseer.web
   :uberjar-name "overseer-standalone.jar"
-  :profiles {:test {:dependencies [[clj-webdriver "0.6.1"]]}
-         :debug { :jvm-opts ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"]}
+  :profiles {:debug { :jvm-opts ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"]}
              :production {:env {:production true}}
              :uberjar {:main overseer.web :aot :all
                        :hooks ['leiningen.cljsbuild]
                        :cljsbuild {:jar true
-                                   :builds {:app
-                                            {:compiler
-                                             {:optimizations :advanced
-                                              :pretty-print false}}}}
+                                   :builds {:app {:source-paths ["env/prod/cljs"]
+                                                  :compiler
+                                                  {:optimizations :advanced
+                                                   :pretty-print false}}}}
                        }})

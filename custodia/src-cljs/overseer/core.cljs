@@ -92,7 +92,7 @@
   (GET (str js/context "/docs") {:handler #(session/put! :docs %)}))
 
 (defn mount-components []
-  (reagent/render [#'navbar] (.getElementById js/document "navbar"))
+  ;; (reagent/render [#'navbar] (.getElementById js/document "navbar"))
   (reagent/render [#'page] (.getElementById js/document "app")))
 
 (defn init! []
