@@ -8,7 +8,8 @@
                  [ring/ring-jetty-adapter "1.2.2"]
                  [org.clojure/tools.nrepl "0.2.7"]
                  [org.clojure/data.json "0.2.5"]
-                 [com.cemerick/friend "0.2.1" :exclusions [xerces/xercesImpl]]
+                 [com.cemerick/friend "0.2.1" :exclusions [xerces/xercesImpl
+                                                           org.clojure/core.cache]]
                  [org.clojure/tools.trace "0.7.8"]
                  [yesql "0.4.2"]
                  [environ "1.0.0"]

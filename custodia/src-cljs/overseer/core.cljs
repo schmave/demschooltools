@@ -46,7 +46,7 @@
 (defn home-page []
   [:div.container
    [:div.jumbotron
-    [:h1 "Welcome to guestbook"]
+    [:h1 "Wome to guestbook"]
     [:p "Time to start building your site!"]
     [:p [:a.btn.btn-primary.btn-lg {:href "http://luminusweb.net"} "Learn more »"]]]
    [:div.row
