@@ -4,6 +4,7 @@
             [secretary.core :as secretary :include-macros true]
             [goog.events :as events]
             [goog.history.EventType :as EventType]
+            [overseer.studenttable :as st]
             [markdown.core :refer [md->html]]
             [ajax.core :refer [GET POST]])
   (:import goog.History))
@@ -59,7 +60,7 @@
               {:__html (md->html docs)}}]]])])
 
 (def pages
-  {:home #'home-page
+  {:home #'st/student-table-page
    :about #'about-page})
 
 (defn page []
