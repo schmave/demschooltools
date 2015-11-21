@@ -10,7 +10,13 @@
 
 (def state (atom nil))
 
-(defn get-student [student way]
+#_(defn get-swipe-button [student way]
+  (let [button-icon (if (= way "out") "fa-arrow-left" "fa-arrow-right")]
+    (if (is-signing-in student)
+      [:button.btn.btn-sm.btn-primary {:onClick (signIn student)}
+       [:i.fa]])))
+
+#_(defn get-student [student way]
   (let [button ]
     [:div.panel.panel-info.student-listing.col-sm-11
      [:div
@@ -21,7 +27,8 @@
      [:div.attendance-button (getSwipeButton student way)]]))
 
 (defn student-table-page []
-  (let [absentCol []
+  [:div "test"]
+  #_(let [absentCol []
         notYetInCol []
         inCol []
         outCol []]

@@ -44,12 +44,17 @@
     [:div.col-md-12
      "this is the story of guestbook... work in progress"]]])
 
+(def value (atom nil))
+
 (defn home-page []
   [:div.container
    [:div.jumbotron
     [:h1 "Wome to guestbook"]
     [:p "Time to start building your site!"]
-    [:p [:a.btn.btn-primary.btn-lg {:href "http://luminusweb.net"} "Learn more »"]]]
+    [:input {:type "text" :value @value
+             :on-change #(reset! value (-> % .-target .-value))
+             }]
+    [:p [:a.btn.btn-primary.btn-lg {:href "http://luminusweb.net"} "this that »"]]]
    [:div.row
     [:div.col-md-12
      [:h2 "Welcome to ClojureScript"]]]
@@ -60,7 +65,7 @@
               {:__html (md->html docs)}}]]])])
 
 (def pages
-  {:home #'st/student-table-page
+  {:home #'home-page
    :about #'about-page})
 
 (defn page []
