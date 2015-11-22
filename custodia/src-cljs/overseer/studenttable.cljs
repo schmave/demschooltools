@@ -8,30 +8,62 @@
             [ajax.core :refer [GET POST]])
   )
 
-(def state (atom nil))
+(defn get-today [] "2013-03-02")
 
-#_(defn get-swipe-button [student way]
-  (let [button-icon (if (= way "out") "fa-arrow-left" "fa-arrow-right")]
+(def state (atom {:students []}))
+
+(defn is-signing-in [s]
+  (or (not= nil (:last_swipe_date s))
+      (= "out" (:last_swipe_type s))
+      (not= (:last_swipe_date s) (get-today))))
+
+(defn get-swipe-button [student way]
+  (let [button-icon (if (= way "out") "fa-arrow-left" "fa-arrow-right")
+        button-text [:i {:class (str "fa" button-icon)} "&nbsp;"]]
     (if (is-signing-in student)
       [:button.btn.btn-sm.btn-primary {:onClick (signIn student)}
-       [:i.fa]])))
+       button-text]
+      [:button.btn.btn-sm.btn-info {:onClick (signOut student)}
+       button-text])))
 
-#_(defn get-student [student way]
-  (let [button ]
-    [:div.panel.panel-info.student-listing.col-sm-11
-     [:div
-      [:Link {:to "student"
-              :params {:studentId student._id}
-              :id (str "student-" + student._id)}
-       student.name]]
-     [:div.attendance-button (getSwipeButton student way)]]))
+(defn make-student-by [pred way students]
+  (->> students
+       (filter pred)
+       (map (fn [student]
+              [:div.panel.panel-info.student-listing.col-sm-11
+               [:div
+                [:Link {:to "student"
+                        :params {:studentId student._id}
+                        :id (str "student-" + student._id)}
+                 student.name]]
+               [:div.attendance-button (getSwipeButton student way)]]))))
+
+(defn get-absents [students]
+  (make-student-by (fn [s] (and (not (:in_today s))
+                                (:absent_today s)))
+                   "absent" students))
+
+(defn get-not-yet-in [students]
+  (make-student-by (fn [s] (and (not (:in_today s))
+                                (not (:absent_today s))))
+                   "notYetIn" students))
+
+(defn get-in [students]
+  (make-student-by (fn [s] (and (:in_today s)
+                                (= "in" (:last_swipe_type s))))
+                   "in" students))
+
+(defn get-out [students]
+  (make-student-by (fn [s] (and (:in_today s)
+                                (= "out" (:last_swipe_type s))))
+                   "out" students))
 
 (defn student-table-page []
-  [:div "test"]
-  #_(let [absentCol []
-        notYetInCol []
-        inCol []
-        outCol []]
+  (let [students (sort-by :name (:students @state))
+        absentCol (get-absents students)
+        notYetInCol (get-not-yet-in students)
+        inCol (get-in students)
+        outCol (get-out students)]
       [:div.row.student-listing-table
             [:div.col-sm-3.column
                 [:div.panel.panel-info.absent
