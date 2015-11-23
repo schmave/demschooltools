@@ -65,7 +65,7 @@
               {:__html (md->html docs)}}]]])])
 
 (def pages
-  {:home #'home-page
+  {:home #'st/student-table-page
    :about #'about-page})
 
 (defn page []
