@@ -25,35 +25,11 @@
                  [org.clojure/tools.trace "0.7.8"]
                  [com.ashafa/clutch "0.4.0"]
 
-                 ;; cljs
-                 [org.clojure/clojurescript "1.7.170" :scope "provided"]
-
-                 [reagent "0.5.1"]
-                 [reagent-forms "0.5.13"]
-                 [reagent-utils "0.1.5"]
-                 [secretary "1.2.3"]
-                 [org.clojure/core.async "0.2.374"]
-                 [cljs-ajax "0.5.1"]
-                 [markdown-clj "0.9.80"]
-                 [org.immutant/web "2.1.1" :exclusions [ch.qos.logback/logback-classic]]
                  ]
   :min-lein-version "2.0.0"
   :plugins [[cider/cider-nrepl "0.10.0-SNAPSHOT"]
             [lein-ring "0.7.0"]
-            [lein-cljsbuild "1.1.1"]
             [environ/environ.lein "0.2.1"]]
-  :resource-paths ["resources" "target/cljsbuild"]
-  :clean-targets ^{:protect false} [:target-path [:cljsbuild :builds :app :compiler :output-dir]
-                                    [:cljsbuild :builds :app :compiler :output-to]]
-  :cljsbuild
-  {:builds
-   {:app
-    {:source-paths ["src-cljs"]
-     :compiler
-     {:output-to "target/cljsbuild/public/js/app.js"
-      :output-dir "target/cljsbuild/public/js/out"
-      :externs ["react/externs/react.js"]
-      :pretty-print true}}}}
   :test-selectors {:default (or (complement :integration)
                                 (complement :performance))
                    :integration :integration
@@ -63,11 +39,4 @@
   :uberjar-name "overseer-standalone.jar"
   :profiles {:debug { :jvm-opts ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"]}
              :production {:env {:production true}}
-             :uberjar {:main overseer.web :aot :all
-                       :hooks ['leiningen.cljsbuild]
-                       :cljsbuild {:jar true
-                                   :builds {:app {:source-paths ["env/prod/cljs"]
-                                                  :compiler
-                                                  {:optimizations :advanced
-                                                   :pretty-print false}}}}
-                       }})
+             :uberjar {:main overseer.web :aot :all}})

@@ -13,7 +13,7 @@
 (def state (atom {:students []}))
 
 (defn load-students [response]
-  (.log js/console (str "got back students!" response))
+  ;; (.log js/console (str "got back students!" response))
   (swap! state (fn [st] (assoc st :students response))))
 
 (defn get-students [] (GET "/students" {:handler load-students}) )
@@ -31,7 +31,7 @@
 
 (defn get-swipe-button [student way]
   (let [button-icon (if (= way "out") "fa-arrow-left" "fa-arrow-right")
-        button-text [:i {:class (str "fa" button-icon)} "&nbsp;"]]
+        button-text [:i {:class (str "fa " button-icon)} " "]]
     (if (is-signing-in student)
       [:button.btn.btn-sm.btn-primary {:onClick (signIn student)}
        button-text]
@@ -46,7 +46,7 @@
                [:div
                 [:Link {:to "student"
                         :params {:studentId (get student "_id")}
-                        :id (str "student-" + (get student "_id"))}
+                        :id (str "student-" (get student "_id"))}
                  (get student "name")]]
                [:div.attendance-button (get-swipe-button student way)]]))))
 
