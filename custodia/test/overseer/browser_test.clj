@@ -8,7 +8,6 @@
 (defn student-id [id] (str "#student-" id))
 
 (defn click-student [id]
-  ;; (Thread/sleep 500)
   (wait-until #(visible? (student-id id)) 1000)
   #_(click (student-id id))
   (to (str "http://localhost:5000/#/students/" id "/"))
@@ -44,6 +43,8 @@
 (defn sign-in [] (clickw "#sign-in"))
 (defn sign-out [] (clickw "#sign-out"))
 (defn override [] (clickw "#override"))
+(defn sign-out-front-page [id] (clickw (str ".sign-" id)))
+(defn sign-in-front-page [id] (clickw (str ".sign-" id)))
 
 (defn login-to-site []
   (do (set-driver! {:browser :firefox} "http://localhost:5000/users/login")
@@ -167,6 +168,23 @@
 
   (assert-total-header 9 4 0 0 2 "")
   (sign-in)
+  (submit-missing)
+
+  (click-student 40)
+
+  (assert-total-header 9 4 0 0 3 "")
+  (quit))
+
+(deftest ^:integration missing-out-swipe-from-front-page
+  (sh/sh "make" "load-aliased-dump")
+  (login-to-site)
+
+  (click-student 40)
+
+  (assert-total-header 9 4 0 0 2 "")
+
+  (clickw "#home")
+  (sign-in-front-page 40)
   (submit-missing)
 
   (click-student 40)

@@ -32,10 +32,11 @@ module.exports = React.createClass({
         if (way === 'out') {
             buttonIcon = 'fa-arrow-left';
         }
+        var className = "fa " + buttonIcon + " sign-" + student._id;
         if(this.isSigningIn(student)) {
-            return <button onClick={this.signIn.bind(this, student)} className="btn btn-sm btn-primary"><i className={"fa "+buttonIcon}>&nbsp;</i></button>;
+            return <button onClick={this.signIn.bind(this, student)} className="btn btn-sm btn-primary"><i className={className}>&nbsp;</i></button>;
         }else{
-            return <button onClick={this.signOut.bind(this, student)} className="btn btn-sm btn-info"><i className={"fa "+buttonIcon}>&nbsp;</i></button>;
+            return <button onClick={this.signOut.bind(this, student)} className="btn btn-sm btn-info"><i className={className}>&nbsp;</i></button>;
         }
     },
     getStudent: function(student, way){
