@@ -27,18 +27,6 @@ module.exports = React.createClass({
     isSigningIn: function(student) {
         return !student.last_swipe_date || student.last_swipe_type === 'out' || !student.last_swipe_date.startsWith(studentStore.getToday())
     },
-    getSwipeButton:  function(student, way){
-        var buttonIcon = 'fa-arrow-right';
-        if (way === 'out') {
-            buttonIcon = 'fa-arrow-left';
-        }
-        var className = "fa " + buttonIcon + " sign-" + student._id;
-        if(this.isSigningIn(student)) {
-            return <button onClick={this.signIn.bind(this, student)} className="btn btn-sm btn-primary"><i className={className}>&nbsp;</i></button>;
-        }else{
-            return <button onClick={this.signOut.bind(this, student)} className="btn btn-sm btn-info"><i className={className}>&nbsp;</i></button>;
-        }
-    },
     getStudent: function(student, way){
         var link = <Link to="student" params={{studentId: student._id}} id={"student-" + student._id}>{student.name}</Link>;
         var button = this.getSwipeButton(student, way);
@@ -75,7 +63,9 @@ module.exports = React.createClass({
         }.bind(this));
 
 
-        return <div className="row student-listing-table">
+        return
+        <div className="row">
+            <div className="row student-listing-table">
             <div className="col-sm-3 column">
                 <div className="panel panel-info absent">
                     <div className="panel-heading absent"><b>Not Coming In ({absentCol.length})</b></div>
@@ -100,9 +90,14 @@ module.exports = React.createClass({
                     <div className="panel-body row">{outCol}</div>
                 </div>
             </div>
+          </div>
         </div>;
     },
     _onChange: function () {
+
+        if (this.refs.missingSwipeCollector) {
+            this.refs.missingSwipeCollector.hide();
+        }
         this.setState({students: studentStore.getStudents()});
     }
 });

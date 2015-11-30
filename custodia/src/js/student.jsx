@@ -26,47 +26,12 @@ var exports = React.createClass({
     componentWillUnmount: function () {
         studentStore.removeChangeListener(this._onChange);
     },
-    getMissingSwipe: function () {
-        var missingdirection = (this.state.student.last_swipe_type == "in") ? "out" : "in";
-        if (!this.state.student.in_today
-                // && this.state.student.last_swipe_type == "in"
-            && this.state.student.direction == "out") {
-            missingdirection = "in";
-        }
-
-        this.setState({missingdirection: missingdirection});
-        this.refs.missingSwipeCollector.show();
-        // use ComponentDidUpdate to check the states then change them
-        // use the onChange for the datepicker to mutate setState
-    },
-    swipeWithMissing: function (missing) {
-        var student = this.state.student,
-            missing = this.refs.missing_swiperef.state.value;
-        actionCreator.swipeStudent(student, student.direction, missing);
-    },
-    validateSignDirection: function (direction) {
-        this.state.student.direction = direction;
-        var missing_in = ((this.state.student.last_swipe_type == "out"
-            || (this.state.student.last_swipe_type == "in" && !this.state.student.in_today)
-            || !this.state.student.last_swipe_type)
-            && direction == "out"),
-            missing_out = (this.state.student.last_swipe_type == "in"
-            && direction == "in");
-
-        if (missing_in || missing_out) {
-            this.getMissingSwipe();
-        } else {
-            actionCreator.swipeStudent(this.state.student, direction);
-        }
-    },
-
     signIn: function () {
         this.validateSignDirection('in');
     },
     signOut: function () {
         this.validateSignDirection('out');
     },
-
     markAbsent: function () {
         actionCreator.markAbsent(this.state.student);
     },
@@ -165,23 +130,6 @@ var exports = React.createClass({
                 </div>
             </div>
         </div>;
-    },
-    getMissingTime: function() {
-        var d = new Date();
-        if (this.state.student.last_swipe_date) {
-            d = new Date(this.state.student.last_swipe_date + "T10:00:00");
-        }
-        if (!this.state.student.in_today
-            && this.state.student.direction == "out") {
-            d = new Date();
-        }
-        d.setHours((this.state.missingdirection == "in") ? 9 : 15);
-        d.setMinutes(0);
-
-        if(this.refs.missing_swiperef) {
-            this.refs.missing_swiperef.state.value = d;
-        }
-        return d;
     },
     render: function () {
         if (this.state.student) {
