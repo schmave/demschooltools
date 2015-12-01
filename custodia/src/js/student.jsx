@@ -1,4 +1,5 @@
-var React = require('react'),
+var
+React = require('react'),
     Heatmap = require('./heatmap.jsx'),
     Modal = require('./modal.jsx'),
     DateTimePicker = require('react-widgets').DateTimePicker,
@@ -28,10 +29,10 @@ var exports = React.createClass({
         studentStore.removeChangeListener(this._onChange);
     },
     signIn: function () {
-        SwipeHelper.validateSignDirection(this, 'in');
+        SwipeHelper.validateSignDirection('in');
     },
     signOut: function () {
-        SwipeHelper.validateSignDirection(this, 'out');
+        SwipeHelper.validateSignDirection('out');
     },
     markAbsent: function () {
         actionCreator.markAbsent(this.state.student);
