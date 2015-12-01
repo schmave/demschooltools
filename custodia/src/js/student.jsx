@@ -6,6 +6,7 @@ var React = require('react'),
     studentStore = require('./StudentStore'),
     Router = require('react-router'),
     Link = Router.Link,
+    SwipeHelper = require('./swipeHelpers'),
     Swipes = require('./swipeslisting.jsx'),
     SwipeListing = require('./swipeslisting.jsx');
 
@@ -27,10 +28,10 @@ var exports = React.createClass({
         studentStore.removeChangeListener(this._onChange);
     },
     signIn: function () {
-        this.validateSignDirection('in');
+        SwipeHelper.validateSignDirection(this, 'in');
     },
     signOut: function () {
-        this.validateSignDirection('out');
+        SwipeHelper.validateSignDirection(this, 'out');
     },
     markAbsent: function () {
         actionCreator.markAbsent(this.state.student);
@@ -140,11 +141,11 @@ var exports = React.createClass({
                     <form className="form-inline">
                         <div className="form-group">
                             <label htmlFor="missing">What time did you sign {this.state.missingdirection}?</label>
-                <DateTimePicker id="missing" defaultValue={this.getMissingTime()} ref="missing_swiperef"
+                <DateTimePicker id="missing" defaultValue={SwipeHelper.getMissingTime(this)} ref="missing_swiperef"
                                             calendar={false}/>
                         </div>
                         <div className="form-group" style={{marginLeft: '2em'}}>
-                            <button id="submit-missing" className="btn btn-sm btn-primary" onClick={this.swipeWithMissing}>
+                <button id="submit-missing" className="btn btn-sm btn-primary" onClick={SwipeHelper.swipeWithMissing(this)}>
                                 Sign {this.state.missingdirection} </button>
                         </div>
                     </form>
