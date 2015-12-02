@@ -1,5 +1,4 @@
-var
-React = require('react'),
+var React = require('react'),
     Heatmap = require('./heatmap.jsx'),
     Modal = require('./modal.jsx'),
     DateTimePicker = require('react-widgets').DateTimePicker,
@@ -7,9 +6,10 @@ React = require('react'),
     studentStore = require('./StudentStore'),
     Router = require('react-router'),
     Link = Router.Link,
-    SwipeHelper = require('./swipeHelpers'),
+    SwipeHelpers = require('./swipeHelpers.jsx'),
     Swipes = require('./swipeslisting.jsx'),
     SwipeListing = require('./swipeslisting.jsx');
+
 
 var exports = React.createClass({
     contextTypes: {
@@ -29,10 +29,10 @@ var exports = React.createClass({
         studentStore.removeChangeListener(this._onChange);
     },
     signIn: function () {
-        SwipeHelper.validateSignDirection('in');
+        this.refs.missingSwipeCollector.validateSignDirection(this.state.student, 'in');
     },
     signOut: function () {
-        SwipeHelper.validateSignDirection('out');
+        this.refs.missingSwipeCollector.validateSignDirection(this.state.student, 'out');
     },
     markAbsent: function () {
         actionCreator.markAbsent(this.state.student);
@@ -137,20 +137,8 @@ var exports = React.createClass({
         if (this.state.student) {
             var activeDate = this.getActiveDay(this.state.student);
             return <div className="row">
-                <Modal ref="missingSwipeCollector"
-                       title={"What time did you sign " + this.state.missingdirection + "?"}>
-                    <form className="form-inline">
-                        <div className="form-group">
-                            <label htmlFor="missing">What time did you sign {this.state.missingdirection}?</label>
-                <DateTimePicker id="missing" defaultValue={SwipeHelper.getMissingTime(this)} ref="missing_swiperef"
-                                            calendar={false}/>
-                        </div>
-                        <div className="form-group" style={{marginLeft: '2em'}}>
-                <button id="submit-missing" className="btn btn-sm btn-primary" onClick={SwipeHelper.swipeWithMissing(this)}>
-                                Sign {this.state.missingdirection} </button>
-                        </div>
-                    </form>
-                </Modal>
+                <SwipeHelpers ref="missingSwipeCollector">
+                </SwipeHelpers>
 
                 <div className="col-sm-1"></div>
                 <div className="col-sm-10">
@@ -203,16 +191,13 @@ var exports = React.createClass({
                 <div className="col-sm-1"></div>
             </div>;
 
+        } else {
+            // no student found
+            return <div></div>;
         }
 
-        return <div></div>
-            ;
     },
     _onChange: function () {
-
-        if (this.refs.missingSwipeCollector) {
-            this.refs.missingSwipeCollector.hide();
-        }
         var s = studentStore.getStudent(this.state.studentId);
 
         var activeDay = this.getActiveDay(s);
