@@ -3,6 +3,7 @@ var React = require('react'),
     Link = Router.Link,
     AdminItem = require('./adminwrapper.jsx'),
     actionCreator = require('./studentactioncreator'),
+    SwipeHelpers = require('./swipeHelpers.jsx'),
     studentStore = require('./StudentStore');
 
 var today = studentStore.getToday();
@@ -18,11 +19,11 @@ module.exports = React.createClass({
     componentWillUnmount: function () {
         studentStore.removeChangeListener(this._onChange);
     },
-    signIn: function(student){
-        actionCreator.swipeStudent(student, 'in');
+    signIn: function (student) {
+        this.refs.missingSwipeCollector.validateSignDirection(student, 'in');
     },
-    signOut: function(student){
-        actionCreator.swipeStudent(student, 'out');
+    signOut: function (student) {
+        this.refs.missingSwipeCollector.validateSignDirection(student, 'out');
     },
     isSigningIn: function(student) {
         return !student.last_swipe_date || student.last_swipe_type === 'out' || !student.last_swipe_date.startsWith(studentStore.getToday())
@@ -76,6 +77,7 @@ module.exports = React.createClass({
 
 
         return <div className="row">
+            <SwipeHelpers ref="missingSwipeCollector"></SwipeHelpers>
             <div className="row student-listing-table">
             <div className="col-sm-3 column">
                 <div className="panel panel-info absent">
@@ -105,10 +107,6 @@ module.exports = React.createClass({
         </div>;
     },
     _onChange: function () {
-
-        if (this.refs.missingSwipeCollector) {
-            this.refs.missingSwipeCollector.hide();
-        }
         this.setState({students: studentStore.getStudents()});
     }
 });

@@ -48,7 +48,8 @@ module.exports = React.createClass({
         var d = new Date();
         if (!student) { return d;}
         if (student.last_swipe_date) {
-            d = new Date(student.last_swipe_date + "T10:00:00");
+            var lastDate = student.last_swipe_date.replace(/T.*/, "");
+            d = new Date(lastDate + "T10:00:00");
         }
         if (!student.in_today
             && student.direction == "out") {

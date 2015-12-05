@@ -143,7 +143,7 @@ var exports = React.createClass({
                 <div className="col-sm-1"></div>
                 <div className="col-sm-10">
                     <div className="panel panel-info">
-                        <div className="panel-heading">
+                       <div className="panel-heading">
                             <div className="row">
                                 {!this.state.editing ? this.showingStudentName() : this.editingStudentName()}
                                 <div className="col-sm-4">
