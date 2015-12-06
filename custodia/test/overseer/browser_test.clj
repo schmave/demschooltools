@@ -9,8 +9,8 @@
 
 (defn click-student [id]
   (wait-until #(visible? (student-id id)) 1000)
-  #_(click (student-id id))
-  (to (str "http://localhost:5000/#/students/" id "/"))
+  (click (student-id id))
+  #_(to (str "http://localhost:5000/#/students/" id "/"))
   #_(wait-until #(visible? "#studentName") 10000)
   )
 
@@ -59,6 +59,8 @@
     (is (= (text "#hd-given") (str "Gave Attendance: " over)))
     (is (= (text "#hd-short") (str "Short: " short))))
     )
+
+
 
 (deftest ^:integration edit-name
   (data/sample-db)
@@ -190,6 +192,38 @@
   (click-student 40)
 
   (assert-total-header 9 4 0 0 3 "")
+  (quit))
+
+(deftest ^:integration missing-swipe-twice-front-page
+  (data/sample-db)
+  (login-to-site)
+
+  (assert-student-in-not-in-col 1)
+  (assert-student-in-not-in-col 2)
+
+  (click-student 1)
+  (assert-total-header 0 0 0 0 1 "1")
+  (clickw "#home")
+
+  (click-student 2)
+  (assert-total-header 0 0 0 0 1 "2")
+  (clickw "#home")
+
+  (sign-in-front-page 1)
+  (submit-missing)
+  (click-student 1)
+  (assert-total-header 1 0 0 0 1 "1")
+  (clickw "#home")
+
+  (sign-in-front-page 2)
+  (submit-missing)
+  (click-student 2)
+  (assert-total-header 1 0 0 0 1 "1")
+  (clickw "#home")
+
+  (assert-student-in-in-col 1)
+  (assert-student-in-in-col 2)
+
   (quit))
 
 (deftest ^:integration loggin-in

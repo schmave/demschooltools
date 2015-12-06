@@ -1,3 +1,6 @@
+* DONE Collect missing swipe from front page
+CLOSED: [2015-12-07 Mon 07:18]
+* TODO multi-tenented
 * DONE Fix Angular Jump 
   CLOSED: [2015-03-26 Thu 16:15]
 * DONE Make absent column
@@ -17,7 +20,8 @@ CLOSED: [2015-05-13 Wed 17:47]
 * DONE Edit student
 CLOSED: [2015-05-13 Wed 17:47]
 * TODO Configurable passwords
-* TODO Hide student
+* DONE Hide student
+CLOSED: [2015-12-07 Mon 07:18]
 * TODO ng grid
 * DONE Create student
   CLOSED: [2014-12-23 Tue 12:03]

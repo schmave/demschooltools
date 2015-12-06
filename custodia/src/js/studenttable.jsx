@@ -57,10 +57,10 @@ module.exports = React.createClass({
             outCol = [];
 
         var students = this.state.students;
-        students.sort(function (a, b) {
+        students.sort((a, b) => {
             return (a['name'] > b['name'] ? 1 : -1);
         });
-        students.map(function (student) {
+        students.map((student) => {
             if (!student.in_today && student.absent_today) {
                 absentCol.push(this.getStudent(student, 'absent'));
             }

@@ -25,6 +25,8 @@ module.exports = React.createClass({
         var student = this.state.student,
             missing = this.refs.missing_datepicker.state.value;
         actionCreator.swipeStudent(student, student.direction, missing);
+        this.setState({student: {}, missingdirection: false})
+        this.refs.missingSwipeCollector.hide();
     },
 
     validateSignDirection: function(student, direction) {
