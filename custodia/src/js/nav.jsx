@@ -21,13 +21,13 @@ module.exports = React.createClass({
                 <div id="navbar" className="collapse navbar-collapse">
                     <ul className="nav navbar-nav">
                         <AdminWrapper>
-                            <li><Link to="reports">Student Totals</Link></li>
+                            <li><Link id="totals-link" to="reports">Student Totals</Link></li>
                         </AdminWrapper>
                         <AdminWrapper>
                             <li><Link to="create">Add Student</Link> </li>
                         </AdminWrapper>
                         <AdminWrapper>
-                            <li><Link to="classes">Classes</Link> </li>
+                            <li><Link id="class-link" to="classes">Classes</Link> </li>
                         </AdminWrapper>
                     </ul>
                     <ul className="nav navbar-nav navbar-right">

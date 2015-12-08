@@ -46,6 +46,31 @@
 (defn sign-out-front-page [id] (clickw (str ".sign-" id)))
 (defn sign-in-front-page [id] (clickw (str ".sign-" id)))
 
+(defn go-to-class-page []
+  (clickw "#class-link"))
+
+(defn go-to-totals-page []
+  (clickw "#totals-link"))
+
+(defn create-class [name]
+  (go-to-class-page)
+  (clickw "#create-class")
+  (input-text "#Class" name)
+  (clickw "#create-class-button")
+  (clickw (str "#" name)))
+
+(defn add-to-class [student-id]
+  (clickw (str "#add-" student-id)))
+
+(defn ensure-class-selected [name]
+  (testing "class selected"
+    (is (= name
+           (text (first (selected-options "#class-select"))))))
+  )
+
+(defn activate-class [name]
+  (clickw (str "#activate-" name)))
+
 (defn login-to-site []
   (do (set-driver! {:browser :firefox} "http://localhost:5000/users/login")
       (login)))
@@ -60,7 +85,19 @@
     (is (= (text "#hd-short") (str "Short: " short))))
     )
 
+(deftest ^:integration make-classes-and-set-default
+  (data/sample-db)
+  (login-to-site)
 
+  (create-class "test")
+  (add-to-class 1)
+
+  (activate-class "test")
+
+  (go-to-totals-page)
+  (ensure-class-selected "test")
+
+  (quit))
 
 (deftest ^:integration edit-name
   (data/sample-db)

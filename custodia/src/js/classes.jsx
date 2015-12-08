@@ -67,6 +67,7 @@ var exports = React.createClass({
             var boundClick = this.classSelected.bind(this, classval),
             selected = (classval._id === this.state.selectedClass._id)  ? "selected" : "";
             return <tr key={classval._id}
+                       id={classval.name} 
                        onClick={boundClick}
                        className={selected}>
                 <td>
@@ -108,7 +109,7 @@ var exports = React.createClass({
             return <div key={"NOTCLASS-" + stu._id} className="out-class panel panel-info student-listing col-sm-11">
                 <div>
                 <div className="attendance-button">
-                <button onClick={this.addToClass.bind(this, stu)} className="btn btn-sm btn-primary"><i className="fa fa-arrow-left">&nbsp;</i></button>
+                <button id={("add-" + stu._id)} onClick={this.addToClass.bind(this, stu)} className="btn btn-sm btn-primary"><i className="fa fa-arrow-left">&nbsp;</i></button>
                 </div>
                 <div className="name"> {stu.name} </div>
             </div>
@@ -118,7 +119,7 @@ var exports = React.createClass({
     },
     render: function () {
         var classActivateButton = (this.state.selectedClass.active !== true)
-            ? <span><button className="btn btn-sm btn-primary" onClick={this.activateClass}>Activate Class</button></span>
+            ? <span><button id={("activate-" + this.state.selectedClass.name)} className="btn btn-sm btn-primary" onClick={this.activateClass}>Activate Class</button></span>
             : <span></span>;
         return <div>
             <div className="row margined class-listing">
@@ -154,7 +155,7 @@ var exports = React.createClass({
                     <div className="panel panel-info">
                        <div className="panel-heading absent"><b>Create Class</b></div>
                         <div className="out-class panel panel-info student-listing col-sm-11">
-                            <Link to="createaclass">Create Class</Link>
+                            <Link id="create-class" to="createaclass">Create Class</Link>
                         </div>
                     </div>
                 </div>

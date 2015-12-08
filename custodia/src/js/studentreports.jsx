@@ -69,7 +69,7 @@ var exports = React.createClass({
     render: function () {
         return <div>
             <div className="row margined">
-                 <select className="pull-left" onChange={this.classSelected} value={this.state.selectedClass._id}>
+                 <select id="class-select" className="pull-left" onChange={this.classSelected} value={this.state.selectedClass._id}>
             {this.state.classes ? this.state.classes.map(function (cls) {
                 return <option value={cls._id}>{cls.name}</option>;
             }.bind(this)) : ""}

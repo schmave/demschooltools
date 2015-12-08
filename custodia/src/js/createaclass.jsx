@@ -20,7 +20,7 @@ var exports = React.createClass({
                                 <input ref="name" className="form-control" id="Class" placeholder="Name"/>
                             </div>
                             <div className="form-group">
-                                <button type="button" onClick={this.submit} className="btn btn-primary">Add Class</button>
+                                <button id="create-class-button" type="button" onClick={this.submit} className="btn btn-primary">Add Class</button>
                             </div>
                         </form>
                     </div>
