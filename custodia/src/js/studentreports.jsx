@@ -15,15 +15,16 @@ var exports = React.createClass({
     },
     setupClassState: function (state) {
         var both = state,
-            classes = both.classes ? both.classes : [];
-        var selectedClass = this.state.selectedClass;
-        if(selectedClass) {
-            var id = selectedClass._id,
-                matching = classes.filter(function(cls) {return cls._id === id;});
-            selectedClass = (matching[0]) ? matching[0] : classes[0];
+            classes = both.classes || [],
+            selectedClass = this.state.selectedClass,
+            id = selectedClass._id,
+            matching = classes.filter(cls => cls._id === id),
+            selectedClass = matching[0] || classes[0];
+        if(classes != [] && !this.state.selectedClass._id) {
+            selectedClass = classes.filter(cls => cls.active == true)[0];
         }
         this.setState({classes: classes,
-                       selectedClass: (selectedClass)?selectedClass:{students:[]},
+                       selectedClass: selectedClass || {students:[]},
                        });
     },
     componentDidMount: function () {
@@ -41,23 +42,25 @@ var exports = React.createClass({
     },
     _onReportChange: function () {
         this.refs.newSchoolYear.hide();
-        var years = reportStore.getSchoolYears();
-        var yearExists = years.years.indexOf(this.state.currentYear) !== -1;
-        var currentYear = (yearExists && this.state.currentYear) ? this.state.currentYear : years.current_year;
-        var currentClassId = this.state.selectedClass ? this.state.selectedClass._id : null;
-        this.setState({years: years, currentYear: currentYear, rows: reportStore.getReport(currentYear, currentClassId)});
+        var years = reportStore.getSchoolYears(),
+            yearExists = years.years.indexOf(this.state.currentYear) !== -1,
+            currentYear = (yearExists && this.state.currentYear) ? this.state.currentYear : years.current_year,
+            currentClassId = this.state.selectedClass ? this.state.selectedClass._id : null;
+        this.setState({years: years,
+                       currentYear: currentYear,
+                       rows: reportStore.getReport(currentYear, currentClassId)});
     },
     classSelected: function (event) {
-        var currentClassId = event.target.value;
-        var report = reportStore.getReport(this.state.currentYear, currentClassId);
-        var matching = this.state.classes.filter(function(cls) {return cls._id == currentClassId;});
-        var selectedClass = (matching[0]) ? matching[0] : this.state.classes[0];
+        var currentClassId = event.target.value,
+            report = reportStore.getReport(this.state.currentYear, currentClassId),
+            matching = this.state.classes.filter(function(cls) {return cls._id == currentClassId;}),
+            selectedClass = (matching[0]) ? matching[0] : this.state.classes[0];
         this.setState({selectedClass: selectedClass, rows: report});
     },
     yearSelected: function (event) {
-        var currentYear = event.target.value;
-        var currentClassId = this.state.selectedClass ? this.state.selectedClass._id : null;
-        var report = reportStore.getReport(currentYear, currentClassId);
+        var currentYear = event.target.value,
+            currentClassId = this.state.selectedClass ? this.state.selectedClass._id : null,
+            report = reportStore.getReport(currentYear, currentClassId);
         this.setState({currentYear: currentYear, rows: report});
     },
     createPeriod: function(){
@@ -70,9 +73,9 @@ var exports = React.createClass({
         return <div>
             <div className="row margined">
                  <select id="class-select" className="pull-left" onChange={this.classSelected} value={this.state.selectedClass._id}>
-            {this.state.classes ? this.state.classes.map(function (cls) {
-                return <option value={cls._id}>{cls.name}</option>;
-            }.bind(this)) : ""}
+                    {this.state.classes ? this.state.classes.map(function (cls) {
+                        return <option value={cls._id}>{cls.name}</option>;
+                    }.bind(this)) : ""}
                 </select>
                 <select className="pull-left" onChange={this.yearSelected} value={this.state.currentYear}>
                     {this.state.years ? this.state.years.years.map(function (year) {
