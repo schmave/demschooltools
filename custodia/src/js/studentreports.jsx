@@ -8,60 +8,73 @@ var reportStore = require('./reportstore'),
 
 // Table data as a list of array.
 var rows = [];
+var getState = function () {
+    return {rows: rows,
+            classes: classStore.getClasses().classes,
+            years: reportStore.getSchoolYears(),
+            selectedClass: null};
+};
 
 var exports = React.createClass({
     getInitialState: function () {
-        return {rows: rows, classes: [],selectedClass: {students:[]}};
-    },
-    setupClassState: function (state) {
-        var both = state,
-            classes = both.classes || [],
-            selectedClass = this.state.selectedClass,
-            id = selectedClass._id,
-            matching = classes.filter(cls => cls._id === id),
-            selectedClass = matching[0] || classes[0];
-        if(classes != [] && !this.state.selectedClass._id) {
-            selectedClass = classes.filter(cls => cls.active == true)[0];
-        }
-        this.setState({classes: classes,
-                       selectedClass: selectedClass || {students:[]},
-                       });
+        return getState();
     },
     componentDidMount: function () {
         reportStore.addChangeListener(this._onReportChange);
         classStore.addChangeListener(this._onClassChange);
-        this.setupClassState(classStore.getClasses());
-        reportStore.getSchoolYears(true);
     },
     componentWillUnmount: function () {
         reportStore.removeChangeListener(this._onReportChange);
         classStore.removeChangeListener(this._onClassChange);
     },
     _onClassChange : function() {
-        this.setupClassState(classStore.getClasses());
+        this.refs.newSchoolYear.hide();
+        var state = getState(),
+            classes = state.classes || [],
+            selectedClass = this.state.selectedClass,
+            id = this.state.selectedClassId,
+            matching = classes.filter(cls => cls._id === id),
+            selectedClass = matching[0] || classes[0];
+        if(classes != [] && !this.state.selectedClassId) {
+            selectedClass = classes.filter(cls => cls.active == true)[0];
+        }
+        state.selectedClass = selectedClass || {};
+        state.selectedClassId = this.state.selectedClass ? this.state.selectedClass._id : null;
+        this.setState(state);
     },
     _onReportChange: function () {
         this.refs.newSchoolYear.hide();
-        var years = reportStore.getSchoolYears(),
+        var state = getState(),
+            years = state.years,
             yearExists = years.years.indexOf(this.state.currentYear) !== -1,
             currentYear = (yearExists && this.state.currentYear) ? this.state.currentYear : years.current_year,
-            currentClassId = this.state.selectedClass ? this.state.selectedClass._id : null;
-        this.setState({years: years,
-                       currentYear: currentYear,
-                       rows: reportStore.getReport(currentYear, currentClassId)});
+            currentClassId = this.state.selectedClassId || null;
+
+        state.currentYear = currentYear;
+        var report = reportStore.getReport(currentYear, currentClassId);
+        state.rows = report || [];
+        state.loading = report=="loading";
+        this.setState(state);
     },
     classSelected: function (event) {
         var currentClassId = event.target.value,
             report = reportStore.getReport(this.state.currentYear, currentClassId),
+            rows = report || [],
             matching = this.state.classes.filter(function(cls) {return cls._id == currentClassId;}),
+
             selectedClass = (matching[0]) ? matching[0] : this.state.classes[0];
-        this.setState({selectedClass: selectedClass, rows: report});
+        this.setState({loading: report,
+                       selectedClass: selectedClass,
+                       selectedClassId: selectedClass._id,
+                       rows: rows});
     },
     yearSelected: function (event) {
         var currentYear = event.target.value,
-            currentClassId = this.state.selectedClass ? this.state.selectedClass._id : null,
-            report = reportStore.getReport(currentYear, currentClassId);
-        this.setState({currentYear: currentYear, rows: report});
+            report = reportStore.getReport(currentYear, this.state.selectedClassId),
+            rows = report || [];
+        this.setState({loading: report,
+                       currentYear: currentYear,
+                       rows: rows});
     },
     createPeriod: function(){
         actionCreator.createPeriod(this.refs.newPeriodStartDate.state.value, this.refs.newPeriodEndDate.state.value);
@@ -70,9 +83,24 @@ var exports = React.createClass({
         actionCreator.deletePeriod(this.state.currentYear);
     },
     render: function () {
+        var grid = null;
+        if(this.state.loading) {
+                grid = <div>Loading</div>;
+        }else {
+                grid = <Griddle id="test" results={this.state.rows} resultsPerPage="200"
+                        columns={['name', 'good', 'overrides', 'unexcused', 'excuses', 'short', 'total_hours']}
+                        columnMetadata={[{displayName: 'Name', columnName: 'name'},
+                                        {displayName: 'Attended', columnName: 'good'},
+                                        {displayName: 'Gave Attendance', columnName: 'overrides'},
+                                        {displayName: 'Unexcused', columnName: 'unexcused'},
+                                        {displayName: 'Excused Absence', columnName: 'excuses'},
+                                        {displayName: 'Short', columnName: 'short'},
+                                        {displayName: 'Total Hours', columnName: 'total_hours'}
+                                        ]}/>;
+        }
         return <div>
             <div className="row margined">
-                 <select id="class-select" className="pull-left" onChange={this.classSelected} value={this.state.selectedClass._id}>
+                 <select id="class-select" className="pull-left" onChange={this.classSelected} value={this.state.selectedClassId}>
                     {this.state.classes ? this.state.classes.map(function (cls) {
                         return <option value={cls._id}>{cls.name}</option>;
                     }.bind(this)) : ""}
@@ -88,17 +116,7 @@ var exports = React.createClass({
                         onClick={function(){this.refs.newSchoolYear.show();}.bind(this)}>New Period
                 </button>
             </div>
-            <Griddle results={this.state.rows} resultsPerPage="200"
-                     columns={['name', 'good', 'overrides', 'unexcused', 'excuses', 'short', 'total_hours']}
-                     columnMetadata={[{displayName: 'Name', columnName: 'name'},
-                                      {displayName: 'Attended', columnName: 'good'},
-                                      {displayName: 'Gave Attendance', columnName: 'overrides'},
-                                      {displayName: 'Unexcused', columnName: 'unexcused'},
-                                      {displayName: 'Excused Absence', columnName: 'excuses'},
-                                      {displayName: 'Short', columnName: 'short'},
-                                      {displayName: 'Total Hours', columnName: 'total_hours'}
-                     ]}/>
-
+            {grid}
             <Modal ref="newSchoolYear" title="Create new period">
                 <form className="form-inline">
                     <div className="form-group">

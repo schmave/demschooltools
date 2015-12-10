@@ -10,8 +10,8 @@ var schoolYears;
 
 var exports = Object.create(base);
 
-exports.getClasses = function () {
-    if (classes.length == 0) {
+exports.getClasses = function (force) {
+    if (classes.length == 0 || force) {
         actionCreator.loadClasses();
         return [];
     } else {
