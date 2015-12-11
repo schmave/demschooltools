@@ -7,10 +7,10 @@ var reportStore = require('./reportstore'),
     Griddle = require('griddle-react');
 
 // Table data as a list of array.
-var rows = [];
 var getState = function () {
-    return {rows: rows,
+    return {rows: [],
             classesAndThings: classStore.getClasses(),
+            classes: [],
             years: reportStore.getSchoolYears()};
 };
 
@@ -19,18 +19,20 @@ var exports = React.createClass({
         return getState();
     },
     componentDidMount: function () {
-        reportStore.addChangeListener(this._onReportChange);
-        classStore.addChangeListener(this._onClassChange);
+        reportStore.addChangeListener(this.onReportChange);
+        classStore.addChangeListener(this.onClassChange);
+        classStore.getClasses(true);
+        reportStore.getSchoolYears(true);
+        this.fetchReport(this.state.selectedClassId, this.state.currentYear);
     },
     componentWillUnmount: function () {
-        reportStore.removeChangeListener(this._onReportChange);
-        classStore.removeChangeListener(this._onClassChange);
+        reportStore.removeChangeListener(this.onReportChange);
+        classStore.removeChangeListener(this.onClassChange);
     },
-    _onClassChange : function() {
+    onClassChange : function() {
         this.refs.newSchoolYear.hide();
         var state = getState(),
-            classes = state.classesAndThings || [],
-            classes = classes.classes,
+            classes = (state.classesAndThings ==[]) ? [] : state.classesAndThings.classes,
             currentSelectedClassId = this.state.selectedClassId,
             matching = classes.filter(cls => cls._id === currentSelectedClassId),
             selectedClass = matching[0] || classes[0];
@@ -39,23 +41,24 @@ var exports = React.createClass({
         }
         state.selectedClass = selectedClass || {};
         state.selectedClassId = state.selectedClass ? state.selectedClass._id : null;
+        state.classes = classes;
         this.setState(state);
         this.fetchReport(state.selectedClassId, state.currentYear);
     },
-    _onReportChange: function (x) {
+    onReportChange: function () {
         this.refs.newSchoolYear.hide();
         var state = getState(),
             years = state.years,
             yearExists = years.years.indexOf(this.state.currentYear) !== -1,
             currentYear = (yearExists && this.state.currentYear) ? this.state.currentYear : years.current_year;
 
-        state.currentYear = currentYear;
-        this.fetchReport(this.state.selectedClassId, state.currentYear);
+        this.setState({currentYear:currentYear});
+        this.fetchReport(this.state.selectedClassId, currentYear);
     },
     fetchReport: function(currentClassId, year) {
         var report = reportStore.getReport(year, currentClassId),
-            rows = report || [];
-        this.setState({loading: (report==null), rows: rows});
+            rows = (report != "loading") ? report : [];
+        this.setState({loading: (report==null||report=="loading"), rows: rows});
     },
     classSelected: function (event) {
         var currentClassId = event.target.value,
