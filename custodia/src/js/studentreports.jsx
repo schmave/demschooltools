@@ -10,9 +10,8 @@ var reportStore = require('./reportstore'),
 var rows = [];
 var getState = function () {
     return {rows: rows,
-            classes: classStore.getClasses().classes,
-            years: reportStore.getSchoolYears(),
-            selectedClass: null};
+            classesAndThings: classStore.getClasses(),
+            years: reportStore.getSchoolYears()};
 };
 
 var exports = React.createClass({
@@ -30,51 +29,46 @@ var exports = React.createClass({
     _onClassChange : function() {
         this.refs.newSchoolYear.hide();
         var state = getState(),
-            classes = state.classes || [],
-            selectedClass = this.state.selectedClass,
-            id = this.state.selectedClassId,
-            matching = classes.filter(cls => cls._id === id),
+            classes = state.classesAndThings || [],
+            classes = classes.classes,
+            currentSelectedClassId = this.state.selectedClassId,
+            matching = classes.filter(cls => cls._id === currentSelectedClassId),
             selectedClass = matching[0] || classes[0];
-        if(classes != [] && !this.state.selectedClassId) {
+        if(classes != [] && !currentSelectedClassId) {
             selectedClass = classes.filter(cls => cls.active == true)[0];
         }
         state.selectedClass = selectedClass || {};
-        state.selectedClassId = this.state.selectedClass ? this.state.selectedClass._id : null;
+        state.selectedClassId = state.selectedClass ? state.selectedClass._id : null;
         this.setState(state);
+        this.fetchReport(state.selectedClassId, state.currentYear);
     },
-    _onReportChange: function () {
+    _onReportChange: function (x) {
         this.refs.newSchoolYear.hide();
         var state = getState(),
             years = state.years,
             yearExists = years.years.indexOf(this.state.currentYear) !== -1,
-            currentYear = (yearExists && this.state.currentYear) ? this.state.currentYear : years.current_year,
-            currentClassId = this.state.selectedClassId || null;
+            currentYear = (yearExists && this.state.currentYear) ? this.state.currentYear : years.current_year;
 
         state.currentYear = currentYear;
-        var report = reportStore.getReport(currentYear, currentClassId);
-        state.rows = report || [];
-        state.loading = report=="loading";
-        this.setState(state);
+        this.fetchReport(this.state.selectedClassId, state.currentYear);
+    },
+    fetchReport: function(currentClassId, year) {
+        var report = reportStore.getReport(year, currentClassId),
+            rows = report || [];
+        this.setState({loading: (report==null), rows: rows});
     },
     classSelected: function (event) {
         var currentClassId = event.target.value,
-            report = reportStore.getReport(this.state.currentYear, currentClassId),
-            rows = report || [],
-            matching = this.state.classes.filter(function(cls) {return cls._id == currentClassId;}),
-
+            matching = this.state.classes.filter(cls => cls._id == currentClassId),
             selectedClass = (matching[0]) ? matching[0] : this.state.classes[0];
-        this.setState({loading: report,
-                       selectedClass: selectedClass,
-                       selectedClassId: selectedClass._id,
-                       rows: rows});
+        this.setState({selectedClass: selectedClass,
+                       selectedClassId: selectedClass._id});
+        this.fetchReport(selectedClass._id, this.state.currentYear);
     },
     yearSelected: function (event) {
-        var currentYear = event.target.value,
-            report = reportStore.getReport(currentYear, this.state.selectedClassId),
-            rows = report || [];
-        this.setState({loading: report,
-                       currentYear: currentYear,
-                       rows: rows});
+        var currentYear = event.target.value;
+        this.setState({currentYear: currentYear});
+        this.fetchReport(this.state.selectedClassId, currentYear);
     },
     createPeriod: function(){
         actionCreator.createPeriod(this.refs.newPeriodStartDate.state.value, this.refs.newPeriodEndDate.state.value);
