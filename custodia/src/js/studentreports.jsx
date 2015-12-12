@@ -31,8 +31,9 @@ var exports = React.createClass({
     },
     onClassChange : function() {
         this.refs.newSchoolYear.hide();
-        var state = getState(),
-            classes = (state.classesAndThings ==[]) ? [] : state.classesAndThings.classes,
+        var classesAndThings= classStore.getClasses(),
+            state = this.state,
+            classes = (classesAndThings ==[]) ? [] : classesAndThings.classes,
             currentSelectedClassId = this.state.selectedClassId,
             matching = classes.filter(cls => cls._id === currentSelectedClassId),
             selectedClass = matching[0] || classes[0];
@@ -45,14 +46,17 @@ var exports = React.createClass({
         this.setState(state);
         this.fetchReport(state.selectedClassId, state.currentYear);
     },
-    onReportChange: function () {
+    onReportChange: function (x) {
         this.refs.newSchoolYear.hide();
-        var state = getState(),
-            years = state.years,
-            yearExists = years.years.indexOf(this.state.currentYear) !== -1,
-            currentYear = (yearExists && this.state.currentYear) ? this.state.currentYear : years.current_year;
+        var state = this.state,
+            years = reportStore.getSchoolYears(),
+            yearExists = years.years.indexOf(state.currentYear) !== -1,
+            currentYear = (yearExists && state.currentYear) ? state.currentYear : years.current_year;
 
-        this.setState({currentYear:currentYear});
+        state.years=years;
+        state.currentYear=currentYear;
+
+        this.setState(state);
         this.fetchReport(this.state.selectedClassId, currentYear);
     },
     fetchReport: function(currentClassId, year) {
