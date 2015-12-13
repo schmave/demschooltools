@@ -37,6 +37,10 @@ public class OrgConfig {
         return result;
     }
 
+    public String getReferralDestination(Charge c) {
+        return "School Meeting";
+    }
+
     static HashMap<String, OrgConfig> configs = new HashMap<String, OrgConfig>();
     static void register(String name, OrgConfig config) {
         configs.put(name, config);
@@ -151,6 +155,15 @@ class TheCircleSchool extends OrgConfig {
         filter_no_charge_cases = true;
 
         OrgConfig.register(name, this);
+    }
+
+    @Override
+    public String getReferralDestination(Charge c) {
+        if (c.plea.equals("Not Guilty")) {
+            return "trial";
+        } else {
+            return "School Meeting";
+        }
     }
 
     public static TheCircleSchool getInstance() {

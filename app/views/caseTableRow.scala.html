@@ -54,7 +54,7 @@
 
 	@for( charge <- c.charges ) {
 		@if( charge.referred_to_sm && charge.sm_decision == null) {
-			<tr><td colspan="3" class="sm_decision">*** Awaiting School Meeting decision on charging
+			<tr><td colspan="3" class="sm_decision">*** Awaiting @OrgConfig.get().getReferralDestination(charge) decision on charging
 			@if(charge.person != null) { @charge.person.getDisplayName() } else { ??? } with
 			@charge.getRuleTitle().
 			</td></tr>

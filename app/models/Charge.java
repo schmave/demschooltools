@@ -149,7 +149,7 @@ public class Charge extends Model implements Comparable<Charge> {
         if (this.rule == null) {
             return "<< no rule >>";
         } else {
-            return this.rule.title;
+            return this.rule.getNumber() + " " + this.rule.title;
         }
     }
 
