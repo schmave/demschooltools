@@ -3,6 +3,7 @@ package models;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.TimeZone;
 
 public class OrgConfig {
     public String name;
@@ -26,6 +27,8 @@ public class OrgConfig {
     public boolean filter_no_charge_cases = false;
 
     public Organization org;
+
+    public TimeZone time_zone = TimeZone.getTimeZone("America/New_York");
 
     public static OrgConfig get() {
         Organization org = Organization.getByHost();

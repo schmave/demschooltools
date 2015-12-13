@@ -736,8 +736,7 @@ public class CRM extends Controller {
     }
 
     public static String formatDate(Date d) {
-        d = new Date(d.getTime() +
-            (Application.getConfiguration().getInt("time_zone_offset") * 1000L * 60 * 60));
+        d = new Date(d.getTime() + OrgConfig.get().time_zone.getOffset(d.getTime()));
         Date now = new Date();
 
 		long diffHours = (now.getTime() - d.getTime()) / 1000 / 60 / 60;
