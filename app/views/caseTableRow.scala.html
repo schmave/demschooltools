@@ -21,7 +21,15 @@
 		} else {
 			@c.people_at_case.filter(_.role == PersonAtCase.ROLE_TESTIFIER).map {tr =>@tr.person.getDisplayName()}.mkString(", ")
 		}
-		</p><p>@c.findings</p></td>
+		</p>
+		<p>
+		@if( c.charges.size() == 0 && OrgConfig.get().filter_no_charge_cases ) {
+			<i>Findings redacted.</i>
+		} else {
+			@c.findings
+		}
+		</p>
+		</td>
 	<td valign="top">
 		@if( c.charges.size() > 0) {
 			<ol>
