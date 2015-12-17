@@ -23,8 +23,8 @@
 		}
 		</p>
 		<p>
-		@if( c.charges.size() == 0 && OrgConfig.get().filter_no_charge_cases ) {
-			<i>Findings redacted.</i>
+		@if( OrgConfig.get().filter_no_charge_cases && c.date_closed == null &&	c.charges.size() == 0 ) {
+			<i>The findings are not shown here because this case has no charges and is not closed.</i>
 		} else {
 			@c.findings
 		}
