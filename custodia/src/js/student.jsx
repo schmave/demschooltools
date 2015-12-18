@@ -105,12 +105,12 @@ var exports = React.createClass({
     },
     showingStudentName: function () {
         return <div className="col-sm-8" id="studentName">
-                  <span id="edit-name" onClick={this.toggleEdit}>
+                <span id="edit-name" onClick={this.toggleEdit}>
                     <h1 className="pull-left">{this.state.student.name}</h1>
                     <span className="fa fa-pencil edit-student"></span>
-                  </span>
+                </span>
 
-            <h2 className="badge badge-red">{(!this.studentInToday() && this.state.student.absent_today) ? 'Absent' : ''}</h2>
+                <h2 className="badge badge-red">{(!this.studentInToday() && this.state.student.absent_today) ? 'Absent' : ''}</h2>
         </div>;
     },
     editingStudentName: function () {
@@ -137,58 +137,58 @@ var exports = React.createClass({
         if (this.state.student) {
             var activeDate = this.getActiveDay(this.state.student);
             return <div className="row">
-                <SwipeHelpers ref="missingSwipeCollector">
-                </SwipeHelpers>
+            <SwipeHelpers ref="missingSwipeCollector">
+            </SwipeHelpers>
 
-                <div className="col-sm-1"></div>
-                <div className="col-sm-10">
-                    <div className="panel panel-info">
-                       <div className="panel-heading">
-                            <div className="row">
-                                {!this.state.editing ? this.showingStudentName() : this.editingStudentName()}
-                                <div className="col-sm-4">
-                                    <div id="hd-attended" className="col-sm-6"><b>Attended:</b> {this.state.student.total_days}</div>
-                                    <div id="hd-absent" className="col-sm-6"><b>Absent:</b> {this.state.student.total_abs}</div>
-                                    <div id="hd-excused" className="col-sm-6"><b>Excused:</b> {this.state.student.total_excused}</div>
-                                    <div id="hd-given" className="col-sm-6"><b>Gave
-                                        Attendance:</b> {this.state.student.total_overrides}
-                                    </div>
-                                    <div id="hd-short" className="col-sm-6"><b>Short:</b> {this.state.student.total_short}</div>
-                                    <div id="hd-required-mins" className="col-sm-6"><b>Required
-                                        Minutes:</b> {this.state.student.olderdate ? 330 : 300}</div>
+            <div className="col-sm-1"></div>
+            <div className="col-sm-10">
+                <div className="panel panel-info">
+                    <div className="panel-heading">
+                        <div className="row">
+                            {!this.state.editing ? this.showingStudentName() : this.editingStudentName()}
+                            <div className="col-sm-4">
+                                <div id="hd-attended" className="col-sm-6"><b>Attended:</b> {this.state.student.total_days}</div>
+                                <div id="hd-absent" className="col-sm-6"><b>Absent:</b> {this.state.student.total_abs}</div>
+                                <div id="hd-excused" className="col-sm-6"><b>Excused:</b> {this.state.student.total_excused}</div>
+                                <div id="hd-given" className="col-sm-6"><b>Gave
+                                    Attendance:</b> {this.state.student.total_overrides}
                                 </div>
+                                <div id="hd-short" className="col-sm-6"><b>Short:</b> {this.state.student.total_short}</div>
+                                <div id="hd-required-mins" className="col-sm-6"><b>Required
+                                    Minutes:</b> {this.state.student.olderdate ? 330 : 300}</div>
                             </div>
                         </div>
-                        <div className="panel-body">
-                            <div className="row">
-                                <div className="col-sm-7">
-                                    <div className="row">
-                                        {this.getActionButtons()}
-                                    </div>
-                                    <Heatmap days={this.state.student.days}/>
+                    </div>
+                    <div className="panel-body">
+                        <div className="row">
+                            <div className="col-sm-7">
+                                <div className="row">
+                                    {this.getActionButtons()}
                                 </div>
-                                <div className="col-sm-2">
-                                    <table className="table table-striped center">
-                                        <thead>
+                                <Heatmap days={this.state.student.days}/>
+                            </div>
+                            <div className="col-sm-2">
+                                <table className="table table-striped center">
+                                    <thead>
                                         <tr>
                                             <th className="center">Attendance</th>
                                         </tr>
-                                        </thead>
-                                        <tbody>
+                                    </thead>
+                                    <tbody>
                                         {this.getPreviousDays()}
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div className="col-sm-2">
-                                    {activeDate && this.state.student
-                                        ? <Swipes student={this.state.student} day={activeDate}/>
-                                        : ''}
-                                </div>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div className="col-sm-2">
+                                {activeDate && this.state.student
+                                 ? <Swipes student={this.state.student} day={activeDate}/>
+                                 : ''}
                             </div>
                         </div>
                     </div>
                 </div>
-                <div className="col-sm-1"></div>
+            </div>
+            <div className="col-sm-1"></div>
             </div>;
 
         } else {

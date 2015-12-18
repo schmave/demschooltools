@@ -65,14 +65,14 @@ var exports = React.createClass({
     classRows : function(){
         return this.state.classes.map(function (classval, i) {
             var boundClick = this.classSelected.bind(this, classval),
-            selected = (classval._id === this.state.selectedClass._id)  ? "selected" : "";
+                selected = (classval._id === this.state.selectedClass._id)  ? "selected" : "";
             return <tr key={classval._id}
-                       id={classval.name} 
+                       id={classval.name}
                        onClick={boundClick}
                        className={selected}>
                 <td>
-                {classval.name}
-                <span className="margined badge badge-green">{classval.active ? "Active" : ""}</span>
+                    {classval.name}
+                    <span className="margined badge badge-green">{classval.active ? "Active" : ""}</span>
                 </td></tr>;
         }.bind(this));
     },
@@ -93,13 +93,13 @@ var exports = React.createClass({
     getStudentRowsInCurrentClass : function(){
         var t = this.state.selectedClass.students.map(function (stu) {
             return <div key={"t" + this.state.selectedClass._id + "-" + stu.student_id}  className="in-class panel panel-info student-listing col-sm-11">
-                <div>
-                <div className="name"> {stu.name} </div>
-                <div className="attendance-button">
-                <button onClick={this.deleteFromClass.bind(this, stu)} className="btn btn-sm btn-primary"><i className="fa fa-arrow-right">&nbsp;</i></button>
-            </div>
-            </div>
-                </div>;
+                    <div>
+                        <div className="name"> {stu.name} </div>
+                        <div className="attendance-button">
+                            <button onClick={this.deleteFromClass.bind(this, stu)} className="btn btn-sm btn-primary"><i className="fa fa-arrow-right">&nbsp;</i></button>
+                        </div>
+                    </div>
+            </div>;
         }.bind(this));
         return t;
     },
@@ -108,58 +108,58 @@ var exports = React.createClass({
         var t = filtered.map(function (stu) {
             return <div key={"NOTCLASS-" + stu._id} className="out-class panel panel-info student-listing col-sm-11">
                 <div>
-                <div className="attendance-button">
-                <button id={("add-" + stu._id)} onClick={this.addToClass.bind(this, stu)} className="btn btn-sm btn-primary"><i className="fa fa-arrow-left">&nbsp;</i></button>
+                    <div className="attendance-button">
+                        <button id={("add-" + stu._id)} onClick={this.addToClass.bind(this, stu)} className="btn btn-sm btn-primary"><i className="fa fa-arrow-left">&nbsp;</i></button>
+                    </div>
+                    <div className="name"> {stu.name} </div>
                 </div>
-                <div className="name"> {stu.name} </div>
-            </div>
-                </div>;
+            </div>;
         }.bind(this));
         return t;
     },
     render: function () {
         var classActivateButton = (this.state.selectedClass.active !== true)
             ? <span><button id={("activate-" + this.state.selectedClass.name)} className="btn btn-sm btn-primary" onClick={this.activateClass}>Activate Class</button></span>
-            : <span></span>;
+                                : <span></span>;
         return <div>
-            <div className="row margined class-listing">
-                <div className="col-sm-2 column">
-                    <table className="table table-striped center">
-                        <thead>
-                            <tr>
-                                <th className="center">Classes</th>
-                            </tr>
-                        </thead>
-                       <tbody> {this.classRows()} </tbody>
-                    </table>
-                </div>
-                <div className="col-sm-2 column">
-                    <div className="panel panel-info">
-                       <div className="panel-heading absent"><b>Manage Class</b></div>
-                       {classActivateButton}
+                <div className="row margined class-listing">
+                    <div className="col-sm-2 column">
+                        <table className="table table-striped center">
+                            <thead>
+                                <tr>
+                                    <th className="center">Classes</th>
+                                </tr>
+                            </thead>
+                            <tbody> {this.classRows()} </tbody>
+                        </table>
                     </div>
-                </div>
-                <div className="col-sm-2 column">
-                   <div className="panel panel-info">
-                        <div className="panel-heading absent"><b>In Class</b></div>
-                        {this.getStudentRowsInCurrentClass()}
+                    <div className="col-sm-2 column">
+                        <div className="panel panel-info">
+                            <div className="panel-heading absent"><b>Manage Class</b></div>
+                            {classActivateButton}
+                        </div>
                     </div>
-                </div>
-                <div className="col-sm-2 column">
-                    <div className="panel panel-info">
-                       <div className="panel-heading absent"><b>Not In Class</b></div>
-                        {this.getStudentRowsNotInCurrentClass()}
+                    <div className="col-sm-2 column">
+                        <div className="panel panel-info">
+                            <div className="panel-heading absent"><b>In Class</b></div>
+                            {this.getStudentRowsInCurrentClass()}
+                        </div>
                     </div>
-                </div>
-                <div className="col-sm-2 column">
-                    <div className="panel panel-info">
-                       <div className="panel-heading absent"><b>Create Class</b></div>
-                        <div className="out-class panel panel-info student-listing col-sm-11">
-                            <Link id="create-class" to="createaclass">Create Class</Link>
+                    <div className="col-sm-2 column">
+                        <div className="panel panel-info">
+                            <div className="panel-heading absent"><b>Not In Class</b></div>
+                            {this.getStudentRowsNotInCurrentClass()}
+                        </div>
+                    </div>
+                    <div className="col-sm-2 column">
+                        <div className="panel panel-info">
+                            <div className="panel-heading absent"><b>Create Class</b></div>
+                            <div className="out-class panel panel-info student-listing col-sm-11">
+                                <Link id="create-class" to="createaclass">Create Class</Link>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
         </div>;
     }
 });

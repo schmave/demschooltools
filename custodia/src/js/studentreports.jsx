@@ -86,33 +86,38 @@ var exports = React.createClass({
     render: function () {
         var grid = null;
         if(this.state.loading) {
-                grid = <div>Loading</div>;
+            grid = <div>Loading</div>;
         }else {
-                grid = <Griddle id="test" results={this.state.rows} resultsPerPage="200"
-                        columns={['name', 'good', 'overrides', 'unexcused', 'excuses', 'short', 'total_hours']}
-                        columnMetadata={[{displayName: 'Name', columnName: 'name'},
-                                        {displayName: 'Attended', columnName: 'good'},
-                                        {displayName: 'Gave Attendance', columnName: 'overrides'},
-                                        {displayName: 'Unexcused', columnName: 'unexcused'},
-                                        {displayName: 'Excused Absence', columnName: 'excuses'},
-                                        {displayName: 'Short', columnName: 'short'},
-                                        {displayName: 'Total Hours', columnName: 'total_hours'}
-                                        ]}/>;
+            grid = <Griddle id="test" results={this.state.rows} resultsPerPage="200"
+                            columns={['name', 'good', 'overrides', 'unexcused', 'excuses', 'short', 'total_hours']}
+                            columnMetadata={[{displayName: 'Name', columnName: 'name'},
+                                             {displayName: 'Attended', columnName: 'good'},
+                                             {displayName: 'Gave Attendance', columnName: 'overrides'},
+                                             {displayName: 'Unexcused', columnName: 'unexcused'},
+                                             {displayName: 'Excused Absence', columnName: 'excuses'},
+                                             {displayName: 'Short', columnName: 'short'},
+                                             {displayName: 'Total Hours', columnName: 'total_hours'}
+                                ]}/>;
         }
         return <div>
             <div className="row margined">
-                 <select id="class-select" className="pull-left" onChange={this.classSelected} value={this.state.selectedClassId}>
+                <select id="class-select" className="pull-left"
+                        onChange={this.classSelected}
+                        value={this.state.selectedClassId}>
                     {this.state.classes ? this.state.classes.map(function (cls) {
-                        return <option value={cls._id}>{cls.name}</option>;
-                    }.bind(this)) : ""}
+                         return <option value={cls._id}>{cls.name}</option>;
+                     }.bind(this)) : ""}
                 </select>
-                <select className="pull-left" onChange={this.yearSelected} value={this.state.currentYear}>
+                <select className="pull-left" onChange={this.yearSelected}
+                        value={this.state.currentYear}>
                     {this.state.years ? this.state.years.years.map(function (year) {
-                        return <option
-                            value={year}>{year === this.state.years.current_year ? year + " (Current)" : year}</option>;
-                    }.bind(this)) : ""}
+                         return <option value={year}> {year === this.state.years.current_year ? year + " (Current)" : year}
+                         </option>;
+                     }.bind(this)) : ""}
                 </select>
-                <button className="pull-left delete-button btn btn-small btn-danger fa fa-trash-o" onClick={this.deletePeriod}></button>
+                <button className="pull-left delete-button btn btn-small btn-danger fa fa-trash-o"
+                        onClick={this.deletePeriod}>
+                </button>
                 <button className="pull-right btn btn-small btn-success"
                         onClick={function(){this.refs.newSchoolYear.show();}.bind(this)}>New Period
                 </button>
