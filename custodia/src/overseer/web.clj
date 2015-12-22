@@ -36,34 +36,33 @@
                     :password (creds/hash-bcrypt (env :userpass))
                     :roles #{roles/user}}})
 
-
 (defroutes app
   (GET "/" []
-       (friend/authenticated (io/resource "index.html")))
+    (friend/authenticated (io/resource "index.html")))
   (GET "/resetdb" []
-       (friend/authorize #{roles/super} ;; (db/reset-db)
-                         (resp/redirect "/")))
+    (friend/authorize #{roles/super} ;; (db/reset-db)
+                      (resp/redirect "/")))
 
   (GET "/dates/today" [] (dates/today-string))
   (GET "/sampledb" []
-       (friend/authorize #{roles/super} ;; (data/sample-db true)
-                         (resp/redirect "/")))
+    (friend/authorize #{roles/super} ;; (data/sample-db true)
+                      (resp/redirect "/")))
 
   student-routes
   class-routes
   report-routes
 
   (GET "/users/login" req
-       (io/resource "login.html"))
+    (io/resource "login.html"))
   (GET "/users/logout" req
-       (friend/logout* (resp/redirect (trace/trace "Logout: " "/users/login"))))
+    (friend/logout* (resp/redirect (trace/trace "Logout: " "/users/login"))))
   (GET "/users/is-user" req
-       (friend/authorize #{roles/user} "You're a user!"))
+    (friend/authorize #{roles/user} "You're a user!"))
   (GET "/users/is-admin" req
-        (friend/authorize #{roles/admin} (resp/response {:admin true})))
+    (friend/authorize #{roles/admin} (resp/response {:admin true})))
   (route/resources "/")
   (ANY "*" []
-       (route/not-found (slurp (io/resource "404.html")))))
+    (route/not-found (slurp (io/resource "404.html")))))
 
 (defn tapp []
   (-> #'app
