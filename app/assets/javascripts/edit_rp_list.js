@@ -101,16 +101,24 @@ requirejs(['utils'], function(utils) {
     };
 
     module.addCharge = function(data, parent_el) {
+		template_data = {
+			"name": utils.displayName(data.person),
+			"case_number": data.the_case.case_number,
+			"day_of_week": data.dayOfWeek,
+			"rule_title": data.rule ? data.ruleTitle : "<No rule>",
+			"resolution_plan": data.resolution_plan,
+			"sm_decision": data.sm_decision,
+			"findings": data.the_case.findings,
+			"sm_decision_date": data.sm_decision_date,
+			"referred_to_sm": data.referred_to_sm
+			};
+			
+		if (data.date_closed) {
+			template_data['date_closed'] = data.date_closed;
+		}
+				
         var new_charge_el = parent_el.append(
-            app.rp_template({
-                "name": utils.displayName(data.person),
-                "case_number": data.the_case.case_number,
-                "day_of_week": data.dayOfWeek,
-                "rule_title": data.rule ? data.rule.title : "<No rule>",
-                "resolution_plan": data.resolution_plan,
-                "sm_decision": data.sm_decision,
-                "referred_to_sm": data.referred_to_sm
-                })).children(":last-child");
+			app.rp_template(template_data)).children(":last-child");
 
         return new module.Charge(data, new_charge_el);
     };
