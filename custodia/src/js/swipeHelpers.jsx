@@ -39,7 +39,7 @@ module.exports = React.createClass({
             missing_out = (student.last_swipe_type == "in"
                            && direction == "in");
 
-        if (missing_in || missing_out) {
+        if ((missing_in || missing_out) && student.last_swipe_date) {
             var missingD = this._getMissingSwipe(student);
             this._setCalendarTime(student, missingD);
         } else {

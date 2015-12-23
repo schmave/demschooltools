@@ -59,6 +59,11 @@
   (clickw "#create-class-button")
   (clickw (str "#" name)))
 
+(defn create-student [name]
+  (clickw "#create-student")
+  (input-text "#studentName" name)
+  (clickw "#saveStudent"))
+
 (defn add-to-class [student-id]
   (clickw (str "#add-" student-id)))
 
@@ -78,11 +83,11 @@
 (defn assert-total-header [att abs ex over short id]
   (testing (str "student page totals: " id)
     (wait-until #(visible? "#hd-attended"))
-    (is (= (text "#hd-attended") (str "Attended: " att)))
-    (is (= (text "#hd-absent") (str "Absent: " abs)))
-    (is (= (text "#hd-excused") (str "Excused: " ex)))
-    (is (= (text "#hd-given") (str "Gave Attendance: " over)))
-    (is (= (text "#hd-short") (str "Short: " short))))
+    (is (= (str "Attended: " att) (text "#hd-attended")))
+    (is (= (str "Absent: " abs) (text "#hd-absent")))
+    (is (= (str "Excused: " ex) (text "#hd-excused")))
+    (is (= (str "Gave Attendance: " over) (text "#hd-given")))
+    (is (= (str "Short: " short) (text "#hd-short"))))
     )
 
 (deftest ^:integration make-classes-and-set-default
@@ -90,6 +95,7 @@
   (login-to-site)
 
   (create-class "test")
+
   (add-to-class 1)
 
   (activate-class "test")
@@ -231,31 +237,52 @@
   (assert-total-header 9 4 0 0 3 "")
   (quit))
 
+(deftest ^:integration first-swipe-isnt-missing-front-page
+  (do
+    (sh/sh "make" "load-aliased-dump")
+    (login-to-site))
+
+  (create-student "new")
+  (clickw "#home")
+
+  (go-to-class-page)
+  (add-to-class 57)
+
+  (clickw "#home")
+  (sign-in-front-page 57)
+
+  (click-student 57)
+
+  (assert-total-header 0 15 0 0 1 "")
+  (quit))
+
 (deftest ^:integration missing-swipe-twice-front-page
-  (data/sample-db)
+  (data/sample-db true)
   (login-to-site)
 
   (assert-student-in-not-in-col 1)
   (assert-student-in-not-in-col 2)
 
   (click-student 1)
-  (assert-total-header 0 0 0 0 1 "1")
+  (assert-total-header 0 1 0 0 1 "1b")
   (clickw "#home")
 
   (click-student 2)
-  (assert-total-header 0 0 0 0 1 "2")
+  (assert-total-header 0 1 0 0 1 "2b")
   (clickw "#home")
 
   (sign-in-front-page 1)
   (submit-missing)
   (click-student 1)
-  (assert-total-header 1 0 0 0 1 "1")
+  (assert-total-header 1 1 0 0 1 "1a")
   (clickw "#home")
 
   (sign-in-front-page 2)
   (submit-missing)
+
+  (clickw "#home")
   (click-student 2)
-  (assert-total-header 1 0 0 0 1 "1")
+  (assert-total-header 1 1 0 0 1 "2a")
   (clickw "#home")
 
   (assert-student-in-in-col 1)
