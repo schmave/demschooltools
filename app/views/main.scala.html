@@ -166,11 +166,23 @@ window.onerror = function(message, file, line, col, error) {
 				@OrgConfig.get().str_res_plans_cap</a>
 	  		<a @if(selectedBtn.equals("weekly_report")) { class="active" }
 				href="@routes.Application.thisWeekReport">Weekly Report</a>
+			<a @if(selectedBtn.equals("view_referred")) { class="active" }
+				href="@routes.Application.viewSchoolMeetingReferrals">
+				Charges referred to S.M. 
+				@defining( Application.getActiveSchoolMeetingReferrals() ) { sm_charges =>
+					@if( sm_charges.size() > 0 ) {
+						<span class="badge">
+							@sm_charges.size()
+						</apan>
+					}
+				}
+			</a>
 			<a @if(selectedBtn.equals("view_sm")) { class="active" }
 				href="@routes.Application.viewSchoolMeetingDecisions">
 				View S.M. decisions</a>
 			<a href="@routes.Application.downloadCharges()">
-				Download charges</a>
+				Download charges
+				</a>
 			</div>
 		</div>
 		}

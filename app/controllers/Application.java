@@ -55,6 +55,11 @@ public class Application extends Controller {
             .eq("person.organization", Organization.getByHost())
             .orderBy("id DESC").findList();
     }
+	
+	public static Result viewSchoolMeetingReferrals() {
+		return ok(views.html.view_sm_referrals.render(
+			getActiveSchoolMeetingReferrals()));
+	}
 
     public static Result viewSchoolMeetingDecisions() {
         List<Charge> the_charges =
@@ -101,8 +106,6 @@ public class Application extends Controller {
             .where().eq("organization", Organization.getByHost())
             .orderBy("date DESC").findList();
 
-        List<Charge> sm_charges = getActiveSchoolMeetingReferrals();
-
         Tag cur_student_tag = Tag.find.where()
             .eq("title", "Current Student")
             .eq("organization", Organization.getByHost())
@@ -142,7 +145,7 @@ public class Application extends Controller {
 
         Collections.sort(entries_with_charges, Entry.SORT_NUMBER);
 
-        return views.html.jc_index.render(meetings, sm_charges, people,
+        return views.html.jc_index.render(meetings, people,
             entries_with_charges).toString();
                 }}));
     }

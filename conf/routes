@@ -30,6 +30,7 @@ GET   /viewPersonHistory/:id    controllers.Application.viewPersonHistory(id: In
 GET   /viewRuleHistory/:id    controllers.Application.viewRuleHistory(id: Integer, start_date : String ?= "", end_date : String ?= "")
 
 
+GET   /viewSchoolMeetingReferrals    controllers.Application.viewSchoolMeetingReferrals()
 GET   /enterSchoolMeeting  controllers.ApplicationEditing.enterSchoolMeetingDecisions()
 GET   /editSchoolMeeting/:charge_id  controllers.ApplicationEditing.editSchoolMeetingDecision(charge_id: Integer)
 POST  /enterSchoolMeeting  controllers.ApplicationEditing.saveSchoolMeetingDecisions()

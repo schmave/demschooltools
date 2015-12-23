@@ -1,4 +1,4 @@
-@(meetings : List [ Meeting ], sm_charges : List [ Charge ], people : List[ Person ],
+@(meetings : List [ Meeting ], people : List[ Person ],
 rules : List[ Entry ])
 
 @import helper._
@@ -40,28 +40,6 @@ requirejs(["utils"], function(utils) {
 	});
 });
 </script>
-
-@if( sm_charges.size() > 0 ) {
-	<h4>Charges referred to School Meeting</h4>
-	<table class="table">
-		<thead><th width="100">Case
-			<th width="20">Person
-			<th width="150">Entry
-			<th width="70">Plea
-			<th>@OrgConfig.get().str_res_plan_cap<th>@OrgConfig.get().str_findings</thead>
-	@for( c <- sm_charges ) {
-		<tr><td>@c.the_case.case_number
-			<td>@if(c.person != null) { @c.person.getDisplayName() } else { <i>No one</i> }
-			<td>@c.getRuleTitle()
-			<td>@c.plea
-			<td>@c.resolution_plan
-			<td>@c.the_case.findings
-	}
-	</table>
-
-	<a class="btn btn-primary" href="@routes.ApplicationEditing.enterSchoolMeetingDecisions">
-	Record School Meeting decisions</a>
-}
 
 <p>
 
