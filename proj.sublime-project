@@ -3,7 +3,8 @@
 	[
 		{
 			"path": ".",
-			"folder_exclude_patterns": ["target"]
+			"folder_exclude_patterns": ["target"],
+			"file_exclude_patterns": ["bootstrap.css", "jquery-ui.js"]
 		}
 	]
 }
