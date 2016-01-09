@@ -36,14 +36,14 @@
 			@for( charge <- c.charges ) {
 				<li>
 				@if( charge.person != null) {
-					@charge.person.getDisplayName():
+					<b>@charge.person.getDisplayName()</b>:
 				}
 				@if( charge.rule != null) {
 					@charge.rule.getNumber() @charge.rule.title.
 					@if( !charge.severity.equals("")){(@charge.severity)}
 					@if( !charge.plea.equals("Guilty") ) { <b>@charge.plea.</b> }
 				}
-				<b>@OrgConfig.get().str_res_plan_short:</b> @charge.resolution_plan
+				<u>@OrgConfig.get().str_res_plan_short: @charge.resolution_plan</u>
 				</li>
 			}
 			</ol>
