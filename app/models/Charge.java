@@ -108,10 +108,7 @@ public class Charge extends Model implements Comparable<Charge> {
 
     public boolean displayInResolutionPlanList() {
         return this.person != null && this.rule != null
-			&& !this.referred_to_sm
-			&& !(this.resolution_plan.trim().toLowerCase().equals("warning") ||
-				 this.resolution_plan.trim().toLowerCase().equals("warning."))
-			&& !this.plea.equals("Not Guilty");
+			&& !this.referred_to_sm && !this.plea.equals("Not Guilty");
     }
 
     public void updateSchoolMeetingDecision(String decision, Date date) {
