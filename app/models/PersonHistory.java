@@ -6,7 +6,7 @@ import controllers.Application;
 
 public class PersonHistory {
 
-    public class Record {
+    public static class Record {
         public Date most_recent_charge;
         public Entry rule;
         public int count;

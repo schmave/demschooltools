@@ -22,6 +22,7 @@ GET  /editResolutionPlanList	controllers.Application.editResolutionPlanList()
 
 POST	/setResolutionPlanComplete	controllers.ApplicationEditing.setResolutionPlanComplete(id : Integer, complete : Boolean)
 
+GET   /personRuleHistory/:personId/:ruleId   controllers.Application.getPersonRuleHistory(personId: Integer, ruleId: Integer)
 GET   /personHistory/:id    controllers.Application.getPersonHistory(id: Integer)
 GET   /ruleHistory/:id    controllers.Application.getRuleHistory(id: Integer)
 

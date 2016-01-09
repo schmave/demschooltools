@@ -322,6 +322,12 @@ requirejs(['utils'], function(utils) {
                 url += "/" + self.rule_chooser.rule;
                 $.get(url, function (data) {
                     el.find(".last-rp").html(data);
+                    el.find(".last-rp .more-info").click(function() {
+                        showSomethingInSidebar(
+                            '/personRuleHistory' + 
+                            '/' + self.people_chooser.people[0].id +
+                            '/' + self.rule_chooser.rule);
+                    });
                 });
             }
 

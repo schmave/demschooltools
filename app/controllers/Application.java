@@ -573,6 +573,23 @@ public class Application extends Controller {
         return rps;
     }
 
+    public static Result getPersonRuleHistory(Integer personId, Integer ruleId) {
+        Person p = Person.findByIdWithJCData(personId);
+        Entry r = Entry.findById(ruleId);
+
+        PersonHistory history = new PersonHistory(p, false, getStartOfYear(), null);
+        PersonHistory.Record rule_record = null;
+        for (PersonHistory.Record record : history.rule_records) {
+            if (record.rule != null && record.rule.equals(r)) {
+                rule_record = record;
+                break;
+            }
+        }
+
+        return ok(views.html.person_rule_history.render(
+            p, r, rule_record, history.charges_by_rule.get(r), history));
+    }
+
     public static Result getPersonHistory(Integer id) {
         Person p = Person.findByIdWithJCData(id);
         return ok(views.html.person_history.render(
@@ -802,9 +819,7 @@ public class Application extends Controller {
 
         if (charges.size() > 0) {
             Charge c = charges.get(0);
-            return ok("" + charges.size() + " prior charges. Last " +
-                OrgConfig.get().str_res_plan_short + " (from case #" +
-                c.the_case.case_number + "): <u>" + c.resolution_plan + "</u>");
+            return ok(views.html.last_rp.render(charges.size(), c));
         }
 
         return ok("No previous charge.");

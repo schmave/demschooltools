@@ -1,0 +1,6 @@
+@(num_charges: Integer, c : Charge)
+
+@num_charges prior charges. 
+Last @OrgConfig.get().str_res_plan_short (from case #@c.the_case.case_number): 
+<u>@c.resolution_plan</u>
+<span class="label label-default more-info">More info</span>
