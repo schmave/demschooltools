@@ -28,7 +28,7 @@ public class OrgConfig {
 
     public Organization org;
 
-    public TimeZone time_zone = TimeZone.getTimeZone("America/New_York");
+    public TimeZone time_zone = TimeZone.getTimeZone("US/Eastern");
 
     public static OrgConfig get() {
         Organization org = Organization.getByHost();
@@ -173,5 +173,34 @@ class TheCircleSchool extends OrgConfig {
     @Override
     public String getCaseNumberPrefix(Meeting m) {
         return new SimpleDateFormat("yyyyMMdd").format(m.date);
+    }
+}
+
+class MakariosLearningCommunity extends OrgConfig {
+    private static final MakariosLearningCommunity INSTANCE = 
+        new MakariosLearningCommunity();
+
+    public MakariosLearningCommunity() {
+        name = "Makarios Learning Community";
+        short_name = "MLC";
+        people_url = "http://mlc.demschooltools.com";
+        time_zone = TimeZone.getTimeZone("US/Central");
+
+        str_manual_title = "Management Manual";
+        str_manual_title_short = "Mgmt. Man.";
+        str_res_plan_short = "Sentence";
+        str_res_plan = "sentence";
+        str_res_plan_cap = "Sentence";
+        str_res_plans = "sentences";
+        str_res_plans_cap = "Sentences";
+        str_findings = "Findings";
+
+        use_minor_referrals = true;
+
+        OrgConfig.register(name, this);
+    }
+
+    public static MakariosLearningCommunity getInstance() {
+        return INSTANCE;
     }
 }
