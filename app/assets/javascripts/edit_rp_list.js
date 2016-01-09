@@ -104,7 +104,10 @@ requirejs(['utils'], function(utils) {
 		template_data = {
 			"name": utils.displayName(data.person),
 			"case_number": data.the_case.case_number,
-			"day_of_week": data.dayOfWeek,
+            "closed_date": utils.reformatDate('m/dd', data.the_case.date_closed),
+			"closed_day_of_week": utils.reformatDate('D', data.the_case.date_closed),
+            "sm_date": utils.reformatDate('m/dd', data.sm_decision_date),
+            "sm_day_of_week": utils.reformatDate('D', data.sm_decision_date),
 			"rule_title": data.rule ? data.ruleTitle : "<No rule>",
 			"resolution_plan": data.resolution_plan,
 			"sm_decision": data.sm_decision,

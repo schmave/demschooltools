@@ -167,6 +167,23 @@ define (['jquery', 'jquery-ui', 'jquery-form', 'handlebars', 'sorttable', 'boots
     	}
     };
 
+    // reformat a YYYY-MM-DD date string using the given format specifier
+    module.reformatDate = function(format, date_str) {
+        if (!date_str) {
+            return undefined;
+        }
+
+        date = module.parseDate(date_str);
+        return $.datepicker.formatDate(format, date);
+    };
+
+    // parse a date in YYYY-MM-DD format
+    module.parseDate = function(date_str) {
+        var parts = date_str.split('-');
+        // new Date(year, month [, day [, hours[, minutes[, seconds[, ms]]]]])
+        return new Date(parts[0], parts[1]-1, parts[2]); // Note: months are 0-based
+    };
+
     return module;
 
 });

@@ -18,7 +18,7 @@
     <logger name="org.avaje.ebean.SUM" level="DEBUG"/>
   -->
 
-  <logger name="org.jdbcdslog.StatementLogger" level="off"/>
+  <logger name="org.jdbcdslog.StatementLogger" level="info"/>
   <logger name="org.jdbcdslog.SlowQueryLogger" level="error"/>
   <logger name="org.jdbcdslog.ResultSetLogger" level="off"/>
 </configuration>
