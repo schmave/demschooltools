@@ -61,7 +61,6 @@
         (friend/authorize #{roles/admin}
                           (data/delete-swipe swipe)
                           (student-page-response id)))
-
   (POST "/students/:id/swipe" [id :<< as-int direction  missing]
         (friend/authorize #{roles/user}
                           (if (= direction "in")
