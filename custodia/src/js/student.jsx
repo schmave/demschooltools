@@ -69,7 +69,7 @@ var exports = React.createClass({
         if (day.excused) {
             return r + ' (Excused)';
         } else if (day.override) {
-            return r + ' (Given Attendence)';
+            return r + ' (Overridden)';
         } else {
             return r;
         }

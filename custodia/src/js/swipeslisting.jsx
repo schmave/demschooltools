@@ -1,8 +1,8 @@
 var React = require('react'),
-    store = require('./StudentStore'),
-    AdminItem = require('./adminwrapper.jsx'),
-    actionCreator = require('./studentactioncreator'),
-    studentStore = require('./StudentStore');
+  store = require('./StudentStore'),
+  AdminItem = require('./adminwrapper.jsx'),
+  actionCreator = require('./studentactioncreator'),
+  studentStore = require('./StudentStore');
 
 var exports = React.createClass({
     contextTypes: {
@@ -57,8 +57,15 @@ var exports = React.createClass({
         actionCreator.override(this.props.student._id, this.props.day);
     },
     render: function () {
+        this.state.day.round_mins = parseFloat(this.state.day.total_mins).toFixed(0);
 
         return <span>
+                        <div>
+                            Day: {this.state.day.day}
+                        </div>
+                        <div>
+                            Minutes: {this.state.day.round_mins}
+                        </div>
             <table className="table table-striped center">
                 <thead>
                 <tr>
@@ -74,7 +81,7 @@ var exports = React.createClass({
                 <div className="pull-left">
                   <AdminItem>
                     <button type="button" id="override" onClick={this.override} className="btn btn-sm btn-info">
-                        Give Attendence
+                        Override
                     </button>
                   </AdminItem>
                 </div>
