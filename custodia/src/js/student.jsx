@@ -62,13 +62,23 @@ var exports = React.createClass({
         return buttons;
     },
     getDayStatus: function (day) {
-        if (day.excused) {
-            return '(Excused)';
-        } else if (day.override) {
-            return '(Given Attendence)';
-        } else {
-            return '';
+        var r = "";
+        if (day.valid) {
+            r = " ✓"
         }
+        if (day.excused) {
+            return r + ' (Excused)';
+        } else if (day.override) {
+            return r + ' (Given Attendence)';
+        } else {
+            return r;
+        }
+    },
+    getDayClass: function (day) {
+        if (day.valid) {
+            return "attended-day"
+        }
+        return "";
     },
     getPreviousDays: function () {
         var selectedDay = this.context.router.getCurrentParams().day;
@@ -77,8 +87,12 @@ var exports = React.createClass({
         }
         return this.state.student.days.map(function (day, i) {
             return <tr className={day.day === this.getActiveDay(this.state.student) ? "selected" : ""}>
-                <td><Link to="student"
-                          params={{studentId: this.state.studentId, day: day.day}}>{day.day} {this.getDayStatus(day)}</Link>
+                <td>
+                    <Link to="student"
+                          className={this.getDayClass(day)}
+                          params={{studentId: this.state.studentId, day: day.day}}>
+                        {day.day} {this.getDayStatus(day)}
+                    </Link>
                 </td>
             </tr>;
         }.bind(this))
@@ -148,10 +162,9 @@ var exports = React.createClass({
                             {!this.state.editing ? this.showingStudentName() : this.editingStudentName()}
                             <div className="col-sm-4">
                                 <div id="hd-attended" className="col-sm-6"><b>Attended:</b> {this.state.student.total_days}</div>
-                                <div id="hd-absent" className="col-sm-6"><b>Absent:</b> {this.state.student.total_abs}</div>
+                                <div id="hd-absent" className="col-sm-6"><b>Unexcused:</b> {this.state.student.total_abs}</div>
                                 <div id="hd-excused" className="col-sm-6"><b>Excused:</b> {this.state.student.total_excused}</div>
-                                <div id="hd-given" className="col-sm-6"><b>Gave
-                                    Attendance:</b> {this.state.student.total_overrides}
+                                <div id="hd-given" className="col-sm-6"><b>Override:</b> {this.state.student.total_overrides}
                                 </div>
                                 <div id="hd-short" className="col-sm-6"><b>Short:</b> {this.state.student.total_short}</div>
                                 <div id="hd-required-mins" className="col-sm-6"><b>Required

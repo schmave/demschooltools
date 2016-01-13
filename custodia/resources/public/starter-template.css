@@ -137,6 +137,9 @@ a {
     /*     float: right; */
     /* } */
 }
+.attended-day {
+    color: green;
+}
 
 .class-listing .panel,
 .student-listing-table .panel

@@ -1,15 +1,22 @@
 * DONE Collect missing swipe from front page
 CLOSED: [2015-12-07 Mon 07:18]
-* TODO Student Page - Change absent to unexcused 
+* DONE Student Page - Change absent to unexcused 
+CLOSED: [2016-01-12 Tue 07:31]
 On the student page in the top right corner where student numbers are listed: could we change "absent" to "unexcused" and put it directly below the excused absences?
-* TODO Student Page - we change "gave attendance" back to "override"?
+* DONE Student Page - we change "gave attendance" back to "override"?
+CLOSED: [2016-01-12 Tue 07:31]
 * TODO Student Page - we have excused and unexcused short days?
+* TODO Student Page - make short and absent days show that way on sidebar
+* TODO Student Page - make excuse and give attendance only show on short or absent days
+* TODO Student Page - show minute count on days
 * TODO Student Page - only 15 minutes short 
 Is it possible to only list days as "short" if they are more than 15 minutes short? So many kids have days that show short when they miss the requirements by a few minutes.
 * TODO Student Totals - "attended" days include "short" days?
+
 * TODO Student Totals - limit the total hours display to two digits after the decimal point?
-* TODO Link online excused absence form that people can fill out. Is there a way to link it to the software?
-* TODO Start date for kids who enroll half way
+* TODO Link online excused absence form that people can fill out. 
+Is there a way to link it to the software?
+* TODO Start date for kids who enroll halfway through year
 * TODO multi-tenented
 * DONE Fix Angular Jump 
   CLOSED: [2015-03-26 Thu 16:15]
