@@ -6,14 +6,27 @@ On the student page in the top right corner where student numbers are listed: co
 * DONE Student Page - we change "gave attendance" back to "override"?
 CLOSED: [2016-01-12 Tue 07:31]
 * TODO Student Page - we have excused and unexcused short days?
-* TODO Student Page - make short and absent days show that way on sidebar
-* TODO Student Page - make excuse and give attendance only show on short or absent days
-* TODO Student Page - show minute count on days
+* DONE Student Page - make short and absent days show that way on sidebar
+CLOSED: [2016-01-14 Thu 16:42]
+* TODO Student Page - make excuse and give attendance buttons only show on short or absent days
+* DONE Student Page - show minute count on days
+CLOSED: [2016-01-14 Thu 07:21]
+* TODO Student Page - short count to change if the short day is excused
+* DONE Student Page - "attended" days include "short" days?
+CLOSED: [2016-01-14 Thu 16:53]
+I think we could remove the "Short" section on the student page, and list the
+number in the attended section as "2 (1)" meaning they were here 2 days but 1
+day was short.
 * TODO Student Page - only 15 minutes short 
-Is it possible to only list days as "short" if they are more than 15 minutes short? So many kids have days that show short when they miss the requirements by a few minutes.
+Is it possible to only list days as "short" if they are more than 15 minutes
+short? So many kids have days that show short when they miss the requirements by
+a few minutes.
 * TODO Student Totals - "attended" days include "short" days?
-
+I think we could remove the "Short" section on the student page, and list the
+number in the attended section as "2 (1)" meaning they were here 2 days but 1
+day was short.
 * TODO Student Totals - limit the total hours display to two digits after the decimal point?
+* TODO Student Totals - student name link to student page
 * TODO Link online excused absence form that people can fill out. 
 Is there a way to link it to the software?
 * TODO Start date for kids who enroll halfway through year
@@ -39,7 +52,8 @@ CLOSED: [2015-05-13 Wed 17:47]
 * TODO Configurable passwords
 * DONE Hide student
 CLOSED: [2015-12-07 Mon 07:18]
-* TODO ng grid
+* DONE ng grid
+CLOSED: [2016-01-14 Thu 16:44]
 * DONE Create student
   CLOSED: [2014-12-23 Tue 12:03]
 * DONE swipe in 

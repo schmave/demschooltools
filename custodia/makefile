@@ -12,6 +12,7 @@ T :
 	@echo load-aliased-dump
 	@echo backup-aliased-dump "for backing up a database after migrating"
 	@echo sql-backup-local-restore
+	@echo sql-local - connect to local database
 	@echo "sql-philly-backup - make backup of philly prod database"
 	@echo "start - start a running overseer site"
 	@echo minify
@@ -59,6 +60,9 @@ webdriver-test :
 # insert into classes_X_students (class_id, student_id) select 1, _id from students;
 drop-tables :
 	psql -d swipes -c " DROP TABLE IF EXISTS years; DROP TABLE IF EXISTS classes_X_students; DROP TABLE IF EXISTS classes; DROP FUNCTION IF EXISTS school_days(text); DROP VIEW IF EXISTS roundedswipes; DROP TABLE IF EXISTS swipes; DROP TABLE IF EXISTS session_store; DROP TABLE IF EXISTS students; DROP TABLE IF EXISTS excuses; DROP TABLE IF EXISTS overrides; "
+
+sql-local : 
+	psql -d swipes
 
 load-massive-dump : drop-tables
 	psql swipes < massive.dump

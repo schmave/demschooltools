@@ -75,8 +75,11 @@ var exports = React.createClass({
         }
     },
     getDayClass: function (day) {
-        if (day.valid) {
-            return "attended-day"
+        if (day.valid==true) {
+            return "attended-day";
+        }
+        if (day.absent==true) {
+            return "absent-day";
         }
         return "";
     },
@@ -150,6 +153,8 @@ var exports = React.createClass({
     render: function () {
         if (this.state.student) {
             var activeDate = this.getActiveDay(this.state.student);
+            var attended = (this.state.student.total_days + this.state.student.total_short).toString()
+                          + " (" + this.state.student.total_short +  ")";
             return <div className="row">
             <SwipeHelpers ref="missingSwipeCollector">
             </SwipeHelpers>
@@ -161,12 +166,11 @@ var exports = React.createClass({
                         <div className="row">
                             {!this.state.editing ? this.showingStudentName() : this.editingStudentName()}
                             <div className="col-sm-4">
-                                <div id="hd-attended" className="col-sm-6"><b>Attended:</b> {this.state.student.total_days}</div>
+                                <div id="hd-attended" className="col-sm-6"><b>Attended:</b> {attended}</div>
                                 <div id="hd-absent" className="col-sm-6"><b>Unexcused:</b> {this.state.student.total_abs}</div>
                                 <div id="hd-excused" className="col-sm-6"><b>Excused:</b> {this.state.student.total_excused}</div>
                                 <div id="hd-given" className="col-sm-6"><b>Override:</b> {this.state.student.total_overrides}
                                 </div>
-                                <div id="hd-short" className="col-sm-6"><b>Short:</b> {this.state.student.total_short}</div>
                                 <div id="hd-required-mins" className="col-sm-6"><b>Required
                                     Minutes:</b> {this.state.student.olderdate ? 330 : 300}</div>
                             </div>

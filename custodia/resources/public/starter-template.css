@@ -140,6 +140,9 @@ a {
 .attended-day {
     color: green;
 }
+.absent-day {
+    color: red;
+}
 
 .class-listing .panel,
 .student-listing-table .panel
