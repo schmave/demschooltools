@@ -18,15 +18,14 @@ I think we could remove the "Short" section on the student page, and list the
 number in the attended section as "2 (1)" meaning they were here 2 days but 1
 day was short.
 * TODO Student Page - only 15 minutes short 
-Is it possible to only list days as "short" if they are more than 15 minutes
-short? So many kids have days that show short when they miss the requirements by
-a few minutes.
-* TODO Student Totals - "attended" days include "short" days?
-I think we could remove the "Short" section on the student page, and list the
-number in the attended section as "2 (1)" meaning they were here 2 days but 1
-day was short.
+1. Dark Green (the current "more than 300" color)- met attendance requirement 
+2. Light Green (the current "less than 75" color)- up to fifteen minutes short
+3. Yellow- more than 15 minutes short
+4. Middle Green (current " between 150 and 225" color)- absent/short day, excused
+5. Red- absent, unexcused* TODO Student Totals - "attended" days include "short" days?
 * TODO Student Totals - limit the total hours display to two digits after the decimal point?
-* TODO Student Totals - student name link to student page
+* DONE Student Totals - student name link to student page
+CLOSED: [2016-01-15 Fri 07:46]
 * TODO Link online excused absence form that people can fill out. 
 Is there a way to link it to the software?
 * TODO Start date for kids who enroll halfway through year

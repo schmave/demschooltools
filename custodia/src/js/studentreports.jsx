@@ -1,6 +1,8 @@
 var reportStore = require('./reportstore'),
     classStore = require('./classstore'),
     Modal = require('./modal.jsx'),
+    Router = require('react-router'),
+    Link = Router.Link,
     DatePicker = require('react-widgets').DateTimePicker,
     actionCreator = require('./reportactioncreator'),
     React = require('react'),
@@ -13,6 +15,15 @@ var getState = function () {
             classes: [],
             years: reportStore.getSchoolYears()};
 };
+
+var StudentLinkComponent = React.createClass({
+  render: function(){
+    //url ="#speakers/" + props.rowData._id + "/" + this.props.data;
+    var sid = this.props.rowData._id,
+        name = this.props.data;
+    return <Link to="student" params={{studentId: sid}} id={"student-" + sid}>{name}</Link>;
+  }
+});
 
 var exports = React.createClass({
     getInitialState: function () {
@@ -90,7 +101,9 @@ var exports = React.createClass({
         }else {
             grid = <Griddle id="test" results={this.state.rows} resultsPerPage="200"
                             columns={['name', 'good', 'overrides', 'unexcused', 'excuses', 'short', 'total_hours']}
-                            columnMetadata={[{displayName: 'Name', columnName: 'name'},
+                            columnMetadata={[{displayName: 'Name',
+                                              columnName: 'name',
+                                              customComponent: StudentLinkComponent },
                                              {displayName: 'Attended', columnName: 'good'},
                                              {displayName: 'Gave Attendance', columnName: 'overrides'},
                                              {displayName: 'Unexcused', columnName: 'unexcused'},
