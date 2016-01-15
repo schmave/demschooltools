@@ -15,6 +15,23 @@ var getState = function () {
             classes: [],
             years: reportStore.getSchoolYears()};
 };
+function pad(num, size) {
+    var s = num+"";
+    while (s.length < size) s = "0" + s;
+    return s;
+}
+function deciHours(time) {
+    if (!time) {return "0:00";}
+    var i = parseInt(time, 10);
+    return i.toString() + ":" + pad(Math.round(((time-i)*60),10), 2);
+}
+
+var StudentTotalComponent = React.createClass({
+  render: function(){
+      var t = deciHours(this.props.data);
+      return <span>{t}</span>;
+  }
+});
 
 var StudentLinkComponent = React.createClass({
   render: function(){
@@ -109,7 +126,7 @@ var exports = React.createClass({
                                              {displayName: 'Unexcused', columnName: 'unexcused'},
                                              {displayName: 'Excused Absence', columnName: 'excuses'},
                                              {displayName: 'Short', columnName: 'short'},
-                                             {displayName: 'Total Hours', columnName: 'total_hours'}
+                                             {displayName: 'Total Hours', columnName: 'total_hours', customComponent: StudentTotalComponent}
                                 ]}/>;
         }
         return <div>
