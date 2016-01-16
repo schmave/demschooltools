@@ -58,7 +58,8 @@ var exports = React.createClass({
     },
     render: function () {
         this.state.day.round_mins = parseFloat(this.state.day.total_mins).toFixed(0);
-
+        var showOverrideExcuseButtons = this.state.day && !this.state.day.override
+                                 && !this.state.day.excused && !this.state.day.valid;
         return <span>
                         <div>
                             Day: {this.state.day.day}
@@ -77,7 +78,8 @@ var exports = React.createClass({
                 {this.getSwipesForDay()}
                 </tbody>
             </table>
-            {this.state.day && !this.state.day.override && !this.state.day.excused ? <div className="action-buttons">
+            {showOverrideExcuseButtons ?
+              <div className="action-buttons">
                 <div className="pull-left">
                   <AdminItem>
                     <button type="button" id="override" onClick={this.override} className="btn btn-sm btn-info">
