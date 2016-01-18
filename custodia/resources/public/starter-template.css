@@ -143,6 +143,10 @@ a {
 .absent-day {
     color: red;
 }
+.q0, .q4, .q3, .q2 {
+    color: red !important;
+    background-color: red !important;
+}
 
 .class-listing .panel,
 .student-listing-table .panel

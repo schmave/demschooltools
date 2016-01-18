@@ -1,6 +1,6 @@
 var React = require('react'),
-    heatmap = require('cal-heatmap'),
-    Heatmapmonth = require('./heatmapmonth.jsx');
+  heatmap = require('cal-heatmap'),
+  Heatmapmonth = require('./heatmapmonth.jsx');
 
 var groupingFunc = function (data) {
     return data.day.split('-')[0] + '-' + data.day.split('-')[1] + '-' + '01';
@@ -9,10 +9,13 @@ var groupingFunc = function (data) {
 module.exports = React.createClass({
     loadHeatmaps: function () {
         var groupedDays = this.props.days.groupBy(groupingFunc);
+        var minutes = this.props.requiredMinutes;
         var sortedDates = Object.keys(groupedDays).sort();
 
         var maps = sortedDates.map(function(date, idx){
-            return <Heatmapmonth index={idx} days={groupedDays[date]}></Heatmapmonth>;
+            return <Heatmapmonth index={idx}
+                                 requiredMinutes={minutes}
+                                 days={groupedDays[date]}></Heatmapmonth>;
         });
         return maps;
     },

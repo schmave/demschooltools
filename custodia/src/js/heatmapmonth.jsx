@@ -8,6 +8,9 @@ var exports = React.createClass({
         var formatted = {};
         days.forEach(function (day) {
             formatted[moment(day.day).unix()] = day.total_mins;
+            if(day.excused) {
+                //formatted[moment(day.day).unix()] = -15;
+            }
         });
         return formatted;
     },
@@ -20,6 +23,12 @@ var exports = React.createClass({
 
         var selector = '#heatmap'+ this.props.index;
         this.map.init({
+            legendColors: {
+	              min: "#dae289",
+		            max: "#3b6427",
+		            empty: "red"
+		            //empty: "white"
+	          },
             itemSelector: selector,
             data: data,
             start: moment(this.props.days[0].day).startOf('month').toDate(),
@@ -27,7 +36,7 @@ var exports = React.createClass({
             subDomain: 'x_day',
             subDomainTextFormat: "%d",
             range: 1,
-            legend: [75, 150, 225, 300],
+            legend: [0, (this.props.requiredMinutes - 15), (this.props.requiredMinutes-1),500],
             legendVerticalPosition: 'center',
             legendCellSize: 8,
             itemName: ['minute', 'minutes'],

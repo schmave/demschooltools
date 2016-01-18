@@ -1,14 +1,14 @@
 var React = require('react'),
-    Heatmap = require('./heatmap.jsx'),
-    Modal = require('./modal.jsx'),
-    DateTimePicker = require('react-widgets').DateTimePicker,
-    actionCreator = require('./studentactioncreator'),
-    studentStore = require('./StudentStore'),
-    Router = require('react-router'),
-    Link = Router.Link,
-    SwipeHelpers = require('./swipeHelpers.jsx'),
-    Swipes = require('./swipeslisting.jsx'),
-    SwipeListing = require('./swipeslisting.jsx');
+  Heatmap = require('./heatmap.jsx'),
+  Modal = require('./modal.jsx'),
+  DateTimePicker = require('react-widgets').DateTimePicker,
+  actionCreator = require('./studentactioncreator'),
+  studentStore = require('./StudentStore'),
+  Router = require('react-router'),
+  Link = Router.Link,
+  SwipeHelpers = require('./swipeHelpers.jsx'),
+  Swipes = require('./swipeslisting.jsx'),
+  SwipeListing = require('./swipeslisting.jsx');
 
 
 var exports = React.createClass({
@@ -154,7 +154,8 @@ var exports = React.createClass({
         if (this.state.student) {
             var activeDate = this.getActiveDay(this.state.student);
             var attended = (this.state.student.total_days + this.state.student.total_short).toString()
-                          + " (" + this.state.student.total_short +  ")";
+                          + " (" + this.state.student.total_short +  ")",
+                requiredMinutes = this.state.student.olderdate ? 330 : 300;
             return <div className="row">
             <SwipeHelpers ref="missingSwipeCollector">
             </SwipeHelpers>
@@ -172,7 +173,7 @@ var exports = React.createClass({
                                 <div id="hd-given" className="col-sm-6"><b>Override:</b> {this.state.student.total_overrides}
                                 </div>
                                 <div id="hd-required-mins" className="col-sm-6"><b>Required
-                                    Minutes:</b> {this.state.student.olderdate ? 330 : 300}</div>
+                                    Minutes:</b> {requiredMinutes}</div>
                             </div>
                         </div>
                     </div>
@@ -182,7 +183,8 @@ var exports = React.createClass({
                                 <div className="row">
                                     {this.getActionButtons()}
                                 </div>
-                                <Heatmap days={this.state.student.days}/>
+                                <Heatmap days={this.state.student.days}
+                                         requiredMinutes={requiredMinutes} />
                             </div>
                             <div className="col-sm-2">
                                 <table className="table table-striped center">

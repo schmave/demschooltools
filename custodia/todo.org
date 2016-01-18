@@ -6,7 +6,8 @@
 2. Light Green (the current "less than 75" color)- up to fifteen minutes short
 3. Yellow- more than 15 minutes short
 4. Middle Green (current " between 150 and 225" color)- absent/short day, excused
-5. Red- absent, unexcused* TODO Student Totals - "attended" days include "short" days?
+5. Red- absent, unexcused
+* TODO Student Totals - "attended" days include "short" days?
 * TODO Link online excused absence form that people can fill out. 
 Is there a way to link it to the software?
 * TODO Start date for kids who enroll halfway through year
