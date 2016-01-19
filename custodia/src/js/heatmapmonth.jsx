@@ -21,9 +21,20 @@ var exports = React.createClass({
         }
         this.map = new heatmap();
 
-        var selector = '#heatmap'+ this.props.index;
+        var selector = '#heatmap'+ this.props.index,
+            padNumber = function(n) {
+                return ("0" + n).slice(-2);
+            },
+            makeDateId = function(d) {
+                var datestring = d.getFullYear() + "-" + padNumber(d.getMonth()+1) + "-" + padNumber(d.getDate());
+
+                return "#day-"+datestring;
+            };
         this.map.init({
             itemSelector: selector,
+            onClick: function(d, nb) {
+                $(makeDateId(d))[0].click();
+            },
             data: data,
             start: moment(this.props.days[0].day).startOf('month').toDate(),
             domain: 'month',

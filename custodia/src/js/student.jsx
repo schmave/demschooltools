@@ -92,6 +92,7 @@ var exports = React.createClass({
             return <tr className={day.day === this.getActiveDay(this.state.student) ? "selected" : ""}>
                 <td>
                     <Link to="student"
+                          id={"day-"+day.day}
                           className={this.getDayClass(day)}
                           params={{studentId: this.state.studentId, day: day.day}}>
                         {day.day} {this.getDayStatus(day)}
