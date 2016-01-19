@@ -23,12 +23,6 @@ var exports = React.createClass({
 
         var selector = '#heatmap'+ this.props.index;
         this.map.init({
-            legendColors: {
-	              min: "#dae289",
-		            max: "#3b6427",
-		            empty: "red"
-		            //empty: "white"
-	          },
             itemSelector: selector,
             data: data,
             start: moment(this.props.days[0].day).startOf('month').toDate(),
