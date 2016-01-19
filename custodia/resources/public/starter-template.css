@@ -145,7 +145,10 @@ a {
 }
 /* absent */
 .q0, .q1 {
-    fill:	#B22222 !important;
+    fill:		#F08080 !important;
+}
+.subdomain-text{
+    fill: black !important;
 }
 /* short */
 .q2 {
