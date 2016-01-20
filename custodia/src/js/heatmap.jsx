@@ -12,12 +12,12 @@ module.exports = React.createClass({
         var minutes = this.props.requiredMinutes;
         var sortedDates = Object.keys(groupedDays).sort();
 
-        var maps = sortedDates.map(function(date, idx){
-            return <Heatmapmonth index={idx}
+        //var maps = sortedDates.map(function(date, idx){
+            return <Heatmapmonth index="1" 
                                  requiredMinutes={minutes}
-                                 days={groupedDays[date]}></Heatmapmonth>;
-        });
-        return maps;
+                                 days={this.props.days}></Heatmapmonth>;
+        //});
+        //return maps;
     },
     render: function () {
         return <div className="row">{this.loadHeatmaps()}</div>;

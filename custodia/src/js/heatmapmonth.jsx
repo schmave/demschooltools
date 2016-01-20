@@ -9,7 +9,10 @@ var exports = React.createClass({
         days.forEach(function (day) {
             formatted[moment(day.day).unix()] = day.total_mins;
             if(day.excused) {
-                //formatted[moment(day.day).unix()] = -15;
+                formatted[moment(day.day).unix()] = 285;
+            }
+            if(!day.absent && day.total_mins == 0) {
+                formatted[moment(day.day).unix()] = 1;
             }
         });
         return formatted;
@@ -36,11 +39,11 @@ var exports = React.createClass({
                 $(makeDateId(d))[0].click();
             },
             data: data,
-            start: moment(this.props.days[0].day).startOf('month').toDate(),
+            start: moment(this.props.days[this.props.days.length-1].day).startOf('month').toDate(),
             domain: 'month',
             subDomain: 'x_day',
             subDomainTextFormat: "%d",
-            range: 1,
+            range: 4,
             legend: [0, (this.props.requiredMinutes - 15), (this.props.requiredMinutes-1),500],
             legendVerticalPosition: 'center',
             legendCellSize: 8,
