@@ -1,7 +1,8 @@
 * TODO Student Page - we have excused and unexcused short days?
 * TODO Student Page - make excuse and give attendance buttons only show on short or absent days
 * TODO Student Page - short count to change if the short day is excused
-* TODO Student Page - only 15 minutes short 
+* DONE Student Page - only 15 minutes short 
+CLOSED: [2016-01-20 Wed 17:26]
 1. Dark Green (the current "more than 300" color)- met attendance requirement 
 2. Light Green (the current "less than 75" color)- up to fifteen minutes short
 3. Yellow- more than 15 minutes short

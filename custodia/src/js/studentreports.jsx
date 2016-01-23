@@ -33,6 +33,15 @@ var StudentTotalComponent = React.createClass({
   }
 });
 
+var StudentAttendendedComponent = React.createClass({
+  render: function(){
+    var good = this.props.rowData.good;
+    var short = this.props.rowData.short;
+
+    var good = (good + short) + " (" + short +  ")";
+    return <span>{good}</span>;
+  }
+});
 var StudentLinkComponent = React.createClass({
   render: function(){
     //url ="#speakers/" + props.rowData._id + "/" + this.props.data;
@@ -116,12 +125,15 @@ var exports = React.createClass({
         if(this.state.loading) {
             grid = <div>Loading</div>;
         }else {
+
             grid = <Griddle id="test" results={this.state.rows} resultsPerPage="200"
                             columns={['name', 'good', 'overrides', 'unexcused', 'excuses', 'short', 'total_hours']}
                             columnMetadata={[{displayName: 'Name',
                                               columnName: 'name',
                                               customComponent: StudentLinkComponent },
-                                             {displayName: 'Attended', columnName: 'good'},
+                                             {displayName: 'Attended',
+                                              customComponent: StudentAttendendedComponent,
+                                              columnName: 'good'},
                                              {displayName: 'Gave Attendance', columnName: 'overrides'},
                                              {displayName: 'Unexcused', columnName: 'unexcused'},
                                              {displayName: 'Excused Absence', columnName: 'excuses'},

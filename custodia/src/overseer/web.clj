@@ -8,8 +8,10 @@
             [compojure.coercions :refer [as-int]]
             [clojure.java.io :as io]
             [clojure.tools.nrepl.server :as nrepl-server]
+            [refactor-nrepl.middleware :as refactor]
             [jdbc-ring-session.core :refer [jdbc-store]]
             [cider.nrepl :refer (cider-nrepl-handler)]
+            [cider.nrepl :as nrepl]
             [ring.adapter.jetty :as jetty]
             [ring.util.response :as resp]
             [clojure.tools.trace :as trace]
@@ -78,6 +80,9 @@
 
 (defn -main [& [port]]
   (db/init-pg)
-  (nrepl-server/start-server :port 7888 :handler cider-nrepl-handler)
+  (nrepl-server/start-server :port 7888 :handler
+                             (apply clojure.tools.nrepl.server/default-handler
+                                    (concat (map resolve cider.nrepl/cider-middleware)
+                                            [refactor/wrap-refactor])))
   (let [port (Integer. (or port (env :port) 5000))]
     (jetty/run-jetty (site (tapp)) {:port port :join? false})))

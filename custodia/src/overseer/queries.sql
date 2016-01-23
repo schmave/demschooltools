@@ -108,10 +108,11 @@ SELECT
     , sum(CASE WHEN oid IS NOT NULL
                OR stu.intervalmin >= stu.requiredmin
           THEN 1 ELSE 0 END) as good
-    , sum(CASE WHEN (oid IS NULL
-                     AND eid IS NULL)
-              AND (stu.intervalmin < stu.requiredmin
-                   AND stu.intervalmin IS NOT NULL)
+    , sum(CASE WHEN oid IS NULL
+               AND eid IS NULL
+               AND (stu.intervalmin < stu.requiredmin
+                    OR stu.intervalmin IS NULL)
+               AND stu.anyswipes IS NOT NULL
           THEN 1 ELSE 0 END) as short
     , sum(CASE WHEN oid IS NOT NULL THEN 1 ELSE 0 END) as overrides
     , sum(CASE WHEN eid IS NOT NULL THEN 1 ELSE 0 END) as excuses

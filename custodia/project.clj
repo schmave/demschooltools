@@ -2,13 +2,13 @@
   :description "Demo Clojure web app"
   :url "http://overseer.herokuapp.com"
   :license {:name "Eclipse Public License v1.0"
-            :url "http://www.eclipse.org/legal/epl-v10.html"}
+            :url "http://www.eclipse.erg/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [compojure "1.4.0"]
                  [ring/ring-jetty-adapter "1.2.2"]
 
                ;;  [alembic "0.3.2"]
-                 [org.clojure/tools.nrepl "0.2.10"]
+                 [org.clojure/tools.nrepl "0.2.12"]
 
                  [org.clojure/data.json "0.2.5"]
                  [com.cemerick/friend "0.2.1" :exclusions [xerces/xercesImpl
@@ -27,6 +27,8 @@
                  [org.postgresql/postgresql "9.4-1201-jdbc41"]
                  [org.clojure/tools.trace "0.7.8"]
                  [com.ashafa/clutch "0.4.0"]
+                 [org.clojure/java.classpath "0.2.2"]
+                 [refactor-nrepl "1.2.0-SNAPSHOT"]
 
                  ]
   :min-lein-version "2.0.0"
