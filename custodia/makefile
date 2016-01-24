@@ -43,7 +43,8 @@ deploy-philly :
 	./prod-deploy.sh $(philly-prod-git)
 
 start :
-	lein run -m overseer.web
+	lein ring server-headless 5000
+# lein run -m overseer.web
 
 debug :
 	lein with-profile debug run -m overseer.web
