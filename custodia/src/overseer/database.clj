@@ -161,7 +161,7 @@
           :name name}
          db/persist!)))
 
-;; (sample-db true) 
+;; (sample-db true)  
 (defn sample-db
   ([] (sample-db false))
   ([have-extra?]

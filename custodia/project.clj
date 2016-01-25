@@ -14,7 +14,7 @@
                  [com.cemerick/friend "0.2.1" :exclusions [xerces/xercesImpl
                                                            org.clojure/core.cache]]
                  [org.clojure/tools.trace "0.7.8"]
-                 [yesql "0.4.2"]
+                 [yesql "0.5.1"]
                  [environ "1.0.0"]
                  [ring/ring-json "0.3.1"]
                  [jdbc-ring-session "0.2"]
@@ -34,7 +34,7 @@
   :min-lein-version "2.0.0"
   :plugins [[cider/cider-nrepl "0.10.0-SNAPSHOT"]
             [refactor-nrepl "1.2.0-SNAPSHOT"]
-            [lein-ring "0.7.0"]
+            [lein-ring "0.9.7"]
             [environ/environ.lein "0.2.1"]]
   :test-selectors {:default (or (complement :integration)
                                 (complement :performance))

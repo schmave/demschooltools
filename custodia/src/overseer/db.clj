@@ -14,9 +14,12 @@
             [clj-time.format :as timef]
             [clojure.java.jdbc :as jdbc]
             [overseer.migrations :as migrations]
+
+            (cemerick.friend [workflows :as workflows]
+                             [credentials :as creds])
             ))
 
-(defqueries "overseer/queries.sql")
+(def ^:dynamic *school-schema* "phillyfreeschool")
 
 (extend-type Date
   jdbc/ISQLParameter
@@ -25,8 +28,11 @@
       (.setTimestamp stmt ix (timec/to-timestamp val) cal))))
 
 (def pgdb (atom nil))
+
+
 ;; (init-pg)
 (defn init-pg []
+  (defqueries "overseer/queries.sql" {:connection @pgdb})
   (swap! pgdb (fn [old]
                 (dissoc (h/korma-connection-map (env :database-url))
                         :classname))))
@@ -36,16 +42,17 @@
 
 (defn drop-all-tables []
   (jdbc/execute! @pgdb ["
-    DROP TABLE IF EXISTS years;
-    DROP TABLE IF EXISTS classes_X_students;
-    DROP TABLE IF EXISTS classes;
-    DROP FUNCTION IF EXISTS school_days(text);
-    DROP VIEW IF EXISTS roundedswipes;
-    DROP TABLE IF EXISTS swipes;
+    DROP TABLE IF EXISTS phillyfreeschool.users;
+    DROP TABLE IF EXISTS phillyfreeschool.years;
+    DROP TABLE IF EXISTS phillyfreeschool.classes_X_students;
+    DROP TABLE IF EXISTS phillyfreeschool.classes;
+    DROP FUNCTION IF EXISTS phillyfreeschool.school_days(text);
+    DROP VIEW IF EXISTS phillyfreeschool.roundedswipes;
+    DROP TABLE IF EXISTS phillyfreeschool.swipes;
     DROP TABLE IF EXISTS session_store;
-    DROP TABLE IF EXISTS students;
-    DROP TABLE IF EXISTS excuses;
-    DROP TABLE IF EXISTS overrides;
+    DROP TABLE IF EXISTS phillyfreeschool.students;
+    DROP TABLE IF EXISTS phillyfreeschool.excuses;
+    DROP TABLE IF EXISTS phillyfreeschool.overrides;
 "]))
 
 (defn reset-db []
@@ -53,41 +60,42 @@
   (create-all-tables))
 
 (defn delete! [doc]
-  (let [table (:type doc)
+  (let [table (str "phillyfreeschool." (name (:type doc)))
         id (:_id doc)]
     (jdbc/delete! @pgdb table ["_id=?" id])))
 
 (defn update! [table id fields]
-  (let [fields (dissoc fields :type)]
+  (let [fields (dissoc fields :type)
+        table (str "phillyfreeschool." (name table))]
     (jdbc/update! @pgdb table fields ["_id=?" id])))
 
 (defn persist! [doc]
   (let [table (:type doc)
+        tablename (str "phillyfreeschool." (name (:type doc)))
         doc (dissoc doc :type)]
     (first (map #(assoc % :type table)
-                (jdbc/insert! @pgdb table doc)))))
+                (jdbc/insert! @pgdb tablename doc)))))
 
 (defn get-*
   ([type] (map #(assoc % :type (keyword type))
-               (jdbc/query @pgdb [(str "select * from " type " order by inserted_date ")])))
+               (jdbc/query @pgdb [(str "select * from phillyfreeschool." (name type) " order by inserted_date ")])))
   ([type id id-col]
    (map #(assoc % :type (keyword type))
         (if id
-          (jdbc/query @pgdb [(str "select * from " type
+          (jdbc/query @pgdb [(str "select * from phillyfreeschool." (name type)
                                   " where " id-col "=?"
                                   " order by inserted_date")
                              id])
-          (jdbc/query @pgdb [(str "select * from " type " order by inserted_date")])))))
+          (jdbc/query @pgdb [(str "select * from phillyfreeschool." (name type) " order by inserted_date")])))))
 
 (defn get-active-class []
-  (-> @pgdb
-      get-active-class-y
+  (-> (get-active-class-y)
       first
       :_id))
 
-;; (get-classes)
+;; (get-classes) 
 (defn get-classes []
-  (let [classes (get-classes-y @pgdb)
+  (let [classes (get-classes-y)
         grouped (vals (group-by :name classes))]
     (map (fn [class-group]
            (let [base (dissoc (first class-group) :student_id :student_name)
@@ -105,34 +113,34 @@
 ;; (get-all-classes-and-students)
 
 (defn activate-class [id]
-  (activate-class-y! @pgdb id))
+  (activate-class-y! {:id id}))
 
 (defn delete-student-from-class [student-id class-id]
-  (delete-student-from-class-y! @pgdb student-id class-id))
+  (delete-student-from-class-y! {:student_id student-id :class_id class-id}))
 
 (defn get-students-for-class [class-id]
-  (get-classes-and-students-y @pgdb class-id))
+  (get-classes-and-students-y {:class_id class-id}))
 
 ;; (jdbc/query @pgdb ["select * from students"])
 ;; (jdbc/query @pgdb ["select * from students where id in (?)" "1"])
 ;; (persist! {:type :students :name "steve" :olderdate nil})
 ;; (update! :students 1 {:olderdate  "test"})
 (defn get-overrides-in-year [year-name student-id]
-  (get-overrides-in-year-y @pgdb year-name student-id))
+  (get-overrides-in-year-y {:year_name year-name :student_id student-id}))
 
 (defn lookup-last-swipe [student-id]
-  (first (lookup-last-swipe-y @pgdb  student-id)))
+  (first (lookup-last-swipe-y {:student_id student-id})))
 
 (defn get-excuses-in-year [year-name student-id]
-  (get-excuses-in-year-y @pgdb year-name student-id))
+  (get-excuses-in-year-y {:year_name year-name :student_id student-id}))
 
 (defn get-student-list-in-out [show-archived]
-  (student-list-in-out-y @pgdb show-archived))
+  (student-list-in-out-y {:show_archived show-archived}))
 
 ;; (map :student_id (get-student-list-in-out))
 
 (defn get-school-days [year-name]
-  (get-school-days-y @pgdb year-name))
+  (get-school-days-y {:year_name year-name}))
 
 ;; (map :days (get-school-days "2014-06-01 2015-06-01"))
 ;; (get-student-page 7 "2014-07-23 2015-06-17")
@@ -140,16 +148,25 @@
 (defn get-student-page
   ([student-id year] (get-student-page student-id year (get-active-class)))
   ([student-id year class-id]
-   (get-student-page-y @pgdb year class-id student-id)))
+   (get-student-page-y {:year_name year :student_id student-id :class_id class-id})))
 
 (defn get-report
   ([year-name] (get-report year-name (get-active-class)))
   ([year-name class-id]
-   (student-report-y @pgdb year-name class-id)))
+   (student-report-y {:year_name year-name :class_id class-id})))
 
 (defn get-swipes-in-year [year-name student-id]
-  (swipes-in-year-y @pgdb year-name student-id))
+  (swipes-in-year-y {:year_name year-name :student_id student-id}))
 
 ;; (get-swipes-in-year "2014-06-01 2015-06-01" 1)
 
 
+(defn make-user [username school-id password roles]
+  (persist! {:type "users"
+             :username username
+             :password (creds/hash-bcrypt password)
+             :roles (str roles)}))
+
+(defn get-user [username]
+  (if-let [u (first (get-user-y {:username username}))]
+    (assoc u :roles (read-string (:roles u)))))

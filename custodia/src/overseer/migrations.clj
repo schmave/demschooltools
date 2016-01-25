@@ -19,12 +19,20 @@
               THEN (date_trunc('day', s.out_time AT TIME ZONE 'America/New_York') + interval '9 hours')
           ELSE s.out_time END)) AS out_time
      , student_id
-   FROM swipes s;
+   FROM phillyfreeschool.swipes s;
 ")
 
 (def initialize-prod-database
   "
-  create table students(
+  CREATE TABLE PHILLYFREESCHOOL.users(
+    user_id BIGSERIAL PRIMARY KEY,
+    username VARCHAR(255),
+    password VARCHAR(255),
+    roles VARCHAR(255),
+    inserted_date TIMESTAMP DEFAULT NOW()
+  );
+
+  create table phillyfreeschool.students(
     _id bigserial primary key,
     name varchar(255),
     inserted_date timestamp default now(),
@@ -33,7 +41,7 @@
     archived BOOLEAN NOT NULL DEFAULT FALSE
   );
 
-  create table swipes(
+  create table phillyfreeschool.swipes(
     _id bigserial primary key,
     student_id bigserial,
     in_time timestamp  with time zone,
@@ -41,13 +49,13 @@
     out_time timestamp with time zone
   );
 
-   create table overrides(
+   create table phillyfreeschool.overrides(
     _id bigserial primary key,
     student_id bigserial,
     inserted_date timestamp default now(),
     date date
   );
-  create table excuses(
+  create table phillyfreeschool.excuses(
     _id bigserial primary key,
     student_id bigserial,
     inserted_date timestamp default now(),
@@ -61,22 +69,22 @@
     value BYTEA
   );
 
-  CREATE OR REPLACE VIEW roundedswipes AS
-  SELECT _id, in_time, out_time, student_id FROM swipes;
+  CREATE OR REPLACE VIEW phillyfreeschool.roundedswipes AS
+  SELECT _id, in_time, out_time, student_id FROM phillyfreeschool.swipes;
 
-  CREATE TABLE classes(
+  CREATE TABLE phillyfreeschool.classes(
        _id BIGSERIAL PRIMARY KEY,
        name VARCHAR(255),
        inserted_date timestamp default now(),
        active BOOLEAN NOT NULL DEFAULT FALSE
   );
 
-  CREATE TABLE classes_X_students(
-       class_id BIGINT NOT NULL REFERENCES classes(_id),
-       student_id BIGINT NOT NULL REFERENCES students(_id)
+  CREATE TABLE phillyfreeschool.Classes_X_students(
+       class_id BIGINT NOT NULL REFERENCES phillyfreeschool.classes(_id),
+       student_id BIGINT NOT NULL REFERENCES phillyfreeschool.students(_id)
   );
 
-  create table years(
+  create table phillyfreeschool.years(
     _id bigserial primary key,
     from_date timestamp  with time zone,
     to_date timestamp  with time zone,
@@ -84,7 +92,7 @@
     name varchar(255)
   );
 
-CREATE OR REPLACE FUNCTION school_days(year_name TEXT, class_id BIGINT)
+CREATE OR REPLACE FUNCTION phillyfreeschool.school_days(year_name TEXT, class_id BIGINT)
   RETURNS TABLE (days date, student_id BIGINT, archived boolean, olderdate date) AS
 $func$
 
@@ -94,17 +102,17 @@ FROM (SELECT DISTINCT days2.days
             (CASE WHEN date(s.in_time AT TIME ZONE 'America/New_York')  IS NULL
             THEN date(s.out_time AT TIME ZONE 'America/New_York')
             ELSE date(s.in_time AT TIME ZONE 'America/New_York') END) AS days
-         FROM roundedswipes s
-         INNER JOIN years y
+         FROM phillyfreeschool.roundedswipes s
+         INNER JOIN phillyfreeschool.years y
             ON ((s.out_time BETWEEN y.from_date AND y.to_date)
             OR (s.in_time BETWEEN y.from_date AND y.to_date))
-         JOIN classes c ON (c.active = true)
-         JOIN classes_X_students cXs ON (cXs.class_id = c._id
+         JOIN phillyfreeschool.classes c ON (c.active = true)
+         JOIN phillyfreeschool.classes_X_students cXs ON (cXs.class_id = c._id
                                          AND s.student_id = cXs.student_id)
          WHERE y.name = $1) days2
          ORDER BY days2.days) AS a
-JOIN classes_X_students cXs ON (1=1)
-JOIN students s ON (s._id = cXs.student_id)
+JOIN phillyfreeschool.classes_X_students cXs ON (1=1)
+JOIN phillyfreeschool.students s ON (s._id = cXs.student_id)
 WHERE cXs.class_id = $2
 $func$
 LANGUAGE sql;
@@ -116,7 +124,7 @@ LANGUAGE sql;
    :db  (env :database-url)
    })
 
-;; (migratus/create mconfig "UpdateSchoolDays")
+;; (migratus/create mconfig "Create users")
 ;;(migratus/migrate mconfig)
 ;; (migratus/rollback mconfig)
 ;; (migratus/down mconfig 20150908103000 20150909070853 20150913085152)
