@@ -66,24 +66,30 @@
   (ANY "*" []
     (route/not-found (slurp (io/resource "404.html")))))
 
-(def tapp
-  (do (db/init-pg)
-      (-> #'app
-          (friend/authenticate {:credential-fn (partial creds/bcrypt-credential-fn users)
-                                :allow-anon? true
-                                :login-uri "/users/login"
-                                :default-landing-uri "/"
-                                :workflows [(workflows/interactive-form)]})
-          (wrap-session {:store (jdbc-store @db/pgdb)
-                         :cookie-attrs {:max-age (* 3 365 24 3600)}})
-          wrap-keyword-params
-          wrap-json-body wrap-json-params wrap-json-response )))
+(defn creds [a]
+  (trace/trace "session" a)
+  (creds/bcrypt-credential-fn users a))
+
+(defn tapp []
+  (-> #'app
+      (friend/authenticate {:credential-fn (partial creds/bcrypt-credential-fn users)
+                            :allow-anon? true
+                            :login-uri "/users/login"
+                            :default-landing-uri "/"
+                            :workflows [(workflows/interactive-form)]})
+      (wrap-session {:store (jdbc-store @db/pgdb)
+                     :cookie-attrs {:max-age (* 3 365 24 3600)}})
+      wrap-keyword-params
+      wrap-json-body wrap-json-params wrap-json-response ))
 
 (defn -main [& [port]]
-  (comment
-    (nrepl-server/start-server :port 7888 :handler
-                               (apply clojure.tools.nrepl.server/default-handler
-                                      (concat (map resolve cider.nrepl/cider-middleware)
-                                              [refactor/wrap-refactor]))))
+  (do (db/init-pg))
+  ;;(comment)
+
+  (nrepl-server/start-server :port 7888 :handler cider-nrepl-handler)
+  (comment (nrepl-server/start-server :port 7888 :handler
+                                     (apply clojure.tools.nrepl.server/default-handler
+                                            (concat (map resolve cider.nrepl/cider-middleware)
+                                                    [refactor/wrap-refactor]))))
   (let [port (Integer. (or port (env :port) 5000))]
     (jetty/run-jetty (site (tapp)) {:port port :join? false})))

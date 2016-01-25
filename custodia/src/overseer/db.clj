@@ -29,10 +29,10 @@
 
 (def pgdb (atom nil))
 
+(defqueries "overseer/queries.sql" )
 
 ;; (init-pg)
 (defn init-pg []
-  (defqueries "overseer/queries.sql" {:connection @pgdb})
   (swap! pgdb (fn [old]
                 (dissoc (h/korma-connection-map (env :database-url))
                         :classname))))
@@ -89,13 +89,14 @@
           (jdbc/query @pgdb [(str "select * from phillyfreeschool." (name type) " order by inserted_date")])))))
 
 (defn get-active-class []
-  (-> (get-active-class-y)
+  (-> (get-active-class-y {} {:connection @pgdb})
       first
       :_id))
 
-;; (get-classes) 
+
+;; (get-classes)
 (defn get-classes []
-  (let [classes (get-classes-y)
+  (let [classes (get-classes-y {} {:connection @pgdb})
         grouped (vals (group-by :name classes))]
     (map (fn [class-group]
            (let [base (dissoc (first class-group) :student_id :student_name)
@@ -108,39 +109,40 @@
 (defn get-all-classes-and-students []
   {:classes (get-classes)
    :students (map (fn [s] {:name (:name s) :_id (:_id s)})
-                  (get-* "students"))}
-  )
+                  (get-* "students"))})
+
 ;; (get-all-classes-and-students)
 
 (defn activate-class [id]
-  (activate-class-y! {:id id}))
+  (activate-class-y! {:id id} {:connection @pgdb}))
 
 (defn delete-student-from-class [student-id class-id]
-  (delete-student-from-class-y! {:student_id student-id :class_id class-id}))
+  (delete-student-from-class-y! {:student_id student-id :class_id class-id} {:connection @pgdb}))
 
 (defn get-students-for-class [class-id]
-  (get-classes-and-students-y {:class_id class-id}))
+  (get-classes-and-students-y {:class_id class-id} {:connection @pgdb}))
 
 ;; (jdbc/query @pgdb ["select * from students"])
 ;; (jdbc/query @pgdb ["select * from students where id in (?)" "1"])
 ;; (persist! {:type :students :name "steve" :olderdate nil})
 ;; (update! :students 1 {:olderdate  "test"})
 (defn get-overrides-in-year [year-name student-id]
-  (get-overrides-in-year-y {:year_name year-name :student_id student-id}))
+  (get-overrides-in-year-y {:year_name year-name :student_id student-id} {:connection @pgdb}))
 
 (defn lookup-last-swipe [student-id]
-  (first (lookup-last-swipe-y {:student_id student-id})))
+  (first (lookup-last-swipe-y {:student_id student-id} {:connection @pgdb})))
 
 (defn get-excuses-in-year [year-name student-id]
-  (get-excuses-in-year-y {:year_name year-name :student_id student-id}))
+  (get-excuses-in-year-y {:year_name year-name :student_id student-id} {:connection @pgdb}))
 
 (defn get-student-list-in-out [show-archived]
-  (student-list-in-out-y {:show_archived show-archived}))
+  (student-list-in-out-y {:show_archived show-archived} {:connection @pgdb}))
+;;(student-list-in-out-y {:show_archived true})
 
 ;; (map :student_id (get-student-list-in-out))
 
 (defn get-school-days [year-name]
-  (get-school-days-y {:year_name year-name}))
+  (get-school-days-y {:year_name year-name} {:connection @pgdb}))
 
 ;; (map :days (get-school-days "2014-06-01 2015-06-01"))
 ;; (get-student-page 7 "2014-07-23 2015-06-17")
@@ -148,15 +150,15 @@
 (defn get-student-page
   ([student-id year] (get-student-page student-id year (get-active-class)))
   ([student-id year class-id]
-   (get-student-page-y {:year_name year :student_id student-id :class_id class-id})))
+   (get-student-page-y {:year_name year :student_id student-id :class_id class-id} {:connection @pgdb})))
 
 (defn get-report
   ([year-name] (get-report year-name (get-active-class)))
   ([year-name class-id]
-   (student-report-y {:year_name year-name :class_id class-id})))
+   (student-report-y { :year_name year-name :class_id class-id} {:connection @pgdb})))
 
 (defn get-swipes-in-year [year-name student-id]
-  (swipes-in-year-y {:year_name year-name :student_id student-id}))
+  (swipes-in-year-y {:year_name year-name :student_id student-id} {:connection @pgdb}))
 
 ;; (get-swipes-in-year "2014-06-01 2015-06-01" 1)
 
@@ -168,5 +170,5 @@
              :roles (str roles)}))
 
 (defn get-user [username]
-  (if-let [u (first (get-user-y {:username username}))]
+  (if-let [u (first (get-user-y { :username username} {:connection @pgdb}))]
     (assoc u :roles (read-string (:roles u)))))
