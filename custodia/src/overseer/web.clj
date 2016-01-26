@@ -86,10 +86,10 @@
   (do (db/init-pg))
   ;;(comment)
 
-  (nrepl-server/start-server :port 7888 :handler cider-nrepl-handler)
-  (comment (nrepl-server/start-server :port 7888 :handler
-                                     (apply clojure.tools.nrepl.server/default-handler
-                                            (concat (map resolve cider.nrepl/cider-middleware)
-                                                    [refactor/wrap-refactor]))))
+  (comment (nrepl-server/start-server :port 7888 :handler cider-nrepl-handler))
+  (nrepl-server/start-server :port 7888 :handler
+                                       (apply clojure.tools.nrepl.server/default-handler
+                                              (concat (map resolve cider.nrepl/cider-middleware)
+                                                      [refactor/wrap-refactor])))
   (let [port (Integer. (or port (env :port) 5000))]
     (jetty/run-jetty (site (tapp)) {:port port :join? false})))
