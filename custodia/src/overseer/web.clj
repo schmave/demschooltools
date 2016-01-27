@@ -83,9 +83,8 @@
       wrap-json-body wrap-json-params wrap-json-response ))
 
 (defn -main [& [port]]
-  (do (db/init-pg))
-  ;;(comment)
-
+  (clojure.java.shell/sh "notify-send" "Server started")
+  (db/init-pg)
   (comment (nrepl-server/start-server :port 7888 :handler cider-nrepl-handler))
   (nrepl-server/start-server :port 7888 :handler
                                        (apply clojure.tools.nrepl.server/default-handler

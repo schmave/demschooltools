@@ -1,17 +1,17 @@
 (ns overseer.web-test
-  (:require [clojure.test :refer :all]
-            [overseer.helpers-test :refer :all]
+  (:require [clj-time.coerce :as c]
+            [clj-time.core :as t]
             [clj-time.format :as f]
             [clj-time.local :as l]
-            [clj-time.core :as t]
-            [clj-time.coerce :as c]
+            [clojure.pprint :as pp]
+            [clojure.test :refer :all]
             [clojure.tools.trace :as trace]
-            [overseer.database :as data]
-            [overseer.db :as db]
             [overseer.attendance :as att]
+            [overseer.database :as data]
             [overseer.dates :as dates]
-            [schema.test :as tests]
-            ))
+            [overseer.db :as db]
+            [overseer.helpers-test :refer :all]
+            [schema.test :as tests]))
 
 ;; run test C-c M-,
 ;; run tests C-c ,
@@ -449,8 +449,8 @@
             sid (:_id s)
             s (data/toggle-student-older sid)
             s (first (data/get-students sid))
-            tomorrow (-> (today-at-utc 9 0) (t/plus (t/days 1)))
-            day-after-next (-> (today-at-utc 9 0) (t/plus (t/days 2)))
+            tomorrow (-> (today-at-utc 10 0) (t/plus (t/days 1)))
+            day-after-next (-> (today-at-utc 10 0) (t/plus (t/days 2)))
             ]
 
         (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
@@ -461,8 +461,9 @@
         (data/swipe-out sid (t/plus tomorrow (t/days 2) (t/minutes 329)))
 
         (let [att (get-att sid)]
+          (pp/pprint att)
           (testing "Total Valid Day Count"
-            (is (= (-> att :total_days) 1))))))
+            (is (= 1 (-> att :total_days)))))))
   )
 
 (comment
