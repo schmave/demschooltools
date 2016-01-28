@@ -115,7 +115,8 @@
             )
           ))))
 
-(def _801pm (today-at-utc 20 1))
+(defn _801pm []
+  (today-at-utc 20 1))
 
 (deftest swipe-in-and-out-at-8pm-with-rounding-test
   (do (data/sample-db)
@@ -123,20 +124,18 @@
             sid (:_id s)]
 
         (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
-        (data/swipe-in sid _801pm)
-        (data/swipe-out sid (t/plus _801pm (t/minutes 5)))
+        (data/swipe-in sid (_801pm))
+        (data/swipe-out sid (t/plus (_801pm) (t/minutes 5)))
         (let [att (get-att sid)
               _10-14 (-> att :days first)
               first-swipe (-> _10-14 :swipes first)]
           (testing "swipe info"
             (is (= "04:00:00" (:nice_out_time first-swipe)))
             (is (= "04:00:00" (:nice_in_time first-swipe))))
-
           (testing "att stuff"
             (is (= (:total_mins _10-14) 0.0))
             (is (= (:total_days att) 0))
             (is (= true (:in_today att))))
-
           ))))
 
 (def _840am (t/minus _10-14_9-14am (t/minutes 90)))

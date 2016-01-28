@@ -185,7 +185,7 @@
 (defn huge-sample-db []
   (db/init-pg)
   (db/reset-db)
-  (make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 1))))
+  (make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 5))))
   (make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
   (loop [x 1]
     (if (> x 80)
