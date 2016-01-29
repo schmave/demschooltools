@@ -47,6 +47,7 @@
     DROP TABLE IF EXISTS phillyfreeschool.classes_X_students;
     DROP TABLE IF EXISTS phillyfreeschool.classes;
     DROP FUNCTION IF EXISTS phillyfreeschool.school_days(text);
+    DROP FUNCTION IF EXISTS phillyfreeschool.school_days(text, bigint);
     DROP VIEW IF EXISTS phillyfreeschool.roundedswipes;
     DROP TABLE IF EXISTS phillyfreeschool.swipes;
     DROP TABLE IF EXISTS session_store;

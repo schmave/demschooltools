@@ -60,9 +60,9 @@ webdriver-test :
 # ALTER USER jack WITH SUPERUSER;
 # insert into classes_X_students (class_id, student_id) select 1, _id from students;
 drop-tables :
-	psql -d swipes -c " DROP TABLE IF EXISTS years; DROP TABLE IF EXISTS classes_X_students; DROP TABLE IF EXISTS classes; DROP FUNCTION IF EXISTS school_days(text); DROP VIEW IF EXISTS roundedswipes; DROP TABLE IF EXISTS swipes; DROP TABLE IF EXISTS session_store; DROP TABLE IF EXISTS students; DROP TABLE IF EXISTS excuses; DROP TABLE IF EXISTS overrides; "
+	psql -d swipes -c " DROP FUNCTION IF EXISTS phillyfreeschool.school_days(text, bigint); DROP TABLE IF EXISTS phillyfreeschool.users; DROP TABLE IF EXISTS phillyfreeschool.years; DROP TABLE IF EXISTS phillyfreeschool.classes_X_students; DROP TABLE IF EXISTS phillyfreeschool.classes; DROP FUNCTION IF EXISTS phillyfreeschool.school_days(text); DROP VIEW IF EXISTS phillyfreeschool.roundedswipes; DROP TABLE IF EXISTS phillyfreeschool.swipes; DROP TABLE IF EXISTS session_store; DROP TABLE IF EXISTS phillyfreeschool.students; DROP TABLE IF EXISTS phillyfreeschool.excuses; DROP TABLE IF EXISTS phillyfreeschool.overrides; DROP TABLE IF EXISTS years; DROP TABLE IF EXISTS classes_X_students; DROP TABLE IF EXISTS classes; DROP FUNCTION IF EXISTS school_days(text); DROP VIEW IF EXISTS roundedswipes; DROP TABLE IF EXISTS swipes; DROP TABLE IF EXISTS session_store; DROP TABLE IF EXISTS students; DROP TABLE IF EXISTS excuses; DROP TABLE IF EXISTS overrides; "
 
-sql-local : 
+sql-local :
 	psql -d swipes
 
 load-massive-dump : drop-tables
