@@ -83,12 +83,12 @@
 (defn assert-total-header [att abs ex over short id]
   (testing (str "student page totals: " id)
     (wait-until #(visible? "#hd-attended"))
-    (is (= (str "Attended: " att) (text "#hd-attended")))
-    (is (= (str "Absent: " abs) (text "#hd-absent")))
+    (is (= (str "Attended: " (+ short att) " (" short ")") (text "#hd-attended")))
+    (is (= (str "Unexcused: " abs) (text "#hd-absent")))
     (is (= (str "Excused: " ex) (text "#hd-excused")))
-    (is (= (str "Gave Attendance: " over) (text "#hd-given")))
-    (is (= (str "Short: " short) (text "#hd-short"))))
-    )
+    (is (= (str "Override: " over) (text "#hd-given")))
+   ;; (is (= (str "Short: " short) (text "#hd-short")))
+    ))
 
 (deftest ^:integration make-classes-and-set-default
   (data/sample-db)
