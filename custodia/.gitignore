@@ -15,3 +15,4 @@ pom.xml
 *.iml
 .idea/
 /node_modules/
+/src/overseer/queries/demo.sql

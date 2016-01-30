@@ -15,12 +15,12 @@
             [heroku-database-url-to-jdbc.core :as h]
             [migratus.core :as migratus]
             [overseer.migrations :as migrations]
-            [overseer.migrations :refer [query]]
             [overseer.roles :as roles]
-            [overseer.pfsqueries :refer :all]
+            [overseer.queries.phillyfreeschool :as pfs]
+            [overseer.queries.demo :as demo]
             [yesql.core :refer [defqueries]]))
 
-;; (init-pg) 
+;; (init-pg)
 
 (def ^:dynamic *school-schema* "phillyfreeschool")
 
@@ -37,9 +37,11 @@
 (defmacro q [n args]
   `(let [s# *school-schema*
          con# @pgdb]
-     (query {:q (str ~(name n)) :params ~args :conn {:connection con#} :schema s#})))
+     (let [f# (resolve (symbol (str "overseer.queries." s# "/" ~(name n))))]
+       (trace/trace f#)
+       (f# ~args {:connection con#}))))
 
-;; (get-user "admin") 
+;; (get-user "admin2")
 (defn get-user [username]
   (if-let [u (first (get-user-y { :username username} {:connection @pgdb}))]
     (assoc u :roles (read-string (:roles u)))))
@@ -57,6 +59,7 @@
   (make-user "super" (env :admin) #{roles/admin roles/user roles/super}  "phillyfreeschool")
   (make-user "user" (env :userpass) #{roles/user} "phillyfreeschool")
   (make-user "admin2" (env :admin) #{roles/user} "otherschool")
+  (make-user "demo" (env :userpass) #{roles/admin roles/user} "demo")
   )
 
 ;; (init-pg) 
@@ -66,24 +69,16 @@
                         :classname))))
 
 (defn create-all-tables []
-  (jdbc/execute! @pgdb [migrations/initialize-prod-database]))
+  (jdbc/execute! @pgdb [migrations/initialize-shared-tables])
+  (jdbc/execute! @pgdb [migrations/initialize-prod-database])
+  (jdbc/execute! @pgdb [(migrations/replace-philly  migrations/initialize-prod-database "demo")])
+  )
 
 (defn drop-all-tables []
-  (jdbc/execute! @pgdb ["
-    DROP TABLE IF EXISTS users;
-    DROP TABLE IF EXISTS session_store;
-
-    DROP TABLE IF EXISTS phillyfreeschool.years;
-    DROP TABLE IF EXISTS phillyfreeschool.classes_X_students;
-    DROP TABLE IF EXISTS phillyfreeschool.classes;
-    DROP FUNCTION IF EXISTS phillyfreeschool.school_days(text);
-    DROP FUNCTION IF EXISTS phillyfreeschool.school_days(text, bigint);
-    DROP VIEW IF EXISTS phillyfreeschool.roundedswipes;
-    DROP TABLE IF EXISTS phillyfreeschool.swipes;
-    DROP TABLE IF EXISTS phillyfreeschool.students;
-    DROP TABLE IF EXISTS phillyfreeschool.excuses;
-    DROP TABLE IF EXISTS phillyfreeschool.overrides;
-"]))
+  (jdbc/execute! @pgdb [" DROP TABLE IF EXISTS users; DROP TABLE IF EXISTS session_store; "])
+  (jdbc/execute! @pgdb [migrations/remove-philly-tables])
+  (jdbc/execute! @pgdb [(migrations/replace-philly  migrations/remove-philly-tables "demo")])
+  )
 
 ;;(reset-db) 
 (defn reset-db []

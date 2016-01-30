@@ -162,6 +162,7 @@
          db/persist!)))
 
 ;; (sample-db true)  
+;; (binding [db/*school-schema* "demo"] (sample-db true))
 (defn sample-db
   ([] (sample-db false))
   ([have-extra?]

@@ -1,8 +1,16 @@
 (ns overseer.migrations
   (:require [environ.core :refer [env]]
+            [clojure.java.io :as io]
             [migratus.core :as migratus]))
 
-(defmulti query :schema)
+(defn replace-philly [from with]
+  (clojure.string/replace from #"phillyfreeschool" with))
+
+(defn make-queries [name]
+  (let [data (slurp "src/overseer/queries/phillyfreeschool.sql")
+        data (replace-philly data name)]
+    (with-open [wrtr (io/writer (str "src/overseer/queries/" name ".sql"))]
+      (.write wrtr data))))
 
 (comment "
  -- broken till otherwise noted
@@ -24,8 +32,19 @@
    FROM phillyfreeschool.swipes s;
 ")
 
-(def initialize-prod-database
-  "
+(def remove-philly-tables "
+    DROP TABLE IF EXISTS phillyfreeschool.years;
+    DROP TABLE IF EXISTS phillyfreeschool.classes_X_students;
+    DROP TABLE IF EXISTS phillyfreeschool.classes;
+    DROP FUNCTION IF EXISTS phillyfreeschool.school_days(text);
+    DROP FUNCTION IF EXISTS phillyfreeschool.school_days(text, bigint);
+    DROP VIEW IF EXISTS phillyfreeschool.roundedswipes;
+    DROP TABLE IF EXISTS phillyfreeschool.swipes;
+    DROP TABLE IF EXISTS phillyfreeschool.students;
+    DROP TABLE IF EXISTS phillyfreeschool.excuses;
+    DROP TABLE IF EXISTS phillyfreeschool.overrides;
+  ")
+(def initialize-shared-tables "
   CREATE TABLE users(
     user_id BIGSERIAL PRIMARY KEY,
     username VARCHAR(255),
@@ -35,6 +54,16 @@
     inserted_date TIMESTAMP DEFAULT NOW()
   );
 
+  CREATE TABLE session_store (
+    session_id VARCHAR(36) NOT NULL PRIMARY KEY,
+    idle_timeout BIGINT,
+    absolute_timeout BIGINT,
+    value BYTEA
+  );
+
+  ")
+(def initialize-prod-database
+  "
   create table phillyfreeschool.students(
     _id bigserial primary key,
     name varchar(255),
@@ -65,12 +94,6 @@
     date date
   );
 
-  CREATE TABLE session_store (
-    session_id VARCHAR(36) NOT NULL PRIMARY KEY,
-    idle_timeout BIGINT,
-    absolute_timeout BIGINT,
-    value BYTEA
-  );
 
   CREATE OR REPLACE VIEW phillyfreeschool.roundedswipes AS
   SELECT _id, in_time, out_time, student_id FROM phillyfreeschool.swipes;
@@ -127,7 +150,7 @@ LANGUAGE sql;
    :db  (env :database-url)
    })
 
-;; (migratus/create mconfig "Create users")
+;; (migratus/create mconfig "make demo tables")
 ;;(migratus/migrate mconfig)
 ;; (migratus/rollback mconfig)
 ;; (migratus/down mconfig 20150908103000 20150909070853 20150913085152)

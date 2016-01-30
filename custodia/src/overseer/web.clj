@@ -29,16 +29,6 @@
             [environ.core :refer [env]])
   (:gen-class))
 
-(def users {"admin" {:username "admin"
-                     :password (creds/hash-bcrypt (env :admin))
-                     :roles #{roles/admin roles/user}}
-            "super" {:username "super"
-                     :password (creds/hash-bcrypt (env :admin))
-                     :roles #{roles/admin roles/user roles/super}}
-            "user" {:username "user"
-                    :password (creds/hash-bcrypt (env :userpass))
-                    :roles #{roles/user}}})
-
 (defroutes app
   (GET "/" []
     (friend/authenticated (io/resource "index.html")))
