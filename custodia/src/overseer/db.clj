@@ -27,23 +27,28 @@
 
 (def pgdb (atom nil))
 
-(defqueries "overseer/queries.sql" )
+(defqueries "overseer/base.sql" )
+(defqueries "overseer/phillyfreeschool.sql" )
 
-(trace/deftrace get-user [username]
+;; (get-user "admin") 
+(defn get-user [username]
   (if-let [u (first (get-user-y { :username username} {:connection @pgdb}))]
     (assoc u :roles (read-string (:roles u)))))
 
-(defn make-user [username password roles]
+(defn make-user [username password roles schema]
   (if-not (get-user username)
     (jdbc/insert! @pgdb "users"
                   {:username username
                    :password (creds/hash-bcrypt password)
+                   :schema_name schema
                    :roles (str roles)})))
 
 (defn init-users []
-  (make-user "admin" (env :admin) #{roles/admin roles/user})
-  (make-user "super" (env :admin) #{roles/admin roles/user roles/super})
-  (make-user "user" (env :userpass) #{roles/user}))
+  (make-user "admin" (env :admin) #{roles/admin roles/user} "phillyfreeschool")
+  (make-user "super" (env :admin) #{roles/admin roles/user roles/super}  "phillyfreeschool")
+  (make-user "user" (env :userpass) #{roles/user} "phillyfreeschool")
+  (make-user "admin2" (env :admin) #{roles/user} "otherschool")
+  )
 
 ;; (init-pg) 
 (defn init-pg []
@@ -71,39 +76,40 @@
     DROP TABLE IF EXISTS phillyfreeschool.overrides;
 "]))
 
+;;(reset-db) 
 (defn reset-db []
   (drop-all-tables)
   (create-all-tables)
   (init-users))
 
 (defn delete! [doc]
-  (let [table (str "phillyfreeschool." (name (:type doc)))
+  (let [table (str *school-schema* "." (name (:type doc)))
         id (:_id doc)]
     (jdbc/delete! @pgdb table ["_id=?" id])))
 
 (defn update! [table id fields]
   (let [fields (dissoc fields :type)
-        table (str "phillyfreeschool." (name table))]
+        table (str *school-schema* "." (name table))]
     (jdbc/update! @pgdb table fields ["_id=?" id])))
 
 (defn persist! [doc]
   (let [table (:type doc)
-        tablename (str "phillyfreeschool." (name (:type doc)))
+        tablename (str *school-schema* "." (name (:type doc)))
         doc (dissoc doc :type)]
     (first (map #(assoc % :type table)
                 (jdbc/insert! @pgdb tablename doc)))))
 
 (defn get-*
   ([type] (map #(assoc % :type (keyword type))
-               (jdbc/query @pgdb [(str "select * from phillyfreeschool." (name type) " order by inserted_date ")])))
+               (jdbc/query @pgdb [(str "select * from " *school-schema* "." (name type) " order by inserted_date ")])))
   ([type id id-col]
    (map #(assoc % :type (keyword type))
         (if id
-          (jdbc/query @pgdb [(str "select * from phillyfreeschool." (name type)
+          (jdbc/query @pgdb [(str "select * from " *school-schema* "." (name type)
                                   " where " id-col "=?"
                                   " order by inserted_date")
                              id])
-          (jdbc/query @pgdb [(str "select * from phillyfreeschool." (name type) " order by inserted_date")])))))
+          (jdbc/query @pgdb [(str "select * from " *school-schema* "." (name type) " order by inserted_date")])))))
 
 (defn get-active-class []
   (-> (get-active-class-y {} {:connection @pgdb})

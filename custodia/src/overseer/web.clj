@@ -5,6 +5,7 @@
             [ring.middleware.session :refer [wrap-session]]
             [compojure.handler :refer [site]]
             [compojure.route :as route]
+            [compojure.core :as compojure]
             [compojure.coercions :refer [as-int]]
             [clojure.java.io :as io]
             [clojure.tools.nrepl.server :as nrepl-server]
@@ -66,6 +67,13 @@
   (ANY "*" []
     (route/not-found (slurp (io/resource "404.html")))))
 
+(defn my-middleware [app]
+  (fn [req]
+    (let [schema  (:schema_name (friend/current-authentication req))]
+      (binding [db/*school-schema* schema]
+        (trace/trace "schema" db/*school-schema*)
+        (app req)))))
+
 (defn tapp []
   (-> #'app
       (friend/authenticate {:credential-fn (partial creds/bcrypt-credential-fn db/get-user)
@@ -73,6 +81,7 @@
                             :login-uri "/users/login"
                             :default-landing-uri "/"
                             :workflows [(workflows/interactive-form)]})
+      (compojure/wrap-routes my-middleware)
       (wrap-session {:store (jdbc-store @db/pgdb)
                      :cookie-attrs {:max-age (* 3 365 24 3600)}})
       wrap-keyword-params
