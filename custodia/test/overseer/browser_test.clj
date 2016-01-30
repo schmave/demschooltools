@@ -8,10 +8,10 @@
 (defn student-id [id] (str "#student-" id))
 
 (defn click-student [id]
-  (wait-until #(visible? (student-id id)) 1000)
-  (click (student-id id))
-  #_(to (str "http://localhost:5000/#/students/" id "/"))
-  #_(wait-until #(visible? "#studentName") 10000)
+  ;;(wait-until #(visible? (student-id id)) 1000)
+  ;;(click (student-id id))
+  (to (str "http://localhost:5000/#/students/" id "/"))
+  ;;(wait-until #(visible? "#studentName") 10000)
   )
 
 (defn submit-missing []

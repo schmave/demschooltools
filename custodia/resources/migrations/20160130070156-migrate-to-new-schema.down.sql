@@ -1,0 +1,10 @@
+alter TABLE phillyfreeschool.users set schema public;
+alter TABLE phillyfreeschool.years set schema public;
+alter TABLE phillyfreeschool.students set schema public;
+alter TABLE classes set schema public;
+alter TABLE phillyfreeschool.classes_X_students set schema public;
+alter VIEW phillyfreeschool.roundedswipes set schema public;
+alter TABLE phillyfreeschool.swipes set schema public;
+alter TABLE phillyfreeschool.excuses set schema public;
+alter TABLE phillyfreeschool.overrides set schema public;
+alter FUNCTION phillyfreeschool.school_days(text, bigint) set schema public;
