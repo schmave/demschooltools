@@ -4,6 +4,7 @@
   (:require [carica.core :as c]
             (cemerick.friend [workflows :as workflows]
                              [credentials :as creds])
+
             [cemerick.url :as url]
             [clj-time.coerce :as timec]
             [clj-time.format :as timef]
@@ -14,8 +15,12 @@
             [heroku-database-url-to-jdbc.core :as h]
             [migratus.core :as migratus]
             [overseer.migrations :as migrations]
+            [overseer.migrations :refer [query]]
             [overseer.roles :as roles]
+            [overseer.pfsqueries :refer :all]
             [yesql.core :refer [defqueries]]))
+
+;; (init-pg) 
 
 (def ^:dynamic *school-schema* "phillyfreeschool")
 
@@ -28,7 +33,11 @@
 (def pgdb (atom nil))
 
 (defqueries "overseer/base.sql" )
-(defqueries "overseer/phillyfreeschool.sql" )
+
+(defmacro q [n args]
+  `(let [s# *school-schema*
+         con# @pgdb]
+     (query {:q (str ~(name n)) :params ~args :conn {:connection con#} :schema s#})))
 
 ;; (get-user "admin") 
 (defn get-user [username]
@@ -112,14 +121,14 @@
           (jdbc/query @pgdb [(str "select * from " *school-schema* "." (name type) " order by inserted_date")])))))
 
 (defn get-active-class []
-  (-> (get-active-class-y {} {:connection @pgdb})
+  (-> (q get-active-class-y {} )
       first
       :_id))
 
 
 ;; (get-classes)
 (defn get-classes []
-  (let [classes (get-classes-y {} {:connection @pgdb})
+  (let [classes (q get-classes-y {} )
         grouped (vals (group-by :name classes))]
     (map (fn [class-group]
            (let [base (dissoc (first class-group) :student_id :student_name)
@@ -137,35 +146,35 @@
 ;; (get-all-classes-and-students)
 
 (defn activate-class [id]
-  (activate-class-y! {:id id} {:connection @pgdb}))
+  (q activate-class-y! {:id id} ))
 
 (defn delete-student-from-class [student-id class-id]
-  (delete-student-from-class-y! {:student_id student-id :class_id class-id} {:connection @pgdb}))
+  (q delete-student-from-class-y! {:student_id student-id :class_id class-id} ))
 
 (defn get-students-for-class [class-id]
-  (get-classes-and-students-y {:class_id class-id} {:connection @pgdb}))
+  (q get-classes-and-students-y {:class_id class-id} ))
 
 ;; (jdbc/query @pgdb ["select * from students"])
 ;; (jdbc/query @pgdb ["select * from students where id in (?)" "1"])
 ;; (persist! {:type :students :name "steve" :olderdate nil})
 ;; (update! :students 1 {:olderdate  "test"})
 (defn get-overrides-in-year [year-name student-id]
-  (get-overrides-in-year-y {:year_name year-name :student_id student-id} {:connection @pgdb}))
+  (q get-overrides-in-year-y {:year_name year-name :student_id student-id} ))
 
 (defn lookup-last-swipe [student-id]
-  (first (lookup-last-swipe-y {:student_id student-id} {:connection @pgdb})))
+  (first (q lookup-last-swipe-y {:student_id student-id} )))
 
 (defn get-excuses-in-year [year-name student-id]
-  (get-excuses-in-year-y {:year_name year-name :student_id student-id} {:connection @pgdb}))
+  (q get-excuses-in-year-y {:year_name year-name :student_id student-id} ))
 
 (defn get-student-list-in-out [show-archived]
-  (student-list-in-out-y {:show_archived show-archived} {:connection @pgdb}))
-;;(student-list-in-out-y {:show_archived true})
+  (q student-list-in-out-y {:show_archived show-archived} ))
+;;(get-student-list-in-out  true)
 
 ;; (map :student_id (get-student-list-in-out))
 
 (defn get-school-days [year-name]
-  (get-school-days-y {:year_name year-name} {:connection @pgdb}))
+  (q get-school-days-y {:year_name year-name} ))
 
 ;; (map :days (get-school-days "2014-06-01 2015-06-01"))
 ;; (get-student-page 7 "2014-07-23 2015-06-17")
@@ -173,14 +182,14 @@
 (defn get-student-page
   ([student-id year] (get-student-page student-id year (get-active-class)))
   ([student-id year class-id]
-   (get-student-page-y {:year_name year :student_id student-id :class_id class-id} {:connection @pgdb})))
+   (q get-student-page-y {:year_name year :student_id student-id :class_id class-id} )))
 
 (defn get-report
   ([year-name] (get-report year-name (get-active-class)))
   ([year-name class-id]
-   (student-report-y { :year_name year-name :class_id class-id} {:connection @pgdb})))
+   (q student-report-y { :year_name year-name :class_id class-id} )))
 
 (defn get-swipes-in-year [year-name student-id]
-  (swipes-in-year-y {:year_name year-name :student_id student-id} {:connection @pgdb}))
+  (q swipes-in-year-y {:year_name year-name :student_id student-id} ))
 
 ;; (get-swipes-in-year "2014-06-01 2015-06-01" 1)

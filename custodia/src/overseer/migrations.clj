@@ -2,6 +2,8 @@
   (:require [environ.core :refer [env]]
             [migratus.core :as migratus]))
 
+(defmulti query :schema)
+
 (comment "
  -- broken till otherwise noted
   CREATE VIEW roundedswipes AS
