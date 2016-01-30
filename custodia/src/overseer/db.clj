@@ -1,23 +1,21 @@
 (ns overseer.db
-  (:import
-   [java.util Date Calendar TimeZone]
-   [java.sql PreparedStatement])
+  (:import [java.sql PreparedStatement]
+           [java.util Date Calendar TimeZone])
   (:require [carica.core :as c]
-            [yesql.core :refer [defqueries]]
+            (cemerick.friend [workflows :as workflows]
+                             [credentials :as creds])
             [cemerick.url :as url]
-            [clojure.tools.trace :as trace]
-            [heroku-database-url-to-jdbc.core :as h]
-            [migratus.core :as migratus]
-            [com.ashafa.clutch :as couch]
-            [environ.core :refer [env]]
             [clj-time.coerce :as timec]
             [clj-time.format :as timef]
             [clojure.java.jdbc :as jdbc]
+            [clojure.tools.trace :as trace]
+            [com.ashafa.clutch :as couch]
+            [environ.core :refer [env]]
+            [heroku-database-url-to-jdbc.core :as h]
+            [migratus.core :as migratus]
             [overseer.migrations :as migrations]
-
-            (cemerick.friend [workflows :as workflows]
-                             [credentials :as creds])
-            ))
+            [overseer.roles :as roles]
+            [yesql.core :refer [defqueries]]))
 
 (def ^:dynamic *school-schema* "phillyfreeschool")
 
@@ -31,7 +29,23 @@
 
 (defqueries "overseer/queries.sql" )
 
-;; (init-pg)
+(trace/deftrace get-user [username]
+  (if-let [u (first (get-user-y { :username username} {:connection @pgdb}))]
+    (assoc u :roles (read-string (:roles u)))))
+
+(defn make-user [username password roles]
+  (if-not (get-user username)
+    (jdbc/insert! @pgdb "users"
+                  {:username username
+                   :password (creds/hash-bcrypt password)
+                   :roles (str roles)})))
+
+(defn init-users []
+  (make-user "admin" (env :admin) #{roles/admin roles/user})
+  (make-user "super" (env :admin) #{roles/admin roles/user roles/super})
+  (make-user "user" (env :userpass) #{roles/user}))
+
+;; (init-pg) 
 (defn init-pg []
   (swap! pgdb (fn [old]
                 (dissoc (h/korma-connection-map (env :database-url))
@@ -42,7 +56,9 @@
 
 (defn drop-all-tables []
   (jdbc/execute! @pgdb ["
-    DROP TABLE IF EXISTS phillyfreeschool.users;
+    DROP TABLE IF EXISTS users;
+    DROP TABLE IF EXISTS session_store;
+
     DROP TABLE IF EXISTS phillyfreeschool.years;
     DROP TABLE IF EXISTS phillyfreeschool.classes_X_students;
     DROP TABLE IF EXISTS phillyfreeschool.classes;
@@ -50,7 +66,6 @@
     DROP FUNCTION IF EXISTS phillyfreeschool.school_days(text, bigint);
     DROP VIEW IF EXISTS phillyfreeschool.roundedswipes;
     DROP TABLE IF EXISTS phillyfreeschool.swipes;
-    DROP TABLE IF EXISTS session_store;
     DROP TABLE IF EXISTS phillyfreeschool.students;
     DROP TABLE IF EXISTS phillyfreeschool.excuses;
     DROP TABLE IF EXISTS phillyfreeschool.overrides;
@@ -58,7 +73,8 @@
 
 (defn reset-db []
   (drop-all-tables)
-  (create-all-tables))
+  (create-all-tables)
+  (init-users))
 
 (defn delete! [doc]
   (let [table (str "phillyfreeschool." (name (:type doc)))
@@ -162,14 +178,3 @@
   (swipes-in-year-y {:year_name year-name :student_id student-id} {:connection @pgdb}))
 
 ;; (get-swipes-in-year "2014-06-01 2015-06-01" 1)
-
-
-(defn make-user [username school-id password roles]
-  (persist! {:type "users"
-             :username username
-             :password (creds/hash-bcrypt password)
-             :roles (str roles)}))
-
-(defn get-user [username]
-  (if-let [u (first (get-user-y { :username username} {:connection @pgdb}))]
-    (assoc u :roles (read-string (:roles u)))))

@@ -205,6 +205,5 @@ FROM (SELECT DISTINCT days2.days
          JOIN phillyfreeschool.students s ON (s._id = cXs.student_id)
 WHERE y.name = :year_name;
 
-
 -- name: get-user-y
-SELECT * FROM phillyfreeschool.users WHERE username = :username;
+SELECT * FROM users WHERE username = :username;

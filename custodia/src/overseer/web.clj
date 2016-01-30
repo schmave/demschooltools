@@ -66,13 +66,9 @@
   (ANY "*" []
     (route/not-found (slurp (io/resource "404.html")))))
 
-(defn creds [a]
-  (trace/trace "session" a)
-  (creds/bcrypt-credential-fn users a))
-
 (defn tapp []
   (-> #'app
-      (friend/authenticate {:credential-fn (partial creds/bcrypt-credential-fn users)
+      (friend/authenticate {:credential-fn (partial creds/bcrypt-credential-fn db/get-user)
                             :allow-anon? true
                             :login-uri "/users/login"
                             :default-landing-uri "/"
@@ -85,6 +81,7 @@
 (defn -main [& [port]]
   (clojure.java.shell/sh "notify-send" "Server started")
   (db/init-pg)
+  (db/init-users)
   (comment (nrepl-server/start-server :port 7888 :handler cider-nrepl-handler))
   (nrepl-server/start-server :port 7888 :handler
                                        (apply clojure.tools.nrepl.server/default-handler
