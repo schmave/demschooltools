@@ -58,7 +58,7 @@
   (make-user "admin" (env :admin) #{roles/admin roles/user} "phillyfreeschool")
   (make-user "super" (env :admin) #{roles/admin roles/user roles/super}  "phillyfreeschool")
   (make-user "user" (env :userpass) #{roles/user} "phillyfreeschool")
-  (make-user "admin2" (env :admin) #{roles/user} "otherschool")
+  (make-user "admin2" (env :admin) #{roles/admin roles/user} "demo")
   (make-user "demo" (env :userpass) #{roles/admin roles/user} "demo")
   )
 

@@ -83,3 +83,101 @@ JOIN demo.students s ON (s._id = cXs.student_id)
 WHERE cXs.class_id = $2
 $func$
 LANGUAGE sql;
+
+insert into demo.classes (_id, name, active) values (1, '2014-2015', true);
+
+insert into demo.students(_id, name) values (1, 'Jim');
+insert into demo.students(_id, name) values (2, 'Sally');
+insert into demo.students(_id, name) values (3, 'Jose');
+insert into demo.students(_id, name) values (4, 'June');
+insert into demo.students(_id, name) values (5, 'Bob');
+insert into demo.students(_id, name) values (6, 'Beth');
+insert into demo.students(_id, name) values (7, 'Rachel');
+
+insert into demo.classes_x_students(class_id, student_id) values (1, 1);
+insert into demo.classes_x_students(class_id, student_id) values (1, 2);
+insert into demo.classes_x_students(class_id, student_id) values (1, 3);
+insert into demo.classes_x_students(class_id, student_id) values (1, 4);
+insert into demo.classes_x_students(class_id, student_id) values (1, 5);
+insert into demo.classes_x_students(class_id, student_id) values (1, 6);
+insert into demo.classes_x_students(class_id, student_id) values (1, 7);
+
+delete from demo.years;
+insert into demo.years(from_date, to_date, name) values
+('2015-06-01 20:00:00-04', '2016-12-12 13:22:21.754519', '2015-06-01 2016-12-12');
+
+
+delete from demo.swipes;
+insert into demo.swipes (student_id, in_time, out_time)
+values (1, '2016-01-25 09:22:21.796-05', '2016-01-25 14:22:21.804-5');
+insert into demo.swipes (student_id, in_time, out_time)
+values (1, '2016-01-26 09:05:21.796-05', '2016-01-26 15:22:21.804-5');
+insert into demo.swipes (student_id, in_time, out_time)
+values (1, '2016-01-27 09:12:21.796-05', '2016-01-27 13:13:21.804-5');
+insert into demo.swipes (student_id, in_time, out_time)
+values (1, '2016-01-28 09:22:21.796-05', '2016-01-28 14:55:21.804-5');
+insert into demo.swipes (student_id, in_time, out_time)
+values (1, '2016-01-29 09:00:21.796-05', '2016-01-29 13:54:21.804-5');
+
+insert into demo.swipes (student_id, in_time, out_time)
+values (2, '2016-01-25 09:22:21.796-05', '2016-01-25 14:22:21.804-5');
+insert into demo.swipes (student_id, in_time, out_time)
+values (2, '2016-01-26 09:05:21.796-05', '2016-01-26 15:22:21.804-5');
+insert into demo.swipes (student_id, in_time, out_time)
+values (2, '2016-01-27 09:12:21.796-05', '2016-01-27 13:13:21.804-5');
+insert into demo.swipes (student_id, in_time, out_time)
+values (2, '2016-01-28 09:22:21.796-05', '2016-01-28 14:55:21.804-5');
+insert into demo.swipes (student_id, in_time, out_time)
+values (2, '2016-01-29 09:00:21.796-05', '2016-01-29 13:54:21.804-5');
+
+insert into demo.swipes (student_id, in_time, out_time)
+values (3, '2016-01-25 09:22:21.796-05', '2016-01-25 14:22:21.804-5');
+insert into demo.swipes (student_id, in_time, out_time)
+values (3, '2016-01-26 09:05:21.796-05', '2016-01-26 15:22:21.804-5');
+insert into demo.swipes (student_id, in_time, out_time)
+values (3, '2016-01-27 09:12:21.796-05', '2016-01-27 13:13:21.804-5');
+insert into demo.swipes (student_id, in_time, out_time)
+values (3, '2016-01-28 09:22:21.796-05', '2016-01-28 14:55:21.804-5');
+insert into demo.swipes (student_id, in_time, out_time)
+values (3, '2016-01-29 09:00:21.796-05', '2016-01-29 13:54:21.804-5');
+
+insert into demo.swipes (student_id, in_time, out_time)
+values (4, '2016-01-25 09:22:21.796-05', '2016-01-25 14:22:21.804-5');
+insert into demo.swipes (student_id, in_time, out_time)
+values (4, '2016-01-26 09:05:21.796-05', '2016-01-26 15:22:21.804-5');
+insert into demo.swipes (student_id, in_time, out_time)
+values (4, '2016-01-27 09:12:21.796-05', '2016-01-27 13:13:21.804-5');
+insert into demo.swipes (student_id, in_time, out_time)
+values (4, '2016-01-28 09:22:21.796-05', '2016-01-28 14:55:21.804-5');
+insert into demo.swipes (student_id, in_time, out_time)
+values (4, '2016-01-29 09:00:21.796-05', '2016-01-29 13:54:21.804-5');
+
+insert into demo.swipes (student_id, in_time, out_time)
+values (5, '2016-01-25 09:22:21.796-05', '2016-01-25 14:22:21.804-5');
+insert into demo.swipes (student_id, in_time, out_time)
+values (5, '2016-01-26 09:05:21.796-05', '2016-01-26 15:22:21.804-5');
+insert into demo.swipes (student_id, in_time, out_time)
+values (5, '2016-01-27 09:12:21.796-05', '2016-01-27 13:13:21.804-5');
+insert into demo.swipes (student_id, in_time, out_time)
+values (5, '2016-01-28 09:22:21.796-05', '2016-01-28 14:55:21.804-5');
+insert into demo.swipes (student_id, in_time, out_time)
+values (5, '2016-01-29 09:00:21.796-05', '2016-01-29 13:54:21.804-5');
+
+insert into demo.swipes (student_id, in_time, out_time)
+values (6, '2016-01-25 09:22:21.796-05', '2016-01-25 14:22:21.804-5');
+insert into demo.swipes (student_id, in_time, out_time)
+values (6, '2016-01-26 09:05:21.796-05', '2016-01-26 15:22:21.804-5');
+insert into demo.swipes (student_id, in_time, out_time)
+values (6, '2016-01-27 09:12:21.796-05', '2016-01-27 13:13:21.804-5');
+insert into demo.swipes (student_id, in_time, out_time)
+values (6, '2016-01-28 09:22:21.796-05', '2016-01-28 14:55:21.804-5');
+insert into demo.swipes (student_id, in_time, out_time)
+values (6, '2016-01-29 09:00:21.796-05', '2016-01-29 13:54:21.804-5');
+
+select * from phillyfreeschool.years;
+select * from phillyfreeschool.swipes;
+select * from demo.swipes;
+select * from demo.years;
+select * from demo.classes;
+select * from demo.students;
+select * from demo.classes_x_students;
