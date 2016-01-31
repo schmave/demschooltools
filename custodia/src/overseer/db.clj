@@ -70,8 +70,8 @@
 
 (defn create-all-tables []
   (jdbc/execute! @pgdb [migrations/initialize-shared-tables])
-  (jdbc/execute! @pgdb [migrations/initialize-prod-database])
-  (jdbc/execute! @pgdb [(migrations/replace-philly  migrations/initialize-prod-database "demo")])
+  (jdbc/execute! @pgdb [migrations/create-philly-schema-sql])
+  (jdbc/execute! @pgdb [(migrations/replace-philly  migrations/create-philly-schema-sql "demo")])
   )
 
 (defn drop-all-tables []

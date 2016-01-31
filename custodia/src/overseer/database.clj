@@ -161,6 +161,21 @@
           :name name}
          db/persist!)))
 
+(defn make-sample-two-students-in-class []
+  (let [{class-id :_id} (make-class "2014-2015")]
+    (db/activate-class class-id)
+    (make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 2))))
+    (make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
+    (let [s (make-student "jim")
+          {sid :_id} s
+          result {:class_id class-id :student_ids [sid]}]
+      (add-student-to-class sid class-id)
+      (let [s (make-student "steve")
+            {sid :_id} s
+            result (update-in result [:student_ids] (fn [sids] (conj sids sid)))]
+        (add-student-to-class sid class-id)
+        result))))
+
 ;; (sample-db true)  
 ;; (binding [db/*school-schema* "demo"] (sample-db true))
 (defn sample-db

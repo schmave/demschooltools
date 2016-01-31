@@ -1,7 +1,6 @@
 (ns overseer.migrations
   (:require [environ.core :refer [env]]
-            [clojure.java.io :as io]
-            [migratus.core :as migratus]))
+            [clojure.java.io :as io]))
 
 (defn replace-philly [from with]
   (clojure.string/replace from #"phillyfreeschool" with))
@@ -11,6 +10,7 @@
         data (replace-philly data name)]
     (with-open [wrtr (io/writer (str "src/overseer/queries/" name ".sql"))]
       (.write wrtr data))))
+
 
 (comment "
  -- broken till otherwise noted
@@ -62,7 +62,7 @@
   );
 
   ")
-(def initialize-prod-database
+(def create-philly-schema-sql
   "
   create table phillyfreeschool.students(
     _id bigserial primary key,
@@ -144,6 +144,10 @@ $func$
 LANGUAGE sql;
   ")
 
+(defn drop-schema-tables-sql [name]
+  (replace-philly remove-philly-tables name))
+(defn create-schema-tables-sql [name]
+  (replace-philly create-philly-schema-sql name))
 
 (def mconfig
   {:store :database

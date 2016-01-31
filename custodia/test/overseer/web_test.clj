@@ -225,6 +225,17 @@
                    0)))
           ))))
 
+(deftest schema-isolation-test
+  (do (db/init-pg)
+      (db/reset-db)
+      (binding [db/*school-schema* "demo"]
+        (data/make-sample-two-students-in-class))
+      (let [resp (data/make-sample-two-students-in-class)
+            att  (att/get-student-list)]
+        (trace/trace "att: " att)
+        (testing "Student Count"
+          (is (= 2 (count att)))))))
+
 ;; 10-14-2014 - good
 ;; 10-15-2014 - good
 ;; 10-16-2014 - short
@@ -309,7 +320,7 @@
             (testing "Total Overrides"
               (is (= (:total_overrides att)
                      0)))
-            ))))  
+            ))))
   )
 
 (deftest in-today-works
@@ -466,11 +477,11 @@
   )
 
 (comment
- (deftest get-current-year
-   (data/sample-db)
-   (testing "Getting current year"
-       (is (= (dates/get-current-year-string (data/get-years))
-              (str "2014-06-01 " (dates/today-string)))))))
+  (deftest get-current-year
+    (data/sample-db)
+    (testing "Getting current year"
+      (is (= (dates/get-current-year-string (data/get-years))
+             (str "2014-06-01 " (dates/today-string)))))))
 
 (deftest excuse-today-is-today
   (do (data/sample-db)
