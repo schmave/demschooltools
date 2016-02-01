@@ -2,7 +2,10 @@
 
 @import helper._
 
-<h3>@r.getNumber() @r.title, @Application.yymmddDate(history.start_date) to @Application.yymmddDate(history.end_date)</h3>
+<h3>@r.getNumber() @r.title</h3>
+<p>@Application.yymmddDate(history.start_date) to @Application.yymmddDate(history.end_date)</p>
+
+<div class="should-limit"><b>Rule text:</b> @Html(Application.markdown(r.content))</div>
 
 <h4>Recent interesting @OrgConfig.get().str_res_plans</h4>
 

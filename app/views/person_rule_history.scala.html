@@ -4,7 +4,9 @@ history: PersonHistory)
 @import helper._
 
 <h4>@p.getDisplayName()</h4>
-<p style="margin-top: 30px;">@e.getNumber() @e.title</p>
+<p>@e.getNumber() @e.title</p>
+
+<div class="should-limit"><b>Rule text:</b> @Html(Application.markdown(e.content))</div>
 
 <p><b>Most recent charge</b>: @Application.formatDateShort(record.most_recent_charge)</p>
 <p><b>Total charges</b>: @record.count</p>

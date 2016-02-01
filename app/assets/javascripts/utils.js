@@ -69,18 +69,6 @@ define (['jquery', 'jquery-ui', 'jquery-form', 'handlebars', 'sorttable', 'boots
         }
     });
 
-    $(".comment_text").each(function() {
-        if (this.offsetHeight > 80) {
-            $(this).addClass("limit_height");
-            $(this).after("<a href='#'>more...</a>");
-            $(this).next().click(function (event) {
-                $(event.target).prev().removeClass("limit_height");
-                $(event.target).remove();
-                return false;
-            });
-        }
-    });
-
     $("input.date").datepicker({
         showOtherMonths: true,
         selectOtherMonths: true,
@@ -89,6 +77,22 @@ define (['jquery', 'jquery-ui', 'jquery-form', 'handlebars', 'sorttable', 'boots
         dateFormat: 'yy-mm-dd'});
 
     var module = {};
+
+    module.limitHeight = function(selector) {
+        $(selector).each(function() {
+            if (this.offsetHeight > 80) {
+                $(this).addClass("limit_height");
+                $(this).after("<a href='#'>more...</a>");
+                $(this).next().click(function (event) {
+                    $(event.target).prev().removeClass("limit_height");
+                    $(event.target).remove();
+                    return false;
+                });
+            }
+        });
+    };
+
+    module.limitHeight('.should-limit');
 
     // These events should capture all possible ways to change the text
     // in a textfield.

@@ -17,6 +17,7 @@ requirejs(['utils'], function(utils) {
                     sorttable.makeSortable(this);
                     sorttable.innerSortFunction.apply($(this).find("th")[1], []);
                 });
+                utils.limitHeight('.should-limit');
         });
     }
 
