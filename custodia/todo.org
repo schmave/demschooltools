@@ -1,6 +1,8 @@
 * TODO Student Page - we have excused and unexcused short days?
-* TODO Student Page - make excuse and give attendance buttons only show on short or absent days
-* TODO Student Page - short count to change if the short day is excused
+* DONE Student Page - make excuse and give attendance buttons only show on short or absent days
+CLOSED: [2016-02-01 Mon 06:53]
+* DONE Student Page - short count to change if the short day is excused
+CLOSED: [2016-02-01 Mon 06:54]
 * DONE Student Page - only 15 minutes short 
 CLOSED: [2016-01-20 Wed 17:26]
 1. Dark Green (the current "more than 300" color)- met attendance requirement 
@@ -12,7 +14,8 @@ CLOSED: [2016-01-20 Wed 17:26]
 * TODO Link online excused absence form that people can fill out. 
 Is there a way to link it to the software?
 * TODO Start date for kids who enroll halfway through year
-* TODO multi-tenented
+* DONE multi-tenented
+CLOSED: [2016-02-01 Mon 06:52]
 * DONE Collect missing swipe from front page
 CLOSED: [2015-12-07 Mon 07:18]
 * DONE Student Page - Change absent to unexcused 
