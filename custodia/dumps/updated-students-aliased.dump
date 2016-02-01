@@ -10,6 +10,15 @@ SET check_function_bodies = false;
 SET client_min_messages = warning;
 
 --
+-- Name: demo; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+CREATE SCHEMA demo;
+
+
+ALTER SCHEMA demo OWNER TO postgres;
+
+--
 -- Name: philly; Type: SCHEMA; Schema: -; Owner: postgres
 --
 
@@ -40,6 +49,39 @@ CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
+
+SET search_path = demo, pg_catalog;
+
+--
+-- Name: school_days(text, bigint); Type: FUNCTION; Schema: demo; Owner: postgres
+--
+
+CREATE FUNCTION school_days(year_name text, class_id bigint) RETURNS TABLE(days date, student_id bigint, archived boolean, olderdate date)
+    LANGUAGE sql
+    AS $_$
+
+SELECT a.days, s._id student_id, s.archived, s.olderdate
+FROM (SELECT DISTINCT days2.days
+    FROM (SELECT
+            (CASE WHEN date(s.in_time AT TIME ZONE 'America/New_York')  IS NULL
+            THEN date(s.out_time AT TIME ZONE 'America/New_York')
+            ELSE date(s.in_time AT TIME ZONE 'America/New_York') END) AS days
+         FROM demo.roundedswipes s
+         INNER JOIN demo.years y
+            ON ((s.out_time BETWEEN y.from_date AND y.to_date)
+            OR (s.in_time BETWEEN y.from_date AND y.to_date))
+         JOIN demo.classes c ON (c.active = true)
+         JOIN demo.classes_X_students cXs ON (cXs.class_id = c._id
+                                         AND s.student_id = cXs.student_id)
+         WHERE y.name = $1) days2
+         ORDER BY days2.days) AS a
+JOIN demo.classes_X_students cXs ON (1=1)
+JOIN demo.students s ON (s._id = cXs.student_id)
+WHERE cXs.class_id = $2
+$_$;
+
+
+ALTER FUNCTION demo.school_days(year_name text, class_id bigint) OWNER TO postgres;
 
 SET search_path = phillyfreeschool, pg_catalog;
 
@@ -111,11 +153,316 @@ $_$;
 
 ALTER FUNCTION public.school_days(year_name text, class_id bigint, school_id bigint) OWNER TO postgres;
 
-SET search_path = philly, pg_catalog;
+SET search_path = demo, pg_catalog;
 
 SET default_tablespace = '';
 
 SET default_with_oids = false;
+
+--
+-- Name: classes; Type: TABLE; Schema: demo; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE classes (
+    _id bigint NOT NULL,
+    name character varying(255),
+    inserted_date timestamp without time zone DEFAULT now(),
+    active boolean DEFAULT false NOT NULL
+);
+
+
+ALTER TABLE demo.classes OWNER TO postgres;
+
+--
+-- Name: classes__id_seq; Type: SEQUENCE; Schema: demo; Owner: postgres
+--
+
+CREATE SEQUENCE classes__id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE demo.classes__id_seq OWNER TO postgres;
+
+--
+-- Name: classes__id_seq; Type: SEQUENCE OWNED BY; Schema: demo; Owner: postgres
+--
+
+ALTER SEQUENCE classes__id_seq OWNED BY classes._id;
+
+
+--
+-- Name: classes_x_students; Type: TABLE; Schema: demo; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE classes_x_students (
+    class_id bigint NOT NULL,
+    student_id bigint NOT NULL
+);
+
+
+ALTER TABLE demo.classes_x_students OWNER TO postgres;
+
+--
+-- Name: excuses; Type: TABLE; Schema: demo; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE excuses (
+    _id bigint NOT NULL,
+    student_id bigint NOT NULL,
+    inserted_date timestamp without time zone DEFAULT now(),
+    date date
+);
+
+
+ALTER TABLE demo.excuses OWNER TO postgres;
+
+--
+-- Name: excuses__id_seq; Type: SEQUENCE; Schema: demo; Owner: postgres
+--
+
+CREATE SEQUENCE excuses__id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE demo.excuses__id_seq OWNER TO postgres;
+
+--
+-- Name: excuses__id_seq; Type: SEQUENCE OWNED BY; Schema: demo; Owner: postgres
+--
+
+ALTER SEQUENCE excuses__id_seq OWNED BY excuses._id;
+
+
+--
+-- Name: excuses_student_id_seq; Type: SEQUENCE; Schema: demo; Owner: postgres
+--
+
+CREATE SEQUENCE excuses_student_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE demo.excuses_student_id_seq OWNER TO postgres;
+
+--
+-- Name: excuses_student_id_seq; Type: SEQUENCE OWNED BY; Schema: demo; Owner: postgres
+--
+
+ALTER SEQUENCE excuses_student_id_seq OWNED BY excuses.student_id;
+
+
+--
+-- Name: overrides; Type: TABLE; Schema: demo; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE overrides (
+    _id bigint NOT NULL,
+    student_id bigint NOT NULL,
+    inserted_date timestamp without time zone DEFAULT now(),
+    date date
+);
+
+
+ALTER TABLE demo.overrides OWNER TO postgres;
+
+--
+-- Name: overrides__id_seq; Type: SEQUENCE; Schema: demo; Owner: postgres
+--
+
+CREATE SEQUENCE overrides__id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE demo.overrides__id_seq OWNER TO postgres;
+
+--
+-- Name: overrides__id_seq; Type: SEQUENCE OWNED BY; Schema: demo; Owner: postgres
+--
+
+ALTER SEQUENCE overrides__id_seq OWNED BY overrides._id;
+
+
+--
+-- Name: overrides_student_id_seq; Type: SEQUENCE; Schema: demo; Owner: postgres
+--
+
+CREATE SEQUENCE overrides_student_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE demo.overrides_student_id_seq OWNER TO postgres;
+
+--
+-- Name: overrides_student_id_seq; Type: SEQUENCE OWNED BY; Schema: demo; Owner: postgres
+--
+
+ALTER SEQUENCE overrides_student_id_seq OWNED BY overrides.student_id;
+
+
+--
+-- Name: swipes; Type: TABLE; Schema: demo; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE swipes (
+    _id bigint NOT NULL,
+    student_id bigint NOT NULL,
+    in_time timestamp with time zone,
+    inserted_date timestamp without time zone DEFAULT now(),
+    out_time timestamp with time zone
+);
+
+
+ALTER TABLE demo.swipes OWNER TO postgres;
+
+--
+-- Name: roundedswipes; Type: VIEW; Schema: demo; Owner: postgres
+--
+
+CREATE VIEW roundedswipes AS
+ SELECT swipes._id,
+    swipes.in_time,
+    swipes.out_time,
+    swipes.student_id
+   FROM swipes;
+
+
+ALTER TABLE demo.roundedswipes OWNER TO postgres;
+
+--
+-- Name: students; Type: TABLE; Schema: demo; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE students (
+    _id bigint NOT NULL,
+    name character varying(255),
+    inserted_date timestamp without time zone DEFAULT now(),
+    olderdate date,
+    show_as_absent date,
+    archived boolean DEFAULT false NOT NULL
+);
+
+
+ALTER TABLE demo.students OWNER TO postgres;
+
+--
+-- Name: students__id_seq; Type: SEQUENCE; Schema: demo; Owner: postgres
+--
+
+CREATE SEQUENCE students__id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE demo.students__id_seq OWNER TO postgres;
+
+--
+-- Name: students__id_seq; Type: SEQUENCE OWNED BY; Schema: demo; Owner: postgres
+--
+
+ALTER SEQUENCE students__id_seq OWNED BY students._id;
+
+
+--
+-- Name: swipes__id_seq; Type: SEQUENCE; Schema: demo; Owner: postgres
+--
+
+CREATE SEQUENCE swipes__id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE demo.swipes__id_seq OWNER TO postgres;
+
+--
+-- Name: swipes__id_seq; Type: SEQUENCE OWNED BY; Schema: demo; Owner: postgres
+--
+
+ALTER SEQUENCE swipes__id_seq OWNED BY swipes._id;
+
+
+--
+-- Name: swipes_student_id_seq; Type: SEQUENCE; Schema: demo; Owner: postgres
+--
+
+CREATE SEQUENCE swipes_student_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE demo.swipes_student_id_seq OWNER TO postgres;
+
+--
+-- Name: swipes_student_id_seq; Type: SEQUENCE OWNED BY; Schema: demo; Owner: postgres
+--
+
+ALTER SEQUENCE swipes_student_id_seq OWNED BY swipes.student_id;
+
+
+--
+-- Name: years; Type: TABLE; Schema: demo; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE years (
+    _id bigint NOT NULL,
+    from_date timestamp with time zone,
+    to_date timestamp with time zone,
+    inserted_date timestamp without time zone DEFAULT now(),
+    name character varying(255)
+);
+
+
+ALTER TABLE demo.years OWNER TO postgres;
+
+--
+-- Name: years__id_seq; Type: SEQUENCE; Schema: demo; Owner: postgres
+--
+
+CREATE SEQUENCE years__id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE demo.years__id_seq OWNER TO postgres;
+
+--
+-- Name: years__id_seq; Type: SEQUENCE OWNED BY; Schema: demo; Owner: postgres
+--
+
+ALTER SEQUENCE years__id_seq OWNED BY years._id;
+
+
+SET search_path = philly, pg_catalog;
 
 --
 -- Name: students; Type: TABLE; Schema: philly; Owner: postgres; Tablespace: 
@@ -564,6 +911,108 @@ CREATE TABLE session_store (
 
 ALTER TABLE public.session_store OWNER TO postgres;
 
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE users (
+    user_id bigint NOT NULL,
+    username character varying(255),
+    password character varying(255),
+    roles character varying(255),
+    schema_name character varying(255),
+    inserted_date timestamp without time zone DEFAULT now()
+);
+
+
+ALTER TABLE public.users OWNER TO postgres;
+
+--
+-- Name: users_user_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE users_user_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.users_user_id_seq OWNER TO postgres;
+
+--
+-- Name: users_user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE users_user_id_seq OWNED BY users.user_id;
+
+
+SET search_path = demo, pg_catalog;
+
+--
+-- Name: _id; Type: DEFAULT; Schema: demo; Owner: postgres
+--
+
+ALTER TABLE ONLY classes ALTER COLUMN _id SET DEFAULT nextval('classes__id_seq'::regclass);
+
+
+--
+-- Name: _id; Type: DEFAULT; Schema: demo; Owner: postgres
+--
+
+ALTER TABLE ONLY excuses ALTER COLUMN _id SET DEFAULT nextval('excuses__id_seq'::regclass);
+
+
+--
+-- Name: student_id; Type: DEFAULT; Schema: demo; Owner: postgres
+--
+
+ALTER TABLE ONLY excuses ALTER COLUMN student_id SET DEFAULT nextval('excuses_student_id_seq'::regclass);
+
+
+--
+-- Name: _id; Type: DEFAULT; Schema: demo; Owner: postgres
+--
+
+ALTER TABLE ONLY overrides ALTER COLUMN _id SET DEFAULT nextval('overrides__id_seq'::regclass);
+
+
+--
+-- Name: student_id; Type: DEFAULT; Schema: demo; Owner: postgres
+--
+
+ALTER TABLE ONLY overrides ALTER COLUMN student_id SET DEFAULT nextval('overrides_student_id_seq'::regclass);
+
+
+--
+-- Name: _id; Type: DEFAULT; Schema: demo; Owner: postgres
+--
+
+ALTER TABLE ONLY students ALTER COLUMN _id SET DEFAULT nextval('students__id_seq'::regclass);
+
+
+--
+-- Name: _id; Type: DEFAULT; Schema: demo; Owner: postgres
+--
+
+ALTER TABLE ONLY swipes ALTER COLUMN _id SET DEFAULT nextval('swipes__id_seq'::regclass);
+
+
+--
+-- Name: student_id; Type: DEFAULT; Schema: demo; Owner: postgres
+--
+
+ALTER TABLE ONLY swipes ALTER COLUMN student_id SET DEFAULT nextval('swipes_student_id_seq'::regclass);
+
+
+--
+-- Name: _id; Type: DEFAULT; Schema: demo; Owner: postgres
+--
+
+ALTER TABLE ONLY years ALTER COLUMN _id SET DEFAULT nextval('years__id_seq'::regclass);
+
+
 SET search_path = philly, pg_catalog;
 
 --
@@ -652,6 +1101,134 @@ SET search_path = public, pg_catalog;
 --
 
 ALTER TABLE ONLY schools ALTER COLUMN school_id SET DEFAULT nextval('schools_school_id_seq'::regclass);
+
+
+--
+-- Name: user_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY users ALTER COLUMN user_id SET DEFAULT nextval('users_user_id_seq'::regclass);
+
+
+SET search_path = demo, pg_catalog;
+
+--
+-- Data for Name: classes; Type: TABLE DATA; Schema: demo; Owner: postgres
+--
+
+COPY classes (_id, name, inserted_date, active) FROM stdin;
+\.
+
+
+--
+-- Name: classes__id_seq; Type: SEQUENCE SET; Schema: demo; Owner: postgres
+--
+
+SELECT pg_catalog.setval('classes__id_seq', 1, false);
+
+
+--
+-- Data for Name: classes_x_students; Type: TABLE DATA; Schema: demo; Owner: postgres
+--
+
+COPY classes_x_students (class_id, student_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: excuses; Type: TABLE DATA; Schema: demo; Owner: postgres
+--
+
+COPY excuses (_id, student_id, inserted_date, date) FROM stdin;
+\.
+
+
+--
+-- Name: excuses__id_seq; Type: SEQUENCE SET; Schema: demo; Owner: postgres
+--
+
+SELECT pg_catalog.setval('excuses__id_seq', 1, false);
+
+
+--
+-- Name: excuses_student_id_seq; Type: SEQUENCE SET; Schema: demo; Owner: postgres
+--
+
+SELECT pg_catalog.setval('excuses_student_id_seq', 1, false);
+
+
+--
+-- Data for Name: overrides; Type: TABLE DATA; Schema: demo; Owner: postgres
+--
+
+COPY overrides (_id, student_id, inserted_date, date) FROM stdin;
+\.
+
+
+--
+-- Name: overrides__id_seq; Type: SEQUENCE SET; Schema: demo; Owner: postgres
+--
+
+SELECT pg_catalog.setval('overrides__id_seq', 1, false);
+
+
+--
+-- Name: overrides_student_id_seq; Type: SEQUENCE SET; Schema: demo; Owner: postgres
+--
+
+SELECT pg_catalog.setval('overrides_student_id_seq', 1, false);
+
+
+--
+-- Data for Name: students; Type: TABLE DATA; Schema: demo; Owner: postgres
+--
+
+COPY students (_id, name, inserted_date, olderdate, show_as_absent, archived) FROM stdin;
+\.
+
+
+--
+-- Name: students__id_seq; Type: SEQUENCE SET; Schema: demo; Owner: postgres
+--
+
+SELECT pg_catalog.setval('students__id_seq', 1, false);
+
+
+--
+-- Data for Name: swipes; Type: TABLE DATA; Schema: demo; Owner: postgres
+--
+
+COPY swipes (_id, student_id, in_time, inserted_date, out_time) FROM stdin;
+\.
+
+
+--
+-- Name: swipes__id_seq; Type: SEQUENCE SET; Schema: demo; Owner: postgres
+--
+
+SELECT pg_catalog.setval('swipes__id_seq', 1, false);
+
+
+--
+-- Name: swipes_student_id_seq; Type: SEQUENCE SET; Schema: demo; Owner: postgres
+--
+
+SELECT pg_catalog.setval('swipes_student_id_seq', 1, false);
+
+
+--
+-- Data for Name: years; Type: TABLE DATA; Schema: demo; Owner: postgres
+--
+
+COPY years (_id, from_date, to_date, inserted_date, name) FROM stdin;
+\.
+
+
+--
+-- Name: years__id_seq; Type: SEQUENCE SET; Schema: demo; Owner: postgres
+--
+
+SELECT pg_catalog.setval('years__id_seq', 1, false);
 
 
 SET search_path = philly, pg_catalog;
@@ -1536,7 +2113,6 @@ COPY swipes (_id, student_id, in_time, inserted_date, out_time) FROM stdin;
 602	10	2015-09-07 15:40:08.541-04	2015-09-07 15:40:08.553098	\N
 603	5	2015-09-07 15:40:10.022-04	2015-09-07 19:40:10.033	2015-09-07 15:40:20.438-04
 601	43	2015-09-07 15:40:07.196-04	2015-09-07 19:40:07.207	2015-09-07 15:40:22.122-04
-604	40	2015-09-07 15:40:13.31-04	2015-09-07 19:40:13.322	2015-09-07 15:40:23.632-04
 605	29	2015-09-07 15:40:16.819-04	2015-09-07 19:40:16.83	2015-09-07 15:40:30.212-04
 \.
 
@@ -1622,7 +2198,78 @@ SELECT pg_catalog.setval('schools_school_id_seq', 4, true);
 
 COPY session_store (session_id, idle_timeout, absolute_timeout, value) FROM stdin;
 080a8eb2-abb3-4116-8977-2dd1feb4ddc3	\N	\N	\\x4e50590800000122f0101b000000026a1863656d657269636b2e667269656e642f6964656e746974791f0070046a0f61757468110070636174696f6e7316009002690561646d696e190d009c066a04747970656a1448000039000e5e00fc0d776f726b666c6f776a10696e7465726163746976652d666f726d6a214200c072656469726563742d6f6e2d4e00323f040172009308757365726e616d658900816a05726f6c657317d100a1136f766572736565722e1500102f2c002b6a14150001c000246a08ec00044800f0000763757272656e74690561646d696e
+1eca9c70-ab04-4aa0-9333-c45235ebb4af	\N	\N	\\x4e50590800000164f0101b000000026a1863656d657269636b2e667269656e642f6964656e746974791f0070046a0f61757468110070636174696f6e7316009002690561646d696e190d009c066a04747970656a1448000039000e5e00fc0d776f726b666c6f776a10696e7465726163746976652d666f726d6a214200c072656469726563742d6f6e2d4e00303f04017200e00c6a07757365725f696464016a080b00436e616d659400816a05726f6c657317dc00a1136f766572736565722e1500102f2c002b6a14150001cb00916a0b736368656d615f4b00f41c107068696c6c79667265657363686f6f6c6a0d696e7365727465645f646174655a000001529cb07ded6a082e01047f00f0000763757272656e74690561646d696e
 \.
+
+
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY users (user_id, username, password, roles, schema_name, inserted_date) FROM stdin;
+1	admin	$2a$10$qidnbTwmjkaPhEwEuBRlbenzfKNnp5M7iPqorEHXcNPyOdbdvYfYe	#{:overseer.roles/user :overseer.roles/admin}	phillyfreeschool	2016-02-01 06:55:58.317287
+2	super	$2a$10$kz6pvxQJL7GUX5bgAZqhAOs1GMoKegZ9ZTIVhwUByJPgl5kyASmEi	#{:overseer.roles/user :overseer.roles/admin :overseer.roles/super}	phillyfreeschool	2016-02-01 06:55:58.486588
+3	user	$2a$10$XYNn9aZNi1J3Nd2EADnQMuh3O8BHdrMzksVEoK4IkQW.f0Jzu0t6a	#{:overseer.roles/user}	phillyfreeschool	2016-02-01 06:55:58.654605
+4	admin2	$2a$10$frDtNCmuehxfabECmlKE8OZPzwm/JeKxh2oKhaeUP.8x3cOSibyvy	#{:overseer.roles/user :overseer.roles/admin}	demo	2016-02-01 06:55:58.824468
+5	demo	$2a$10$ef3FxI0sgUrDLIZGwtI37uErYFBqFlBgMnnZoVcZbSzawPZAmnXNS	#{:overseer.roles/user :overseer.roles/admin}	demo	2016-02-01 06:55:58.990112
+\.
+
+
+--
+-- Name: users_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('users_user_id_seq', 5, true);
+
+
+SET search_path = demo, pg_catalog;
+
+--
+-- Name: classes_pkey; Type: CONSTRAINT; Schema: demo; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY classes
+    ADD CONSTRAINT classes_pkey PRIMARY KEY (_id);
+
+
+--
+-- Name: excuses_pkey; Type: CONSTRAINT; Schema: demo; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY excuses
+    ADD CONSTRAINT excuses_pkey PRIMARY KEY (_id);
+
+
+--
+-- Name: overrides_pkey; Type: CONSTRAINT; Schema: demo; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY overrides
+    ADD CONSTRAINT overrides_pkey PRIMARY KEY (_id);
+
+
+--
+-- Name: students_pkey; Type: CONSTRAINT; Schema: demo; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY students
+    ADD CONSTRAINT students_pkey PRIMARY KEY (_id);
+
+
+--
+-- Name: swipes_pkey; Type: CONSTRAINT; Schema: demo; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY swipes
+    ADD CONSTRAINT swipes_pkey PRIMARY KEY (_id);
+
+
+--
+-- Name: years_pkey; Type: CONSTRAINT; Schema: demo; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY years
+    ADD CONSTRAINT years_pkey PRIMARY KEY (_id);
 
 
 SET search_path = philly, pg_catalog;
@@ -1717,6 +2364,32 @@ ALTER TABLE ONLY schools
 
 ALTER TABLE ONLY session_store
     ADD CONSTRAINT session_store_pkey PRIMARY KEY (session_id);
+
+
+--
+-- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (user_id);
+
+
+SET search_path = demo, pg_catalog;
+
+--
+-- Name: classes_x_students_class_id_fkey; Type: FK CONSTRAINT; Schema: demo; Owner: postgres
+--
+
+ALTER TABLE ONLY classes_x_students
+    ADD CONSTRAINT classes_x_students_class_id_fkey FOREIGN KEY (class_id) REFERENCES classes(_id);
+
+
+--
+-- Name: classes_x_students_student_id_fkey; Type: FK CONSTRAINT; Schema: demo; Owner: postgres
+--
+
+ALTER TABLE ONLY classes_x_students
+    ADD CONSTRAINT classes_x_students_student_id_fkey FOREIGN KEY (student_id) REFERENCES students(_id);
 
 
 SET search_path = phillyfreeschool, pg_catalog;
