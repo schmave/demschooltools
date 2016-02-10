@@ -29,7 +29,6 @@ Print active @OrgConfig.get().str_res_plans</a></p>
 <table class="table completed-rps printable-res-plans no-print">
 </table>
 
-
 <script id="rp-template" type="text/x-handlebars-template">
 <tr>
 	<td class="name col-xs-1">{{name}}
@@ -37,7 +36,9 @@ Print active @OrgConfig.get().str_res_plans</a></p>
 	{{#if closed_date}}<br/>Closed on {{closed_date}} ({{closed_day_of_week}}) {{/if}}
 	{{#if sm_date}}<br/>SM ruled on {{sm_date}} ({{sm_day_of_week}}) {{/if}}
 	<br/>{{rule_title}}
-	<td class="col-xs-4">@OrgConfig.get().str_findings: {{findings}}</td>
+    @if( OrgConfig.get().show_findings_in_rp_list ) {
+	   <td class="col-xs-4">@OrgConfig.get().str_findings: {{findings}}</td>
+    }
 	<td class="col-xs-3">{{resolution_plan}}
     {{#if referred_to_sm}}
         {{#if sm_decision}}

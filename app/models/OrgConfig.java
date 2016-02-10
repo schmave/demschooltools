@@ -17,7 +17,7 @@ public class OrgConfig {
     public String str_res_plans;
     public String str_res_plans_cap;
     public String str_committee_name = "Judicial Committee";
-	public String str_findings = "Findings";
+    public String str_findings = "Findings";
 
     public boolean show_no_contest_plea = false;
     public boolean show_severity = false;
@@ -25,6 +25,7 @@ public class OrgConfig {
     public boolean show_checkbox_for_res_plan = true;
     public boolean track_writer = true;
     public boolean filter_no_charge_cases = false;
+    public boolean show_findings_in_rp_list = true;
 
     public Organization org;
 
@@ -124,6 +125,7 @@ class Fairhaven extends OrgConfig {
 		str_findings = "JC Report";
 
         use_minor_referrals = true;
+        show_findings_in_rp_list = false;
 
         OrgConfig.register(name, this);
     }
@@ -177,7 +179,7 @@ class TheCircleSchool extends OrgConfig {
 }
 
 class MakariosLearningCommunity extends OrgConfig {
-    private static final MakariosLearningCommunity INSTANCE = 
+    private static final MakariosLearningCommunity INSTANCE =
         new MakariosLearningCommunity();
 
     public MakariosLearningCommunity() {
