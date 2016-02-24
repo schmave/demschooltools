@@ -130,6 +130,10 @@ a {
     width: 90%;
 }
 
+.new-class .student-listing {
+    width: 40%;
+}
+
 .student-listing-table {
     text-align: center;
 }

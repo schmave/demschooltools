@@ -126,7 +126,7 @@ var exports = React.createClass({
             ? <span><button id={("activate-" + this.state.selectedClass.name)} className="btn btn-sm btn-primary" onClick={this.activateClass}>Activate Class</button></span>
                                 : <span></span>;
         return <div>
-                <div className="row margined class-listing">
+                <div className="row margined class-listing new-class">
                     <div className="col-sm-2 column">
                         <table className="table table-striped center">
                             <thead>
@@ -140,13 +140,13 @@ var exports = React.createClass({
                             <tbody> {this.classRows()} </tbody>
                         </table>
                     </div>
-                    <div className="col-sm-4 column">
+                    <div className="col-sm-5 column">
                         <div className="panel panel-info">
                             <div className="panel-heading absent"><b>In Class</b></div>
                             {this.getStudentRowsInCurrentClass()}
                         </div>
                     </div>
-                    <div className="col-sm-4 column">
+                    <div className="col-sm-5 column">
                         <div className="panel panel-info">
                             <div className="panel-heading absent"><b>Not In Class</b></div>
                             {this.getStudentRowsNotInCurrentClass()}
