@@ -72,8 +72,12 @@ var exports = React.createClass({
                        className={selected}>
                 <td>
                     {classval.name}
-                    <span className="margined badge badge-green">{classval.active ? "Active" : ""}</span>
-                </td></tr>;
+                    {classval.active ?
+                    <span className="margined badge badge-green">Active</span>
+                        : <span onClick={this.activateClass} className="margined badge">Activate</span>}
+                </td>
+            </tr>
+
         }.bind(this));
     },
     selectedStudentContains: function(stu) {
@@ -92,7 +96,7 @@ var exports = React.createClass({
     },
     getStudentRowsInCurrentClass : function(){
         var t = this.state.selectedClass.students.map(function (stu) {
-            return <div key={"t" + this.state.selectedClass._id + "-" + stu.student_id}  className="in-class panel panel-info student-listing col-sm-11">
+            return <div key={"t" + this.state.selectedClass._id + "-" + stu.student_id}  className="in-class panel panel-info student-listing col-sm-4">
                     <div>
                         <div className="name"> {stu.name} </div>
                         <div className="attendance-button">
@@ -127,36 +131,25 @@ var exports = React.createClass({
                         <table className="table table-striped center">
                             <thead>
                                 <tr>
-                                    <th className="center">Classes</th>
+                                    <th className="center">
+                                        <span className="h2">Classes</span>&nbsp;
+                                            <Link style={{verticalAlign: "text-bottom"}} className="btn btn-primary btn-xs" id="create-class" to="createaclass">Add new</Link>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody> {this.classRows()} </tbody>
                         </table>
                     </div>
-                    <div className="col-sm-2 column">
-                        <div className="panel panel-info">
-                            <div className="panel-heading absent"><b>Manage Class</b></div>
-                            {classActivateButton}
-                        </div>
-                    </div>
-                    <div className="col-sm-2 column">
+                    <div className="col-sm-4 column">
                         <div className="panel panel-info">
                             <div className="panel-heading absent"><b>In Class</b></div>
                             {this.getStudentRowsInCurrentClass()}
                         </div>
                     </div>
-                    <div className="col-sm-2 column">
+                    <div className="col-sm-4 column">
                         <div className="panel panel-info">
                             <div className="panel-heading absent"><b>Not In Class</b></div>
                             {this.getStudentRowsNotInCurrentClass()}
-                        </div>
-                    </div>
-                    <div className="col-sm-2 column">
-                        <div className="panel panel-info">
-                            <div className="panel-heading absent"><b>Create Class</b></div>
-                            <div className="out-class panel panel-info student-listing col-sm-11">
-                                <Link id="create-class" to="createaclass">Create Class</Link>
-                            </div>
                         </div>
                     </div>
                 </div>

@@ -82,6 +82,11 @@ a {
     text-align: center;
 }
 
+.badge-green {
+    background-color: green !important;
+    color: white !important;
+}
+
 .badge-red {
     background-color: red !important;
     color: white !important;
