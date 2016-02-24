@@ -86,40 +86,42 @@
   (create-all-tables)
   (init-users))
 
+(defn append-schema [q]
+  (str *school-schema* "." q))
+
 (defn delete! [doc]
-  (let [table (str *school-schema* "." (name (:type doc)))
+  (let [table (append-schema (name (:type doc)))
         id (:_id doc)]
     (jdbc/delete! @pgdb table ["_id=?" id])))
 
 (defn update! [table id fields]
   (let [fields (dissoc fields :type)
-        table (str *school-schema* "." (name table))]
+        table (append-schema (name table))]
     (jdbc/update! @pgdb table fields ["_id=?" id])))
 
 (defn persist! [doc]
   (let [table (:type doc)
-        tablename (str *school-schema* "." (name (:type doc)))
+        tablename (append-schema (name (:type doc)))
         doc (dissoc doc :type)]
     (first (map #(assoc % :type table)
                 (jdbc/insert! @pgdb tablename doc)))))
 
 (defn get-*
   ([type] (map #(assoc % :type (keyword type))
-               (jdbc/query @pgdb [(str "select * from " *school-schema* "." (name type) " order by inserted_date ")])))
+               (jdbc/query @pgdb [(str "select * from " (append-schema (name type)) " order by inserted_date ")])))
   ([type id id-col]
    (map #(assoc % :type (keyword type))
         (if id
-          (jdbc/query @pgdb [(str "select * from " *school-schema* "." (name type)
+          (jdbc/query @pgdb [(str "select * from " (append-schema (name type))
                                   " where " id-col "=?"
                                   " order by inserted_date")
                              id])
-          (jdbc/query @pgdb [(str "select * from " *school-schema* "." (name type) " order by inserted_date")])))))
+          (jdbc/query @pgdb [(str "select * from " (append-schema (name type)) " order by inserted_date")])))))
 
 (defn get-active-class []
   (-> (q get-active-class-y {} )
       first
       :_id))
-
 
 ;; (get-classes)
 (defn get-classes []
