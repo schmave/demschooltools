@@ -29,11 +29,12 @@ var React = require('react'),
     classStore = require('./classstore'),
     actionCreator = require('./classactioncreator'),
     Link = Router.Link,
+    FilterBox = require('./filterbox.jsx'),
     studentStore = require('./StudentStore');
 
 var exports = React.createClass({
     getInitialState: function () {
-        return {classes:[], students: [], selectedClass: {students:[]}};
+        return {classes:[], filterText: '', students: [], selectedClass: {students:[]}};
     },
     setupState: function (state) {
         var both = state,
@@ -95,8 +96,9 @@ var exports = React.createClass({
         actionCreator.activateClass(this.state.selectedClass._id);
     },
     getStudentRowsInCurrentClass : function(){
-        var t = this.state.selectedClass.students.map(function (stu) {
-            return <div key={"t" + this.state.selectedClass._id + "-" + stu.student_id}  className="in-class panel panel-info student-listing col-sm-4">
+        var t = this.state.selectedClass.students.filter(
+                function(s){ return s.name.toLocaleLowerCase().indexOf(this.state.filterText.toLocaleLowerCase()) > -1;}.bind(this))
+            .map(function (stu) { return <div key={"t" + this.state.selectedClass._id + "-" + stu.student_id}  className="in-class panel panel-info student-listing col-sm-4">
                     <div>
                         <div className="name"> {stu.name} </div>
                         <div className="attendance-button">
@@ -121,6 +123,9 @@ var exports = React.createClass({
         }.bind(this));
         return t;
     },
+    filterChanged: function(filter){
+        this.setState({filterText: filter});
+    },
     render: function () {
         var classActivateButton = (this.state.selectedClass.active !== true)
             ? <span><button id={("activate-" + this.state.selectedClass.name)} className="btn btn-sm btn-primary" onClick={this.activateClass}>Activate Class</button></span>
@@ -143,6 +148,7 @@ var exports = React.createClass({
                     <div className="col-sm-5 column">
                         <div className="panel panel-info">
                             <div className="panel-heading absent"><b>In Class</b></div>
+                            <div> <FilterBox onFilterChange={this.filterChanged} /></div>
                             {this.getStudentRowsInCurrentClass()}
                         </div>
                     </div>
