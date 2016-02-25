@@ -35,7 +35,7 @@
 ;; (get-school-days "2014-06-01 2015-06-01")
 
 (deftest get-school-days-test
-  (data/sample-db true)
+  (sample-db true)
   (let [year (dates/get-current-year-string (data/get-years))
         school-days (get-school-days year)]
     (testing "School days"
@@ -76,7 +76,7 @@
   )
 
 (deftest swipe-attendence-override-test
-  (do (data/sample-db)
+  (do (sample-db)
       (let [{sid :_id} (data/make-student "test")]
         (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
         (data/swipe-in sid  _10-14_9-14am)
@@ -99,7 +99,7 @@
   )
 
 (deftest class-and-adding-students
-  (do (data/sample-db)
+  (do (sample-db)
       (let [class-id (get-class-id-by-name "2014-2015")
             {student-id :_id} (data/make-student "Jimmy Hotel")]
         (db/activate-class class-id)
@@ -119,7 +119,7 @@
   (today-at-utc 20 1))
 
 (deftest swipe-in-and-out-at-8pm-with-rounding-test
-  (do (data/sample-db)
+  (do (sample-db)
       (let [s (data/make-student "test")
             sid (:_id s)]
 
@@ -142,7 +142,7 @@
 (def _339pm (t/plus _10-14_9-14am (t/minutes 330)))
 
 (deftest swipe-before-9-test
-  (do (data/sample-db)
+  (do (sample-db)
       (let [s (data/make-student "test")
             sid (:_id s)]
 
@@ -165,7 +165,7 @@
 (def _330pm (t/date-time 2014 10 14 19 30))
 
 (deftest swipe-roundings-after-4
-  (do (data/sample-db)
+  (do (sample-db)
       (let [s (data/make-student "test")
             sid (:_id s)]
 
@@ -204,7 +204,7 @@
           ))))
 
 (deftest single-swipe-short-test
-  (do (data/sample-db)
+  (do (sample-db)
       (let [s (data/make-student "test")
             sid (:_id s)]
 
@@ -229,8 +229,8 @@
   (do (db/init-pg)
       (db/reset-db)
       (binding [db/*school-schema* "demo"]
-        (data/make-sample-two-students-in-class))
-      (let [resp (data/make-sample-two-students-in-class)
+        (make-sample-two-students-in-class))
+      (let [resp (make-sample-two-students-in-class)
             att  (att/get-student-list)]
         (trace/trace "att: " att)
         (testing "Student Count"
@@ -244,7 +244,7 @@
 ;; 10-19-2014 - absent
 ;; 10-20-2014 - absent
 (deftest swipe-attendence-test
-  (do (data/sample-db)
+  (do (sample-db)
       (let [s (data/make-student "test")
             sid (:_id s)
             s2 (data/make-student "test2")
@@ -324,7 +324,7 @@
   )
 
 (deftest in-today-works
-  (do (data/sample-db)
+  (do (sample-db)
       (let [s (data/make-student "test")
             sid (:_id s)]
 
@@ -339,7 +339,7 @@
   )
 
 (deftest swiped-in-yesterday-no-exception-test
-  (do (data/sample-db)
+  (do (sample-db)
       (let [s (data/make-student "test")
             sid (:_id s)]
 
@@ -350,14 +350,14 @@
         )))
 
 (deftest swiped-out-without-in-no-exception-test
-  (do (data/sample-db)
+  (do (sample-db)
       (let [s (data/make-student "test")
             sid (:_id s)]
         (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
         )))
 
 (deftest sign-out-without-in
-  (do (data/sample-db)
+  (do (sample-db)
       (let [s (data/make-student "test")
             sid (:_id s)]
 
@@ -370,7 +370,7 @@
   )
 
 (deftest students-with-att
-  (do (data/sample-db)
+  (do (sample-db)
       (testing "students with att"
         (is (not= '() (att/get-student-with-att 1))))
       (let [s (data/make-student "test")
@@ -397,7 +397,7 @@
       (is (not= nil res)))))
 
 (deftest student-list-when-last-swipe-sanitized2
-  (do (data/sample-db)
+  (do (sample-db)
       (let [s (data/make-student "test")
             sid (:_id s)
             now (today-at-utc 15 0)]
@@ -423,7 +423,7 @@
             )))))
 
 (deftest student-list-when-last-swipe-sanitized3
-  (do (data/sample-db)
+  (do (sample-db)
       (let [s (data/make-student "test")
             sid (:_id s)
             now (today-at-utc 15 0)]
@@ -440,7 +440,7 @@
             )))))
 
 (deftest absent-student-main-page
-  (do (data/sample-db)
+  (do (sample-db)
       (let [s (data/make-student "test")
             sid (:_id s)
             x (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
@@ -454,7 +454,7 @@
           ))))
 
 (deftest older-student-required-minutes
-  (do (data/sample-db)
+  (do (sample-db)
       (let [s (data/make-student "test")
             sid (:_id s)
             s (data/toggle-student-older sid)
@@ -478,13 +478,13 @@
 
 (comment
   (deftest get-current-year
-    (data/sample-db)
+    (sample-db)
     (testing "Getting current year"
       (is (= (dates/get-current-year-string (data/get-years))
              (str "2014-06-01 " (dates/today-string)))))))
 
 (deftest excuse-today-is-today
-  (do (data/sample-db)
+  (do (sample-db)
       (let [
             {dummy-id :_id} (data/make-student "dummy")
             {sid :_id} (data/make-student "test")
@@ -505,7 +505,7 @@
   )
 
 (deftest swipe-today-not-in-on-excused-or-override
-  (do (data/sample-db)
+  (do (sample-db)
       (let [s (data/make-student "test")
             sid (:_id s)
             s2 (data/make-student "tests1")
@@ -524,7 +524,7 @@
   )
 
 (deftest swipe-attendence-shows-only-when-in
-  (do (data/sample-db)
+  (do (sample-db)
       (let [s (data/make-student "test")
             sid (:_id s)]
 

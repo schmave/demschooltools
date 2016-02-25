@@ -1,6 +1,8 @@
 (ns overseer.helpers-test
   (:require [clj-time.local :as l]
             [clj-time.core :as t]
+            [overseer.db :as db]
+            [clojure.tools.trace :as trace]
             [overseer.database :as data]
             [overseer.attendance :as att]
             [clj-time.coerce :as c]))
@@ -50,3 +52,62 @@
 
 (defn get-class-id-by-name [name]
   (:_id (data/get-class-by-name name)))
+
+(defn make-sample-two-students-in-class []
+  (let [{class-id :_id} (data/make-class "2014-2015")]
+    (db/activate-class class-id)
+    (data/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 2))))
+    (data/make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
+    (let [s (data/make-student "jim")
+          {sid :_id} s
+          result {:class_id class-id :student_ids [sid]}]
+      (data/add-student-to-class sid class-id)
+      (let [s (data/make-student "steve")
+            {sid :_id} s
+            result (update-in result [:student_ids] (fn [sids] (conj sids sid)))]
+        (data/add-student-to-class sid class-id)
+        result))))
+
+;; (sample-db true)  
+;; (binding [db/*school-schema* "demo"] (sample-db true))
+(defn sample-db
+  ([] (sample-db false))
+  ([have-extra?]
+   (db/init-pg)
+   (db/reset-db)
+   (let [{class-id :_id} (data/make-class "2014-2015")]
+     (db/activate-class class-id)
+     (data/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 2))))
+     (data/make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
+     (let [s (data/make-student "jim")
+           {sid :_id} s]
+       (data/add-student-to-class sid class-id)
+       (when have-extra? (data/swipe-in sid (t/minus (t/now) (t/days 2)))))
+     (let [s (data/make-student "steve")
+           {sid :_id} s]
+       (data/add-student-to-class sid class-id)
+       (when have-extra? (data/swipe-in sid (t/minus (t/now) (t/days 1) (t/hours 5)))))))
+  )
+
+;; (huge-sample-db)
+(defn huge-sample-db []
+  (db/init-pg)
+  (db/reset-db)
+  (data/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 5))))
+  (data/make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
+  (loop [x 1]
+    (if (> x 80)
+      :done
+      (do (let [s (data/make-student (str "zax" x))]
+            (loop [y 2]
+              (trace/trace (str "Id:" x " Num:" y " of:" (* 80 200)))
+              (if (> y 200)
+                :done
+                (do
+                  (data/swipe-in x (t/minus (t/now) (t/days y)))
+                  (data/swipe-out x (t/minus (t/plus (t/now) (t/minutes 5))
+                                        (t/days y)))
+                  (recur (inc y))))))
+
+          (recur (inc x)))))
+  )
