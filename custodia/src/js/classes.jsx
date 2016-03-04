@@ -29,8 +29,7 @@ var React = require('react'),
     classStore = require('./classstore'),
     actionCreator = require('./classactioncreator'),
     Link = Router.Link,
-    FilterBox = require('./filterbox.jsx'),
-    studentStore = require('./StudentStore');
+    FilterBox = require('./filterbox.jsx');
 
 var exports = React.createClass({
     getInitialState: function () {

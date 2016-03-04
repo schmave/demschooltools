@@ -7,9 +7,10 @@ var component = React.createClass({
       .onFilterChange(event.target.value);
   },
   render: function() {
-    return <div className="panel">
-      <form className="form-inline">
+    return <div style={{padding: "5px"}} className="panel ">
+      <form style={{textAlign: "center"}} className="form-inline">
         <input
+          style={{width: "90%"}}
           type="text"
           placeholder="Search..."
           className="form-control"
