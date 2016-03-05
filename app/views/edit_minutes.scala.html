@@ -113,6 +113,11 @@ View printable minutes</a>
 <div class="radio-inline">
   <label><input type="radio" class="plea-not-guilty" value="Not Guilty"><span>Not Guilty</span></label>
 </div>
+@if( OrgConfig.get().show_na_plea ) {
+<div class="radio-inline">
+  <label><input type="radio" class="plea-na" value="N/A"><span>N/A</span></label>
+</div>
+}
 &nbsp;&nbsp;&nbsp;<label><input type="checkbox" class="refer-to-sm"><span> Refer to School Meeting</span></label>
 	@if( OrgConfig.get().use_minor_referrals ) {
         <label><span class="minor-referral-label">Refer to:</span><input type="text" class="minor-referral-destination"></label>

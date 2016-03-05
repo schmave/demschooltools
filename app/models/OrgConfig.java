@@ -20,6 +20,7 @@ public class OrgConfig {
     public String str_findings = "Findings";
 
     public boolean show_no_contest_plea = false;
+    public boolean show_na_plea = false;
     public boolean show_severity = false;
     public boolean use_minor_referrals = false;
     public boolean show_checkbox_for_res_plan = true;
@@ -96,6 +97,7 @@ class PhillyFreeSchool extends OrgConfig {
         str_res_plans_cap = "Sentences";
 
         show_no_contest_plea = true;
+        show_na_plea = true;
         show_severity = true;
         use_minor_referrals = true;
 

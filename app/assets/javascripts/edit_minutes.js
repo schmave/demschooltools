@@ -220,6 +220,8 @@ requirejs(['utils'], function(utils) {
                 el.find(".plea-no-contest").prop("checked", true);
             } else if (json.plea == "Not Guilty") {
                 el.find(".plea-not-guilty").prop("checked", true);
+            } else if (json.plea == "N/A") {
+                el.find(".plea-na").prop("checked", true);
             }
 
             // rule, person
@@ -282,6 +284,11 @@ requirejs(['utils'], function(utils) {
                 url += "&plea=Not Guilty";
             }
 
+            plea = el.find(".plea-na");
+            if (plea.prop("checked")) {
+                url += "&plea=N/A";
+            }
+
             refer = el.find(".refer-to-sm");
             url += "&referred_to_sm=" + refer.prop("checked");
 
@@ -325,7 +332,7 @@ requirejs(['utils'], function(utils) {
                     el.find(".last-rp").html(data);
                     el.find(".last-rp .more-info").click(function() {
                         showSomethingInSidebar(
-                            '/personRuleHistory' + 
+                            '/personRuleHistory' +
                             '/' + self.people_chooser.people[0].id +
                             '/' + self.rule_chooser.rule);
                     });
@@ -354,6 +361,7 @@ requirejs(['utils'], function(utils) {
         el.find(".resolution_plan").on(utils.TEXT_AREA_EVENTS, self.checkText);
         el.find(".plea-guilty").change(self.markAsModified);
         el.find(".plea-no-contest").change(self.markAsModified);
+        el.find(".plea-na").change(self.markAsModified);
         el.find(".plea-not-guilty").change(self.markAsModified);
         el.find(".plea-not-guilty").change(function() {
                 self.el.find(".refer-to-sm").prop("checked", true);
