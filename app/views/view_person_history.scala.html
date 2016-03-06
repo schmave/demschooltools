@@ -3,7 +3,7 @@
 
 @import helper._
 
-@main(p.getDisplayName() + "'s JC history", "jc") {
+@main(p.getDisplayName() + "'s " + OrgConfig.get().str_jc_name_short + " history", "jc") {
 
 <script type="text/javascript">
 requirejs(['utils'], function() {

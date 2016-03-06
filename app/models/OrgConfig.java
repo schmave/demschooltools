@@ -16,7 +16,8 @@ public class OrgConfig {
     public String str_res_plan_cap;
     public String str_res_plans;
     public String str_res_plans_cap;
-    public String str_committee_name = "Judicial Committee";
+    public String str_jc_name = "Judicial Committee";
+    public String str_jc_name_short = "JC";
     public String str_findings = "Findings";
 
     public boolean show_no_contest_plea = false;
@@ -68,7 +69,7 @@ class ThreeRiversVillageSchool extends OrgConfig {
         str_res_plan_cap = "Resolution plan";
         str_res_plans = "resolution plans";
         str_res_plans_cap = "Resolution plans";
-        str_committee_name = "Justice Committee";
+        str_jc_name = "Justice Committee";
 
         show_checkbox_for_res_plan = false;
 
@@ -205,6 +206,36 @@ class MakariosLearningCommunity extends OrgConfig {
     }
 
     public static MakariosLearningCommunity getInstance() {
+        return INSTANCE;
+    }
+}
+
+class TheOpenSchool extends OrgConfig {
+    private static final TheOpenSchool INSTANCE = new TheOpenSchool();
+
+    public TheOpenSchool() {
+        name = "The Open School";
+        short_name = "TOS";
+        people_url = "http://tos.demschooltools.com";
+        time_zone = TimeZone.getTimeZone("US/Pacific");
+
+        str_manual_title = "Law Book";
+        str_manual_title_short = "Law Book";
+        str_res_plan_short = "Sentence";
+        str_res_plan = "sentence";
+        str_res_plan_cap = "Sentence";
+        str_res_plans = "sentences";
+        str_res_plans_cap = "Sentences";
+        str_findings = "Findings";
+        str_jc_name = "Civics Board";
+        str_jc_name_short = "CB";
+
+        use_minor_referrals = true;
+
+        OrgConfig.register(name, this);
+    }
+
+    public static TheOpenSchool getInstance() {
         return INSTANCE;
     }
 }

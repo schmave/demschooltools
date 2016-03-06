@@ -2,7 +2,7 @@
 
 @import helper._
 
-@main("JC " + OrgConfig.get().str_res_plans + " from " + Application.formatMeetingDate(m.date), "jc") {
+@main(OrgConfig.get().str_jc_name_short + " " + OrgConfig.get().str_res_plans + " from " + Application.formatMeetingDate(m.date), "jc") {
 
 <script>
 requirejs(['utils'], function() {

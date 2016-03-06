@@ -58,14 +58,15 @@ public class UserRole extends Model {
     }
 
     public static String getDescription(String role) {
+        String jc_name = OrgConfig.get().str_jc_name_short;
         if (role.equals(ROLE_VIEW_JC)) {
-            return "View JC records & rules";
+            return "View " + jc_name + " records & rules";
         } else if (role.equals(ROLE_EDIT_MANUAL)) {
             return "Edit " + OrgConfig.get().str_manual_title_short;
         } else if (role.equals(ROLE_EDIT_RECENT_JC)) {
-            return "Edit recent JC records + the active " + OrgConfig.get().str_res_plans;
+            return "Edit recent " + jc_name + " records + the active " + OrgConfig.get().str_res_plans;
         } else if (role.equals(ROLE_EDIT_ALL_JC)) {
-            return "Edit all JC records";
+            return "Edit all " + jc_name + " records";
         } else if (role.equals(ROLE_ALL_ACCESS)) {
             return "View and Edit everything";
         }

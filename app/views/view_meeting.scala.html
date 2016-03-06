@@ -2,9 +2,9 @@
 
 @import helper._
 
-@main("JC minutes from " + Application.formatMeetingDate(m.date), "jc") {
+@main(OrgConfig.get().str_jc_name_short + " minutes from " + Application.formatMeetingDate(m.date), "jc") {
 
-<h3>JC minutes from @Application.formatMeetingDate(m.date)</h3>
+<h3>@OrgConfig.get().str_jc_name_short minutes from @Application.formatMeetingDate(m.date)</h3>
 <p><a href="@routes.Application.printMeeting(m.id)" class="btn btn-success no-print">
 1. Print minutes</a>
 <a href="@routes.Application.viewMeetingResolutionPlans(m.id)"

@@ -30,8 +30,9 @@
 
 <p class=>Access at the "@UserRole.getDescription(UserRole.ROLE_VIEW_JC)" level is available
 for all traffic from a particular IP address. This can be used to give read-only
-access to JC records and the @OrgConfig.get().str_manual_title to anyone connecting
-through your school's internet connection. Enter an IP address to allow below to enable this feature.</p>
+access to @OrgConfig.get().str_jc_name_short records and the @OrgConfig.get().str_manual_title to anyone connecting
+through your school's internet connection. Enter an IP address to allow below to enable this feature.
+(To see your current IP address, visit <a href="http://whatismyipaddress.com/">whatismyipaddress.com</a>).</p>
 
 @form(routes.Settings.saveAccess()) {
 <p>Allow read-only access, as described above, from this IP address:

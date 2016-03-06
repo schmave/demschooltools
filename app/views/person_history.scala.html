@@ -2,7 +2,7 @@
 
 @import helper._
 
-<h3>@p.getDisplayName()'s JC history, @Application.yymmddDate(history.start_date) to @Application.yymmddDate(history.end_date)</h3>
+<h3>@p.getDisplayName()'s @OrgConfig.get().str_jc_name_short history, @Application.yymmddDate(history.start_date) to @Application.yymmddDate(history.end_date)</h3>
 <h4>Recent @OrgConfig.get().str_res_plans</h4>
 
 @if( recent_rps.size() == 0 ) {

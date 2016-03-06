@@ -55,7 +55,7 @@ config = @Html(Utils.toJson(OrgConfig.get()));
 </div>
 
 <script id="meeting-template" type="text/x-handlebars-template">
-<h2>@OrgConfig.get().str_committee_name minutes<br>@Application.formatMeetingDate(meeting.date)</h2>
+<h2>@OrgConfig.get().str_jc_name minutes<br>@Application.formatMeetingDate(meeting.date)</h2>
 <p><a href="@routes.Application.viewMeeting(meeting.id)" class="btn btn-warning">
 View printable minutes</a>
 <p>Committee:

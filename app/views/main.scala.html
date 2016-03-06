@@ -48,7 +48,7 @@ window.onerror = function(message, file, line, col, error) {
 				<a href="@routes.Attendance.index()">Attendance</a>
 			</li>
 			<li @if(menu.equals("jc")) { class="active" }>
-				<a href="@routes.Application.index()">JC</a>
+				<a href="@routes.Application.index()">@OrgConfig.get().str_jc_name_short</a>
 			</li>
 			<li @if(menu.equals("manual")) { class="active" }>
 				<a href="@routes.Application.viewManual()">@OrgConfig.get().str_manual_title_short</a>
@@ -168,7 +168,7 @@ window.onerror = function(message, file, line, col, error) {
 				href="@routes.Application.thisWeekReport">Weekly Report</a>
 			<a @if(selectedBtn.equals("view_referred")) { class="active" }
 				href="@routes.Application.viewSchoolMeetingReferrals">
-				Charges referred to S.M. 
+				Charges referred to S.M.
 				@defining( Application.getActiveSchoolMeetingReferrals() ) { sm_charges =>
 					@if( sm_charges.size() > 0 ) {
 						<span class="badge">
