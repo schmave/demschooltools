@@ -12,15 +12,13 @@
             [clojure.tools.trace :as trace]
             [com.ashafa.clutch :as couch]
             [environ.core :refer [env]]
-            [heroku-database-url-to-jdbc.core :as h]
             [migratus.core :as migratus]
             [overseer.migrations :as migrations]
             [overseer.roles :as roles]
             [overseer.queries.phillyfreeschool :as pfs]
             [overseer.queries.demo :as demo]
+            [overseer.database.connection :refer [pgdb init-pg]]
             [yesql.core :refer [defqueries]]))
-
-;; (init-pg)
 
 (def ^:dynamic *school-schema* "phillyfreeschool")
 
@@ -30,7 +28,6 @@
     (let [cal (Calendar/getInstance (TimeZone/getTimeZone "UTC"))]
       (.setTimestamp stmt ix (timec/to-timestamp val) cal))))
 
-(def pgdb (atom nil))
 
 (defqueries "overseer/base.sql" )
 
@@ -61,12 +58,6 @@
   (make-user "admin2" (env :admin) #{roles/admin roles/user} "demo")
   (make-user "demo" (env :userpass) #{roles/admin roles/user} "demo")
   )
-
-;; (init-pg) 
-(defn init-pg []
-  (swap! pgdb (fn [old]
-                (dissoc (h/korma-connection-map (env :database-url))
-                        :classname))))
 
 (defn create-all-tables []
   (jdbc/execute! @pgdb [migrations/initialize-shared-tables])

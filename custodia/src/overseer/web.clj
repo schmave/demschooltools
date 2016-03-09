@@ -22,6 +22,7 @@
             [overseer.classes :refer [class-routes]]
             [overseer.student :refer [student-routes]]
             [overseer.reports :refer [report-routes]]
+            [overseer.database.connection :as conn]
             [overseer.roles :as roles]
             [cemerick.friend :as friend]
             (cemerick.friend [workflows :as workflows]
@@ -72,14 +73,14 @@
                             :default-landing-uri "/"
                             :workflows [(workflows/interactive-form)]})
       (compojure/wrap-routes my-middleware)
-      (wrap-session {:store (jdbc-store @db/pgdb)
+      (wrap-session {:store (jdbc-store @conn/pgdb)
                      :cookie-attrs {:max-age (* 3 365 24 3600)}})
       wrap-keyword-params
       wrap-json-body wrap-json-params wrap-json-response ))
 
 (defn -main [& [port]]
   (clojure.java.shell/sh "notify-send" "Server started")
-  (db/init-pg)
+  (conn/init-pg)
   (db/init-users)
   (comment (nrepl-server/start-server :port 7888 :handler cider-nrepl-handler))
   (nrepl-server/start-server :port 7888 :handler

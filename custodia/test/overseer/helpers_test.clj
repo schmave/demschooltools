@@ -4,6 +4,7 @@
             [overseer.db :as db]
             [clojure.tools.trace :as trace]
             [overseer.database :as data]
+            [overseer.database.connection :as conn]
             [overseer.attendance :as att]
             [clj-time.coerce :as c]))
 
@@ -73,7 +74,7 @@
 (defn sample-db
   ([] (sample-db false))
   ([have-extra?]
-   (db/init-pg)
+   (conn/init-pg)
    (db/reset-db)
    (let [{class-id :_id} (data/make-class "2014-2015")]
      (db/activate-class class-id)
@@ -91,7 +92,7 @@
 
 ;; (huge-sample-db)
 (defn huge-sample-db []
-  (db/init-pg)
+  (conn/init-pg)
   (db/reset-db)
   (data/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 5))))
   (data/make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))

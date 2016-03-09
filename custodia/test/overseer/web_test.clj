@@ -8,6 +8,7 @@
             [clojure.tools.trace :as trace]
             [overseer.attendance :as att]
             [overseer.database :as data]
+            [overseer.database.connection :as conn]
             [overseer.dates :as dates]
             [overseer.db :as db]
             [overseer.helpers-test :refer :all]
@@ -226,7 +227,7 @@
           ))))
 
 (deftest schema-isolation-test
-  (do (db/init-pg)
+  (do (conn/init-pg)
       (db/reset-db)
       (binding [db/*school-schema* "demo"]
         (make-sample-two-students-in-class))
