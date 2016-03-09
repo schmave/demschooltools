@@ -1,11 +1,8 @@
 (ns overseer.database
-  (:require [com.ashafa.clutch :as couch]
-            [overseer.db :as db]
+  (:require [overseer.db :as db]
             [overseer.helpers :refer :all]
             [overseer.dates :refer :all]
             [clojure.tools.trace :as trace]
-            [clj-time.format :as f]
-            [clj-time.local :as l]
             [clj-time.core :as t]
             [clj-time.coerce :as c]
             [schema.core :as s]
