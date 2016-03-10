@@ -74,7 +74,11 @@ var exports = React.createClass({
                     {classval.name}
                     {classval.active ?
                      <span className="margined badge badge-green">Active</span>
-                     : <span onClick={this.activateClass} className="margined badge">Activate</span>}
+                     : <span onClick={this.activateClass}
+                             id={"activate-"+classval.name}
+                             className="margined badge">
+                         Activate
+                     </span>}
                 </td>
             </tr>
 
