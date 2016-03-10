@@ -2,7 +2,7 @@
   (:require [clojure.test :refer :all]
             [clojure.java.shell :as sh]
             [clj-time.core :as t]
-            [overseer.database :as data]
+            [overseer.helpers-test :refer :all]
             [clj-webdriver.taxi :refer :all]))
 
 (defn student-id [id] (str "#student-" id))
@@ -91,7 +91,7 @@
     ))
 
 (deftest ^:integration make-classes-and-set-default
-  (data/sample-db)
+  (sample-db)
   (login-to-site)
 
   (create-class "test")
@@ -106,7 +106,7 @@
   (quit))
 
 (deftest ^:integration edit-name
-  (data/sample-db)
+  (sample-db)
   (login-to-site)
   ;; Edit then save name
   (click-student 1)
@@ -134,7 +134,7 @@
   (quit))
 
 (deftest ^:integration filling-in-missing-swipes
-  (data/sample-db)
+  (sample-db)
   (login-to-site)
 
   (data/swipe-in 1 (t/minus (t/now) (t/days 1)))
@@ -148,7 +148,7 @@
   (quit))
 
 (deftest ^:integration overrides-and-excuses
-  (data/sample-db)
+  (sample-db)
   (login-to-site)
 
   (assert-student-in-not-in-col 1)
@@ -257,7 +257,7 @@
   (quit))
 
 (deftest ^:integration missing-swipe-twice-front-page
-  (data/sample-db true)
+  (sample-db true)
   (login-to-site)
 
   (assert-student-in-not-in-col 1)
