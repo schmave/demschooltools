@@ -1,5 +1,6 @@
 (ns overseer.migrations
   (:require [environ.core :refer [env]]
+            [migratus.core :as migratus]
             [clojure.java.io :as io]))
 
 (defn replace-philly [from with]
@@ -69,6 +70,7 @@
     name varchar(255),
     inserted_date timestamp default now(),
     olderdate date,
+    start_date date,
     show_as_absent date,
     archived BOOLEAN NOT NULL DEFAULT FALSE
   );
@@ -154,8 +156,8 @@ LANGUAGE sql;
    :db  (env :database-url)
    })
 
-;; (migratus/create mconfig "make demo tables")
-;;(migratus/migrate mconfig)
+;; (migratus/create mconfig "student start date")
+;; (migratus/migrate mconfig)
 ;; (migratus/rollback mconfig)
 ;; (migratus/down mconfig 20150908103000 20150909070853 20150913085152)
 

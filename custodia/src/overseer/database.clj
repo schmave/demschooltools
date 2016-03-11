@@ -144,6 +144,12 @@
     (db/update! :students _id {:olderdate (:olderdate student)})
     student))
 
+(trace/deftrace set-student-start-date [_id date]
+  (let [student (first (get-students _id))
+        student (assoc student :start_date (make-sqldate date))]
+    (db/update! :students _id {:start_date (:start_date student)})
+    student))
+
 (trace/deftrace toggle-student-absent [_id]
   (let [student (first (get-students _id))
         student (assoc student :show_as_absent (make-sqldate (str (t/now))))]
