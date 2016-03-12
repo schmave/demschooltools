@@ -90,12 +90,6 @@
           )))
   )
 
-(defn student-att-is [att total abs overrides short]
-  (testing "Student attendence"
-    (is (= total (:total_days att)) "Total days")
-    (is (= abs (:total_abs att)) "Total Abs")
-    (is (= overrides (:total_overrides att)) "Total overrides")
-    (is (= short (:total_short att))) "Total short"))
 
 (deftest swipe-attendence-override-test
   (do (sample-db)

@@ -8,6 +8,7 @@
             [clojure.tools.trace :as trace]
             [overseer.db :as db]
             [overseer.database :as data]
+            [overseer.helpers-test :refer :all]
             [overseer.attendance :as att]
             [overseer.helpers :as h]
             [overseer.dates :as dates]
@@ -26,7 +27,7 @@
 
 (deftest swipe-attendence-with-class-test
   "Report is defined without a class but will use the default one"
-  (do (data/sample-db)
+  (do (sample-db)
       (let [class-id (get-class-id-by-name "2014-2015")
             other-class (data/make-class "test")
             activated (db/activate-class (:_id other-class))
@@ -57,7 +58,7 @@
 
 
 (deftest swipe-attendence-test
-  (do (data/sample-db)  
+  (do (sample-db)
       (let [today-str (dates/get-current-year-string (data/get-years))
             class-id (get-class-id-by-name "2014-2015")
             {sid :_id} (data/make-student "test")
@@ -76,24 +77,8 @@
         (let [att (db/get-report today-str)
               student1 (first (filter #(= sid (:_id %)) att))
               student2 (first (filter #(= sid2 (:_id %)) att))]
-          (testing "Total Valid Day Count"
-            (is (= (:good student1)
-                   4)))
-          (testing "Total Short Day Count"
-            (is (= (:short student1)
-                   1)))
-          (testing "Total Excused Count"
-            (is (= (:excuses student1)
-                   1)))
-          (testing "Total Abs Count"
-            (is (= (:unexcused student1)
-                   1)))
-          (testing "Total Overrides"
-            (is (= (:overrides student1)
-                   1)))
-          (testing "Total Hours"
-            (is (= (int (:total_hours student1))
-                   26)))
+          (student-report-is student1 4 1 1 1 1 26)
+
           (testing "Total short count student 2"
             ;; TODO - determine correct short count (otherwise 2)
             (is (= (:short student2)

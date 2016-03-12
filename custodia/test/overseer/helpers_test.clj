@@ -1,6 +1,7 @@
 (ns overseer.helpers-test
   (:require [clj-time.local :as l]
             [clj-time.core :as t]
+            [clojure.test :refer :all]
             [overseer.db :as db]
             [clojure.tools.trace :as trace]
             [overseer.database :as data]
@@ -68,6 +69,22 @@
             result (update-in result [:student_ids] (fn [sids] (conj sids sid)))]
         (data/add-student-to-class sid class-id)
         result))))
+
+(defn student-report-is [att good short excuses unexcused overrides hours]
+  (testing "Student attendence"
+    (is (= good (:good att)) "good")
+    (is (= short (:short att)) "short")
+    (is (= excuses (:excuses att)) "excuses")
+    (is (= overrides (:overrides att)) "overrides")
+    (is (= hours (:total_hours att)) "hours")
+    (is (= unexcused (:unexcused att))) "unexcused"))
+
+(defn student-att-is [att total abs overrides short]
+  (testing "Student attendence"
+    (is (= total (:total_days att)) "Total days")
+    (is (= abs (:total_abs att)) "Total Abs")
+    (is (= overrides (:total_overrides att)) "Total overrides")
+    (is (= short (:total_short att))) "Total short"))
 
 ;; (sample-db true)  
 ;; (binding [db/*school-schema* "demo"] (sample-db true))
