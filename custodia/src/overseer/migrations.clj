@@ -142,6 +142,7 @@ FROM (SELECT DISTINCT days2.days
 JOIN phillyfreeschool.classes_X_students cXs ON (1=1)
 JOIN phillyfreeschool.students s ON (s._id = cXs.student_id)
 WHERE cXs.class_id = $2
+AND (s.start_date < a.days OR s.start_date is null);
 $func$
 LANGUAGE sql;
   ")
