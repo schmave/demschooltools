@@ -1,14 +1,14 @@
 var React = require('react'),
-  Heatmap = require('./heatmap.jsx'),
-  Modal = require('./modal.jsx'),
-  DateTimePicker = require('react-widgets').DateTimePicker,
-  actionCreator = require('./studentactioncreator'),
-  studentStore = require('./StudentStore'),
-  Router = require('react-router'),
-  Link = Router.Link,
-  SwipeHelpers = require('./swipeHelpers.jsx'),
-  Swipes = require('./swipeslisting.jsx'),
-  SwipeListing = require('./swipeslisting.jsx');
+    Heatmap = require('./heatmap.jsx'),
+    Modal = require('./modal.jsx'),
+    DateTimePicker = require('react-widgets').DateTimePicker,
+    actionCreator = require('./studentactioncreator'),
+    studentStore = require('./StudentStore'),
+    Router = require('react-router'),
+    Link = Router.Link,
+    SwipeHelpers = require('./swipeHelpers.jsx'),
+    Swipes = require('./swipeslisting.jsx'),
+    SwipeListing = require('./swipeslisting.jsx');
 
 
 var exports = React.createClass({
@@ -141,7 +141,7 @@ var exports = React.createClass({
                 <button id="cancel-name" onClick={this.toggleEdit} className="btn btn-danger">
                     <i className="fa fa-times"></i></button>
             </div>
-            <div>
+            <div className="col-md-4" >
                 <div><input type="radio" name="older" onChange={this.toggleHours}
                             checked={!this.state.student.olderdate}/> 300 Minutes
                 </div>
@@ -149,13 +149,20 @@ var exports = React.createClass({
                             checked={this.state.student.olderdate}/> 330 Minutes
                 </div>
             </div>
+            <div className="col-md-4" id="nameRow">
+                <b>Student Start Date:</b>
+                <DateTimePicker id="missing" defaultValue={new Date()}
+                                ref="missing_datepicker"
+                                calendar={true}
+                                time={false} />
+            </div>
         </div>;
     },
     render: function () {
         if (this.state.student) {
             var activeDate = this.getActiveDay(this.state.student);
             var attended = (this.state.student.total_days + this.state.student.total_short).toString()
-                          + " (" + this.state.student.total_short +  ")",
+                + " (" + this.state.student.total_short +  ")",
                 requiredMinutes = this.state.student.olderdate ? 330 : 300;
             return <div className="row">
             <SwipeHelpers ref="missingSwipeCollector">
