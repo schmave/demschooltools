@@ -79,13 +79,14 @@
       wrap-json-body wrap-json-params wrap-json-response ))
 
 (defn -main [& [port]]
-  (clojure.java.shell/sh "notify-send" "Server started")
   (conn/init-pg)
   (db/init-users)
   (comment (nrepl-server/start-server :port 7888 :handler cider-nrepl-handler))
-  (nrepl-server/start-server :port 7888 :handler
-                                       (apply clojure.tools.nrepl.server/default-handler
-                                              (concat (map resolve cider.nrepl/cider-middleware)
-                                                      [refactor/wrap-refactor])))
+  (if-let [dev (env :dev)]
+    (clojure.java.shell/sh "notify-send" "Server started")
+    (nrepl-server/start-server :port 7888 :handler
+                               (apply clojure.tools.nrepl.server/default-handler
+                                      (concat (map resolve cider.nrepl/cider-middleware)
+                                              [refactor/wrap-refactor]))))
   (let [port (Integer. (or port (env :port) 5000))]
     (jetty/run-jetty (site (tapp)) {:port port :join? false})))
