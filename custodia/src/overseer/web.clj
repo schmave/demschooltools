@@ -82,7 +82,7 @@
   (conn/init-pg)
   (db/init-users)
   (comment (nrepl-server/start-server :port 7888 :handler cider-nrepl-handler))
-  (if-let [dev (env :dev)]
+  (when-let [dev (env :dev)]
     (clojure.java.shell/sh "notify-send" "Server started")
     (nrepl-server/start-server :port 7888 :handler
                                (apply clojure.tools.nrepl.server/default-handler

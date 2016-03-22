@@ -32,9 +32,9 @@
                             (resp/response {:made made?
                                             :students (get-student-list)}))))
 
-  (PUT "/students/:id" [id :<< as-int name]
+  (PUT "/students/:id" [id :<< as-int name start_date]
        (friend/authorize #{roles/admin}
-                         (data/rename id name))
+                         (data/edit-student id name start_date))
        (student-page-response id))
 
   (POST "/students/:id/togglehours" [id :<< as-int]

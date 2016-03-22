@@ -36,7 +36,6 @@
 (defn delete-swipe [swipe]
   (db/delete! swipe))
 
-
 (s/defn make-timestamp :- java.sql.Timestamp
   [t :- DateTime] (c/to-timestamp t))
 
@@ -93,8 +92,8 @@
   (when-let [year (first (get-years year))]
     (db/delete! year)))
 
-(trace/deftrace rename [_id name]
-  (db/update! :students _id {:name name}))
+(trace/deftrace edit-student [_id name start-date]
+  (db/update! :students _id {:name name :start_date (make-sqldate start-date)}))
 
 (trace/deftrace excuse-date [id date-string]
   (db/persist! {:type :excuses
@@ -133,7 +132,10 @@
 
 (trace/deftrace make-student [name]
   (when (student-not-yet-created name)
-    (db/persist! {:type :students :name name :olderdate nil :show_as_absent nil})))
+    (db/persist! {:type :students
+                  :name name
+                  :start_date nil ;;(make-sqldate (today-string))
+                  :olderdate nil :show_as_absent nil})))
 
 (defn- toggle-date [older]
   (if older nil (make-sqldate (str (t/now)))))

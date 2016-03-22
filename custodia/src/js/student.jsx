@@ -105,7 +105,9 @@ var exports = React.createClass({
         this.setState({editing: !this.state.editing});
     },
     saveChange: function () {
-        actionCreator.updateStudent(this.state.student._id, this.refs.name.getDOMNode().value);
+        actionCreator.updateStudent(this.state.student._id,
+                                    this.refs.name.getDOMNode().value,
+                                    this.refs.missing_datepicker.state.value);
         this.toggleEdit();
     },
     getActiveDay: function (student) {
@@ -132,6 +134,7 @@ var exports = React.createClass({
         </div>;
     },
     editingStudentName: function () {
+        var pickerDate = (this.state.student.start_date) ? new Date(this.state.student.start_date) : null;
         return <div className="col-sm-8 row">
             <div className="col-sm-3" id="nameRow">
                 <input ref="name" className="form-control" id="studentName"
@@ -151,7 +154,7 @@ var exports = React.createClass({
             </div>
             <div className="col-md-4" id="nameRow">
                 <b>Student Start Date:</b>
-                <DateTimePicker id="missing" defaultValue={new Date()}
+                <DateTimePicker id="missing" defaultValue={pickerDate}
                                 ref="missing_datepicker"
                                 calendar={true}
                                 time={false} />

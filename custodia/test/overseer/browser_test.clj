@@ -25,7 +25,7 @@
 (defn login []
   (wait-until #(visible? "#username"))
   (input-text "#username" "admin")
-  (input-text "#password" "changeme")
+  (input-text "#password" "web")
   (submit "#password"))
 
 (defn assert-student-in-in-col [id]
