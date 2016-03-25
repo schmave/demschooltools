@@ -1,6 +1,7 @@
 (ns overseer.browser-test
   (:require [clojure.test :refer :all]
             [clojure.java.shell :as sh]
+            [overseer.database :as data]
             [clj-time.core :as t]
             [overseer.helpers-test :refer :all]
             [clj-webdriver.taxi :refer :all]))
@@ -8,7 +9,7 @@
 (defn student-id [id] (str "#student-" id))
 
 (defn click-student [id]
-  ;;(wait-until #(visible? (student-id id)) 1000)
+  ;; (wait-until #(visible? (student-id id)) 1000)
   ;;(click (student-id id))
   (to (str "http://localhost:5000/#/students/" id "/"))
   ;;(wait-until #(visible? "#studentName") 10000)
@@ -253,7 +254,16 @@
 
   (click-student 57)
 
-  (assert-total-header 0 15 0 0 1 "")
+  (assert-total-header 0 0 0 0 0 "")
+
+  ;;(clickw "#edit-name")
+
+ ;; (wait-until #(visible? "#missing_input"))
+ ;; (clear "#missing_input")
+ ;; (input-text "#missing_input" "1/1/2015")
+ ;; (clickw "#save-name")
+
+  ;;(assert-total-header 0 15 0 0 1 "")
   (quit))
 
 (deftest ^:integration missing-swipe-twice-front-page

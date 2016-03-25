@@ -87,9 +87,7 @@
           (testing "Start date is set"
             (is (= today (str (:start_date s)))))
           (student-att-is att 0 0 0 0)
-          )))
-  )
-
+          ))))
 
 (deftest swipe-attendence-override-test
   (do (sample-db)

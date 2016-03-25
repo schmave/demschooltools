@@ -78,6 +78,7 @@ FROM (SELECT DISTINCT days2.days
 JOIN demo.classes_X_students cXs ON (1=1)
 JOIN demo.students s ON (s._id = cXs.student_id)
 WHERE cXs.class_id = $2
+AND (s.start_date < a.days OR s.start_date is null);
 $_$;
 
 
@@ -111,6 +112,7 @@ FROM (SELECT DISTINCT days2.days
 JOIN phillyfreeschool.classes_X_students cXs ON (1=1)
 JOIN phillyfreeschool.students s ON (s._id = cXs.student_id)
 WHERE cXs.class_id = $2
+AND (s.start_date < a.days OR s.start_date is null);
 $_$;
 
 
@@ -356,6 +358,7 @@ CREATE TABLE students (
     name character varying(255),
     inserted_date timestamp without time zone DEFAULT now(),
     olderdate date,
+    start_date date,
     show_as_absent date,
     archived boolean DEFAULT false NOT NULL
 );
@@ -709,7 +712,8 @@ CREATE TABLE students (
     inserted_date timestamp without time zone DEFAULT now(),
     olderdate date,
     show_as_absent date,
-    archived boolean DEFAULT false NOT NULL
+    archived boolean DEFAULT false NOT NULL,
+    start_date date
 );
 
 
@@ -1183,7 +1187,7 @@ SELECT pg_catalog.setval('overrides_student_id_seq', 1, false);
 -- Data for Name: students; Type: TABLE DATA; Schema: demo; Owner: postgres
 --
 
-COPY students (_id, name, inserted_date, olderdate, show_as_absent, archived) FROM stdin;
+COPY students (_id, name, inserted_date, olderdate, start_date, show_as_absent, archived) FROM stdin;
 \.
 
 
@@ -1454,63 +1458,63 @@ SELECT pg_catalog.setval('overrides_student_id_seq', 1, false);
 -- Data for Name: students; Type: TABLE DATA; Schema: phillyfreeschool; Owner: postgres
 --
 
-COPY students (_id, name, inserted_date, olderdate, show_as_absent, archived) FROM stdin;
-1	Arathilion Boom	2015-02-28 17:58:52.114107	\N	\N	f
-2	John Darran	2015-02-28 17:59:07.69319	\N	\N	f
-3	Jol Carlstein	2015-02-28 17:59:31.048086	\N	\N	f
-4	Galak Daklan	2015-02-28 18:00:03.61059	2015-02-28	\N	f
-5	Brodie Ananillka	2015-02-28 18:00:13.497292	2015-02-28	\N	f
-6	Aria Xergo	2015-02-28 18:01:39.74869	\N	\N	f
-7	Edea Rostoni	2015-02-28 18:01:56.847391	2015-02-28	\N	f
-8	Elayne Janin	2015-02-28 18:02:20.010071	2015-02-28	\N	f
-9	Klai Berus	2015-02-28 18:02:53.436831	2015-02-28	\N	f
-10	Boc Kodd	2015-02-28 18:03:08.957112	\N	\N	f
-11	Aztin Tess	2015-02-28 18:03:40.88869	\N	\N	f
-12	Burin Cruz	2015-02-28 18:04:04.933979	\N	\N	f
-13	Rine Grainer	2015-02-28 18:09:05.469534	\N	\N	f
-14	Garr Salis	2015-02-28 18:09:40.932399	\N	\N	f
-15	Nikana Kwai	2015-02-28 18:10:19.49899	\N	\N	f
-16	Herub Arcturus	2015-02-28 18:10:43.146978	\N	\N	f
-17	Proddo Scutu	2015-02-28 18:11:32.163393	2015-02-28	\N	f
-18	Galven Twilight	2015-02-28 18:11:53.879631	2015-02-28	\N	f
-19	Riyec Lester	2015-02-28 18:13:03.81862	\N	\N	f
-20	Stanza Eisahn	2015-02-28 18:13:28.434347	2015-02-28	\N	f
-21	Delcep Jasha	2015-02-28 18:13:54.660132	\N	\N	f
-22	Sybegh Febri	2015-02-28 18:14:10.755825	2015-02-28	\N	f
-23	Jorel Makesa	2015-02-28 18:14:33.021079	\N	\N	f
-24	Nil Sunspot	2015-02-28 18:14:59.647788	\N	\N	f
-25	Syrena Modun	2015-02-28 18:15:26.87682	\N	\N	f
-26	Addison Nunes	2015-02-28 18:15:59.541962	\N	\N	f
-27	Hiram Hethna	2015-02-28 18:16:27.597298	\N	\N	f
-28	Nosh Ker Ghent	2015-02-28 18:16:56.219286	2015-02-28	\N	f
-29	Squessibionaro Volsh	2015-02-28 18:18:35.369216	\N	\N	f
-30	Giriz Cata	2015-02-28 18:18:48.953436	2015-02-28	\N	f
-31	Darth Trammer	2015-02-28 18:19:14.19723	\N	\N	f
-32	Derin Youngblood	2015-02-28 18:19:43.080167	\N	\N	f
-33	Iocasta Dewan	2015-02-28 18:20:32.89105	2015-02-28	\N	f
-34	Dei Dol	2015-02-28 18:21:07.645458	\N	\N	f
-35	Leon Zih	2015-02-28 18:21:34.287546	\N	\N	f
-36	Auugu Roeder	2015-02-28 18:21:57.771999	\N	\N	f
-37	Wile Ktrame	2015-02-28 18:22:31.449561	\N	\N	f
-38	Philipp Umdal	2015-02-28 18:23:06.31044	\N	\N	f
-39	Yurist Quizan	2015-02-28 18:23:36.165564	\N	\N	f
-40	Ala Taurendil	2015-02-28 18:24:01.406614	\N	\N	f
-41	Fuil Chance	2015-02-28 18:24:20.965676	\N	\N	f
-42	Paldamar Athan	2015-02-28 18:24:36.740241	\N	\N	f
-43	Ben Brin	2015-02-28 18:25:21.159719	\N	\N	f
-44	Europa Kestal	2015-02-28 18:25:42.240029	\N	\N	f
-45	Xathas Cage	2015-02-28 18:25:56.593355	2015-02-28	\N	f
-46	Warryk Joyriak	2015-02-28 18:26:18.549019	\N	\N	f
-47	Pexereca Pollard	2015-02-28 18:26:33.810037	\N	\N	f
-48	Dorn Kosokhan	2015-02-28 18:26:53.256968	\N	\N	f
-49	Philipp Waray	2015-03-02 13:39:23.636741	\N	\N	f
-50	Pacer Sixxkiller	2015-03-02 13:39:39.0226	\N	\N	f
-51	Imay Ashen	2015-03-02 13:40:02.313919	\N	\N	f
-52	Perth Warner	2015-03-02 13:41:23.178921	\N	\N	f
-53	Maxon Lund	2015-03-02 13:41:51.289769	\N	\N	f
-54	Keyan Omega	2015-03-02 13:56:04.98173	\N	\N	f
-55	Cyern Brahnx	2015-03-02 14:15:16.5578	\N	\N	f
-56	Frank Jahsop	2015-03-11 19:38:15.224542	\N	\N	f
+COPY students (_id, name, inserted_date, olderdate, show_as_absent, archived, start_date) FROM stdin;
+1	Arathilion Boom	2015-02-28 17:58:52.114107	\N	\N	f	\N
+2	John Darran	2015-02-28 17:59:07.69319	\N	\N	f	\N
+3	Jol Carlstein	2015-02-28 17:59:31.048086	\N	\N	f	\N
+4	Galak Daklan	2015-02-28 18:00:03.61059	2015-02-28	\N	f	\N
+5	Brodie Ananillka	2015-02-28 18:00:13.497292	2015-02-28	\N	f	\N
+6	Aria Xergo	2015-02-28 18:01:39.74869	\N	\N	f	\N
+7	Edea Rostoni	2015-02-28 18:01:56.847391	2015-02-28	\N	f	\N
+8	Elayne Janin	2015-02-28 18:02:20.010071	2015-02-28	\N	f	\N
+9	Klai Berus	2015-02-28 18:02:53.436831	2015-02-28	\N	f	\N
+10	Boc Kodd	2015-02-28 18:03:08.957112	\N	\N	f	\N
+11	Aztin Tess	2015-02-28 18:03:40.88869	\N	\N	f	\N
+12	Burin Cruz	2015-02-28 18:04:04.933979	\N	\N	f	\N
+13	Rine Grainer	2015-02-28 18:09:05.469534	\N	\N	f	\N
+14	Garr Salis	2015-02-28 18:09:40.932399	\N	\N	f	\N
+15	Nikana Kwai	2015-02-28 18:10:19.49899	\N	\N	f	\N
+16	Herub Arcturus	2015-02-28 18:10:43.146978	\N	\N	f	\N
+17	Proddo Scutu	2015-02-28 18:11:32.163393	2015-02-28	\N	f	\N
+18	Galven Twilight	2015-02-28 18:11:53.879631	2015-02-28	\N	f	\N
+19	Riyec Lester	2015-02-28 18:13:03.81862	\N	\N	f	\N
+20	Stanza Eisahn	2015-02-28 18:13:28.434347	2015-02-28	\N	f	\N
+21	Delcep Jasha	2015-02-28 18:13:54.660132	\N	\N	f	\N
+22	Sybegh Febri	2015-02-28 18:14:10.755825	2015-02-28	\N	f	\N
+23	Jorel Makesa	2015-02-28 18:14:33.021079	\N	\N	f	\N
+24	Nil Sunspot	2015-02-28 18:14:59.647788	\N	\N	f	\N
+25	Syrena Modun	2015-02-28 18:15:26.87682	\N	\N	f	\N
+26	Addison Nunes	2015-02-28 18:15:59.541962	\N	\N	f	\N
+27	Hiram Hethna	2015-02-28 18:16:27.597298	\N	\N	f	\N
+28	Nosh Ker Ghent	2015-02-28 18:16:56.219286	2015-02-28	\N	f	\N
+29	Squessibionaro Volsh	2015-02-28 18:18:35.369216	\N	\N	f	\N
+30	Giriz Cata	2015-02-28 18:18:48.953436	2015-02-28	\N	f	\N
+31	Darth Trammer	2015-02-28 18:19:14.19723	\N	\N	f	\N
+32	Derin Youngblood	2015-02-28 18:19:43.080167	\N	\N	f	\N
+33	Iocasta Dewan	2015-02-28 18:20:32.89105	2015-02-28	\N	f	\N
+34	Dei Dol	2015-02-28 18:21:07.645458	\N	\N	f	\N
+35	Leon Zih	2015-02-28 18:21:34.287546	\N	\N	f	\N
+36	Auugu Roeder	2015-02-28 18:21:57.771999	\N	\N	f	\N
+37	Wile Ktrame	2015-02-28 18:22:31.449561	\N	\N	f	\N
+38	Philipp Umdal	2015-02-28 18:23:06.31044	\N	\N	f	\N
+39	Yurist Quizan	2015-02-28 18:23:36.165564	\N	\N	f	\N
+40	Ala Taurendil	2015-02-28 18:24:01.406614	\N	\N	f	\N
+41	Fuil Chance	2015-02-28 18:24:20.965676	\N	\N	f	\N
+42	Paldamar Athan	2015-02-28 18:24:36.740241	\N	\N	f	\N
+43	Ben Brin	2015-02-28 18:25:21.159719	\N	\N	f	\N
+44	Europa Kestal	2015-02-28 18:25:42.240029	\N	\N	f	\N
+45	Xathas Cage	2015-02-28 18:25:56.593355	2015-02-28	\N	f	\N
+46	Warryk Joyriak	2015-02-28 18:26:18.549019	\N	\N	f	\N
+47	Pexereca Pollard	2015-02-28 18:26:33.810037	\N	\N	f	\N
+48	Dorn Kosokhan	2015-02-28 18:26:53.256968	\N	\N	f	\N
+49	Philipp Waray	2015-03-02 13:39:23.636741	\N	\N	f	\N
+50	Pacer Sixxkiller	2015-03-02 13:39:39.0226	\N	\N	f	\N
+51	Imay Ashen	2015-03-02 13:40:02.313919	\N	\N	f	\N
+52	Perth Warner	2015-03-02 13:41:23.178921	\N	\N	f	\N
+53	Maxon Lund	2015-03-02 13:41:51.289769	\N	\N	f	\N
+54	Keyan Omega	2015-03-02 13:56:04.98173	\N	\N	f	\N
+55	Cyern Brahnx	2015-03-02 14:15:16.5578	\N	\N	f	\N
+56	Frank Jahsop	2015-03-11 19:38:15.224542	\N	\N	f	\N
 \.
 
 
@@ -2207,11 +2211,11 @@ COPY session_store (session_id, idle_timeout, absolute_timeout, value) FROM stdi
 --
 
 COPY users (user_id, username, password, roles, schema_name, inserted_date) FROM stdin;
-1	admin	$2a$10$qidnbTwmjkaPhEwEuBRlbenzfKNnp5M7iPqorEHXcNPyOdbdvYfYe	#{:overseer.roles/user :overseer.roles/admin}	phillyfreeschool	2016-02-01 06:55:58.317287
-2	super	$2a$10$kz6pvxQJL7GUX5bgAZqhAOs1GMoKegZ9ZTIVhwUByJPgl5kyASmEi	#{:overseer.roles/user :overseer.roles/admin :overseer.roles/super}	phillyfreeschool	2016-02-01 06:55:58.486588
-3	user	$2a$10$XYNn9aZNi1J3Nd2EADnQMuh3O8BHdrMzksVEoK4IkQW.f0Jzu0t6a	#{:overseer.roles/user}	phillyfreeschool	2016-02-01 06:55:58.654605
-4	admin2	$2a$10$frDtNCmuehxfabECmlKE8OZPzwm/JeKxh2oKhaeUP.8x3cOSibyvy	#{:overseer.roles/user :overseer.roles/admin}	demo	2016-02-01 06:55:58.824468
-5	demo	$2a$10$ef3FxI0sgUrDLIZGwtI37uErYFBqFlBgMnnZoVcZbSzawPZAmnXNS	#{:overseer.roles/user :overseer.roles/admin}	demo	2016-02-01 06:55:58.990112
+1	admin	$2a$10$jWSJLlR30Q23mhxQc2f.guqzwnf2w8WfQj72vsKt8S17sZMzqCYJG	#{:overseer.roles/user :overseer.roles/admin}	phillyfreeschool	2016-03-25 07:42:43.876094
+2	super	$2a$10$imUWUexESoZfBht9GTeap.6eXOIRC/KZ29rNBhO9Wl2ANX7H/ijea	#{:overseer.roles/user :overseer.roles/admin :overseer.roles/super}	phillyfreeschool	2016-03-25 07:42:44.047093
+3	user	$2a$10$2PombAyuq8U0s7JTkcN8J.E00ioBrXlmJSp9mdwGLOtcWpro8vseG	#{:overseer.roles/user}	phillyfreeschool	2016-03-25 07:42:44.215493
+4	admin2	$2a$10$e912nIzPRw6t1k3VdY3zJOg0watlIbBBuvMto1jJR9dXaGOfyUbh6	#{:overseer.roles/user :overseer.roles/admin}	demo	2016-03-25 07:42:44.382896
+5	demo	$2a$10$DeJHtWI6CAqjmDdqMVCpiuTNUE1yKhF0xn0cMj5bX5D//uejKegMK	#{:overseer.roles/user :overseer.roles/admin}	demo	2016-03-25 07:42:44.549367
 \.
 
 
