@@ -130,12 +130,17 @@
 (trace/deftrace add-student-to-class [student-id class-id]
   (db/persist! {:type :classes_X_students :student_id student-id :class_id class-id}))
 
-(trace/deftrace make-student [name]
-  (when (student-not-yet-created name)
-    (db/persist! {:type :students
-                  :name name
-                  :start_date nil ;;(make-sqldate (today-string))
-                  :olderdate nil :show_as_absent nil})))
+(trace/deftrace make-student-starting-today [name]
+  (make-student name (make-sqldate (today-string))))
+
+(trace/deftrace make-student
+  ([name] (make-student name nil))
+  ([name start-date]
+   (when (student-not-yet-created name)
+     (db/persist! {:type :students
+                   :name name
+                   :start_date start-date
+                   :olderdate nil :show_as_absent nil}))))
 
 (defn- toggle-date [older]
   (if older nil (make-sqldate (str (t/now)))))

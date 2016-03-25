@@ -28,7 +28,7 @@
 
   (POST "/students" [name]
         (friend/authorize #{roles/admin}
-                          (let [made? (data/make-student name)]
+                          (let [made? (data/make-student-starting-today name)]
                             (resp/response {:made made?
                                             :students (get-student-list)}))))
 
