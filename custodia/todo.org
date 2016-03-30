@@ -13,7 +13,8 @@ CLOSED: [2016-01-20 Wed 17:26]
 * TODO Student Totals - "attended" days include "short" days?
 * TODO Link online excused absence form that people can fill out. 
 Is there a way to link it to the software?
-* TODO Start date for kids who enroll halfway through year
+* DONE Start date for kids who enroll halfway through year
+CLOSED: [2016-03-30 Wed 06:53]
 * DONE multi-tenented
 CLOSED: [2016-02-01 Mon 06:52]
 * DONE Collect missing swipe from front page
