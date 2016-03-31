@@ -1,9 +1,9 @@
 ALTER TABLE phillyfreeschool.students
       DROP COLUMN start_date;
-
+--;;
 ALTER TABLE demo.students
       DROP COLUMN start_date;
-
+--;;
 CREATE OR REPLACE FUNCTION phillyfreeschool.school_days(year_name TEXT, class_id BIGINT)
   RETURNS TABLE (days date, student_id BIGINT, archived boolean, olderdate date) AS
 $func$
@@ -29,7 +29,7 @@ WHERE cXs.class_id = $2;
 
 $func$
 LANGUAGE sql;
-
+--;;
 CREATE OR REPLACE FUNCTION demo.school_days(year_name TEXT, class_id BIGINT)
   RETURNS TABLE (days date, student_id BIGINT, archived boolean, olderdate date) AS
 $func$

@@ -1,12 +1,12 @@
 ALTER TABLE phillyfreeschool.students
       ADD COLUMN start_date date;
+--;;
 ALTER TABLE demo.students
       ADD COLUMN start_date date;
-
+--;;
 CREATE OR REPLACE FUNCTION phillyfreeschool.school_days(year_name TEXT, class_id BIGINT)
   RETURNS TABLE (days date, student_id BIGINT, archived boolean, olderdate date) AS
 $func$
-
 SELECT a.days, s._id student_id, s.archived, s.olderdate
 FROM (SELECT DISTINCT days2.days
     FROM (SELECT
@@ -28,11 +28,10 @@ WHERE cXs.class_id = $2
 AND (s.start_date < a.days OR s.start_date is null);
 $func$
 LANGUAGE sql;
-
+--;;
 CREATE OR REPLACE FUNCTION demo.school_days(year_name TEXT, class_id BIGINT)
   RETURNS TABLE (days date, student_id BIGINT, archived boolean, olderdate date) AS
 $func$
-
 SELECT a.days, s._id student_id, s.archived, s.olderdate
 FROM (SELECT DISTINCT days2.days
     FROM (SELECT
