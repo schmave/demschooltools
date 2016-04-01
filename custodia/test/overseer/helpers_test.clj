@@ -56,15 +56,15 @@
   (:_id (data/get-class-by-name name)))
 
 (defn make-sample-two-students-in-class []
-  (let [{class-id :_id} (data/make-class "2014-2015")]
+  (let [{class-id :_id} (data/get-class-by-name "2014-2015")]
     (db/activate-class class-id)
     (data/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 2))))
     (data/make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
-    (let [s (data/make-student "jim")
+    (let [s (data/make-student "jim2")
           {sid :_id} s
           result {:class_id class-id :student_ids [sid]}]
       (data/add-student-to-class sid class-id)
-      (let [s (data/make-student "steve")
+      (let [s (data/make-student "steve2")
             {sid :_id} s
             result (update-in result [:student_ids] (fn [sids] (conj sids sid)))]
         (data/add-student-to-class sid class-id)
@@ -93,7 +93,7 @@
   ([have-extra?]
    (conn/init-pg)
    (db/reset-db)
-   (let [{class-id :_id} (data/make-class "2014-2015")]
+   (let [{class-id :_id} (data/get-class-by-name "2014-2015")]
      (db/activate-class class-id)
      (data/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 2))))
      (data/make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))

@@ -66,15 +66,19 @@
   )
 
 (defn drop-all-tables []
-  (jdbc/execute! @pgdb [" DROP TABLE IF EXISTS users; DROP TABLE IF EXISTS session_store; "])
-  (jdbc/execute! @pgdb [migrations/remove-philly-tables])
-  (jdbc/execute! @pgdb [(migrations/replace-philly  migrations/remove-philly-tables "demo")])
+  ;; (jdbc/execute! @pgdb [" DROP DATABASE IF EXISTS ?" (env :database-url)])
+  (jdbc/execute! @pgdb [(str "DROP TABLE IF EXISTS schema_migrations;"
+                             "DROP TABLE IF EXISTS users; "
+                             "DROP TABLE IF EXISTS session_store;")])
+  (jdbc/execute! @pgdb ["DROP SCHEMA IF EXISTS phillyfreeschool CASCADE"])
+  (jdbc/execute! @pgdb ["DROP SCHEMA IF EXISTS phillyfreeschool CASCADE"])
   )
 
-;;(reset-db) 
+;;(reset-db)
 (defn reset-db []
   (drop-all-tables)
-  (create-all-tables)
+  ;;(create-all-tables)
+  (migrations/migrate-db @pgdb)
   (init-users))
 
 (defn append-schema [q]

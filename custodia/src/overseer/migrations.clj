@@ -33,18 +33,6 @@
    FROM phillyfreeschool.swipes s;
 ")
 
-(def remove-philly-tables "
-    DROP TABLE IF EXISTS phillyfreeschool.years;
-    DROP TABLE IF EXISTS phillyfreeschool.classes_X_students;
-    DROP TABLE IF EXISTS phillyfreeschool.classes;
-    DROP FUNCTION IF EXISTS phillyfreeschool.school_days(text);
-    DROP FUNCTION IF EXISTS phillyfreeschool.school_days(text, bigint);
-    DROP VIEW IF EXISTS phillyfreeschool.roundedswipes;
-    DROP TABLE IF EXISTS phillyfreeschool.swipes;
-    DROP TABLE IF EXISTS phillyfreeschool.students;
-    DROP TABLE IF EXISTS phillyfreeschool.excuses;
-    DROP TABLE IF EXISTS phillyfreeschool.overrides;
-  ")
 (def initialize-shared-tables "
   CREATE TABLE users(
     user_id BIGSERIAL PRIMARY KEY,
@@ -61,7 +49,6 @@
     absolute_timeout BIGINT,
     value BYTEA
   );
-
   ")
 (def create-philly-schema-sql
   "
@@ -152,10 +139,9 @@ LANGUAGE sql;
 (defn create-schema-tables-sql [name]
   (replace-philly create-philly-schema-sql name))
 
-(def mconfig
-  {:store :database
-   :db  (env :database-url)
-   })
+(defn migrate-db [con]
+  (migratus/migrate {:store :database
+                     :db con}))
 
 ;; (migratus/create mconfig "student start date")
 ;; (migratus/migrate mconfig)
