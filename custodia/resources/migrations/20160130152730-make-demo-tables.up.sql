@@ -34,14 +34,6 @@ create table demo.excuses(
 );
 --;;
 
-CREATE TABLE session_store (
-  session_id VARCHAR(36) NOT NULL PRIMARY KEY,
-  idle_timeout BIGINT,
-  absolute_timeout BIGINT,
-  value BYTEA
-);
---;;
-
 CREATE OR REPLACE VIEW demo.roundedswipes AS
 SELECT _id, in_time, out_time, student_id FROM demo.swipes;
 --;;
@@ -230,18 +222,3 @@ values (6, '2016-01-28 09:22:21.796-05', '2016-01-28 14:55:21.804-5');
 --;;
 insert into demo.swipes (student_id, in_time, out_time)
 values (6, '2016-01-29 09:00:21.796-05', '2016-01-29 13:54:21.804-5');
---;;
-
-select * from phillyfreeschool.years;
---;;
-select * from phillyfreeschool.swipes;
---;;
-select * from demo.swipes;
---;;
-select * from demo.years;
---;;
-select * from demo.classes;
---;;
-select * from demo.students;
---;;
-select * from demo.classes_x_students;

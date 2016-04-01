@@ -1,4 +1,4 @@
-alter TABLE users set schema phillyfreeschool;
+create schema phillyfreeschool;
 --;;
 alter TABLE years set schema phillyfreeschool;
 --;;
@@ -15,7 +15,5 @@ alter TABLE swipes set schema phillyfreeschool;
 alter TABLE excuses set schema phillyfreeschool;
 --;;
 alter TABLE overrides set schema phillyfreeschool;
---;;
-alter FUNCTION school_days(text) set schema phillyfreeschool;
 --;;
 alter FUNCTION school_days(text, bigint) set schema phillyfreeschool;

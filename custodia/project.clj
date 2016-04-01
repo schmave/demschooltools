@@ -6,8 +6,6 @@
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [compojure "1.4.0"]
                  [ring/ring-jetty-adapter "1.2.2"]
-
-               ;;  [alembic "0.3.2"]
                  [org.clojure/tools.nrepl "0.2.12"]
 
                  [org.clojure/data.json "0.2.5"]
@@ -23,7 +21,7 @@
                  [heroku-database-url-to-jdbc "0.2.2"]
                  [org.clojure/java.jdbc "0.4.1"]
                  [prismatic/schema "0.4.2"]
-                 [migratus "0.8.4"]
+                 [migratus "0.8.13"]
                  [org.postgresql/postgresql "9.4-1201-jdbc41"]
                  [org.clojure/tools.trace "0.7.8"]
                  [com.ashafa/clutch "0.4.0"]
@@ -35,7 +33,16 @@
   :plugins [[cider/cider-nrepl "0.10.0-SNAPSHOT"]
             [refactor-nrepl "1.2.0-SNAPSHOT"]
             [lein-ring "0.9.7"]
+            [migratus-lein "0.2.6"]
             [environ/environ.lein "0.2.1"]]
+  :migratus {:store :database
+             :migration-dir "migrations"
+             :db {:classname "org.postgresql.Driver",
+                  :subprotocol "postgresql",
+                  :user "",
+                  :password "",
+                  :subname "//localhost:5432/DBNAME"}
+             }
   :test-selectors {:default (or (complement :integration)
                                 (complement :performance))
                    :integration :integration
