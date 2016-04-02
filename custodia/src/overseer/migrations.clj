@@ -134,11 +134,6 @@ $func$
 LANGUAGE sql;
   ")
 
-(defn drop-schema-tables-sql [name]
-  (replace-philly remove-philly-tables name))
-(defn create-schema-tables-sql [name]
-  (replace-philly create-philly-schema-sql name))
-
 (defn migrate-db [con]
   (migratus/migrate {:store :database
                      :db con}))

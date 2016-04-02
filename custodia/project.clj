@@ -6,7 +6,6 @@
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [compojure "1.4.0"]
                  [ring/ring-jetty-adapter "1.2.2"]
-                 [org.clojure/tools.nrepl "0.2.12"]
 
                  [org.clojure/data.json "0.2.5"]
                  [com.cemerick/friend "0.2.1" :exclusions [xerces/xercesImpl
@@ -26,8 +25,9 @@
                  [org.clojure/tools.trace "0.7.8"]
                  [com.ashafa/clutch "0.4.0"]
                  [org.clojure/java.classpath "0.2.2"]
-                 [refactor-nrepl "1.2.0-SNAPSHOT"]
-
+                 ;;[refactor-nrepl "1.2.0"]
+                 [alembic "0.3.2"]
+                 [org.clojure/tools.nrepl "0.2.12"]
                  ]
   :min-lein-version "2.0.0"
   :plugins [[cider/cider-nrepl "0.10.0-SNAPSHOT"]
@@ -51,7 +51,7 @@
   :ring {:handler overseer.web/tapp
          :nrepl {:start? true
                  :port 9998}}
-  ;; :main overseer.web
+  :main overseer.web
   :uberjar-name "overseer-standalone.jar"
   :profiles {:debug { :jvm-opts ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"]}
              :production {:env {:production true}}
