@@ -51,7 +51,7 @@
   :ring {:handler overseer.web/tapp
          :nrepl {:start? true
                  :port 9998}}
-  :main overseer.web
+  ;; :main overseer.web
   :uberjar-name "overseer-standalone.jar"
   :profiles {:debug { :jvm-opts ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"]}
              :production {:env {:production true}}

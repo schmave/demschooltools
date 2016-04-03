@@ -12,27 +12,6 @@
     (with-open [wrtr (io/writer (str "src/overseer/queries/" name ".sql"))]
       (.write wrtr data))))
 
-
-(comment "
- -- broken till otherwise noted
-  CREATE VIEW roundedswipes AS
-  SELECT
-     _id
-     , ((CASE WHEN (EXTRACT(HOURS FROM s.in_time AT TIME ZONE 'America/New_York') < 9
-                  AND EXTRACT(HOURS FROM s.in_time AT TIME ZONE 'America/New_York') < 16)
-              THEN (date_trunc('day', s.in_time AT TIME ZONE 'America/New_York') + interval '9 hours')
-              WHEN (EXTRACT(HOURS FROM s.in_time AT TIME ZONE 'America/New_York') >= 16)
-              THEN (date_trunc('day', s.in_time AT TIME ZONE 'America/New_York') + interval '16 hours')
-          ELSE s.in_time END)) as in_time
-     , ((CASE WHEN (EXTRACT(HOURS FROM s.out_time AT TIME ZONE 'America/New_York') >= 16)
-              THEN (date_trunc('day', s.out_time AT TIME ZONE 'America/New_York') + interval '16 hours') 
-              WHEN (EXTRACT(HOURS FROM s.out_time AT TIME ZONE 'America/New_York') < 9)
-              THEN (date_trunc('day', s.out_time AT TIME ZONE 'America/New_York') + interval '9 hours')
-          ELSE s.out_time END)) AS out_time
-     , student_id
-   FROM phillyfreeschool.swipes s;
-")
-
 (def initialize-shared-tables "
   CREATE TABLE users(
     user_id BIGSERIAL PRIMARY KEY,
@@ -50,6 +29,7 @@
     value BYTEA
   );
   ")
+
 (def create-philly-schema-sql
   "
   create table phillyfreeschool.students(
@@ -139,7 +119,4 @@ LANGUAGE sql;
                      :db con}))
 
 ;; (migratus/create mconfig "student start date")
-;; (migratus/migrate mconfig)
-;; (migratus/rollback mconfig)
-;; (migratus/down mconfig 20150908103000 20150909070853 20150913085152)
 
