@@ -55,7 +55,7 @@ public class Application extends Controller {
             .eq("person.organization", Organization.getByHost())
             .orderBy("id DESC").findList();
     }
-	
+
 	public static Result viewSchoolMeetingReferrals() {
 		return ok(views.html.view_sm_referrals.render(
 			getActiveSchoolMeetingReferrals()));
@@ -789,7 +789,10 @@ public class Application extends Controller {
 
         List<Entry> rules = Entry.find.where()
             .eq("section.chapter.organization", Organization.getByHost())
-            .eq("deleted", false).orderBy("title ASC").findList();
+            .eq("deleted", false)
+            .eq("section.deleted", false)
+            .eq("section.chapter.deleted", false)
+            .orderBy("title ASC").findList();
 
         List<Map<String, String> > result = new ArrayList<Map<String, String> > ();
         for (Entry r : rules) {
