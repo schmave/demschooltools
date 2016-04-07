@@ -22,3 +22,4 @@ makarios_learning_community/*
 connect_to_server.bat
 copy_release_to_server.bat
 *.sublime-workspace
+winscp_script.txt
