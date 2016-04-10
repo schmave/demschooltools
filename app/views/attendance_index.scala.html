@@ -1,11 +1,31 @@
 @(people : List[Person], person_to_stats : Map[Person, AttendanceStats],
-  codes : List[String], codes_map : Map[String, AttendanceCode])
+  codes : List[String], codes_map : Map[String, AttendanceCode], current_people: List[Person])
 
 @import helper._
 
+<script type="text/javascript">
+requirejs(['utils'], function() {
+	$(function() {
+		if ($('input[value=current]').prop('checked')) {
+			$('.attendance-view tr.inactive').hide();
+		}
+		$('input[value=current]').click(function() {
+			$('.attendance-view tr.inactive').hide();
+		});
+		$('input[value=all]').click(function() {
+			$('.attendance-view tr').show();
+		});
+	});
+});
+</script>
 
-<h3>Attendance Summary</h3>
-<p>Click on a column title to sort by that column.
+<h3>Attendance Summary
+</h3>
+<div id="attendance-student-picker">
+	<label><input type="radio" name="type" value="current"> Show only current students and staff</label><br>
+	<label><input type="radio" name="type" value="all" checked> Show all people who have attended this school year</label>
+</div>
+<p style="margin-bottom: 30px;">Click on a column title to sort by that column.
 <table class="attendance-view table sortable">
 <thead><th width=200>Name</th>
 	@for( code <- codes ) {
@@ -20,7 +40,11 @@
 	</thead>
 
 @for( p <- people ) {
-<tr><td><a href="@routes.Attendance.viewPersonReport(p.person_id)">@p.first_name @p.last_name</a></td>
+<tr
+@if( !current_people.contains(p)) {
+	class="inactive"
+}
+><td><a href="@routes.Attendance.viewPersonReport(p.person_id)">@p.first_name @p.last_name</a></td>
 	@for( code <- codes ) {
 		@if( person_to_stats.get(p).absence_counts.containsKey(codes_map.get(code)) ) {
 			<td>@person_to_stats.get(p).absence_counts.get(codes_map.get(code))</td>

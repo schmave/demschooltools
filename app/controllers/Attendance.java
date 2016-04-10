@@ -89,7 +89,8 @@ public class Attendance extends Controller {
         List<String> all_codes = new ArrayList<String>(codes_map.keySet());
 
         return views.html.attendance_index.render(
-            all_people, person_to_stats, all_codes, codes_map).toString();
+            all_people, person_to_stats, all_codes, codes_map,
+            Application.allPeople()).toString();
                 }}));
     }
 
