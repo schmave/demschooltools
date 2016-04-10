@@ -5,15 +5,34 @@
 
 <script type="text/javascript">
 requirejs(['utils'], function() {
+	var fixHighlights = function() {
+		var els = $('.attendance-view tr');
+		els.removeClass('shade');
+		var even = false;
+		for (var i = 0; i < els.length; i++) {
+			debugger;
+			if ($(els[i]).css('display') !== 'none') {
+				if (even) {
+					$(els[i]).addClass('shade');
+				}
+				even = !even;
+			}
+		}
+	};
+
 	$(function() {
 		if ($('input[value=current]').prop('checked')) {
 			$('.attendance-view tr.inactive').hide();
 		}
+		fixHighlights();
+
 		$('input[value=current]').click(function() {
 			$('.attendance-view tr.inactive').hide();
+			fixHighlights();
 		});
 		$('input[value=all]').click(function() {
 			$('.attendance-view tr').show();
+			fixHighlights();
 		});
 	});
 });
