@@ -4,12 +4,16 @@ import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import javax.persistence.*;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
+import org.postgresql.util.PSQLException;
+
 import models.Person;
+
 
 public class Utils
 {
@@ -26,6 +30,19 @@ public class Utils
         }
 
         return result;
+    }
+
+    public static void eatIfUniqueViolation(PersistenceException pe) throws PersistenceException {
+        PSQLException e = (PSQLException)pe.getCause();
+        if (e == null) {
+            throw pe;
+        }
+
+        if (!e.getSQLState().equals("23505")) {
+            throw pe;
+        } else {
+            System.out.println("Ate a 23505 error");
+        }
     }
 
     // day_of_week is, e.g., Calendar.TUESDAY

@@ -15,6 +15,8 @@ import com.avaje.ebean.RawSqlBuilder;
 import com.avaje.ebean.SqlUpdate;
 import com.csvreader.CsvWriter;
 
+import controllers.Utils;
+
 import models.*;
 
 import play.*;
@@ -198,35 +200,56 @@ public class Attendance extends Controller {
             codes));
     }
 
-    public static Result createPersonWeek(int person_id, String monday) {
+    public static Result createPersonWeek() {
         CachedPage.remove(CACHE_INDEX);
 
-        Calendar start_date = Utils.parseDateOrNow(monday);
-        Calendar end_date = (Calendar)start_date.clone();
-        Person p = Person.findById(person_id);
+        Map<String,String[]> data = request().body().asFormUrlEncoded();
+        Calendar start_date = Utils.parseDateOrNow(data.get("monday")[0]);
 
-        AttendanceWeek.create(start_date.getTime(), p);
+        ArrayList<Object> result = new ArrayList<Object>();
+        String[] person_ids = data.get("person_id[]");
 
-        // look up our newly-created object so that we get the ID
-        Map<String, Object> result = new HashMap<String, Object>();
-        result.put("week", AttendanceWeek.find.where()
-            .eq("person", p)
-            .eq("monday", start_date.getTime())
-            .findUnique());
+        for (String person_id : person_ids) {
+            Calendar end_date = (Calendar)start_date.clone();
+            boolean alreadyExists = false;
+            Person p = Person.findById(Integer.parseInt(person_id));
+            try {
+                AttendanceWeek.create(start_date.getTime(), p);
+            } catch (javax.persistence.PersistenceException pe) {
+                Utils.eatIfUniqueViolation(pe);
+                alreadyExists = true;
+            }
+            Map<String, Object> one_result = new HashMap<String, Object>();
 
-        for (int i = 0; i < 5; i++) {
-            AttendanceDay.create(end_date.getTime(), p);
-            end_date.add(Calendar.DAY_OF_MONTH, 1);
+            // look up our newly-created object so that we get the ID
+            one_result.put("week", AttendanceWeek.find.where()
+                .eq("person", p)
+                .eq("monday", start_date.getTime())
+                .findUnique());
+
+            for (int i = 0; i < 5; i++) {
+                try {
+                    AttendanceDay.create(end_date.getTime(), p);
+                } catch (javax.persistence.PersistenceException pe) {
+                    Utils.eatIfUniqueViolation(pe);
+                    alreadyExists = true;
+                }
+                end_date.add(Calendar.DAY_OF_MONTH, 1);
+            }
+
+            one_result.put("days",
+                AttendanceDay.find.where()
+                .eq("person", p)
+                .ge("day", start_date.getTime())
+                .le("day", end_date.getTime())
+                .order("day ASC")
+                .setMaxRows(5)
+                .findList());
+
+            if (!alreadyExists) {
+                result.add(one_result);
+            }
         }
-
-        result.put("days",
-            AttendanceDay.find.where()
-            .eq("person", p)
-            .ge("day", start_date.getTime())
-            .le("day", end_date.getTime())
-            .order("day ASC")
-            .setMaxRows(5)
-            .findList());
 
         return ok(Utils.toJson(result));
     }

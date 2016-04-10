@@ -15,12 +15,11 @@ import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import controllers.Application;
+import controllers.Utils;
 
 import com.avaje.ebean.Model;
 import com.avaje.ebean.Model.Finder;
 import play.libs.Json;
-
-import org.postgresql.util.PSQLException;
 
 @Entity
 @Table(name="`case`")
@@ -92,18 +91,9 @@ public class Case extends Model implements Comparable<Case> {
             CaseMeeting.create(this, this.meeting);
         }
         catch (PersistenceException pe) {
-            PSQLException e = (PSQLException)pe.getCause();
-            if (e == null) {
-                throw pe;
-            }
-
             // Throw the exception only if this is something other than a
             // "unique_violation", meaning that this CaseMeeting already exists.
-            if (!e.getSQLState().equals("23505")) {
-                throw pe;
-            } else {
-                System.out.println("Ate a 23505 error in continueInMeeting");
-            }
+            Utils.eatIfUniqueViolation(pe);
         }
 
         this.meeting = m;

@@ -38,7 +38,7 @@ requirejs(['utils', 'edit_attendance_week'], function() {});
 
 <h3>Editing week of @Application.yymmddDate(monday)</h3>
 <p><a href="@routes.Attendance.viewWeek()?date=@Application.yymmddDate(monday)">Finish editing, return to viewing</a></p>
-<table class="table attendance-view">
+<table id="attendance-editing" class="table attendance-view">
 <thead><tr><th>Name</th>
 <th colspan=2>Monday</th>
 <th colspan=2>Tuesday</th>

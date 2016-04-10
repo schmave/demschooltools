@@ -95,7 +95,7 @@ requirejs(['utils'], function(utils) {
             self.end_input.val(typedToUserTime(self.end_input.val()));
 
             self.checkForCode();
-        }
+        };
 
         this.save = function() {
             self.dirty = false;
@@ -107,7 +107,7 @@ requirejs(['utils'], function(utils) {
                     "&end_time=" + self.end_input.val();
             }
             $.post(url);
-        }
+        };
 
         self.start_input = $(start_input);
         self.end_input = $(end_input);
@@ -148,7 +148,7 @@ requirejs(['utils'], function(utils) {
             self.dirty = false;
             $.post("/attendance/saveWeek?week_id=" + self.week.id +
                    "&extra_hours=" + self.week_el.val());
-        }
+        };
 
         self.person = person;
         self.days = [];
@@ -169,13 +169,22 @@ requirejs(['utils'], function(utils) {
         self.week_el.on(utils.TEXT_AREA_EVENTS, self.setDirty);
 
         return self;
-    };
+    }
 
-    function addNewPersonRow(person) {
-        $.post("/attendance/createPersonWeek?person_id=" + person.person_id +
-               "&monday=" + app.monday).done(function(data) {
-                var result = $.parseJSON(data);
-                loadRow(person, result.days, result.week, $(".table"));
+    function addNewPersonRow(people) {
+        var ids = [];
+        for (var i = 0; i < people.length; i++) {
+            ids.push(people[i].person_id);
+        }
+        $.post("/attendance/createPersonWeek", {
+                'person_id[]': ids,
+                monday: app.monday
+            }).done(function(data) {
+                var results = $.parseJSON(data);
+                for (var i = 0; i < results.length; i++) {
+                    var result = results[i];
+                    loadRow(result.week.person, result.days, result.week, $(".table"));
+                }
             });
     }
 
@@ -186,23 +195,42 @@ requirejs(['utils'], function(utils) {
             })).children(":last-child");
 
         new_el.find("a").click(function () {
-            addNewPersonRow(person);
+            addNewPersonRow([person]);
             new_el.remove();
         });
     }
 
     function addAllAdditionalPeople() {
-        $("#additional-people a").click();
+        $("#additional-people").empty();
+        addNewPersonRow(app.initial_data.additional_people);
     }
 
     function loadRow(person, days, week, dest_el) {
-        var new_row_el = dest_el.append(
+        var insert_before_i;
+        for (var i = 0; i < app.person_rows.length; i++) {
+            var p2 = app.person_rows[i].person;
+            if ((p2.first_name + ' ' + p2.last_name) >
+                (person.first_name + ' ' + person.last_name)) {
+                insert_before_i = i;
+                break;
+            }
+        }
+        var new_row_el = $($.parseHTML(
             app.person_row_template({
                 "name": person.first_name + " " + person.last_name
-            })).children(":last-child");
+            })));
+        if (insert_before_i !== undefined) {
+            app.person_rows[insert_before_i].el.before(new_row_el);
+        } else {
+            dest_el.append(new_row_el);
+        }
 
         var new_row = new PersonRow(person, days, week, new_row_el);
-        app.person_rows.push(new_row);
+        if (insert_before_i !== undefined) {
+            app.person_rows.splice(insert_before_i, 0, new_row);
+        } else {
+            app.person_rows.push(new_row);
+        }
     }
 
     function setNoSchool(day_num) {
@@ -246,7 +274,7 @@ requirejs(['utils'], function(utils) {
         window.setTimeout(saveIfNeeded, 2000);
     }
 
-    app.person_row_template = Handlebars.compile($("#person-row-template").html());
+    app.person_row_template = Handlebars.compile($("#person-row-template").html().trim());
     app.additional_person_template =
         Handlebars.compile($("#additional-person-template").html());
 
