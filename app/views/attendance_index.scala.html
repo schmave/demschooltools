@@ -10,7 +10,6 @@ requirejs(['utils'], function() {
 		els.removeClass('shade');
 		var even = false;
 		for (var i = 0; i < els.length; i++) {
-			debugger;
 			if ($(els[i]).css('display') !== 'none') {
 				if (even) {
 					$(els[i]).addClass('shade');
@@ -25,6 +24,11 @@ requirejs(['utils'], function() {
 			$('.attendance-view tr.inactive').hide();
 		}
 		fixHighlights();
+
+		$('.sortable th').click(function() {
+				window.setTimeout(function() { fixHighlights(); },
+			50);
+		});
 
 		$('input[value=current]').click(function() {
 			$('.attendance-view tr.inactive').hide();
