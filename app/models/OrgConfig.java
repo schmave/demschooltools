@@ -239,3 +239,32 @@ class TheOpenSchool extends OrgConfig {
         return INSTANCE;
     }
 }
+
+class Houston extends OrgConfig {
+    private static final Houston INSTANCE = new Houston();
+    public TimeZone time_zone = TimeZone.getTimeZone("US/Central");
+
+    public Houston() {
+        name = "Houston Sudbury School";
+        short_name = "HSS";
+        people_url = "http://hss.demschooltools.com";
+
+        str_manual_title = "Lawbook";
+        str_manual_title_short = "Lawbook";
+        str_res_plan_short = "Sentence";
+        str_res_plan = "sentence";
+        str_res_plan_cap = "Sentence";
+        str_res_plans = "sentences";
+        str_res_plans_cap = "Sentences";
+        str_findings = "Findings";
+
+        use_minor_referrals = true;
+        track_writer = false;
+
+        OrgConfig.register(name, this);
+    }
+
+    public static Houston getInstance() {
+        return INSTANCE;
+    }
+}
