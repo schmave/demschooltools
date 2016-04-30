@@ -135,6 +135,9 @@ public class Application extends Controller {
             .fetch("section")
             .fetch("section.chapter")
             .where().eq("section.chapter.organization", Organization.getByHost())
+			.eq("section.chapter.deleted", false)
+			.eq("section.deleted", false)
+			.eq("deleted", false)
             .findList();
         List<Entry> entries_with_charges = new ArrayList<Entry>();
         for (Entry e : entries) {
