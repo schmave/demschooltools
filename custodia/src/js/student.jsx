@@ -86,10 +86,17 @@ var exports = React.createClass({
         }
         return "";
     },
+    toggleMonth: function(month) {
+        if (this.state.selectedMonth === month) {
+            this.setState({selectedMonth: "" });
+        } else {
+            this.setState({selectedMonth: month });
+        }
+    },
     openMonth: function(month) {
         this.setState({selectedMonth: month });
     },
-    listMonth: function(days, show) {
+    listMonth: function(days, show, month) {
         return days.map(function (day, i) {
             var hide = (!show) ? "hidden" : "";
             var selected = day.day === this.getActiveDay(this.state.student) ? "selected" : "";
@@ -97,6 +104,7 @@ var exports = React.createClass({
             return <tr className={clsName}>
                 <td>
                     <Link to="student"
+                          onClick={this.openMonth.bind(this, month)}
                           id={"day-"+day.day}
                           className={this.getDayClass(day)}
                           params={{studentId: this.state.studentId, day: day.day}}>
@@ -114,9 +122,9 @@ var exports = React.createClass({
         var groupedDays = this.state.student.days.groupBy(groupingFunc);
         var months = Object.keys(groupedDays);
         return months.map(function(month){
-            return <tr onClick={this.openMonth.bind(this, month)} style={{fontWeight:"bold"}}>
-                <td> {month} </td>
-                {this.listMonth(groupedDays[month], (this.state.selectedMonth == month))}
+            return <tr style={{fontWeight:"bold"}}>
+                <td onClick={this.toggleMonth.bind(this, month)} style={{fontWeight:"bold"}}>   > {month} </td>
+                {this.listMonth(groupedDays[month], (this.state.selectedMonth == month), month)}
             </tr>;
         }.bind(this));
     },
