@@ -146,6 +146,10 @@ a {
     /*     float: right; */
     /* } */
 }
+
+.hidden {
+    display:none;
+}
 .attended-day {
     color: green;
 }

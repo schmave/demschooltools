@@ -10,6 +10,9 @@ var React = require('react'),
     Swipes = require('./swipeslisting.jsx'),
     SwipeListing = require('./swipeslisting.jsx');
 
+var groupingFunc = function (data) {
+    return data.day.split('-')[0] + '-' + data.day.split('-')[1];
+};
 
 var exports = React.createClass({
     contextTypes: {
@@ -83,13 +86,15 @@ var exports = React.createClass({
         }
         return "";
     },
-    getPreviousDays: function () {
-        var selectedDay = this.context.router.getCurrentParams().day;
-        if (!selectedDay && this.state.day) {
-            //routerc.get().transitionTo('swipes', {studentId :this.state.studentId, day: this.state.day});
-        }
-        return this.state.student.days.map(function (day, i) {
-            return <tr className={day.day === this.getActiveDay(this.state.student) ? "selected" : ""}>
+    openMonth: function(month) {
+        this.setState({selectedMonth: month });
+    },
+    listMonth: function(days, show) {
+        return days.map(function (day, i) {
+            var hide = (!show) ? "hidden" : "";
+            var selected = day.day === this.getActiveDay(this.state.student) ? "selected" : "";
+            var clsName = hide + " " + selected;
+            return <tr className={clsName}>
                 <td>
                     <Link to="student"
                           id={"day-"+day.day}
@@ -100,6 +105,20 @@ var exports = React.createClass({
                 </td>
             </tr>;
         }.bind(this))
+    },
+    getPreviousDays: function () {
+        var selectedDay = this.context.router.getCurrentParams().day;
+        if (!selectedDay && this.state.day) {
+            //routerc.get().transitionTo('swipes', {studentId :this.state.studentId, day: this.state.day});
+        }
+        var groupedDays = this.state.student.days.groupBy(groupingFunc);
+        var months = Object.keys(groupedDays);
+        return months.map(function(month){
+            return <tr onClick={this.openMonth.bind(this, month)} style={{fontWeight:"bold"}}>
+                <td> {month} </td>
+                {this.listMonth(groupedDays[month], (this.state.selectedMonth == month))}
+            </tr>;
+        }.bind(this));
     },
     toggleEdit: function () {
         this.setState({editing: !this.state.editing});
@@ -233,6 +252,7 @@ var exports = React.createClass({
         var activeDay = this.getActiveDay(s);
         this.setState({
             student: s,
+            selectedMonth : "2016-04",
             activeDay: activeDay
         });
     }
