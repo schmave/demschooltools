@@ -154,8 +154,11 @@ public class Attendance extends Controller {
         } else {
             List<Person> additional_people = Application.allPeople();
             additional_people.removeAll(all_people);
+
             Collections.sort(additional_people, Person.SORT_DISPLAY_NAME);
 
+            response().setHeader("Cache-Control", "max-age=0, no-cache, no-store");
+            response().setHeader("Pragma", "no-cache");
             return ok(views.html.edit_attendance_week.render(
                 start_date.getTime(),
                 codes,
