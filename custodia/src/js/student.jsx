@@ -122,10 +122,17 @@ var exports = React.createClass({
         var groupedDays = this.state.student.days.groupBy(groupingFunc);
         var months = Object.keys(groupedDays);
         return months.map(function(month){
+            var cls = (month===this.state.selectedMonth)
+                ? "glyphicon glyphicon-chevron-down"
+                    : "glyphicon glyphicon-chevron-right";
             return <span>
             <tr style={{fontWeight:"bold"}}>
-                <td onClick={this.toggleMonth.bind(this, month)} style={{fontWeight:"bold"}}>   > {month} </td>
-
+                <td onClick={this.toggleMonth.bind(this, month)}
+                    style={{fontWeight:"bold"}}>
+                    <span className={cls}
+                          style={{"padding-right":"3px"}} ></span>
+                    {month}
+                </td>
             </tr>
             {this.listMonth(groupedDays[month], (this.state.selectedMonth == month), month)}
             </span>;
