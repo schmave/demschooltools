@@ -39,7 +39,8 @@ var exports = React.createClass({
                 $(makeDateId(d))[0].click();
             },
             data: data,
-            start: moment(this.props.days[this.props.days.length-1].day).startOf('month').toDate(),
+     //       start: moment(this.props.days[this.props.days.length-1].day).startOf('month').toDate(),
+            start: moment(this.props.days[0].day).startOf('month').toDate(),
             domain: 'month',
             subDomain: 'x_day',
             subDomainTextFormat: "%d",
