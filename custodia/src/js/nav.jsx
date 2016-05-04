@@ -1,6 +1,7 @@
 var React = require('react'),
     Router = require('react-router'),
     Link = Router.Link,
+    SuperWrapper = require('./superwrapper.jsx'),
     AdminWrapper = require('./adminwrapper.jsx');
 
 module.exports = React.createClass({
@@ -29,6 +30,9 @@ module.exports = React.createClass({
                         <AdminWrapper>
                             <li><Link id="class-link" to="classes">Classes</Link> </li>
                         </AdminWrapper>
+                        <SuperWrapper>
+                            <li><Link id="class-link" to="admin">Admin</Link> </li>
+                        </SuperWrapper>
                     </ul>
                     <ul className="nav navbar-nav navbar-right">
                         <li><a href="/users/logout">Logout</a></li>

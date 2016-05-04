@@ -55,6 +55,8 @@
     (friend/authorize #{roles/user} "You're a user!"))
   (GET "/users/is-admin" req
     (friend/authorize #{roles/admin} (resp/response {:admin true})))
+  (GET "/users/is-super" req
+    (friend/authorize #{roles/super} (resp/response {:super true})))
   (route/resources "/")
   (ANY "*" []
     (route/not-found (slurp (io/resource "404.html")))))

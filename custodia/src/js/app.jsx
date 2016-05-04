@@ -6,6 +6,7 @@ var React = require('react'),
     Student = require('./student.jsx'),
     CreateStudent = require('./createstudent.jsx'),
     CreateAClass = require('./createaclass.jsx'),
+    Administration = require('./administration.jsx'),
     SwipeListing = require('./swipeslisting.jsx'),
     StudentReports = require('./studentreports.jsx'),
     Classes = require('./classes.jsx'),
@@ -39,6 +40,7 @@ var routes = (
         <Route name="reports" path="reports" handler={StudentReports} />
         <Route name="classes" path="classes" handler={Classes} />
         <Route name="createaclass" path="class/new" handler={CreateAClass} />
+        <Route name="admin" path="administration" handler={Administration} />
 
         <DefaultRoute handler={StudentTable}/>
     </Route>

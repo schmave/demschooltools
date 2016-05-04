@@ -4,11 +4,15 @@ var EventEmitter = require('events').EventEmitter,
     ajax = require('./ajaxhelper');
 
 var isAdmin;
+var isSuper;
 var CHANGE_EVENT = "CHANGE!";
 
 var exports = assign({}, EventEmitter.prototype, {
     isAdmin: function () {
         return isAdmin;
+    },
+    isSuper: function () {
+        return isSuper;
     },
     emitChange: function(){
         this.emit(CHANGE_EVENT);
@@ -26,6 +30,14 @@ ajax.get('/users/is-admin').then(function (data) {
     exports.emitChange();
 }, function (data) {
     isAdmin = false;
+    exports.emitChange();
+});
+
+ajax.get('/users/is-super').then(function (data) {
+    isSuper = true;
+    exports.emitChange();
+}, function (data) {
+    isSuper = false;
     exports.emitChange();
 });
 
