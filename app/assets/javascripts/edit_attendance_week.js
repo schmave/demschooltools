@@ -123,9 +123,8 @@ requirejs(['utils'], function(utils) {
             self.end_input.val(dbTimeToUserTime(data.end_time));
         }
 
-        self.start_input.blur(self.onChange);
-        self.start_input.on(utils.TEXT_AREA_EVENTS, self.checkForCode);
-        self.end_input.blur(self.onChange);
+        self.start_input.on(utils.TEXT_AREA_EVENTS, self.onChange);
+        self.end_input.on(utils.TEXT_AREA_EVENTS, self.onChange);
 
         return self;
     }
