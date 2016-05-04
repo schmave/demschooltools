@@ -90,11 +90,12 @@ requirejs(['utils'], function(utils) {
 
         self.onChange = function() {
             self.dirty = true;
+            self.checkForCode();
+        };
 
+        self.onBlur = function() {
             self.start_input.val(typedToUserTime(self.start_input.val()));
             self.end_input.val(typedToUserTime(self.end_input.val()));
-
-            self.checkForCode();
         };
 
         this.save = function() {
@@ -123,6 +124,8 @@ requirejs(['utils'], function(utils) {
             self.end_input.val(dbTimeToUserTime(data.end_time));
         }
 
+        self.start_input.blur(self.onBlur);
+        self.end_input.blur(self.onBlur);
         self.start_input.on(utils.TEXT_AREA_EVENTS, self.onChange);
         self.end_input.on(utils.TEXT_AREA_EVENTS, self.onChange);
 
