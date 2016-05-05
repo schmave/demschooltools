@@ -22,12 +22,13 @@
 
 (def ^:dynamic *school-schema* "phillyfreeschool")
 
+(def current-schemas ["phillyfreeschool" "demo"])
+
 (extend-type Date
   jdbc/ISQLParameter
   (set-parameter [val ^PreparedStatement stmt ix]
     (let [cal (Calendar/getInstance (TimeZone/getTimeZone "UTC"))]
       (.setTimestamp stmt ix (timec/to-timestamp val) cal))))
-
 
 (defqueries "overseer/base.sql" )
 
@@ -42,6 +43,11 @@
 (defn get-user [username]
   (if-let [u (first (get-user-y { :username username} {:connection @pgdb}))]
     (assoc u :roles (read-string (:roles u)))))
+
+;;(set-user-schema "super" "TEST")
+;;(get-user "super")
+(defn set-user-schema [username schema]
+  (jdbc/update! @pgdb :users {:schema_name schema} ["username=?" username]))
 
 (defn make-user [username password roles schema]
   (if-not (get-user username)
@@ -80,10 +86,13 @@
         id (:_id doc)]
     (jdbc/delete! @pgdb table ["_id=?" id])))
 
-(defn update! [table id fields]
-  (let [fields (dissoc fields :type)
-        table (append-schema (name table))]
-    (jdbc/update! @pgdb table fields ["_id=?" id])))
+(defn update!
+  ([table id fields]
+   (update! table id fields "_id"))
+  ([table id fields where-id]
+   (let [fields (dissoc fields :type)
+         table (append-schema (name table))]
+     (jdbc/update! @pgdb table fields [(str where-id "=?") id]))))
 
 (defn persist! [doc]
   (let [table (:type doc)

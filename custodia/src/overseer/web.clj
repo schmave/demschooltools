@@ -3,6 +3,7 @@
             [ring.middleware.json :refer [wrap-json-response wrap-json-body wrap-json-params]]
             [ring.middleware.keyword-params :refer [wrap-keyword-params]]
             [ring.middleware.session :refer [wrap-session]]
+            [ring.middleware.reload :refer [wrap-reload]]
             [compojure.handler :refer [site]]
             [compojure.route :as route]
             [compojure.core :as compojure]
@@ -43,6 +44,21 @@
     (friend/authorize #{roles/super} ;; (data/sample-db true)
                       (resp/redirect "/")))
 
+  (PUT "/admin/:name" [name password schema]
+    (friend/authorize #{roles/super}
+                     (db/make-user name password #{roles/admin} schema)))
+
+  (PUT "/schema/:schema" [schema]
+    (friend/authorize #{roles/super}
+                      (db/set-user-schema "super" schema)))
+
+  (GET "/schemas" [name]
+    (friend/authorize #{roles/super}
+                      (resp/response db/current-schemas)))
+  (GET "/hello" []
+    (friend/authorize #{roles/super}
+                      (resp/response "there")))
+
   student-routes
   class-routes
   report-routes
@@ -63,9 +79,10 @@
 
 (defn my-middleware [app]
   (fn [req]
+    ;;(trace/trace "req" req)
     (let [schema  (:schema_name (friend/current-authentication req))]
       (binding [db/*school-schema* schema]
-        (trace/trace "schema" db/*school-schema*)
+        ;;(trace/trace "schema" db/*school-schema*)
         (app req)))))
 
 (defn tapp []
@@ -76,6 +93,7 @@
                             :default-landing-uri "/"
                             :workflows [(workflows/interactive-form)]})
       (compojure/wrap-routes my-middleware)
+      wrap-reload
       (wrap-session {:store (jdbc-store @conn/pgdb)
                      :cookie-attrs {:max-age (* 3 365 24 3600)}})
       wrap-keyword-params

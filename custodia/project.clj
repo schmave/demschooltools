@@ -6,7 +6,7 @@
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [compojure "1.4.0"]
                  [ring/ring-jetty-adapter "1.2.2"]
-
+                 [ring/ring-devel "1.4.0"]
                  [org.clojure/data.json "0.2.5"]
                  [com.cemerick/friend "0.2.1" :exclusions [xerces/xercesImpl
                                                            org.clojure/core.cache]]
