@@ -12,7 +12,7 @@ var exports = {
             dispatcher.dispatch({
                 type: constants.systemEvents.TODAY_LOADED,
                 data: data
-            })
+            });
         });
     },
     loadStudents: function () {

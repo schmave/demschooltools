@@ -12,7 +12,8 @@ var exports = React.createClass({
         router: React.PropTypes.func
     },
     getInitialState: function () {
-        return {schemas: userStore.getSchemas()};
+        return {schemas: userStore.getSchemas(),
+                selectedSchema: userStore.getSuperSchema()};
     },
     componentDidMount: function () {
         userStore.addChangeListener(this._onChange);
@@ -21,9 +22,15 @@ var exports = React.createClass({
     componentWillUnmount: function () {
         userStore.removeChangeListener(this._onChange);
     },
+    selectSchema: function(s) {
+        userStore.setSuperSchema(s);
+        this.setState({selectedSchema:s});
+    },
     makeItems: function() {
+        var that = this;
         return this.state.schemas.map(function(schema){
-            return (<li><a href="#">{schema}</a></li>);
+            return (<li><a onClick={that.selectSchema.bind(that,schema)}>
+                     {schema}</a></li>);
         });
     },
     makeDropDown: function() {
@@ -31,7 +38,7 @@ var exports = React.createClass({
             <button className="btn btn-default dropdown-toggle"
             type="button" id="dropdownMenu1"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-            Dropdown
+            {this.state.selectedSchema}
                 <span className="caret"></span>
             </button>
 
@@ -48,7 +55,8 @@ var exports = React.createClass({
             </SuperItem>
     },
     _onChange: function () {
-        this.setState({schemas: userStore.getSchemas()});
+        this.setState({schemas: userStore.getSchemas(),
+                       selectedSchema: userStore.getSuperSchema()});
     }
 });
 

@@ -72,17 +72,21 @@
   (GET "/users/is-admin" req
     (friend/authorize #{roles/admin} (resp/response {:admin true})))
   (GET "/users/is-super" req
-    (friend/authorize #{roles/super} (resp/response {:super true})))
+    (friend/authorize #{roles/super}
+                      (let [user (db/get-user "super")]
+                        (resp/response {:super true
+                                        :schema (:schema_name user)}))))
   (route/resources "/")
   (ANY "*" []
     (route/not-found (slurp (io/resource "404.html")))))
 
 (defn my-middleware [app]
   (fn [req]
+    (trace/trace "TEST")
     ;;(trace/trace "req" req)
     (let [schema  (:schema_name (friend/current-authentication req))]
       (binding [db/*school-schema* schema]
-        ;;(trace/trace "schema" db/*school-schema*)
+        (trace/trace "schema" db/*school-schema*)
         (app req)))))
 
 (defn tapp []
