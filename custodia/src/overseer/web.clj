@@ -82,12 +82,17 @@
 
 (defn my-middleware [app]
   (fn [req]
-    (trace/trace "TEST")
-    ;;(trace/trace "req" req)
-    (let [schema  (:schema_name (friend/current-authentication req))]
-      (binding [db/*school-schema* schema]
-        (trace/trace "schema" db/*school-schema*)
-        (app req)))))
+    (let [auth (friend/current-authentication req)
+          schema (:schema_name auth)
+          username (:username auth)]
+      (if (= "super" username)
+        (let [schema (:schema_name (db/get-user username))]
+          (binding [db/*school-schema* schema]
+           ;; (trace/trace "schema" db/*school-schema*)
+            (app req)))
+        (binding [db/*school-schema* schema]
+          ;;(trace/trace "schema" db/*school-schema*)
+          (app req))))))
 
 (defn tapp []
   (-> #'app
