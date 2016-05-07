@@ -51,6 +51,17 @@ var exports = {
             });
         });
     },
+    makeStudent: function (name) {
+        ajax.put('/makestudent/' + name, {
+            password: password
+        }).then(function (data) {
+            this.loadStudents();
+            dispatcher.dispatch({
+                type: constants.studentEvents.STUDENT_LOADED,
+                data: data.student
+            });
+        }.bind(this));
+    },
     updateStudent: function (id, name, start_date) {
         ajax.put('/students/' + id, {
             name: name,
@@ -115,7 +126,7 @@ var exports = {
             dispatcher.dispatch({
                 type: constants.studentEvents.STUDENT_LOADED,
                 data: data.student
-            })
+            });
         });
     },
     excuse: function(studentId, day){

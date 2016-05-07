@@ -16,13 +16,13 @@ exports.getStudents = function(force){
         actionCreator.loadStudents();
         return [];
     }
-}
+};
 
 exports.getToday = function(){
     if(today) return today;
 
     actionCreator.loadToday();
-}
+};
 
 exports.getStudent = function(id){
     if(studentDetails[id]){
@@ -31,7 +31,7 @@ exports.getStudent = function(id){
         actionCreator.loadStudent(id);
         return null;
     }
-}
+};
 
 dispatcher.register(function(action){
     switch(action.type){

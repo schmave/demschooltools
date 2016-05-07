@@ -32,6 +32,10 @@
                             (resp/response {:made made?
                                             :students (get-student-list)}))))
 
+  (PUT "/makestudent/:name" [name password]
+    (friend/authorize #{roles/super}
+                     (db/make-user name password #{roles/admin})))
+
   (PUT "/students/:id" [id :<< as-int name start_date]
        (friend/authorize #{roles/admin}
                          (data/edit-student id name start_date))

@@ -44,10 +44,6 @@
     (friend/authorize #{roles/super} ;; (data/sample-db true)
                       (resp/redirect "/")))
 
-  (PUT "/admin/:name" [name password schema]
-    (friend/authorize #{roles/super}
-                     (db/make-user name password #{roles/admin} schema)))
-
   (PUT "/schema/:schema" [schema]
     (friend/authorize #{roles/super}
                       (db/set-user-schema "super" schema)))
@@ -88,10 +84,8 @@
       (if (= "super" username)
         (let [schema (:schema_name (db/get-user username))]
           (binding [db/*school-schema* schema]
-           ;; (trace/trace "schema" db/*school-schema*)
             (app req)))
         (binding [db/*school-schema* schema]
-          ;;(trace/trace "schema" db/*school-schema*)
           (app req))))))
 
 (defn tapp []

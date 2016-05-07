@@ -49,12 +49,12 @@
 (defn set-user-schema [username schema]
   (jdbc/update! @pgdb :users {:schema_name schema} ["username=?" username]))
 
-(defn make-user [username password roles schema]
+(defn make-user [username password roles]
   (if-not (get-user username)
     (jdbc/insert! @pgdb "users"
                   {:username username
                    :password (creds/hash-bcrypt password)
-                   :schema_name schema
+                   :schema_name *school-schema*
                    :roles (str roles)})))
 
 (defn init-users []

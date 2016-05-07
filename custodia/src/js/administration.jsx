@@ -47,10 +47,18 @@ var exports = React.createClass({
         </ul>
       </div>);
     },
+    makeStudent: function(name, password) {
+        actionCreator.makeStudent(name, password);
+    },
     render: function () {
         return <SuperItem>
             <div>Administration
-            {this.makeDropDown()}
+                {this.makeDropDown()}
+                <div>
+                    <h2>Make Student</h2>
+                    <label>Name: </label>
+                    <input ></input>
+                </div>
             </div>
             </SuperItem>
     },
