@@ -47,8 +47,15 @@ var exports = React.createClass({
         </ul>
       </div>);
     },
-    makeStudent: function(name, password) {
-        actionCreator.makeStudent(name, password);
+    makeStudent: function() {
+        actionCreator.makeStudent(this.state.username, this.state.password);
+        this.setState({username: "", password:""});
+    },
+    handleUsernameChange: function(event) {
+        this.setState({username: event.target.value});
+    },
+    handlePasswordChange: function(event) {
+        this.setState({password: event.target.value});
     },
     render: function () {
         return <SuperItem>
@@ -56,8 +63,39 @@ var exports = React.createClass({
                 {this.makeDropDown()}
                 <div>
                     <h2>Make Student</h2>
-                    <label>Name: </label>
-                    <input ></input>
+                    <form className="navbar-form navbar-left" role="search">
+                        <div className="row">
+                            <div className="col-lg-6">
+                                <div className="input-group">
+                                    <input type="text"
+                                           className="form-control"
+                                           placeholder="Username"
+                                           value={this.state.username}
+                                           onChange={this.handleUsernameChange}
+                                           aria-describedby="username">
+                                    </input>
+                                </div>
+                            </div>
+                            <div className="col-lg-6">
+                                <div className="input-group">
+                                    <input type="text"
+                                           className="form-control"
+                                           value={this.state.password}
+                                           onChange={this.handlePasswordChange}
+                                           placeholder="Password"
+                                           aria-describedby="password">
+                                    </input>
+                                    <button type="button"
+                                            onClick={this.makeStudent.bind(this)}
+                                            className="btn btn-default"
+                                            aria-label="Left Align">
+                                        <span className="glyphicon glyphicon-save" aria-hidden="true"></span>
+                                        Create
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
             </SuperItem>

@@ -51,7 +51,7 @@ var exports = {
             });
         });
     },
-    makeStudent: function (name) {
+    makeStudent: function (name, password) {
         ajax.put('/makestudent/' + name, {
             password: password
         }).then(function (data) {
