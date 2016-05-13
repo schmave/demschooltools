@@ -44,6 +44,11 @@
   (if-let [u (first (get-user-y { :username username} {:connection @pgdb}))]
     (assoc u :roles (read-string (:roles u)))))
 
+;;(get-users)
+(defn get-users []
+  (->> (jdbc/query @pgdb ["select * from users;"])
+      (map #(dissoc % :password))))
+
 ;;(set-user-schema "super" "TEST")
 ;;(get-user "super")
 (defn set-user-schema [username schema]

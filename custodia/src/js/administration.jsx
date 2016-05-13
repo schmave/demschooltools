@@ -13,6 +13,7 @@ var exports = React.createClass({
     },
     getInitialState: function () {
         return {schemas: userStore.getSchemas(),
+                users: userStore.getUsers(),
                 selectedSchema: userStore.getSuperSchema()};
     },
     componentDidMount: function () {
@@ -41,14 +42,13 @@ var exports = React.createClass({
             {this.state.selectedSchema}
                 <span className="caret"></span>
             </button>
-
             <ul className="dropdown-menu" aria-labelledby="dropdownMenu1">
             {this.makeItems()}
         </ul>
       </div>);
     },
-    makeStudent: function() {
-        actionCreator.makeStudent(this.state.username, this.state.password);
+    makeUser: function() {
+        actionCreator.makeUser(this.state.username, this.state.password);
         this.setState({username: "", password:""});
     },
     handleUsernameChange: function(event) {
@@ -57,12 +57,25 @@ var exports = React.createClass({
     handlePasswordChange: function(event) {
         this.setState({password: event.target.value});
     },
+    drawUsers: function() {
+        var users = this.state.users;
+        users = users.groupBy(u=>u.schema_name);
+        if (Object.keys(users).length !== 0) {
+          return Object.keys(users).map(function(k){
+              var userGroup = users[k];
+              return <div>
+                <h4>{ k }</h4>
+                { userGroup.map(function(user){ return <div>{ user.username }</div>;}) }
+              </div>
+          });
+        }
+    },
     render: function () {
         return <SuperItem>
             <div>Administration
                 {this.makeDropDown()}
                 <div>
-                    <h2>Make Student</h2>
+                    <h2>Make User</h2>
                     <form className="navbar-form navbar-left" role="search">
                         <div className="row">
                             <div className="col-lg-6">
@@ -86,7 +99,7 @@ var exports = React.createClass({
                                            aria-describedby="password">
                                     </input>
                                     <button type="button"
-                                            onClick={this.makeStudent.bind(this)}
+                                            onClick={this.makeUser.bind(this)}
                                             className="btn btn-default"
                                             aria-label="Left Align">
                                         <span className="glyphicon glyphicon-save" aria-hidden="true"></span>
@@ -94,6 +107,7 @@ var exports = React.createClass({
                                     </button>
                                 </div>
                             </div>
+                            {this.drawUsers()}
                         </div>
                     </form>
                 </div>
@@ -102,6 +116,7 @@ var exports = React.createClass({
     },
     _onChange: function () {
         this.setState({schemas: userStore.getSchemas(),
+                       users: userStore.getUsers(),
                        selectedSchema: userStore.getSuperSchema()});
     }
 });

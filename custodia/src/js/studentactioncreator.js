@@ -51,14 +51,15 @@ var exports = {
             });
         });
     },
-    makeStudent: function (name, password) {
-        ajax.put('/makestudent/' + name, {
+    makeUser: function (name, password) {
+        ajax.put('/user', {
+            name: name,
             password: password
         }).then(function (data) {
             this.loadStudents();
             dispatcher.dispatch({
                 type: constants.studentEvents.STUDENT_LOADED,
-                data: data.student
+                data: data
             });
         }.bind(this));
     },

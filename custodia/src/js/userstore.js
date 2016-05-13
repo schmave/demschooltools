@@ -5,6 +5,7 @@ var EventEmitter = require('events').EventEmitter,
 
 var isAdmin;
 var isSuper;
+var users =[];
 var schemas = [];
 var superSchema;
 var CHANGE_EVENT = "CHANGE!";
@@ -15,6 +16,9 @@ var exports = assign({}, EventEmitter.prototype, {
     },
     isSuper: function () {
         return isSuper;
+    },
+    getUsers: function () {
+        return users;
     },
     getSchemas: function () {
         return schemas;
@@ -56,6 +60,10 @@ ajax.get('/users/is-super').then(function (data) {
     isSuper = false;
     exports.emitChange();
 });
+ajax.get('/user').then(function (data) {
+    users = data.users;
+    exports.emitChange();
+}, function (data) {});
 
 ajax.get('/schemas').then(function (data) {
     schemas = data;
