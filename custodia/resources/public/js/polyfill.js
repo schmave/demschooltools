@@ -51,5 +51,5 @@
             add(acc, predicate(current), current);
             return acc;
         }, {});
-    }
+    };
 })();

@@ -60,7 +60,7 @@
                   {:username username
                    :password (creds/hash-bcrypt password)
                    :schema_name *school-schema*
-                   :roles (str roles)})))
+                   :roles  (str (conj roles roles/user))})))
 
 (defn init-users []
   (make-user "admin" (env :admin) #{roles/admin roles/user} "phillyfreeschool")
