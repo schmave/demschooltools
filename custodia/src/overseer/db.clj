@@ -54,13 +54,16 @@
 (defn set-user-schema [username schema]
   (jdbc/update! @pgdb :users {:schema_name schema} ["username=?" username]))
 
-(defn make-user [username password roles]
-  (if-not (get-user username)
-    (jdbc/insert! @pgdb "users"
-                  {:username username
-                   :password (creds/hash-bcrypt password)
-                   :schema_name *school-schema*
-                   :roles  (str (conj roles roles/user))})))
+(defn make-user
+  ([username password roles]
+   (make-user username password roles *school-schema*))
+  ([username password roles schema]
+   (if-not (get-user username)
+     (jdbc/insert! @pgdb "users"
+                   {:username username
+                    :password (creds/hash-bcrypt password)
+                    :schema_name schema
+                    :roles  (str (conj roles roles/user))}))))
 
 (defn init-users []
   (make-user "admin" (env :admin) #{roles/admin roles/user} "phillyfreeschool")
