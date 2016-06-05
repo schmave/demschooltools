@@ -1,0 +1,115 @@
+Kana Zamba
+Seyda Ivalice
+Elgun Lapaz
+Jagged Kestal
+Dak Thashin
+Arani Parsa
+Van Duine
+Bentha Olluan
+Savior Varn
+Eric Hansol
+Tam Walsh
+Amaza McGhee
+Andyr Min
+Daniel Akura
+Kara Haasa
+Obdulla Zittoun
+Conner Lyell
+Wolam Adrien
+Lyman Zaptros
+Octavia Athzaria
+Ahm Jervada
+Darius Dorien
+Elix Brodi
+Caileta Kasra
+Quin-Tain Thatch
+Catri Dettun
+Thion Wain
+Palaras Logoth
+Farguess Drayen
+Attila Krandor
+Sapphire Plmary
+Borz Jasha
+Mego  Fallon
+Tai-San Vrand
+Cale Senn
+Nema Ardross
+Niuk Vang
+Ian Keler
+Risshik Rey
+Artemis Jarrde
+Venussia Groeg
+Oona Gregory
+Montacca Acksedge
+Dev Pzallon
+Liunb Agneta
+Minn Cunha
+Wurth Lendix
+Elamas Damaris
+Janos Moryne
+Kerlos Valentine
+Crysenia Ukarme
+Taima Dinoa
+Tyrel McGhee
+Cryus Visputin
+Vatari Kelen
+Skobra Rabor
+Aquila Ryen
+Ventik Ashukahwa
+Proc Star
+Roy Jansen
+Astarii Roye
+Dorian Jastrinas
+Kyle Charliss
+Iocasta Axfow
+Aalto Dannuz
+Tenten Ennada
+Bendak Sarn
+Sach Rhane
+Padme Fuqua
+Michael Prost
+Jens Tade
+Jason Eberle
+Arish Talon
+Elias Rahn
+Oyuna Kurn
+Tak Kovani
+Strago Valen
+Zhane Natta
+Varon Dettun
+Kiratta Claermoore
+Crev Convarion
+Cyrinity Rogocki
+Keylara Daqemef
+Tonnil Corcer
+Rob Hwang
+Krava Kellar
+John Landala
+Vekis Triald
+Raddi Varsin
+Volo Novastar
+Rassth Diruno
+Ty Larbec
+Jaku Levedru
+Brodie Long
+Zoserab Payne
+Karei Dulius
+Tendra Benten
+Aaran Swift
+Drexia Cornag
+Adram Alavai
+INSERT INTO students (_id, name, inserted_date, olderdate, show_as_absent, archived, start_date) VALUES (10, 'Krava Kellar', '2015-02-28 18:03:08.957112', NULL, '2016-03-01', false, NULL);
+INSERT INTO students (_id, name, inserted_date, olderdate, show_as_absent, archived, start_date) VALUES (2, 'John Landala', '2015-02-28 17:59:07.69319', NULL, '2016-04-15', false, NULL);
+INSERT INTO students (_id, name, inserted_date, olderdate, show_as_absent, archived, start_date) VALUES (59, 'Vekis Triald', '2015-09-08 16:08:20.923961', NULL, '2016-04-15', false, NULL);
+INSERT INTO students (_id, name, inserted_date, olderdate, show_as_absent, archived, start_date) VALUES (8, 'Raddi Varsin', '2015-02-28 18:02:20.010071', '2015-02-28', '2016-04-15', false, NULL);
+INSERT INTO students (_id, name, inserted_date, olderdate, show_as_absent, archived, start_date) VALUES (4, 'Volo Novastar', '2015-02-28 18:00:03.61059', '2015-02-28', '2016-04-29', false, NULL);
+INSERT INTO students (_id, name, inserted_date, olderdate, show_as_absent, archived, start_date) VALUES (54, 'Rassth Diruno', '2015-03-02 13:56:04.98173', NULL, '2016-04-29', false, NULL);
+INSERT INTO students (_id, name, inserted_date, olderdate, show_as_absent, archived, start_date) VALUES (6, 'Ty Larbec', '2015-02-28 18:01:39.74869', '2015-09-10', '2016-04-29', false, NULL);
+INSERT INTO students (_id, name, inserted_date, olderdate, show_as_absent, archived, start_date) VALUES (48, 'Jaku Levedru', '2015-02-28 18:26:53.256968', NULL, '2016-02-04', false, NULL);
+INSERT INTO students (_id, name, inserted_date, olderdate, show_as_absent, archived, start_date) VALUES (22, 'Brodie Long', '2015-02-28 18:14:10.755825', '2015-02-28', '2016-04-29', false, NULL);
+INSERT INTO students (_id, name, inserted_date, olderdate, show_as_absent, archived, start_date) VALUES (12, 'Zoserab Payne', '2015-02-28 18:04:04.933979', NULL, '2016-04-21', false, NULL);
+INSERT INTO students (_id, name, inserted_date, olderdate, show_as_absent, archived, start_date) VALUES (49, 'Karei Dulius', '2015-03-02 13:39:23.636741', NULL, '2016-02-04', false, NULL);
+INSERT INTO students (_id, name, inserted_date, olderdate, show_as_absent, archived, start_date) VALUES (25, 'Tendra Benten', '2015-02-28 18:15:26.87682', NULL, '2016-03-22', false, NULL);
+INSERT INTO students (_id, name, inserted_date, olderdate, show_as_absent, archived, start_date) VALUES (58, 'Aaran Swift', '2015-06-01 14:24:56.983056', NULL, '2016-04-07', false, NULL);
+INSERT INTO students (_id, name, inserted_date, olderdate, show_as_absent, archived, start_date) VALUES (76, 'Drexia Cornag', '2016-02-10 13:59:52.232639', NULL, '2016-04-29', false, NULL);
+INSERT INTO students (_id, name, inserted_date, olderdate, show_as_absent, archived, start_date) VALUES (56, 'Adram Alavai', '2015-03-11 19:38:15.224542', NULL, '2016-04-07', false, NULL);
