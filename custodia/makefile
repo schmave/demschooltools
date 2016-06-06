@@ -6,6 +6,7 @@ T :
 	@echo deploy-philly
 	@echo unit-test
 	@echo "sql-philly - connect to philly postgres prod database"
+	@echo "setup-prod-demo-data - fill the demo database with safe data"
 	@echo webdriver-test
 	@echo drop-tables
 	@echo load-massive-dump
@@ -28,6 +29,9 @@ hello :
 
 deploy-test :
 	git push $(web-test-git) master
+
+setup-prod-demo-data :
+	heroku pg:psql --app shining-overseer < demo/demo-data.sql
 
 sql-philly :
 	heroku pg:psql --app shining-overseer

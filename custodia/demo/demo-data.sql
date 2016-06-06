@@ -1,3 +1,6 @@
+-- This will clear and insert a year's worth of santizied student
+-- data for the demo site, to run use ``make setup-prod-demo-data``
+
 --
 -- PostgreSQL database dump
 --
