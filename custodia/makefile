@@ -92,3 +92,6 @@ sjs :
 
 sjswatch :
 	nodejs /usr/local/bin/watchify -t babelify ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
+
+sjswatchprod :
+	nodejs /usr/local/bin/watchify -t babelify ./src/js/app.jsx -o ./resources/public/js/gen/app.js
