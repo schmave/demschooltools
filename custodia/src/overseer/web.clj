@@ -4,6 +4,7 @@
             [ring.middleware.keyword-params :refer [wrap-keyword-params]]
             [ring.middleware.session :refer [wrap-session]]
             [ring.middleware.reload :refer [wrap-reload]]
+            [ring.middleware.not-modified :refer [wrap-not-modified]]
             [compojure.handler :refer [site]]
             [compojure.route :as route]
             [compojure.core :as compojure]
@@ -28,7 +29,8 @@
             [cemerick.friend :as friend]
             (cemerick.friend [workflows :as workflows]
                              [credentials :as creds])
-            [environ.core :refer [env]])
+            [environ.core :refer [env]] 
+            )
   (:gen-class))
 
 
@@ -99,8 +101,11 @@
       wrap-reload
       (wrap-session {:store (jdbc-store @conn/pgdb)
                      :cookie-attrs {:max-age (* 3 365 24 3600)}})
+      wrap-not-modified
       wrap-keyword-params
-      wrap-json-body wrap-json-params wrap-json-response))
+      wrap-json-body
+      wrap-json-params
+      wrap-json-response))
 
 (defn -main [& [port]]
   (conn/init-pg)
