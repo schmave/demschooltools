@@ -61,6 +61,8 @@
   class-routes
   report-routes
 
+  (GET "/about" req
+    (io/resource "about.html"))
   (GET "/users/login" req
     (io/resource "login.html"))
   (GET "/users/logout" req
