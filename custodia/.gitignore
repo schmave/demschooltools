@@ -16,3 +16,4 @@ pom.xml
 .idea/
 /node_modules/
 /src/overseer/queries/demo.sql
+/src/js/.tern-port
