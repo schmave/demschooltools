@@ -38,25 +38,29 @@
       <div class="starter-template">
         <div class="form-group col-md-9" >
           <div class="panel panel-default">
-            <div class = "panel-heading">
-              <h1 class="panel-title">
-                Welcome to Custodia!
-              </h1>
-            </div>
             <div class="panel-body">
-              <h1>
-                We <span class="glyphicon glyphicon-heart"></span>
-                Democratic Free Schools
-              </h1>
-              Custodia is a fully-featured attendance tracking software
-              built specifically to meet the needs of a Democratic Free
-              School.
               <div class="col-md-6">
-                <h3>Students Sign Themselves In!</h3>
-                <img src="/images/front-page.png" class="img-thumbnail"/>
+                <h1>
+                  Free, Open-Source Attendance Tracking
+                </h1>
+                <p>Find us on <a href="https://github.com/steveshogren/overseer">github</a>!</p>
               </div>
               <div class="col-md-6">
-                <h3>Administrator's View</h3>
+                <h1>
+                  We <span class="glyphicon glyphicon-heart"></span>
+                  Democratic Free Schools
+                </h1>
+                <p>
+                  Custodia is built specifically to meet the needs of a Democratic
+                  Free School.
+                </p>
+              </div>
+              <div class="col-md-12">
+                <h1>Students Sign Themselves In!</h1>
+                <img src="/images/front-page.png" class="img-thumbnail"/>
+              </div>
+              <div class="col-md-12">
+                <h1>Administrator's View</h1>
                 <img src="/images/Report.png" class="img-thumbnail"/>
               </div>
             </div>
@@ -64,21 +68,27 @@
         </div>
         <div class="form-group col-md-3" >
           <div class="panel panel-default" >
-            <div class = "panel-heading">
-              Existing Users Login Here:
+            <div class="panel-heading">
+              Existing Users:
             </div>
             <div class="panel-body">
               <form method="POST" action="/users/login">
-                <label for="username" class="control-label">Username</label>
-                <div class="">
-                  <input class="form-control" id="username" name="username" type="text" />
+                <div class="form-group">
+                  <label for="username" class="control-label">Username</label>
+                  <div class="">
+                    <input class="form-control" id="username" name="username" type="text" />
+                  </div>
                 </div>
-                <label for="password" class=" control-label">Password</label>
-                <div class="">
-                  <input class="form-control" id="password" name="password" type="password" />
+                <div class="form-group">
+                  <label for="password" class=" control-label">Password</label>
+                  <div class="">
+                    <input class="form-control" id="password" name="password" type="password" />
+                  </div>
                 </div>
-                <div>
-                  <button type="submit" class="btn btn-primary">Login</button>
+                <div class="form-group">
+                  <div class="">
+                    <button type="submit" class="btn btn-primary">Login</button>
+                  </div>
                 </div>
               </form>
             </div>
