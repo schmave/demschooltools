@@ -105,6 +105,10 @@
                 :student_id id
                 :date (make-sqldate date-string)}))
 
+(trace/deftrace insert-email [email]
+  (db/persist! {:type :emails
+                :email email}))
+
 ;; (get-students )
 (defn get-students
   ([] (db/get-* "students"))

@@ -39,6 +39,10 @@
        (trace/trace f#)
        (f# ~args {:connection con#}))))
 
+;; (insert-email "test@test.com")
+(trace/deftrace insert-email [email]
+  (jdbc/insert! @pgdb :emails {:email email}))
+
 ;; (get-user "admin2")
 (defn get-user [username]
   (if-let [u (first (get-user-y { :username username} {:connection @pgdb}))]
@@ -76,6 +80,7 @@
 (defn drop-all-tables []
   (jdbc/execute! @pgdb [(str "DROP TABLE IF EXISTS schema_migrations;"
                              "DROP TABLE IF EXISTS users; "
+                             "DROP TABLE IF EXISTS emails; "
                              "DROP TABLE IF EXISTS session_store;"
                              "DROP SCHEMA IF EXISTS phillyfreeschool CASCADE;"
                              "DROP SCHEMA IF EXISTS demo CASCADE;")]))

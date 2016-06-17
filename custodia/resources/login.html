@@ -55,14 +55,34 @@
                   Free School.
                 </p>
               </div>
-              <div class="col-md-12">
-                <h1>Students Sign Themselves In!</h1>
+              <!--               <div class="col-md-12">
+                   <h1>Features</h1>
+                   <ul><li>Students Sign Themselves In!</li></ul>
+                   <ul><li>Easy To Read Reports!</li></ul>
+                   <ul><li>Tracks Hours, Not Days</li></ul>
+                   </div> -->
+              <div class="col-md-6">
+                <h3>Students Sign Themselves In!</h3>
                 <img src="/images/front-page.png" class="img-thumbnail"/>
               </div>
-              <div class="col-md-12">
-                <h1>Administrator's View</h1>
+              <div class="col-md-6">
+                <h3>Easy Reporting</h3>
                 <img src="/images/Report.png" class="img-thumbnail"/>
               </div>
+              <form method="POST" action="/email">
+                <h3>Email Me Info!</h3>
+                <div class="form-group">
+                  <label for="email" class="control-label">Email</label>
+                  <div class="">
+                    <input class="form-control" id="email" name="email" type="text" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="">
+                    <button type="submit" class="btn btn-primary">Login</button>
+                  </div>
+                </div>
+              </form>
             </div>
           </div>
         </div>

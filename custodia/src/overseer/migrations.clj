@@ -1,6 +1,7 @@
 (ns overseer.migrations
   (:require [environ.core :refer [env]]
             [migratus.core :as migratus]
+            [overseer.database.connection :refer [pgdb init-pg]]
             [clojure.java.io :as io]))
 
 (defn replace-philly [from with]
@@ -13,6 +14,11 @@
       (.write wrtr data))))
 
 (def initialize-shared-tables "
+  CREATE TABLE emails(
+    user_id BIGSERIAL PRIMARY KEY,
+    email VARCHAR(255),
+    inserted_date TIMESTAMP DEFAULT NOW()
+  );
   CREATE TABLE users(
     user_id BIGSERIAL PRIMARY KEY,
     username VARCHAR(255),
@@ -87,12 +93,12 @@
     name varchar(255)
   );
 
-CREATE OR REPLACE FUNCTION phillyfreeschool.school_days(year_name TEXT, class_id BIGINT)
+  CREATE OR REPLACE FUNCTION phillyfreeschool.school_days(year_name TEXT, class_id BIGINT)
   RETURNS TABLE (days date, student_id BIGINT, archived boolean, olderdate date) AS
-$func$
+  $func$
 
-SELECT a.days, s._id student_id, s.archived, s.olderdate
-FROM (SELECT DISTINCT days2.days
+  SELECT a.days, s._id student_id, s.archived, s.olderdate
+  FROM (SELECT DISTINCT days2.days
     FROM (SELECT
             (CASE WHEN date(s.in_time AT TIME ZONE 'America/New_York')  IS NULL
             THEN date(s.out_time AT TIME ZONE 'America/New_York')
@@ -106,17 +112,16 @@ FROM (SELECT DISTINCT days2.days
                                          AND s.student_id = cXs.student_id)
          WHERE y.name = $1) days2
          ORDER BY days2.days) AS a
-JOIN phillyfreeschool.classes_X_students cXs ON (1=1)
-JOIN phillyfreeschool.students s ON (s._id = cXs.student_id)
-WHERE cXs.class_id = $2
-AND (s.start_date < a.days OR s.start_date is null);
-$func$
-LANGUAGE sql;
+  JOIN phillyfreeschool.classes_X_students cXs ON (1=1)
+  JOIN phillyfreeschool.students s ON (s._id = cXs.student_id)
+  WHERE cXs.class_id = $2
+  AND (s.start_date < a.days OR s.start_date is null);
+  $func$
+  LANGUAGE sql;
   ")
 
 (defn migrate-db [con]
   (migratus/migrate {:store :database
                      :db con}))
 
-;; (migratus/create mconfig "student start date")
-
+;;(migratus/create {:store :database :db @pgdb} "add emails")

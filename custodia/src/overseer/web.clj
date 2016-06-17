@@ -61,6 +61,10 @@
   class-routes
   report-routes
 
+  (POST "/email" [email]
+    (db/insert-email email)
+    (io/resource "login.html"))
+
   (GET "/about" req
     (io/resource "about.html"))
   (GET "/users/login" req
