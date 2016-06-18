@@ -63,7 +63,7 @@
 
   (POST "/email" [email]
     (db/insert-email email)
-    (io/resource "login.html"))
+    (resp/redirect "/users/login"))
 
   (GET "/about" req
     (io/resource "about.html"))
