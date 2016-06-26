@@ -409,12 +409,30 @@
     (testing "Can get last swipe type"
       (is (not= nil res)))))
 
+(deftest student-list-in-out-in
+  (do (sample-db)
+      (let [s (data/make-student "test")
+            sid (:_id s)
+            now (today-at-utc 20 0)]
+        (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
+        (data/swipe-in sid (t/minus now (t/days 1)))
+        (data/swipe-out sid (t/minus now (t/days 1)))
+        (data/swipe-in sid (t/minus now (t/days 1)))
+
+        (let [att  (att/get-student-list)
+              our-hero (filter #(= sid (:_id %)) att)]
+          (testing "Student Count"
+            (is (= (->> our-hero count) 1))
+            (is (= (->> our-hero first :last_swipe_type) "in"))
+            (is (= (->> our-hero first :in_today) true))
+            )))))
+
+
 (deftest student-list-when-last-swipe-sanitized2
   (do (sample-db)
       (let [s (data/make-student "test")
             sid (:_id s)
             now (today-at-utc 15 0)]
-
         (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
         ;; has an in, then missed two days, next in should
         ;; show a last swipe type
