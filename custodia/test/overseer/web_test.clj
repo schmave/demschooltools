@@ -419,7 +419,7 @@
         (data/swipe-out sid (t/minus now (t/days 1)))
         (data/swipe-in sid (t/minus now (t/days 1)))
 
-        (let [att  (att/get-student-list)
+        (let [att (att/get-student-list)
               our-hero (filter #(= sid (:_id %)) att)]
           (testing "Student Count"
             (is (= (->> our-hero count) 1))
