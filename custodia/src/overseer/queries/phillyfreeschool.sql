@@ -35,6 +35,8 @@ SELECT
   , to_char(s.out_time at time zone 'America/New_York', 'HH:MI:SS') as nice_out_time
   , s.out_time
   , s.in_time
+  , s.rounded_out_time
+  , s.rounded_in_time
   , extract(EPOCH FROM (s.out_time - s.in_time)::INTERVAL)/60 as intervalmin
   , o._id has_override
   , e._id has_excuse
