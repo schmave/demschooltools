@@ -415,9 +415,9 @@
             sid (:_id s)
             now (today-at-utc 20 0)]
         (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
-        (data/swipe-in sid (t/minus now (t/days 1)))
-        (data/swipe-out sid (t/minus now (t/days 1)))
-        (data/swipe-in sid (t/minus now (t/days 1)))
+        (data/swipe-in sid (t/plus now (t/seconds 1)))
+        (data/swipe-out sid (t/plus now (t/seconds 2)))
+        (data/swipe-in sid (t/plus now (t/seconds 3)))
 
         (let [att (att/get-student-list)
               our-hero (filter #(= sid (:_id %)) att)]
