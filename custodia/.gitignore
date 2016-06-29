@@ -17,3 +17,4 @@ pom.xml
 /node_modules/
 /src/overseer/queries/demo.sql
 /src/js/.tern-port
+/src/overseer/queries/generated-demo.sql

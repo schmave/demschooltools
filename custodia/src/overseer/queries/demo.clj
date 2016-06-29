@@ -5,4 +5,4 @@
 
 (def a (m/make-queries "demo"))
 
-(defqueries "overseer/queries/demo.sql" )
+(defqueries "overseer/queries/generated-demo.sql" )

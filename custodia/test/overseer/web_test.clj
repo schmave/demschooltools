@@ -412,11 +412,11 @@
   (do (sample-db)
       (let [s (data/make-student "test")
             sid (:_id s)
-            now (today-at-utc 20 0)]
+            _8pm (today-at-utc 20 0)]
         (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
-        (data/swipe-in sid (t/plus now (t/seconds 1)))
-        (data/swipe-out sid (t/plus now (t/seconds 2)))
-        (data/swipe-in sid (t/plus now (t/seconds 3)))
+        (data/swipe-in sid (t/plus _8pm (t/seconds 1)))
+        (data/swipe-out sid (t/plus _8pm (t/seconds 2)))
+        (data/swipe-in sid (t/plus _8pm (t/seconds 3)))
 
         (let [att (att/get-student-list)
               our-hero (filter #(= sid (:_id %)) att)]
@@ -431,13 +431,13 @@
   (do (sample-db)
       (let [s (data/make-student "test")
             sid (:_id s)
-            now (today-at-utc 15 0)]
+            _3pm (today-at-utc 15 0)]
         (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
         ;; has an in, then missed two days, next in should
         ;; show a last swipe type
-        (data/swipe-in 1 (t/minus now (t/days 2)))
-        (data/swipe-in 1 (t/minus now (t/days 1)))
-        (data/swipe-in sid (t/minus now (t/days 3)))
+        (data/swipe-in 1 (t/minus _3pm (t/days 2)))
+        (data/swipe-in 1 (t/minus _3pm (t/days 1)))
+        (data/swipe-in sid (t/minus _3pm (t/days 3)))
         (let [att (first (att/get-student-with-att sid))]
           (testing "Student Att Count"
             (is (= (->> att :last_swipe_type) "in"))
@@ -456,9 +456,9 @@
   (do (sample-db)
       (let [s (data/make-student "test")
             sid (:_id s)
-            now (today-at-utc 15 0)]
-        (data/swipe-in sid (t/plus now (t/hours 1)))
-        (data/swipe-out sid now)
+            _3pm (today-at-utc 15 0)]
+        (data/swipe-in sid (t/plus _3pm (t/hours 1)))
+        (data/swipe-out sid _3pm)
         (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
         (let [att  (att/get-student-list)
               our-hero (filter #(= sid (:_id %)) att)]

@@ -10,7 +10,7 @@
 (defn make-queries [name]
   (let [data (slurp "src/overseer/queries/phillyfreeschool.sql")
         data (replace-philly data name)]
-    (with-open [wrtr (io/writer (str "src/overseer/queries/" name ".sql"))]
+    (with-open [wrtr (io/writer (str "src/overseer/queries/generated-" name ".sql"))]
       (.write wrtr data))))
 
 (defn migrate-db [con]
