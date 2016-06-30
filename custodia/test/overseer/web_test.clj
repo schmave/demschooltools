@@ -143,8 +143,8 @@
               _10-14 (-> att :days first)
               first-swipe (-> _10-14 :swipes first)]
           (testing "swipe info"
-            (is (= "04:00:00" (:nice_out_time first-swipe)))
-            (is (= "04:00:00" (:nice_in_time first-swipe))))
+            (is (= "08:06:00" (:nice_out_time first-swipe)))
+            (is (= "08:01:00" (:nice_in_time first-swipe))))
           (testing "att stuff"
             (is (= (:total_mins _10-14) 0.0))
             (is (= (:total_days att) 0))
@@ -201,12 +201,12 @@
                    "03:30:00")))
           (testing "10/15 has in rounding"
             (is (= (-> _10-15 :swipes first :nice_in_time)
-                   "09:00:00")))
+                   "08:39:27")))
           (testing "10/15 minutes" (is (= (-> _10-15 :total_mins) 390.0)))
           (testing "10/15 valid" (is (= (-> _10-15 :valid) true)))
           (testing "10/14 has out rounding"
             (is (= (-> _10-14 :swipes first :nice_out_time)
-                   "04:00:00")))
+                   "05:00:00")))
           (testing "10/14 has no in rounding"
             (is (= (-> _10-14 :swipes first :nice_in_time)
                    "12:00:00")))
@@ -457,7 +457,7 @@
       (let [s (data/make-student "test")
             sid (:_id s)
             _3pm (today-at-utc 15 0)]
-        (data/swipe-in sid (t/plus _3pm (t/hours 1)))
+        (data/swipe-in sid (t/minus _3pm (t/hours 1)))
         (data/swipe-out sid _3pm)
         (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
         (let [att  (att/get-student-list)

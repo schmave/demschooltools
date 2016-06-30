@@ -21,7 +21,7 @@
 (defn get-excuses [id]
   (db/get-* "excuses" id "student_id"))
 
-(trace/deftrace lookup-last-swipe-for-day [id day]
+(defn lookup-last-swipe-for-day [id day]
   (let [last (db/lookup-last-swipe id)]
     (when (= day (make-date-string (:in_time last)))
       last)))
@@ -44,7 +44,7 @@
 (defn- make-sqldate [t]
   (->> t str (f/parse) c/to-sql-date))
 
-(trace/deftrace swipe-in
+(defn swipe-in
   ([id] (swipe-in id (t/now)))
   ([id in-time]
    (let [in-timestamp (make-timestamp in-time)
@@ -68,11 +68,11 @@
       swipe)))
 
 ;; (sample-db)
-(trace/deftrace swipe-out
+(defn swipe-out
   ([id] (swipe-out id (t/now)))
   ([id out-time]
    (let [rounded-out-time (round-swipe-time out-time)
-         last-swipe (lookup-last-swipe-for-day id (make-date-string rounded-out-time))
+         last-swipe (trace/trace "Last Swipe" (lookup-last-swipe-for-day id (make-date-string rounded-out-time)))
          only-swiped-in? (only-swiped-in? last-swipe)
          in-swipe (if only-swiped-in?
                     last-swipe
@@ -80,7 +80,7 @@
          out-swipe (assoc in-swipe
                           :out_time (make-timestamp out-time)
                           :rounded_out_time (make-timestamp rounded-out-time))
-         out-swipe (sanitize-out out-swipe)]
+         out-swipe (trace/trace "Creating swipe" (sanitize-out out-swipe))]
      (if only-swiped-in?
        (db/update! :swipes (:_id out-swipe) out-swipe)
        (db/persist! out-swipe))
@@ -93,24 +93,24 @@
   ([names]
    (db/get-* "years" names "name")))
 
-(trace/deftrace delete-year [year]
+(defn delete-year [year]
   (when-let [year (first (get-years year))]
     (db/delete! year)))
 
-(trace/deftrace edit-student [_id name start-date]
+(defn edit-student [_id name start-date]
   (db/update! :students _id {:name name :start_date (make-sqldate start-date)}))
 
-(trace/deftrace excuse-date [id date-string]
+(defn excuse-date [id date-string]
   (db/persist! {:type :excuses
                 :student_id id
                 :date (make-sqldate date-string)}))
 
-(trace/deftrace override-date [id date-string]
+(defn override-date [id date-string]
   (db/persist! {:type :overrides
                 :student_id id
                 :date (make-sqldate date-string)}))
 
-(trace/deftrace insert-email [email]
+(defn insert-email [email]
   (db/persist! {:type :emails
                 :email email}))
 
@@ -132,14 +132,14 @@
 (defn class-not-yet-created [name]
   (thing-not-yet-created name db/get-classes))
 
-(trace/deftrace make-class [name]
+(defn make-class [name]
   (when (class-not-yet-created name)
     (db/persist! {:type :classes :name name :active false})))
 
-(trace/deftrace add-student-to-class [student-id class-id]
+(defn add-student-to-class [student-id class-id]
   (db/persist! {:type :classes_X_students :student_id student-id :class_id class-id}))
 
-(trace/deftrace make-student
+(defn make-student
   ([name] (make-student name nil))
   ([name start-date]
    (when (student-not-yet-created name)
@@ -148,31 +148,31 @@
                    :start_date start-date
                    :olderdate nil :show_as_absent nil}))))
 
-(trace/deftrace make-student-starting-today [name]
+(defn make-student-starting-today [name]
   (make-student name (make-sqldate (today-string))))
 
 (defn- toggle-date [older]
   (if older nil (make-sqldate (str (t/now)))))
 
-(trace/deftrace toggle-student-older [_id]
+(defn toggle-student-older [_id]
   (let [student (first (get-students _id))
         student (assoc student :olderdate (toggle-date (:olderdate student)))]
     (db/update! :students _id {:olderdate (:olderdate student)})
     student))
 
-(trace/deftrace set-student-start-date [_id date]
+(defn set-student-start-date [_id date]
   (let [student (first (get-students _id))
         student (assoc student :start_date (make-sqldate date))]
     (db/update! :students _id {:start_date (:start_date student)})
     student))
 
-(trace/deftrace toggle-student-absent [_id]
+(defn toggle-student-absent [_id]
   (let [student (first (get-students _id))
         student (assoc student :show_as_absent (make-sqldate (str (t/now))))]
     (db/update! :students _id {:show_as_absent (:show_as_absent student)})
     student))
 
-(trace/deftrace make-year [from to] 
+(defn make-year [from to] 
   (let [from (f/parse from)
         to (f/parse to)
         name (str (f/unparse date-format from) " "  (f/unparse date-format to))]

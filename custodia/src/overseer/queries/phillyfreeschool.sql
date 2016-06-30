@@ -51,9 +51,9 @@ SELECT
   FROM phillyfreeschool.school_days(:year_name, :class_id) AS schooldays
   LEFT JOIN phillyfreeschool.swipes s
       ON (
-       ((schooldays.days = date(s.rounded_in_time AT TIME ZONE 'America/New_York'))
+       ((schooldays.days = date(s.in_time AT TIME ZONE 'America/New_York'))
        OR
-        (schooldays.days = date(s.rounded_out_time AT TIME ZONE 'America/New_York')))
+        (schooldays.days = date(s.out_time AT TIME ZONE 'America/New_York')))
         AND schooldays.student_id = s.student_id)
         LEFT JOIN phillyfreeschool.overrides o
       ON (schooldays.days = o.date AND o.student_id = schooldays.student_id)
@@ -75,8 +75,8 @@ select stu.name
          ELSE l.ins
          END AS last_swipe_date
          FROM phillyfreeschool.students stu
-LEFT JOIN (SELECT max(s.rounded_in_time) AS ins
-                , max(s.rounded_out_time) AS outs
+LEFT JOIN (SELECT max(s.in_time) AS ins
+                , max(s.out_time) AS outs
                 , s.student_id
                 FROM phillyfreeschool.swipes s
            GROUP BY s.student_id
@@ -92,12 +92,12 @@ AND c.active = TRUE
 -- name: get-school-days-y
 SELECT DISTINCT days2.days
 FROM (SELECT
-             to_char(s.rounded_in_time at time zone 'America/New_York', 'YYYY-MM-DD') as days
-             , s.rounded_in_time
+             to_char(s.in_time at time zone 'America/New_York', 'YYYY-MM-DD') as days
+             , s.in_time
              FROM phillyfreeschool.swipes s
              INNER JOIN phillyfreeschool.years y
-             ON ((s.rounded_out_time BETWEEN y.from_date AND y.to_date)
-                 OR (s.rounded_in_time BETWEEN y.from_date AND y.to_date))
+             ON ((s.out_time BETWEEN y.from_date AND y.to_date)
+                 OR (s.in_time BETWEEN y.from_date AND y.to_date))
       WHERE y.name = :year_name) days2
 ORDER BY days2.days;
 
@@ -137,7 +137,7 @@ FROM (
 
 FROM phillyfreeschool.school_days(:year_name, :class_id) as schooldays
 LEFT JOIN phillyfreeschool.swipes s
-                ON (schooldays.days = date(s.rounded_in_time AT TIME ZONE 'America/New_York')
+                ON (schooldays.days = date(s.in_time AT TIME ZONE 'America/New_York')
                     AND schooldays.student_id = s.student_id)
                     LEFT JOIN phillyfreeschool.overrides o
            ON (schooldays.days = o.date AND o.student_id = schooldays.student_id)
@@ -156,8 +156,8 @@ SELECT s.*
        , to_char(s.out_time at time zone 'America/New_York', 'HH:MI:SS') as nice_out_time
        FROM phillyfreeschool.swipes s
        INNER JOIN phillyfreeschool.years y
-      ON ((s.rounded_out_time BETWEEN y.from_date AND y.to_date)
-          OR (s.rounded_in_time BETWEEN y.from_date AND y.to_date))
+      ON ((s.out_time BETWEEN y.from_date AND y.to_date)
+          OR (s.in_time BETWEEN y.from_date AND y.to_date))
 WHERE y.name= :year_name
   AND s.student_id = :student_id;
 
@@ -191,13 +191,13 @@ ORDER BY c.name;
 SELECT a.days, s._id student_id, s.archived, s.olderdate
 FROM (SELECT DISTINCT days2.days
     FROM (SELECT
-            (CASE WHEN date(s.rounded_in_time AT TIME ZONE 'America/New_York')  IS NULL
+            (CASE WHEN date(s.in_time AT TIME ZONE 'America/New_York')  IS NULL
             THEN date(s.out_time AT TIME ZONE 'America/New_York')
             ELSE date(s.in_time AT TIME ZONE 'America/New_York') END) AS days
             FROM phillyfreeschool.swipes s
             INNER JOIN phillyfreeschool.years y
-            ON ((s.rounded_out_time BETWEEN y.from_date AND y.to_date)
-            OR (s.rounded_in_time BETWEEN y.from_date AND y.to_date))
+            ON ((s.out_time BETWEEN y.from_date AND y.to_date)
+            OR (s.in_time BETWEEN y.from_date AND y.to_date))
             JOIN phillyfreeschool.classes_X_students cXs ON (cXs.class_id = y.class_id
                                          AND s.student_id = cXs.student_id)
          WHERE y.name = :year_name) days2
