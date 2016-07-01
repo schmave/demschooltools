@@ -39,7 +39,6 @@
 (s/defn make-timestamp :- java.sql.Timestamp
   [t :- DateTime] (c/to-timestamp t))
 
-
 ;; (make-sqldate "2015-03-30")
 (defn- make-sqldate [t]
   (->> t str (f/parse) c/to-sql-date))
@@ -58,13 +57,13 @@
   (let [in (:in_time swipe)
         in (when in (c/from-sql-time in))
         out (:out_time swipe)
-        out (when out (c/from-sql-time out))
-        ]
-    (if (and in out)
-      (if (or (not (t/before? in out))
-              (not (= (t/day in) (t/day out))))
-        (assoc swipe :out_time (:in_time swipe))
-        swipe)
+        out (when out (c/from-sql-time out))]
+    (if (and (and in out)
+             (or (not (t/before? in out))
+                 (not (= (t/day in) (t/day out)))))
+      (assoc swipe
+             :out_time (:in_time swipe)
+             :rounded_out_time (:rounded_in_time swipe))
       swipe)))
 
 ;; (sample-db)
@@ -80,7 +79,9 @@
          out-swipe (assoc in-swipe
                           :out_time (make-timestamp out-time)
                           :rounded_out_time (make-timestamp rounded-out-time))
-         out-swipe (trace/trace "Creating swipe" (sanitize-out out-swipe))]
+         out-swipe (sanitize-out out-swipe)
+         interval (t/in-minutes (t/interval out-time (c/from-sql-time (:in_time in-swipe))))
+         out-swipe (assoc out-swipe :interval_min interval)]
      (if only-swiped-in?
        (db/update! :swipes (:_id out-swipe) out-swipe)
        (db/persist! out-swipe))

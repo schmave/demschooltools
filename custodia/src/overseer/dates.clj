@@ -28,6 +28,12 @@
     (f/parse (f/formatters :date-time) d)
     d))
 
+(defn calculate-interval [swipe]
+  (let [out-time (-> swipe :out_time c/from-sql-time)
+        in-time (-> swipe :in_time c/from-sql-time)
+        interval (t/in-minutes (t/interval out-time in-time))]
+    (assoc swipe :interval_min )))
+
 (defn make-date-string-without-timezone [d]
   (when d
     (if (instance? org.joda.time.DateTime d)

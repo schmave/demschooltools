@@ -37,7 +37,7 @@ SELECT
   , s.in_time
   , s.rounded_out_time
   , s.rounded_in_time
-  , extract(EPOCH FROM (s.rounded_out_time - s.rounded_in_time)::INTERVAL)/60 as intervalmin
+  , s.intervalmin
   , o._id has_override
   , e._id has_excuse
   , schooldays.olderdate
@@ -132,7 +132,7 @@ FROM (
         , (CASE WHEN schooldays.olderdate IS NULL
                      OR schooldays.olderdate > schooldays.days
                      THEN 300 ELSE 330 END) as requiredmin
-        , sum(extract(EPOCH FROM (s.rounded_out_time - s.rounded_in_time)::INTERVAL)/60) AS intervalmin
+        , s.intervalmin
          , schooldays.days AS day
 
 FROM phillyfreeschool.school_days(:year_name, :class_id) as schooldays
@@ -151,7 +151,7 @@ GROUP BY stu.student_id;
 -- name: swipes-in-year-y
 SELECT s.*
        ,'swipes' AS type
-       , extract(EPOCH FROM (s.rounded_out_time - s.rounded_in_time)::INTERVAL)/60 as interval
+       , s.intervalmin as interval
        , to_char(s.in_time at time zone 'America/New_York', 'HH:MI:SS') as nice_in_time
        , to_char(s.out_time at time zone 'America/New_York', 'HH:MI:SS') as nice_out_time
        FROM phillyfreeschool.swipes s

@@ -60,10 +60,14 @@
     (testing "sanitize swipe out with newer out time forces same out as in"
       (let [passed (assoc (data/make-swipe 1)
                           :in_time (c/to-sql-time _10-14_9-14am)
-                          :out_time (c/to-sql-time (t/minus _10-14_9-14am (t/minutes 5))))
+                          :out_time (c/to-sql-time (t/minus _10-14_9-14am (t/minutes 5)))
+                          :rounded_in_time (c/to-sql-time _10-14_9-14am)
+                          :rounded_out_time (c/to-sql-time (t/minus _10-14_9-14am (t/minutes 5))))
             result (data/sanitize-out passed)]
         (is (= (:in_time passed) (:in_time result)))
         (is (= (:in_time passed) (:out_time result)))
+        (is (= (:rounded_in_time passed) (:rounded_out_time result)))
+        (is (= (:rounded_in_time passed) (:rounded_in_time result)))
         ))
     (testing "sanitize swipe out with out in wrong day forces out to be same day"
       (let [passed (assoc (data/make-swipe 1)
@@ -215,6 +219,22 @@
           (testing "One short" (is (= (:total_short att) 1)))
           (testing "One attendance" (is (= (:total_days att) 1)))
           ))))
+
+(deftest calculates-interval-test
+  (do (sample-db)
+      (let [s (data/make-student "test")
+            sid (:_id s)
+            _900am (today-at-utc 9 0)
+            _902am (today-at-utc 9 2)
+            ]
+
+        (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
+        (data/swipe-in sid _900am)
+        (data/swipe-out sid _902am)
+        (let [att (get-att sid)]
+          (trace/trace att)
+          (testing "Interval Time"
+            (is (= (-> att :days first :total_mins) 2.0)))))))
 
 (deftest single-swipe-short-test
   (do (sample-db)

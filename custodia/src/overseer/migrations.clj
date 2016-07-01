@@ -17,4 +17,4 @@
   (migratus/migrate {:store :database
                      :db con}))
 
-;;(migratus/create {:store :database :db @pgdb} "add emails")
+;; (migratus/create {:store :database :db @pgdb} "calculated interval")

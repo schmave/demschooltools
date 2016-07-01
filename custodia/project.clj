@@ -31,7 +31,7 @@
                  ]
   :min-lein-version "2.0.0"
   :plugins [[cider/cider-nrepl "0.10.0-SNAPSHOT"]
-            [refactor-nrepl "1.2.0-SNAPSHOT"]
+            [refactor-nrepl "2.0.0-SNAPSHOT"]
             [lein-ring "0.9.7"]
             [migratus-lein "0.2.6"]
             [environ/environ.lein "0.2.1"]]

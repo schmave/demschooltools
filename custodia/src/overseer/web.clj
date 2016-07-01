@@ -10,11 +10,11 @@
             [compojure.core :as compojure]
             [compojure.coercions :refer [as-int]]
             [clojure.java.io :as io]
-            [clojure.tools.nrepl.server :as nrepl-server]
+            ;;[clojure.tools.nrepl.server :as nrepl-server]
             [refactor-nrepl.middleware :as refactor]
             [jdbc-ring-session.core :refer [jdbc-store]]
-            [cider.nrepl :refer (cider-nrepl-handler)]
-            [cider.nrepl :as nrepl]
+            ;;[cider.nrepl :refer (cider-nrepl-handler)]
+            ;;[cider.nrepl :as nrepl]
             [ring.adapter.jetty :as jetty]
             [ring.util.response :as resp]
             [clojure.tools.trace :as trace]
@@ -113,14 +113,16 @@
       wrap-json-params
       wrap-json-response))
 
-(defn -main [& [port]]
+;;(start-site 5000)
+(defn start-site [port]
   (conn/init-pg)
   (db/init-users)
   (when-let [dev (env :dev)]
     (clojure.java.shell/sh "notify-send" "Server started")
-    (nrepl-server/start-server :port 7888 :handler
-                               (apply clojure.tools.nrepl.server/default-handler
-                                      (concat (map resolve cider.nrepl/cider-middleware)
-                                              [refactor/wrap-refactor]))))
+    ;;(nrepl-server/start-server :port 7888 :handler (apply clojure.tools.nrepl.server/default-handler (concat (map resolve cider.nrepl/cider-middleware) [refactor/wrap-refactor])))
+    )
   (let [port (Integer. (or port (env :port) 5000))]
     (jetty/run-jetty (site (tapp)) {:port port :join? false})))
+
+(defn -main [& [port]]
+  (start-site port))
