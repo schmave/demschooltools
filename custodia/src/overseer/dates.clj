@@ -31,8 +31,8 @@
 (defn calculate-interval [swipe]
   (let [out-time (-> swipe :out_time c/from-sql-time)
         in-time (-> swipe :in_time c/from-sql-time)
-        interval (t/in-minutes (t/interval out-time in-time))]
-    (assoc swipe :interval_min )))
+        interval (t/in-minutes (t/interval in-time out-time))]
+    interval))
 
 (defn make-date-string-without-timezone [d]
   (when d

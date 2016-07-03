@@ -80,8 +80,8 @@
                           :out_time (make-timestamp out-time)
                           :rounded_out_time (make-timestamp rounded-out-time))
          out-swipe (sanitize-out out-swipe)
-         interval (t/in-minutes (t/interval out-time (c/from-sql-time (:in_time in-swipe))))
-         out-swipe (assoc out-swipe :interval_min interval)]
+         interval (calculate-interval out-swipe)
+         out-swipe (assoc out-swipe :intervalmin interval)]
      (if only-swiped-in?
        (db/update! :swipes (:_id out-swipe) out-swipe)
        (db/persist! out-swipe))
