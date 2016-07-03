@@ -234,7 +234,7 @@
         (let [att (get-att sid)]
           (trace/trace att)
           (testing "Interval Time"
-            (is (= (-> att :days first :total_mins) 2.0)))))))
+            (is (= (-> att :days first :total_mins) 2M)))))))
 
 (deftest single-swipe-short-test
   (do (sample-db)
@@ -445,7 +445,6 @@
             (is (= (->> our-hero first :last_swipe_type) "in"))
             (is (= (->> our-hero first :in_today) true))
             )))))
-
 
 (deftest student-list-when-last-swipe-sanitized2
   (do (sample-db)

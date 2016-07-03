@@ -169,10 +169,10 @@
         in_today (and (= today-string
                          (-> summed-days first :day))
                       (-> summed-days first :swipes only-swipes count (> 0)))
-        [last-swipe-type last-swipe-date] (get-last-swipe-type summed-days)]
+        [last-swipe-type last-swipe-date] (get-last-swipe-type summed-days)
+        total_minutes (->> summed-days (map :total_mins) (reduce +))]
     (merge student {:total_days (count (filter :valid summed-days))
-                    :total_hours (with-precision 5 (/ (reduce + (map :total_mins summed-days))
-                                                       60))
+                    :total_hours (with-precision 5 (/ total_minutes 60))
                     :total_abs (count (filter #(and (-> % :valid not)
                                                     (-> % :excused not)
                                                     (-> % :short not))
