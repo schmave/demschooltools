@@ -18,3 +18,4 @@ pom.xml
 /src/overseer/queries/demo.sql
 /src/js/.tern-port
 /src/overseer/queries/generated-demo.sql
+/src/overseer/queries/test.sql
