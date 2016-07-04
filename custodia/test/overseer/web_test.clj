@@ -150,7 +150,7 @@
             (is (= "08:06:00" (:nice_out_time first-swipe)))
             (is (= "08:01:00" (:nice_in_time first-swipe))))
           (testing "att stuff"
-            (is (= (:total_mins _10-14) 0.0))
+            (is (= (:total_mins _10-14) 0M))
             (is (= (:total_days att) 0))
             (is (= true (:in_today att))))
           ))))
@@ -173,7 +173,7 @@
                    1)))
           (testing "Total Minute Count"
             (is (= (-> att :days first :total_mins)
-                   399.4541)))
+                   399M)))
 
           ))))
 
@@ -206,7 +206,7 @@
           (testing "10/15 has in rounding"
             (is (= (-> _10-15 :swipes first :nice_in_time)
                    "08:39:27")))
-          (testing "10/15 minutes" (is (= (-> _10-15 :total_mins) 390.0)))
+          (testing "10/15 minutes" (is (= (-> _10-15 :total_mins) 390M)))
           (testing "10/15 valid" (is (= (-> _10-15 :valid) true)))
           (testing "10/14 has out rounding"
             (is (= (-> _10-14 :swipes first :nice_out_time)
@@ -214,7 +214,7 @@
           (testing "10/14 has no in rounding"
             (is (= (-> _10-14 :swipes first :nice_in_time)
                    "12:00:00")))
-          (testing "10/14 minutes" (is (= (-> _10-14 :total_mins) 240.0)))
+          (testing "10/14 minutes" (is (= (-> _10-14 :total_mins) 240M)))
           (testing "10/14 not valid" (is (= (-> _10-14 :valid) false)))
           (testing "One short" (is (= (:total_short att) 1)))
           (testing "One attendance" (is (= (:total_days att) 1)))
@@ -326,7 +326,7 @@
                    1)))
           (testing "Total Hours"
             (is (= (:total_hours att)
-                   26.527295000000002)))
+                   26.5M)))
           (testing "Days sorted correctly"
             (is (= (-> att :days first :day)
                    "2014-10-20")))

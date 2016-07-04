@@ -29,8 +29,8 @@
     d))
 
 (defn calculate-interval [swipe]
-  (let [out-time (-> swipe :out_time c/from-sql-time)
-        in-time (-> swipe :in_time c/from-sql-time)
+  (let [out-time (-> swipe :rounded_out_time c/from-sql-time)
+        in-time (-> swipe :rounded_in_time c/from-sql-time)
         interval (t/in-minutes (t/interval in-time out-time))]
     interval))
 
