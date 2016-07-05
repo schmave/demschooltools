@@ -30,9 +30,10 @@
 
 (defn calculate-interval [swipe]
   (let [out-time (-> swipe :rounded_out_time c/from-sql-time)
-        in-time (-> swipe :rounded_in_time c/from-sql-time)
-        interval (t/in-minutes (t/interval in-time out-time))]
-    interval))
+        in-time (-> swipe :rounded_in_time c/from-sql-time)]
+    (if (and out-time in-time)
+      (t/in-minutes (t/interval in-time out-time))
+      0M)))
 
 (defn make-date-string-without-timezone [d]
   (when d
