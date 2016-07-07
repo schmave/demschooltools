@@ -29,10 +29,9 @@
             [cemerick.friend :as friend]
             (cemerick.friend [workflows :as workflows]
                              [credentials :as creds])
-            [environ.core :refer [env]] 
+            [environ.core :refer [env]]
             )
   (:gen-class))
-
 
 (defroutes app
   (GET "/" []

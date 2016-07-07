@@ -26,7 +26,7 @@ module.exports = React.createClass({
         this.refs.missingSwipeCollector.validateSignDirection(student, 'out');
     },
     isSigningIn: function(student) {
-        return !student.last_swipe_date || student.last_swipe_type === 'out' || !student.last_swipe_date.startsWith(studentStore.getToday())
+        return !student.last_swipe_date || student.last_swipe_type === 'out' || !student.last_swipe_date.startsWith(studentStore.getToday());
     },
     getSwipeButton:  function(student, way){
         var buttonIcon = 'fa-arrow-right';
@@ -105,8 +105,6 @@ module.exports = React.createClass({
                 </div>
             </div>
         </div>;
-    },
-    _onChange: function () {
-        this.setState({students: studentStore.getStudents()});
     }
+    //_onChange: function () {this.setState({students: studentStore.getStudents()});}
 });
