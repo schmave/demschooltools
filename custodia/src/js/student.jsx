@@ -19,14 +19,15 @@ var exports = React.createClass({
         router: React.PropTypes.func
     },
     getInitialState: function () {
+        var studentId = this.context.router.getCurrentParams().studentId;
         return {
-            studentId: this.context.router.getCurrentParams().studentId,
-            editing: false
+            studentId: studentId,
+            editing: false,
+            student: studentStore.getStudent(studentId)
         };
     },
     componentDidMount: function () {
         studentStore.addChangeListener(this._onChange);
-        this.setState({student: studentStore.getStudent(this.state.studentId)});
     },
     componentWillUnmount: function () {
         studentStore.removeChangeListener(this._onChange);

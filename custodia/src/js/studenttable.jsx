@@ -10,11 +10,10 @@ var today = studentStore.getToday();
 
 module.exports = React.createClass({
     getInitialState: function () {
-        return {students: []};
+        return {students: studentStore.getStudents(true)};
     },
     componentDidMount: function () {
         studentStore.addChangeListener(this._onChange);
-        this.setState({students: studentStore.getStudents(true)});
     },
     componentWillUnmount: function () {
         studentStore.removeChangeListener(this._onChange);
@@ -105,6 +104,8 @@ module.exports = React.createClass({
                 </div>
             </div>
         </div>;
+    },
+    _onChange: function () {
+        this.setState({students: studentStore.getStudents()});
     }
-    //_onChange: function () {this.setState({students: studentStore.getStudents()});}
 });
