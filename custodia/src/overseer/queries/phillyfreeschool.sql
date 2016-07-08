@@ -133,20 +133,20 @@ FROM (
                      OR schooldays.olderdate > schooldays.days
                      THEN 300 ELSE 330 END) as requiredmin
         , s.intervalmin
-         , schooldays.days AS day
-
-FROM phillyfreeschool.school_days(:year_name, :class_id) as schooldays
-LEFT JOIN phillyfreeschool.swipes s
-                ON (schooldays.days = date(s.in_time AT TIME ZONE 'America/New_York')
-                    AND schooldays.student_id = s.student_id)
-                    LEFT JOIN phillyfreeschool.overrides o
-           ON (schooldays.days = o.date AND o.student_id = schooldays.student_id)
-           LEFT JOIN phillyfreeschool.excuses e
-           ON (schooldays.days = e.date AND e.student_id = schooldays.student_id)
+        , schooldays.days AS day
+      FROM phillyfreeschool.school_days(:year_name, :class_id) as schooldays
+      LEFT JOIN phillyfreeschool.swipes s
+                      ON (schooldays.days = date(s.in_time AT TIME ZONE 'America/New_York')
+                          AND schooldays.student_id = s.student_id)
+                          LEFT JOIN phillyfreeschool.overrides o
+                ON (schooldays.days = o.date AND o.student_id = schooldays.student_id)
+                LEFT JOIN phillyfreeschool.excuses e
+                ON (schooldays.days = e.date AND e.student_id = schooldays.student_id)
       WHERE schooldays.days IS NOT NULL
-      GROUP BY schooldays.student_id, day, schooldays.olderdate
+      GROUP BY schooldays.student_id, day, schooldays.olderdate, s.intervalmin
   ) AS stu
 GROUP BY stu.student_id;
+
 
 -- name: swipes-in-year-y
 SELECT s.*

@@ -1,5 +1,6 @@
 (ns overseer.web
   (:require [compojure.core :refer [defroutes GET PUT POST DELETE ANY]]
+            [clojure.java.shell :as sh]
             [ring.middleware.json :refer [wrap-json-response wrap-json-body wrap-json-params]]
             [ring.middleware.keyword-params :refer [wrap-keyword-params]]
             [ring.middleware.session :refer [wrap-session]]
@@ -11,7 +12,7 @@
             [compojure.coercions :refer [as-int]]
             [clojure.java.io :as io]
             ;;[clojure.tools.nrepl.server :as nrepl-server]
-            [refactor-nrepl.middleware :as refactor]
+            ;; [refactor-nrepl.middleware :as refactor]
             [jdbc-ring-session.core :refer [jdbc-store]]
             ;;[cider.nrepl :refer (cider-nrepl-handler)]
             ;;[cider.nrepl :as nrepl]
@@ -117,7 +118,7 @@
   (conn/init-pg)
   (db/init-users)
   (when-let [dev (env :dev)]
-    (clojure.java.shell/sh "notify-send" "Server started")
+    (sh/sh "notify-send" "Server started")
     ;;(nrepl-server/start-server :port 7888 :handler (apply clojure.tools.nrepl.server/default-handler (concat (map resolve cider.nrepl/cider-middleware) [refactor/wrap-refactor])))
     )
   (let [port (Integer. (or port (env :port) 5000))]
