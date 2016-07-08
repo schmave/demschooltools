@@ -5,16 +5,6 @@ var eventEmitter = require('events').EventEmitter,
     dispatcher = require('./appdispatcher');
 
 var exports = {
-    loadToday: function(){
-        $.ajax({
-           url: '/dates/today'
-        }).then(function(data){
-            dispatcher.dispatch({
-                type: constants.systemEvents.TODAY_LOADED,
-                data: data
-            });
-        });
-    },
     loadStudents: function () {
         $.ajax({
             url: '/students'

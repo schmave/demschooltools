@@ -19,9 +19,7 @@ exports.getStudents = function(force){
 };
 
 exports.getToday = function(){
-    if(today) return today;
-
-    actionCreator.loadToday();
+    return today;
 };
 
 exports.getStudent = function(id){
@@ -36,11 +34,8 @@ exports.getStudent = function(id){
 dispatcher.register(function(action){
     switch(action.type){
         case constants.studentEvents.LOADED:
-            students = action.data;
-            exports.emitChange();
-            break;
-        case constants.systemEvents.TODAY_LOADED:
-            today = action.data;
+            students = action.data.students;
+            today = action.data.today;
             exports.emitChange();
             break;
         case constants.studentEvents.STUDENT_SWIPED:

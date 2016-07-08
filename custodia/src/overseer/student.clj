@@ -21,7 +21,8 @@
 (defroutes student-routes
   (GET "/students" req
        (friend/authorize #{roles/user}
-                         (resp/response (get-student-list))))
+                         (resp/response {:today (dates/today-string)
+                                         :students (get-student-list)})))
 
   (GET "/students/:id" [id :<< as-int]
        (friend/authorize #{roles/user} (student-page-response id)))

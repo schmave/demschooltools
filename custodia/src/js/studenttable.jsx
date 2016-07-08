@@ -6,11 +6,10 @@ var React = require('react'),
     SwipeHelpers = require('./swipeHelpers.jsx'),
     studentStore = require('./StudentStore');
 
-
 module.exports = React.createClass({
     getInitialState: function () {
-        var today = studentStore.getToday();
-        return {students: studentStore.getStudents(true)};
+        return {students: studentStore.getStudents(true),
+                today: null};
     },
     componentDidMount: function () {
         studentStore.addChangeListener(this._onChange);
@@ -74,7 +73,6 @@ module.exports = React.createClass({
             }
         }.bind(this));
 
-
         return <div className="row">
             <SwipeHelpers ref="missingSwipeCollector"></SwipeHelpers>
             <div className="row student-listing-table">
@@ -106,6 +104,7 @@ module.exports = React.createClass({
         </div>;
     },
     _onChange: function () {
-        this.setState({students: studentStore.getStudents()});
+        this.setState({students: studentStore.getStudents(),
+                       today: studentStore.getToday()});
     }
 });

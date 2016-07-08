@@ -41,7 +41,6 @@
     (friend/authorize #{roles/super} ;; (db/reset-db)
                       (resp/redirect "/")))
 
-  (GET "/dates/today" [] (dates/today-string))
   (GET "/sampledb" []
     (friend/authorize #{roles/super} ;; (data/sample-db true)
                       (resp/redirect "/")))
