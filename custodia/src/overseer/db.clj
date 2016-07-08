@@ -12,7 +12,6 @@
             [clojure.tools.trace :as trace]
             [com.ashafa.clutch :as couch]
             [environ.core :refer [env]]
-            [migratus.core :as migratus]
             [overseer.migrations :as migrations]
             [overseer.roles :as roles]
             [overseer.queries.phillyfreeschool :as pfs]

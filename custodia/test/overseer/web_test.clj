@@ -397,8 +397,7 @@
         (data/swipe-out sid (t/plus _10-14_9-14am (t/days 1) (t/minutes 331)))
         (let [att (get-att sid)]
           (testing "swiping out on another day just is an out"
-            (is (= 2 (-> att :days count)))))))
-  )
+            (is (= 2 (-> att :days count))))))))
 
 (deftest students-with-att
   (do (sample-db)
