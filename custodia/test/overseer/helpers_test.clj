@@ -95,7 +95,7 @@
    (db/reset-db)
    (let [{class-id :_id} (data/get-class-by-name "2014-2015")]
      (db/activate-class class-id)
-     (data/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 2))))
+     (data/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 9))))
      (data/make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
      (let [s (data/make-student "jim")
            {sid :_id} s]

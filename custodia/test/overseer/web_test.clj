@@ -392,7 +392,6 @@
   (do (sample-db)
       (let [s (data/make-student "test")
             sid (:_id s)]
-
         (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
         (data/swipe-in sid _10-14_9-14am)
         (data/swipe-out sid (t/plus _10-14_9-14am (t/days 1) (t/minutes 331)))
