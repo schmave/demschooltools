@@ -68,7 +68,7 @@ var exports = React.createClass({
     getDayStatus: function (day) {
         var r = "";
         if (day.valid) {
-            r = " ✓"
+            r = " ✓";
         }
         if (day.excused) {
             return r + ' (Excused)';
@@ -113,7 +113,7 @@ var exports = React.createClass({
                     </Link>
                 </td>
             </tr>;
-        }.bind(this))
+        }.bind(this));
     },
     getPreviousDays: function () {
         var selectedDay = this.context.router.getCurrentParams().day;

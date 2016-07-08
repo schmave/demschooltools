@@ -6,10 +6,10 @@ var React = require('react'),
     SwipeHelpers = require('./swipeHelpers.jsx'),
     studentStore = require('./StudentStore');
 
-var today = studentStore.getToday();
 
 module.exports = React.createClass({
     getInitialState: function () {
+        var today = studentStore.getToday();
         return {students: studentStore.getStudents(true)};
     },
     componentDidMount: function () {

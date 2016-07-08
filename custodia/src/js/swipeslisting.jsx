@@ -1,8 +1,6 @@
 var React = require('react'),
-  store = require('./StudentStore'),
   AdminItem = require('./adminwrapper.jsx'),
-  actionCreator = require('./studentactioncreator'),
-  studentStore = require('./StudentStore');
+  actionCreator = require('./studentactioncreator');
 
 var exports = React.createClass({
     contextTypes: {
