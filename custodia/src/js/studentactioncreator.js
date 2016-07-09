@@ -66,19 +66,19 @@ var exports = {
         }.bind(this));
     },
     swipeStudent: function (student, direction, missing) {
-        var student = student;
+        //var student = student;
         ajax.post('students/' + student._id + '/swipe', {direction: direction, missing:missing})
             .then(function (data) {
                 dispatcher.dispatch({
                     type: constants.studentEvents.STUDENT_SWIPED,
-                    data: {students: data}
+                    data: data
                 });
-                this.loadStudent(student._id);
+                //this.loadStudent(student._id);
                 dispatcher.dispatch({
                     type: constants.systemEvents.FLASH,
                     message: student.name + ' swiped successfully!'
                 });
-                student = null;
+                //student = null;
                 router.get().transitionTo('students');
             }.bind(this));
     },

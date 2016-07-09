@@ -10,8 +10,11 @@
             [overseer.roles :as roles]
             [cemerick.friend :as friend]))
 
+(defn student-attendence [student-id]
+  (first (att/get-student-with-att student-id)))
+
 (defn student-page-response [student-id]
-  (resp/response {:student (first (att/get-student-with-att student-id))}))
+  (resp/response {:student (student-attendence student-id)}))
 
 (defn show-archived? [] true)
 
@@ -76,4 +79,5 @@
                                 (data/swipe-in id))
                             (do (when missing (data/swipe-in id missing))
                                 (data/swipe-out id))))
-        (resp/response (get-student-list))))
+        (resp/response {:student (student-attendence id)
+                        :students (get-student-list)})))
