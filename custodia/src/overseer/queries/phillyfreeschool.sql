@@ -48,7 +48,7 @@ SELECT
                OR schooldays.olderdate > schooldays.days
                THEN 300 ELSE 330 END) as requiredmin
   , schooldays.days AS day
-  FROM phillyfreeschool.school_days(:year_name, :class_id) AS schooldays
+  FROM phillyfreeschool.student_school_days(:student_id, :year_name, :class_id) AS schooldays
   LEFT JOIN phillyfreeschool.swipes s
       ON (
        ((schooldays.days = date(s.in_time AT TIME ZONE 'America/New_York'))
