@@ -1,6 +1,5 @@
 (ns overseer.attendance
   (:require [overseer.db :as db]
-            [goat.core :as goat]
             [overseer.helpers :refer :all]
             [overseer.dates :refer :all]
             [overseer.database :as data]
@@ -195,32 +194,6 @@
   ([id year]
    (map #(get-attendance year (:_id %) %)
         (data/get-students id))))
-
-(do
-  (goat/reset-instrumentation!)
-  (goat/instrument-functions! 'overseer.attendance)
-  (goat/instrument-functions! 'overseer.db)
-  (goat/instrument-functions! 'overseer.database))
-
-
-(goat/get-top-fperf 15 )
-(comment {:name overseer.db/get-student-page, :call-count 2, :total-time 328}
- {:name overseer.attendance/get-attendance, :call-count 1, :total-time 206}
- {:name overseer.database/swipe-in, :call-count 2, :total-time 36}
- {:name overseer.attendance/get-student-with-att,
-  :call-count 2,
-  :total-time 28}
- {:name overseer.attendance/get-student-list, :call-count 1, :total-time 20}
- {:name overseer.attendance/append-validity, :call-count 201, :total-time 20}
- {:name overseer.db/get-student-list-in-out, :call-count 1, :total-time 19}
- {:name overseer.db/persist!, :call-count 1, :total-time 18}
- {:name overseer.db/get-*, :call-count 2, :total-time 17}
- {:name overseer.database/get-years, :call-count 1, :total-time 10}
- {:name overseer.db/get-user, :call-count 1, :total-time 10}
- {:name overseer.db/get-user-y, :call-count 1, :total-time 10}
- {:name overseer.db/get-active-class, :call-count 1, :total-time 10}
- {:name overseer.database/get-students, :call-count 1, :total-time 8}
- {:name overseer.attendance/get-last-swipe-type, :call-count 1, :total-time 3})
 
 ;;(get-student-with-att 8)
 ;; (get-current-year-string (data/get-years))

@@ -2,6 +2,7 @@
   (:require [clojure.test :refer :all]
             [clj-time.format :as f]
             [clojure.java.shell :as sh]
+            [goat.core :as goat]
             [clj-time.local :as l]
             [clj-time.core :as t]
             [clj-time.coerce :as c]
@@ -25,6 +26,14 @@
   (jdbc/execute! @pgdb [(str "DELETE FROM users where 1=1; ")])
   (db/init-users))
 
+(defn collect-timing []
+  (goat/clear-perf-data!)
+  (let [x (att/get-student-with-att 1)
+        stu (first x)
+        perf (goat/get-fperf-data)]
+    (testing "days all came back" (is (= 199 (count (:days stu)))))
+    (:total-time (get perf 'overseer.db/get-student-page))))
+
 (deftest ^:performance massive-timing
   (sh/sh "make" "load-massive-dump")
   (migrate-test-db)
@@ -34,7 +43,20 @@
                 students)))
   (let [students (time (att/get-student-list))]
     (testing "found all students" (is (= 80 (count students)))))
-  (let [x (time (att/get-student-with-att 1))
-        stu (first x)]
-    (testing "days all came back" (is (= 199 (count (:days stu)))))))
+
+  (goat/reset-instrumentation!)
+  (goat/instrument-functions! 'overseer.attendance)
+  (goat/instrument-functions! 'overseer.db)
+  (goat/instrument-functions! 'overseer.database)
+
+  #_(goat/get-top-fperf 15 )
+
+  (let [runs (map (fn [x] (collect-timing)) (range 10))
+        t (trace/trace "runs " runs)
+        average-time (int (/ (apply + (trace/trace "runs" runs)) 10))]
+    (testing "its fast too"
+      (is (> 250 average-time))))
+
+
+  )
 
