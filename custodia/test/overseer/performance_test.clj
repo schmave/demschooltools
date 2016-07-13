@@ -21,7 +21,8 @@
             ))
 
 (defn migrate-test-db []
-  (jdbc/execute! @pgdb [(str "DELETE FROM schema_migrations where 1=1; ")])
+  ;;(jdbc/execute! @pgdb [(str "DELETE FROM schema_migrations where 1=1; ")])
+  (jdbc/execute! @pgdb [(str "DROP TABLE schema_migrations")])
   (migrations/migrate-db @pgdb)
   (jdbc/execute! @pgdb [(str "DELETE FROM users where 1=1; ")])
   (db/init-users))
@@ -51,11 +52,12 @@
 
   #_(goat/get-top-fperf 15 )
 
-  (let [runs (map (fn [x] (collect-timing)) (range 10))
+  (let [run-size 50
+        runs (map (fn [x] (collect-timing)) (range run-size))
         t (trace/trace "runs " runs)
-        average-time (int (/ (apply + (trace/trace "runs" runs)) 10))]
+        average-time (int (/ (apply + (trace/trace "runs" runs)) run-size))]
     (testing "its fast too"
-      (is (> 250 average-time))))
+      (is (> 150 average-time))))
 
 
   )
