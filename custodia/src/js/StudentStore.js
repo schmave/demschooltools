@@ -40,7 +40,6 @@ dispatcher.register(function(action){
             break;
         case constants.studentEvents.STUDENT_SWIPED:
             students = action.data.students;
-            studentDetails[action.data.student._id] = action.data.student;
             exports.emitChange();
             break;
         case constants.studentEvents.STUDENT_LOADED:

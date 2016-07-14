@@ -58,6 +58,7 @@
     (testing "its fast too"
       (is (> 250 average-time))))
 
+  (goat/reset-instrumentation!)
 
   )
 

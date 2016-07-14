@@ -79,5 +79,4 @@
                                 (data/swipe-in id))
                             (do (when missing (data/swipe-in id missing))
                                 (data/swipe-out id))))
-        (resp/response {:student (student-attendence id)
-                        :students (get-student-list)})))
+        (resp/response {:students (get-student-list)})))
