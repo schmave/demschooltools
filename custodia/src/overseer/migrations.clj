@@ -1,6 +1,7 @@
 (ns overseer.migrations
   (:require [environ.core :refer [env]]
             [migratus.core :as migratus]
+            [heroku-database-url-to-jdbc.core :as h]
             [overseer.database.connection :refer [pgdb init-pg]]
             [clojure.java.io :as io]))
 

@@ -7,6 +7,7 @@
                  [goat "0.1.0-SNAPSHOT"]
                  [compojure "1.4.0"]
                  [ring/ring-jetty-adapter "1.2.2"]
+                 [org.slf4j/slf4j-log4j12 "1.7.9"]
                  [ring/ring-devel "1.4.0"]
                  [org.clojure/data.json "0.2.5"]
                  [com.cemerick/friend "0.2.1" :exclusions [xerces/xercesImpl
