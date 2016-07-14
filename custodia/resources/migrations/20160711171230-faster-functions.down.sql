@@ -1,4 +1,9 @@
-
+ALTER TABLE phillyfreeschool.swipes
+DROP COLUMN swipe_day date DEFAULT null;
+--;;
+ALTER TABLE demo.swipes
+DROP COLUMN swipe_day date DEFAULT null;
+--;;
 CREATE OR REPLACE FUNCTION phillyfreeschool.school_days(year_name TEXT, class_id BIGINT)
   RETURNS TABLE (days date, student_id BIGINT, archived boolean, olderdate date) AS
 $func$

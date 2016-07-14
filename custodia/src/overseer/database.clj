@@ -31,7 +31,7 @@
 (declare swipe-out)
 
 (defn make-swipe [student-id]
-  {:type :swipes :student_id student-id :in_time nil :out_time nil})
+  {:type :swipes :student_id student-id :in_time nil :out_time nil :swipe_day nil})
 
 (defn delete-swipe [swipe]
   (db/delete! swipe))
@@ -50,6 +50,7 @@
          rounded-in-timestamp (make-timestamp (round-swipe-time in-time))
          ]
      (db/persist! (assoc (make-swipe id)
+                         :swipe_day (c/to-sql-date rounded-in-timestamp)
                          :rounded_in_time rounded-in-timestamp
                          :in_time in-timestamp)))))
 
@@ -77,12 +78,15 @@
          in-swipe (if only-swiped-in?
                     last-swipe
                     (make-swipe id))
+         rounded-out-timestamp (make-timestamp rounded-out-time)
          out-swipe (assoc in-swipe
                           :out_time (make-timestamp out-time)
-                          :rounded_out_time (make-timestamp rounded-out-time))
+                          :rounded_out_time rounded-out-timestamp)
          out-swipe (sanitize-out out-swipe)
          interval (calculate-interval out-swipe)
-         out-swipe (assoc out-swipe :intervalmin interval)]
+         out-swipe (assoc out-swipe
+                          :intervalmin interval
+                          :swipe_day (c/to-sql-date rounded-out-timestamp))]
      (if only-swiped-in?
        (db/update! :swipes (:_id out-swipe) out-swipe)
        (db/persist! out-swipe))

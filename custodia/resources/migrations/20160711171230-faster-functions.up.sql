@@ -47,8 +47,6 @@ END;
 $$
 LANGUAGE plpgsql;
 --;;
-
---;;
 CREATE OR REPLACE FUNCTION demo.student_school_days(stu_id BIGINT, y_name TEXT, cls_id BIGINT)
 RETURNS TABLE (days date, student_id BIGINT, archived boolean, olderdate date) AS $$
 BEGIN
@@ -74,53 +72,56 @@ END;
 $$
 LANGUAGE plpgsql;
 --;;
-
 CREATE OR REPLACE FUNCTION phillyfreeschool.school_days(year_name TEXT, class_id BIGINT)
   RETURNS TABLE (days date, student_id BIGINT, archived boolean, olderdate date) AS
-$func$
-SELECT a.days, s._id student_id, s.archived, s.olderdate
-FROM (SELECT DISTINCT days2.days
-    FROM (SELECT
-            (CASE WHEN date(s.in_time AT TIME ZONE 'America/New_York')  IS NULL
-            THEN date(s.out_time AT TIME ZONE 'America/New_York')
-            ELSE date(s.in_time AT TIME ZONE 'America/New_York') END) AS days
-         FROM phillyfreeschool.roundedswipes s
-         INNER JOIN phillyfreeschool.years y
-            ON ((s.out_time BETWEEN y.from_date AND y.to_date)
-            OR (s.in_time BETWEEN y.from_date AND y.to_date))
-         JOIN phillyfreeschool.classes c ON (c.active = true)
-         JOIN phillyfreeschool.classes_X_students cXs ON (cXs.class_id = c._id
-                                         AND s.student_id = cXs.student_id)
-         WHERE y.name = $1) days2
-         ORDER BY days2.days) AS a
-JOIN phillyfreeschool.classes_X_students cXs ON (1=1)
-JOIN phillyfreeschool.students s ON (s._id = cXs.student_id)
-WHERE cXs.class_id = $2
-AND (s.start_date < a.days OR s.start_date is null);
-$func$
-LANGUAGE sql;
+BEGIN
+  BEGIN
+    CREATE TEMP TABLE temp1 ON COMMIT DROP AS
+    SELECT DISTINCT s.swipe_day as days
+    FROM phillyfreeschool.swipes s
+    JOIN phillyfreeschool.classes_X_students cXs
+    ON (cXs.class_id = $3 AND s.student_id = cXs.student_id)
+    INNER JOIN phillyfreeschool.years y ON (s.swipe_day BETWEEN y.from_date AND y.to_date)
+    WHERE y.name = $2
+    ORDER BY s.swipe_day;
+  END;
+  BEGIN
+    RETURN QUERY
+    SELECT a.days, s._id student_id, s.archived, s.olderdate
+    FROM temp1 AS a
+    JOIN phillyfreeschool.classes_X_students cXs ON (cXs.class_id = $2)
+    JOIN phillyfreeschool.students s ON (s._id = cXs.student_id)
+    WHERE cXs.class_id = $2
+    AND (s.start_date < a.days OR s.start_date is null);
+  END;
+  RETURN;
+END;
+$$
+LANGUAGE plpgsql;
 --;;
 CREATE OR REPLACE FUNCTION demo.school_days(year_name TEXT, class_id BIGINT)
-  RETURNS TABLE (days date, student_id BIGINT, archived boolean, olderdate date) AS
-$func$
+RETURNS TABLE (days date, student_id BIGINT, archived boolean, olderdate date) AS
+BEGIN
+BEGIN
+CREATE TEMP TABLE temp1 ON COMMIT DROP AS
+SELECT DISTINCT s.swipe_day as days
+FROM demo.swipes s
+JOIN demo.classes_X_students cXs
+ON (cXs.class_id = $3 AND s.student_id = cXs.student_id)
+INNER JOIN demo.years y ON (s.swipe_day BETWEEN y.from_date AND y.to_date)
+WHERE y.name = $2
+ORDER BY s.swipe_day;
+END;
+BEGIN
+RETURN QUERY
 SELECT a.days, s._id student_id, s.archived, s.olderdate
-FROM (SELECT DISTINCT days2.days
-    FROM (SELECT
-            (CASE WHEN date(s.in_time AT TIME ZONE 'America/New_York')  IS NULL
-            THEN date(s.out_time AT TIME ZONE 'America/New_York')
-            ELSE date(s.in_time AT TIME ZONE 'America/New_York') END) AS days
-         FROM demo.roundedswipes s
-         INNER JOIN demo.years y
-            ON ((s.out_time BETWEEN y.from_date AND y.to_date)
-            OR (s.in_time BETWEEN y.from_date AND y.to_date))
-         JOIN demo.classes c ON (c.active = true)
-         JOIN demo.classes_X_students cXs ON (cXs.class_id = c._id
-                                         AND s.student_id = cXs.student_id)
-         WHERE y.name = $1) days2
-         ORDER BY days2.days) AS a
-JOIN demo.classes_X_students cXs ON (1=1)
+FROM temp1 AS a
+JOIN demo.classes_X_students cXs ON (cXs.class_id = $2)
 JOIN demo.students s ON (s._id = cXs.student_id)
 WHERE cXs.class_id = $2
 AND (s.start_date < a.days OR s.start_date is null);
-$func$
-LANGUAGE sql;
+END;
+RETURN;
+END;
+$$
+LANGUAGE plpgsql;
