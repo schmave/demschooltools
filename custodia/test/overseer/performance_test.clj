@@ -54,10 +54,9 @@
 
   (let [run-size 50
         runs (map (fn [x] (collect-timing)) (range run-size))
-        t (trace/trace "runs " runs)
         average-time (int (/ (apply + (trace/trace "runs" runs)) run-size))]
     (testing "its fast too"
-      (is (> 150 average-time))))
+      (is (> 250 average-time))))
 
 
   )
