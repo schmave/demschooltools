@@ -10,7 +10,7 @@ SET swipe_day =
     from phillyfreeschool.swipes s2 where s1._id = s2._id);
 --;;
 ALTER TABLE demo.swipes
-ADD COLUMN day date DEFAULT null;
+ADD COLUMN swipe_day date DEFAULT null;
 --;;
 UPDATE demo.swipes s1
 SET swipe_day =

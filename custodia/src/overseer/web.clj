@@ -95,6 +95,15 @@
         (binding [db/*school-schema* schema]
           (app req))))))
 
+(defn wrap-exception-handling
+  [handler]
+  (fn [request]
+    (try
+      (handler request)
+      (catch Exception e
+        (trace/trace "Exception:" e)
+        {:status 400 :body "Invalid data"}))))
+
 (defn tapp []
   (-> #'app
       (friend/authenticate {:credential-fn (partial creds/bcrypt-credential-fn db/get-user)
@@ -110,7 +119,9 @@
       wrap-keyword-params
       wrap-json-body
       wrap-json-params
-      wrap-json-response))
+      wrap-json-response
+      wrap-exception-handling
+      ))
 
 ;;(start-site 5000)
 (defn start-site [port]
