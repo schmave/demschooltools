@@ -19,3 +19,7 @@
                      :db con}))
 
 ;; (migratus/create {:store :database :db @pgdb} "calculated interval")
+
+(comment
+  (migratus/migrate {:store :database
+                     :db {}}))
