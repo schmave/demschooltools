@@ -18,7 +18,7 @@
             ;;[cider.nrepl :as nrepl]
             [ring.adapter.jetty :as jetty]
             [ring.util.response :as resp]
-            [clojure.tools.trace :as trace]
+            [clojure.tools.logging :as log]
             [clojure.pprint :as pp]
             [overseer.db :as db]
             [overseer.database.sample-db :as sampledb]
@@ -70,7 +70,7 @@
   (GET "/users/login" req
     (io/resource "login.html"))
   (GET "/users/logout" req
-    (friend/logout* (resp/redirect (trace/trace "Logout: " "/users/login"))))
+    (friend/logout* (resp/redirect (log/spyf "Logout: %s" "/users/login"))))
   (GET "/users/is-user" req
     (friend/authorize #{roles/user} "You're a user!"))
   (GET "/users/is-admin" req
@@ -102,7 +102,7 @@
     (try
       (handler request)
       (catch Exception e
-        (trace/trace "Exception:" e)
+        (log/error e "Exception")
         {:status 400 :body "Invalid data"}))))
 
 (defn tapp []

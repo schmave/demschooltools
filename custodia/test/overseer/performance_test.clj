@@ -7,6 +7,7 @@
             [clj-time.core :as t]
             [clj-time.coerce :as c]
             [clojure.tools.trace :as trace]
+            [overseer.database.connection :as conn]
             [overseer.db :as d]
             [overseer.attendance :as att]
             [overseer.helpers :as h]
@@ -35,7 +36,9 @@
     (testing "days all came back" (is (= 199 (count (:days stu)))))
     (:total-time (get perf 'overseer.db/get-student-page))))
 
-(deftest ^:performance massive-timing
+(defn ^:performance massive-timing []
+  (conn/init-pg)
+  (db/drop-all-tables)
   (sh/sh "make" "load-massive-dump")
   (migrate-test-db)
   (data/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 9))))

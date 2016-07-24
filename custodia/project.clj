@@ -8,10 +8,16 @@
                  [compojure "1.4.0"]
                  [ring/ring-jetty-adapter "1.2.2"]
                  [org.slf4j/slf4j-log4j12 "1.7.9"]
+                 [org.clojure/tools.logging "0.3.1"]
                  [ring/ring-devel "1.4.0"]
                  [org.clojure/data.json "0.2.5"]
                  [com.cemerick/friend "0.2.1" :exclusions [xerces/xercesImpl
                                                            org.clojure/core.cache]]
+                 [org.slf4j/slf4j-log4j12 "1.7.1"]
+                 [log4j/log4j "1.2.17" :exclusions [javax.mail/mail
+                                                    javax.jms/jms
+                                                    com.sun.jmdk/jmxtools
+                                                    com.sun.jmx/jmxri]]
                  [org.clojure/tools.trace "0.7.8"]
                  [yesql "0.5.1"]
                  [environ "1.0.0"]

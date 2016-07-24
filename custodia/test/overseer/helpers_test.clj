@@ -3,7 +3,7 @@
             [clj-time.core :as t]
             [clojure.test :refer :all]
             [overseer.db :as db]
-            [clojure.tools.trace :as trace]
+            [clojure.tools.logging :as log]
             [overseer.database :as data]
             [overseer.database.connection :as conn]
             [overseer.attendance :as att]
@@ -86,7 +86,7 @@
     (is (= overrides (:total_overrides att)) "Total overrides")
     (is (= short (:total_short att))) "Total short"))
 
-;; (sample-db true)  
+;; (sample-db true) 
 ;; (binding [db/*school-schema* "demo"] (sample-db true))
 (defn sample-db
   ([] (sample-db false))
@@ -118,7 +118,7 @@
       :done
       (do (let [s (data/make-student (str "zax" x))]
             (loop [y 2]
-              (trace/trace (str "Id:" x " Num:" y " of:" (* 80 200)))
+              (log/info (str "Id:" x " Num:" y " of:" (* 80 200)))
               (if (> y 200)
                 :done
                 (do

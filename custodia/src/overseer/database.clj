@@ -2,7 +2,8 @@
   (:require [overseer.db :as db]
             [overseer.helpers :refer :all]
             [overseer.dates :refer :all]
-            [clojure.tools.trace :as trace]
+            [overseer.helpers :as logh]
+            [clojure.tools.logging :as log]
             [clj-time.format :as f]
             [clj-time.local :as l]
             [clj-time.core :as t]
@@ -73,7 +74,7 @@
   ([id out-time]
    (let [rounded-out-time (round-swipe-time out-time)
          out-time (cond-parse-date-string out-time)
-         last-swipe (trace/trace "Last Swipe" (lookup-last-swipe-for-day id (make-date-string rounded-out-time)))
+         last-swipe (log/spyf "Last Swipe: %s" (lookup-last-swipe-for-day id (make-date-string rounded-out-time)))
          only-swiped-in? (only-swiped-in? last-swipe)
          in-swipe (if only-swiped-in?
                     last-swipe

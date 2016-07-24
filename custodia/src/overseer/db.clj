@@ -9,13 +9,14 @@
             [clj-time.coerce :as timec]
             [clj-time.format :as timef]
             [clojure.java.jdbc :as jdbc]
-            [clojure.tools.trace :as trace]
             [com.ashafa.clutch :as couch]
             [environ.core :refer [env]]
             [overseer.migrations :as migrations]
             [overseer.roles :as roles]
             [overseer.queries.phillyfreeschool :as pfs]
+            [overseer.helpers :as logh]
             [overseer.queries.demo :as demo]
+            [clojure.tools.logging :as log]
             [overseer.database.connection :refer [pgdb init-pg]]
             [yesql.core :refer [defqueries]]))
 
@@ -35,11 +36,11 @@
   `(let [s# *school-schema*
          con# @pgdb]
      (let [f# (resolve (symbol (str "overseer.queries." s# "/" ~(name n))))]
-       (trace/trace f#)
+       (log/info f# ~args)
        (f# ~args {:connection con#}))))
 
 ;; (insert-email "test@test.com")
-(trace/deftrace insert-email [email]
+(logh/deftrace insert-email [email]
   (jdbc/insert! @pgdb :emails {:email email}))
 
 ;; (get-user "admin2")

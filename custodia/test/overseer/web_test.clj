@@ -5,7 +5,6 @@
             [clj-time.local :as l]
             [clojure.pprint :as pp]
             [clojure.test :refer :all]
-            [clojure.tools.trace :as trace]
             [overseer.attendance :as att]
             [overseer.database :as data]
             [overseer.database.connection :as conn]
@@ -14,8 +13,6 @@
             [overseer.helpers-test :refer :all]
             [schema.test :as tests]))
 
-;; run test C-c M-,
-;; run tests C-c ,
 (comment
   (run-tests 'overseer.web-test)
   )
@@ -126,7 +123,6 @@
           (testing "class creation"
             (is (= 1 (count classes)))
             (is (= true (-> classes first :active))))
-          (trace/trace students)
           (testing "students in class"
             (is (= 3 (count students)))
             (is (= 2 (count (filter (comp not nil? :class_id) students))))
@@ -199,7 +195,6 @@
         (let [att (get-att sid)
               _10-15 (-> att :days first)
               _10-14 (-> att :days second)]
-          (trace/trace att)
           (testing "10/15 has no out rounding"
             (is (= (-> _10-15 :swipes first :nice_out_time)
                    "03:30:00")))
@@ -232,7 +227,6 @@
         (data/swipe-in sid _900am)
         (data/swipe-out sid _902am)
         (let [att (get-att sid)]
-          (trace/trace att)
           (testing "Interval Time"
             (is (= (-> att :days first :total_mins) 2M)))))))
 
@@ -264,7 +258,6 @@
       ;; no need to create any students in demo, they are already there
       (let [resp (make-sample-two-students-in-class)
             att  (att/get-student-list)]
-        (trace/trace "att: " att)
         (testing "Student Count"
           (is (= 2 (count att)))))))
 
@@ -479,7 +472,6 @@
         (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
         (let [att  (att/get-student-list)
               our-hero (filter #(= sid (:_id %)) att)]
-          (trace/trace our-hero)
           (testing "Student Count"
             (is (= (->> our-hero count) 1))
             (is (= (->> our-hero first :last_swipe_type) "out"))
@@ -492,7 +484,7 @@
             sid (:_id s)
             x (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
             s (data/toggle-student-absent sid)
-            att (trace/trace "att" (att/get-student-list))]
+            att (att/get-student-list)]
 
         (testing "Student Count"
           (is (= (-> att count) 3))
@@ -543,7 +535,6 @@
         (data/excuse-date sid today-string)
         (let [att  (get-att sid)
               today (-> att :days first)]
-          (trace/trace att)
           (testing "First day is today string"
             (is (= (:day today) today-string)))
           (testing "Today is excused"
