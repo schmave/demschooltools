@@ -25,8 +25,7 @@
       )
     (let [_10pm_ninth (dates/round-swipe-time (t/date-time 2015 10 10 1))]
       (is (= 16 (t/hour _10pm_ninth)))
-      (is (= 9 (t/day _10pm_ninth)))
-      )))
+      (is (= 9 (t/day _10pm_ninth))))))
 
 (defn get-school-days [year]
   (map :days (filter :days (db/get-school-days year))))
