@@ -1,21 +1,21 @@
 
 # overseer
 
-A barebones Clojure app, which can easily be deployed to Heroku.
+Overseer is a clojure web application which runs on the Jetty server. The site
+uses postges for persistence. It can be installed and run anywhere.
 
-## Running Locally
+## Lein
 
-Make sure you have Clojure installed.  Also, install the [Heroku Toolbelt](https://toolbelt.heroku.com/).
+You will need to get [lein 2](http://leiningen.org/) installed and running. 
 
-```sh
-$ git clone https://github.com/heroku/overseer.git
-$ cd overseer
-$ lein repl
-user=> (require 'overseer.web)
-user=>(def server (overseer.web/-main))
-```
+To ensure you have the correct version, run: ```lein --version``` and verify
+that it is greater than 2.0.
 
-Your app should now be running on [localhost:5000](http://localhost:5000/).
+## Postgres
+
+You will need to follow the steps to get a running
+[postgres](https://www.postgresql.org/) database on your system. Once that is
+complete, and you can log in, create a new database for the application to run.
 
 ## Profiles.clj
 
@@ -24,8 +24,8 @@ connection settings to your running web site. To make this easier, lein allows
 for a file to be put in the same folder as the project.clj with machine-specific
 settings. 
 
-You will want to make a file called profiles.clj in the base project directory.
-DO NOT ADD IT TO GIT. Add in the following:
+Make a file called profiles.clj in the base project directory. DO NOT ADD IT TO
+GIT. Add in the following:
 
 ```clojure
 {:dev {:repl-options {:init-ns overseer.web}
@@ -43,7 +43,8 @@ DO NOT ADD IT TO GIT. Add in the following:
        :env {:database-url "postgres://USER:PASSWORD@localhost:5432/DATABASE"
              :admin "web"
              :userpass "web"
-             :dev true}}}
+             :dev true
+             :notify false}}}
 ```
 
 Replace the following words in your profiles.clj:
@@ -52,6 +53,20 @@ Replace the following words in your profiles.clj:
 * USER - your local postgres username
 * PASSWORD - your local postgres username's password
 
-Keep in mind that the assumed port number (5432) is the postgres default. If
-your postgres uses a different port, you will need to change that too.
+Keep in mind that the assumed port number (5432) in the two connection strings
+is the postgres default. If your postgres uses a different port, you will need
+to change that too.
 
+## Running Locally
+
+```sh
+$ git clone https://github.com/steveshogren/overseer.git
+$ cd overseer
+$ lein repl
+user=>(def server (overseer.web/-main))
+```
+
+Your app should now be running on [localhost:5000](http://localhost:5000/).
+
+
+License: GPL-3.0+ 

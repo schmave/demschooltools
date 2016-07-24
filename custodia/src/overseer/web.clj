@@ -127,10 +127,7 @@
 (defn start-site [port]
   (conn/init-pg)
   (db/init-users)
-  (when-let [dev (env :dev)]
-    (sh/sh "notify-send" "Server started")
-    ;;(nrepl-server/start-server :port 7888 :handler (apply clojure.tools.nrepl.server/default-handler (concat (map resolve cider.nrepl/cider-middleware) [refactor/wrap-refactor])))
-    )
+  (if (env :notify) (sh/sh "notify-send" "Server started"))
   (let [port (Integer. (or port (env :port) 5000))]
     (jetty/run-jetty (site (tapp)) {:port port :join? false})))
 
