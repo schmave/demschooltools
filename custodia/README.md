@@ -43,6 +43,7 @@ GIT. Add in the following:
              :admin "web"
              :userpass "web"
              :dev true
+             :migratedb false
              :notify false}}}
 ```
 
@@ -55,6 +56,17 @@ Replace the following words in your profiles.clj:
 Keep in mind that the assumed port number (5432) in the two connection strings
 is the postgres default. If your postgres uses a different port, you will need
 to change that too.
+
+When starting with a new database, or when you want to "reset" your current
+database, set the key ```:migratedb``` to ```true``` before you start the
+application. That will cause the database to be recreated empty, then some
+sample data be put inside it. CAUTION: leaving it set to ```true``` will cause
+it to drop EVERY TIME. You might want it true for the first time, then
+immediately set it to ```false``` after the application starts.
+
+The application also sets up five default users for local testing. They are
+"admin", "super", "admin2", "user", and "demo". They all have the password
+"web". Typically, you will use "super" for local testing.
 
 ## NPM
 

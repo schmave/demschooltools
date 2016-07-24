@@ -21,6 +21,7 @@
             [clojure.tools.trace :as trace]
             [clojure.pprint :as pp]
             [overseer.db :as db]
+            [overseer.database.sample-db :as sampledb]
             [overseer.dates :as dates]
             [overseer.classes :refer [class-routes]]
             [overseer.student :refer [student-routes]]
@@ -127,6 +128,9 @@
 (defn start-site [port]
   (conn/init-pg)
   (db/init-users)
+  (if (env :migratedb)
+    (db/reset-db)
+    (sampledb/sample-db))
   (if (env :notify) (sh/sh "notify-send" "Server started"))
   (let [port (Integer. (or port (env :port) 5000))]
     (jetty/run-jetty (site (tapp)) {:port port :join? false})))
