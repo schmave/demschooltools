@@ -29,6 +29,7 @@ var React = require('react'),
     classStore = require('./classstore'),
     actionCreator = require('./classactioncreator'),
     Link = Router.Link,
+    AdminWrapper = require('./adminwrapper.jsx'),
     FilterBox = require('./filterbox.jsx');
 
 var exports = React.createClass({
@@ -152,6 +153,9 @@ var exports = React.createClass({
                                         <tbody> {this.classRows()} </tbody>
                                     </table>
                                 </div>
+                        <AdminWrapper>
+                            <Link to="create" className="btn btn-primary btn-xs" id="create-student">Add Student</Link>
+                        </AdminWrapper>
 
                                 <div className="col-sm-10 column">
                                      <FilterBox onFilterChange={this.filterChanged} />

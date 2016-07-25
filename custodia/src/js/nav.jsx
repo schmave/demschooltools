@@ -25,9 +25,6 @@ module.exports = React.createClass({
                             <li><Link id="totals-link" to="reports">Student Totals</Link></li>
                         </AdminWrapper>
                         <AdminWrapper>
-                            <li><Link to="create" id="create-student">Add Student</Link> </li>
-                        </AdminWrapper>
-                        <AdminWrapper>
                             <li><Link id="class-link" to="classes">Classes</Link> </li>
                         </AdminWrapper>
                         <SuperWrapper>
