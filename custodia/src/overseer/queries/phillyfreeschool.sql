@@ -105,7 +105,7 @@ SELECT
   stu.student_id
     , stu.student_id as _id
     , (select s.name from phillyfreeschool.students s WHERE s._id = stu.student_id) as name
-    , sum(CASE WHEN oid IS NOT NULL THEN stu.requiredmin/60 ELSE stu.intervalmin/60 END) as total_hours
+    , round(sum(CASE WHEN oid IS NOT NULL THEN stu.requiredmin/60 ELSE stu.intervalmin/60 END)) as total_hours
     , sum(CASE WHEN oid IS NOT NULL
                OR stu.intervalmin >= stu.requiredmin
           THEN 1 ELSE 0 END) as good
@@ -131,18 +131,18 @@ FROM (
         , (CASE WHEN schooldays.olderdate IS NULL
                      OR schooldays.olderdate > schooldays.days
                      THEN 300 ELSE 330 END) as requiredmin
-        , s.intervalmin
+        , sum(s.intervalmin) as intervalmin
         , schooldays.days AS day
       FROM phillyfreeschool.school_days(:year_name, :class_id) as schooldays
       LEFT JOIN phillyfreeschool.swipes s
                       ON (schooldays.days = date(s.in_time AT TIME ZONE 'America/New_York')
                           AND schooldays.student_id = s.student_id)
-                          LEFT JOIN phillyfreeschool.overrides o
+      LEFT JOIN phillyfreeschool.overrides o
                 ON (schooldays.days = o.date AND o.student_id = schooldays.student_id)
-                LEFT JOIN phillyfreeschool.excuses e
+      LEFT JOIN phillyfreeschool.excuses e
                 ON (schooldays.days = e.date AND e.student_id = schooldays.student_id)
       WHERE schooldays.days IS NOT NULL
-      GROUP BY schooldays.student_id, day, schooldays.olderdate, s.intervalmin
+      GROUP BY schooldays.student_id, day, schooldays.olderdate
   ) AS stu
 GROUP BY stu.student_id;
 

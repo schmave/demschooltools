@@ -68,7 +68,6 @@
              :rounded_out_time (:rounded_in_time swipe))
       swipe)))
 
-;; (sample-db)
 (defn swipe-out
   ([id] (swipe-out id (t/now)))
   ([id out-time]

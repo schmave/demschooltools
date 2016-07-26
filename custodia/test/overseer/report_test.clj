@@ -42,6 +42,8 @@
         (let [att (db/get-report today-str class-id)
               student1 (first (filter #(= sid (:_id %)) att))
               student2 (first (filter #(= sid2 (:_id %)) att))]
+
+          (student-report-is student1 3 2 0 0 0 25M)
           (testing "Student 1 Counts"
             (is (= 3 (:good student1)))
             (is (= 25 (int (:total_hours student1))))
@@ -77,12 +79,10 @@
         (let [att (db/get-report today-str)
               student1 (first (filter #(= sid (:_id %)) att))
               student2 (first (filter #(= sid2 (:_id %)) att))]
-          (student-report-is student1 4 1 1 1 1 26)
+          (student-report-is student1 4 1 1 1 1 26M)
 
           (testing "Total short count student 2"
-            ;; TODO - determine correct short count (otherwise 2)
-            (is (= (:short student2)
-                   0)))
+            (is (= (:short student2) 2)))
           (testing "Total Abs Count For Student 2 Should equal number of total days for student 1 and 2"
             (is (= (:unexcused student2)
                    5)))

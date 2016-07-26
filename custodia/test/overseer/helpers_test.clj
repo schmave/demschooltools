@@ -107,11 +107,11 @@
        (when have-extra? (data/swipe-in sid (t/minus (t/now) (t/days 1) (t/hours 5)))))))
   )
 
-;; (huge-sample-db)
+;; (huge-sample-db) 
 (defn huge-sample-db []
   (conn/init-pg)
   (db/reset-db)
-  (data/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 5))))
+  (data/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 5))))  
   (data/make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
   (loop [x 1]
     (if (> x 80)
