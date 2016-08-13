@@ -1,4 +1,4 @@
- (ns overseer.helpers-test
+(ns overseer.helpers-test
   (:require [clj-time.local :as l]
             [clj-time.core :as t]
             [clojure.test :refer :all]
@@ -8,6 +8,7 @@
             [overseer.database.connection :as conn]
             [overseer.attendance :as att]
             [clj-time.coerce :as c]))
+
 
 (defn today-at-utc [h m]
   (t/plus (t/today-at h m) (t/hours 4)))
@@ -22,6 +23,7 @@
 (def _10-18 (t/plus _10-14_9-14am (t/days 4)))
 (def _10-19 (t/plus _10-14_9-14am (t/days 5)))
 (def _10-20 (t/plus _10-14_9-14am (t/days 6)))
+
 
 (defn add-3good-2short-swipes [sid]
   ;; good
@@ -107,25 +109,31 @@
        (when have-extra? (data/swipe-in sid (t/minus (t/now) (t/days 1) (t/hours 5)))))))
   )
 
+
+
 ;; (huge-sample-db) 
 (defn huge-sample-db []
   (conn/init-pg)
   (db/reset-db)
   (data/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 5))))  
   (data/make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
-  (loop [x 1]
-    (if (> x 80)
-      :done
-      (do (let [s (data/make-student (str "zax" x))]
-            (loop [y 2]
-              (log/info (str "Id:" x " Num:" y " of:" (* 80 200)))
-              (if (> y 200)
-                :done
-                (do
-                  (data/swipe-in x (t/minus (t/now) (t/days y)))
-                  (data/swipe-out x (t/minus (t/plus (t/now) (t/minutes 5))
-                                        (t/days y)))
-                  (recur (inc y))))))
 
-          (recur (inc x)))))
+  (let [{class-id :_id} (data/get-class-by-name "2014-2015")]
+    (db/activate-class class-id)
+    (loop [x 1]
+      (if (> x 80)
+        :done
+        (do (let [s (data/make-student (str "zax" x))
+                  {sid :_id} s]
+              (data/add-student-to-class sid class-id)
+              (loop [y 2]
+                (log/info (str "Id:" x " Num:" y " of:" (* 80 200)))
+                (if (> y 200)
+                  :done
+                  (do
+                    (data/swipe-in x (t/minus (today-at-utc 9 0) (t/days y)))
+                    (data/swipe-out x (t/minus (t/plus (today-at-utc 9 0) (t/hours 6))
+                                               (t/days y)))
+                    (recur (inc y))))))
+            (recur (inc x))))))
   )
