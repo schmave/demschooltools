@@ -20,3 +20,5 @@ pom.xml
 /src/overseer/queries/generated-demo.sql
 /src/overseer/queries/test.sql
 /log/app.log
+/hs_err_pid20615.log
+/test/log4j.properties

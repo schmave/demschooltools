@@ -22,4 +22,4 @@
 
 (comment
   (migratus/migrate {:store :database
-                     :db {}}))
+                     :db @pgdb}))
