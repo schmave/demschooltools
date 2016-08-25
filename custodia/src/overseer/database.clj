@@ -157,6 +157,7 @@
 (defn make-student-starting-today [name]
   (make-student name (make-sqldate (today-string))))
 
+
 (defn- toggle-date [older]
   (if older nil (make-sqldate (str (t/now)))))
 
@@ -165,6 +166,15 @@
         student (assoc student :olderdate (toggle-date (:olderdate student)))]
     (db/update! :students _id {:olderdate (:olderdate student)})
     student))
+
+(defn modify-student [_id f field]
+  (let [student (first (get-students _id))
+        newVal (f student)]
+    (db/update! :students _id {field newVal})
+    (assoc student field newVal)))
+
+(defn set-student-email [_id email]
+  (modify-student _id (fn [_] email) :guardian_email ))
 
 (defn set-student-start-date [_id date]
   (let [student (first (get-students _id))

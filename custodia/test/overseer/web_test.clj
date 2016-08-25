@@ -76,6 +76,15 @@
 
   )
 
+(deftest set-student-email
+  (sample-db true)
+  (let [{sid :_id} (data/make-student "test")
+        email "test@email.com"]
+    (data/set-student-email sid email)
+    (let [s (-> (data/get-students sid) first)]
+      (testing "Email is set"
+        (is (= email (:guardian_email s)))))))
+
 (deftest student-start-date-prevents-short-count-test
   (do (sample-db true)
       (let [{sid :_id} (data/make-student "test")
