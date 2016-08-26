@@ -157,36 +157,26 @@
 (defn make-student-starting-today [name]
   (make-student name (make-sqldate (today-string))))
 
-
 (defn- toggle-date [older]
   (if older nil (make-sqldate (str (t/now)))))
 
-(defn toggle-student-older [_id]
-  (let [student (first (get-students _id))
-        student (assoc student :olderdate (toggle-date (:olderdate student)))]
-    (db/update! :students _id {:olderdate (:olderdate student)})
-    student))
-
-(defn modify-student [_id f field]
+(defn modify-student [_id field f]
   (let [student (first (get-students _id))
         newVal (f student)]
     (db/update! :students _id {field newVal})
     (assoc student field newVal)))
 
+(defn toggle-student-older [_id]
+  (modify-student _id :olderdate #(toggle-date (:olderdate %))))
+
 (defn set-student-email [_id email]
-  (modify-student _id (fn [_] email) :guardian_email ))
+  (modify-student _id :guardian_email (fn [_] email)))
 
 (defn set-student-start-date [_id date]
-  (let [student (first (get-students _id))
-        student (assoc student :start_date (make-sqldate date))]
-    (db/update! :students _id {:start_date (:start_date student)})
-    student))
+  (modify-student _id  :start_date (fn [_] (make-sqldate date))))
 
 (defn toggle-student-absent [_id]
-  (let [student (first (get-students _id))
-        student (assoc student :show_as_absent (make-sqldate (str (t/now))))]
-    (db/update! :students _id {:show_as_absent (:show_as_absent student)})
-    student))
+  (modify-student _id :show_as_absent (fn [_] (make-sqldate (str (t/now))))))
 
 (defn make-year [from to] 
   (let [from (f/parse from)
