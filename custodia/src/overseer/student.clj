@@ -43,15 +43,20 @@
     (friend/authorize #{roles/super}
                       (resp/response {:users (db/get-users)})))
 
-  (PUT "/students/:id" [id :<< as-int name start_date]
+  (PUT "/students/:id" [id :<< as-int name start_date email]
        (friend/authorize #{roles/admin}
-                         (data/edit-student id name start_date))
+                         (data/edit-student id name start_date email))
        (student-page-response id))
 
   (POST "/students/:id/togglehours" [id :<< as-int]
         (friend/authorize #{roles/admin}
                           (do (data/toggle-student-older id)
                               (student-page-response id))))
+
+  (POST "/students/:id/email" [id :<< as-int email]
+    (friend/authorize #{roles/admin}
+                      (do (data/set-student-email id email)
+                          (student-page-response id))))
 
   (POST "/students/:id/absent" [id :<< as-int]
         (friend/authorize #{roles/user}

@@ -78,9 +78,9 @@
 
 (deftest set-student-email
   (sample-db true)
-  (let [{sid :_id} (data/make-student "test")
+  (let [{sid :_id date :start_date} (data/make-student "test")
         email "test@email.com"]
-    (data/set-student-email sid email)
+    (data/edit-student sid "test" date email)
     (let [s (-> (data/get-students sid) first)]
       (testing "Email is set"
         (is (= email (:guardian_email s)))))))

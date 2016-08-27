@@ -103,8 +103,11 @@
   (when-let [year (first (get-years year))]
     (db/delete! year)))
 
-(defn edit-student [_id name start-date]
-  (db/update! :students _id {:name name :start_date (make-sqldate start-date)}))
+(defn edit-student [_id name start-date email]
+  (db/update! :students _id
+              {:name name
+               :start_date (make-sqldate start-date)
+               :guardian_email email}))
 
 (defn excuse-date [id date-string]
   (db/persist! {:type :excuses
@@ -168,9 +171,6 @@
 
 (defn toggle-student-older [_id]
   (modify-student _id :olderdate #(toggle-date (:olderdate %))))
-
-(defn set-student-email [_id email]
-  (modify-student _id :guardian_email (fn [_] email)))
 
 (defn set-student-start-date [_id date]
   (modify-student _id  :start_date (fn [_] (make-sqldate date))))

@@ -145,7 +145,8 @@ var exports = React.createClass({
     saveChange: function () {
         actionCreator.updateStudent(this.state.student._id,
                                     this.refs.name.getDOMNode().value,
-                                    this.refs.missing_datepicker.state.value);
+                                    this.refs.missing_datepicker.state.value,
+                                    this.refs.email.getDOMNode().value);
         this.toggleEdit();
     },
     getActiveDay: function (student) {
@@ -177,6 +178,8 @@ var exports = React.createClass({
             <div className="col-sm-3" id="nameRow">
                 <input ref="name" className="form-control" id="studentName"
                        defaultValue={this.state.student.name}/>
+                <input ref="email" className="form-control" id="email"
+                       defaultValue={this.state.student.guardian_email}/>
                 <button onClick={this.saveChange} className="btn btn-success">
                     <i id="save-name" className="fa fa-check icon-large">Save</i></button>
                 <button id="cancel-name" onClick={this.toggleEdit} className="btn btn-danger">

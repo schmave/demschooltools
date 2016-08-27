@@ -53,10 +53,11 @@ var exports = {
             });
         }.bind(this));
     },
-    updateStudent: function (id, name, start_date) {
+    updateStudent: function (id, name, start_date, email) {
         ajax.put('/students/' + id, {
             name: name,
-            start_date: start_date
+            start_date: start_date,
+            email: email
         }).then(function (data) {
             this.loadStudents();
             dispatcher.dispatch({

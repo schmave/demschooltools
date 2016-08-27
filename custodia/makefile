@@ -19,8 +19,6 @@ T :
 	@echo minify
 	@echo js
 	@echo watch
-	@echo sjs
-	@echo sjswatch
 
 # example of ls and echo
 hello :
@@ -87,8 +85,3 @@ js :
 watch :
 	watchify -v -t babelify ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
 
-#sjs :
-#	nodejs /usr/local/bin/browserify -t babelify ./src/js/app.jsx -o ./resources/public/js/gen/app.js
-#
-#sjswatch :
-#	nodejs /usr/local/bin/watchify -t babelify ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
