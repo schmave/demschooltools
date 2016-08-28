@@ -45,7 +45,7 @@ var exports = assign({}, EventEmitter.prototype, {
 });
 
 ajax.get('/users/is-admin').then(function (data) {
-    isAdmin = true;
+    isAdmin = data.admin;
     exports.emitChange();
 }, function (data) {
     isAdmin = false;
@@ -53,7 +53,7 @@ ajax.get('/users/is-admin').then(function (data) {
 });
 
 ajax.get('/users/is-super').then(function (data) {
-    isSuper = true;
+    isSuper = data.super;
     superSchema = data.schema;
     exports.emitChange();
 }, function (data) {

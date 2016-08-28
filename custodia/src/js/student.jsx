@@ -1,5 +1,7 @@
 var React = require('react'),
     Heatmap = require('./heatmap.jsx'),
+    userStore = require('./userstore'),
+    AdminItem = require('./adminwrapper.jsx'),
     Modal = require('./modal.jsx'),
     DateTimePicker = require('react-widgets').DateTimePicker,
     actionCreator = require('./studentactioncreator'),
@@ -140,7 +142,9 @@ var exports = React.createClass({
         }.bind(this));
     },
     toggleEdit: function () {
-        this.setState({editing: !this.state.editing});
+        if(userStore.isAdmin()) {
+            this.setState({editing: !this.state.editing});
+        }
     },
     saveChange: function () {
         actionCreator.updateStudent(this.state.student._id,

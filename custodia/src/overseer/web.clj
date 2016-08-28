@@ -35,6 +35,9 @@
             )
   (:gen-class))
 
+(defn get-username [req]
+  (:username (friend/current-authentication req)))
+
 (defroutes app
   (GET "/" []
     (friend/authenticated (io/resource "index.html")))
@@ -74,15 +77,15 @@
   (GET "/users/is-user" req
     (friend/authorize #{roles/user} "You're a user!"))
   (GET "/users/is-admin" req
-    (friend/authorize #{roles/admin} (resp/response {:admin true})))
+    (resp/response {:admin (= "admin" (get-username req))}))
   (GET "/users/is-super" req
-    (friend/authorize #{roles/super}
-                      (let [user (db/get-user "super")]
-                        (resp/response {:super true
-                                        :schema (:schema_name user)}))))
+    (let [user (db/get-user "super")]
+      (resp/response {:super (= "super" (get-username req))
+                      :schema (:schema_name user)})))
   (route/resources "/")
   (ANY "*" []
     (route/not-found (slurp (io/resource "404.html")))))
+
 
 (defn my-middleware [app]
   (fn [req]
