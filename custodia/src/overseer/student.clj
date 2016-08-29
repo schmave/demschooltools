@@ -53,11 +53,6 @@
                           (do (data/toggle-student-older id)
                               (student-page-response id))))
 
-  (POST "/students/:id/email" [id :<< as-int email]
-    (friend/authorize #{roles/admin}
-                      (do (data/set-student-email id email)
-                          (student-page-response id))))
-
   (POST "/students/:id/absent" [id :<< as-int]
         (friend/authorize #{roles/user}
                           (do (data/toggle-student-absent id)

@@ -56,19 +56,21 @@ ajax.get('/users/is-super').then(function (data) {
     isSuper = data.super;
     superSchema = data.schema;
     exports.emitChange();
+    if (data.super) {
+        ajax.get('/user').then(function (data) {
+            users = data.users;
+            exports.emitChange();
+        }, function (data) {});
+
+        ajax.get('/schemas').then(function (data) {
+            schemas = data;
+            exports.emitChange();
+        }, function (data) {
+            exports.emitChange();
+        });
+    }
 }, function (data) {
     isSuper = false;
-    exports.emitChange();
-});
-ajax.get('/user').then(function (data) {
-    users = data.users;
-    exports.emitChange();
-}, function (data) {});
-
-ajax.get('/schemas').then(function (data) {
-    schemas = data;
-    exports.emitChange();
-}, function (data) {
     exports.emitChange();
 });
 
