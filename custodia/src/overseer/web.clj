@@ -38,13 +38,6 @@
 (defroutes app
   (GET "/" []
     (friend/authenticated (io/resource "index.html")))
-  (GET "/resetdb" []
-    (friend/authorize #{roles/super} ;; (db/reset-db)
-                      (resp/redirect "/")))
-
-  (GET "/sampledb" []
-    (friend/authorize #{roles/super} ;; (data/sample-db true)
-                      (resp/redirect "/")))
 
   (PUT "/schema/:schema" [schema]
     (friend/authorize #{roles/super}
@@ -74,10 +67,10 @@
   (GET "/users/is-user" req
     (friend/authorize #{roles/user} "You're a user!"))
   (GET "/users/is-admin" req
-    (resp/response {:admin (-> req friend/current-authentication :roles  roles/admin)}))
+    (resp/response {:admin (-> req friend/current-authentication :roles roles/admin)}))
   (GET "/users/is-super" req
     (let [user (db/get-user "super")]
-      (resp/response {:super (-> req friend/current-authentication :roles  roles/super)
+      (resp/response {:super (-> req friend/current-authentication :roles roles/super)
                       :schema (:schema_name user)})))
   (route/resources "/")
   (ANY "*" []
