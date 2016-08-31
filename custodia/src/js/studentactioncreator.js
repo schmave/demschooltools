@@ -34,7 +34,7 @@ var exports = {
                 type: constants.systemEvents.FLASH,
                 message: 'Successfully created ' + data.made.name + '.'
             });
-            router.get().transitionTo('students');
+            router.get().transitionTo('classes');
         }.bind(this), function (error) {
             dispatcher.dispatch({
                 type: constants.systemEvents.FLASH,

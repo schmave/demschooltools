@@ -67,22 +67,21 @@ var exports = React.createClass({
         return this.state.classes.map(function (classval, i) {
             var boundClick = this.classSelected.bind(this, classval),
                 selected = (classval._id === this.state.selectedClass._id)  ? "selected" : "";
-            return <tr key={classval._id}
+            return (<tr key={classval._id}
                        id={classval.name}
                        onClick={boundClick}
                        className={selected}>
-                <td>
-                    {classval.name}
-                    {classval.active ?
-                     <span className="margined badge badge-green">Active</span>
-                     : <span onClick={this.activateClass}
-                             id={"activate-"+classval.name}
-                             className="margined badge">
-                         Activate
-                     </span>}
-                </td>
-            </tr>
-
+                      <td>
+                          {classval.name}
+                          {classval.active ?
+                              <span className="margined badge badge-green">Active</span>
+                              : <span onClick={this.activateClass}
+                                      id={"activate-"+classval.name}
+                                      className="margined badge">
+                                  Activate
+                             </span>}
+                      </td>
+                    </tr>);
         }.bind(this));
     },
     selectedStudentContains: function(stu) {
@@ -140,40 +139,47 @@ var exports = React.createClass({
                                 : <span></span>;
         return <div>
                             <div className="row margined class-listing new-class">
+                              <div className="col-sm-2 column">
+                                  <table className="table table-striped center">
+                                    <thead>
+                                      <tr>
+                                        <th className="center">
+                                          <span className="h2">Classes</span>&nbsp;
+                                        </th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      <tr><td>
+                                          <Link style={{verticalAlign: "text-bottom"}} className="btn btn-primary btn-xs" id="create-class" to="createaclass">Add new</Link>
+                                      </td></tr>
+                                      {this.classRows()}
+                                    </tbody>
+                                  </table>
+                              </div>
+                              <div className="col-sm-10 column">
                                 <div className="col-sm-2 column">
-                                    <table className="table table-striped center">
-                                        <thead>
-                                            <tr>
-                                                <th className="center">
-                                                    <span className="h2">Classes</span>&nbsp;
-                                                    <Link style={{verticalAlign: "text-bottom"}} className="btn btn-primary btn-xs" id="create-class" to="createaclass">Add new</Link>
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody> {this.classRows()} </tbody>
-                                    </table>
-                                </div>
-                        <AdminWrapper>
-                            <Link to="create" className="btn btn-primary btn-xs" id="create-student">Add Student</Link>
-                        </AdminWrapper>
-
-                                <div className="col-sm-10 column">
-                                     <FilterBox onFilterChange={this.filterChanged} />
+                                  <Link to="create" className="btn btn-primary btn-xs" id="create-student">
+                                    Add Student
+                                  </Link>
                                 </div>
                                 <div className="col-sm-10 column">
-                                    <div className="col-sm-6 column">
-                                        <div className="panel panel-info">
-                                            <div className="panel-heading absent"><b>In Class</b></div>
-                                            {this.getStudentRowsInCurrentClass()}
-                                        </div>
-                                    </div>
-                                    <div className="col-sm-6 column">
-                                        <div className="panel panel-info">
-                                            <div className="panel-heading absent"><b>Not In Class</b></div>
-                                            {this.getStudentRowsNotInCurrentClass()}
-                                        </div>
-                                    </div>
+                                  <FilterBox onFilterChange={this.filterChanged} />
                                 </div>
+                                <div className="col-sm-12 column">
+                                  <div className="col-sm-6 column">
+                                    <div className="panel panel-info">
+                                      <div className="panel-heading absent"><b>In Class</b></div>
+                                      {this.getStudentRowsInCurrentClass()}
+                                    </div>
+                                  </div>
+                                  <div className="col-sm-6 column">
+                                    <div className="panel panel-info">
+                                      <div className="panel-heading absent"><b>Not In Class</b></div>
+                                      {this.getStudentRowsNotInCurrentClass()}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
         </div>;
     }
