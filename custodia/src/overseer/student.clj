@@ -30,7 +30,7 @@
   (GET "/students/:id" [id :<< as-int]
        (friend/authorize #{roles/user} (student-page-response id)))
 
-  (POST "/students" [name]
+  (POST "/students" [name email]
         (friend/authorize #{roles/admin}
                           (let [made? (data/make-student-starting-today name)]
                             (resp/response {:made made?

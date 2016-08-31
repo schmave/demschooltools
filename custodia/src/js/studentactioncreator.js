@@ -24,9 +24,10 @@ var exports = {
                 });
             });
     },
-    createStudent: function (name) {
+    createStudent: function (name, email) {
         ajax.post('/students', {
-            name: name
+            name: name,
+            email: email
         }).then(function (data) {
             this.loadStudents();
             dispatcher.dispatch({

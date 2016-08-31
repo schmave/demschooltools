@@ -3,7 +3,8 @@ var React = require('react'),
 
 var exports = React.createClass({
     submit: function(){
-        actionCreator.createStudent(this.refs.name.getDOMNode().value);
+        actionCreator.createStudent(this.refs.name.getDOMNode().value,
+                                    this.refs.email.getDOMNode().value);
     },
     render: function () {
         return <div className="row">
@@ -18,6 +19,10 @@ var exports = React.createClass({
                             <div className="form-group">
                                 <label htmlFor="studentName">Name</label>
                                 <input ref="name" className="form-control" id="studentName" placeholder="Name"/>
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="email">Parent Email</label>
+                                <input ref="email" className="form-control" id="email" placeholder="Parent Email"/>
                             </div>
                             <div className="form-group">
                                 <button type="button" id="saveStudent" onClick={this.submit} className="btn btn-primary">Add Student</button>
