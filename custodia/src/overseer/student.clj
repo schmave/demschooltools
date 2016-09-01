@@ -22,6 +22,9 @@
   (att/get-student-list (show-archived?)))
 
 (defroutes student-routes
+  (GET "/allstudents" req
+    (friend/authorize #{roles/admin}
+                      (resp/response (data/get-students))))
   (GET "/students" req
        (friend/authorize #{roles/user}
                          (resp/response {:today (dates/today-string)
@@ -32,9 +35,8 @@
 
   (POST "/students" [name email]
         (friend/authorize #{roles/admin}
-                          (let [made? (data/make-student-starting-today name)]
-                            (resp/response {:made made?
-                                            :students (get-student-list)}))))
+                          (resp/response {:made (data/make-student-starting-today name)
+                                          :students (get-student-list)})))
 
   (PUT "/user" [name password]
     (friend/authorize #{roles/super}

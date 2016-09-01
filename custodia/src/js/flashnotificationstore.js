@@ -6,9 +6,10 @@ var EventEmitter = require('events').EventEmitter,
 var CHANGE_EVENT = 'change';
 
 var latest = '';
+var level = 'success';
 
 function getLatest(){
-    return latest;
+    return {message: latest, level: level};
 }
 
 var exports = assign({}, EventEmitter.prototype, {
@@ -28,6 +29,7 @@ dispatcher.register(function(action){
     switch(action.type){
         case constants.systemEvents.FLASH:
             latest = action.message;
+            level = action.level || 'success';
             exports.emitChange();
             break;
     }

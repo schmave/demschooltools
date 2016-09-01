@@ -5,6 +5,16 @@ var eventEmitter = require('events').EventEmitter,
     dispatcher = require('./appdispatcher');
 
 var exports = {
+    loadAllStudents: function () {
+        $.ajax({
+            url: '/allstudents'
+        }).then(function (data) {
+            dispatcher.dispatch({
+                type: constants.studentEvents.ALL_LOADED,
+                data: data
+            });
+        });
+    },
     loadStudents: function () {
         $.ajax({
             url: '/students'
@@ -29,12 +39,23 @@ var exports = {
             name: name,
             email: email
         }).then(function (data) {
-            this.loadStudents();
             dispatcher.dispatch({
-                type: constants.systemEvents.FLASH,
-                message: 'Successfully created ' + data.made.name + '.'
+                type: constants.studentEvents.ALL_LOADED,
+                data: data.students
             });
-            router.get().transitionTo('classes');
+            if(data.made) {
+                dispatcher.dispatch({
+                    type: constants.systemEvents.FLASH,
+                    message: 'Successfully created ' + data.made.name + '.'
+                });
+                router.get().transitionTo('classes');
+            } else {
+                dispatcher.dispatch({
+                    type: constants.systemEvents.FLASH,
+                    message: 'Student ' + name + ' already exists.',
+                    level: 'error'
+                });
+            }
         }.bind(this), function (error) {
             dispatcher.dispatch({
                 type: constants.systemEvents.FLASH,

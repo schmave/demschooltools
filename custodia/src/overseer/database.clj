@@ -148,11 +148,15 @@
 (defn add-student-to-class [student-id class-id]
   (db/persist! {:type :classes_X_students :student_id student-id :class_id class-id}))
 
+(defn has-name [n]
+  (not= "" (clojure.string/trim n)))
+
 (defn make-student
   ([name] (make-student name nil))
-  ([name start-date] (make-student name start-date))
+  ([name start-date] (make-student name start-date ""))
   ([name start-date email]
-   (when (student-not-yet-created name)
+   (when (and (has-name name)
+              (student-not-yet-created name))
      (db/persist! {:type :students
                    :name name
                    :start_date start-date

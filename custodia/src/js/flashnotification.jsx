@@ -12,8 +12,8 @@ var exports = React.createClass({
         var message = store.getLatest();
         if(message){
             this.notifications.addNotification({
-                message: message,
-                level: 'success'
+                message: message.message,
+                level: message.level
             });
         }
     },

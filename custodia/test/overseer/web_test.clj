@@ -76,6 +76,10 @@
 
   )
 
+(deftest no-student-name-invalid
+  (testing "Email is set"
+    (is (= nil (data/make-student "  ")))))
+
 (deftest set-student-email
   (sample-db true)
   (let [{sid :_id date :start_date} (data/make-student "test")

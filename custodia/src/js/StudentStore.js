@@ -4,7 +4,7 @@ var EventEmitter = require('events').EventEmitter,
     base = require('./storebase'),
     actionCreator = require('./studentactioncreator');
 
-var students, today;
+var students, today, allStudents;
 var studentDetails = {};
 
 var exports = Object.create(base);
@@ -14,6 +14,15 @@ exports.getStudents = function(force){
         return students;
     }else{
         actionCreator.loadStudents();
+        return [];
+    }
+};
+
+exports.getAllStudents = function(force){
+    if(!force && allStudents){
+        return allStudents;
+    }else{
+        actionCreator.loadAllStudents();
         return [];
     }
 };
@@ -33,6 +42,10 @@ exports.getStudent = function(id){
 
 dispatcher.register(function(action){
     switch(action.type){
+        case constants.studentEvents.ALL_LOADED:
+            allStudents = action.data;
+            exports.emitChange();
+            break;
         case constants.studentEvents.LOADED:
             students = action.data.students;
             today = action.data.today;

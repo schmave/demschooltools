@@ -30,16 +30,17 @@ var React = require('react'),
     actionCreator = require('./classactioncreator'),
     Link = Router.Link,
     AdminWrapper = require('./adminwrapper.jsx'),
+    studentStore = require('./StudentStore'),
     FilterBox = require('./filterbox.jsx');
 
 var exports = React.createClass({
     getInitialState: function () {
-        return {classes:[], filterText: '', students: [], selectedClass: {students:[]}};
+        return {classes:classStore.getClasses(true),
+                filterText: '',
+                students: studentStore.getAllStudents(true),
+                selectedClass: {students:[]}};
     },
-    setupState: function (state) {
-        var both = state,
-            classes = both.classes ? both.classes : [],
-            students = both.students ? both.students : [];
+    setupState: function (classes, students) {
         var selectedClass = this.state.selectedClass;
         if(selectedClass) {
             var id = selectedClass._id,
@@ -47,18 +48,22 @@ var exports = React.createClass({
             selectedClass = (matching[0]) ? matching[0] : classes[0];
         }
         this.setState({classes: classes,
-                       selectedClass: (selectedClass)?selectedClass:{students:[]},
-                       students: students});
+                       students: students,
+                       selectedClass: (selectedClass)?selectedClass:{students:[]}});
     },
     componentDidMount: function () {
-        this.setupState(classStore.getClasses());
-        classStore.addChangeListener(this._onChange);
+        classStore.addChangeListener(this._onClassChange);
+        studentStore.addChangeListener(this._onStudentChange);
     },
     componentWillUnmount: function () {
-        classStore.removeChangeListener(this._onChange);
+        studentStore.removeChangeListener(this._onStudentChange);
+        classStore.removeChangeListener(this._onClassChange);
     },
-    _onChange: function () {
-        this.setupState(classStore.getClasses());
+    _onClassChange: function () {
+        this.setupState(classStore.getClasses().classes, this.state.students);
+    },
+    _onStudentChange: function () {
+        this.setupState(this.state.classes, studentStore.getAllStudents());
     },
     classSelected: function (classval) {
         this.setState({selectedClass: classval});
