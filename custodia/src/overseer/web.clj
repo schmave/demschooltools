@@ -31,13 +31,22 @@
             [cemerick.friend :as friend]
             (cemerick.friend [workflows :as workflows]
                              [credentials :as creds])
+            [stencil.core :refer [render-string]]
             [environ.core :refer [env]]
             )
   (:gen-class))
 
+(defn read-template [filename]
+  (slurp (clojure.java.io/resource filename)))
+
+(defn uuid [] (str (java.util.UUID/randomUUID)))
+
+(def start-id (subs (uuid) 0 7))
+
 (defroutes app
   (GET "/" []
-    (friend/authenticated (io/resource "index.html")))
+    (friend/authenticated
+     (render-string (read-template "index.html") {:id start-id})))
 
   (PUT "/schema/:schema" [schema]
     (friend/authorize #{roles/super}
@@ -72,6 +81,9 @@
     (let [user (db/get-user "super")]
       (resp/response {:super (-> req friend/current-authentication :roles roles/super)
                       :schema (:schema_name user)})))
+
+  (GET "/js/gen/:id{.+}/app.js" req
+    (io/resource "public/js/gen/app.js"))
   (route/resources "/")
   (ANY "*" []
     (route/not-found (slurp (io/resource "404.html")))))

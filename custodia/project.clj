@@ -33,6 +33,7 @@
                  [org.clojure/tools.trace "0.7.8"]
                  [com.ashafa/clutch "0.4.0"]
                  [org.clojure/java.classpath "0.2.2"]
+                 [stencil "0.5.0"]
                  ;;[refactor-nrepl "1.2.0"]
                  ;;[alembic "0.3.2"]
                  ;;[org.clojure/tools.nrepl "0.2.12"]
