@@ -161,7 +161,8 @@
                    :name name
                    :start_date start-date
                    :guardian_email email
-                   :olderdate nil :show_as_absent nil}))))
+                   :olderdate nil
+                   :show_as_absent nil}))))
 
 (defn make-student-starting-today
   ([name] (make-student-starting-today name ""))

@@ -35,7 +35,7 @@
 
   (POST "/students" [name email]
         (friend/authorize #{roles/admin}
-                          (resp/response {:made (data/make-student-starting-today name)
+                          (resp/response {:made (data/make-student-starting-today name email)
                                           :students (get-student-list)})))
 
   (PUT "/user" [name password]

@@ -21,8 +21,8 @@ var exports = React.createClass({
                                 <input ref="name" className="form-control" id="studentName" placeholder="Name"/>
                             </div>
                             <div className="form-group">
-                                <label htmlFor="email">Parent Email</label>
-                                <input ref="email" className="form-control" id="email" placeholder="Parent Email"/>
+                                <label htmlFor="parentEmail">Parent Email</label>
+                                <input ref="email" className="form-control" id="parentEmail" placeholder="Parent Email"/>
                             </div>
                             <div className="form-group">
                                 <button type="button" id="saveStudent" onClick={this.submit} className="btn btn-primary">Add Student</button>

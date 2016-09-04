@@ -180,9 +180,9 @@ var exports = React.createClass({
         var pickerDate = (this.state.student.start_date) ? new Date(this.state.student.start_date) : null;
         return <div className="col-sm-8 row">
             <div className="col-sm-3" id="nameRow">
-                <input ref="name" className="form-control" id="studentName"
+                Name: <input ref="name" className="form-control" id="studentName"
                        defaultValue={this.state.student.name}/>
-                <input ref="email" className="form-control" id="email"
+                Parent Email: <input ref="email" className="form-control" id="email"
                        defaultValue={this.state.student.guardian_email}/>
                 <button onClick={this.saveChange} className="btn btn-success">
                     <i id="save-name" className="fa fa-check icon-large">Save</i></button>
