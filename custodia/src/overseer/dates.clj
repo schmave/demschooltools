@@ -1,7 +1,6 @@
 (ns overseer.dates
   (:require [com.ashafa.clutch :as couch]
             [overseer.db :as db]
-            [overseer.database :as data]
             [overseer.helpers :refer :all]
             [clojure.tools.trace :as trace]
             [clj-time.format :as f]
