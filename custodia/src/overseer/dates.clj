@@ -1,6 +1,7 @@
 (ns overseer.dates
   (:require [com.ashafa.clutch :as couch]
             [overseer.db :as db]
+            [overseer.database :as data]
             [overseer.helpers :refer :all]
             [clojure.tools.trace :as trace]
             [clj-time.format :as f]
@@ -82,6 +83,7 @@
       (assoc swipe :interval int-hours))
     swipe))
 
+
 (defn get-current-year-string [years]
   (let [current_year (->> years
                           (filter #(t/within? (t/interval (c/from-sql-time (:from_date %))
@@ -89,5 +91,6 @@
                                               (t/now)))
                           first
                           :name)]
-    (if current_year current_year
-        (-> years first :name))))
+    (if current_year
+      current_year
+      (-> years last :name))))
