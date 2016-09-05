@@ -58,7 +58,7 @@ module.exports = React.createClass({
         students.sort((a, b) => {
             return (a['name'] > b['name'] ? 1 : -1);
         });
-        students.map((student) => {
+        students.map(function(student) {
             if (!student.in_today && student.absent_today) {
                 absentCol.push(this.getStudent(student, 'absent'));
             }
