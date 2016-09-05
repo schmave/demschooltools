@@ -80,8 +80,8 @@ minify :
 	browserify -t reactify -t uglifyify ./src/js/app.jsx -o ./resources/public/js/gen/app.js
 
 js :
-	node_modules/.bin/browserify src/js/app.jsx -o resources/public/js/gen/app.js -t [ babelify --presets [ es2015 react ] ]
+	browserify -t babelify ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
 
 watch :
-	node_modules/.bin/watchify src/js/app.jsx -o resources/public/js/gen/app.js -t [ babelify --presets [ es2015 react ] ]
+	watchify -v -t babelify ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
 
