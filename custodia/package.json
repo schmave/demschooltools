@@ -22,28 +22,26 @@
   "homepage": "https://github.com/thedreadpirate/overseer",
   "dependencies": {
     "cal-heatmap": "3.5.4",
-    "flux": "^2.0.3",
-    "griddle-react": "^0.2.13",
-    "jest-cli": "^0.5.0",
-    "moment": "^2.10.6",
-    "object-assign": "^3.0.0",
-    "react": "^0.13.3",
-    "react-notification-system": "^0.1.14",
-    "react-router": "^0.13.3",
-    "react-skylight": "^0.2.0",
-    "react-widgets": "^2.8.0",
-    "underscore": "^1.8.3"
+    "d3": "3.5.6",
+    "flux": "2.1.1",
+    "griddle-react": "0.2.14",
+    "jest-cli": "0.5.4",
+    "moment": "2.10.6",
+    "object-assign": "3.0.0",
+    "react": "0.13.3",
+    "react-notification-system": "0.1.14",
+    "react-router": "0.13.3",
+    "react-skylight": "0.2.0",
+    "react-widgets": "2.8.0",
+    "underscore": "1.8.3"
   },
   "devDependencies": {
-    "babel-cli": "^6.14.0",
-    "babel-preset-react": "^6.11.1",
-    "concurrently": "^2.0.0",
-    "jest-cli": "^0.5.0",
-
-    "babel-preset-es2015": "^6.14.0",
-    "babelify": "^7.3.0",
-    "browserify": "^13.1.0",
-    "uglifyify": "^3.0.2",
-    "watchify": "^3.7.0"
+    "babelify": "6.3.0",
+    "browserify": "11.0.1",
+    "concurrently": "2.0.0",
+    "jest-cli": "0.5.0",
+    "reactify": "1.1.1",
+    "uglifyify": "3.0.1",
+    "watchify": "3.4.0"
   }
 }
