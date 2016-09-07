@@ -141,7 +141,7 @@
 (defn class-not-yet-created [name]
   (thing-not-yet-created name db/get-classes))
 
-(defn make-class [name]
+(defn make-class [name from_date to_date]
   (when (class-not-yet-created name)
     (db/persist! {:type :classes :name name :active false})))
 

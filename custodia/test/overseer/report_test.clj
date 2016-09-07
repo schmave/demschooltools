@@ -36,8 +36,8 @@
             {sid2 :_id} (data/make-student "test2")]
         (data/add-student-to-class sid class-id)
         (add-3good-2short-swipes sid)
-        (data/swipe-in sid2 _10-19)
-        (data/swipe-in sid2 _10-20)
+        (data/swipe-in sid2 _2014_10_19)
+        (data/swipe-in sid2 _2014_10_20)
 
         (let [att (db/get-report today-str class-id)
               student1 (first (filter #(= sid (:_id %)) att))
@@ -70,8 +70,8 @@
         (data/override-date sid "2014-10-18")
         (data/excuse-date sid "2014-10-20")
 
-        (data/swipe-in sid2 _10-19)
-        (data/swipe-in sid2 _10-20)
+        (data/swipe-in sid2 _2014_10_19)
+        (data/swipe-in sid2 _2014_10_20)
 
         (data/add-student-to-class sid class-id)
         (data/add-student-to-class sid2 class-id)

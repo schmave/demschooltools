@@ -14,9 +14,9 @@
   (GET "/classes" []
        (friend/authorize #{roles/admin}
                          (resp/response (db/get-all-classes-and-students))))
-  (POST "/classes" [name]
+  (POST "/classes" [name from_date to_date]
         (friend/authorize #{roles/admin}
-                          (data/make-class name)
+                          (data/make-class name from_date to_date)
                           (resp/response (db/get-all-classes-and-students))))
 
   (POST "/classes/:cid/student/:sid/add" [cid :<< as-int sid :<< as-int]
