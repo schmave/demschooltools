@@ -4,6 +4,7 @@ web-test-git := git@heroku.com:shining-overseer-test.git
 T :
 	@echo deploy-test
 	@echo deploy-philly
+	@echo log-philly
 	@echo unit-test
 	@echo "sql-philly - connect to philly postgres prod database"
 	@echo "setup-prod-demo-data - fill the demo database with safe data"
@@ -16,6 +17,10 @@ T :
 	@echo sql-local - connect to local database
 	@echo "sql-philly-backup - make backup of philly prod database"
 	@echo "start - start a running overseer site"
+
+	@echo generate-sequence-reset
+	@echo run-sequence-reset
+	@echo deploy-philly
 	@echo minify
 	@echo js
 	@echo watch
@@ -31,6 +36,9 @@ deploy-test :
 setup-prod-demo-data :
 	heroku pg:psql --app shining-overseer < demo/demo-data.sql
 
+log-philly :
+	heroku logs --app shining-overseer
+
 sql-philly :
 	heroku pg:psql --app shining-overseer
 
@@ -41,7 +49,14 @@ sql-philly-backup :
 sql-backup-local-restore :
 	pg_restore --verbose --clean --no-acl --no-owner -h localhost -U postgres -d swipes latest.dump
 
-deploy-philly :
+generate-sequence-reset :
+	psql -h localhost -U postgres -d swipes -Atq -f reset.sql -o genreset.sql
+
+run-sequence-reset :
+	psql -f genreset.sql
+
+deploy-philly : generate-sequence-reset
+	echo 'do you need to run the sequence reset?'
 	./prod-deploy.sh $(philly-prod-git)
 
 start :
