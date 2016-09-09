@@ -92,7 +92,7 @@ without errors.
 $ git clone https://github.com/steveshogren/overseer.git
 $ cd overseer
 $ lein repl
-user=>(def server (overseer.web/-main))
+user=>(start-site 5000)
 ```
 
 Your app should now be running on [localhost:5000](http://localhost:5000/).
