@@ -268,3 +268,63 @@ class Houston extends OrgConfig {
         return INSTANCE;
     }
 }
+
+
+class Sandbox extends OrgConfig {
+    private static final Sandbox INSTANCE = new Sandbox();
+    public TimeZone time_zone = TimeZone.getTimeZone("US/Eastern");
+
+    public Sandbox() {
+        name = "DemSchoolTools sandbox area";
+        short_name = "Sandbox";
+        people_url = "http://sandbox.demschooltools.com";
+
+        str_manual_title = "Lawbook";
+        str_manual_title_short = "Lawbook";
+        str_res_plan_short = "Sentence";
+        str_res_plan = "sentence";
+        str_res_plan_cap = "Sentence";
+        str_res_plans = "sentences";
+        str_res_plans_cap = "Sentences";
+        str_findings = "Findings";
+
+        use_minor_referrals = true;
+        track_writer = false;
+
+        OrgConfig.register(name, this);
+    }
+
+    public static Sandbox getInstance() {
+        return INSTANCE;
+    }
+}
+
+
+class Clearview extends OrgConfig {
+    private static final Clearview INSTANCE = new Clearview();
+    public TimeZone time_zone = TimeZone.getTimeZone("US/Central");
+
+    public Clearview() {
+        name = "Clearview Sudbury School";
+        short_name = "CSS";
+        people_url = "http://css.demschooltools.com";
+
+        str_manual_title = "Lawbook";
+        str_manual_title_short = "Lawbook";
+        str_res_plan_short = "Sentence";
+        str_res_plan = "sentence";
+        str_res_plan_cap = "Sentence";
+        str_res_plans = "sentences";
+        str_res_plans_cap = "Sentences";
+        str_findings = "Findings";
+
+        use_minor_referrals = true;
+        track_writer = false;
+
+        OrgConfig.register(name, this);
+    }
+
+    public static Clearview getInstance() {
+        return INSTANCE;
+    }
+}
