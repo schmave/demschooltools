@@ -56,12 +56,12 @@ public class Application extends Controller {
             .orderBy("id DESC").findList();
     }
 
-	public static Result viewSchoolMeetingReferrals() {
+	public Result viewSchoolMeetingReferrals() {
 		return ok(views.html.view_sm_referrals.render(
 			getActiveSchoolMeetingReferrals()));
 	}
 
-    public static Result viewSchoolMeetingDecisions() {
+    public Result viewSchoolMeetingDecisions() {
         List<Charge> the_charges =
             Charge.find
                 .fetch("rule")
@@ -93,7 +93,7 @@ public class Application extends Controller {
 		return people;
 	}
 
-    public static Result index() {
+    public Result index() {
         return ok(views.html.cached_page.render(
             new CachedPage(CACHE_INDEX,
                 "JC database",
@@ -153,7 +153,7 @@ public class Application extends Controller {
                 }}));
     }
 
-    public static Result downloadCharges() throws IOException {
+    public Result downloadCharges() throws IOException {
         response().setHeader("Content-Type", "text/csv; charset=utf-8");
         response().setHeader("Content-Disposition",
             "attachment; filename=All charges.csv");
@@ -255,18 +255,18 @@ public class Application extends Controller {
         return ok("\ufeff" + new String(baos.toByteArray(), charset));
     }
 
-    public static Result viewMeeting(int meeting_id) {
+    public Result viewMeeting(int meeting_id) {
         return ok(views.html.view_meeting.render(Meeting.findById(meeting_id)));
     }
 
-    public static Result printMeeting(int meeting_id) throws Exception {
+    public Result printMeeting(int meeting_id) throws Exception {
         response().setHeader("Content-Type", "application/pdf");
         return ok(
             renderToPDF(
                 views.html.view_meeting.render(Meeting.findById(meeting_id)).toString()));
     }
 
-    public static Result editResolutionPlanList() {
+    public Result editResolutionPlanList() {
         response().setHeader("Cache-Control", "max-age=0, no-cache, no-store");
         response().setHeader("Pragma", "no-cache");
 
@@ -304,11 +304,11 @@ public class Application extends Controller {
         return ok(views.html.edit_rp_list.render(active_rps, completed_rps));
     }
 
-    public static Result viewMeetingResolutionPlans(int meeting_id) {
+    public Result viewMeetingResolutionPlans(int meeting_id) {
         return ok(views.html.view_meeting_resolution_plans.render(Meeting.findById(meeting_id)));
     }
 
-    public static Result downloadMeetingResolutionPlans(int meeting_id) throws IOException {
+    public Result downloadMeetingResolutionPlans(int meeting_id) throws IOException {
         response().setHeader("Content-Type", "text/csv; charset=utf-8");
         response().setHeader("Content-Disposition", "attachment; filename=" + OrgConfig.get().str_res_plans + ".csv");
 
@@ -353,11 +353,11 @@ public class Application extends Controller {
         return ok("\ufeff" + new String(baos.toByteArray(), charset));
     }
 
-	public static Result viewManual() {
+	public Result viewManual() {
         return ok(renderManualTOC());
 	}
 
-    public static Result viewManualChanges(String begin_date_string) {
+    public Result viewManualChanges(String begin_date_string) {
         Date begin_date = null;
 
         try {
@@ -391,7 +391,7 @@ public class Application extends Controller {
             changes_to_display));
     }
 
-    public static Result printManual() {
+    public Result printManual() {
         return ok(views.html.print_manual.render(Chapter.all()));
     }
 
@@ -504,7 +504,7 @@ public class Application extends Controller {
             });
     }
 
-    public static Result printManualChapter(Integer id) throws Exception {
+    public Result printManualChapter(Integer id) throws Exception {
         response().setHeader("Content-Type", "application/pdf");
 
         if (id == -1) {
@@ -527,7 +527,7 @@ public class Application extends Controller {
         }
     }
 
-	public static Result viewChapter(Integer id) {
+	public Result viewChapter(Integer id) {
         Chapter c = Chapter.find
             .fetch("sections", new FetchConfig().query())
             .fetch("sections.entries", new FetchConfig().query())
@@ -576,7 +576,7 @@ public class Application extends Controller {
         return rps;
     }
 
-    public static Result getPersonRuleHistory(Integer personId, Integer ruleId) {
+    public Result getPersonRuleHistory(Integer personId, Integer ruleId) {
         Person p = Person.findByIdWithJCData(personId);
         Entry r = Entry.findById(ruleId);
 
@@ -593,7 +593,7 @@ public class Application extends Controller {
             p, r, rule_record, history.charges_by_rule.get(r), history));
     }
 
-    public static Result getPersonHistory(Integer id) {
+    public Result getPersonHistory(Integer id) {
         Person p = Person.findByIdWithJCData(id);
         return ok(views.html.person_history.render(
 			p,
@@ -602,7 +602,7 @@ public class Application extends Controller {
 			false));
     }
 
-    public static Result viewPersonHistory(Integer id, Boolean redact_names, String start_date_str, String end_date_str) {
+    public Result viewPersonHistory(Integer id, Boolean redact_names, String start_date_str, String end_date_str) {
 		Date start_date = getStartOfYear();
 		Date end_date = null;
 
@@ -620,7 +620,7 @@ public class Application extends Controller {
 			redact_names));
     }
 
-    public static Result getRuleHistory(Integer id) {
+    public Result getRuleHistory(Integer id) {
         Entry r = Entry.findByIdWithJCData(id);
         return ok(views.html.rule_history.render(
 			r,
@@ -628,7 +628,7 @@ public class Application extends Controller {
 			getRecentResolutionPlans(r)));
     }
 
-    public static Result viewRuleHistory(Integer id, String start_date_str, String end_date_str) {
+    public Result viewRuleHistory(Integer id, String start_date_str, String end_date_str) {
 		Date start_date = getStartOfYear();
 		Date end_date = null;
 
@@ -645,7 +645,7 @@ public class Application extends Controller {
 			getRecentResolutionPlans(r)));
     }
 
-    public static Result viewPersonsWriteups(Integer id) {
+    public Result viewPersonsWriteups(Integer id) {
         Person p = Person.findByIdWithJCData(id);
 
 		List<Case> cases_written_up = new ArrayList<Case>(p.getThisYearCasesWrittenUp());
@@ -656,11 +656,11 @@ public class Application extends Controller {
         return ok(views.html.view_persons_writeups.render(p, cases_written_up));
     }
 
-    public static Result thisWeekReport() {
+    public Result thisWeekReport() {
         return viewWeeklyReport("");
     }
 
-    public static Result printWeeklyMinutes(String date_string) throws Exception {
+    public Result printWeeklyMinutes(String date_string) throws Exception {
         Calendar start_date = new GregorianCalendar();
         try {
             Date parsed_date = new SimpleDateFormat("yyyy-M-d").parse(date_string);
@@ -688,7 +688,7 @@ public class Application extends Controller {
         return ok(renderToPDF(documents));
     }
 
-    public static Result viewWeeklyReport(String date_string) {
+    public Result viewWeeklyReport(String date_string) {
         Calendar start_date = Utils.parseDateOrNow(date_string);
         Utils.adjustToPreviousDay(start_date, Calendar.WEDNESDAY);
 
@@ -810,7 +810,7 @@ public class Application extends Controller {
         return Json.stringify(Json.toJson(result));
     }
 
-    public static Result getLastRp(Integer personId, Integer ruleId) {
+    public Result getLastRp(Integer personId, Integer ruleId) {
         Date now = new Date();
 
         // Look up person using findById to guarantee that the current user
@@ -923,7 +923,7 @@ public class Application extends Controller {
 		}
 	}
 
-    public static Result renderMarkdown() {
+    public Result renderMarkdown() {
         Map<String, String[]> form_data = request().body().asFormUrlEncoded();
 
         String markdown = form_data.get("markdown")[0];

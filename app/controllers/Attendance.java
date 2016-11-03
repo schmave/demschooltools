@@ -32,7 +32,7 @@ public class Attendance extends Controller {
 
     static Form<AttendanceCode> code_form = Form.form(AttendanceCode.class);
 
-    public static Result index() {
+    public Result index() {
         return ok(views.html.cached_page.render(
             new CachedPage(CACHE_INDEX,
                 "Attendance",
@@ -94,7 +94,7 @@ public class Attendance extends Controller {
                 }}));
     }
 
-    public static Result viewOrEditWeek(String date, boolean do_view) {
+    public Result viewOrEditWeek(String date, boolean do_view) {
         Calendar start_date = Utils.parseDateOrNow(date);
         Utils.adjustToPreviousDay(start_date, Calendar.MONDAY);
 
@@ -169,7 +169,7 @@ public class Attendance extends Controller {
         }
     }
 
-    public static Result viewPersonReport(Integer person_id) {
+    public Result viewPersonReport(Integer person_id) {
         Person p = Person.findById(person_id);
 
         Calendar now = new GregorianCalendar();
@@ -204,7 +204,7 @@ public class Attendance extends Controller {
             codes));
     }
 
-    public static Result createPersonWeek() {
+    public Result createPersonWeek() {
         CachedPage.remove(CACHE_INDEX);
 
         Map<String,String[]> data = request().body().asFormUrlEncoded();
@@ -258,7 +258,7 @@ public class Attendance extends Controller {
         return ok(Utils.toJson(result));
     }
 
-    public static Result deletePersonWeek(int person_id, String monday) {
+    public Result deletePersonWeek(int person_id, String monday) {
         CachedPage.remove(CACHE_INDEX);
 
         Calendar start_date = Utils.parseDateOrNow(monday);
@@ -289,7 +289,7 @@ public class Attendance extends Controller {
         return ok();
     }
 
-    public static Result download() throws IOException {
+    public Result download() throws IOException {
         response().setHeader("Content-Type", "text/csv; charset=utf-8");
         response().setHeader("Content-Disposition",
             "attachment; filename=Attendance.csv");
@@ -350,22 +350,22 @@ public class Attendance extends Controller {
         return ok("\ufeff" + new String(baos.toByteArray(), charset));
     }
 
-    public static Result viewWeek(String date) {
+    public Result viewWeek(String date) {
         return viewOrEditWeek(date, true);
     }
 
-    public static Result editWeek(String date) {
+    public Result editWeek(String date) {
         return viewOrEditWeek(date, false);
     }
 
-    public static Result saveWeek(Integer week_id, Double extra_hours) {
+    public Result saveWeek(Integer week_id, Double extra_hours) {
         CachedPage.remove(CACHE_INDEX);
 
         AttendanceWeek.find.byId(week_id).edit(extra_hours);
         return ok();
     }
 
-    public static Result saveDay(Integer day_id, String code,
+    public Result saveDay(Integer day_id, String code,
         String start_time, String end_time) throws Exception {
         CachedPage.remove(CACHE_INDEX);
 
@@ -390,13 +390,13 @@ public class Attendance extends Controller {
         return codes;
     }
 
-    public static Result viewCodes() {
+    public Result viewCodes() {
         return ok(views.html.attendance_codes.render(
             AttendanceCode.all(OrgConfig.get().org),
             code_form));
     }
 
-    public static Result newCode() {
+    public Result newCode() {
         AttendanceCode ac = AttendanceCode.create(OrgConfig.get().org);
         Form<AttendanceCode> filled_form = code_form.bindFromRequest();
         ac.edit(filled_form);
@@ -406,13 +406,13 @@ public class Attendance extends Controller {
         return redirect(routes.Attendance.viewCodes());
     }
 
-    public static Result editCode(Integer code_id) {
+    public Result editCode(Integer code_id) {
         AttendanceCode ac = AttendanceCode.findById(code_id);
         Form<AttendanceCode> filled_form = code_form.fill(ac);
         return ok(views.html.edit_attendance_code.render(filled_form));
     }
 
-    public static Result saveCode() {
+    public Result saveCode() {
         Form<AttendanceCode> filled_form = code_form.bindFromRequest();
         AttendanceCode ac = AttendanceCode.findById(
             Integer.parseInt(filled_form.field("id").value()));

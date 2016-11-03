@@ -23,7 +23,7 @@ import play.mvc.Http.Context;
 public class ApplicationEditing extends Controller {
 
     @Secured.Auth(UserRole.ROLE_EDIT_RECENT_JC)
-    public static Result editTodaysMinutes() {
+    public Result editTodaysMinutes() {
         Meeting the_meeting = Meeting.find.where()
             .eq("organization", Organization.getByHost())
             .eq("date", new Date()).findUnique();
@@ -35,7 +35,7 @@ public class ApplicationEditing extends Controller {
         return editMinutes(the_meeting);
     }
 
-    static Result tooOldToEdit() {
+    Result tooOldToEdit() {
         return unauthorized("This JC data is too old for you to edit.");
     }
 
@@ -52,7 +52,7 @@ public class ApplicationEditing extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_RECENT_JC)
-    public static Result editMinutes(Meeting meeting) {
+    public Result editMinutes(Meeting meeting) {
         if (!authToEdit(meeting.date)) {
             return tooOldToEdit();
         }
@@ -63,7 +63,7 @@ public class ApplicationEditing extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_RECENT_JC)
-    public static Result editMeeting(int meeting_id) {
+    public Result editMeeting(int meeting_id) {
         Meeting the_meeting = Meeting.findById(meeting_id);
         return editMinutes(the_meeting);
     }
@@ -74,7 +74,7 @@ public class ApplicationEditing extends Controller {
     // for two cases with the same ID to be generated, leading to an error when
     // the second case is persisted because of a violated unique constraint.
     @Secured.Auth(UserRole.ROLE_EDIT_RECENT_JC)
-    public synchronized static Result createCase(Integer meeting_id) {
+    public synchronized Result createCase(Integer meeting_id) {
         Meeting m = Meeting.findById(meeting_id);
 
         String next_num = "" + (m.cases.size() + 1);
@@ -88,7 +88,7 @@ public class ApplicationEditing extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_RECENT_JC)
-    public static Result continueCase(Integer meeting_id, Integer case_id) {
+    public Result continueCase(Integer meeting_id, Integer case_id) {
         Meeting m = Meeting.findById(meeting_id);
         Case c = Case.findById(case_id);
 
@@ -102,7 +102,7 @@ public class ApplicationEditing extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_RECENT_JC)
-    public static Result saveCase(Integer id) {
+    public Result saveCase(Integer id) {
         CachedPage.remove(Application.CACHE_INDEX);
         Case c = Case.findById(id);
 
@@ -113,7 +113,7 @@ public class ApplicationEditing extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_RECENT_JC)
-    public static Result addPersonAtMeeting(Integer meeting_id, Integer person_id,
+    public Result addPersonAtMeeting(Integer meeting_id, Integer person_id,
         Integer role) {
         Meeting m = Meeting.find.byId(meeting_id);
 
@@ -123,7 +123,7 @@ public class ApplicationEditing extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_RECENT_JC)
-    public static Result removePersonAtMeeting(Integer meeting_id, Integer person_id,
+    public Result removePersonAtMeeting(Integer meeting_id, Integer person_id,
         Integer role) {
         SqlUpdate update = Ebean.createSqlUpdate(
             "DELETE from person_at_meeting where meeting_id = :meeting_id"+
@@ -138,7 +138,7 @@ public class ApplicationEditing extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_RECENT_JC)
-    public static Result addPersonAtCase(Integer case_id, Integer person_id, Integer role)
+    public Result addPersonAtCase(Integer case_id, Integer person_id, Integer role)
     {
         CachedPage.remove(Application.CACHE_INDEX);
         PersonAtCase.create(Case.find.ref(case_id), Person.find.ref(person_id), role);
@@ -146,7 +146,7 @@ public class ApplicationEditing extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_RECENT_JC)
-    public static Result removePersonAtCase(Integer case_id, Integer person_id, Integer role)
+    public Result removePersonAtCase(Integer case_id, Integer person_id, Integer role)
     {
         SqlUpdate update = Ebean.createSqlUpdate(
             "DELETE from person_at_case where case_id = :case_id "+
@@ -161,14 +161,14 @@ public class ApplicationEditing extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_RECENT_JC)
-    public static Result addCharge(Integer case_id)
+    public Result addCharge(Integer case_id)
     {
         Charge c = Charge.create(Case.find.ref(case_id));
         return ok("" + c.id);
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_RECENT_JC)
-    public static Result saveCharge(int id) {
+    public Result saveCharge(int id) {
         CachedPage.remove(Application.CACHE_INDEX);
         Charge c = Charge.findById(id);
 
@@ -179,7 +179,7 @@ public class ApplicationEditing extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_RECENT_JC)
-    public static Result setResolutionPlanComplete(Integer chargeId, Boolean complete) {
+    public Result setResolutionPlanComplete(Integer chargeId, Boolean complete) {
         Charge c = Charge.findById(chargeId);
         c.setRPComplete(complete);
 
@@ -187,7 +187,7 @@ public class ApplicationEditing extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_RECENT_JC)
-    public static Result removeCharge(int id) {
+    public Result removeCharge(int id) {
         Charge c = Charge.findById(id);
         c.delete();
 
@@ -195,12 +195,12 @@ public class ApplicationEditing extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_RECENT_JC)
-    public static Result enterSchoolMeetingDecisions() {
+    public Result enterSchoolMeetingDecisions() {
         return ok(views.html.enter_sm_decisions.render(Application.getActiveSchoolMeetingReferrals()));
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_RECENT_JC)
-    public static Result editSchoolMeetingDecision(Integer charge_id) {
+    public Result editSchoolMeetingDecision(Integer charge_id) {
         Charge c = Charge.findById(charge_id);
 
         if (!authToEdit(c.sm_decision_date)) {
@@ -211,7 +211,7 @@ public class ApplicationEditing extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_RECENT_JC)
-    public static Result saveSchoolMeetingDecisions() {
+    public Result saveSchoolMeetingDecisions() {
         CachedPage.remove(Application.CACHE_INDEX);
         Map<String, String[]> form_data = request().body().asFormUrlEncoded();
 
@@ -227,20 +227,20 @@ public class ApplicationEditing extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
-	public static Result addChapter() {
+	public Result addChapter() {
         CachedPage.remove(Application.CACHE_MANUAL);
 		Form<Chapter> form = Form.form(Chapter.class);
 		return ok(views.html.edit_chapter.render(form, true));
 	}
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
-	public static Result editChapter(Integer id) {
+	public Result editChapter(Integer id) {
 		Form<Chapter> filled_form = new Form<Chapter>(Chapter.class).fill(Chapter.findById(id));
 		return ok(views.html.edit_chapter.render(filled_form, false));
 	}
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
-	public static Result saveChapter() {
+	public Result saveChapter() {
         CachedPage.remove(Application.CACHE_MANUAL);
 		Form<Chapter> form = new Form<Chapter>(Chapter.class).bindFromRequest();
 
@@ -256,7 +256,7 @@ public class ApplicationEditing extends Controller {
 	}
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
-	public static Result addSection(Integer chapterId) {
+	public Result addSection(Integer chapterId) {
         CachedPage.remove(Application.CACHE_MANUAL);
 		Form<Section> form = Form.form(Section.class);
 		Map<String, String> map = new HashMap<String, String>();
@@ -266,14 +266,14 @@ public class ApplicationEditing extends Controller {
 	}
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
-	public static Result editSection(Integer id) {
+	public Result editSection(Integer id) {
 		Section existing_section = Section.findById(id);
 		Form<Section> filled_form = new Form<Section>(Section.class).fill(existing_section);
 		return ok(views.html.edit_section.render(filled_form, existing_section.chapter, false, Chapter.all()));
 	}
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
-	public static Result saveSection() {
+	public Result saveSection() {
         CachedPage.remove(Application.CACHE_MANUAL);
 		Form<Section> form = new Form<Section>(Section.class).bindFromRequest();
 
@@ -289,7 +289,7 @@ public class ApplicationEditing extends Controller {
 	}
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
-	public static Result addEntry(Integer sectionId) {
+	public Result addEntry(Integer sectionId) {
         CachedPage.remove(Application.CACHE_MANUAL);
 		Form<Entry> form = Form.form(Entry.class);
 		Map<String, String> map = new HashMap<String, String>();
@@ -299,14 +299,14 @@ public class ApplicationEditing extends Controller {
 	}
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
-	public static Result editEntry(Integer id) {
+	public Result editEntry(Integer id) {
         Entry e = Entry.findById(id);
 		Form<Entry> filled_form = new Form<Entry>(Entry.class).fill(e);
 		return ok(views.html.edit_entry.render(filled_form, e.section, false, Chapter.all()));
 	}
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
-	public static Result saveEntry() {
+	public Result saveEntry() {
         CachedPage.remove(Application.CACHE_MANUAL);
 		Form<Entry> form = new Form<Entry>(Entry.class).bindFromRequest();
 

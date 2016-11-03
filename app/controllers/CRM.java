@@ -36,13 +36,13 @@ import play.mvc.Http.Context;
 @Secured.Auth(UserRole.ROLE_ALL_ACCESS)
 public class CRM extends Controller {
 
-	static Form<Person> personForm = Form.form(Person.class);
-    static Form<Comment> commentForm = Form.form(Comment.class);
-    static Form<Donation> donationForm = Form.form(Donation.class);
+	Form<Person> personForm = Form.form(Person.class);
+    Form<Comment> commentForm = Form.form(Comment.class);
+    Form<Donation> donationForm = Form.form(Donation.class);
 
     public static final String CACHE_RECENT_COMMENTS = "CRM-recentComments-";
 
-    public static Result recentComments() {
+    public Result recentComments() {
         return ok(views.html.cached_page.render(
             new CachedPage(CACHE_RECENT_COMMENTS,
                 "All people",
@@ -62,7 +62,7 @@ public class CRM extends Controller {
             }));
     }
 
-    public static Result person(Integer id) {
+    public Result person(Integer id) {
         Person the_person = Person.findById(id);
 
         List<Person> family_members =
@@ -102,7 +102,7 @@ public class CRM extends Controller {
             all_donations));
     }
 
-    public static Result jsonPeople(String query) {
+    public Result jsonPeople(String query) {
 		Expression search_expr = null;
 
 		HashSet<Person> selected_people = new HashSet<Person>();
@@ -160,7 +160,7 @@ public class CRM extends Controller {
     // personId should be -1 if the client doesn't care about a particular
     // person, but just wants a list of available tags. In that case,
     // the "create new tag" functionality is also disabled.
-    public static Result jsonTags(String term, Integer personId) {
+    public Result jsonTags(String term, Integer personId) {
         String like_arg = "%" + term + "%";
         List<Tag> selected_tags =
             Tag.find.where()
@@ -202,7 +202,7 @@ public class CRM extends Controller {
         return ok(Json.stringify(Json.toJson(result)));
     }
 
-	public static Collection<Person> getTagMembers(Integer tagId, String familyMode) {
+	public Collection<Person> getTagMembers(Integer tagId, String familyMode) {
         List<Person> people = Tag.findById(tagId).people;
 
         Set<Person> selected_people = new HashSet<Person>();
@@ -231,13 +231,13 @@ public class CRM extends Controller {
 		return selected_people;
 	}
 
-	public static Result renderTagMembers(Integer tagId, String familyMode) {
+	public Result renderTagMembers(Integer tagId, String familyMode) {
         Tag the_tag = Tag.findById(tagId);
 		return ok(views.html.to_address_fragment.render(the_tag.title,
 			getTagMembers(tagId, familyMode)));
 	}
 
-    public static Result addTag(Integer tagId, String title, Integer personId) {
+    public Result addTag(Integer tagId, String title, Integer personId) {
         CachedPage.remove(Application.CACHE_INDEX);
         CachedPage.remove(Attendance.CACHE_INDEX);
 
@@ -268,7 +268,7 @@ public class CRM extends Controller {
         return ok(views.html.tag_fragment.render(the_tag, p));
     }
 
-    public static Result removeTag(Integer person_id, Integer tag_id) {
+    public Result removeTag(Integer person_id, Integer tag_id) {
         Tag t = Tag.findById(tag_id);
         Person p = Person.findById(person_id);
 
@@ -301,11 +301,11 @@ public class CRM extends Controller {
         }
     }
 
-    public static Result allPeople() {
+    public Result allPeople() {
         return ok(views.html.all_people.render(Person.all()));
     }
 
-	public static Result viewTag(Integer id) {
+	public Result viewTag(Integer id) {
         Tag the_tag = Tag.find
             .fetch("people")
             .fetch("people.phone_numbers", new FetchConfig().query())
@@ -325,7 +325,7 @@ public class CRM extends Controller {
             the_tag, people, people_with_family, the_tag.use_student_display));
     }
 
-    public static Result downloadTag(Integer id) throws IOException {
+    public Result downloadTag(Integer id) throws IOException {
         Tag the_tag = Tag.find
             .fetch("people")
             .fetch("people.phone_numbers", new FetchConfig().query())
@@ -404,11 +404,11 @@ public class CRM extends Controller {
         return ok("\ufeff" + new String(baos.toByteArray(), charset));
     }
 
-    public static Result newPerson() {
+    public Result newPerson() {
         return ok(views.html.new_person.render(personForm));
     }
 
-    public static Result makeNewPerson() {
+    public Result makeNewPerson() {
         Form<Person> filledForm = personForm.bindFromRequest();
         if(filledForm.hasErrors()) {
             return badRequest(
@@ -430,7 +430,7 @@ public class CRM extends Controller {
 		return getPendingEmail() != null;
 	}
 
-	public static Result viewPendingEmail() {
+	public Result viewPendingEmail() {
 		Email e = getPendingEmail();
 		if (e == null) {
 			return redirect(routes.CRM.recentComments());
@@ -459,7 +459,7 @@ public class CRM extends Controller {
 		return ok(views.html.view_pending_email.render(e, test_addresses, from_addresses));
 	}
 
-    public static Result sendTestEmail() {
+    public Result sendTestEmail() {
         final Map<String, String[]> values = request().body().asFormUrlEncoded();
         Email e = Email.findById(Integer.parseInt(values.get("id")[0]));
         e.parseMessage();
@@ -477,7 +477,7 @@ public class CRM extends Controller {
         return ok();
     }
 
-    public static Result sendEmail() {
+    public Result sendEmail() {
         final Map<String, String[]> values = request().body().asFormUrlEncoded();
         Email e = Email.findById(Integer.parseInt(values.get("id")[0]));
         e.parseMessage();
@@ -527,7 +527,7 @@ public class CRM extends Controller {
         return ok();
     }
 
-    public static Result deleteEmail() {
+    public Result deleteEmail() {
         final Map<String, String[]> values = request().body().asFormUrlEncoded();
         Email e = Email.findById(Integer.parseInt(values.get("id")[0]));
         e.delete();
@@ -535,16 +535,16 @@ public class CRM extends Controller {
         return ok();
     }
 
-    public static Result deletePerson(Integer id) {
+    public Result deletePerson(Integer id) {
         Person.delete(id);
         return redirect(routes.CRM.recentComments());
     }
 
-    public static Result editPerson(Integer id) {
+    public Result editPerson(Integer id) {
         return ok(views.html.edit_person.render(Person.findById(id).fillForm()));
     }
 
-    public static Result savePersonEdits() {
+    public Result savePersonEdits() {
         CachedPage.remove(Application.CACHE_INDEX);
         CachedPage.remove(Attendance.CACHE_INDEX);
 
@@ -558,7 +558,7 @@ public class CRM extends Controller {
         return redirect(routes.CRM.person(Person.updateFromForm(filledForm).person_id));
     }
 
-    public static String getInitials(Person p) {
+    public String getInitials(Person p) {
         String result = "";
         if (p.first_name != null && p.first_name.length() > 0) {
             result += p.first_name.charAt(0);
@@ -569,7 +569,7 @@ public class CRM extends Controller {
         return result;
     }
 
-    public static Result addComment() {
+    public Result addComment() {
         CachedPage.remove(CACHE_RECENT_COMMENTS);
         Form<Comment> filledForm = commentForm.bindFromRequest();
         Comment new_comment = new Comment();
@@ -611,7 +611,7 @@ public class CRM extends Controller {
         }
     }
 
-    public static Result addDonation() {
+    public Result addDonation() {
         Form<Donation> filledForm = donationForm.bindFromRequest();
         Donation new_donation = new Donation();
 
@@ -663,7 +663,7 @@ public class CRM extends Controller {
         return ok(views.html.donation_fragment.render(Donation.find.byId(new_donation.id)));
     }
 
-    public static Result donationThankYou(int id)
+    public Result donationThankYou(int id)
     {
         Donation d = Donation.find.byId(id);
         d.thanked = true;
@@ -674,7 +674,7 @@ public class CRM extends Controller {
         return ok();
     }
 
-    public static Result donationIndiegogoReward(int id)
+    public Result donationIndiegogoReward(int id)
     {
         Donation d = Donation.findById(id);
         d.indiegogo_reward_given = true;
@@ -685,7 +685,7 @@ public class CRM extends Controller {
         return ok();
     }
 
-    public static Result donationsNeedingThankYou()
+    public Result donationsNeedingThankYou()
     {
         List<Donation> donations = Donation.find
             .fetch("person")
@@ -696,7 +696,7 @@ public class CRM extends Controller {
         return ok(views.html.donation_list.render("Donations needing thank you", donations));
     }
 
-    public static Result donationsNeedingIndiegogo()
+    public Result donationsNeedingIndiegogo()
     {
         List<Donation> donations = Donation.find
             .fetch("person")
@@ -707,7 +707,7 @@ public class CRM extends Controller {
         return ok(views.html.donation_list.render("Donations needing Indiegogo reward", donations));
     }
 
-    public static Result donations()
+    public Result donations()
     {
         return ok(views.html.donation_list.render("All donations",
                 Donation.find
@@ -754,14 +754,14 @@ public class CRM extends Controller {
         return new SimpleDateFormat(format).format(d);
     }
 
-    public static Result viewTaskList(Integer id) {
+    public Result viewTaskList(Integer id) {
         TaskList list = TaskList.findById(id);
         List<Person> people = list.tag.people;
 
         return ok(views.html.task_list.render(list, people));
     }
 
-    public static Result viewMailchimpSettings() {
+    public Result viewMailchimpSettings() {
         MailChimpClient mailChimpClient = new MailChimpClient();
         Organization org = OrgConfig.get().org;
 
@@ -774,7 +774,7 @@ public class CRM extends Controller {
             mc_list_map));
     }
 
-    public static Result saveMailchimpSettings() {
+    public Result saveMailchimpSettings() {
         final Map<String, String[]> values = request().body().asFormUrlEncoded();
 
         if (values.containsKey("mailchimp_api_key")) {

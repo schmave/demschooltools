@@ -18,11 +18,11 @@ import play.mvc.*;
 @Secured.Auth(UserRole.ROLE_ALL_ACCESS)
 public class Settings extends Controller {
 
-    static Form<Task> task_form = Form.form(Task.class);
-    static Form<TaskList> list_form = Form.form(TaskList.class);
-    static Form<User> user_form = Form.form(User.class);
+    Form<Task> task_form = Form.form(Task.class);
+    Form<TaskList> list_form = Form.form(TaskList.class);
+    Form<User> user_form = Form.form(User.class);
 
-    public static Result viewNotifications() {
+    public Result viewNotifications() {
         List<NotificationRule> rules = NotificationRule.find.where()
             .eq("organization", OrgConfig.get().org)
             .order("the_type DESC, tag.id")
@@ -31,7 +31,7 @@ public class Settings extends Controller {
         return ok(views.html.view_notifications.render(rules));
     }
 
-    public static Result editNotifications() {
+    public Result editNotifications() {
         final Map<String, String[]> values = request().body().asFormUrlEncoded();
 
         if (values.containsKey("remove_notification_id")) {
@@ -57,21 +57,21 @@ public class Settings extends Controller {
 				NotificationRule.create(NotificationRule.TYPE_DONATION, null, email);
 			}
 		}
-		
+
         return redirect(routes.Settings.viewNotifications());
     }
 
-    public static Result viewTaskLists() {
+    public Result viewTaskLists() {
         return ok(views.html.view_task_lists.render(TaskList.allForOrg(), list_form));
     }
 
-    public static Result viewTaskList(Integer id) {
+    public Result viewTaskList(Integer id) {
         TaskList list = TaskList.findById(id);
         return ok(views.html.settings_task_list.render(
             list, list_form.fill(list), task_form));
     }
 
-    public static Result newTask() {
+    public Result newTask() {
         Task t = task_form.bindFromRequest().get();
         t.enabled = true;
         t.save();
@@ -79,10 +79,10 @@ public class Settings extends Controller {
         return redirect(routes.Settings.viewTaskList(t.task_list.id));
     }
 
-    public static Result newTaskList() {
+    public Result newTaskList() {
         TaskList list = list_form.bindFromRequest().get();
         list.organization = OrgConfig.get().org;
-		
+
 		list.title = list.title.trim();
 		if (list.title.equals("")) {
 			list.title = "Untitled checklist";
@@ -101,14 +101,14 @@ public class Settings extends Controller {
         return redirect(routes.Settings.viewTaskList(list.id));
     }
 
-    public static Result editTask(Integer id) {
+    public Result editTask(Integer id) {
         Form<Task> filled_form = task_form.fill(Task.findById(id));
 
         return ok(views.html.edit_task.render(filled_form,
             TaskList.allForOrg()));
     }
 
-    public static Result saveTask() {
+    public Result saveTask() {
         Form<Task> filled_form = task_form.bindFromRequest();
         Task t = filled_form.get();
         if (filled_form.apply("enabled").value().equals("false")) {
@@ -119,7 +119,7 @@ public class Settings extends Controller {
         return redirect(routes.Settings.viewTaskList(t.task_list.id));
     }
 
-    public static Result saveTaskList() {
+    public Result saveTaskList() {
         Form<TaskList> filled_form = list_form.bindFromRequest();
         TaskList list = filled_form.get();
 
@@ -133,7 +133,7 @@ public class Settings extends Controller {
         return redirect(routes.Settings.viewTaskList(list.id));
     }
 
-    public static Result viewAccess() {
+    public Result viewAccess() {
         Organization org = OrgConfig.get().org;
         List<User> users =
             User.find.where().eq("organization", org)
@@ -152,7 +152,7 @@ public class Settings extends Controller {
         return ok(views.html.view_access.render(users, allowed_ip, user_form));
     }
 
-    public static Result saveAccess() {
+    public Result saveAccess() {
         Map<String, String[]> form_data = request().body().asFormUrlEncoded();
         Organization org = OrgConfig.get().org;
 
@@ -172,13 +172,13 @@ public class Settings extends Controller {
         return redirect(routes.Settings.viewAccess());
     }
 
-    public static Result editUser(Integer id) {
+    public Result editUser(Integer id) {
         User u = User.findById(id);
 
         return ok(views.html.edit_user.render(u, user_form.fill(u)));
     }
 
-    public static Result saveUser() {
+    public Result saveUser() {
         Form<User> filled_form = user_form.bindFromRequest();
         User u = filled_form.get();
         Map<String, String[]> form_data = request().body().asFormUrlEncoded();
@@ -209,7 +209,7 @@ public class Settings extends Controller {
         return redirect(routes.Settings.viewAccess());
     }
 
-    public static Result newUser() {
+    public Result newUser() {
         Map<String, String[]> form_data = request().body().asFormUrlEncoded();
 
         User u = User.create(

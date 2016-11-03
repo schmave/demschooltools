@@ -4,6 +4,7 @@ import java.util.*;
 
 import javax.persistence.*;
 
+import com.avaje.ebean.Model;
 import play.data.*;
 import play.data.validation.Constraints.*;
 import play.db.ebean.*;

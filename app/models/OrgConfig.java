@@ -289,7 +289,7 @@ class Sandbox extends OrgConfig {
         str_findings = "Findings";
 
         use_minor_referrals = true;
-        track_writer = false;
+        track_writer = true;
 
         OrgConfig.register(name, this);
     }
@@ -298,7 +298,6 @@ class Sandbox extends OrgConfig {
         return INSTANCE;
     }
 }
-
 
 class Clearview extends OrgConfig {
     private static final Clearview INSTANCE = new Clearview();

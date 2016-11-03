@@ -28,7 +28,14 @@ import views.html.*;
 @With(DumpOnError.class)
 public class Public extends Controller {
 
-	public static Result postEmail() {
+    PlayAuthenticate mAuth;
+
+    @Inject
+    public Public(final PlayAuthenticate auth) {
+        mAuth = auth;
+    }
+
+	public Result postEmail() {
 		final java.util.Map<String, String[]> values = request().body().asFormUrlEncoded();
 
 		Email new_email = Email.create(values.get("email")[0]);
@@ -157,7 +164,7 @@ public class Public extends Controller {
         return result;
     }
 
-    public static Result syncMailchimp() {
+    public Result syncMailchimp() {
         // Disable mailchimp integration for now.
         if (1 == 1) {
             return ok("");
@@ -326,26 +333,26 @@ public class Public extends Controller {
         return ok("");
     }
 
-    public static Result oAuthDenied(String provider)
+    public Result oAuthDenied(String provider)
     {
         session().remove("timeout");
         return redirect(routes.Public.index());
     }
 
-    public static Result index()
+    public Result index()
     {
 		if (Organization.getByHost() == null) {
 			return unauthorized("Unknown organization");
 		}
-        return ok(views.html.login.render(flash("notice")));
+        return ok(views.html.login.render(mAuth, flash("notice")));
     }
 
-    public static Result authenticate(String provider) {
+    public Result authenticate(String provider) {
         session("timeout", "" + System.currentTimeMillis());
         return com.feth.play.module.pa.controllers.Authenticate.authenticate(provider);
     }
 
-    public static Result loggedOut() {
+    public Result loggedOut() {
         return ok(views.html.logged_out.render());
     }
 }
