@@ -307,7 +307,7 @@ public class Person extends Model implements Comparable<Person> {
         // on both a map of values and an object. Crazy.
         return new Form<Person>(null, Person.class, data,
             new HashMap<String,List<ValidationError>>(),
-            Some(this), null);
+            this, null);
     }
 
     // called by PersonController

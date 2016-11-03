@@ -22,6 +22,7 @@ import com.csvreader.CsvWriter;
 import com.ecwid.mailchimp.*;
 import com.ecwid.mailchimp.method.v2_0.lists.ListMethodResult;
 import com.feth.play.module.pa.PlayAuthenticate;
+import com.google.inject.Inject;
 
 import models.*;
 
@@ -35,6 +36,13 @@ import play.mvc.Http.Context;
 @With(DumpOnError.class)
 @Secured.Auth(UserRole.ROLE_ALL_ACCESS)
 public class CRM extends Controller {
+
+    Application mApplication;
+
+    @Inject
+    public CRM(final Application app) {
+        mApplication = app;
+    }
 
 	Form<Person> personForm = Form.form(Person.class);
     Form<Comment> commentForm = Form.form(Comment.class);
@@ -258,7 +266,7 @@ public class CRM extends Controller {
         PersonTagChange ptc = PersonTagChange.create(
             the_tag,
             p,
-            Application.getCurrentUser(),
+            mApplication.getCurrentUser(),
             true);
 
         p.tags.add(the_tag);
@@ -277,7 +285,7 @@ public class CRM extends Controller {
             PersonTagChange ptc = PersonTagChange.create(
                 t,
                 p,
-                Application.getCurrentUser(),
+                mApplication.getCurrentUser(),
                 false);
         }
 
@@ -558,7 +566,7 @@ public class CRM extends Controller {
         return redirect(routes.CRM.person(Person.updateFromForm(filledForm).person_id));
     }
 
-    public String getInitials(Person p) {
+    public static String getInitials(Person p) {
         String result = "";
         if (p.first_name != null && p.first_name.length() > 0) {
             result += p.first_name.charAt(0);
@@ -575,7 +583,7 @@ public class CRM extends Controller {
         Comment new_comment = new Comment();
 
         new_comment.person = Person.findById(Integer.parseInt(filledForm.field("person").value()));
-        new_comment.user = Application.getCurrentUser();
+        new_comment.user = mApplication.getCurrentUser();
         new_comment.message = filledForm.field("message").value();
 
         String task_id_string = filledForm.field("comment_task_ids").value();
@@ -650,16 +658,6 @@ public class CRM extends Controller {
 
         new_donation.save();
 
-        for (NotificationRule rule :
-                NotificationRule.findByType(NotificationRule.TYPE_DONATION)) {
-            play.libs.mailer.Email mail = new play.libs.mailer.Email();
-            mail.setSubject("Donation recorded from " + new_donation.person.first_name + " " + new_donation.person.last_name);
-            mail.addTo(rule.email);
-            mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
-            mail.setBodyHtml(views.html.donation_email.render(new_donation).toString());
-            play.libs.mailer.MailerPlugin.send(mail);
-        }
-
         return ok(views.html.donation_fragment.render(Donation.find.byId(new_donation.id)));
     }
 
@@ -667,7 +665,7 @@ public class CRM extends Controller {
     {
         Donation d = Donation.find.byId(id);
         d.thanked = true;
-        d.thanked_by_user = Application.getCurrentUser();
+        d.thanked_by_user = mApplication.getCurrentUser();
         d.thanked_time = new Date();
 
         d.save();
@@ -678,7 +676,7 @@ public class CRM extends Controller {
     {
         Donation d = Donation.findById(id);
         d.indiegogo_reward_given = true;
-        d.indiegogo_reward_by_user = Application.getCurrentUser();
+        d.indiegogo_reward_by_user = mApplication.getCurrentUser();
         d.indiegogo_reward_given_time = new Date();
 
         d.save();

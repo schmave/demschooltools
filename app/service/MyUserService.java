@@ -1,6 +1,6 @@
 package service;
 
-import com.feth.play.module.pa.service.UserServicePlugin;
+import com.feth.play.module.pa.service.UserService;
 import com.feth.play.module.pa.user.AuthUser;
 import com.feth.play.module.pa.user.AuthUserIdentity;
 import com.feth.play.module.pa.user.EmailIdentity;
@@ -12,10 +12,10 @@ import models.User;
 import play.Application;
 import play.Logger;
 
-public class MyUserServicePlugin extends UserServicePlugin {
+public class MyUserService implements UserService {
 
     @Inject
-	public MyUserServicePlugin(final Application app) {
+    public MyUserService(final Application app) {
 		super(app);
 	}
 
@@ -23,7 +23,7 @@ public class MyUserServicePlugin extends UserServicePlugin {
     // you can't log in.
 	@Override
 	public Object save(final AuthUser authUser) {
-        Logger.debug("MyUserServicePlugin::save " + authUser);
+        Logger.debug("MyUserService::save " + authUser);
 		final boolean isLinked = User.existsByAuthUserIdentity(authUser);
 		if (!isLinked) {
             if (authUser instanceof EmailIdentity) {
@@ -44,7 +44,7 @@ public class MyUserServicePlugin extends UserServicePlugin {
 
 	@Override
 	public Object getLocalIdentity(final AuthUserIdentity identity) {
-        Logger.debug("MyUserServicePlugin::getLocalIdentity " + identity);
+        Logger.debug("MyUserService::getLocalIdentity " + identity);
 		// For production: Caching might be a good idea here...
 		// ...and dont forget to sync the cache when users get deactivated/deleted
 		final User u = User.findByAuthUserIdentity(identity);

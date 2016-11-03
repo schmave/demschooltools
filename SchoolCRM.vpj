@@ -83,7 +83,7 @@
 			<F N="app/models/MailChimpSyncInfo.java"/>
 			<F N="app/models/ManualChange.java"/>
 			<F N="app/models/Meeting.java"/>
-			<F N="app/service/MyUserServicePlugin.java"/>
+			<F N="app/service/MyUserService.java"/>
 			<F N="app/models/OddOrEven.java"/>
 			<F N="app/models/Organization.java"/>
 			<F N="app/models/OrgConfig.java"/>

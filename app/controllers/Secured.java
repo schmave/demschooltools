@@ -4,12 +4,15 @@ import java.lang.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.concurrent.CompletionStage;
+import java.util.concurrent.CompletableFuture;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.SqlQuery;
 import com.avaje.ebean.SqlRow;
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.user.AuthUser;
+import com.google.inject.Inject;
 
 import models.OrgConfig;
 import models.Organization;
@@ -48,24 +51,27 @@ public class Secured {
      */
     public static class AuthenticatedAction extends Action<Auth> {
 
-        public F.Promise<Result> call(final Context ctx) {
+        PlayAuthenticate mAuth;
+
+        @Inject
+        public AuthenticatedAction(final PlayAuthenticate auth) {
+            mAuth = auth;
+        }
+
+        @Override
+        public CompletionStage<Result> call(final Context ctx) {
             try {
-                Authenticator authenticator = new Authenticator();
+                Authenticator authenticator = new Authenticator(mAuth);
                 String username = authenticator.getUsername(ctx, configuration.value());
-                if(username == null) {
+                if (username == null) {
                     Result unauthorized = authenticator.onUnauthorized(ctx);
-                    return F.Promise.pure(unauthorized);
+                    return CompletableFuture.completedFuture(unauthorized);
                 } else {
                     try {
                         ctx.request().setUsername(username);
-                        return delegate.call(ctx).transform(
-                            result -> {
+                        return delegate.call(ctx).whenComplete(
+                            (result, throwable) -> {
                                 ctx.request().setUsername(null);
-                                return result;
-                            },
-                            throwable -> {
-                                ctx.request().setUsername(null);
-                                return throwable;
                             }
                         );
                     } catch(Exception e) {
@@ -84,6 +90,12 @@ public class Secured {
 
 
     public static class Authenticator extends Results {
+        PlayAuthenticate mAuth;
+
+        @Inject
+        public Authenticator(final PlayAuthenticate auth) {
+            mAuth = auth;
+        }
 
     	public String getUsername(final Context ctx, String role) {
             String username = getUsernameOrIP(ctx, true);
@@ -108,7 +120,7 @@ public class Secured {
 
         public String getUsernameOrIP(final Context ctx, boolean allow_ip) {
             Logger.debug("Authenticator::getUsername " + ctx + ", " + allow_ip);
-            final AuthUser u = PlayAuthenticate.getUser(ctx.session());
+            final AuthUser u = mAuth.getUser(ctx.session());
 
             if (u != null) {
                 User the_user = User.findByAuthUserIdentity(u);
@@ -159,7 +171,7 @@ public class Secured {
                 // If a user is logged in but they don't have the proper role
                 // for the page they are trying to access, logging in again
                 // isn't going to help them.
-                PlayAuthenticate.storeOriginalUrl(ctx);
+                mAuth.storeOriginalUrl(ctx);
                 return redirect(routes.Public.index());
             } else {
                 return unauthorized("You can't access this page.");

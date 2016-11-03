@@ -5,6 +5,7 @@ import java.util.*;
 
 import javax.mail.*;
 import javax.mail.internet.*;
+import javax.inject.Singleton;
 
 import com.ecwid.mailchimp.*;
 import com.ecwid.mailchimp.method.v2_0.lists.ListMethod;
@@ -14,6 +15,7 @@ import com.ecwid.mailchimp.method.v2_0.lists.UnsubscribeMethod;
 import com.ecwid.mailchimp.method.v2_0.lists.UpdateMemberMethod;
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.user.AuthUser;
+import com.google.inject.Inject;
 
 import models.*;
 
@@ -25,6 +27,7 @@ import play.mvc.Http.Context;
 
 import views.html.*;
 
+@Singleton
 @With(DumpOnError.class)
 public class Public extends Controller {
 

@@ -6,6 +6,7 @@ import java.nio.file.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import javax.inject.Singleton;
 
 import org.markdown4j.Markdown4jProcessor;
 import org.xhtmlrenderer.pdf.ITextRenderer;
@@ -19,6 +20,7 @@ import com.avaje.ebean.RawSqlBuilder;
 import com.avaje.ebean.SqlUpdate;
 import com.csvreader.CsvWriter;
 import com.feth.play.module.pa.PlayAuthenticate;
+import com.google.inject.Inject;
 
 import models.*;
 
@@ -28,9 +30,21 @@ import play.libs.Json;
 import play.mvc.*;
 import play.mvc.Http.Context;
 
+@Singleton
 @With(DumpOnError.class)
 @Secured.Auth(UserRole.ROLE_VIEW_JC)
 public class Application extends Controller {
+
+    PlayAuthenticate mAuth;
+
+    // TODO: Remove this once we change the main template to not use it
+    static Application sInstance = null;
+
+    @Inject
+    public Application(final PlayAuthenticate auth) {
+        mAuth = auth;
+        sInstance = this;
+    }
 
     public static final String CACHE_INDEX = "Application-index-";
     public static final String CACHE_MANUAL = "Application-viewManual-";
@@ -905,7 +919,7 @@ public class Application extends Controller {
 
     public static User getCurrentUser() {
         return User.findByAuthUserIdentity(
-            PlayAuthenticate.getUser(Context.current().session()));
+            sInstance.mAuth.getUser(Context.current().session()));
     }
 
     public static Configuration getConfiguration() {
