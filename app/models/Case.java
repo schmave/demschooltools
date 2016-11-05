@@ -43,7 +43,7 @@ public class Case extends Model implements Comparable<Case> {
     public Meeting meeting;
 
     @JsonIgnore
-    // @ManyToMany(mappedBy = "additional_cases")
+    @ManyToMany(mappedBy = "additional_cases")
     public List<Meeting> additional_meetings;
 
     @OneToMany(mappedBy="the_case")
@@ -88,7 +88,8 @@ public class Case extends Model implements Comparable<Case> {
     public void continueInMeeting(Meeting m) {
         try {
             // remember the previous meeting
-            CaseMeeting.create(this, this.meeting);
+            this.meeting.additional_cases.add(this);
+            this.meeting.save();
         }
         catch (PersistenceException pe) {
             // Throw the exception only if this is something other than a
