@@ -48,10 +48,6 @@ public class Settings extends Controller {
 			if (values.containsKey("comment")) {
 				NotificationRule.create(NotificationRule.TYPE_COMMENT, null, email);
 			}
-
-			if (values.containsKey("donation")) {
-				NotificationRule.create(NotificationRule.TYPE_DONATION, null, email);
-			}
 		}
 
         return redirect(routes.Settings.viewNotifications());

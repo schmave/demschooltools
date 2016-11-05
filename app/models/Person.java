@@ -68,11 +68,6 @@ public class Person extends Model implements Comparable<Person> {
     public List<Comment> comments;
 
     @OneToMany(mappedBy="person")
-    @OrderBy("date DESC")
-    @JsonIgnore
-    public List<Donation> donations;
-
-    @OneToMany(mappedBy="person")
     @JsonIgnore
     public List<CompletedTask> completed_tasks;
 

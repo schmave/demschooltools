@@ -82,9 +82,6 @@ public class CRM extends Controller {
         List<Comment> all_comments = Comment.find.where().in("person_id", family_ids).
             order("created DESC").findList();
 
-        List<Donation> all_donations = Donation.find.where().in("person_id", family_ids).
-            order("date DESC").findList();
-
         String comment_destination = "<No email set>";
         boolean first = true;
         for (NotificationRule rule :
@@ -102,8 +99,7 @@ public class CRM extends Controller {
             the_person,
             family_members,
             all_comments,
-            comment_destination,
-            all_donations));
+            comment_destination));
     }
 
     public Result jsonPeople(String query) {
@@ -265,6 +261,7 @@ public class CRM extends Controller {
             p,
             mApplication.getCurrentUser(),
             true);
+
 
         p.tags.add(the_tag);
 
@@ -617,60 +614,6 @@ public class CRM extends Controller {
         } else {
             return ok();
         }
-    }
-
-    public Result donationThankYou(int id)
-    {
-        Donation d = Donation.find.byId(id);
-        d.thanked = true;
-        d.thanked_by_user = mApplication.getCurrentUser();
-        d.thanked_time = new Date();
-
-        d.save();
-        return ok();
-    }
-
-    public Result donationIndiegogoReward(int id)
-    {
-        Donation d = Donation.findById(id);
-        d.indiegogo_reward_given = true;
-        d.indiegogo_reward_by_user = mApplication.getCurrentUser();
-        d.indiegogo_reward_given_time = new Date();
-
-        d.save();
-        return ok();
-    }
-
-    public Result donationsNeedingThankYou()
-    {
-        List<Donation> donations = Donation.find
-            .fetch("person")
-            .where()
-            .eq("person.organization", Organization.getByHost())
-            .eq("thanked", false).orderBy("date DESC").findList();
-
-        return ok(views.html.donation_list.render("Donations needing thank you", donations));
-    }
-
-    public Result donationsNeedingIndiegogo()
-    {
-        List<Donation> donations = Donation.find
-            .fetch("person")
-            .where()
-            .eq("person.organization", Organization.getByHost())
-            .eq("indiegogo_reward_given", false).orderBy("date DESC").findList();
-
-        return ok(views.html.donation_list.render("Donations needing Indiegogo reward", donations));
-    }
-
-    public Result donations()
-    {
-        return ok(views.html.donation_list.render("All donations",
-                Donation.find
-                .fetch("person")
-                .where()
-                .eq("person.organization", Organization.getByHost())
-                .orderBy("date DESC").findList()));
     }
 
     public static int calcAge(Person p) {

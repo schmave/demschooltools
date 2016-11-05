@@ -111,21 +111,10 @@ window.onerror = function(message, file, line, col, error) {
 							<li><a href="@routes.CRM.viewTaskList(l.id)">@l.title</a></li>
 							}
 					</ul></span>
-			<span class="dropdown">
-				<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-				  Donations
-				  <b class="caret"></b>
-				</a>
-					<ul class="dropdown-menu">
-					<li><a href="@routes.CRM.donations()">All</a></li>
-						<li><a href="@routes.CRM.donationsNeedingThankYou()">need thank you</a></li>
-						<li><a href="@routes.CRM.donationsNeedingIndiegogo()">need Indiegogo reward</a></li>
-					</ul></span>
-			@if(CRM.hasPendingEmail()) {
 
+				@if(CRM.hasPendingEmail()) {
 					<a href="@routes.CRM.viewPendingEmail()">Pending Email <span class="label label-warning">1</span></a>
-
-			}
+				}
 
 			   <input id="navbar_people_search" type="search" placeholder="Search people..."/>
 			<a href="@routes.CRM.newPerson()">Add a person</a>

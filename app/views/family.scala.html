@@ -1,5 +1,5 @@
 @(p : Person, family_members: List[Person], comments: List[Comment],
-  comment_email : String, donations: List[Donation])
+  comment_email : String)
 
 @import helper._
 
@@ -81,12 +81,6 @@
                                              $("#new_comment textarea").val("");
                                              $("#new_comment").hide();
                                              $("#add_comment_p").show();
-                                             }});
-            $("#donation_form").ajaxForm({"success" : function(response, status) {
-                                             $("#donations").prepend("<tr>" + response + "</tr>");
-                                             $("#new_donation textarea").val("");
-                                             $("#new_donation").hide();
-                                             $('#add_donation_p').show()
                                              }});
         });
 	</script>

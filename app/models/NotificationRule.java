@@ -20,7 +20,7 @@ public class NotificationRule extends Model {
     public Tag tag;
 
     public static final int TYPE_TAG = 0;
-    public static final int TYPE_DONATION = 1;
+    // public static final int TYPE_DONATION = 1;
     public static final int TYPE_COMMENT = 2;
 
     public int the_type;
