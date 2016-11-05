@@ -40,8 +40,8 @@ public class Chapter extends Model {
 
 	public Boolean deleted;
 
-    public static Finder<Integer,Chapter> find = new Finder<>(
-        Integer.class, Chapter.class
+    public static Finder<Integer,Chapter> find = new Finder<Integer,Chapter>(
+        Chapter.class
     );
 
     public static Chapter findById(int id) {

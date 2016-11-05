@@ -22,8 +22,8 @@ public class PersonChange extends Model {
     @Column(insertable = false, updatable = false)
     public Date time;
 
-    public static Finder<Integer, PersonChange> find = new Finder<>(
-        Integer.class, PersonChange.class
+    public static Finder<Integer, PersonChange> find = new Finder<Integer, PersonChange>(
+        PersonChange.class
     );
 
     public static PersonChange create(Person p, String new_email) {

@@ -38,8 +38,8 @@ public class Donation extends Model {
     public User indiegogo_reward_by_user;
     public Date indiegogo_reward_given_time;
 
-    public static Finder<Integer, Donation> find = new Finder<>(
-        Integer.class, Donation.class
+    public static Finder<Integer, Donation> find = new Finder<Integer, Donation>(
+        Donation.class
     );
 
     public static Donation findById(int id) {

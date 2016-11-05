@@ -1,6 +1,7 @@
 package service;
 
-import com.feth.play.module.pa.service.UserService;
+import com.feth.play.module.pa.PlayAuthenticate;
+import com.feth.play.module.pa.service.AbstractUserService;
 import com.feth.play.module.pa.user.AuthUser;
 import com.feth.play.module.pa.user.AuthUserIdentity;
 import com.feth.play.module.pa.user.EmailIdentity;
@@ -9,15 +10,14 @@ import com.google.inject.Inject;
 import models.LinkedAccount;
 import models.User;
 
-import play.Application;
 import play.Logger;
 
-public class MyUserService implements UserService {
+public class MyUserService extends AbstractUserService {
 
     @Inject
-    public MyUserService(final Application app) {
-		super(app);
-	}
+    public MyUserService(final PlayAuthenticate auth) {
+        super(auth);
+    }
 
     // We do not create new user accounts. If you aren't already approved,
     // you can't log in.

@@ -43,7 +43,7 @@ public class Case extends Model implements Comparable<Case> {
     public Meeting meeting;
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "additional_cases")
+    // @ManyToMany(mappedBy = "additional_cases")
     public List<Meeting> additional_meetings;
 
     @OneToMany(mappedBy="the_case")
@@ -57,8 +57,8 @@ public class Case extends Model implements Comparable<Case> {
 
     public Date date_closed;
 
-    public static Finder<Integer, Case> find = new Finder<>(
-        Integer.class, Case.class
+    public static Finder<Integer, Case> find = new Finder<Integer, Case>(
+        Case.class
     );
 
     public static Case findById(Integer id) {

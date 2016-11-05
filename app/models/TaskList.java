@@ -25,8 +25,8 @@ public class TaskList extends Model {
     @JoinColumn(name="tag_id")
     public Tag tag;
 
-    public static Finder<Integer, TaskList> find = new Finder<>(
-        Integer.class, TaskList.class
+    public static Finder<Integer, TaskList> find = new Finder<Integer, TaskList>(
+        TaskList.class
     );
 
     public static TaskList findById(int id) {

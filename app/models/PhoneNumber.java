@@ -21,8 +21,8 @@ public class PhoneNumber extends Model {
     @JoinColumn(name="person_id")
     public Person owner;
 
-    public static Finder<Integer, PhoneNumber> find = new Finder<>(
-        Integer.class, PhoneNumber.class
+    public static Finder<Integer, PhoneNumber> find = new Finder<Integer, PhoneNumber>(
+        PhoneNumber.class
     );
 
     public static PhoneNumber create(String number, String comment, Person owner) {

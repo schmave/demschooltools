@@ -30,7 +30,14 @@ public class Attendance extends Controller {
 
     public static final String CACHE_INDEX = "Attendance-index-";
 
-    static Form<AttendanceCode> code_form = Form.form(AttendanceCode.class);
+    static Form<AttendanceCode> code_form;
+
+    static Form<AttendanceCode> getCodeForm() {
+        if (code_form == null) {
+            code_form = Form.form(AttendanceCode.class);
+        }
+        return code_form;
+    }
 
     public Result index() {
         return ok(views.html.cached_page.render(
@@ -393,12 +400,12 @@ public class Attendance extends Controller {
     public Result viewCodes() {
         return ok(views.html.attendance_codes.render(
             AttendanceCode.all(OrgConfig.get().org),
-            code_form));
+            getCodeForm()));
     }
 
     public Result newCode() {
         AttendanceCode ac = AttendanceCode.create(OrgConfig.get().org);
-        Form<AttendanceCode> filled_form = code_form.bindFromRequest();
+        Form<AttendanceCode> filled_form = getCodeForm().bindFromRequest();
         ac.edit(filled_form);
 
         CachedPage.remove(CACHE_INDEX);
@@ -408,12 +415,12 @@ public class Attendance extends Controller {
 
     public Result editCode(Integer code_id) {
         AttendanceCode ac = AttendanceCode.findById(code_id);
-        Form<AttendanceCode> filled_form = code_form.fill(ac);
+        Form<AttendanceCode> filled_form = getCodeForm().fill(ac);
         return ok(views.html.edit_attendance_code.render(filled_form));
     }
 
     public Result saveCode() {
-        Form<AttendanceCode> filled_form = code_form.bindFromRequest();
+        Form<AttendanceCode> filled_form = getCodeForm().bindFromRequest();
         AttendanceCode ac = AttendanceCode.findById(
             Integer.parseInt(filled_form.field("id").value()));
         ac.edit(filled_form);

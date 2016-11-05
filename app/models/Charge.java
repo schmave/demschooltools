@@ -52,9 +52,7 @@ public class Charge extends Model implements Comparable<Charge> {
 
     public String minor_referral_destination = "";
 
-    public static Finder<Integer, Charge> find = new Finder<>(
-        Integer.class, Charge.class
-    );
+    public static Finder<Integer, Charge> find = new Finder<Integer, Charge>(Charge.class);
 
     public static Charge findById(int id) {
         return find.where().eq("the_case.meeting.organization", Organization.getByHost())

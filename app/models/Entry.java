@@ -47,8 +47,8 @@ public class Entry extends Model implements Comparable<Entry> {
     @OrderBy("date_entered ASC")
     public List<ManualChange> changes;
 
-    public static Finder<Integer,Entry> find = new Finder<>(
-        Integer.class, Entry.class
+    public static Finder<Integer,Entry> find = new Finder<Integer,Entry>(
+        Entry.class
     );
 
     public static Entry findById(int id) {

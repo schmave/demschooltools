@@ -27,8 +27,8 @@ public class MailchimpSync extends Model {
 
     public boolean sync_local_removes;
 
-    public static Finder<Integer, MailchimpSync> find = new Finder<>(
-        Integer.class, MailchimpSync.class
+    public static Finder<Integer, MailchimpSync> find = new Finder<Integer, MailchimpSync>(
+        MailchimpSync.class
     );
 
     public static MailchimpSync create(Tag t, String mailchimp_list_id, boolean sync_local_adds, boolean sync_local_removes) {

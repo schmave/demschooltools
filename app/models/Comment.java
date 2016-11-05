@@ -31,7 +31,7 @@ public class Comment extends Model {
     @OneToMany(mappedBy="comment")
     public List<CompletedTask> completed_tasks;
 
-    public static Finder<Integer, Comment> find = new Finder<>(
-        Integer.class, Comment.class
+    public static Finder<Integer, Comment> find = new Finder<Integer, Comment>(
+        Comment.class
     );
 }

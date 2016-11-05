@@ -113,7 +113,6 @@ GET     /getTagMembers			  controllers.CRM.renderTagMembers(tagId : Integer, fam
 
 POST    /addComment               controllers.CRM.addComment()
 
-POST    /addDonation              controllers.CRM.addDonation()
 POST    /thankDonation/:id        controllers.CRM.donationThankYou(id: Integer)
 POST    /indiegogoDonation/:id        controllers.CRM.donationIndiegogoReward(id: Integer)
 GET     /donations/thankyou       controllers.CRM.donationsNeedingThankYou()

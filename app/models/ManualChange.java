@@ -48,8 +48,8 @@ public class ManualChange extends Model {
 
     public Date date_entered = new Date();
 
-    public static Finder<Integer,ManualChange> find = new Finder<>(
-        Integer.class, ManualChange.class
+    public static Finder<Integer,ManualChange> find = new Finder<Integer,ManualChange>(
+        ManualChange.class
     );
 
     void initCreate(String num, String title, String content) {

@@ -27,8 +27,8 @@ public class AttendanceWeek extends Model {
 
     public double extra_hours = 0;
 
-    public static Finder<Integer, AttendanceWeek> find = new Finder<>(
-        Integer.class, AttendanceWeek.class
+    public static Finder<Integer, AttendanceWeek> find = new Finder<Integer, AttendanceWeek>(
+        AttendanceWeek.class
     );
 
     public static AttendanceWeek create(Date m, Person p)

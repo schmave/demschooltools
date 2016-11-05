@@ -13,11 +13,13 @@ import com.ecwid.mailchimp.method.v2_0.lists.ListMethodResult;
 import com.ecwid.mailchimp.method.v2_0.lists.SubscribeMethod;
 import com.ecwid.mailchimp.method.v2_0.lists.UnsubscribeMethod;
 import com.ecwid.mailchimp.method.v2_0.lists.UpdateMemberMethod;
+import com.feth.play.module.pa.controllers.Authenticate;
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.user.AuthUser;
 import com.google.inject.Inject;
 
 import models.*;
+
 
 import play.*;
 import play.data.*;
@@ -31,10 +33,12 @@ import views.html.*;
 @With(DumpOnError.class)
 public class Public extends Controller {
 
-    PlayAuthenticate mAuth;
+    PlayAuthenticate mPlayAuth;
+    Authenticate mAuth;
 
     @Inject
-    public Public(final PlayAuthenticate auth) {
+    public Public(final PlayAuthenticate playAuth, final Authenticate auth) {
+        mPlayAuth = playAuth;
         mAuth = auth;
     }
 
@@ -347,12 +351,12 @@ public class Public extends Controller {
 		if (Organization.getByHost() == null) {
 			return unauthorized("Unknown organization");
 		}
-        return ok(views.html.login.render(mAuth, flash("notice")));
+        return ok(views.html.login.render(mPlayAuth, flash("notice")));
     }
 
     public Result authenticate(String provider) {
         session("timeout", "" + System.currentTimeMillis());
-        return com.feth.play.module.pa.controllers.Authenticate.authenticate(provider);
+        return mAuth.authenticate(provider);
     }
 
     public Result loggedOut() {

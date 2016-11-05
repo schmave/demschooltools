@@ -39,8 +39,8 @@ public class User extends Model {
 	@OneToMany(cascade = CascadeType.ALL)
 	public List<LinkedAccount> linkedAccounts;
 
-	public static final Finder<Integer, User> find = new Finder<>(
-			Integer.class, User.class);
+	public static final Finder<Integer, User> find = new Finder<Integer, User>(
+			User.class);
 
     public static User findById(Integer id) {
         return find.where().eq("organization", OrgConfig.get().org)

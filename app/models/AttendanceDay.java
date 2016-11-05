@@ -33,8 +33,8 @@ public class AttendanceDay extends Model {
     public Time start_time;
     public Time end_time;
 
-    public static Finder<Integer, AttendanceDay> find = new Finder<>(
-        Integer.class, AttendanceDay.class
+    public static Finder<Integer, AttendanceDay> find = new Finder<Integer, AttendanceDay>(
+        AttendanceDay.class
     );
 
     public static AttendanceDay create(Date day, Person p)
@@ -51,7 +51,7 @@ public class AttendanceDay extends Model {
         if (time_string == null || time_string.equals("")) {
             return null;
         }
-		
+
 		String[] formats = {"h:mm a", "h:mma"};
 
 		for (String format : formats) {
@@ -60,8 +60,8 @@ public class AttendanceDay extends Model {
 				return new Time(d.getTime());
 			} catch (ParseException e) {
 			}
-		}		
-		
+		}
+
 		return null;
     }
 

@@ -19,7 +19,7 @@ public class Tag extends Model {
 
     public boolean use_student_display;
 
-    @ManyToMany
+    @ManyToMany(cascade=CascadeType.ALL)
     @JoinTable(name="person_tag",
         joinColumns=@JoinColumn(name="tag_id",referencedColumnName = "id"),
         inverseJoinColumns = @JoinColumn(name="person_id", referencedColumnName="person_id"))
@@ -41,8 +41,8 @@ public class Tag extends Model {
     @OneToMany(mappedBy="tag")
     public List<NotificationRule> notification_rules;
 
-    public static Finder<Integer, Tag> find = new Finder<>(
-        Integer.class, Tag.class
+    public static Finder<Integer, Tag> find = new Finder<Integer, Tag>(
+        Tag.class
     );
 
     public static Tag findById(int id) {

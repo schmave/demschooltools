@@ -4,8 +4,8 @@ import com.feth.play.module.mail.IMailer;
 import com.feth.play.module.mail.Mailer;
 import com.feth.play.module.mail.Mailer.MailerFactory;
 import com.feth.play.module.pa.Resolver;
-import com.feth.play.module.pa.providers.google.GoogleAuthProvider;
-import com.feth.play.module.pa.providers.facebook.FacebookAuthProvider;
+import com.feth.play.module.pa.providers.oauth2.google.GoogleAuthProvider;
+import com.feth.play.module.pa.providers.oauth2.facebook.FacebookAuthProvider;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 

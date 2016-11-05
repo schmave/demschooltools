@@ -18,10 +18,6 @@ import play.mvc.*;
 @Secured.Auth(UserRole.ROLE_ALL_ACCESS)
 public class Settings extends Controller {
 
-    Form<Task> task_form = Form.form(Task.class);
-    Form<TaskList> list_form = Form.form(TaskList.class);
-    Form<User> user_form = Form.form(User.class);
-
     public Result viewNotifications() {
         List<NotificationRule> rules = NotificationRule.find.where()
             .eq("organization", OrgConfig.get().org)
@@ -62,16 +58,20 @@ public class Settings extends Controller {
     }
 
     public Result viewTaskLists() {
+        Form<TaskList> list_form = Form.form(TaskList.class);
         return ok(views.html.view_task_lists.render(TaskList.allForOrg(), list_form));
     }
 
     public Result viewTaskList(Integer id) {
         TaskList list = TaskList.findById(id);
+        Form<TaskList> list_form = Form.form(TaskList.class);
+        Form<Task> task_form = Form.form(Task.class);
         return ok(views.html.settings_task_list.render(
             list, list_form.fill(list), task_form));
     }
 
     public Result newTask() {
+        Form<Task> task_form = Form.form(Task.class);
         Task t = task_form.bindFromRequest().get();
         t.enabled = true;
         t.save();
@@ -80,6 +80,7 @@ public class Settings extends Controller {
     }
 
     public Result newTaskList() {
+        Form<TaskList> list_form = Form.form(TaskList.class);
         TaskList list = list_form.bindFromRequest().get();
         list.organization = OrgConfig.get().org;
 
@@ -102,6 +103,7 @@ public class Settings extends Controller {
     }
 
     public Result editTask(Integer id) {
+        Form<Task> task_form = Form.form(Task.class);
         Form<Task> filled_form = task_form.fill(Task.findById(id));
 
         return ok(views.html.edit_task.render(filled_form,
@@ -109,6 +111,7 @@ public class Settings extends Controller {
     }
 
     public Result saveTask() {
+        Form<Task> task_form = Form.form(Task.class);
         Form<Task> filled_form = task_form.bindFromRequest();
         Task t = filled_form.get();
         if (filled_form.apply("enabled").value().equals("false")) {
@@ -120,6 +123,7 @@ public class Settings extends Controller {
     }
 
     public Result saveTaskList() {
+        Form<TaskList> list_form = Form.form(TaskList.class);
         Form<TaskList> filled_form = list_form.bindFromRequest();
         TaskList list = filled_form.get();
 
@@ -149,6 +153,7 @@ public class Settings extends Controller {
             allowed_ip = result.get(0).getString("ip");
         }
 
+        Form<User> user_form = Form.form(User.class);
         return ok(views.html.view_access.render(users, allowed_ip, user_form));
     }
 
@@ -175,10 +180,12 @@ public class Settings extends Controller {
     public Result editUser(Integer id) {
         User u = User.findById(id);
 
+        Form<User> user_form = Form.form(User.class);
         return ok(views.html.edit_user.render(u, user_form.fill(u)));
     }
 
     public Result saveUser() {
+        Form<User> user_form = Form.form(User.class);
         Form<User> filled_form = user_form.bindFromRequest();
         User u = filled_form.get();
         Map<String, String[]> form_data = request().body().asFormUrlEncoded();

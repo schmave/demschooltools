@@ -3,7 +3,7 @@ logLevel := Level.Warn
 
 // Use the Play sbt plugin for Play projects
 addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.5.9")
-addSbtPlugin("com.typesafe.sbt" % "sbt-play-ebean" % "3.0.0")
+addSbtPlugin("com.typesafe.sbt" % "sbt-play-ebean" % "3.1.0")
 
 // I can't figure out how to disable jshint for
 // jquery, handlebars, bootstrap--maybe webjars would be a solution?

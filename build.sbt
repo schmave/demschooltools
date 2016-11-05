@@ -31,6 +31,6 @@ libraryDependencies ++= Seq(
   "com.feth"      %% "play-authenticate" % "0.8.1-SNAPSHOT",
   "com.typesafe.play" %% "play-mailer" % "5.0.0",
   "com.ecwid" % "ecwid-mailchimp" % "2.0.1.0",
-  "org.xhtmlrenderer" % "flying-saucer-pdf" % "9.0.7",
-  "com.googlecode.usc" % "jdbcdslog" % "1.0.6.2"
+  "org.xhtmlrenderer" % "flying-saucer-pdf" % "9.0.7"
+  // "com.googlecode.usc" % "jdbcdslog" % "1.0.6.2"
 )

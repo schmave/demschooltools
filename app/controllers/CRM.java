@@ -44,10 +44,6 @@ public class CRM extends Controller {
         mApplication = app;
     }
 
-	Form<Person> personForm = Form.form(Person.class);
-    Form<Comment> commentForm = Form.form(Comment.class);
-    Form<Donation> donationForm = Form.form(Donation.class);
-
     public static final String CACHE_RECENT_COMMENTS = "CRM-recentComments-";
 
     public Result recentComments() {
@@ -261,7 +257,8 @@ public class CRM extends Controller {
             the_tag = Tag.find.ref(tagId);
         }
 
-        PersonTag pt = PersonTag.create(the_tag, p);
+        the_tag.people.add(p);
+        the_tag.save();
 
         PersonTagChange ptc = PersonTagChange.create(
             the_tag,
@@ -413,10 +410,12 @@ public class CRM extends Controller {
     }
 
     public Result newPerson() {
+        Form<Person> personForm = Form.form(Person.class);
         return ok(views.html.new_person.render(personForm));
     }
 
     public Result makeNewPerson() {
+        Form<Person> personForm = Form.form(Person.class);
         Form<Person> filledForm = personForm.bindFromRequest();
         if(filledForm.hasErrors()) {
             return badRequest(
@@ -556,6 +555,7 @@ public class CRM extends Controller {
         CachedPage.remove(Application.CACHE_INDEX);
         CachedPage.remove(Attendance.CACHE_INDEX);
 
+        Form<Person> personForm = Form.form(Person.class);
         Form<Person> filledForm = personForm.bindFromRequest();
         if(filledForm.hasErrors()) {
             return badRequest(
@@ -579,7 +579,7 @@ public class CRM extends Controller {
 
     public Result addComment() {
         CachedPage.remove(CACHE_RECENT_COMMENTS);
-        Form<Comment> filledForm = commentForm.bindFromRequest();
+        Form<Comment> filledForm = Form.form(Comment.class).bindFromRequest();
         Comment new_comment = new Comment();
 
         new_comment.person = Person.findById(Integer.parseInt(filledForm.field("person").value()));
@@ -617,48 +617,6 @@ public class CRM extends Controller {
         } else {
             return ok();
         }
-    }
-
-    public Result addDonation() {
-        Form<Donation> filledForm = donationForm.bindFromRequest();
-        Donation new_donation = new Donation();
-
-        new_donation.person = Person.findById(Integer.parseInt(filledForm.field("person").value()));
-        new_donation.description = filledForm.field("description").value();
-
-		String dollar_value = filledForm.field("dollar_value").value();
-		if (dollar_value.charAt(0) == '$') {
-			dollar_value = dollar_value.substring(1);
-		}
-        new_donation.dollar_value = Float.parseFloat(dollar_value);
-
-        try
-        {
-            new_donation.date = new SimpleDateFormat("yyyy-MM-dd").parse(filledForm.field("date").value());
-            // Set time to 12 noon so that time zone issues won't bump us to the wrong day.
-            new_donation.date.setHours(12);
-        }
-        catch (ParseException e)
-        {
-            new_donation.date = new Date();
-        }
-
-        new_donation.is_cash = filledForm.field("donation_type").value().equals("Cash");
-        if (filledForm.field("needs_thank_you").value() != null) {
-            new_donation.thanked = !filledForm.field("needs_thank_you").value().equals("on");
-        } else {
-            new_donation.thanked = true;
-        }
-
-        if (filledForm.field("needs_indiegogo_reward").value() != null) {
-            new_donation.indiegogo_reward_given = !filledForm.field("needs_indiegogo_reward").value().equals("on");
-        } else {
-            new_donation.indiegogo_reward_given = true;
-        }
-
-        new_donation.save();
-
-        return ok(views.html.donation_fragment.render(Donation.find.byId(new_donation.id)));
     }
 
     public Result donationThankYou(int id)

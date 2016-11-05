@@ -27,8 +27,8 @@ public class AttendanceCode extends Model {
     public String description = "";
     public String color="#000000";
 
-    public static Finder<Integer, AttendanceCode> find = new Finder<>(
-        Integer.class, AttendanceCode.class
+    public static Finder<Integer, AttendanceCode> find = new Finder<Integer, AttendanceCode>(
+        AttendanceCode.class
     );
 
     public static List<AttendanceCode> all(Organization org) {

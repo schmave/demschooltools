@@ -235,14 +235,14 @@ public class ApplicationEditing extends Controller {
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
 	public Result editChapter(Integer id) {
-		Form<Chapter> filled_form = new Form<Chapter>(Chapter.class).fill(Chapter.findById(id));
+		Form<Chapter> filled_form = Form.form(Chapter.class).fill(Chapter.findById(id));
 		return ok(views.html.edit_chapter.render(filled_form, false));
 	}
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
 	public Result saveChapter() {
         CachedPage.remove(Application.CACHE_MANUAL);
-		Form<Chapter> form = new Form<Chapter>(Chapter.class).bindFromRequest();
+		Form<Chapter> form = Form.form(Chapter.class).bindFromRequest();
 
 		Chapter c = null;
 		if (form.field("id").value() != null) {
@@ -268,14 +268,14 @@ public class ApplicationEditing extends Controller {
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
 	public Result editSection(Integer id) {
 		Section existing_section = Section.findById(id);
-		Form<Section> filled_form = new Form<Section>(Section.class).fill(existing_section);
+		Form<Section> filled_form = Form.form(Section.class).fill(existing_section);
 		return ok(views.html.edit_section.render(filled_form, existing_section.chapter, false, Chapter.all()));
 	}
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
 	public Result saveSection() {
         CachedPage.remove(Application.CACHE_MANUAL);
-		Form<Section> form = new Form<Section>(Section.class).bindFromRequest();
+		Form<Section> form = Form.form(Section.class).bindFromRequest();
 
 		Section s = null;
 		if (form.field("id").value() != null) {
@@ -301,14 +301,14 @@ public class ApplicationEditing extends Controller {
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
 	public Result editEntry(Integer id) {
         Entry e = Entry.findById(id);
-		Form<Entry> filled_form = new Form<Entry>(Entry.class).fill(e);
+		Form<Entry> filled_form = Form.form(Entry.class).fill(e);
 		return ok(views.html.edit_entry.render(filled_form, e.section, false, Chapter.all()));
 	}
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
 	public Result saveEntry() {
         CachedPage.remove(Application.CACHE_MANUAL);
-		Form<Entry> form = new Form<Entry>(Entry.class).bindFromRequest();
+		Form<Entry> form = Form.form(Entry.class).bindFromRequest();
 
 		Entry e = null;
 		if (form.field("id").value() != null) {

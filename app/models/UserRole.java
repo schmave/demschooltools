@@ -30,8 +30,8 @@ public class UserRole extends Model {
 
     public String role;
 
-	public static final Finder<Integer, UserRole> find = new Finder<>(
-			Integer.class, UserRole.class);
+	public static final Finder<Integer, UserRole> find = new Finder<Integer, UserRole>(
+			UserRole.class);
 
     public static UserRole create(User u, String r) {
         UserRole result = new UserRole();

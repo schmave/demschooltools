@@ -114,8 +114,8 @@ public class Person extends Model implements Comparable<Person> {
         fieldsToUpdateExplicitly.add("approximate_dob");
     }
 
-    public static Finder<Integer,Person> find = new Finder<>(
-        Integer.class, Person.class
+    public static Finder<Integer,Person> find = new Finder<Integer,Person>(
+        Person.class
     );
 
     public static Person findById(int id) {
@@ -307,7 +307,7 @@ public class Person extends Model implements Comparable<Person> {
         // on both a map of values and an object. Crazy.
         return new Form<Person>(null, Person.class, data,
             new HashMap<String,List<ValidationError>>(),
-            this, null);
+            Optional.of(this), null, null, null);
     }
 
     // called by PersonController

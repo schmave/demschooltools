@@ -35,8 +35,8 @@ public class Email extends Model {
 	public boolean sent;
 	public boolean deleted;
 
-    public static Finder<Integer, Email> find = new Finder<>(
-        Integer.class, Email.class
+    public static Finder<Integer, Email> find = new Finder<Integer, Email>(
+        Email.class
     );
 
     public static Email findById(int id) {
