@@ -9,14 +9,20 @@ import javax.persistence.*;
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.github.mustachejava.DefaultMustacheFactory;
+import com.github.mustachejava.Mustache;
+import com.github.mustachejava.MustacheFactory;
 
 import org.postgresql.util.PSQLException;
 
-import models.Person;
+import play.Play;
 
+import models.Person;
 
 public class Utils
 {
+    static MustacheFactory sMustache = new DefaultMustacheFactory();
+
     public static Calendar parseDateOrNow(String date_string) {
         Calendar result = new GregorianCalendar();
 
@@ -76,6 +82,16 @@ public class Utils
             e.printStackTrace();
             return "";
         }
+    }
+
+    public static String renderMustache(String templateName, Object scopes) {
+        StringWriter writer = new StringWriter();
+        sMustache.compile(
+            new InputStreamReader(
+                Play.application().resourceAsStream("public/mustache/" + templateName)),
+            templateName)
+            .execute(writer, scopes);
+        return writer.toString();
     }
 }
 

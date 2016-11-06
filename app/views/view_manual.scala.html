@@ -8,9 +8,7 @@ Printed on @Application.yymmddDate().
 
 <h1>@OrgConfig.get().short_name @OrgConfig.get().str_manual_title</h1>
 
-<h3 class="no-print"><a class="highlight" href="@routes.Application.viewManualChanges()">See what's changed</a>&mdash;since a date of your choice!</h3>
-
-<p class="no-print"><a href="@routes.ApplicationEditing.addChapter()">Add new chapter</a></p>
+<p class="no-print"><a class="btn btn-primary" href="@routes.ApplicationEditing.addChapter()">Add new chapter</a></p>
 
 <ul>
 @for( c <- chapters ) {

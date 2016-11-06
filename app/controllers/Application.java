@@ -17,6 +17,8 @@ import com.avaje.ebean.Expression;
 import com.avaje.ebean.FetchConfig;
 import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
+import com.avaje.ebean.SqlQuery;
+import com.avaje.ebean.SqlRow;
 import com.avaje.ebean.SqlUpdate;
 import com.csvreader.CsvWriter;
 import com.feth.play.module.pa.PlayAuthenticate;
@@ -548,10 +550,62 @@ public class Application extends Controller {
             .where().eq("organization", Organization.getByHost())
             .eq("id", id).findUnique();
 
-        System.out.println("going into render\n\n\n");
-
 		return ok(views.html.view_chapter.render(c));
 	}
+
+    public Result searchManual(String searchString) {
+        Map<String, Object> scopes = new HashMap<String, Object>();
+        scopes.put("searchString", searchString);
+
+        String sql =
+            "SELECT ei.id " +
+            "FROM entry_index ei " +
+            "WHERE ei.document @@ plainto_tsquery(:searchString) " +
+            "and ei.organization_id=:orgId " +
+            "ORDER BY ts_rank(ei.document, plainto_tsquery(:searchString), 0) DESC";
+
+        OrgConfig orgConfig = OrgConfig.get();
+        SqlQuery sqlQuery = Ebean.createSqlQuery(sql);
+        sqlQuery.setParameter("orgId", orgConfig.org.id);
+        sqlQuery.setParameter("searchString", searchString);
+
+        List<SqlRow> result = sqlQuery.findList();
+        List<Integer> entryIds = new ArrayList<Integer>();
+        for (int i = 0; i < result.size(); i++) {
+            entryIds.add(result.get(i).getInteger("id"));
+        }
+
+        List<SqlRow> headlines = null;
+        if (entryIds.size() > 0) {
+            sql = "SELECT e.id, ts_headline(e.content, plainto_tsquery(:searchString)) as headline " +
+                "FROM entry e WHERE e.id IN (:entryIds)";
+            sqlQuery = Ebean.createSqlQuery(sql);
+            sqlQuery.setParameter("searchString", searchString);
+            sqlQuery.setParameter("entryIds", entryIds);
+            headlines = sqlQuery.findList();
+        }
+
+        Map<Integer, Entry> entries = Entry.find
+            .fetch("section", new FetchConfig().query())
+            .fetch("section.chapter", new FetchConfig().query())
+            .where().in("id", entryIds).findMap();
+
+        ArrayList<Map<String, Object>> entriesList = new ArrayList<Map<String, Object>>();
+        for (int i = 0; i < result.size(); i++) {
+            Map<String, Object> entryInfo = new HashMap<String, Object>();
+            entryInfo.put("entry", entries.get(result.get(i).getInteger("id")));
+            entryInfo.put("headline", headlines.get(i).getString("headline"));
+            entriesList.add(entryInfo);
+        }
+        scopes.put("entries", entriesList);
+
+        return ok(views.html.main_with_mustache.render(
+            "Manual Search: " + searchString,
+            "manual",
+            "",
+            "manual_search.html",
+            scopes));
+    }
 
     static List<Charge> getLastWeekCharges(Person p) {
         List<Charge> last_week_charges = new ArrayList<Charge>();

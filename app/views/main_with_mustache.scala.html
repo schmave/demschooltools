@@ -1,0 +1,5 @@
+@(title: String, menu : String, selectedBtn : String, templateName: String, scopes: Object)
+
+@main(title, menu, selectedBtn) {
+	@Html(Utils.renderMustache(templateName, scopes))
+}
