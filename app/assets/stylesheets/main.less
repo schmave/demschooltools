@@ -486,8 +486,23 @@ hr {
     background-color: #eee;
 } */
 
-.man-section {
-    width: 7in;
+@media screen and (max-width: 600px) {
+  ul.nav {
+    li {
+      a {
+        padding: 12px 4px;
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 8in) {
+  .man-section {
+      width: 7in;
+  }
+  .man-entry-content {
+    width: 6in;
+  }
 }
 
 .man-entry {
@@ -498,9 +513,8 @@ hr {
 }
 
 .man-entry-content {
-    page-break-before: avoid;
+  page-break-before: avoid;
 	margin-left: 40px;
-	width: 6in;
 }
 
 .man-entry-change-history {
