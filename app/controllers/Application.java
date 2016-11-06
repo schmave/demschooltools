@@ -575,14 +575,18 @@ public class Application extends Controller {
             entryIds.add(result.get(i).getInteger("id"));
         }
 
-        List<SqlRow> headlines = null;
+        Map<Integer, String> entryToHeadline = new HashMap<Integer, String>();
         if (entryIds.size() > 0) {
-            sql = "SELECT e.id, ts_headline(e.content, plainto_tsquery(:searchString)) as headline " +
+            sql = "SELECT e.id, ts_headline(e.content, plainto_tsquery(:searchString), 'MaxFragments=5') as headline " +
                 "FROM entry e WHERE e.id IN (:entryIds)";
             sqlQuery = Ebean.createSqlQuery(sql);
             sqlQuery.setParameter("searchString", searchString);
             sqlQuery.setParameter("entryIds", entryIds);
-            headlines = sqlQuery.findList();
+            List<SqlRow> headlines = sqlQuery.findList();
+            for (int i = 0; i < headlines.size(); i++) {
+                entryToHeadline.put(headlines.get(i).getInteger("id"),
+                    headlines.get(i).getString("headline"));
+            }
         }
 
         Map<Integer, Entry> entries = Entry.find
@@ -593,8 +597,9 @@ public class Application extends Controller {
         ArrayList<Map<String, Object>> entriesList = new ArrayList<Map<String, Object>>();
         for (int i = 0; i < result.size(); i++) {
             Map<String, Object> entryInfo = new HashMap<String, Object>();
-            entryInfo.put("entry", entries.get(result.get(i).getInteger("id")));
-            entryInfo.put("headline", headlines.get(i).getString("headline"));
+            int entryId = result.get(i).getInteger("id");
+            entryInfo.put("entry", entries.get(entryId));
+            entryInfo.put("headline", entryToHeadline.get(entryId));
             entriesList.add(entryInfo);
         }
         scopes.put("entries", entriesList);
