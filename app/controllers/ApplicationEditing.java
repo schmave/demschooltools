@@ -2,6 +2,7 @@ package controllers;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.sql.Connection;
 import java.util.*;
 
 import com.avaje.ebean.Ebean;
@@ -10,10 +11,12 @@ import com.avaje.ebean.RawSql;
 import com.avaje.ebean.RawSqlBuilder;
 import com.avaje.ebean.SqlUpdate;
 import com.feth.play.module.pa.PlayAuthenticate;
+import com.google.inject.Inject;
 
 import models.*;
 
 import play.*;
+import play.db.Database;
 import play.data.*;
 import play.libs.Json;
 import play.mvc.*;
@@ -21,6 +24,13 @@ import play.mvc.Http.Context;
 
 @With(DumpOnError.class)
 public class ApplicationEditing extends Controller {
+
+    private Database mDatabase;
+
+    @Inject
+    public ApplicationEditing(Database db) {
+        this.mDatabase = db;
+    }
 
     @Secured.Auth(UserRole.ROLE_EDIT_RECENT_JC)
     public Result editTodaysMinutes() {
@@ -226,9 +236,19 @@ public class ApplicationEditing extends Controller {
         return redirect(routes.ApplicationEditing.enterSchoolMeetingDecisions());
     }
 
+    void onManualChange() {
+        CachedPage.remove(Application.CACHE_MANUAL);
+        try {
+            Connection conn = mDatabase.getConnection();
+            conn.prepareStatement("REFRESH MATERIALIZED VIEW entry_index WITH DATA").execute();
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
 	public Result addChapter() {
-        CachedPage.remove(Application.CACHE_MANUAL);
 		Form<Chapter> form = Form.form(Chapter.class);
 		return ok(views.html.edit_chapter.render(form, true));
 	}
@@ -241,7 +261,6 @@ public class ApplicationEditing extends Controller {
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
 	public Result saveChapter() {
-        CachedPage.remove(Application.CACHE_MANUAL);
 		Form<Chapter> form = Form.form(Chapter.class).bindFromRequest();
 
 		Chapter c = null;
@@ -252,12 +271,12 @@ public class ApplicationEditing extends Controller {
 			c = Chapter.create(form);
 		}
 
+        onManualChange();
 		return redirect(routes.Application.viewChapter(c.id));
 	}
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
 	public Result addSection(Integer chapterId) {
-        CachedPage.remove(Application.CACHE_MANUAL);
 		Form<Section> form = Form.form(Section.class);
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("chapter.id", "" + chapterId);
@@ -274,8 +293,7 @@ public class ApplicationEditing extends Controller {
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
 	public Result saveSection() {
-        CachedPage.remove(Application.CACHE_MANUAL);
-		Form<Section> form = Form.form(Section.class).bindFromRequest();
+        Form<Section> form = Form.form(Section.class).bindFromRequest();
 
 		Section s = null;
 		if (form.field("id").value() != null) {
@@ -285,12 +303,12 @@ public class ApplicationEditing extends Controller {
 			s = Section.create(form);
 		}
 
-		return redirect(routes.Application.viewChapter(s.chapter.id).url() + "#section_" + s.id);
+		onManualChange();
+        return redirect(routes.Application.viewChapter(s.chapter.id).url() + "#section_" + s.id);
 	}
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
 	public Result addEntry(Integer sectionId) {
-        CachedPage.remove(Application.CACHE_MANUAL);
 		Form<Entry> form = Form.form(Entry.class);
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("section.id", "" + sectionId);
@@ -307,7 +325,6 @@ public class ApplicationEditing extends Controller {
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
 	public Result saveEntry() {
-        CachedPage.remove(Application.CACHE_MANUAL);
 		Form<Entry> form = Form.form(Entry.class).bindFromRequest();
 
 		Entry e = null;
@@ -318,6 +335,7 @@ public class ApplicationEditing extends Controller {
 			e = Entry.create(form);
 		}
 
+        onManualChange();
 		return redirect(routes.Application.viewChapter(e.section.chapter.id).url() + "#entry_" + e.id);
 	}
 
