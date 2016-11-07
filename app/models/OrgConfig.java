@@ -70,6 +70,7 @@ class ThreeRiversVillageSchool extends OrgConfig {
         str_res_plans = "resolution plans";
         str_res_plans_cap = "Resolution plans";
         str_jc_name = "Justice Committee";
+        use_minor_referrals = true;
 
         show_checkbox_for_res_plan = false;
 
