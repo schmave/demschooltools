@@ -200,11 +200,11 @@ public class Settings extends Controller {
 
         if (filled_form.apply("active").value().equals("false")) {
             u.active = false;
-            Ebean.delete(orig_user.linkedAccounts);
+            Ebean.deleteAll(orig_user.linkedAccounts);
         }
 
         if (!orig_user.email.equals(u.email)) {
-            Ebean.delete(orig_user.linkedAccounts);
+            Ebean.deleteAll(orig_user.linkedAccounts);
         }
 
         u.update();
