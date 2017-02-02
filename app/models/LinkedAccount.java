@@ -28,11 +28,6 @@ public class LinkedAccount extends Model {
 	public static final Finder<Long, LinkedAccount> find = new Finder<Long, LinkedAccount>(
 			LinkedAccount.class);
 
-	public static LinkedAccount findByProviderKey(final User user, String key) {
-		return find.where().eq("user", user).eq("providerKey", key)
-				.findUnique();
-	}
-
 	public static LinkedAccount create(final AuthUser authUser) {
 		final LinkedAccount ret = new LinkedAccount();
 		ret.update(authUser);

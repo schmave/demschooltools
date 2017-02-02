@@ -161,9 +161,4 @@ public class User extends Model {
                 .eq("active", true)
                 .eq("email", email);
 	}
-
-	public LinkedAccount getAccountByProvider(final String providerKey) {
-		return LinkedAccount.findByProviderKey(this, providerKey);
-	}
-
 }
