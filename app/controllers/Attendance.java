@@ -220,6 +220,10 @@ public class Attendance extends Controller {
         ArrayList<Object> result = new ArrayList<Object>();
         String[] person_ids = data.get("person_id[]");
 
+        if (person_ids == null) {
+            return badRequest("No person_id[] found");
+        }
+
         for (String person_id : person_ids) {
             Calendar end_date = (Calendar)start_date.clone();
             boolean alreadyExists = false;
