@@ -13,7 +13,7 @@ import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 
-import org.postgresql.util.PSQLException;
+import java.sql.SQLException;
 
 import play.Play;
 
@@ -39,12 +39,25 @@ public class Utils
     }
 
     public static void eatIfUniqueViolation(PersistenceException pe) throws PersistenceException {
-        PSQLException e = (PSQLException)pe.getCause();
-        if (e == null) {
+        SQLException sqlEx = null;
+        PersistenceException persistEx = pe;
+
+        while (persistEx != null && sqlEx == null) {
+            Throwable cause = persistEx.getCause();
+            if (cause instanceof SQLException) {
+                sqlEx = (SQLException) cause;
+            } else if (cause instanceof PersistenceException) {
+                persistEx = (PersistenceException) cause;
+            } else {
+                break;
+            }
+        }
+
+        if (sqlEx == null) {
             throw pe;
         }
 
-        if (!e.getSQLState().equals("23505")) {
+        if (!sqlEx.getSQLState().equals("23505")) {
             throw pe;
         } else {
             System.out.println("Ate a 23505 error");
