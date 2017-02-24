@@ -10,6 +10,8 @@ import javax.persistence.*;
 import com.avaje.ebean.Model;
 import com.avaje.ebean.Model.Finder;
 
+import play.data.*;
+
 @Entity
 public class Tag extends Model {
     @Id
@@ -57,6 +59,17 @@ public class Tag extends Model {
 
         result.save();
         return result;
+    }
+
+    public void updateFromForm(Form<Tag> form) {
+        if (title.equals("Staff") || title.equals("Current Student")) {
+            return;
+        }
+
+        title = form.field("title").value();
+        String student_val = form.field("use_student_display").value();
+        use_student_display = student_val != null && student_val.equals("true");
+        save();
     }
 
     public static Map<String, List<Tag>> getWithPrefixes() {

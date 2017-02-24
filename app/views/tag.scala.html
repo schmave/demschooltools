@@ -1,9 +1,12 @@
-@(tag: Tag, people: List[Person], people_with_family: Collection[Person], use_student_display: Boolean)
+@(tag: Tag, people: List[Person], people_with_family: Collection[Person], use_student_display: Boolean, allow_edit: Boolean)
 
 @import helper._
 
 @main("All people tagged " + tag.title, "crm") {
 <h1>@tag.title
+@if( allow_edit ) {
+    <a class="man-edit no-print" href="@routes.CRM.editTag(tag.id)">Edit Tag</a>
+}
 @if( tag.task_lists.size() > 0 ) {
    <span class="view-task-list">Also see task list:
    @for( task_list <- tag.task_lists ) {

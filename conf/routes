@@ -115,6 +115,8 @@ GET     /getTagMembers			  controllers.CRM.renderTagMembers(tagId : Integer, fam
 POST    /addComment               controllers.CRM.addComment()
 
 GET     /viewTag/:id              controllers.CRM.viewTag(id: Integer)
+GET     /editTag/:id            controllers.CRM.editTag(id: Integer)
+POST    /saveTag                controllers.CRM.saveTag()
 GET     /downloadTag/:id	  controllers.CRM.downloadTag(id: Integer)
 
 GET     /viewTaskList/:id         controllers.CRM.viewTaskList(id: Integer)

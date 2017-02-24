@@ -307,6 +307,22 @@ public class CRM extends Controller {
         return ok(views.html.all_people.render(Person.all()));
     }
 
+    public Result editTag(Integer id) {
+        Form<Tag> filled_form = Form.form(Tag.class).fill(Tag.findById(id));
+        return ok(views.html.edit_tag.render(filled_form));
+    }
+
+    public Result saveTag() {
+        Form<Tag> form = Form.form(Tag.class).bindFromRequest();
+
+        if (form.field("id").value() != null) {
+            Tag t = Tag.findById(Integer.parseInt(form.field("id").value()));
+            t.updateFromForm(form);
+            return redirect(routes.CRM.viewTag(t.id));
+        }
+        return redirect(routes.CRM.recentComments());
+    }
+
 	public Result viewTag(Integer id) {
         Tag the_tag = Tag.find
             .fetch("people")
@@ -323,8 +339,11 @@ public class CRM extends Controller {
             }
         }
 
+        boolean allow_editing = !(
+            the_tag.title.equals("Staff") || the_tag.title.equals("Current Student"));
+
         return ok(views.html.tag.render(
-            the_tag, people, people_with_family, the_tag.use_student_display));
+            the_tag, people, people_with_family, the_tag.use_student_display, allow_editing));
     }
 
     public Result downloadTag(Integer id) throws IOException {

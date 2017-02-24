@@ -53,7 +53,7 @@
 	@helper.textarea(form("content"), '_label -> "Content (see preview below)", 'rows->12, 'class -> "form-control")
 	</div>
 
-	<input type="submit" value="Save">
+	@save_button("Save")
 
 	<h3>Live Preview</h3>
 	<div id="markdown_preview"></div>

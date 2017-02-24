@@ -1,0 +1,39 @@
+@(form: Form[Tag])
+
+@implicitField = @{ helper.FieldConstructor(myConstructor.f) }
+
+@main("Edit tag " + form("title").value(), "crm") {
+    <h2 class="big-margin-top">Edit tag "@form("title").value()"</h2>
+
+    @helper.form(routes.CRM.saveTag(), 'class -> "form-horizontal") {
+
+        @if(form("id").value()) {
+        	<input type="hidden" name="id" value="@form("id").value()"/>
+        }
+        @helper.inputText(form("title"), '_label -> "Title", 'class-> "form-control")
+    	@helper.checkbox(form("use_student_display"), '_label -> "This is a list of students")
+        @save_button("Save")
+    }
+
+    <hr class="big-margin-top">
+    <h4>Tips about Tags</h4>
+    <p class="instructions">
+    If you check the box labeled "This is a list of students", the columns shown when you
+    view all people in the tag will include data that is interesting for students, e.g. School District, DOB, Gender, etc.
+    </p>
+    <p class="instructions">If you leave that box unchecked, the view for this tag will not show those columns.
+    </p>
+    <p class="instructions">&nbsp;
+    </p>
+    <p class="instructions">You can create "sub-tags" by creating multiple tags with a common
+    prefix that ends with a colon (:) character. For example, if you use tags to keep track of
+    attendance at events, you would have one tag per event:
+    <ul>
+    <li>Event: 2016/02 potluck
+    <li>Event: 2016/03 open house
+    <li>Event: 2016/04 open house
+    </ul>
+    Tags with a common prefix like this will be put in a submenu that looks like this:
+    </p>
+    <img src="/assets/images/tag_menu_demo.png"/>
+}

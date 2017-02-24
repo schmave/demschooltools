@@ -25,7 +25,6 @@
 </div>
         @helper.inputText(form("title"), '_label -> "Title", 'class -> "form-control")
 		@helper.checkbox(form("deleted"), '_label -> "Check this to delete")
-
-		<input type="submit" value="Save">
+        @save_button("Save")
 }
 }
