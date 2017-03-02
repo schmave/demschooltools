@@ -298,6 +298,12 @@ public class Person extends Model implements Comparable<Person> {
             i++;
         }
 
+        if (this.dob !=  null) {
+            // The default form filler writes the DOB in an unparseable
+            // format, so override it with this.
+            data.put("dob", Application.yymmddDate(this.dob));
+        }
+
         // This is how you create a hybrid form based
         // on both a map of values and an object. Crazy.
         return new Form<Person>(null, Person.class, data,

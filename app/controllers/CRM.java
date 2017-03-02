@@ -28,6 +28,7 @@ import models.*;
 
 import play.*;
 import play.data.*;
+import play.data.validation.ValidationError;
 import play.libs.Json;
 import play.mvc.*;
 import play.mvc.Http.Context;
@@ -574,6 +575,13 @@ public class CRM extends Controller {
         Form<Person> personForm = Form.form(Person.class);
         Form<Person> filledForm = personForm.bindFromRequest();
         if(filledForm.hasErrors()) {
+            System.out.println("ERRORS!");
+            for (Map.Entry<String, List<ValidationError>> error : filledForm.errors().entrySet()) {
+                System.out.println(error.getKey());
+                for (ValidationError error2 : error.getValue()) {
+                    System.out.println(error2.key() + ", " + error2.message());
+                }
+            }
             return badRequest(
                 views.html.edit_person.render(filledForm)
             );
