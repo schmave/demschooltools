@@ -141,9 +141,11 @@
 (defn class-not-yet-created [name]
   (thing-not-yet-created name db/get-classes))
 
-(defn make-class [name from_date to_date]
-  (when (class-not-yet-created name)
-    (db/persist! {:type :classes :name name :active false})))
+(defn make-class
+  ([name] (make-class name nil nil))
+  ([name from_date to_date]
+   (when (class-not-yet-created name)
+     (db/persist! {:type :classes :name name :active false}))))
 
 (defn add-student-to-class [student-id class-id]
   (db/persist! {:type :classes_X_students :student_id student-id :class_id class-id}))

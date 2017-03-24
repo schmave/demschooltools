@@ -7,6 +7,7 @@
             [clojure.test :refer :all]
             [overseer.attendance :as att]
             [overseer.database :as data]
+            [overseer.database.users :as users]
             [overseer.database.connection :as conn]
             [overseer.dates :as dates]
             [overseer.db :as db]
@@ -288,7 +289,7 @@
 
 (deftest schema-isolation-test
   (do (conn/init-pg)
-      (db/reset-db)
+      (users/reset-db)
       ;; no need to create any students in demo, they are already there
       (let [resp (make-sample-two-students-in-class)
             att  (att/get-student-list)]

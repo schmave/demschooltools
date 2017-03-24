@@ -27,6 +27,7 @@
             [overseer.student :refer [student-routes]]
             [overseer.reports :refer [report-routes]]
             [overseer.database.connection :as conn]
+            [overseer.database.users :as users]
             [overseer.roles :as roles]
             [cemerick.friend :as friend]
             (cemerick.friend [workflows :as workflows]
@@ -50,7 +51,7 @@
 
   (PUT "/schema/:schema" [schema]
     (friend/authorize #{roles/super}
-                      (db/set-user-schema "super" schema)))
+                      (users/set-user-schema "super" schema)))
 
   (GET "/schemas" [name]
     (friend/authorize #{roles/super}
@@ -64,7 +65,7 @@
   report-routes
 
   (POST "/email" [email]
-    (db/insert-email email)
+    (users/insert-email email)
     (resp/redirect "/users/login"))
 
   (GET "/about" req
@@ -78,7 +79,7 @@
   (GET "/users/is-admin" req
     (resp/response {:admin (-> req friend/current-authentication :roles roles/admin)}))
   (GET "/users/is-super" req
-    (let [user (db/get-user "super")]
+    (let [user (users/get-user "super")]
       (resp/response {:super (-> req friend/current-authentication :roles roles/super)
                       :schema (:schema_name user)})))
 
@@ -94,7 +95,7 @@
           schema (:schema_name auth)
           username (:username auth)]
       (if (= "super" username)
-        (let [schema (:schema_name (db/get-user username))]
+        (let [schema (:schema_name (users/get-user username))]
           (binding [db/*school-schema* schema]
             (app req)))
         (binding [db/*school-schema* schema]
@@ -111,7 +112,7 @@
 
 (defn tapp []
   (-> #'app
-      (friend/authenticate {:credential-fn (partial creds/bcrypt-credential-fn db/get-user)
+      (friend/authenticate {:credential-fn (partial creds/bcrypt-credential-fn users/get-user)
                             :allow-anon? true
                             :login-uri "/users/login"
                             :default-landing-uri "/"
@@ -131,9 +132,9 @@
 ;;(start-site 5000)  
 (defn start-site [port]
   (conn/init-pg)
-  (db/init-users)
+  (users/init-users)
   (if (env :migratedb)
-    (do (db/reset-db)
+    (do (users/reset-db)
         (sampledb/sample-db)))
   (if (env :notify) (sh/sh "notify-send" "Server started"))
   (let [port (Integer. (or port (env :port) 5000))]

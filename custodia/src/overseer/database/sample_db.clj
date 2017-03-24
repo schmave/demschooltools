@@ -6,6 +6,7 @@
             [clojure.tools.trace :as trace]
             [overseer.database :as data]
             [overseer.database.connection :as conn]
+            [overseer.database.users :as users]
             [overseer.attendance :as att]
             [clj-time.coerce :as c]))
 
@@ -13,7 +14,7 @@
   ([] (sample-db false))
   ([have-extra?]
    (conn/init-pg)
-   (db/reset-db)
+   (users/reset-db)
    (let [{class-id :_id} (data/get-class-by-name "2014-2015")]
      (db/activate-class class-id)
      (data/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 9))))

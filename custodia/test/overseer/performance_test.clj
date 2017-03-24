@@ -14,6 +14,7 @@
             [overseer.helpers-test :as testhelpers]
             [overseer.dates :as dates]
             [overseer.database.connection :refer [pgdb]]
+            [overseer.database.users :as users]
             [overseer.migrations :as migrations]
             [overseer.db :as db]
             [overseer.database :as data]
@@ -26,7 +27,7 @@
   (jdbc/execute! @pgdb [(str "DROP TABLE schema_migrations")])
   (migrations/migrate-db @pgdb)
   (jdbc/execute! @pgdb [(str "DELETE FROM users where 1=1; ")])
-  (db/init-users))
+  (users/init-users))
 
 (defn collect-timing []
   (goat/clear-perf-data!)
@@ -38,7 +39,7 @@
 
 (defn ^:performance massive-timing []
   (conn/init-pg)
-  (db/drop-all-tables)
+  (users/drop-all-tables)
   (sh/sh "make" "load-massive-dump")
   (migrate-test-db)
   (data/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 9))))

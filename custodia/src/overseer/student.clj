@@ -5,6 +5,7 @@
             [clojure.tools.trace :as trace]
             [overseer.db :as db]
             [overseer.database :as data]
+            [overseer.database.users :as users]
             [overseer.dates :as dates]
             [overseer.attendance :as att]
             [overseer.roles :as roles]
@@ -40,10 +41,10 @@
 
   (PUT "/user" [name password]
     (friend/authorize #{roles/super}
-                     (db/make-user name password #{roles/admin})))
+                     (users/make-user name password #{roles/admin})))
   (GET "/user" []
     (friend/authorize #{roles/super}
-                      (resp/response {:users (db/get-users)})))
+                      (resp/response {:users (users/get-users)})))
 
   (PUT "/students/:id" [id :<< as-int name start_date email]
        (friend/authorize #{roles/admin}
