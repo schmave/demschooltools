@@ -53,8 +53,9 @@
                 (jdbc/insert! @pgdb tablename doc)))))
 
 (defn get-*
-  ([type] (map #(assoc % :type (keyword type))
-               (jdbc/query @pgdb [(str "select * from " (append-schema (name type)) " order by inserted_date ")])))
+  ([type]
+   (map #(assoc % :type (keyword type))
+        (jdbc/query @pgdb [(str "select * from " (append-schema (name type)) " order by inserted_date ")])))
   ([type id id-col]
    (map #(assoc % :type (keyword type))
         (if id

@@ -171,26 +171,27 @@
 (def _500pm_2014_10_14 (t/date-time 2014 10 14 21 0))
 (def _330pm_2014_10_14 (t/date-time 2014 10 14 19 30))
 
-(deftest making-class-with-swipe-out-of-range
-  (do (sample-db)
-      (let [class (data/make-class "name" "2015-08-12"  "2016-06-10")
-            cid (get-class-id-by-name "name")
-            s (data/make-student "test")
-            sid (:_id s)]
-        (data/add-student-to-class sid cid)
-        (db/activate-class cid)
+(comment 
+ (deftest making-class-with-swipe-out-of-range
+   (do (sample-db)
+       (let [class (data/make-class "name" "2015-08-12"  "2016-06-10")
+             cid (get-class-id-by-name "name")
+             s (data/make-student "test")
+             sid (:_id s)]
+         (data/add-student-to-class sid cid)
+         (db/activate-class cid)
 
-        ;; swipe in 2014
-        (data/swipe-in sid _900am_2014_10_14)
-        (data/swipe-out sid _339pm_2014_10_14)
-        (let [att (get-att sid)]
-          (testing "Total Valid Day Count"
-            (is (= (:total_days att)
-                   0)))
-          (testing "Total Minute Count"
-            (is (= (-> att :days first :total_mins)
-                   0M)))
-          ))))
+         ;; swipe in 2014
+         (data/swipe-in sid _900am_2014_10_14)
+         (data/swipe-out sid _339pm_2014_10_14)
+         (let [att (get-att sid)]
+           (testing "Total Valid Day Count"
+             (is (= (:total_days att)
+                    0)))
+           (testing "Total Minute Count"
+             (is (= (-> att :days first :total_mins)
+                    0M)))
+           )))))
 
 (deftest swipe-before-9-test
   (do (sample-db)
@@ -545,7 +546,7 @@
         (data/swipe-out sid (t/plus tomorrow (t/days 2) (t/minutes 329)))
 
         (let [att (get-att sid)]
-          (pp/pprint att)
+          ;; (pp/pprint att)
           (testing "Total Valid Day Count"
             (is (= 1 (-> att :total_days)))))))
   )
