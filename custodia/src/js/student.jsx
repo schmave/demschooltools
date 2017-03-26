@@ -9,6 +9,7 @@ var React = require('react'),
     Router = require('react-router'),
     Link = Router.Link,
     SwipeHelpers = require('./swipeHelpers.jsx'),
+    StudentEditor = require('./student/studentEditor.jsx'),
     Swipes = require('./swipeslisting.jsx'),
     SwipeListing = require('./swipeslisting.jsx');
 
@@ -67,6 +68,7 @@ var exports = React.createClass({
 
         return buttons;
     },
+
     getDayStatus: function (day) {
         var r = "";
         if (day.valid) {
@@ -117,6 +119,7 @@ var exports = React.createClass({
             </tr>;
         }.bind(this));
     },
+
     getPreviousDays: function () {
         var selectedDay = this.context.router.getCurrentParams().day;
         if (!selectedDay && this.state.day) {
@@ -141,11 +144,17 @@ var exports = React.createClass({
             </span>;
         }.bind(this));
     },
+
     toggleEdit: function () {
         if(userStore.isAdmin()) {
-            this.setState({editing: !this.state.editing});
+            var edit = !this.state.editing;
+            this.setState({editing: edit});
+            if (edit) {
+               this.refs.studentEditor.edit(this.state.student);
+            }
         }
     },
+
     saveChange: function () {
         actionCreator.updateStudent(this.state.student._id,
                                     this.refs.name.getDOMNode().value,
@@ -153,6 +162,7 @@ var exports = React.createClass({
                                     this.refs.email.getDOMNode().value);
         this.toggleEdit();
     },
+
     getActiveDay: function (student) {
         if (this.context.router.getCurrentParams().day) {
             return this.context.router.getCurrentParams().day;
@@ -162,10 +172,12 @@ var exports = React.createClass({
             return '';
         }
     },
+
     toggleHours: function () {
         this.state.student.olderdate = !!!this.state.student.olderdate;
         actionCreator.toggleHours(this.state.student._id);
     },
+
     showingStudentName: function () {
         return <div className="col-sm-8" id="studentName">
                 <span id="edit-name" onClick={this.toggleEdit}>
@@ -176,36 +188,7 @@ var exports = React.createClass({
                 <h2 className="badge badge-red">{(!this.studentInToday() && this.state.student.absent_today) ? 'Absent' : ''}</h2>
         </div>;
     },
-    editingStudentName: function () {
-        var pickerDate = (this.state.student.start_date) ? new Date(this.state.student.start_date) : null;
-        return <div className="col-sm-8 row">
-            <div className="col-sm-3" id="nameRow">
-                Name: <input ref="name" className="form-control" id="studentName"
-                       defaultValue={this.state.student.name}/>
-                Parent Email: <input ref="email" className="form-control" id="email"
-                       defaultValue={this.state.student.guardian_email}/>
-                <button onClick={this.saveChange} className="btn btn-success">
-                    <i id="save-name" className="fa fa-check icon-large">Save</i></button>
-                <button id="cancel-name" onClick={this.toggleEdit} className="btn btn-danger">
-                    <i className="fa fa-times"></i></button>
-            </div>
-            <div className="col-md-4" >
-                <div><input type="radio" name="older" onChange={this.toggleHours}
-                            checked={!this.state.student.olderdate}/> 300 Minutes
-                </div>
-                <div><input type="radio" name="older" onChange={this.toggleHours}
-                            checked={this.state.student.olderdate}/> 330 Minutes
-                </div>
-            </div>
-            <div className="col-md-4" id="nameRow">
-                <b>Student Start Date:</b>
-                <DateTimePicker id="missing" defaultValue={pickerDate}
-                                ref="missing_datepicker"
-                                calendar={true}
-                                time={false} />
-            </div>
-        </div>;
-    },
+
     render: function () {
         if (this.state.student) {
             var activeDate = this.getActiveDay(this.state.student);
@@ -213,6 +196,9 @@ var exports = React.createClass({
                 + " (" + this.state.student.total_short +  ")",
                 requiredMinutes = this.state.student.olderdate ? 330 : 300;
             return <div className="row">
+
+            <StudentEditor ref="studentEditor">
+            </StudentEditor>
             <SwipeHelpers ref="missingSwipeCollector">
             </SwipeHelpers>
 
@@ -221,7 +207,8 @@ var exports = React.createClass({
                 <div className="panel panel-info">
                     <div className="panel-heading">
                         <div className="row">
-                            {!this.state.editing ? this.showingStudentName() : this.editingStudentName()}
+                          {/* {!this.state.editing ? this.showingStudentName() : this.editingStudentName()} */}
+                            { this.showingStudentName() }
                             <div className="col-sm-4">
                                 <div id="hd-attended" className="col-sm-6"><b>Attended:</b> {attended}</div>
                                 <div id="hd-absent" className="col-sm-6"><b>Unexcused:</b> {this.state.student.total_abs}</div>
