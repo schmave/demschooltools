@@ -7,26 +7,7 @@ var React = require('react'),
 
 module.exports = React.createClass({
     getInitialState: function() {
-        return {};
-    },
-    _getMissingSwipe : function(student) {
-        var missingdirection = (student.last_swipe_type == "in") ? "out" : "in";
-        if (!student.in_today && student.direction == "out") {
-            missingdirection = "in";
-        }
-        this.setState({missingdirection: missingdirection});
-        this.refs.missingSwipeCollector.show();
-        return missingdirection;
-        // use ComponentDidUpdate to check the states then change them
-        // use the onChange for the datepicker to mutate setState
-    },
-
-    _swipeWithMissing: function(missing) {
-        var student = this.state.student,
-            missing = this.refs.missing_datepicker.state.value;
-        actionCreator.swipeStudent(student, student.direction, missing);
-        this.setState({student: {}, missingdirection: false})
-        this.refs.missingSwipeCollector.hide();
+        return {student: {start_date: null, guardian_email: "", name : "", olderdate: null}};
     },
 
     saveChange: function () {
@@ -34,34 +15,25 @@ module.exports = React.createClass({
                                     this.refs.name.getDOMNode().value,
                                     this.refs.missing_datepicker.state.value,
                                     this.refs.email.getDOMNode().value);
-        this.toggleEdit();
-    },
-
-    editingStudentName: function () {
+        this.refs.studentEditor.hide();
     },
 
     edit: function(student) {
         this.setState({student: student})
-        student.direction = direction;
-        var missing_in = ((student.last_swipe_type == "out"
-                        || (student.last_swipe_type == "in" && !student.in_today)
-                        || !student.last_swipe_type)
-                       && direction == "out"),
-            missing_out = (student.last_swipe_type == "in"
-                        && direction == "in");
-
-        if ((missing_in || missing_out) && student.last_swipe_date) {
-            var missingD = this._getMissingSwipe(student);
-            this._setCalendarTime(student, missingD);
-        } else {
-            actionCreator.swipeStudent(student, direction);
-        }
+        this.refs.studentEditor.show();
     },
 
     toggleHours: function () {
         this.state.student.olderdate = !!!this.state.student.olderdate;
         actionCreator.toggleHours(this.state.student._id);
     },
+
+    close: function () {
+        if (this.refs.studentEditor) {
+            this.refs.studentEditor.hide();
+        }
+    },
+
     render: function()  {
         var pickerDate = (this.state.student.start_date) ? new Date(this.state.student.start_date) : null;
         return <div className="row">
@@ -75,7 +47,7 @@ module.exports = React.createClass({
                                      defaultValue={this.state.student.guardian_email}/>
                 <button onClick={this.saveChange} className="btn btn-success">
                   <i id="save-name" className="fa fa-check icon-large">Save</i></button>
-                <button id="cancel-name" onClick={this.toggleEdit} className="btn btn-danger">
+                <button id="cancel-name" onClick={ this.close() } className="btn btn-danger">
                   <i className="fa fa-times"></i></button>
               </div>
               <div className="col-md-4" >
@@ -98,8 +70,8 @@ module.exports = React.createClass({
     },
 
     _onChange: function() {
-        if (this.refs.missingSwipeCollector) {
-            this.refs.missingSwipeCollector.hide();
+        if (this.refs.studentEditor) {
+            //this.refs.studentEditor.hide();
         }
     }
 });
