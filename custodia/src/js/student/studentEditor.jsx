@@ -34,23 +34,32 @@ module.exports = React.createClass({
         }
     },
 
+    handleChange(event) {
+        const target = event.target;
+        const value = target.type === 'checkbox' ? target.checked : target.value;
+        const name = target.name;
+        var partialState = this.state.student;
+        partialState[name] = value;
+        this.setState(partialState);
+    },
+
     render: function()  {
         var pickerDate = (this.state.student.start_date) ? new Date(this.state.student.start_date) : null;
         return <div className="row">
           <Modal ref="studentEditor"
                  title="Edit Student">
-            <form className="form-inline">
-              <div className="col-sm-3" id="nameRow">
-                Name: <input ref="name" className="form-control" id="studentName"
-                             defaultValue={this.state.student.name}/>
-                Parent Email: <input ref="email" className="form-control" id="email"
-                                     defaultValue={this.state.student.guardian_email}/>
-                <button onClick={this.saveChange} className="btn btn-success">
-                  <i id="save-name" className="fa fa-check icon-large">Save</i></button>
-                <button id="cancel-name" onClick={ this.close() } className="btn btn-danger">
-                  <i className="fa fa-times"></i></button>
+            <form className="form">
+              <div className="form-group" id="nameRow">
+                <label htmlFor="name">Name:</label>
+                <input ref="name" className="form-control" id="studentName"
+                       name="name" onChange={this.handleChange}
+                       value={this.state.student.name}/>
+                <label htmlFor="email">Parent Email:</label>
+                <input ref="email" className="form-control" id="email"
+                       name="guardian_email" onChange={this.handleChange}
+                       value={this.state.student.guardian_email}/>
               </div>
-              <div className="col-md-4" >
+              <div className="form-group" >
                 <div><input type="radio" name="older" onChange={this.toggleHours}
                             checked={!this.state.student.olderdate}/> 300 Minutes
                 </div>
@@ -58,13 +67,19 @@ module.exports = React.createClass({
                             checked={this.state.student.olderdate}/> 330 Minutes
                 </div>
               </div>
-              <div className="col-md-4" id="nameRow">
+              <div className="form-group" id="nameRow">
                 <b>Student Start Date:</b>
                 <DateTimePicker id="missing" defaultValue={pickerDate}
                                 ref="missing_datepicker"
                                 calendar={true}
                                 time={false} />
               </div>
+              <button onClick={this.saveChange} className="btn btn-success">
+                <i id="save-name" className="fa fa-check icon-large"> Save</i>
+              </button>
+              <button id="cancel-name" onClick={ this.close } className="btn btn-danger">
+                <i className="fa fa-times"> Cancel</i>
+              </button>
             </form>
           </Modal></div>;
     },

@@ -33,11 +33,11 @@ module.exports = React.createClass({
         this.setState({student: student})
         student.direction = direction;
         var missing_in = ((student.last_swipe_type == "out"
-                           || (student.last_swipe_type == "in" && !student.in_today)
-                           || !student.last_swipe_type)
-                          && direction == "out"),
+                        || (student.last_swipe_type == "in" && !student.in_today)
+                        || !student.last_swipe_type)
+                       && direction == "out"),
             missing_out = (student.last_swipe_type == "in"
-                           && direction == "in");
+                        && direction == "in");
 
         if ((missing_in || missing_out) && student.last_swipe_date) {
             var missingD = this._getMissingSwipe(student);
@@ -67,21 +67,21 @@ module.exports = React.createClass({
     },
     render: function()  {
         return <div className="row">
-            <Modal ref="missingSwipeCollector"
-                       title={"What time did you sign " + this.state.missingdirection + "?"}>
-                    <form className="form-inline">
-                        <div className="form-group">
-                            <label htmlFor="missing">What time did you sign {this.state.missingdirection}?</label>
-            <DateTimePicker id="missing" defaultValue={new Date()}
-                                         ref="missing_datepicker"
-                                         calendar={false}/>
-                        </div>
-                        <div className="form-group" style={{marginLeft: '2em'}}>
+          <Modal ref="missingSwipeCollector"
+                 title={"What time did you sign " + this.state.missingdirection + "?"}>
+            <form className="form-inline">
+              <div className="form-group">
+                <label htmlFor="missing">What time did you sign {this.state.missingdirection}?</label>
+                <DateTimePicker id="missing" defaultValue={new Date()}
+                                ref="missing_datepicker"
+                                calendar={false}/>
+              </div>
+              <div className="form-group" style={{marginLeft: '2em'}}>
                 <button id="submit-missing" className="btn btn-sm btn-primary" onClick={this._swipeWithMissing}>
-                                Sign {this.state.missingdirection} </button>
-                        </div>
-                    </form>
-            </Modal></div>;
+                  Sign {this.state.missingdirection} </button>
+              </div>
+            </form>
+          </Modal></div>;
     },
 
     _onChange: function() {
