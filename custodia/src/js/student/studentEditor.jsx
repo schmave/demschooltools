@@ -13,7 +13,7 @@ module.exports = React.createClass({
     saveChange: function () {
         actionCreator.updateStudent(this.state.student._id,
                                     this.refs.name.getDOMNode().value,
-                                    this.refs.missing_datepicker.state.value,
+                                    this.refs.startdate_datepicker.state.value,
                                     this.refs.email.getDOMNode().value);
         this.refs.studentEditor.hide();
     },
@@ -58,19 +58,15 @@ module.exports = React.createClass({
                 <input ref="email" className="form-control" id="email"
                        name="guardian_email" onChange={this.handleChange}
                        value={this.state.student.guardian_email}/>
-              </div>
-              <div className="form-group" >
                 <div><input type="radio" name="older" onChange={this.toggleHours}
                             checked={!this.state.student.olderdate}/> 300 Minutes
                 </div>
                 <div><input type="radio" name="older" onChange={this.toggleHours}
                             checked={this.state.student.olderdate}/> 330 Minutes
                 </div>
-              </div>
-              <div className="form-group" id="nameRow">
                 <b>Student Start Date:</b>
                 <DateTimePicker id="missing" defaultValue={pickerDate}
-                                ref="missing_datepicker"
+                                ref="startdate_datepicker"
                                 calendar={true}
                                 time={false} />
               </div>
@@ -86,7 +82,7 @@ module.exports = React.createClass({
 
     _onChange: function() {
         if (this.refs.studentEditor) {
-            //this.refs.studentEditor.hide();
+            this.refs.studentEditor.hide();
         }
     }
 });
