@@ -19,7 +19,7 @@ module.exports = React.createClass({
     },
 
     edit: function(student) {
-        this.setState({student: student})
+        this.setState({student: jQuery.extend({}, student)})
         this.refs.studentEditor.show();
     },
 
@@ -37,7 +37,7 @@ module.exports = React.createClass({
     handleChange(event) {
         const target = event.target;
         const value = target.type === 'checkbox' ? target.checked : target.value;
-        const name = target.name;
+        const name = target.id;
         var partialState = this.state.student;
         partialState[name] = value;
         this.setState(partialState);
@@ -51,17 +51,17 @@ module.exports = React.createClass({
             <form className="form">
               <div className="form-group" id="nameRow">
                 <label htmlFor="name">Name:</label>
-                <input ref="name" className="form-control" id="studentName"
-                       name="name" onChange={this.handleChange}
+                <input ref="name" className="form-control" id="name"
+                        onChange={this.handleChange}
                        value={this.state.student.name}/>
                 <label htmlFor="email">Parent Email:</label>
-                <input ref="email" className="form-control" id="email"
-                       name="guardian_email" onChange={this.handleChange}
+                <input ref="email" className="form-control" id="guardian_email"
+                        onChange={this.handleChange}
                        value={this.state.student.guardian_email}/>
-                <div><input type="radio" name="older" onChange={this.toggleHours}
+                <div><input type="radio" id="older" onChange={this.toggleHours}
                             checked={!this.state.student.olderdate}/> 300 Minutes
                 </div>
-                <div><input type="radio" name="older" onChange={this.toggleHours}
+                <div><input type="radio" id="older" onChange={this.toggleHours}
                             checked={this.state.student.olderdate}/> 330 Minutes
                 </div>
                 <b>Student Start Date:</b>
