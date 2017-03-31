@@ -7,19 +7,22 @@ var React = require('react'),
 
 module.exports = React.createClass({
     getInitialState: function() {
-        return {student: {start_date: null, guardian_email: "", name : "", olderdate: null}};
+        return {student: {start_date: null, guardian_email: "", name : "", olderdate: null},
+                startdate_datepicker: null};
     },
 
     saveChange: function () {
         actionCreator.updateStudent(this.state.student._id,
                                     this.refs.name.getDOMNode().value,
-                                    this.refs.startdate_datepicker.state.value,
+                                    this.refs.startdate.state.value,
                                     this.refs.email.getDOMNode().value);
         this.refs.studentEditor.hide();
     },
 
     edit: function(student) {
-        this.setState({student: jQuery.extend({}, student)})
+        this.setState(
+            {student: jQuery.extend({}, student),
+             startdate_datepicker: (student.start_date) ? new Date(student.start_date) : null})
         this.refs.studentEditor.show();
     },
 
@@ -34,7 +37,11 @@ module.exports = React.createClass({
         }
     },
 
-    handleChange(event) {
+    handleDateChange: function(d) {
+        this.setState({startdate_datepicker: d});
+    },
+
+    handleChange: function(event) {
         const target = event.target;
         const value = target.type === 'checkbox' ? target.checked : target.value;
         const name = target.id;
@@ -44,7 +51,6 @@ module.exports = React.createClass({
     },
 
     render: function()  {
-        var pickerDate = (this.state.student.start_date) ? new Date(this.state.student.start_date) : null;
         return <div className="row">
           <Modal ref="studentEditor"
                  title="Edit Student">
@@ -52,11 +58,11 @@ module.exports = React.createClass({
               <div className="form-group" id="nameRow">
                 <label htmlFor="name">Name:</label>
                 <input ref="name" className="form-control" id="name"
-                        onChange={this.handleChange}
+                       onChange={this.handleChange}
                        value={this.state.student.name}/>
                 <label htmlFor="email">Parent Email:</label>
                 <input ref="email" className="form-control" id="guardian_email"
-                        onChange={this.handleChange}
+                       onChange={this.handleChange}
                        value={this.state.student.guardian_email}/>
                 <div><input type="radio" id="older" onChange={this.toggleHours}
                             checked={!this.state.student.olderdate}/> 300 Minutes
@@ -65,8 +71,8 @@ module.exports = React.createClass({
                             checked={this.state.student.olderdate}/> 330 Minutes
                 </div>
                 <b>Student Start Date:</b>
-                <DateTimePicker id="missing" defaultValue={pickerDate}
-                                ref="startdate_datepicker"
+                <DateTimePicker id="missing" value={this.state.startdate_datepicker}
+                                ref="startdate" onChange={this.handleDateChange}
                                 calendar={true}
                                 time={false} />
               </div>
