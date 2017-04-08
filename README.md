@@ -20,6 +20,11 @@ See [the wiki](https://github.com/schmave/demschooltools/wiki/) for more informa
         INSERT INTO organization_hosts(host, organization_id) VALUES ('localhost:9000', 1);
         INSERT INTO tag(title, use_student_display, organization_id) VALUES ('Current Student', true, 1);
         INSERT INTO tag(title, use_student_display, organization_id) VALUES ('Staff', false, 1);
-        INSERT INTO users(email, name, active, email_validated, organization_id) VALUES ('<your email address here>', '<your name>', true, true, null);
 
-9. Navigate to [http://localhost:9000](http://localhost:9000). You will see a login page. Log in with a Google or Facebook account associated with the email address that you put in the users table in the previous step. Once you log in, you will see a page with headings "People", "Attendance", "JC", etc.
+8. Disable authentication by adding the following code to the top of `Authenticator.getUsername` in app/controllers/Secured.java:
+
+        if (1 == 1) {
+            return "Admin User";
+        }
+
+9. Navigate to [http://localhost:9000](http://localhost:9000). You will see a page with headings "People", "Attendance", "JC", etc.
