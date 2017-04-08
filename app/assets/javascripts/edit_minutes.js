@@ -397,15 +397,13 @@ requirejs(['utils'], function(utils) {
                 return;
             }
 
-            url = "/saveCase?id=" + id;
-            url += "&location=" + encodeURIComponent(self.el.find(".location").val());
-            url += "&findings=" + encodeURIComponent(self.el.find(".findings").val());
-            url += "&date=" + encodeURIComponent(self.el.find(".date").val());
-            url += "&time=" + encodeURIComponent(self.el.find(".time").val());
-            url += "&closed=" + encodeURIComponent(
-                !self.el.find("input.continued").prop("checked"));
-
-            $.post(url, function(data) {
+            $.post("/saveCase?id=" + id, {
+                closed: !self.el.find("input.continued").prop("checked"),
+                date: self.el.find(".date").val(),
+                findings: self.el.find(".findings").val(),
+                location: self.el.find(".location").val(),
+                time: self.el.find(".time").val()
+            }, function(data) {
                 self.is_modified = false;
             });
         };

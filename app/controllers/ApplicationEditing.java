@@ -116,7 +116,7 @@ public class ApplicationEditing extends Controller {
         CachedPage.remove(Application.CACHE_INDEX);
         Case c = Case.findById(id);
 
-        c.edit(request().queryString());
+        c.edit(request().body().asFormUrlEncoded());
         c.save();
 
         return ok();
