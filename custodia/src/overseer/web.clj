@@ -132,10 +132,10 @@
 ;;(start-site 5000)  
 (defn start-site [port]
   (conn/init-pg)
-  (users/init-users)
   (if (env :migratedb)
     (do (users/reset-db)
         (sampledb/sample-db)))
+  (users/init-users)
   (if (env :notify) (sh/sh "notify-send" "Server started"))
   (let [port (Integer. (or port (env :port) 5000))]
     (jetty/run-jetty (site (tapp)) {:port port :join? false})))
