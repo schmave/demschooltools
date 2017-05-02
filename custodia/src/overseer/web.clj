@@ -136,7 +136,9 @@
     (do (users/reset-db)
         (sampledb/sample-db)))
   (users/init-users)
-  (if (env :notify) (sh/sh "notify-send" "Server started"))
+  (if (env :notify)
+    (do (print "Server started")
+        (sh/sh "notify-send" "-u" "critical" "Server started")))
   (let [port (Integer. (or port (env :port) 5000))]
     (jetty/run-jetty (site (tapp)) {:port port :join? false})))
 
