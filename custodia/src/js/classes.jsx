@@ -103,11 +103,11 @@ var exports = React.createClass({
     activateClass:function() {
         actionCreator.activateClass(this.state.selectedClass._id);
     },
-    filterStudents : function(s) {
+    filterStudents: function(s) {
         return s.filter(function(s){ return s.name.toLocaleLowerCase().indexOf(this.state.filterText.toLocaleLowerCase()) > -1;}.bind(this));
     },
 
-    getStudentRowsInCurrentClass : function(){
+    getStudentRowsInCurrentClass: function(){
         var t = this.filterStudents(this.state.selectedClass.students)
                     .map(function (stu) { return <div key={"t" + this.state.selectedClass._id + "-" + stu.student_id}  className="in-class panel panel-info student-listing col-sm-4">
                 <div>
@@ -162,11 +162,6 @@ var exports = React.createClass({
                                   </table>
                               </div>
                               <div className="col-sm-10 column">
-                                <div className="col-sm-2 column">
-                                  <Link to="create" className="btn btn-primary btn-xs" id="create-student">
-                                    Add Student
-                                  </Link>
-                                </div>
                                 <div className="col-sm-10 column">
                                   <FilterBox onFilterChange={this.filterChanged} />
                                 </div>

@@ -125,7 +125,7 @@
 
 ;; (get-students )
 (defn get-students
-  ([] (db/get-* "students"))
+  ([] (sort-by :name (db/get-* "students")))
   ([id] (db/get-* "students" id "_id")))
 
 (defn get-class-by-name

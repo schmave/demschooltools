@@ -86,6 +86,7 @@ LEFT JOIN (SELECT max(s.in_time) AS ins
 WHERE (stu.archived = :show_archived
        OR stu.archived = FALSE)
 AND c.active = TRUE
+ORDER BY stu.name
 ;
 
 -- name: get-school-days-y
@@ -174,7 +175,8 @@ SELECT s._id as student_id
        , cXs.class_id
        FROM phillyfreeschool.students s
        LEFT JOIN phillyfreeschool.classes_X_students cXs
-   ON (cXs.student_id = s._id AND cXs.class_id = :class_id);
+   ON (cXs.student_id = s._id AND cXs.class_id = :class_id)
+ORDER BY s.name;
 
 -- name: get-active-class-y
 SELECT _id from phillyfreeschool.classes where active = true;

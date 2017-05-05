@@ -16,6 +16,7 @@ T :
 	@echo sql-backup-local-restore
 	@echo sql-local - connect to local database
 	@echo "sql-philly-backup - make backup of philly prod database"
+	@echo "logs - tail of local logs"
 	@echo "start - start a running overseer site"
 
 	@echo generate-sequence-reset
@@ -58,6 +59,9 @@ run-sequence-reset :
 deploy-philly : generate-sequence-reset
 	echo 'do you need to run the sequence reset?'
 	./prod-deploy.sh $(philly-prod-git)
+
+logs :
+	tail -f log/app.log
 
 start :
 	lein run -m overseer.web
