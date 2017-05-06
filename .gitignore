@@ -1,25 +1,35 @@
 syntax:glob
+
 logs
 project/project
 project/target
 target
-tmp
-.history
 dist
-/.idea
-/*.iml
-/out
+
+# Unknown -- remove these someday?
 /.idea_modules
 /RUNNING_PID
 /.settings
-*.vpwhist
-*.vtg
+
+# School-specific files
 fairhaven/*
 the_circle_school/*
 trvs/*
 makarios_learning_community/*
+
 *~
 connect_to_server.bat
 copy_release_to_server.bat
-*.sublime-workspace
 winscp_script.txt
+
+# Eclipse files
+/bin/
+/.project
+/.classpath
+/.cache-main
+/.settings
+/.tmpBin
+/.externalToolBuilders
+
+# Sublime Text files
+*.sublime-workspace

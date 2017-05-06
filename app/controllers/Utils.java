@@ -6,18 +6,15 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.persistence.*;
 
-import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.github.mustachejava.DefaultMustacheFactory;
-import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 
 import java.sql.SQLException;
 
 import play.Play;
-
-import models.Person;
+import play.twirl.api.Html;
+import play.twirl.api.HtmlFormat;
 
 public class Utils
 {
@@ -105,6 +102,10 @@ public class Utils
             templateName)
             .execute(writer, scopes);
         return writer.toString();
+    }
+
+    public static Html newlineToBr(String input) {
+        return HtmlFormat.raw(HtmlFormat.escape(input.trim()).body().replace("\n", "<br/>"));
     }
 }
 
