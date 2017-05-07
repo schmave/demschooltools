@@ -32,13 +32,19 @@ var exports = React.createClass({
         this.setupState(studentStore.getAllStudents());
     },
 
-    getActiveStudents : function(){
-        var t = this.state.students
-                    .map(function (stu) { return <div key={"t-" + stu._id}  className="in-class panel panel-info student-listing col-sm-4">
-                      <div>
-                        <div className="name"> {stu.name} </div>
-                      </div>
-                    </div>;
+    filterStudents: function(s) {
+        return s.filter(function(s){ return s.name.toLocaleLowerCase().indexOf(this.state.filterText.toLocaleLowerCase()) > -1;}.bind(this));
+    },
+
+    getActiveStudents: function(){
+        var t = this.filterStudents(this.state.students)
+                    .map(function (stu) {
+                        var link = <Link to="student" params={{studentId: stu._id}} id={"student-" + stu._id}>{stu.name}</Link>;
+                        return <div key={"t-" + stu._id}  className="col-sm-4">
+                          <div>
+                            <div className="name"> {link} </div>
+                          </div>
+                        </div>;
                     }.bind(this));
         return t;
     },
@@ -52,7 +58,7 @@ var exports = React.createClass({
                           <div className="row margined class-listing new-class">
                             <div className="col-sm-10 column">
                               <div className="col-sm-2 column">
-                                <Link to="create" className="btn btn-primary btn-xs" id="create-student">
+                                <Link to="create" className="btn btn-primary btn" id="create-student">
                                   Add Student
                                 </Link>
                               </div>
