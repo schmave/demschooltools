@@ -1,12 +1,12 @@
 
-# overseer
+# Overseer
 
 Overseer is a clojure web application which runs on the Jetty server. The site
-uses postges for persistence.
+uses postgres for persistence.
 
 ## Lein
 
-You will need to get [lein 2](http://leiningen.org/) installed and running. 
+You will need to get [lein 2](http://leiningen.org/) installed and running.
 
 To ensure you have the correct version, run: ```lein --version``` and verify
 that it is greater than 2.0.
@@ -21,7 +21,7 @@ system. Once that is complete, create a new database for overseer to use to run.
 To run the site locally, you need to configure lein to pass the correct database
 connection settings to your running web site. To make this easier, lein allows
 for a file to be put in the same folder as the project.clj with machine-specific
-settings. 
+settings.
 
 Make a file called profiles.clj in the base project directory. NEVER ADD IT TO
 GIT. Add in the following:
@@ -70,32 +70,26 @@ The application also sets up five default users for local testing. They are
 
 ## NPM
 
-You will need to install [npm](https://www.npmjs.com/).
-
-## Browserify/Watchify
-
-You will need to install watchify and browserify to watch the js files for
-changes and build it.
-
-```sh
-npm install watchify -g
-npm install browserify -g
-npm install reactify -g
-```
-
-To watch for changes, run: ```make watch```. It should build the app.js file
-without errors.
+You will need to install [Node.js and npm](https://nodejs.org/en/download/releases/).
+This project uses a package (npm-shrinkwrap) that is incompatible with npm
+version >= 3, so install a 4.x version of Node.js 4.x. Node.js
+version 6.x will not work.
 
 ## Running Locally
 
 ```sh
 $ git clone https://github.com/steveshogren/overseer.git
 $ cd overseer
-$ lein repl
-user=>(start-site 5000)
+$ npm install
 ```
 
-Your app should now be running on [localhost:5000](http://localhost:5000/).
+To build the frontend and serve it while listening for changes,
+run ```make watch```
+
+To run the backend, run ```make start```.
+
+If both the frontend and backend are running, the app will be available at
+[localhost:5000](http://localhost:5000/).
 
 
-License: GPL-3.0+ 
+License: GPL-3.0+
