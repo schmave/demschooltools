@@ -44,7 +44,8 @@
             ;;[refactor-nrepl "2.0.0-SNAPSHOT"]
             [lein-ring "0.9.7"]
             [migratus-lein "0.2.6"]
-            [environ/environ.lein "0.2.1"]]
+            [environ/environ.lein "0.2.1"]
+            [lein-environ "1.1.0"]]
   :migratus {:store :database
              :migration-dir "migrations"
              :db {:classname "org.postgresql.Driver",
