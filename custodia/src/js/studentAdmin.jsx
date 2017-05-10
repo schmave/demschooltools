@@ -2,6 +2,7 @@ var React = require('react'),
     Router = require('react-router'),
     actionCreator = require('./studentactioncreator'),
     Link = Router.Link,
+    StudentEditor = require('./student/studentEditor.jsx'),
     AdminWrapper = require('./adminwrapper.jsx'),
     studentStore = require('./StudentStore'),
     FilterBox = require('./filterbox.jsx');
@@ -53,14 +54,27 @@ var exports = React.createClass({
         this.setState({filterText: filter});
     },
 
+    toggleEdit: function () {
+        if(userStore.isAdmin()) {
+            var edit = !this.state.editing;
+            this.setState({editing: edit});
+            if (edit) {
+               this.refs.studentEditor.edit();
+            }
+        }
+    },
+
     render: function () {
         return <div>
+            <StudentEditor ref="studentEditor">
+            </StudentEditor>
                           <div className="row margined class-listing new-class">
                             <div className="col-sm-10 column">
                               <div className="col-sm-2 column">
-                                <Link to="create" className="btn btn-primary btn" id="create-student">
+                                <span onClick={this.toggleEdit}
+                                   className="btn btn-primary btn" id="create-student">
                                   Add Student
-                                </Link>
+                                </span>
                               </div>
                               <div className="col-sm-10 column">
                                 <FilterBox onFilterChange={this.filterChanged} />
@@ -68,7 +82,7 @@ var exports = React.createClass({
                               <div className="col-sm-12 column">
                                 <div className="col-sm-12 column">
                                   <div className="panel panel-info">
-                                    <div className="panel-heading absent"><b>Active</b></div>
+                                    <div className="panel-heading absent"><b>Students</b></div>
                                     {this.getActiveStudents()}
                                   </div>
                                 </div>

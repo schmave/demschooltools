@@ -48,7 +48,7 @@ var exports = {
                     type: constants.systemEvents.FLASH,
                     message: 'Successfully created ' + data.made.name + '.'
                 });
-                router.get().transitionTo('classes');
+                router.get().transitionTo('studentAdmin');
             } else {
                 dispatcher.dispatch({
                     type: constants.systemEvents.FLASH,

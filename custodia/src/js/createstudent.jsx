@@ -36,23 +36,3 @@ var exports = React.createClass({
 });
 
 module.exports = exports;
-
-//var UncontrolledInput = React.createClass({
-//  reset: function() {
-//    this.refs.input.getDOMNode().value = "Hello!";
-//  },
-//
-//  alertValue: function() {
-//    alert(this.refs.input.getDOMNode().value);
-//  },
-//
-//  render: function() {
-//    return (
-//      <div>
-//        <input ref="input" defaultValue="Hello!" />
-//        <button onClick={this.reset}>Reset</button>
-//        <button onClick={this.alertValue}>Alert Value</button>
-//      </div>
-//    );
-//  }
-//});

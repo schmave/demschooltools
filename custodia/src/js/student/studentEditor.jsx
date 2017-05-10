@@ -30,12 +30,15 @@ module.exports = React.createClass({
 
     saveChange: function () {
         this.savingShow();
-        actionCreator.updateStudent(this.state.student._id,
-                                    this.refs.name.getDOMNode().value,
-                                    this.refs.startdate.state.value,
-                                    this.refs.email.getDOMNode().value);
+        if (this.state.student._id == null) {
+            console.log("Create new student here");
+        } else {
+            actionCreator.updateStudent(this.state.student._id,
+                                        this.refs.name.getDOMNode().value,
+                                        this.refs.startdate.state.value,
+                                        this.refs.email.getDOMNode().value);
+        }
     },
-
 
     edit: function(student) {
         this.setState(
