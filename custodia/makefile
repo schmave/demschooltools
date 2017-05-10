@@ -96,11 +96,10 @@ backup-aliased-dump :
 	pg_dump swipes > dumps/updated-students-aliased.dump
 
 minify :
-	browserify -t reactify -t uglifyify ./src/js/app.jsx -o ./resources/public/js/gen/app.js
+	./node_modules/.bin/browserify -t reactify -t uglifyify ./src/js/app.jsx -o ./resources/public/js/gen/app.js
 
 js :
-	browserify -t babelify ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
+	./node_modules/.bin/browserify -t babelify ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
 
 watch :
-	watchify -v -t babelify ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
-
+	./node_modules/.bin/watchify -v -t babelify ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
