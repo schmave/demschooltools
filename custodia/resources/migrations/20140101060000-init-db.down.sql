@@ -4,7 +4,7 @@ DROP VIEW IF EXISTS roundedswipes;
 --;;
 DROP TABLE IF EXISTS swipes;
 --;;
-DROP TABLE IF EXISTS session_store;
+DROP TABLE IF EXISTS overseer.session_store;
 --;;
 DROP TABLE IF EXISTS students;
 --;;

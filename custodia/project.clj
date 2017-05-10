@@ -22,7 +22,7 @@
                  [yesql "0.5.1"]
                  [environ "1.0.0"]
                  [ring/ring-json "0.3.1"]
-                 [jdbc-ring-session "0.2"]
+                 [jdbc-ring-session "0.8"]
                  [sonian/carica "1.1.0" :exclusions [[cheshire]]]
                  [clj-time "0.8.0"]
                  [heroku-database-url-to-jdbc "0.2.2"]
@@ -48,6 +48,7 @@
             [lein-environ "1.1.0"]]
   :migratus {:store :database
              :migration-dir "migrations"
+             :migration-table-name "overseer.migratus"
              :db {:classname "org.postgresql.Driver",
                   :subprotocol "postgresql",
                   :user "",

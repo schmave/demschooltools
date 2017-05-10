@@ -1,3 +1,2 @@
 -- name: get-user-y
-SELECT * FROM users WHERE username = :username;
-
+SELECT * FROM overseer.users WHERE username = :username;

@@ -119,7 +119,7 @@
                             :workflows [(workflows/interactive-form)]})
       (compojure/wrap-routes my-middleware)
       wrap-reload
-      (wrap-session {:store (jdbc-store @conn/pgdb)
+      (wrap-session {:store (jdbc-store @conn/pgdb {:table :overseer.session_store})
                      :cookie-attrs {:max-age (* 3 365 24 3600)}})
       wrap-not-modified
       wrap-keyword-params
@@ -129,7 +129,7 @@
       wrap-exception-handling
       ))
 
-;;(start-site 5000)  
+;;(start-site 5000)
 (defn start-site [port]
   (conn/init-pg)
   (if (env :migratedb)

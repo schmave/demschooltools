@@ -119,10 +119,6 @@
                 :student_id id
                 :date (make-sqldate date-string)}))
 
-(defn insert-email [email]
-  (db/persist! {:type :emails
-                :email email}))
-
 ;; (get-students )
 (defn get-students
   ([] (sort-by :name (db/get-* "students")))
@@ -188,7 +184,7 @@
 (defn toggle-student-absent [_id]
   (modify-student _id :show_as_absent (fn [_] (make-sqldate (str (t/now))))))
 
-(defn make-year [from to] 
+(defn make-year [from to]
   (let [from (f/parse from)
         to (f/parse to)
         name (str (f/unparse date-format from) " "  (f/unparse date-format to))]
