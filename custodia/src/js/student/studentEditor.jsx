@@ -54,8 +54,8 @@ module.exports = React.createClass({
 
     toggleHours: function () {
         if (this.state.student._id > 0) {
-          this.state.student.olderdate = !!!this.state.student.olderdate;
-          actionCreator.toggleHours(this.state.student._id);
+            this.state.student.olderdate = !!!this.state.student.olderdate;
+            actionCreator.toggleHours(this.state.student._id);
         }
     },
 
@@ -81,44 +81,50 @@ module.exports = React.createClass({
     render: function()  {
         var title = ((this.state.creating) ? "Create" :  "Edit") + " Student"
         return <div className="row">
-        <Modal ref="studentEditor"
-        title={title}>
-        {(this.state.saving) ?
-         <div>
-           <p style={{'text-align':'center'}}>
-             <img src="/images/spinner.gif" />
-           </p>
-         </div>
-       : <form className="form">
-           <div className="form-group" id="nameRow">
-             <label htmlFor="name">Name:</label>
-             <input ref="name" className="form-control" id="name"
-                    onChange={this.handleChange}
-                    value={this.state.student.name}/>
-             <label htmlFor="email">Parent Email:</label>
-             <input ref="email" className="form-control" id="guardian_email"
-                    onChange={this.handleChange}
-                    value={this.state.student.guardian_email}/>
-             <div><input type="radio" id="older" onChange={this.toggleHours}
-                         checked={!this.state.student.olderdate}/> 300 Minutes
-             </div>
-             <div><input type="radio" id="older" onChange={this.toggleHours}
-                         checked={this.state.student.olderdate}/> 330 Minutes
-             </div>
-             <b>Student Start Date:</b>
-             <DateTimePicker id="missing" value={this.state.startdate_datepicker}
-                             ref="startdate" onChange={this.handleDateChange}
-                             calendar={true}
-                             time={false} />
-           </div>
-           <button onClick={this.saveChange} className="btn btn-success">
-             <i id="save-name" className="fa fa-check icon-large"> Save</i>
-           </button>
-           <button id="cancel-name" onClick={ this.close } className="btn btn-danger">
-             <i className="fa fa-times"> Cancel</i>
-           </button>
+          <Modal ref="studentEditor"
+                 title={title}>
+            {(this.state.saving) ?
+            <div>
+              <p style={{'text-align':'center'}}>
+                <img src="/images/spinner.gif" />
+              </p>
+            </div>
+             : <form className="form">
+                <div className="form-group" id="nameRow">
+                <label htmlFor="name">Name:</label>
+                <input ref="name" className="form-control" id="name"
+                onChange={this.handleChange}
+                value={this.state.student.name}/>
+                <label htmlFor="email">Parent Email:</label>
+                <input ref="email" className="form-control" id="guardian_email"
+                onChange={this.handleChange}
+                value={this.state.student.guardian_email}/>
+
+                { (!this.state.creating) ?
+                  <div>
+                    <div><input type="radio" id="older" onChange={this.toggleHours}
+                                checked={!this.state.student.olderdate}/> 300 Minutes
+                    </div>
+                    <div><input type="radio" id="older" onChange={this.toggleHours}
+                                checked={this.state.student.olderdate}/> 330 Minutes
+                    </div>
+                  </div>
+                : <div></div>
+                }
+                <b>Student Start Date:</b>
+                <DateTimePicker id="missing" value={this.state.startdate_datepicker}
+                                ref="startdate" onChange={this.handleDateChange}
+                                calendar={true}
+                                time={false} />
+        </div>
+        <button onClick={this.saveChange} className="btn btn-success">
+          <i id="save-name" className="fa fa-check icon-large"> Save</i>
+        </button>
+        <button id="cancel-name" onClick={ this.close } className="btn btn-danger">
+          <i className="fa fa-times"> Cancel</i>
+        </button>
        </form>
-        }
+            }
           </Modal></div>;
     },
 
