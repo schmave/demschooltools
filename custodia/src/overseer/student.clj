@@ -34,10 +34,10 @@
   (GET "/students/:id" [id :<< as-int]
        (friend/authorize #{roles/user} (student-page-response id)))
 
-  (POST "/students" [name email]
+  (POST "/students" [name start_date email]
         (friend/authorize #{roles/admin}
-                          (resp/response {:made (data/make-student-starting-today name email)
-                                          :students (get-student-list)})))
+                          (resp/response {:made (data/make-student name start_date email)
+                                          :students (data/get-students)})))
 
   (PUT "/user" [name password]
     (friend/authorize #{roles/super}

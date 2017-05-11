@@ -34,10 +34,11 @@ var exports = {
                 });
             });
     },
-    createStudent: function (name, email) {
+    createStudent: function (name, start_date, email) {
         ajax.post('/students', {
             name: name,
-            email: email
+            email: email,
+            start_date: start_date
         }).then(function (data) {
             dispatcher.dispatch({
                 type: constants.studentEvents.ALL_LOADED,

@@ -55,24 +55,22 @@ var exports = React.createClass({
     },
 
     toggleEdit: function () {
-        if(userStore.isAdmin()) {
-            var edit = !this.state.editing;
-            this.setState({editing: edit});
-            if (edit) {
-               this.refs.studentEditor.edit();
-            }
+        var edit = !this.state.editing;
+        this.setState({editing: edit});
+        if (edit) {
+            this.refs.studentEditor.edit();
         }
     },
 
     render: function () {
         return <div>
-            <StudentEditor ref="studentEditor">
-            </StudentEditor>
+                          <StudentEditor ref="studentEditor">
+                          </StudentEditor>
                           <div className="row margined class-listing new-class">
                             <div className="col-sm-10 column">
                               <div className="col-sm-2 column">
                                 <span onClick={this.toggleEdit}
-                                   className="btn btn-primary btn" id="create-student">
+                                      className="btn btn-primary btn" id="create-student">
                                   Add Student
                                 </span>
                               </div>

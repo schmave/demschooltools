@@ -161,14 +161,14 @@
               (student-not-yet-created name))
      (db/persist! {:type :students
                    :name name
-                   :start_date start-date
+                   :start_date (make-sqldate start-date)
                    :guardian_email email
                    :olderdate nil
                    :show_as_absent nil}))))
 
 (defn make-student-starting-today
   ([name] (make-student-starting-today name ""))
-  ([name email] (make-student name (make-sqldate (today-string)) email)))
+  ([name email] (make-student name (today-string) email)))
 
 (defn- toggle-date [older]
   (if older nil (make-sqldate (str (t/now)))))
