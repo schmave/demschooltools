@@ -19,10 +19,21 @@ var exports = React.createClass({
 
     setupState: function (classes, students) {
         var selectedClass = this.state.selectedClass;
-        if(selectedClass) {
+        if(selectedClass && selectedClass._id) {
             var id = selectedClass._id,
                 matching = classes.filter(function(cls) {return cls._id === id;});
             selectedClass = (matching[0]) ? matching[0] : classes[0];
+        } else {
+            if(classes.length > 0) {
+                var activeClasses = classes.filter((cls)=> cls.active);
+                if(activeClasses.length > 0) {
+                    selectedClass = activeClasses[0];
+                } else {
+                    selectedClass = {students:[]};
+                }
+            } else {
+                selectedClass = {students:[]};
+            }
         }
         this.setState({classes: classes,
                        students: students,
@@ -102,6 +113,7 @@ var exports = React.createClass({
     },
 
     getStudentRowsInCurrentClass: function(){
+        var a = 1;
         var t = this.filterStudents(this.state.selectedClass.students.sort(this.rankAlphabetically))
                     .map(function (stu) { return <div key={"t" + this.state.selectedClass._id + "-" + stu.student_id}  className="in-class panel panel-info student-listing col-sm-4">
               <div>
