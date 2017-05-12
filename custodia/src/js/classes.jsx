@@ -1,31 +1,6 @@
-if (!Array.prototype.some) {
-    Array.prototype.some = function(fun/*, thisArg*/) {
-        'use strict';
-
-        if (this == null) {
-            throw new TypeError('Array.prototype.some called on null or undefined');
-        }
-
-        if (typeof fun !== 'function') {
-            throw new TypeError();
-        }
-
-        var t = Object(this);
-        var len = t.length >>> 0;
-
-        var thisArg = arguments.length >= 2 ? arguments[1] : void 0;
-        for (var i = 0; i < len; i++) {
-            if (i in t && fun.call(thisArg, t[i], i, t)) {
-                return true;
-            }
-        }
-
-        return false;
-    };
-}
-
 var React = require('react'),
     Router = require('react-router'),
+    helpers= require('./helpers/some'),
     classStore = require('./classstore'),
     actionCreator = require('./classactioncreator'),
     Link = Router.Link,
@@ -34,12 +9,14 @@ var React = require('react'),
     FilterBox = require('./filterbox.jsx');
 
 var exports = React.createClass({
+
     getInitialState: function () {
         return {classes:classStore.getClasses(true),
                 filterText: '',
                 students: studentStore.getAllStudents(true),
                 selectedClass: {students:[]}};
     },
+
     setupState: function (classes, students) {
         var selectedClass = this.state.selectedClass;
         if(selectedClass) {
@@ -51,24 +28,30 @@ var exports = React.createClass({
                        students: students,
                        selectedClass: (selectedClass)?selectedClass:{students:[]}});
     },
+
     componentDidMount: function () {
         classStore.addChangeListener(this._onClassChange);
         studentStore.addChangeListener(this._onStudentChange);
     },
+
     componentWillUnmount: function () {
         studentStore.removeChangeListener(this._onStudentChange);
         classStore.removeChangeListener(this._onClassChange);
     },
+
     _onClassChange: function () {
         this.setupState(classStore.getClasses().classes, this.state.students);
     },
+
     _onStudentChange: function () {
         this.setupState(this.state.classes, studentStore.getAllStudents());
     },
+
     classSelected: function (classval) {
         this.setState({selectedClass: classval});
     },
-    classRows : function(){
+
+    classRows: function(){
         return this.state.classes.map(function (classval, i) {
             var boundClick = this.classSelected.bind(this, classval),
                 selected = (classval._id === this.state.selectedClass._id)  ? "selected" : "";
@@ -89,20 +72,25 @@ var exports = React.createClass({
             </tr>);
         }.bind(this));
     },
+
     selectedStudentContains: function(stu) {
         return !this.state.selectedClass.students.some(function(istu){
             return istu.student_id === stu._id;
         });
     },
+
     deleteFromClass:function(student) {
         actionCreator.deleteStudentFromClass(student.student_id, this.state.selectedClass._id);
     },
+
     addToClass:function(student) {
         actionCreator.addStudentToClass(student._id, this.state.selectedClass._id);
     },
+
     activateClass:function() {
         actionCreator.activateClass(this.state.selectedClass._id);
     },
+
     filterStudents: function(s) {
         return s.filter(function(s){ return s.name.toLocaleLowerCase().indexOf(this.state.filterText.toLocaleLowerCase()) > -1;}.bind(this));
     },
