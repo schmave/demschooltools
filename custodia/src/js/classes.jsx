@@ -71,12 +71,12 @@ var exports = React.createClass({
                         onClick={boundClick}
                         className={selected}>
               <td>
-                {classval.name}
+                <span className="pull-left">{classval.name}</span>
                 {classval.active ?
-                 <span className="margined badge badge-green">Active</span>
-                 : <span onClick={this.activateClass}
+                 <span className="pull-right margined badge badge-green">Active</span>
+                 : <span onClick={this.activateClass.bind(this, classval._id)}
                          id={"activate-"+classval.name}
-                         className="margined badge">
+                         className="pull-right margined badge">
                    Activate
                  </span>}
               </td>
@@ -98,8 +98,8 @@ var exports = React.createClass({
         actionCreator.addStudentToClass(student._id, this.state.selectedClass._id);
     },
 
-    activateClass:function() {
-        actionCreator.activateClass(this.state.selectedClass._id);
+    activateClass:function(_id) {
+        actionCreator.activateClass(_id);
     },
 
     filterStudents: function(s) {
