@@ -18,7 +18,7 @@
   (migratus/migrate {:store :database
                      :db con}))
 
-;; (migratus/create {:store :database :db @pgdb} "calculated interval")
+;;(migratus/create {:store :database :db @pgdb} "create school")
 
 (comment
   (migratus/migrate {:store :database

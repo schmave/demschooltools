@@ -65,6 +65,7 @@
                              "DROP TABLE IF EXISTS emails; "
                              "DROP TABLE IF EXISTS session_store;"
                              "DROP SCHEMA IF EXISTS phillyfreeschool CASCADE;"
+                             "DROP SCHEMA IF EXISTS overseer CASCADE;"
                              "DROP SCHEMA IF EXISTS demo CASCADE;")]))
 
 ;;(reset-db)
