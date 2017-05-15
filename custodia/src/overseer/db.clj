@@ -10,9 +10,9 @@
             [overseer.queries.phillyfreeschool :as pfs]
             ))
 
-(def ^:dynamic *school-schema* "phillyfreeschool")
+;;(def ^:dynamic *school-schema* "phillyfreeschool")
 
-(def current-schemas ["phillyfreeschool" "demo"])
+;; (def current-schemas ["phillyfreeschool" "demo"])
 
 (extend-type Date
   jdbc/ISQLParameter
@@ -28,9 +28,8 @@
        (log/info f# ~args)
        (f# ~args {:connection con#}))))
 
-
 (defn append-schema [q]
-  (str *school-schema* "." q))
+  (str "overseer." q))
 
 (defn delete! [doc]
   (let [table (append-schema (name (:type doc)))
