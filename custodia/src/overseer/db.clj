@@ -10,9 +10,7 @@
             [overseer.queries.phillyfreeschool :as pfs]
             ))
 
-;;(def ^:dynamic *school-schema* "phillyfreeschool")
-
-;; (def current-schemas ["phillyfreeschool" "demo"])
+(def ^:dynamic *school-id* 1)
 
 (extend-type Date
   jdbc/ISQLParameter
@@ -54,15 +52,18 @@
 (defn get-*
   ([type]
    (map #(assoc % :type (keyword type))
-        (jdbc/query @pgdb [(str "select * from " (append-schema (name type)) " order by inserted_date ")])))
+        (jdbc/query @pgdb [(str "select * from "
+                                (append-schema (name type))
+                                " order by inserted_date ")
+                           ])))
   ([type id id-col]
    (map #(assoc % :type (keyword type))
         (if id
           (jdbc/query @pgdb [(str "select * from " (append-schema (name type))
                                   " where " id-col "=?"
                                   " order by inserted_date")
-                             id])
-          (jdbc/query @pgdb [(str "select * from " (append-schema (name type)) " order by inserted_date")])))))
+                             id ])
+          (get-* type)))))
 
 (defn get-active-class []
   (-> (q get-active-class-y {} )
@@ -95,7 +96,7 @@
   (q delete-student-from-class-y! {:student_id student-id :class_id class-id} ))
 
 (defn get-students-for-class [class-id]
-  (q get-classes-and-students-y {:class_id class-id} ))
+  (q get-classes-and-students-y {:class_id class-id :school_id *school-id*} ))
 
 ;; (jdbc/query @pgdb ["select * from students"])
 ;; (jdbc/query @pgdb ["select * from students where id in (?)" "1"])
@@ -111,7 +112,7 @@
   (q get-excuses-in-year-y {:year_name year-name :student_id student-id} ))
 
 (defn get-student-list-in-out [show-archived]
-  (q student-list-in-out-y {:show_archived show-archived} ))
+  (q student-list-in-out-y {:show_archived show-archived :school_id *school-id*} ))
 ;;(get-student-list-in-out  true)
 
 ;; (map :student_id (get-student-list-in-out))
@@ -133,6 +134,6 @@
    (q student-report-y { :year_name year-name :class_id class-id} )))
 
 (defn get-swipes-in-year [year-name student-id]
-  (q swipes-in-year-y {:year_name year-name :student_id student-id} ))
+  (q swipes-in-year-y {:year_name year-name :student_id student-id :school_id *school-id*} ))
 
 ;; (get-swipes-in-year "2014-06-01 2015-06-01" 1)

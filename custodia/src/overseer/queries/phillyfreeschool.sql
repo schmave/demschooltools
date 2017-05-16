@@ -86,10 +86,12 @@ LEFT JOIN (SELECT max(s.in_time) AS ins
 WHERE (stu.archived = :show_archived
        OR stu.archived = FALSE)
 AND c.active = TRUE
+AND stu.school_id = :school_id
 ORDER BY stu.name
 ;
 
 -- name: get-school-days-y
+-- TODO
 SELECT DISTINCT days2.days
 FROM (SELECT
              to_char(s.in_time at time zone 'America/New_York', 'YYYY-MM-DD') as days
@@ -155,14 +157,17 @@ SELECT s.*
        , to_char(s.in_time at time zone 'America/New_York', 'HH:MI:SS') as nice_in_time
        , to_char(s.out_time at time zone 'America/New_York', 'HH:MI:SS') as nice_out_time
        FROM overseer.swipes s
+       INNER JOIN overseer.students stu ON (stu._id = s.student_id)
        INNER JOIN overseer.years y
       ON ((s.out_time BETWEEN y.from_date AND y.to_date)
           OR (s.in_time BETWEEN y.from_date AND y.to_date))
 WHERE y.name= :year_name
+  AND stu.school_id = :school_id
   AND s.student_id = :student_id;
 
 -- name: activate-class-y!
 -- Set a single class to be active, and unactivate all others
+-- TODO add school to classes
 UPDATE overseer.classes SET active = (_id = :id);
 
 -- name: delete-student-from-class-y!
@@ -176,12 +181,15 @@ SELECT s._id as student_id
        FROM overseer.students s
        LEFT JOIN overseer.classes_X_students cXs
    ON (cXs.student_id = s._id AND cXs.class_id = :class_id)
+WHERE s.school_id = :school_id
 ORDER BY s.name;
 
 -- name: get-active-class-y
+-- TODO add school to classes
 SELECT _id from overseer.classes where active = true;
 
 -- name: get-classes-y
+-- TODO add school to classes
 SELECT c.name, c._id, c.active, cXs.student_id, s.name student_name
 FROM overseer.classes c
 LEFT JOIN overseer.classes_X_students cXs ON (cXs.class_id = c._id)
@@ -206,4 +214,4 @@ FROM (SELECT DISTINCT days2.days
          JOIN overseer.years y ON (1=1)
          JOIN overseer.classes_X_students cXs ON (cXs.class_id = y.class_id)
          JOIN overseer.students s ON (s._id = cXs.student_id)
-WHERE y.name = :year_name;
+WHERE y.name = :year_name and s.school_id = :school_id;

@@ -8,6 +8,6 @@ inserted_date timestamp default now()
 --;;
 
 INSERT INTO overseer.schools (_id, name, timezone)
-VALUES (1, 'Philly Free School',   'America/New_York'),
-       (2, 'Demo School',   'America/New_York');
+VALUES (1, 'Philly Free School', 'America/New_York'),
+       (2, 'Demo School', 'America/New_York');
 
