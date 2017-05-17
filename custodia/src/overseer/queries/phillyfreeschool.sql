@@ -1,7 +1,3 @@
--- name: clean-swipes-y
--- Gives a list of swipes rounded
-SELECT * FROM overseer.swipes;
-
 -- name: get-overrides-in-year-y
 -- Get a list of overrides in a year for a given student
 SELECT e.*
@@ -91,12 +87,12 @@ ORDER BY stu.name
 ;
 
 -- name: get-school-days-y
--- TODO
 SELECT DISTINCT days2.days
 FROM (SELECT
              to_char(s.in_time at time zone 'America/New_York', 'YYYY-MM-DD') as days
              , s.in_time
              FROM overseer.swipes s
+             INNER JOIN overseer.students stu on (stu._id = s.student_id AND stu.school_id = :school_id)
              INNER JOIN overseer.years y
              ON ((s.out_time BETWEEN y.from_date AND y.to_date)
                  OR (s.in_time BETWEEN y.from_date AND y.to_date))
@@ -167,8 +163,7 @@ WHERE y.name= :year_name
 
 -- name: activate-class-y!
 -- Set a single class to be active, and unactivate all others
--- TODO add school to classes
-UPDATE overseer.classes SET active = (_id = :id);
+UPDATE overseer.classes SET active = (_id = :id) where school_id = :school_id;
 
 -- name: delete-student-from-class-y!
 DELETE FROM overseer.classes_X_students
@@ -185,33 +180,18 @@ WHERE s.school_id = :school_id
 ORDER BY s.name;
 
 -- name: get-active-class-y
--- TODO add school to classes
-SELECT _id from overseer.classes where active = true;
+SELECT _id from overseer.classes where active = true and school_id = :school_id;
+
+-- name: get-students-y
+SELECT * from overseer.students where school_id = :school_id;
+
+-- name: get-years-y
+SELECT * from overseer.years where school_id = :school_id;
 
 -- name: get-classes-y
--- TODO add school to classes
 SELECT c.name, c._id, c.active, cXs.student_id, s.name student_name
 FROM overseer.classes c
 LEFT JOIN overseer.classes_X_students cXs ON (cXs.class_id = c._id)
 LEFT JOIN overseer.students s ON (cXs.student_id = s._id)
+WHERE c.school_id = :school_id
 ORDER BY c.name;
-
--- name: school-days-for-class-year
-SELECT a.days, s._id student_id, s.archived, s.olderdate
-FROM (SELECT DISTINCT days2.days
-    FROM (SELECT
-            (CASE WHEN date(s.in_time AT TIME ZONE 'America/New_York')  IS NULL
-            THEN date(s.out_time AT TIME ZONE 'America/New_York')
-            ELSE date(s.in_time AT TIME ZONE 'America/New_York') END) AS days
-            FROM overseer.swipes s
-            INNER JOIN overseer.years y
-            ON ((s.out_time BETWEEN y.from_date AND y.to_date)
-            OR (s.in_time BETWEEN y.from_date AND y.to_date))
-            JOIN overseer.classes_X_students cXs ON (cXs.class_id = y.class_id
-                                         AND s.student_id = cXs.student_id)
-         WHERE y.name = :year_name) days2
-         ORDER BY days2.days) AS a
-         JOIN overseer.years y ON (1=1)
-         JOIN overseer.classes_X_students cXs ON (cXs.class_id = y.class_id)
-         JOIN overseer.students s ON (s._id = cXs.student_id)
-WHERE y.name = :year_name and s.school_id = :school_id;

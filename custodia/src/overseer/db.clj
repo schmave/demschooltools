@@ -20,11 +20,12 @@
 
 
 (defmacro q [n args]
-  `(let [s# *school-schema*
-         con# @pgdb]
-     (let [f# (resolve (symbol (str "overseer.queries." s# "/" ~(name n))))]
-       (log/info f# ~args)
-       (f# ~args {:connection con#}))))
+  (n args {:connection @pgdb})
+  (comment `(let [s# *school-schema*
+          con# @pgdb]
+      (let [f# (resolve (symbol (str "overseer.queries./" ~(name n))))]
+        (log/info f# ~args)
+        (f# ~args {:connection con#})))))
 
 (defn append-schema [q]
   (str "overseer." q))
@@ -50,12 +51,12 @@
                 (jdbc/insert! @pgdb tablename doc)))))
 
 (defn get-*
-  ([type]
-   (map #(assoc % :type (keyword type))
-        (jdbc/query @pgdb [(str "select * from "
-                                (append-schema (name type))
-                                " order by inserted_date ")
-                           ])))
+  ;; ([type]
+  ;;  (map #(assoc % :type (keyword type))
+  ;;       (jdbc/query @pgdb [(str "select * from "
+  ;;                               (append-schema (name type))
+  ;;                               " order by inserted_date ")
+  ;;                          ])))
   ([type id id-col]
    (map #(assoc % :type (keyword type))
         (if id
@@ -66,13 +67,13 @@
           (get-* type)))))
 
 (defn get-active-class []
-  (-> (q get-active-class-y {} )
+  (-> (q get-active-class-y {:school_id *school-id*} )
       first
       :_id))
 
 ;; (get-classes)
 (defn get-classes []
-  (let [classes (q get-classes-y {} )
+  (let [classes (q get-classes-y {:school_id *school-id*} )
         grouped (vals (group-by :name classes))]
     (map (fn [class-group]
            (let [base (dissoc (first class-group) :student_id :student_name)
@@ -82,15 +83,21 @@
              (assoc base :students students)))
          grouped)))
 
+(defn get-all-years []
+  (q get-years-y {:school_id *school-id*}))
+
+(defn get-all-students []
+  (q get-students-y {:school_id *school-id*}))
+
 (defn get-all-classes-and-students []
   {:classes (get-classes)
    :students (map (fn [s] {:name (:name s) :_id (:_id s)})
-                  (get-* "students"))})
+                  (get-all-students))})
 
 ;; (get-all-classes-and-students)
 
 (defn activate-class [id]
-  (q activate-class-y! {:id id} ))
+  (q activate-class-y! {:id id :school_id *school-id*} ))
 
 (defn delete-student-from-class [student-id class-id]
   (q delete-student-from-class-y! {:student_id student-id :class_id class-id} ))
@@ -118,7 +125,7 @@
 ;; (map :student_id (get-student-list-in-out))
 
 (defn get-school-days [year-name]
-  (q get-school-days-y {:year_name year-name} ))
+  (q get-school-days-y {:year_name year-name :school_id *school-id*} ))
 
 ;; (map :days (get-school-days "2014-06-01 2015-06-01"))
 ;; (get-student-page 7 "2014-07-23 2015-06-17")

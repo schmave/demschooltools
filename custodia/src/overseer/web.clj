@@ -49,13 +49,13 @@
     (friend/authenticated
      (render-string (read-template "index.html") {:id start-id})))
 
-  (PUT "/schema/:schema" [schema]
-    (friend/authorize #{roles/super}
-                      (users/set-user-schema "super" schema)))
+  ;; (PUT "/schema/:schema" [schema]
+  ;;   (friend/authorize #{roles/super}
+  ;;                     (users/set-user-schema "super" schema)))
 
-  (GET "/schemas" [name]
-    (friend/authorize #{roles/super}
-                      (resp/response db/current-schemas)))
+  ;; (GET "/schemas" [name]
+  ;;   (friend/authorize #{roles/super}
+  ;;                     (resp/response db/current-schemas)))
   (GET "/hello" []
     (friend/authorize #{roles/super}
                       (resp/response "there")))
@@ -92,13 +92,13 @@
 (defn my-middleware [app]
   (fn [req]
     (let [auth (friend/current-authentication req)
-          schema (:schema_name auth)
+          schema (:school_id auth)
           username (:username auth)]
       (if (= "super" username)
-        (let [schema (:schema_name (users/get-user username))]
-          (binding [db/*school-schema* schema]
+        (let [schema (:school_id (users/get-user username))]
+          (binding [db/*school-id* schema]
             (app req)))
-        (binding [db/*school-schema* schema]
+        (binding [db/*school-id* schema]
           (app req))))))
 
 (defn wrap-exception-handling

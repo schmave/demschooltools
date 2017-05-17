@@ -90,7 +90,7 @@
     (is (= short (:total_short att))) "Total short"))
 
 ;; (sample-db true) 
-;; (binding [db/*school-schema* "demo"] (sample-db true))
+;; (binding [db/*school-id* 1] (sample-db true))
 (defn sample-db
   ([] (sample-db false))
   ([have-extra?]

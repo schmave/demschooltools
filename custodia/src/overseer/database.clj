@@ -11,10 +11,10 @@
             [schema.core :as s]
             ))
 
-(defn get-swipes
-  ([] (db/get-* "swipes"))
-  ([id]
-   (db/get-* "swipes" id "student_id")))
+;; (defn get-swipes-
+;;   ([] (db/get-* "swipes"))
+;;   ([id]
+;;    (db/get-* "swipes" id "student_id")))
 
 (defn get-overrides [id]
   (db/get-* "overrides" id "student_id"))
@@ -95,7 +95,7 @@
 ;; TODO - make multimethod on type
 ;; (get-years)
 (defn get-years
-  ([] (db/get-* "years"))
+  ([] (db/get-all-years))
   ([names]
    (db/get-* "years" names "name")))
 
@@ -125,7 +125,7 @@
 
 ;; (get-students )
 (defn get-students
-  ([] (sort-by :name (db/get-* "students")))
+  ([] (sort-by :name (db/get-all-students)))
   ([id] (db/get-* "students" id "_id")))
 
 (defn get-class-by-name
