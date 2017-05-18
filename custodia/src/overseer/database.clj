@@ -145,7 +145,7 @@
   ([name] (make-class name nil nil))
   ([name from_date to_date]
    (when (class-not-yet-created name)
-     (db/persist! {:type :classes :name name :active false}))))
+     (db/persist! {:type :classes :name name :active false :school_id db/*school-id*}))))
 
 (defn add-student-to-class [student-id class-id]
   (db/persist! {:type :classes_X_students :student_id student-id :class_id class-id}))
@@ -161,6 +161,7 @@
               (student-not-yet-created name))
      (db/persist! {:type :students
                    :name name
+                   :school_id db/*school-id*
                    :start_date (make-sqldate start-date)
                    :guardian_email email
                    :olderdate nil
@@ -195,5 +196,6 @@
     (->> {:type :years
           :from_date (make-timestamp from)
           :to_date (make-timestamp to)
+          :school_id db/*school-id*
           :name name}
          db/persist!)))

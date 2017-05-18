@@ -6,9 +6,9 @@
             [clojure.tools.logging :as log]
             [overseer.database.connection :refer [pgdb init-pg]]
 
-            [overseer.queries.demo :as demo]
-            [overseer.queries.phillyfreeschool :as pfs]
-            ))
+            [overseer.queries.phillyfreeschool :refer :all]
+
+            [clojure.tools.trace :as trace]))
 
 (def ^:dynamic *school-id* 1)
 
@@ -18,14 +18,8 @@
     (let [cal (Calendar/getInstance (TimeZone/getTimeZone "UTC"))]
       (.setTimestamp stmt ix (timec/to-timestamp val) cal))))
 
-
-(defmacro q [n args]
-  (n args {:connection @pgdb})
-  (comment `(let [s# *school-schema*
-          con# @pgdb]
-      (let [f# (resolve (symbol (str "overseer.queries./" ~(name n))))]
-        (log/info f# ~args)
-        (f# ~args {:connection con#})))))
+(defn q [n args]
+  (n args {:connection @pgdb}))
 
 (defn append-schema [q]
   (str "overseer." q))
@@ -51,12 +45,6 @@
                 (jdbc/insert! @pgdb tablename doc)))))
 
 (defn get-*
-  ;; ([type]
-  ;;  (map #(assoc % :type (keyword type))
-  ;;       (jdbc/query @pgdb [(str "select * from "
-  ;;                               (append-schema (name type))
-  ;;                               " order by inserted_date ")
-  ;;                          ])))
   ([type id id-col]
    (map #(assoc % :type (keyword type))
         (if id
@@ -118,9 +106,9 @@
 (defn get-excuses-in-year [year-name student-id]
   (q get-excuses-in-year-y {:year_name year-name :student_id student-id} ))
 
-(defn get-student-list-in-out [show-archived]
+(trace/deftrace get-student-list-in-out [show-archived]
   (q student-list-in-out-y {:show_archived show-archived :school_id *school-id*} ))
-;;(get-student-list-in-out  true)
+;; (get-student-list-in-out  true)
 
 ;; (map :student_id (get-student-list-in-out))
 
