@@ -47,12 +47,10 @@
 (defn get-*
   ([type id id-col]
    (map #(assoc % :type (keyword type))
-        (if id
-          (jdbc/query @pgdb [(str "select * from " (append-schema (name type))
-                                  " where " id-col "=?"
-                                  " order by inserted_date")
-                             id ])
-          (get-* type)))))
+        (jdbc/query @pgdb [(str "select * from " (append-schema (name type))
+                                " where " id-col "=?"
+                                " order by inserted_date")
+                           id ]))))
 
 (defn get-active-class []
   (-> (q get-active-class-y {:school_id *school-id*} )
@@ -106,7 +104,7 @@
 (defn get-excuses-in-year [year-name student-id]
   (q get-excuses-in-year-y {:year_name year-name :student_id student-id} ))
 
-(trace/deftrace get-student-list-in-out [show-archived]
+(defn get-student-list-in-out [show-archived]
   (q student-list-in-out-y {:show_archived show-archived :school_id *school-id*} ))
 ;; (get-student-list-in-out  true)
 
@@ -131,4 +129,5 @@
 (defn get-swipes-in-year [year-name student-id]
   (q swipes-in-year-y {:year_name year-name :student_id student-id :school_id *school-id*} ))
 
-;; (get-swipes-in-year "2014-06-01 2015-06-01" 1)
+(defn get-schools []
+  (q get-schools-y {}))

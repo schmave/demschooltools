@@ -1,3 +1,7 @@
+DROP SCHEMA IF EXISTS overseer CASCADE;
+
+--;;
+
 ALTER SCHEMA phillyfreeschool RENAME TO overseer;
 
 --;;

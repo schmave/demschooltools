@@ -18,7 +18,7 @@
   (migratus/migrate {:store :database
                      :db con}))
 
-;;(migratus/create {:store :database :db @pgdb} "create school")
+;;(migratus/create {:store :database :db @pgdb} "remove schema from users")
 
 (comment
   (migratus/migrate {:store :database

@@ -12,13 +12,12 @@ var exports = React.createClass({
         router: React.PropTypes.func
     },
     getInitialState: function () {
-        return {schemas: userStore.getSchemas(),
+        return {schools: userStore.getSchools(),
                 users: userStore.getUsers(),
                 selectedSchema: userStore.getSuperSchema()};
     },
     componentDidMount: function () {
         userStore.addChangeListener(this._onChange);
-        //this.setState({student: studentStore.getStudent(this.state.studentId)});
     },
     componentWillUnmount: function () {
         userStore.removeChangeListener(this._onChange);
@@ -29,9 +28,9 @@ var exports = React.createClass({
     },
     makeItems: function() {
         var that = this;
-        return this.state.schemas.map(function(schema){
-            return (<li><a onClick={that.selectSchema.bind(that,schema)}>
-                     {schema}</a></li>);
+        return this.state.schools.map(function(school){
+            return (<li><a onClick={that.selectSchema.bind(that,school)}>
+                     {school}</a></li>);
         });
     },
     makeDropDown: function() {
@@ -115,7 +114,7 @@ var exports = React.createClass({
             </SuperItem>
     },
     _onChange: function () {
-        this.setState({schemas: userStore.getSchemas(),
+        this.setState({schemas: userStore.getSchools(),
                        users: userStore.getUsers(),
                        selectedSchema: userStore.getSuperSchema()});
     }

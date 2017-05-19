@@ -37,8 +37,8 @@
 
 ;;(set-user-schema "super" "TEST")
 ;;(get-user "super")
-(defn set-user-schema [username schema]
-  (jdbc/update! @pgdb :users {:schema_name schema} ["username=?" username]))
+(defn set-user-school [_id school]
+  (jdbc/update! @pgdb :users {:school_id school} ["user_id=?" _id]))
 
 (defn make-user
   ([username password roles]

@@ -11,11 +11,6 @@
             [schema.core :as s]
             ))
 
-;; (defn get-swipes-
-;;   ([] (db/get-* "swipes"))
-;;   ([id]
-;;    (db/get-* "swipes" id "student_id")))
-
 (defn get-overrides [id]
   (db/get-* "overrides" id "student_id"))
 

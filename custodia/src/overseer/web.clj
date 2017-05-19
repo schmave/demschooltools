@@ -11,11 +11,7 @@
             [compojure.core :as compojure]
             [compojure.coercions :refer [as-int]]
             [clojure.java.io :as io]
-            ;;[clojure.tools.nrepl.server :as nrepl-server]
-            ;; [refactor-nrepl.middleware :as refactor]
             [jdbc-ring-session.core :refer [jdbc-store]]
-            ;;[cider.nrepl :refer (cider-nrepl-handler)]
-            ;;[cider.nrepl :as nrepl]
             [ring.adapter.jetty :as jetty]
             [ring.util.response :as resp]
             [clojure.tools.logging :as log]
@@ -49,13 +45,14 @@
     (friend/authenticated
      (render-string (read-template "index.html") {:id start-id})))
 
-  ;; (PUT "/schema/:schema" [schema]
-  ;;   (friend/authorize #{roles/super}
-  ;;                     (users/set-user-schema "super" schema)))
+  (PUT "/school/:school_id" [school_id]
+    (friend/authorize #{roles/super}
+                      (users/set-user-school (:user_id (users/get-user "super")) school_id)))
 
-  ;; (GET "/schemas" [name]
-  ;;   (friend/authorize #{roles/super}
-  ;;                     (resp/response db/current-schemas)))
+  (GET "/schools" [name]
+    (friend/authorize #{roles/super}
+                      (resp/response db/get-schools)))
+
   (GET "/hello" []
     (friend/authorize #{roles/super}
                       (resp/response "there")))

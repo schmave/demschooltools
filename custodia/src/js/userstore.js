@@ -20,14 +20,14 @@ var exports = assign({}, EventEmitter.prototype, {
     getUsers: function () {
         return users;
     },
-    getSchemas: function () {
+    getSchools: function () {
         return schemas;
     },
     getSuperSchema: function() {
         return superSchema;
     },
     setSuperSchema: function(name) {
-        var route = 'schema/' + name;
+        var route = 'school/' + name;
         ajax.put(route).then(function (data) {
             superSchema = name;
             exports.emitChange();
@@ -62,7 +62,7 @@ ajax.get('/users/is-super').then(function (data) {
             exports.emitChange();
         }, function (data) {});
 
-        ajax.get('/schemas').then(function (data) {
+        ajax.get('/schools').then(function (data) {
             schemas = data;
             exports.emitChange();
         }, function (data) {

@@ -188,6 +188,9 @@ SELECT * from overseer.students where school_id = :school_id;
 -- name: get-years-y
 SELECT * from overseer.years where school_id = :school_id;
 
+-- name: get-schools-y
+SELECT * from overseer.schools;
+
 -- name: get-classes-y
 SELECT c.name, c._id, c.active, cXs.student_id, s.name student_name
 FROM overseer.classes c
@@ -195,3 +198,4 @@ LEFT JOIN overseer.classes_X_students cXs ON (cXs.class_id = c._id)
 LEFT JOIN overseer.students s ON (cXs.student_id = s._id)
 WHERE c.school_id = :school_id
 ORDER BY c.name;
+
