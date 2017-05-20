@@ -45,13 +45,13 @@
     (friend/authenticated
      (render-string (read-template "index.html") {:id start-id})))
 
-  (PUT "/school/:school_id" [school_id]
+  (PUT "/school/:school_id" [school_id :<< as-int]
     (friend/authorize #{roles/super}
                       (users/set-user-school (:user_id (users/get-user "super")) school_id)))
 
-  (GET "/schools" [name]
+  (GET "/schools" []
     (friend/authorize #{roles/super}
-                      (resp/response db/get-schools)))
+                      (resp/response (db/get-schools))))
 
   (GET "/hello" []
     (friend/authorize #{roles/super}

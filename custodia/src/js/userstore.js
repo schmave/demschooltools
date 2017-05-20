@@ -7,7 +7,7 @@ var isAdmin;
 var isSuper;
 var users =[];
 var schemas = [];
-var superSchema;
+var superSchool;
 var CHANGE_EVENT = "CHANGE!";
 
 var exports = assign({}, EventEmitter.prototype, {
@@ -24,12 +24,12 @@ var exports = assign({}, EventEmitter.prototype, {
         return schemas;
     },
     getSuperSchema: function() {
-        return superSchema;
+        return superSchool;
     },
-    setSuperSchema: function(name) {
-        var route = 'school/' + name;
+    setSuperSchema: function(school) {
+        var route = 'school/' + school._id;
         ajax.put(route).then(function (data) {
-            superSchema = name;
+            superSchool = school;
             exports.emitChange();
         }.bind(this));
     },
@@ -54,7 +54,7 @@ ajax.get('/users/is-admin').then(function (data) {
 
 ajax.get('/users/is-super').then(function (data) {
     isSuper = data.super;
-    superSchema = data.schema;
+    superSchool = data.schema;
     exports.emitChange();
     if (data.super) {
         ajax.get('/user').then(function (data) {

@@ -14,7 +14,7 @@ var exports = React.createClass({
     getInitialState: function () {
         return {schools: userStore.getSchools(),
                 users: userStore.getUsers(),
-                selectedSchema: userStore.getSuperSchema()};
+                selectedSchool: userStore.getSuperSchema()};
     },
     componentDidMount: function () {
         userStore.addChangeListener(this._onChange);
@@ -24,13 +24,13 @@ var exports = React.createClass({
     },
     selectSchema: function(s) {
         userStore.setSuperSchema(s);
-        this.setState({selectedSchema:s});
+        this.setState({selectedSchool:s});
     },
     makeItems: function() {
         var that = this;
         return this.state.schools.map(function(school){
             return (<li><a onClick={that.selectSchema.bind(that,school)}>
-                     {school}</a></li>);
+                     {school.name}</a></li>);
         });
     },
     makeDropDown: function() {
@@ -38,7 +38,7 @@ var exports = React.createClass({
             <button className="btn btn-default dropdown-toggle"
             type="button" id="dropdownMenu1"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-            {this.state.selectedSchema}
+            {this.state.selectedSchool?this.state.selectedSchool.name:""}
                 <span className="caret"></span>
             </button>
             <ul className="dropdown-menu" aria-labelledby="dropdownMenu1">
@@ -114,9 +114,9 @@ var exports = React.createClass({
             </SuperItem>
     },
     _onChange: function () {
-        this.setState({schemas: userStore.getSchools(),
+        this.setState({schools: userStore.getSchools(),
                        users: userStore.getUsers(),
-                       selectedSchema: userStore.getSuperSchema()});
+                       selectedSchool: userStore.getSuperSchema()});
     }
 });
 
