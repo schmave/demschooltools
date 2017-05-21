@@ -6,7 +6,7 @@ var EventEmitter = require('events').EventEmitter,
 var isAdmin;
 var isSuper;
 var users =[];
-var schemas = [];
+var schools = [];
 var superSchool;
 var CHANGE_EVENT = "CHANGE!";
 
@@ -21,12 +21,12 @@ var exports = assign({}, EventEmitter.prototype, {
         return users;
     },
     getSchools: function () {
-        return schemas;
+        return schools;
     },
-    getSuperSchema: function() {
+    getSuperSelectedSchool: function() {
         return superSchool;
     },
-    setSuperSchema: function(school) {
+    setSuperSchool: function(school) {
         var route = 'school/' + school._id;
         ajax.put(route).then(function (data) {
             superSchool = school;
@@ -63,7 +63,8 @@ ajax.get('/users/is-super').then(function (data) {
         }, function (data) {});
 
         ajax.get('/schools').then(function (data) {
-            schemas = data;
+            schools = data.schools;
+            superSchool = data.superSelectedSchool;
             exports.emitChange();
         }, function (data) {
             exports.emitChange();

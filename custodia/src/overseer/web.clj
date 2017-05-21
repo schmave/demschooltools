@@ -51,7 +51,12 @@
 
   (GET "/schools" []
     (friend/authorize #{roles/super}
-                      (resp/response (db/get-schools))))
+                      (resp/response
+                       (let [schools (db/get-schools)
+                             superSchoolId (:school_id (users/get-user "super"))
+                             superSchool (first (filter (fn [s] (= superSchoolId (:_id s))) schools))]
+                         {:schools schools
+                          :superSelectedSchool superSchool}))))
 
   (GET "/hello" []
     (friend/authorize #{roles/super}
