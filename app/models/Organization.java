@@ -32,6 +32,8 @@ public class Organization extends Model {
 
     public String mailchimp_updates_email;
 
+    public String printer_email;
+
     @OneToMany(mappedBy="organization")
     @JsonIgnore
     public List<NotificationRule> notification_rules;
@@ -82,6 +84,11 @@ public class Organization extends Model {
 
     public void setLastMailChimpSyncTime(Date d) {
         this.mailchimp_last_sync_person_changes = d;
+        this.save();
+    }
+
+    public void setPrinterEmail(String email) {
+        this.printer_email = email;
         this.save();
     }
 }

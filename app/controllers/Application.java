@@ -1002,4 +1002,132 @@ public class Application extends Controller {
         String markdown = form_data.get("markdown")[0];
         return ok(markdown(markdown));
     }
+
+    @Secured.Auth(UserRole.ROLE_ALL_ACCESS)
+    public Result fileSharing() {
+        Map<String, Object> scopes = new HashMap<String, Object>();
+
+        ArrayList<String> existingFiles = new ArrayList<>();
+        File files[] = getSharedFileDirectory().listFiles();
+        for (File f : files) {
+            existingFiles.add(f.getName());
+        }
+
+        scopes.put("existing_files", existingFiles);
+
+        scopes.put("printer_email", OrgConfig.get().org.printer_email);
+        return ok(views.html.main_with_mustache.render(
+            "File Sharing config",
+            "misc",
+            "file_sharing",
+            "file_sharing.html",
+            scopes));
+    }
+
+    @Secured.Auth(UserRole.ROLE_ALL_ACCESS)
+    public Result saveFileSharingSettings() {
+        final Map<String, String[]> values = request().body().asFormUrlEncoded();
+
+        if (values.containsKey("printer_email")) {
+            OrgConfig.get().org.setPrinterEmail(values.get("printer_email")[0]);
+        }
+
+        return redirect(routes.Application.fileSharing());
+    }
+
+    @Secured.Auth(UserRole.ROLE_ALL_ACCESS)
+    public Result uploadFileShare() throws IOException {
+        Http.MultipartFormData<File> body = request().body().asMultipartFormData();
+        Http.MultipartFormData.FilePart<File> pdf = body.getFile("pdf_upload");
+        if (pdf != null) {
+            String fileName = pdf.getFilename();
+            if (!fileName.equals("")) {
+                File outputFile = new File(getSharedFileDirectory(), fileName);
+                copyFileUsingStream(pdf.getFile(), outputFile);
+            }
+        }
+        return redirect(routes.Application.fileSharing());
+    }
+
+    private static File getSharedFileDirectory() {
+        File result = new File("/www-dst", "" + OrgConfig.get().org.id);
+        if (!result.exists()) {
+            result.mkdir();
+        }
+        return result;
+    }
+
+    @Secured.Auth(UserRole.ROLE_ALL_ACCESS)
+    public Result deleteFile() {
+        final Map<String, String[]> values = request().body().asFormUrlEncoded();
+
+        if (values.containsKey("filename")) {
+            File the_file = new File(getSharedFileDirectory(), values.get("filename")[0]);
+            if (the_file.exists()) {
+                the_file.delete();
+            }
+        }
+
+        return redirect(routes.Application.fileSharing());
+    }
+
+    public Result viewFiles() {
+        Map<String, Object> scopes = new HashMap<String, Object>();
+
+        ArrayList<String> existingFiles = new ArrayList<>();
+        File files[] = getSharedFileDirectory().listFiles();
+        for (File f : files) {
+            existingFiles.add(f.getName());
+        }
+
+        scopes.put("existing_files", existingFiles);
+
+        scopes.put("printer_email", OrgConfig.get().org.printer_email);
+        return ok(views.html.main_with_mustache.render(
+            "DemSchoolTools shared files",
+            "misc",
+            "view_files",
+            "view_files.html",
+            scopes));
+    }
+
+    public Result emailFile() {
+        final Map<String, String[]> values = request().body().asFormUrlEncoded();
+
+        if (values.containsKey("filename")) {
+            File the_file = new File(getSharedFileDirectory(), values.get("filename")[0]);
+            if (the_file.exists()) {
+                play.libs.mailer.Email mail = new play.libs.mailer.Email();
+                mail.setSubject("Print from DemSchoolTools");
+                mail.addTo(OrgConfig.get().org.printer_email);
+                mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
+                mail.addAttachment(the_file.getName(), the_file);
+                play.libs.mailer.MailerPlugin.send(mail);
+            }
+        }
+
+        return redirect(routes.Application.viewFiles());
+    }
+
+    public static void copyFileUsingStream(File source, File dest) throws IOException {
+        InputStream is = null;
+        OutputStream os = null;
+        try {
+            is = new FileInputStream(source);
+            os = new FileOutputStream(dest);
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = is.read(buffer)) > 0) {
+                os.write(buffer, 0, length);
+            }
+        } finally {
+            if (is != null) {
+                is.close();
+            }
+            if (os != null) {
+                os.close();
+            }
+        }
+    }
+
 }

@@ -1,0 +1,26 @@
+<h3>File Sharing config</h3>
+
+<form method="POST" action="/misc/saveFileSharingSettings">
+<p>Your printer email address is:
+<input type="text" size=40 name="printer_email" value="{{printer_email}}"/>
+<input type="submit" value="Save"/></p>
+</form>
+
+<p>Existing files:
+<ul>
+{{#existing_files}}
+<li><form method="POST" action="/misc/deleteFile">
+        <input type="hidden" name="filename" value="{{.}}"/>
+        {{.}}
+        <input type="submit" value="Delete"/>
+    </form>
+</li>
+{{/existing_files}}
+</ul>
+</p>
+
+<p>Upload a <b>PDF</b> file:</p>
+<form method="POST" enctype="multipart/form-data" action="/misc/uploadFileShare">
+<input type="file" name="pdf_upload" size="80">
+<input type="submit" value="Upload"/>
+</form>

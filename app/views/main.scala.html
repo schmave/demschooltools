@@ -56,6 +56,11 @@ window.onerror = function(message, file, line, col, error) {
             <li @if(menu.equals("settings")) { class="active" } class="dropdown">
                 <a href="@routes.Settings.viewNotifications()">Settings</a>
             </li>
+            @if(OrgConfig.get().enable_file_sharing) {
+                <li @if(menu.equals("misc")) { class="active" } class="dropdown">
+                    <a href="@routes.Application.viewFiles()">Misc</a>
+                </li>
+            }
             <li style="float:right;">
                 @if(Application.isCurrentUserEditor()) {
                     <a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout">
@@ -206,6 +211,17 @@ window.onerror = function(message, file, line, col, error) {
                 href="@routes.Settings.viewTaskLists()">Checklists</a>
             <a @if(selectedBtn.equals("settings_access")) { class="active" }
                 href="@routes.Settings.viewAccess()">Users & Access</a>
+            </div>
+        </div>
+        }
+
+        @if(menu.equals("misc")) {
+        <div class="tab-pane active" id="settings">
+            <div class="subnav">
+            <a @if(selectedBtn.equals("view_files")) { class="active" }
+                href="@routes.Application.viewFiles()">Shared Files</a>
+            <a @if(selectedBtn.equals("file_sharing")) { class="active" }
+                href="@routes.Application.fileSharing()">Manage Shared Files</a>
             </div>
         </div>
         }

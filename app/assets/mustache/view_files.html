@@ -1,0 +1,10 @@
+<h2>DemSchoolTools Shared Files</h2>
+
+{{#existing_files}}
+    <hr/>
+    <h3>{{.}}</h3>
+    <form method="POST" action="/misc/emailFile">
+        <input type="hidden" name="filename" value="{{.}}"/>
+        <input type="submit" value="Send to printer"/>
+    </form>
+{{/existing_files}}

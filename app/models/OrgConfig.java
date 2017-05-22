@@ -29,6 +29,8 @@ public class OrgConfig {
     public boolean filter_no_charge_cases = false;
     public boolean show_findings_in_rp_list = true;
 
+    public boolean enable_file_sharing = false;
+
     public Organization org;
 
     public TimeZone time_zone = TimeZone.getTimeZone("US/Eastern");
@@ -73,6 +75,8 @@ class ThreeRiversVillageSchool extends OrgConfig {
         use_minor_referrals = true;
 
         show_checkbox_for_res_plan = false;
+
+        enable_file_sharing = true;
 
         OrgConfig.register(name, this);
     }

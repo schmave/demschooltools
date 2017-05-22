@@ -150,6 +150,13 @@ POST     /settings/access/newUser controllers.Settings.newUser()
 POST     /settings/access/saveUser controllers.Settings.saveUser()
 
 
+GET    /misc/fileSharing           controllers.Application.fileSharing()
+GET    /misc/viewFiles              controllers.Application.viewFiles()
+POST   /misc/saveFileSharingSettings   controllers.Application.saveFileSharingSettings()
+POST   /misc/uploadFileShare          controllers.Application.uploadFileShare()
+POST   /misc/emailFile              controllers.Application.emailFile()
+POST   /misc/deleteFile              controllers.Application.deleteFile()
+
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
