@@ -129,5 +129,10 @@
 (defn get-swipes-in-year [year-name student-id]
   (q swipes-in-year-y {:year_name year-name :student_id student-id :school_id *school-id*} ))
 
-(defn get-schools []
-  (q get-schools-y {}))
+(defn get-schools
+  ([] (q get-schools-y {}))
+  ([id] (first (filter (fn [s] (= id (:_id s)))
+                       (q get-schools-y {})))))
+
+(defn get-current-school []
+  (get-schools *school-id*))

@@ -14,7 +14,7 @@ var exports = React.createClass({
     getInitialState: function () {
         return {schools: userStore.getSchools(),
                 users: userStore.getUsers(),
-                selectedSchool: userStore.getSuperSelectedSchool()};
+                selectedSchool: userStore.getSelectedSchool()};
     },
     componentDidMount: function () {
         userStore.addChangeListener(this._onChange);
@@ -117,7 +117,7 @@ var exports = React.createClass({
     _onChange: function () {
         this.setState({schools: userStore.getSchools(),
                        users: userStore.getUsers(),
-                       selectedSchool: userStore.getSuperSelectedSchool()});
+                       selectedSchool: userStore.getSelectedSchool()});
     }
 });
 

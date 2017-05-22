@@ -7,7 +7,7 @@ var isAdmin;
 var isSuper;
 var users =[];
 var schools = [];
-var superSchool;
+var currentSchool;
 var CHANGE_EVENT = "CHANGE!";
 
 var exports = assign({}, EventEmitter.prototype, {
@@ -23,13 +23,13 @@ var exports = assign({}, EventEmitter.prototype, {
     getSchools: function () {
         return schools;
     },
-    getSuperSelectedSchool: function() {
-        return superSchool;
+    getSelectedSchool: function() {
+        return currentSchool;
     },
     setSuperSchool: function(school) {
         var route = 'school/' + school._id;
         ajax.put(route).then(function (data) {
-            superSchool = school;
+            currentSchool = school;
             exports.emitChange();
         }.bind(this));
     },
@@ -46,6 +46,7 @@ var exports = assign({}, EventEmitter.prototype, {
 
 ajax.get('/users/is-admin').then(function (data) {
     isAdmin = data.admin;
+    currentSchool = data.school;
     exports.emitChange();
 }, function (data) {
     isAdmin = false;
@@ -54,7 +55,7 @@ ajax.get('/users/is-admin').then(function (data) {
 
 ajax.get('/users/is-super').then(function (data) {
     isSuper = data.super;
-    superSchool = data.schema;
+    currentSchool = data.schema;
     exports.emitChange();
     if (data.super) {
         ajax.get('/user').then(function (data) {
@@ -64,7 +65,7 @@ ajax.get('/users/is-super').then(function (data) {
 
         ajax.get('/schools').then(function (data) {
             schools = data.schools;
-            superSchool = data.superSelectedSchool;
+            currentSchool = data.school;
             exports.emitChange();
         }, function (data) {
             exports.emitChange();

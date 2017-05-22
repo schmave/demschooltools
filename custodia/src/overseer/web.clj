@@ -30,7 +30,8 @@
                              [credentials :as creds])
             [stencil.core :refer [render-string]]
             [environ.core :refer [env]]
-            )
+
+            [overseer.db :as d])
   (:gen-class))
 
 (defn read-template [filename]
@@ -53,10 +54,9 @@
     (friend/authorize #{roles/super}
                       (resp/response
                        (let [schools (db/get-schools)
-                             superSchoolId (:school_id (users/get-user "super"))
-                             superSchool (first (filter (fn [s] (= superSchoolId (:_id s))) schools))]
+                             superSchool (db/get-current-school)]
                          {:schools schools
-                          :superSelectedSchool superSchool}))))
+                          :school superSchool}))))
 
   (GET "/hello" []
     (friend/authorize #{roles/super}
@@ -77,13 +77,16 @@
   (GET "/users/logout" req
     (friend/logout* (resp/redirect (log/spyf "Logout: %s" "/users/login"))))
   (GET "/users/is-user" req
-    (friend/authorize #{roles/user} "You're a user!"))
+       (friend/authorize #{roles/user} {:message "You're a user!"
+                                        :school (db/get-current-school)}))
   (GET "/users/is-admin" req
-    (resp/response {:admin (-> req friend/current-authentication :roles roles/admin)}))
+       (resp/response
+        {:admin (-> req friend/current-authentication :roles roles/admin)
+         :school (db/get-current-school)}))
   (GET "/users/is-super" req
     (let [user (users/get-user "super")]
       (resp/response {:super (-> req friend/current-authentication :roles roles/super)
-                      :schema (:schema_name user)})))
+                      :school (db/get-current-school)})))
 
   (GET "/js/gen/:id{.+}/app.js" req
     (io/resource "public/js/gen/app.js"))
