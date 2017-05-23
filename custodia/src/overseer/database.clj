@@ -139,8 +139,7 @@
 (defn make-class
   ([name] (make-class name nil nil))
   ([name from_date to_date]
-   (let [classes (db/get-classes)
-         active (boolean (seq classes))]
+   (let [active (-> (db/get-classes) seq boolean not)]
      (when (class-not-yet-created name)
        (db/persist! {:type :classes :name name :active active :school_id db/*school-id*})))))
 
