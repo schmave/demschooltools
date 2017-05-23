@@ -295,6 +295,7 @@ class Sandbox extends OrgConfig {
 
         use_minor_referrals = true;
         track_writer = true;
+        enable_file_sharing = true;
 
         OrgConfig.register(name, this);
     }
