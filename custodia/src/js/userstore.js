@@ -55,7 +55,7 @@ ajax.get('/users/is-admin').then(function (data) {
 
 ajax.get('/users/is-super').then(function (data) {
     isSuper = data.super;
-    currentSchool = data.schema;
+    currentSchool = data.school;
     exports.emitChange();
     if (data.super) {
         ajax.get('/user').then(function (data) {
