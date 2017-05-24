@@ -43,6 +43,7 @@ GIT. Add in the following:
              :admin "web"
              :userpass "web"
              :dev true
+             :newdb false
              :migratedb false
              :notify false}}}
 ```
@@ -58,11 +59,14 @@ is the postgres default. If your postgres uses a different port, you will need
 to change that too.
 
 When starting with a new database, or when you want to "reset" your current
-database, set the key ```:migratedb``` to ```true``` before you start the
+database, set the key ```:newdb``` to ```true``` before you start the
 application. That will cause the database to be recreated empty, then some
 sample data be put inside it. CAUTION: leaving it set to ```true``` will cause
 it to drop EVERY TIME. You might want it true for the first time, then
 immediately set it to ```false``` after the application starts.
+
+If you want to apply a new migration to an existing database, set the key
+```:migratedb``` to ```true```.
 
 The application also sets up five default users for local testing. They are
 "admin", "super", "admin2", "user", and "demo". They all have the password

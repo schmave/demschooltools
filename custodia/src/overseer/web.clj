@@ -23,6 +23,8 @@
             [overseer.student :refer [student-routes]]
             [overseer.reports :refer [report-routes]]
             [overseer.database.connection :as conn]
+
+            [overseer.migrations :as migrations]
             [overseer.database.users :as users]
             [overseer.roles :as roles]
             [cemerick.friend :as friend]
@@ -137,7 +139,9 @@
 ;;(start-site 5000)  
 (defn start-site [port]
   (conn/init-pg)
-  (if (env :migratedb)
+  (when (env :migratedb)
+    (migrations/migrate-db @conn/pgdb))
+  (when (env :newdb)
     (do (users/reset-db)
         (sampledb/sample-db)))
   (users/init-users)
