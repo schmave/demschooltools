@@ -27,8 +27,8 @@ WHERE y.name= :year_name AND e.student_id = :student_id;
 -- name: get-student-page-y
 SELECT
   schooldays.student_id
-  , to_char(s.in_time at time zone 'America/New_York', 'HH:MI:SS') as nice_in_time
-  , to_char(s.out_time at time zone 'America/New_York', 'HH:MI:SS') as nice_out_time
+  , to_char(s.in_time at time zone :timezone, 'HH:MI:SS') as nice_in_time
+  , to_char(s.out_time at time zone :timezone, 'HH:MI:SS') as nice_out_time
   , s.out_time
   , s.in_time
   , s.rounded_out_time
@@ -47,9 +47,9 @@ SELECT
 FROM overseer.student_school_days(:student_id, :year_name, :class_id) AS schooldays
 LEFT JOIN overseer.swipes s
       ON (
-       ((schooldays.days = date(s.in_time AT TIME ZONE 'America/New_York'))
+       ((schooldays.days = date(s.in_time AT TIME ZONE :timezone))
        OR
-        (schooldays.days = date(s.out_time AT TIME ZONE 'America/New_York')))
+        (schooldays.days = date(s.out_time AT TIME ZONE :timezone)))
         AND s.student_id = :student_id)
 LEFT JOIN overseer.overrides o
      ON (schooldays.days = o.date AND o.student_id = schooldays.student_id)
@@ -89,7 +89,7 @@ ORDER BY stu.name
 -- name: get-school-days-y
 SELECT DISTINCT days2.days
 FROM (SELECT
-             to_char(s.in_time at time zone 'America/New_York', 'YYYY-MM-DD') as days
+             to_char(s.in_time at time zone :timezone, 'YYYY-MM-DD') as days
              , s.in_time
              FROM overseer.swipes s
              INNER JOIN overseer.students stu on (stu._id = s.student_id AND stu.school_id = :school_id)
@@ -134,7 +134,7 @@ FROM (
         , schooldays.days AS day
       FROM overseer.school_days(:year_name, :class_id) as schooldays
       LEFT JOIN overseer.swipes s
-                      ON (schooldays.days = date(s.in_time AT TIME ZONE 'America/New_York')
+                      ON (schooldays.days = date(s.in_time AT TIME ZONE :timezone)
                           AND schooldays.student_id = s.student_id)
       LEFT JOIN overseer.overrides o
                 ON (schooldays.days = o.date AND o.student_id = schooldays.student_id)
@@ -150,8 +150,8 @@ GROUP BY stu.student_id;
 SELECT s.*
        ,'swipes' AS type
        , s.intervalmin as interval
-       , to_char(s.in_time at time zone 'America/New_York', 'HH:MI:SS') as nice_in_time
-       , to_char(s.out_time at time zone 'America/New_York', 'HH:MI:SS') as nice_out_time
+       , to_char(s.in_time at time zone :timezone, 'HH:MI:SS') as nice_in_time
+       , to_char(s.out_time at time zone :timezone, 'HH:MI:SS') as nice_out_time
        FROM overseer.swipes s
        INNER JOIN overseer.students stu ON (stu._id = s.student_id)
        INNER JOIN overseer.years y
