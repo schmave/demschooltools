@@ -101,9 +101,6 @@
 (defn get-student-list-in-out [show-archived]
   (q student-list-in-out-y {:show_archived show-archived :school_id *school-id*} ))
 
-(defn get-school-days [year-name]
-  (q get-school-days-y {:year_name year-name :school_id *school-id* :timezone (get-school-time-zone)} ))
-
 (defn get-schools
   ([] (q get-schools-y {}))
   ([id] (first (filter (fn [s] (= id (:_id s)))
@@ -114,6 +111,10 @@
 
 (defn get-school-time-zone []
   (:timezone (get-current-school)))
+
+(defn get-school-days [year-name]
+  (q get-school-days-y {:year_name year-name :school_id *school-id* :timezone (get-school-time-zone)} ))
+
 
 (defn get-student-page
   ([student-id year] (get-student-page student-id year (get-active-class)))
