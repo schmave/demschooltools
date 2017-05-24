@@ -40,6 +40,9 @@
 (defn set-user-school [_id school]
   (jdbc/update! @pgdb :users {:school_id school} ["user_id=?" _id]))
 
+(defn make-new-school [school]
+  (db/persist! {:type :schools :name school}))
+
 (defn make-user
   ([username password roles]
    (make-user username password roles db/*school-id*))
