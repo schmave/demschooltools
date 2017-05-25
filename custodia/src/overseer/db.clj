@@ -3,12 +3,12 @@
            [java.util Date Calendar TimeZone])
   (:require [clj-time.coerce :as timec]
             [clojure.java.jdbc :as jdbc]
+            [yesql.core :refer [defqueries] ]
             [clojure.tools.logging :as log]
             [overseer.database.connection :refer [pgdb init-pg]]
-
-            [overseer.queries.phillyfreeschool :refer :all]
-
             [clojure.tools.trace :as trace]))
+
+(defqueries "overseer/queries/school_queries.sql" )
 
 (def ^:dynamic *school-id* 1)
 

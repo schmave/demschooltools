@@ -13,7 +13,6 @@
 
             [overseer.migrations :as migrations]
             ;; [overseer.queries.demo :as demo]
-            [overseer.queries.phillyfreeschool :as pfs]
             [yesql.core :refer [defqueries]]
             [overseer.db :as db]
 
