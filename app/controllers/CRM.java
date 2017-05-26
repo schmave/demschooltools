@@ -166,6 +166,7 @@ public class CRM extends Controller {
         List<Tag> selected_tags =
             Tag.find.where()
                 .eq("organization", Organization.getByHost())
+                .eq("show_in_menu", true)
                 .ilike("title", "%" + term + "%").findList();
 
 		List<Tag> existing_tags = null;
@@ -268,6 +269,10 @@ public class CRM extends Controller {
 
         notifyAboutTag(the_tag, p, true);
 
+        CachedPage.remove(Application.CACHE_INDEX);
+        CachedPage.remove(Attendance.CACHE_INDEX);
+        CachedPage.remove(CACHE_RECENT_COMMENTS);
+
         return ok(views.html.tag_fragment.render(the_tag, p));
     }
 
@@ -308,6 +313,27 @@ public class CRM extends Controller {
         return ok(views.html.all_people.render(Person.all()));
     }
 
+    public Result viewAllTags() {
+        List<Tag> tags = Tag.find
+            .where().eq("organization", Organization.getByHost())
+            .orderBy("lower(title)")
+            .findList();
+
+        Map<String, Object> scopes = new HashMap<>();
+        List<Object> serialized_tags = new ArrayList<>();
+        for (Tag tag : tags) {
+            serialized_tags.add(tag.serialize());
+        }
+        scopes.put("tags", serialized_tags);
+
+        return ok(views.html.main_with_mustache.render(
+            "All Tags",
+            "crm",
+            "",
+            "view_all_tags.html",
+            scopes));
+    }
+
     public Result editTag(Integer id) {
         Form<Tag> filled_form = Form.form(Tag.class).fill(Tag.findById(id));
         return ok(views.html.edit_tag.render(filled_form));
@@ -319,6 +345,11 @@ public class CRM extends Controller {
         if (form.field("id").value() != null) {
             Tag t = Tag.findById(Integer.parseInt(form.field("id").value()));
             t.updateFromForm(form);
+
+            CachedPage.remove(Application.CACHE_INDEX);
+            CachedPage.remove(Attendance.CACHE_INDEX);
+            CachedPage.remove(CACHE_RECENT_COMMENTS);
+
             return redirect(routes.CRM.viewTag(t.id));
         }
         return redirect(routes.CRM.recentComments());
@@ -340,11 +371,8 @@ public class CRM extends Controller {
             }
         }
 
-        boolean allow_editing = !(
-            the_tag.title.equals("Staff") || the_tag.title.equals("Current Student"));
-
         return ok(views.html.tag.render(
-            the_tag, people, people_with_family, the_tag.use_student_display, allow_editing));
+            the_tag, people, people_with_family, the_tag.use_student_display, true));
     }
 
     public Result downloadTag(Integer id) throws IOException {

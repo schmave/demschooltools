@@ -18,8 +18,8 @@ See [the wiki](https://github.com/schmave/demschooltools/wiki/) for more informa
 8. Open pgAdmin and run this SQL:
 
         INSERT INTO organization_hosts(host, organization_id) VALUES ('localhost:9000', 1);
-        INSERT INTO tag(title, use_student_display, organization_id) VALUES ('Current Student', true, 1);
-        INSERT INTO tag(title, use_student_display, organization_id) VALUES ('Staff', false, 1);
+        INSERT INTO tag(title, use_student_display, organization_id, show_in_jc) VALUES ('Current Student', true, 1, true);
+        INSERT INTO tag(title, use_student_display, organization_id, show_in_jc) VALUES ('Staff', false, 1, true);
 
 8. Disable authentication by adding the following code to the top of `Authenticator.getUsername` in app/controllers/Secured.java:
 

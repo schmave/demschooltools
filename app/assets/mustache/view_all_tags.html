@@ -1,0 +1,14 @@
+<h3>All tags</h3>
+
+<p class="instructions">Tags that are not shown in the "Tags" menu above are listed in parentheses.</p>
+
+<p class="instructions">Tags that cause tagged people to be included in the JC and Attendance
+systems have <b>(JC/Attendance)</b> listed after the tag name.</p>
+
+{{#tags}}
+<p>
+    <a href="/viewTag/{{id}}">{{^show_in_menu}}({{/show_in_menu}}{{title}}{{^show_in_menu}}){{/show_in_menu}}</a>
+    {{#show_in_jc}}<b>(JC/Attendance)</b>{{/show_in_jc}}
+    <span class="man-edit"><a href="/editTag/{{id}}">Edit</a></span>
+</p>
+{{/tags}}

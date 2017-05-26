@@ -111,6 +111,7 @@ GET     /jsonTags/:personId       controllers.CRM.jsonTags(term ?= "", personId:
 POST    /addTag/:personId         controllers.CRM.addTag(tagId : Integer ?= null, title ?= "", personId : Integer)
 POST    /removeTag/:personId/:tagId controllers.CRM.removeTag(personId: Integer, tagId: Integer)
 GET     /getTagMembers			  controllers.CRM.renderTagMembers(tagId : Integer, familyMode : String)
+GET     /viewAllTags              controllers.CRM.viewAllTags()
 
 POST    /addComment               controllers.CRM.addComment()
 

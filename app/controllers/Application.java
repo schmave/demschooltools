@@ -72,10 +72,10 @@ public class Application extends Controller {
             .orderBy("id DESC").findList();
     }
 
-	public Result viewSchoolMeetingReferrals() {
-		return ok(views.html.view_sm_referrals.render(
-			getActiveSchoolMeetingReferrals()));
-	}
+    public Result viewSchoolMeetingReferrals() {
+        return ok(views.html.view_sm_referrals.render(
+            getActiveSchoolMeetingReferrals()));
+    }
 
     public Result viewSchoolMeetingDecisions() {
         List<Charge> the_charges =
@@ -94,20 +94,18 @@ public class Application extends Controller {
         return ok(views.html.view_sm_decisions.render(the_charges));
     }
 
-	public static List<Person> allPeople() {
-        Tag cur_student_tag = Tag.find.where()
-            .eq("title", "Current Student")
+    public static List<Person> allPeople() {
+        List<Tag> tags = Tag.find.where()
+            .eq("show_in_jc", true)
             .eq("organization", Organization.getByHost())
-            .findUnique();
-        Tag staff_tag = Tag.find.where()
-            .eq("title", "Staff")
-            .eq("organization", Organization.getByHost())
-            .findUnique();
+            .findList();
 
-        List<Person> people = new ArrayList<Person>(cur_student_tag.people);
-        people.addAll(staff_tag.people);
-		return people;
-	}
+        List<Person> people = new ArrayList<>();
+        for (Tag tag : tags) {
+            people.addAll(tag.people);
+        }
+        return people;
+    }
 
     public Result index() {
         return ok(views.html.cached_page.render(
@@ -122,14 +120,10 @@ public class Application extends Controller {
             .where().eq("organization", Organization.getByHost())
             .orderBy("date DESC").findList();
 
-        Tag cur_student_tag = Tag.find.where()
-            .eq("title", "Current Student")
+        List<Tag> tags = Tag.find.where()
+            .eq("show_in_jc", true)
             .eq("organization", Organization.getByHost())
-            .findUnique();
-        Tag staff_tag = Tag.find.where()
-            .eq("title", "Staff")
-            .eq("organization", Organization.getByHost())
-            .findUnique();
+            .findList();
 
         List<Person> people = Person.find
             .fetch("charges")
@@ -139,7 +133,7 @@ public class Application extends Controller {
             .fetch("cases_involved_in.the_case", new FetchConfig().query())
             .fetch("cases_involved_in.the_case.meeting", new FetchConfig().query())
             .where()
-            .in("tags", cur_student_tag, staff_tag)
+            .in("tags", tags)
             .findList();
 
         Collections.sort(people, Person.SORT_DISPLAY_NAME);
@@ -151,9 +145,9 @@ public class Application extends Controller {
             .fetch("section")
             .fetch("section.chapter")
             .where().eq("section.chapter.organization", Organization.getByHost())
-			.eq("section.chapter.deleted", false)
-			.eq("section.deleted", false)
-			.eq("deleted", false)
+            .eq("section.chapter.deleted", false)
+            .eq("section.deleted", false)
+            .eq("deleted", false)
             .findList();
         List<Entry> entries_with_charges = new ArrayList<Entry>();
         for (Entry e : entries) {
@@ -369,9 +363,9 @@ public class Application extends Controller {
         return ok("\ufeff" + new String(baos.toByteArray(), charset));
     }
 
-	public Result viewManual() {
+    public Result viewManual() {
         return ok(renderManualTOC());
-	}
+    }
 
     public Result viewManualChanges(String begin_date_string) {
         Date begin_date = null;
@@ -543,15 +537,15 @@ public class Application extends Controller {
         }
     }
 
-	public Result viewChapter(Integer id) {
+    public Result viewChapter(Integer id) {
         Chapter c = Chapter.find
             .fetch("sections", new FetchConfig().query())
             .fetch("sections.entries", new FetchConfig().query())
             .where().eq("organization", Organization.getByHost())
             .eq("id", id).findUnique();
 
-		return ok(views.html.view_chapter.render(c));
-	}
+        return ok(views.html.view_chapter.render(c));
+    }
 
     public Result searchManual(String searchString) {
         Map<String, Object> scopes = new HashMap<String, Object>();
@@ -617,8 +611,8 @@ public class Application extends Controller {
 
         Date now = new Date();
 
-		Collections.sort(p.charges);
-		Collections.reverse(p.charges);
+        Collections.sort(p.charges);
+        Collections.reverse(p.charges);
         for (Charge c : p.charges) {
             // Include if <= 7 days ago
             if (now.getTime() - c.the_case.meeting.date.getTime() <
@@ -633,8 +627,8 @@ public class Application extends Controller {
     static Collection<String> getRecentResolutionPlans(Entry r) {
         Set<String> rps = new HashSet<String>();
 
-		Collections.sort(r.charges);
-		Collections.reverse(r.charges);
+        Collections.sort(r.charges);
+        Collections.reverse(r.charges);
 
         for (Charge c : r.charges) {
             if (!c.resolution_plan.toLowerCase().equals("warning") &&
@@ -669,62 +663,62 @@ public class Application extends Controller {
     public Result getPersonHistory(Integer id) {
         Person p = Person.findByIdWithJCData(id);
         return ok(views.html.person_history.render(
-			p,
-			new PersonHistory(p, false, getStartOfYear(), null),
-			getLastWeekCharges(p),
-			false));
+            p,
+            new PersonHistory(p, false, getStartOfYear(), null),
+            getLastWeekCharges(p),
+            false));
     }
 
     public Result viewPersonHistory(Integer id, Boolean redact_names, String start_date_str, String end_date_str) {
-		Date start_date = getStartOfYear();
-		Date end_date = null;
+        Date start_date = getStartOfYear();
+        Date end_date = null;
 
         try {
             start_date = new SimpleDateFormat("yyyy-M-d").parse(start_date_str);
             end_date = new SimpleDateFormat("yyyy-M-d").parse(end_date_str);
         } catch (ParseException e) {
-		}
+        }
 
         Person p = Person.findByIdWithJCData(id);
         return ok(views.html.view_person_history.render(
-			p,
-			new PersonHistory(p, true, start_date, end_date),
-			getLastWeekCharges(p),
-			redact_names));
+            p,
+            new PersonHistory(p, true, start_date, end_date),
+            getLastWeekCharges(p),
+            redact_names));
     }
 
     public Result getRuleHistory(Integer id) {
         Entry r = Entry.findByIdWithJCData(id);
         return ok(views.html.rule_history.render(
-			r,
-			new RuleHistory(r, false, getStartOfYear(), null),
-			getRecentResolutionPlans(r)));
+            r,
+            new RuleHistory(r, false, getStartOfYear(), null),
+            getRecentResolutionPlans(r)));
     }
 
     public Result viewRuleHistory(Integer id, String start_date_str, String end_date_str) {
-		Date start_date = getStartOfYear();
-		Date end_date = null;
+        Date start_date = getStartOfYear();
+        Date end_date = null;
 
         try {
             start_date = new SimpleDateFormat("yyyy-M-d").parse(start_date_str);
             end_date = new SimpleDateFormat("yyyy-M-d").parse(end_date_str);
         } catch (ParseException e) {
-		}
+        }
 
         Entry r = Entry.findByIdWithJCData(id);
         return ok(views.html.view_rule_history.render(
-			r,
-			new RuleHistory(r, true, start_date, end_date),
-			getRecentResolutionPlans(r)));
+            r,
+            new RuleHistory(r, true, start_date, end_date),
+            getRecentResolutionPlans(r)));
     }
 
     public Result viewPersonsWriteups(Integer id) {
         Person p = Person.findByIdWithJCData(id);
 
-		List<Case> cases_written_up = new ArrayList<Case>(p.getThisYearCasesWrittenUp());
+        List<Case> cases_written_up = new ArrayList<Case>(p.getThisYearCasesWrittenUp());
 
-		Collections.sort(cases_written_up);
-		Collections.reverse(cases_written_up);
+        Collections.sort(cases_written_up);
+        Collections.reverse(cases_written_up);
 
         return ok(views.html.view_persons_writeups.render(p, cases_written_up));
     }
@@ -845,7 +839,7 @@ public class Application extends Controller {
         List<Person> people = allPeople();
         Collections.sort(people, Person.SORT_DISPLAY_NAME);
 
-		term = term.toLowerCase();
+        term = term.toLowerCase();
 
         List<Map<String, String> > result = new ArrayList<Map<String, String> > ();
         for (Person p : people) {
@@ -861,7 +855,7 @@ public class Application extends Controller {
     }
 
     public static String jsonRules(String term) {
-		term = term.toLowerCase();
+        term = term.toLowerCase();
 
         List<Entry> rules = Entry.find.where()
             .eq("section.chapter.organization", Organization.getByHost())
@@ -940,9 +934,9 @@ public class Application extends Controller {
         return new SimpleDateFormat("EE--MMMM dd, yyyy").format(d);
     }
 
-	public static String yymmddDate(Date d) {
-		return new SimpleDateFormat("yyyy-M-d").format(d);
-	}
+    public static String yymmddDate(Date d) {
+        return new SimpleDateFormat("yyyy-M-d").format(d);
+    }
 
     public static String yymmddDate() {
         return new SimpleDateFormat("yyyy-M-d").format(new Date());
@@ -974,7 +968,7 @@ public class Application extends Controller {
         } else {
             return ctx.request().remoteAddress();
         }
-	}
+    }
 
     public static User getCurrentUser() {
         return User.findByAuthUserIdentity(
@@ -982,19 +976,19 @@ public class Application extends Controller {
     }
 
     public static Configuration getConfiguration() {
-		return Play.application().configuration().getConfig("school_crm");
-	}
+        return Play.application().configuration().getConfig("school_crm");
+    }
 
-	public static String markdown(String input) {
+    public static String markdown(String input) {
         if (input == null) {
             return "";
         }
-		try {
-			return new Markdown4jProcessor().process(input);
-		} catch (IOException e) {
-			return e.toString() + "<br><br>" + input;
-		}
-	}
+        try {
+            return new Markdown4jProcessor().process(input);
+        } catch (IOException e) {
+            return e.toString() + "<br><br>" + input;
+        }
+    }
 
     public Result renderMarkdown() {
         Map<String, String[]> form_data = request().body().asFormUrlEncoded();

@@ -1,9 +1,6 @@
 package models;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 import javax.persistence.*;
 
@@ -20,6 +17,8 @@ public class Tag extends Model {
     public String title;
 
     public boolean use_student_display;
+    public boolean show_in_menu;
+    public boolean show_in_jc;
 
     @ManyToMany(cascade=CascadeType.ALL)
     @JoinTable(name="person_tag",
@@ -56,27 +55,40 @@ public class Tag extends Model {
         Tag result = new Tag();
         result.title = title;
         result.organization = Organization.getByHost();
+        result.show_in_menu = true;
 
         result.save();
         return result;
     }
 
-    public void updateFromForm(Form<Tag> form) {
-        if (title.equals("Staff") || title.equals("Current Student")) {
-            return;
-        }
+    public Map<String, Object> serialize() {
+        Map<String, Object> t = new HashMap<>();
+        t.put("id", id);
+        t.put("title", title);
+        t.put("show_in_menu", show_in_menu);
+        t.put("show_in_jc", show_in_jc);
+        return t;
+    }
 
+    public static boolean getBooleanFromForm(Form<?> form, String field_name) {
+        String val = form.field(field_name).value();
+        return val != null && val.equals("true");
+    }
+
+    public void updateFromForm(Form<Tag> form) {
         title = form.field("title").value();
-        String student_val = form.field("use_student_display").value();
-        use_student_display = student_val != null && student_val.equals("true");
+        use_student_display = getBooleanFromForm(form, "use_student_display");
+        show_in_jc = getBooleanFromForm(form, "show_in_jc");
+        show_in_menu = getBooleanFromForm(form, "show_in_menu");
         save();
     }
 
     public static Map<String, List<Tag>> getWithPrefixes() {
-        Map<String, List<Tag>> result = new TreeMap<String, List<Tag>>();
+        Map<String, List<Tag>> result = new TreeMap<String, List<Tag>>(String.CASE_INSENSITIVE_ORDER);
 
         for (Tag t : find.where()
                 .eq("organization", Organization.getByHost())
+                .eq("show_in_menu", true)
                 .order("title ASC").findList()) {
             String[] splits = t.title.split(":");
             String prefix = t.title;
