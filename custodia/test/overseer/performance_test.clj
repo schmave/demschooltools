@@ -17,7 +17,7 @@
             [overseer.database.users :as users]
             [overseer.migrations :as migrations]
             [overseer.db :as db]
-            [overseer.database :as data]
+            [overseer.commands :as data]
             [clojure.java.jdbc :as jdbc]
             [clojure.pprint :refer :all]
             ))
@@ -43,7 +43,7 @@
   (sh/sh "make" "load-massive-dump")
   (migrate-test-db)
   (data/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 9))))
-  (let [students (data/get-students)]
+  (let [students (db/get-students)]
     (doall (map #(data/add-student-to-class (:_id %) 1)
                 students)))
   (let [students (time (att/get-student-list))]

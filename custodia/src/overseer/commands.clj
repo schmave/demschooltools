@@ -1,4 +1,4 @@
-(ns overseer.database
+(ns overseer.commands
   (:require [overseer.db :as db]
             [overseer.helpers :refer :all]
             [overseer.dates :refer :all]
@@ -10,12 +10,6 @@
             [clj-time.coerce :as c]
             [schema.core :as s]
             ))
-
-(defn get-overrides [id]
-  (db/get-* "overrides" id "student_id"))
-
-(defn get-excuses [id]
-  (db/get-* "excuses" id "student_id"))
 
 (defn lookup-last-swipe-for-day [id day]
   (let [last (db/lookup-last-swipe id)]
@@ -118,10 +112,6 @@
   (db/persist! {:type :emails
                 :email email}))
 
-;; (get-students )
-(defn get-students
-  ([] (sort-by :name (db/get-all-students)))
-  ([id] (db/get-* "students" id "_id")))
 
 (defn get-class-by-name
   ([name] (first (db/get-* "classes" name "name"))))
@@ -131,7 +121,7 @@
 
 ;; (get-years)
 (defn student-not-yet-created [name]
-  (thing-not-yet-created name get-students))
+  (thing-not-yet-created name db/get-students))
 
 (defn class-not-yet-created [name]
   (thing-not-yet-created name db/get-classes))
@@ -171,7 +161,7 @@
   (if older nil (make-sqldate (str (t/now)))))
 
 (defn modify-student [_id field f]
-  (let [student (first (get-students _id))
+  (let [student (first (db/get-students _id))
         newVal (f student)]
     (db/update! :students _id {field newVal})
     (assoc student field newVal)))

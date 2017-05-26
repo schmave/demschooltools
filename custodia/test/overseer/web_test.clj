@@ -6,7 +6,7 @@
             [clojure.pprint :as pp]
             [clojure.test :refer :all]
             [overseer.attendance :as att]
-            [overseer.database :as data]
+            [overseer.commands :as data]
             [overseer.database.users :as users]
             [overseer.database.connection :as conn]
             [overseer.dates :as dates]
@@ -86,7 +86,7 @@
   (let [{sid :_id date :start_date} (data/make-student "test")
         email "test@email.com"]
     (data/edit-student sid "test" date email)
-    (let [s (-> (data/get-students sid) first)]
+    (let [s (-> (db/get-students sid) first)]
       (testing "Email is set"
         (is (= email (:guardian_email s)))))))
 
@@ -96,7 +96,7 @@
             today (dates/today-string)]
         (data/add-student-to-class sid (get-class-id-by-name "2014-2015"))
         (data/set-student-start-date sid today)
-        (let [s (-> (data/get-students sid) first)
+        (let [s (-> (db/get-students sid) first)
               att (get-att sid)]
           (testing "Start date is set"
             (is (= today (str (:start_date s)))))
@@ -533,7 +533,7 @@
       (let [s (data/make-student "test")
             sid (:_id s)
             s (data/toggle-student-older sid)
-            s (first (data/get-students sid))
+            s (first (db/get-students sid))
             tomorrow (-> (today-at-utc 10 0) (t/plus (t/days 1)))
             day-after-next (-> (today-at-utc 10 0) (t/plus (t/days 2)))
             ]

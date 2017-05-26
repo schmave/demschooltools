@@ -4,7 +4,7 @@
             [clojure.test :refer :all]
             [overseer.db :as db]
             [clojure.tools.logging :as log]
-            [overseer.database :as data]
+            [overseer.commands :as data]
             [overseer.database.users :as users]
             [overseer.database.connection :as conn]
             [overseer.attendance :as att]

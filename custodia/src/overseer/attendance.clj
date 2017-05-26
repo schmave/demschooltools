@@ -2,7 +2,7 @@
   (:require [overseer.db :as db]
             [overseer.helpers :refer :all]
             [overseer.dates :refer :all]
-            [overseer.database :as data]
+            [overseer.commands :as data]
             [clojure.tools.trace :as trace]
             [clj-time.format :as f]
             [clj-time.local :as l]
@@ -193,7 +193,7 @@
   ([id] (get-student-with-att id (get-current-year-string (data/get-years))))
   ([id year]
    (map #(get-attendance year (:_id %) %)
-        (data/get-students id))))
+        (db/get-students id))))
 
 ;;(get-student-with-att 8)
 ;; (get-current-year-string (data/get-years))

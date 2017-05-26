@@ -7,7 +7,7 @@
             [clj-time.coerce :as c]
             [clojure.tools.trace :as trace]
             [overseer.db :as db]
-            [overseer.database :as data]
+            [overseer.commands :as data]
             [overseer.helpers-test :refer :all]
             [overseer.attendance :as att]
             [overseer.helpers :as h]

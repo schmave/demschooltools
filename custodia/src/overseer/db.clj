@@ -129,3 +129,7 @@
 (defn get-swipes-in-year [year-name student-id]
   (q swipes-in-year-y {:year_name year-name :student_id student-id :school_id *school-id*  :timezone (get-school-time-zone)} ))
 
+;; (get-students )
+(defn get-students
+  ([] (sort-by :name (get-all-students)))
+  ([id] (get-* "students" id "_id")))
