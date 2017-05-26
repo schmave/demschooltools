@@ -4,7 +4,7 @@
             [ring.util.response :as resp]
             [clojure.tools.trace :as trace]
             [overseer.db :as db]
-            [overseer.commands :as data]
+            [overseer.commands :as cmd]
             [overseer.database.users :as users]
             [overseer.dates :as dates]
             [overseer.attendance :as att]
@@ -36,7 +36,7 @@
 
   (POST "/students" [name start_date email]
         (friend/authorize #{roles/admin}
-                          (resp/response {:made (data/make-student name start_date email)
+                          (resp/response {:made (cmd/make-student name start_date email)
                                           :students (db/get-students)})))
 
   (PUT "/user" [name password]
@@ -48,38 +48,38 @@
 
   (PUT "/students/:id" [id :<< as-int name start_date email]
        (friend/authorize #{roles/admin}
-                         (data/edit-student id name start_date email))
+                         (cmd/edit-student id name start_date email))
        (student-page-response id))
 
   (POST "/students/:id/togglehours" [id :<< as-int]
         (friend/authorize #{roles/admin}
-                          (do (data/toggle-student-older id)
+                          (do (cmd/toggle-student-older id)
                               (student-page-response id))))
 
   (POST "/students/:id/absent" [id :<< as-int]
         (friend/authorize #{roles/user}
-                          (do (data/toggle-student-absent id)
+                          (do (cmd/toggle-student-absent id)
                               (student-page-response id))))
 
   (POST "/students/:id/excuse" [id :<< as-int day]
         (friend/authorize #{roles/admin}
-                          (data/excuse-date id day))
+                          (cmd/excuse-date id day))
         (student-page-response id))
 
   (POST "/students/:id/override" [id :<< as-int day]
         (friend/authorize #{roles/admin}
-                          (data/override-date id day))
+                          (cmd/override-date id day))
         (student-page-response id))
 
   (POST "/students/:id/swipe/delete" [id :<< as-int swipe]
         (friend/authorize #{roles/admin}
-                          (data/delete-swipe swipe)
+                          (cmd/delete-swipe swipe)
                           (student-page-response id)))
   (POST "/students/:id/swipe" [id :<< as-int direction  missing]
         (friend/authorize #{roles/user}
                           (if (= direction "in")
-                            (do (when missing (data/swipe-out id missing))
-                                (data/swipe-in id))
-                            (do (when missing (data/swipe-in id missing))
-                                (data/swipe-out id))))
+                            (do (when missing (cmd/swipe-out id missing))
+                                (cmd/swipe-in id))
+                            (do (when missing (cmd/swipe-in id missing))
+                                (cmd/swipe-out id))))
         (resp/response {:students (get-student-list)})))

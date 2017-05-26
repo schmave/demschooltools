@@ -4,7 +4,7 @@
             [clojure.test :refer :all]
             [overseer.db :as db]
             [clojure.tools.logging :as log]
-            [overseer.commands :as data]
+            [overseer.commands :as cmd]
             [overseer.database.users :as users]
             [overseer.database.connection :as conn]
             [overseer.attendance :as att]
@@ -29,48 +29,48 @@
 (defn add-3good-2short-swipes [sid]
   ;; good
 
-  (data/swipe-in sid _2014_10-14_9-14am)
-  (data/swipe-out sid (t/plus _2014_10-14_9-14am (t/hours 6)))
+  (cmd/swipe-in sid _2014_10-14_9-14am)
+  (cmd/swipe-out sid (t/plus _2014_10-14_9-14am (t/hours 6)))
 
   ;; good
 
-  (data/swipe-in sid _2014_10_15)
-  (data/swipe-out sid (t/plus _2014_10_15 (t/hours 6)))
+  (cmd/swipe-in sid _2014_10_15)
+  (cmd/swipe-out sid (t/plus _2014_10_15 (t/hours 6)))
 
   ;; short
 
-  (data/swipe-in sid _2014_10_16)
-  (data/swipe-out sid (t/plus _2014_10_16 (t/hours 4)))
+  (cmd/swipe-in sid _2014_10_16)
+  (cmd/swipe-out sid (t/plus _2014_10_16 (t/hours 4)))
 
   ;; good = two short segments
 
-  (data/swipe-in sid _2014_10_17)
-  (data/swipe-out sid (t/plus _2014_10_17 (t/hours 4)))
-  (data/swipe-in sid (t/plus _2014_10_17 (t/hours 4.1)))
-  (data/swipe-out sid (t/plus _2014_10_17 (t/hours 6)))
+  (cmd/swipe-in sid _2014_10_17)
+  (cmd/swipe-out sid (t/plus _2014_10_17 (t/hours 4)))
+  (cmd/swipe-in sid (t/plus _2014_10_17 (t/hours 4.1)))
+  (cmd/swipe-out sid (t/plus _2014_10_17 (t/hours 6)))
 
   ;; short
 
-  (data/swipe-in sid _2014_10_18)
-  (data/swipe-out sid (t/plus _2014_10_18 (t/hours 4)))
+  (cmd/swipe-in sid _2014_10_18)
+  (cmd/swipe-out sid (t/plus _2014_10_18 (t/hours 4)))
   )
 
 (defn get-class-id-by-name [name]
-  (:_id (data/get-class-by-name name)))
+  (:_id (cmd/get-class-by-name name)))
 
 (defn make-sample-two-students-in-class []
-  (let [{class-id :_id} (data/get-class-by-name "2014-2015")]
+  (let [{class-id :_id} (cmd/get-class-by-name "2014-2015")]
     (db/activate-class class-id)
-    (data/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 2))))
-    (data/make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
-    (let [s (data/make-student "jim2")
+    (cmd/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 2))))
+    (cmd/make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
+    (let [s (cmd/make-student "jim2")
           {sid :_id} s
           result {:class_id class-id :student_ids [sid]}]
-      (data/add-student-to-class sid class-id)
-      (let [s (data/make-student "steve2")
+      (cmd/add-student-to-class sid class-id)
+      (let [s (cmd/make-student "steve2")
             {sid :_id} s
             result (update-in result [:student_ids] (fn [sids] (conj sids sid)))]
-        (data/add-student-to-class sid class-id)
+        (cmd/add-student-to-class sid class-id)
         result))))
 
 (defn student-report-is [att good short excuses unexcused overrides hours]
@@ -96,18 +96,18 @@
   ([have-extra?]
    (conn/init-pg)
    (users/reset-db)
-   (let [{class-id :_id} (data/get-class-by-name "2014-2015")]
+   (let [{class-id :_id} (cmd/get-class-by-name "2014-2015")]
      (db/activate-class class-id)
-     (data/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 9))))
-     (data/make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
-     (let [s (data/make-student "jim")
+     (cmd/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 9))))
+     (cmd/make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
+     (let [s (cmd/make-student "jim")
            {sid :_id} s]
-       (data/add-student-to-class sid class-id)
-       (when have-extra? (data/swipe-in sid (t/minus (t/now) (t/days 2)))))
-     (let [s (data/make-student "steve")
+       (cmd/add-student-to-class sid class-id)
+       (when have-extra? (cmd/swipe-in sid (t/minus (t/now) (t/days 2)))))
+     (let [s (cmd/make-student "steve")
            {sid :_id} s]
-       (data/add-student-to-class sid class-id)
-       (when have-extra? (data/swipe-in sid (t/minus (t/now) (t/days 1) (t/hours 5)))))))
+       (cmd/add-student-to-class sid class-id)
+       (when have-extra? (cmd/swipe-in sid (t/minus (t/now) (t/days 1) (t/hours 5)))))))
   )
 
 
@@ -116,24 +116,24 @@
 (defn huge-sample-db []
   (conn/init-pg)
   (users/reset-db)
-  (data/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 5))))  
-  (data/make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
+  (cmd/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 5))))  
+  (cmd/make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
 
-  (let [{class-id :_id} (data/get-class-by-name "2014-2015")]
+  (let [{class-id :_id} (cmd/get-class-by-name "2014-2015")]
     (db/activate-class class-id)
     (loop [x 1]
       (if (> x 80)
         :done
-        (do (let [s (data/make-student (str "zax" x))
+        (do (let [s (cmd/make-student (str "zax" x))
                   {sid :_id} s]
-              (data/add-student-to-class sid class-id)
+              (cmd/add-student-to-class sid class-id)
               (loop [y 2]
                 (log/info (str "Id:" x " Num:" y " of:" (* 80 200)))
                 (if (> y 200)
                   :done
                   (do
-                    (data/swipe-in x (t/minus (today-at-utc 9 0) (t/days y)))
-                    (data/swipe-out x (t/minus (t/plus (today-at-utc 9 0) (t/hours 6))
+                    (cmd/swipe-in x (t/minus (today-at-utc 9 0) (t/days y)))
+                    (cmd/swipe-out x (t/minus (t/plus (today-at-utc 9 0) (t/hours 6))
                                                (t/days y)))
                     (recur (inc y))))))
             (recur (inc x))))))
