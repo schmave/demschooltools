@@ -8,7 +8,7 @@
             [overseer.database.connection :refer [pgdb init-pg]]
             [clojure.tools.trace :as trace]))
 
-(defqueries "overseer/queries/school_queries.sql" )
+(defqueries "overseer/school_queries.sql" )
 
 (def ^:dynamic *school-id* 1)
 
