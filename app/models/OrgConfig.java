@@ -28,6 +28,7 @@ public class OrgConfig {
     public boolean track_writer = true;
     public boolean filter_no_charge_cases = false;
     public boolean show_findings_in_rp_list = true;
+    public boolean use_year_in_case_number = false;
 
     public boolean enable_file_sharing = false;
 
@@ -52,7 +53,11 @@ public class OrgConfig {
     }
 
     public String getCaseNumberPrefix(Meeting m) {
-        return new SimpleDateFormat("MM-dd-").format(m.date);
+        if (use_year_in_case_number) {
+            return new SimpleDateFormat("YYYY-MM-dd-").format(m.date);
+        } else {
+            return new SimpleDateFormat("MM-dd-").format(m.date);
+        }
     }
 }
 
@@ -134,6 +139,7 @@ class Fairhaven extends OrgConfig {
 
         use_minor_referrals = true;
         show_findings_in_rp_list = false;
+        use_year_in_case_number = true;
 
         OrgConfig.register(name, this);
     }
@@ -265,6 +271,7 @@ class Houston extends OrgConfig {
 
         use_minor_referrals = true;
         track_writer = false;
+        use_year_in_case_number = true;
 
         OrgConfig.register(name, this);
     }
