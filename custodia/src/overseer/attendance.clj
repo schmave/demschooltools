@@ -1,6 +1,7 @@
 (ns overseer.attendance
   (:require [overseer.db :as db]
             [overseer.helpers :refer :all]
+            [overseer.queries :as queries]
             [overseer.dates :refer :all]
             [overseer.commands :as cmd]
             [clojure.tools.trace :as trace]
@@ -119,7 +120,7 @@
   ([] (get-student-list false))
   ([show-archived]
    (let [today-string (make-date-string (t/now))
-         inout (db/get-student-list-in-out show-archived)
+         inout (queries/get-student-list-in-out show-archived)
          inout (map #(assoc %
                             :in_today (= today-string
                                          (make-date-string (:last_swipe_date %)))
@@ -154,7 +155,7 @@
 
 (defn get-attendance
   [year id student]
-  (let [swipes (db/get-student-page id year)
+  (let [swipes (queries/get-student-page id year)
         swipes (map #(assoc % :day (-> % :day make-date-string-without-timezone)
                             :has_override (boolean (:has_override %))
                             :has_excuse (boolean (:has_excuse %)))
@@ -193,7 +194,7 @@
   ([id] (get-student-with-att id (get-current-year-string (cmd/get-years))))
   ([id year]
    (map #(get-attendance year (:_id %) %)
-        (db/get-students id))))
+        (queries/get-students id))))
 
 ;;(get-student-with-att 8)
 ;; (get-current-year-string (cmd/get-years))

@@ -7,6 +7,7 @@
             [clojure.test :refer :all]
             [overseer.attendance :as att]
             [overseer.commands :as cmd]
+            [overseer.queries :as queries]
             [overseer.database.users :as users]
             [overseer.database.connection :as conn]
             [overseer.dates :as dates]
@@ -29,7 +30,7 @@
       (is (= 9 (t/day _10pm_ninth))))))
 
 (defn get-school-days [year]
-  (map :days (filter :days (db/get-school-days year))))
+  (map :days (filter :days (queries/get-school-days year))))
 ;; (get-school-days "2014-06-01 2015-06-01")
 
 (deftest get-school-days-test
@@ -86,7 +87,7 @@
   (let [{sid :_id date :start_date} (cmd/make-student "test")
         email "test@email.com"]
     (cmd/edit-student sid "test" date email)
-    (let [s (-> (db/get-students sid) first)]
+    (let [s (-> (queries/get-students sid) first)]
       (testing "Email is set"
         (is (= email (:guardian_email s)))))))
 
@@ -96,7 +97,7 @@
             today (dates/today-string)]
         (cmd/add-student-to-class sid (get-class-id-by-name "2014-2015"))
         (cmd/set-student-start-date sid today)
-        (let [s (-> (db/get-students sid) first)
+        (let [s (-> (queries/get-students sid) first)
               att (get-att sid)]
           (testing "Start date is set"
             (is (= today (str (:start_date s)))))
@@ -130,9 +131,9 @@
   (do (sample-db)
       (let [class-id (get-class-id-by-name "2014-2015")
             {student-id :_id} (cmd/make-student "Jimmy Hotel")]
-        (db/activate-class class-id)
-        (let [classes (db/get-classes)
-              students (db/get-students-for-class class-id)]
+        (queries/activate-class class-id)
+        (let [classes (queries/get-classes)
+              students (queries/get-students-for-class class-id)]
           (testing "class creation"
             (is (= 1 (count classes)))
             (is (= true (-> classes first :active))))
@@ -179,7 +180,7 @@
              s (cmd/make-student "test")
              sid (:_id s)]
          (cmd/add-student-to-class sid cid)
-         (db/activate-class cid)
+         (queries/activate-class cid)
 
          ;; swipe in 2014
          (cmd/swipe-in sid _900am_2014_10_14)
@@ -328,7 +329,7 @@
         (cmd/swipe-in sid2 _2014_10_20)
 
         (testing "getting classes"
-          (let [cls (first (db/get-classes))]
+          (let [cls (first (queries/get-classes))]
             (is (= 4 (-> cls :students count)))))
 
         (testing "School year is list of days with swipes"
@@ -533,7 +534,7 @@
       (let [s (cmd/make-student "test")
             sid (:_id s)
             s (cmd/toggle-student-older sid)
-            s (first (db/get-students sid))
+            s (first (queries/get-students sid))
             tomorrow (-> (today-at-utc 10 0) (t/plus (t/days 1)))
             day-after-next (-> (today-at-utc 10 0) (t/plus (t/days 2)))
             ]

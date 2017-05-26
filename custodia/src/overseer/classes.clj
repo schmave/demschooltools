@@ -4,6 +4,7 @@
             [ring.util.response :as resp]
             [clojure.tools.trace :as trace]
             [overseer.db :as db]
+            [overseer.queries :as queries]
             [overseer.commands :as cmd]
             [overseer.dates :as dates]
             [overseer.roles :as roles]
@@ -13,24 +14,24 @@
 (defroutes class-routes
   (GET "/classes" []
        (friend/authorize #{roles/admin}
-                         (resp/response (db/get-all-classes-and-students))))
+                         (resp/response (queries/get-all-classes-and-students))))
   (POST "/classes" [name from_date to_date]
         (friend/authorize #{roles/admin}
                           (cmd/make-class name from_date to_date)
-                          (resp/response (db/get-all-classes-and-students))))
+                          (resp/response (queries/get-all-classes-and-students))))
 
   (POST "/classes/:cid/student/:sid/add" [cid :<< as-int sid :<< as-int]
         (friend/authorize #{roles/admin}
                           (cmd/add-student-to-class sid cid)
-                          (resp/response (db/get-all-classes-and-students))))
+                          (resp/response (queries/get-all-classes-and-students))))
 
   (POST "/classes/:cid/student/:sid/delete" [cid :<< as-int sid :<< as-int]
         (friend/authorize #{roles/admin}
-                          (db/delete-student-from-class sid cid)
-                          (resp/response (db/get-all-classes-and-students))))
+                          (queries/delete-student-from-class sid cid)
+                          (resp/response (queries/get-all-classes-and-students))))
 
   (POST "/classes/:cid/activate" [cid :<< as-int]
         (friend/authorize #{roles/admin}
-                          (db/activate-class cid)
-                          (resp/response (db/get-all-classes-and-students)))))
+                          (queries/activate-class cid)
+                          (resp/response (queries/get-all-classes-and-students)))))
 

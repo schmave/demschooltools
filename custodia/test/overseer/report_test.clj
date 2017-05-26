@@ -7,6 +7,7 @@
             [clj-time.coerce :as c]
             [clojure.tools.trace :as trace]
             [overseer.db :as db]
+            [overseer.queries :as queries]
             [overseer.commands :as cmd]
             [overseer.helpers-test :refer :all]
             [overseer.attendance :as att]
@@ -30,7 +31,7 @@
   (do (sample-db)
       (let [class-id (get-class-id-by-name "2014-2015")
             other-class (cmd/make-class "test")
-            activated (db/activate-class (:_id other-class))
+            activated (queries/activate-class (:_id other-class))
             today-str (dates/get-current-year-string (cmd/get-years))
             {sid :_id} (cmd/make-student "test")
             {sid2 :_id} (cmd/make-student "test2")]
@@ -39,7 +40,7 @@
         (cmd/swipe-in sid2 _2014_10_19)
         (cmd/swipe-in sid2 _2014_10_20)
 
-        (let [att (db/get-report today-str class-id)
+        (let [att (queries/get-report today-str class-id)
               student1 (first (filter #(= sid (:_id %)) att))
               student2 (first (filter #(= sid2 (:_id %)) att))]
 
@@ -55,7 +56,7 @@
             (is (= student2 nil)))
           )
         (testing "an older date string shows no attendance in that time"
-          (is (= '() (db/get-report "06-01-2013 05-01-2014")))))) 
+          (is (= '() (queries/get-report "06-01-2013 05-01-2014")))))) 
   )
 
 
@@ -76,7 +77,7 @@
         (cmd/add-student-to-class sid class-id)
         (cmd/add-student-to-class sid2 class-id)
 
-        (let [att (db/get-report today-str)
+        (let [att (queries/get-report today-str)
               student1 (first (filter #(= sid (:_id %)) att))
               student2 (first (filter #(= sid2 (:_id %)) att))]
           (student-report-is student1 4 1 1 1 1 26M)
@@ -88,6 +89,6 @@
                    5)))
           )
         (testing "an older date string shows no attendance in that time"
-          (is (= '() (db/get-report "06-01-2013 05-01-2014")))))) 
+          (is (= '() (queries/get-report "06-01-2013 05-01-2014")))))) 
   )
 

@@ -1,6 +1,7 @@
 (ns overseer.commands
   (:require [overseer.db :as db]
             [overseer.helpers :refer :all]
+            [overseer.queries :as queries]
             [overseer.dates :refer :all]
             [overseer.helpers :as logh]
             [clojure.tools.logging :as log]
@@ -12,7 +13,7 @@
             ))
 
 (defn lookup-last-swipe-for-day [id day]
-  (let [last (db/lookup-last-swipe id)]
+  (let [last (queries/lookup-last-swipe id)]
     (when (= day (make-date-string (:in_time last)))
       last)))
 
@@ -84,7 +85,7 @@
 ;; TODO - make multimethod on type
 ;; (get-years)
 (defn get-years
-  ([] (db/get-all-years))
+  ([] (queries/get-all-years))
   ([names]
    (db/get-* "years" names "name")))
 
@@ -121,15 +122,15 @@
 
 ;; (get-years)
 (defn student-not-yet-created [name]
-  (thing-not-yet-created name db/get-students))
+  (thing-not-yet-created name queries/get-students))
 
 (defn class-not-yet-created [name]
-  (thing-not-yet-created name db/get-classes))
+  (thing-not-yet-created name queries/get-classes))
 
 (defn make-class
   ([name] (make-class name nil nil))
   ([name from_date to_date]
-   (let [active (-> (db/get-classes) seq boolean not)]
+   (let [active (-> (queries/get-classes) seq boolean not)]
      (when (class-not-yet-created name)
        (db/persist! {:type :classes :name name :active active :school_id db/*school-id*})))))
 
@@ -161,7 +162,7 @@
   (if older nil (make-sqldate (str (t/now)))))
 
 (defn modify-student [_id field f]
-  (let [student (first (db/get-students _id))
+  (let [student (first (queries/get-students _id))
         newVal (f student)]
     (db/update! :students _id {field newVal})
     (assoc student field newVal)))

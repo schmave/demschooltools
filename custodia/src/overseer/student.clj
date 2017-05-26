@@ -4,6 +4,7 @@
             [ring.util.response :as resp]
             [clojure.tools.trace :as trace]
             [overseer.db :as db]
+            [overseer.queries :as queries]
             [overseer.commands :as cmd]
             [overseer.database.users :as users]
             [overseer.dates :as dates]
@@ -25,7 +26,7 @@
 (defroutes student-routes
   (GET "/allstudents" req
     (friend/authorize #{roles/admin}
-                      (resp/response (db/get-students))))
+                      (resp/response (queries/get-students))))
   (GET "/students" req
        (friend/authorize #{roles/user}
                          (resp/response {:today (dates/today-string)
@@ -37,7 +38,7 @@
   (POST "/students" [name start_date email]
         (friend/authorize #{roles/admin}
                           (resp/response {:made (cmd/make-student name start_date email)
-                                          :students (db/get-students)})))
+                                          :students (queries/get-students)})))
 
   (PUT "/user" [name password]
     (friend/authorize #{roles/super}

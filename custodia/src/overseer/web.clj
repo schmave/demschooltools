@@ -17,6 +17,7 @@
             [clojure.tools.logging :as log]
             [clojure.pprint :as pp]
             [overseer.db :as db]
+            [overseer.queries :as queries]
             [overseer.database.sample-db :as sampledb]
             [overseer.dates :as dates]
             [overseer.classes :refer [class-routes]]
@@ -55,8 +56,8 @@
   (GET "/schools" []
     (friend/authorize #{roles/super}
                       (resp/response
-                       (let [schools (db/get-schools)
-                             superSchool (db/get-current-school)]
+                       (let [schools (queries/get-schools)
+                             superSchool (queries/get-current-school)]
                          {:schools schools
                           :school superSchool}))))
 
@@ -80,15 +81,15 @@
     (friend/logout* (resp/redirect (log/spyf "Logout: %s" "/users/login"))))
   (GET "/users/is-user" req
        (friend/authorize #{roles/user} {:message "You're a user!"
-                                        :school (db/get-current-school)}))
+                                        :school (queries/get-current-school)}))
   (GET "/users/is-admin" req
        (resp/response
         {:admin (-> req friend/current-authentication :roles roles/admin)
-         :school (db/get-current-school)}))
+         :school (queries/get-current-school)}))
   (GET "/users/is-super" req
     (let [user (users/get-user "super")]
       (resp/response {:super (-> req friend/current-authentication :roles roles/super)
-                      :school (db/get-current-school)})))
+                      :school (queries/get-current-school)})))
 
   (GET "/js/gen/:id{.+}/app.js" req
     (io/resource "public/js/gen/app.js"))

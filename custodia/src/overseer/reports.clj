@@ -4,6 +4,7 @@
             [ring.util.response :as resp]
             [clojure.tools.trace :as trace]
             [overseer.db :as db]
+            [overseer.queries :as queries]
             [overseer.commands :as cmd]
             [overseer.dates :as dates]
             [overseer.roles :as roles]
@@ -28,10 +29,10 @@
                             (resp/response {:made made?}))))
   (GET "/reports/:year" [year]
        (friend/authorize #{roles/admin}
-                         (resp/response (db/get-report year))))
+                         (resp/response (queries/get-report year))))
   (GET "/reports/:year/:class" [year class :<< as-int]
        (friend/authorize #{roles/admin}
-                         (resp/response (db/get-report year class))))
+                         (resp/response (queries/get-report year class))))
 
   )
 

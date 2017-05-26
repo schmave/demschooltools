@@ -3,6 +3,7 @@
             [clj-time.core :as t]
             [clojure.test :refer :all]
             [overseer.db :as db]
+            [overseer.queries :as queries]
             [clojure.tools.logging :as log]
             [overseer.commands :as cmd]
             [overseer.database.users :as users]
@@ -60,7 +61,7 @@
 
 (defn make-sample-two-students-in-class []
   (let [{class-id :_id} (cmd/get-class-by-name "2014-2015")]
-    (db/activate-class class-id)
+    (queries/activate-class class-id)
     (cmd/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 2))))
     (cmd/make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
     (let [s (cmd/make-student "jim2")
@@ -97,7 +98,7 @@
    (conn/init-pg)
    (users/reset-db)
    (let [{class-id :_id} (cmd/get-class-by-name "2014-2015")]
-     (db/activate-class class-id)
+     (queries/activate-class class-id)
      (cmd/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 9))))
      (cmd/make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
      (let [s (cmd/make-student "jim")
@@ -120,7 +121,7 @@
   (cmd/make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
 
   (let [{class-id :_id} (cmd/get-class-by-name "2014-2015")]
-    (db/activate-class class-id)
+    (queries/activate-class class-id)
     (loop [x 1]
       (if (> x 80)
         :done
