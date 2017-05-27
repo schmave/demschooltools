@@ -31,7 +31,7 @@
   (do (sample-db)
       (let [class-id (get-class-id-by-name "2014-2015")
             other-class (cmd/make-class "test")
-            activated (queries/activate-class (:_id other-class))
+            activated (cmd/activate-class (:_id other-class))
             today-str (dates/get-current-year-string (cmd/get-years))
             {sid :_id} (cmd/make-student "test")
             {sid2 :_id} (cmd/make-student "test2")]

@@ -32,6 +32,6 @@
 
   (POST "/classes/:cid/activate" [cid :<< as-int]
         (friend/authorize #{roles/admin}
-                          (queries/activate-class cid)
+                          (cmd/activate-class cid)
                           (resp/response (queries/get-all-classes-and-students)))))
 

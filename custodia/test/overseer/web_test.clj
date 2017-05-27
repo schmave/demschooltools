@@ -131,7 +131,7 @@
   (do (sample-db)
       (let [class-id (get-class-id-by-name "2014-2015")
             {student-id :_id} (cmd/make-student "Jimmy Hotel")]
-        (queries/activate-class class-id)
+        (cmd/activate-class class-id)
         (let [classes (queries/get-classes)
               students (queries/get-students-for-class class-id)]
           (testing "class creation"
@@ -180,7 +180,7 @@
              s (cmd/make-student "test")
              sid (:_id s)]
          (cmd/add-student-to-class sid cid)
-         (queries/activate-class cid)
+         (cmd/activate-class cid)
 
          ;; swipe in 2014
          (cmd/swipe-in sid _900am_2014_10_14)

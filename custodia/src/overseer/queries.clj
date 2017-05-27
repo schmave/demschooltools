@@ -9,7 +9,7 @@
             [overseer.database.connection :refer [pgdb init-pg]]
             [clojure.tools.trace :as trace]))
 
-(defqueries "overseer/school_queries.sql" )
+(defqueries "overseer/yesql/queries.sql" )
 
 (defn get-active-class []
   (-> (db/q get-active-class-y {:school_id db/*school-id*} )
@@ -38,12 +38,6 @@
   {:classes (get-classes)
    :students (map (fn [s] {:name (:name s) :_id (:_id s)})
                   (get-all-students))})
-
-(defn activate-class [id]
-  (db/q activate-class-y! {:id id :school_id db/*school-id*} ))
-
-(defn delete-student-from-class [student-id class-id]
-  (db/q delete-student-from-class-y! {:student_id student-id :class_id class-id} ))
 
 (defn get-students-for-class [class-id]
   (db/q get-classes-and-students-y {:class_id class-id :school_id db/*school-id*} ))

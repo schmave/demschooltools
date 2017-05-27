@@ -2,6 +2,7 @@
   (:require [overseer.db :as db]
             [overseer.helpers :refer :all]
             [overseer.queries :as queries]
+            [yesql.core :as yesql]
             [overseer.dates :refer :all]
             [overseer.helpers :as logh]
             [clojure.tools.logging :as log]
@@ -11,6 +12,14 @@
             [clj-time.coerce :as c]
             [schema.core :as s]
             ))
+
+(yesql/defqueries "overseer/yesql/commands.sql" )
+
+(defn activate-class [id]
+  (db/q activate-class-y! {:id id :school_id db/*school-id*} ))
+
+(defn delete-student-from-class [student-id class-id]
+  (db/q delete-student-from-class-y! {:student_id student-id :class_id class-id} ))
 
 (defn lookup-last-swipe-for-day [id day]
   (let [last (queries/lookup-last-swipe id)]
