@@ -2,9 +2,8 @@
   (:require [overseer.db :as db]
             [overseer.helpers :refer :all]
             [overseer.queries :as queries]
-            [yesql.core :as yesql]
+            [yesql.core :refer [defqueries]]
             [overseer.dates :refer :all]
-            [overseer.helpers :as logh]
             [clojure.tools.logging :as log]
             [clj-time.format :as f]
             [clj-time.local :as l]
@@ -13,7 +12,7 @@
             [schema.core :as s]
             ))
 
-(yesql/defqueries "overseer/yesql/commands.sql" )
+(defqueries "overseer/yesql/commands.sql" )
 
 (defn activate-class [id]
   (db/q activate-class-y! {:id id :school_id db/*school-id*} ))

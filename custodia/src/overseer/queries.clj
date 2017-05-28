@@ -1,13 +1,8 @@
 (ns overseer.queries
   (:import [java.sql PreparedStatement]
            [java.util Date Calendar TimeZone])
-  (:require [clj-time.coerce :as timec]
-            [clojure.java.jdbc :as jdbc]
-            [yesql.core :refer [defqueries] ]
-            [clojure.tools.logging :as log]
-            [overseer.db :as db]
-            [overseer.database.connection :refer [pgdb init-pg]]
-            [clojure.tools.trace :as trace]))
+  (:require [yesql.core :refer [defqueries] ]
+            [overseer.db :as db]))
 
 (defqueries "overseer/yesql/queries.sql" )
 

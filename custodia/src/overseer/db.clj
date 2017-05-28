@@ -3,9 +3,7 @@
            [java.util Date Calendar TimeZone])
   (:require [clj-time.coerce :as timec]
             [clojure.java.jdbc :as jdbc]
-            [clojure.tools.logging :as log]
-            [overseer.database.connection :refer [pgdb init-pg]]
-            [clojure.tools.trace :as trace]))
+            [overseer.database.connection :refer [pgdb init-pg]]))
 
 (def ^:dynamic *school-id* 1)
 
@@ -18,7 +16,7 @@
 (defn q [n args]
   (n args {:connection @pgdb}))
 
-(defn append-schema [q]
+(defn- append-schema [q]
   (str "overseer." q))
 
 (defn delete! [doc]
