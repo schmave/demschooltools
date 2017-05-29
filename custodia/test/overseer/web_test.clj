@@ -35,7 +35,7 @@
 
 (deftest get-school-days-test
   (sample-db true)
-  (let [year (dates/get-current-year-string (cmd/get-years))
+  (let [year (dates/get-current-year-string (queries/get-years))
         school-days (get-school-days year)]
     (testing "School days"
       (is (= school-days [(dates/make-date-string (t/minus (t/now)
@@ -333,7 +333,7 @@
             (is (= 4 (-> cls :students count)))))
 
         (testing "School year is list of days with swipes"
-          (is (= (get-school-days (dates/get-current-year-string (cmd/get-years)))
+          (is (= (get-school-days (dates/get-current-year-string (queries/get-years)))
                  (list "2014-10-14" "2014-10-15" "2014-10-16" "2014-10-17" "2014-10-18" "2014-10-19" "2014-10-20"))))
         (testing "Student Front Page Count"
           (is (= (-> (att/get-student-list) count) 4)))
@@ -556,7 +556,7 @@
   (deftest get-current-year
     (sample-db)
     (testing "Getting current year"
-      (is (= (dates/get-current-year-string (cmd/get-years))
+      (is (= (dates/get-current-year-string (queries/get-years))
              (str "2014-06-01 " (dates/today-string)))))))
 
 (deftest excuse-today-is-today

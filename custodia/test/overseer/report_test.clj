@@ -32,7 +32,7 @@
       (let [class-id (get-class-id-by-name "2014-2015")
             other-class (cmd/make-class "test")
             activated (cmd/activate-class (:_id other-class))
-            today-str (dates/get-current-year-string (cmd/get-years))
+            today-str (dates/get-current-year-string (queries/get-years))
             {sid :_id} (cmd/make-student "test")
             {sid2 :_id} (cmd/make-student "test2")]
         (cmd/add-student-to-class sid class-id)
@@ -62,7 +62,7 @@
 
 (deftest swipe-attendence-test
   (do (sample-db)
-      (let [today-str (dates/get-current-year-string (cmd/get-years))
+      (let [today-str (dates/get-current-year-string (queries/get-years))
             class-id (get-class-id-by-name "2014-2015")
             {sid :_id} (cmd/make-student "test")
             {sid2 :_id} (cmd/make-student "test2")]

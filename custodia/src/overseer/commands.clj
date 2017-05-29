@@ -9,8 +9,7 @@
             [clj-time.local :as l]
             [clj-time.core :as t]
             [clj-time.coerce :as c]
-            [schema.core :as s]
-            ))
+            [schema.core :as s]))
 
 (defqueries "overseer/yesql/commands.sql" )
 
@@ -20,12 +19,13 @@
 (defn delete-student-from-class [student-id class-id]
   (db/q delete-student-from-class-y! {:student_id student-id :class_id class-id} ))
 
-(defn lookup-last-swipe-for-day [id day]
+(defn- lookup-last-swipe-for-day [id day]
   (let [last (queries/lookup-last-swipe id)]
     (when (= day (make-date-string (:in_time last)))
       last)))
 
-(defn only-swiped-in? [in-swipe] (and in-swipe (not (:out_time in-swipe))))
+(defn- only-swiped-in? [in-swipe]
+  (and in-swipe (not (:out_time in-swipe))))
 
 (declare swipe-out)
 
@@ -90,15 +90,8 @@
        (db/persist! out-swipe))
      out-swipe)))
 
-;; TODO - make multimethod on type
-;; (get-years)
-(defn get-years
-  ([] (queries/get-all-years))
-  ([names]
-   (db/get-* "years" names "name")))
-
 (defn delete-year [year]
-  (when-let [year (first (get-years year))]
+  (when-let [year (first (queries/get-years year))]
     (db/delete! year)))
 
 (defn edit-student [_id name start-date email]

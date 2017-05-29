@@ -6,6 +6,7 @@
 
 (defqueries "overseer/yesql/queries.sql" )
 
+
 (defn get-active-class []
   (-> (db/q get-active-class-y {:school_id db/*school-id*} )
       first
@@ -25,6 +26,13 @@
 
 (defn get-all-years []
   (db/q get-years-y {:school_id db/*school-id*}))
+
+;; TODO - make multimethod on type
+;; (get-years)
+(defn get-years
+  ([] (get-all-years))
+  ([names]
+   ((filter (fn [y] (= names {:name y})) (get-all-years)))))
 
 (defn get-all-students []
   (db/q get-students-y {:school_id db/*school-id*}))

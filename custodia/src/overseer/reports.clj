@@ -11,7 +11,7 @@
             [cemerick.friend :as friend]))
 
 (defn year-resp []
-  (let [years (cmd/get-years)]
+  (let [years (queries/get-years)]
     (resp/response {:years (map :name years)
                     :current_year (dates/get-current-year-string years)})))
 

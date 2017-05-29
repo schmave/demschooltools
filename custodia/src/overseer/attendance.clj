@@ -111,7 +111,7 @@
      :swipes records}))
 
 (defn get-year-from-to [year-string]
-  (let [year (first (cmd/get-years year-string))
+  (let [year (first (queries/get-years year-string))
         from (f/parse (:from_date year))
         to (f/parse (:to_date year))]
     [from to]))
@@ -191,10 +191,10 @@
                     :days summed-days})))
 
 (defn get-student-with-att
-  ([id] (get-student-with-att id (get-current-year-string (cmd/get-years))))
+  ([id] (get-student-with-att id (get-current-year-string (queries/get-years))))
   ([id year]
    (map #(get-attendance year (:_id %) %)
         (queries/get-students id))))
 
 ;;(get-student-with-att 8)
-;; (get-current-year-string (cmd/get-years))
+;; (get-current-year-string (queries/get-years))
