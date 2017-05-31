@@ -35,7 +35,7 @@
   (db/delete! swipe))
 
 (s/defn make-timestamp :- java.sql.Timestamp
-  [t :- DateTime] (c/to-timestamp t))
+  [t :- dates/DateTime] (c/to-timestamp t))
 
 ;; (make-sqldate "2015-03-30")
 (defn- make-sqldate [t]
@@ -176,7 +176,7 @@
 (defn make-year [from to]
   (let [from (f/parse from)
         to (f/parse to)
-        name (str (f/unparse date-format from) " "  (f/unparse date-format to))]
+        name (str (f/unparse dates/date-format from) " "  (f/unparse dates/date-format to))]
     (->> {:type :years
           :from_date (make-timestamp from)
           :to_date (make-timestamp to)
