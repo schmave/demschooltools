@@ -1,9 +1,8 @@
 (ns overseer.commands
   (:require [overseer.db :as db]
-            [overseer.helpers :refer :all]
             [overseer.queries :as queries]
             [yesql.core :refer [defqueries]]
-            [overseer.dates :refer :all]
+            [overseer.dates :as dates]
             [clojure.tools.logging :as log]
             [clj-time.format :as f]
             [clj-time.local :as l]
@@ -21,7 +20,7 @@
 
 (defn- lookup-last-swipe-for-day [id day]
   (let [last (queries/lookup-last-swipe id)]
-    (when (= day (make-date-string (:in_time last)))
+    (when (= day (dates/make-date-string (:in_time last)))
       last)))
 
 (defn- only-swiped-in? [in-swipe]
@@ -46,8 +45,7 @@
   ([id] (swipe-in id (t/now)))
   ([id in-time]
    (let [in-timestamp (make-timestamp in-time)
-         rounded-in-timestamp (make-timestamp (round-swipe-time in-time))
-         ]
+         rounded-in-timestamp (make-timestamp (dates/round-swipe-time in-time))]
      (db/persist! (assoc (make-swipe id)
                          :swipe_day (c/to-sql-date rounded-in-timestamp)
                          :rounded_in_time rounded-in-timestamp
@@ -69,9 +67,9 @@
 (defn swipe-out
   ([id] (swipe-out id (t/now)))
   ([id out-time]
-   (let [rounded-out-time (round-swipe-time out-time)
-         out-time (cond-parse-date-string out-time)
-         last-swipe (log/spyf "Last Swipe: %s" (lookup-last-swipe-for-day id (make-date-string rounded-out-time)))
+   (let [rounded-out-time (dates/round-swipe-time out-time)
+         out-time (dates/cond-parse-date-string out-time)
+         last-swipe (log/spyf "Last Swipe: %s" (lookup-last-swipe-for-day id (dates/make-date-string rounded-out-time)))
          only-swiped-in? (only-swiped-in? last-swipe)
          in-swipe (if only-swiped-in?
                     last-swipe
@@ -81,7 +79,7 @@
                           :out_time (make-timestamp out-time)
                           :rounded_out_time rounded-out-timestamp)
          out-swipe (sanitize-out out-swipe)
-         interval (calculate-interval out-swipe)
+         interval (dates/calculate-interval out-swipe)
          out-swipe (assoc out-swipe
                           :intervalmin interval
                           :swipe_day (c/to-sql-date rounded-out-timestamp))]
@@ -114,14 +112,12 @@
   (db/persist! {:type :emails
                 :email email}))
 
-
 (defn get-class-by-name
   ([name] (first (db/get-* "classes" name "name"))))
 
 (defn thing-not-yet-created [name getter]
   (empty? (filter #(= name (:name %)) (getter))))
 
-;; (get-years)
 (defn student-not-yet-created [name]
   (thing-not-yet-created name queries/get-students))
 
@@ -138,7 +134,7 @@
 (defn add-student-to-class [student-id class-id]
   (db/persist! {:type :classes_X_students :student_id student-id :class_id class-id}))
 
-(defn has-name [n]
+(defn- has-name [n]
   (not= "" (clojure.string/trim n)))
 
 (defn make-student
@@ -157,7 +153,7 @@
 
 (defn make-student-starting-today
   ([name] (make-student-starting-today name ""))
-  ([name email] (make-student name (today-string) email)))
+  ([name email] (make-student name (dates/today-string) email)))
 
 (defn- toggle-date [older]
   (if older nil (make-sqldate (str (t/now)))))
@@ -177,7 +173,7 @@
 (defn toggle-student-absent [_id]
   (modify-student _id :show_as_absent (fn [_] (make-sqldate (str (t/now))))))
 
-(defn make-year [from to] 
+(defn make-year [from to]
   (let [from (f/parse from)
         to (f/parse to)
         name (str (f/unparse date-format from) " "  (f/unparse date-format to))]
