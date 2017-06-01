@@ -89,3 +89,6 @@
 (defn get-students
   ([] (sort-by :name (get-all-students)))
   ([id] (db/get-* "students" id "_id")))
+
+(defn get-class-by-name
+  ([name] (first (db/get-* "classes" name "name"))))

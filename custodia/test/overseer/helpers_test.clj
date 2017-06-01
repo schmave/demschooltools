@@ -57,10 +57,10 @@
   )
 
 (defn get-class-id-by-name [name]
-  (:_id (cmd/get-class-by-name name)))
+  (:_id (queries/get-class-by-name name)))
 
 (defn make-sample-two-students-in-class []
-  (let [{class-id :_id} (cmd/get-class-by-name "2014-2015")]
+  (let [{class-id :_id} (queries/get-class-by-name "2014-2015")]
     (cmd/activate-class class-id)
     (cmd/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 2))))
     (cmd/make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
@@ -97,7 +97,7 @@
   ([have-extra?]
    (conn/init-pg)
    (users/reset-db)
-   (let [{class-id :_id} (cmd/get-class-by-name "2014-2015")]
+   (let [{class-id :_id} (queries/get-class-by-name "2014-2015")]
      (cmd/activate-class class-id)
      (cmd/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 9))))
      (cmd/make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
@@ -120,7 +120,7 @@
   (cmd/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 5))))  
   (cmd/make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
 
-  (let [{class-id :_id} (cmd/get-class-by-name "2014-2015")]
+  (let [{class-id :_id} (queries/get-class-by-name "2014-2015")]
     (cmd/activate-class class-id)
     (loop [x 1]
       (if (> x 80)

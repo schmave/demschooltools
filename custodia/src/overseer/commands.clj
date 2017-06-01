@@ -112,9 +112,6 @@
   (db/persist! {:type :emails
                 :email email}))
 
-(defn get-class-by-name
-  ([name] (first (db/get-* "classes" name "name"))))
-
 (defn thing-not-yet-created [name getter]
   (empty? (filter #(= name (:name %)) (getter))))
 
