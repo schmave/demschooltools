@@ -27,7 +27,7 @@
 
   (POST "/classes/:cid/student/:sid/delete" [cid :<< as-int sid :<< as-int]
         (friend/authorize #{roles/admin}
-                          (queries/delete-student-from-class sid cid)
+                          (cmd/delete-student-from-class sid cid)
                           (resp/response (queries/get-all-classes-and-students))))
 
   (POST "/classes/:cid/activate" [cid :<< as-int]

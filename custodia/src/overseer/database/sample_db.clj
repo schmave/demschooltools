@@ -17,7 +17,7 @@
    (conn/init-pg)
    (users/reset-db)
    (let [{class-id :_id} (queries/get-class-by-name "2014-2015")]
-     (queries/activate-class class-id)
+     (cmd/activate-class class-id)
      (cmd/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 9))))
      (cmd/make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
      (let [s (cmd/make-student "jim")
