@@ -18,11 +18,6 @@
 (defn delete-student-from-class [student-id class-id]
   (db/q delete-student-from-class-y! {:student_id student-id :class_id class-id} ))
 
-(defn- lookup-last-swipe-for-day [id day]
-  (let [last (queries/lookup-last-swipe id)]
-    (when (= day (dates/make-date-string (:in_time last)))
-      last)))
-
 (defn- only-swiped-in? [in-swipe]
   (and in-swipe (not (:out_time in-swipe))))
 
@@ -69,7 +64,7 @@
   ([id out-time]
    (let [rounded-out-time (dates/round-swipe-time out-time)
          out-time (dates/cond-parse-date-string out-time)
-         last-swipe (log/spyf "Last Swipe: %s" (lookup-last-swipe-for-day id (dates/make-date-string rounded-out-time)))
+         last-swipe (log/spyf "Last Swipe: %s" (queries/lookup-last-swipe-for-day id (dates/make-date-string rounded-out-time)))
          only-swiped-in? (only-swiped-in? last-swipe)
          in-swipe (if only-swiped-in?
                     last-swipe
@@ -112,20 +107,11 @@
   (db/persist! {:type :emails
                 :email email}))
 
-(defn thing-not-yet-created [name getter]
-  (empty? (filter #(= name (:name %)) (getter))))
-
-(defn student-not-yet-created [name]
-  (thing-not-yet-created name queries/get-students))
-
-(defn class-not-yet-created [name]
-  (thing-not-yet-created name queries/get-classes))
-
 (defn make-class
   ([name] (make-class name nil nil))
   ([name from_date to_date]
    (let [active (-> (queries/get-classes) seq boolean not)]
-     (when (class-not-yet-created name)
+     (when (queries/class-not-yet-created name)
        (db/persist! {:type :classes :name name :active active :school_id db/*school-id*})))))
 
 (defn add-student-to-class [student-id class-id]
@@ -139,7 +125,7 @@
   ([name start-date] (make-student name start-date ""))
   ([name start-date email]
    (when (and (has-name name)
-              (student-not-yet-created name))
+              (queries/student-not-yet-created name))
      (db/persist! {:type :students
                    :name name
                    :school_id db/*school-id*

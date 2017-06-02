@@ -2,6 +2,7 @@
   (:import [java.sql PreparedStatement]
            [java.util Date Calendar TimeZone])
   (:require [yesql.core :refer [defqueries] ]
+            [overseer.dates :as dates]
             [overseer.db :as db]))
 
 (defqueries "overseer/yesql/queries.sql" )
@@ -92,3 +93,17 @@
 
 (defn get-class-by-name
   ([name] (first (db/get-* "classes" name "name"))))
+
+(defn- thing-not-yet-created [name getter]
+  (empty? (filter #(= name (:name %)) (getter))))
+
+(defn student-not-yet-created [name]
+  (thing-not-yet-created name get-students))
+
+(defn class-not-yet-created [name]
+  (thing-not-yet-created name get-classes))
+
+(defn lookup-last-swipe-for-day [id day]
+  (let [last (lookup-last-swipe id)]
+    (when (= day (dates/make-date-string (:in_time last)))
+      last)))
