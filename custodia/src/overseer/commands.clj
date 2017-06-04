@@ -153,6 +153,9 @@
 (defn set-student-start-date [_id date]
   (modify-student _id  :start_date (fn [_] (make-sqldate date))))
 
+(defn toggle-student-teacher [_id]
+  (modify-student _id :is_teacher #(not (:is_teacher %))))
+
 (defn toggle-student-absent [_id]
   (modify-student _id :show_as_absent (fn [_] (make-sqldate (str (t/now))))))
 

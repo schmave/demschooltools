@@ -62,6 +62,11 @@
                           (do (cmd/toggle-student-absent id)
                               (student-page-response id))))
 
+  (POST "/students/:id/maketeacher" [id :<< as-int]
+        (friend/authorize #{roles/user}
+                          (do (cmd/toggle-student-teacher id)
+                              (student-page-response id))))
+
   (POST "/students/:id/excuse" [id :<< as-int day]
         (friend/authorize #{roles/admin}
                           (cmd/excuse-date id day))
