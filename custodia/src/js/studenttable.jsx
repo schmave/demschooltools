@@ -39,7 +39,12 @@ module.exports = React.createClass({
         }
     },
     getStudent: function(student, way){
-        var link = <Link to="student" params={{studentId: student._id}} id={"student-" + student._id}>{student.name}</Link>;
+        var is_teacher = student.is_teacher ? "is_teacher" : "";
+        var link = <Link to="student" params={{studentId: student._id}}
+                         className={is_teacher}
+                         id={"student-" + student._id}>
+                     {student.name}
+                   </Link>;
         var button = this.getSwipeButton(student, way);
         return <div className="panel panel-info student-listing col-sm-11">
             <div >{link}</div>

@@ -62,6 +62,7 @@ ORDER BY schooldays.days DESC;
 select stu.name
        , stu._id
        , stu.show_as_absent
+       , stu.is_teacher
        , stu.archived
        , CASE WHEN l.outs >= l.ins THEN 'out'
          ELSE 'in'

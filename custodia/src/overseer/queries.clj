@@ -7,7 +7,6 @@
 
 (defqueries "overseer/yesql/queries.sql" )
 
-
 (defn get-active-class []
   (-> (db/q get-active-class-y {:school_id db/*school-id*} )
       first
