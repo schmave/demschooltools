@@ -35,9 +35,9 @@
   (GET "/students/:id" [id :<< as-int]
        (friend/authorize #{roles/user} (student-page-response id)))
 
-  (POST "/students" [name start_date email]
+  (POST "/students" [name start_date email is_teacher]
         (friend/authorize #{roles/admin}
-                          (resp/response {:made (cmd/make-student name start_date email)
+                          (resp/response {:made (cmd/make-student name start_date email is_teacher)
                                           :students (queries/get-students)})))
 
   (PUT "/user" [name password]
@@ -47,9 +47,9 @@
     (friend/authorize #{roles/super}
                       (resp/response {:users (users/get-users)})))
 
-  (PUT "/students/:id" [id :<< as-int name start_date email]
+  (PUT "/students/:id" [id :<< as-int name start_date email is_teacher]
        (friend/authorize #{roles/admin}
-                         (cmd/edit-student id name start_date email))
+                         (cmd/edit-student id name start_date email is_teacher))
        (student-page-response id))
 
   (POST "/students/:id/togglehours" [id :<< as-int]
@@ -62,10 +62,10 @@
                           (do (cmd/toggle-student-absent id)
                               (student-page-response id))))
 
-  (POST "/students/:id/maketeacher" [id :<< as-int]
-        (friend/authorize #{roles/user}
-                          (do (cmd/toggle-student-teacher id)
-                              (student-page-response id))))
+  ;; (POST "/students/:id/maketeacher" [id :<< as-int]
+  ;;       (friend/authorize #{roles/user}
+  ;;                         (do (cmd/toggle-student-teacher id)
+  ;;                             (student-page-response id))))
 
   (POST "/students/:id/excuse" [id :<< as-int day]
         (friend/authorize #{roles/admin}

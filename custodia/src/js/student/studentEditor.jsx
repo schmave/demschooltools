@@ -34,12 +34,14 @@ module.exports = React.createClass({
         if (this.state.student._id == null) {
             actionCreator.createStudent(this.refs.name.getDOMNode().value,
                                         this.refs.startdate.state.value,
-                                        this.refs.email.getDOMNode().value);
+                                        this.refs.email.getDOMNode().value,
+                                        this.state.student.is_teacher);
         } else {
             actionCreator.updateStudent(this.state.student._id,
                                         this.refs.name.getDOMNode().value,
                                         this.refs.startdate.state.value,
-                                        this.refs.email.getDOMNode().value);
+                                        this.refs.email.getDOMNode().value,
+                                        this.state.student.is_teacher);
         }
     },
 
@@ -63,6 +65,11 @@ module.exports = React.createClass({
         if (this.refs.studentEditor) {
             this.refs.studentEditor.hide();
         }
+    },
+
+    handleTeacherChange: function(state) {
+        this.state.student.is_teacher = !this.state.student.is_teacher;
+        this.setState({student: this.state.student});
     },
 
     handleDateChange: function(d) {
@@ -102,6 +109,7 @@ module.exports = React.createClass({
 
                 { (!this.state.creating) ?
                   <div>
+                   <label htmlFor="email">Required Hours:</label>
                     <div><input type="radio" id="older" onChange={this.toggleHours}
                                 checked={!this.state.student.olderdate}/> 300 Minutes
                     </div>
@@ -111,6 +119,12 @@ module.exports = React.createClass({
                   </div>
                 : <div></div>
                 }
+                <div>
+                  <label htmlFor="is_teacher">Is Teacher:</label>
+                  <div><input type="checkbox" id="is_teacher" onChange={this.handleTeacherChange}
+                              checked={this.state.student.is_teacher}/> Is Teacher?
+                  </div>
+                </div>
                 <b>Student Start Date:</b>
                 <DateTimePicker id="missing" value={this.state.startdate_datepicker}
                                 ref="startdate" onChange={this.handleDateChange}

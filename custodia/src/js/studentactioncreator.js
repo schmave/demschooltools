@@ -34,11 +34,12 @@ var exports = {
                 });
             });
     },
-    createStudent: function (name, start_date, email) {
+    createStudent: function (name, start_date, email, is_teacher) {
         ajax.post('/students', {
             name: name,
             email: email,
-            start_date: start_date
+            start_date: start_date,
+            is_teacher: is_teacher
         }).then(function (data) {
             dispatcher.dispatch({
                 type: constants.studentEvents.ALL_LOADED,
@@ -76,11 +77,12 @@ var exports = {
             });
         }.bind(this));
     },
-    updateStudent: function (id, name, start_date, email) {
+    updateStudent: function (id, name, start_date, email, is_teacher) {
         ajax.put('/students/' + id, {
             name: name,
             start_date: start_date,
-            email: email
+            email: email,
+            is_teacher: is_teacher
         }).then(function (data) {
             this.loadStudents();
             dispatcher.dispatch({
