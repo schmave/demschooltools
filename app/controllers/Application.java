@@ -436,6 +436,18 @@ public class Application extends Controller {
         OutputStreamWriter writer = new OutputStreamWriter(
             new FileOutputStream(html_file),
             Charset.forName("UTF-8"));
+
+        // XML 1.0 only allows the following characters
+        // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+        String xml10pattern = "[^"
+                            + "\u0009\r\n"
+                            + "\u0020-\uD7FF"
+                            + "\uE000-\uFFFD"
+                            + "\ud800\udc00-\udbff\udfff"
+                            + "]";
+
+        orig_html = orig_html.replaceAll(xml10pattern, "");
+
         orig_html = orig_html.replaceAll("/assets/", "");
         // XHTML can't handle HTML entities without some extra incantations,
         // none of which I can get to work right now, so hence this ugliness.
