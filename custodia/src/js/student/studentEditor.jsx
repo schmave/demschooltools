@@ -31,15 +31,16 @@ module.exports = React.createClass({
 
     saveChange: function () {
         this.savingShow();
+        var startDate = this.refs.startdate.state.value || new Date();
         if (this.state.student._id == null) {
             actionCreator.createStudent(this.refs.name.getDOMNode().value,
-                                        this.refs.startdate.state.value,
+                                        startDate,
                                         this.refs.email.getDOMNode().value,
                                         this.state.student.is_teacher);
         } else {
             actionCreator.updateStudent(this.state.student._id,
                                         this.refs.name.getDOMNode().value,
-                                        this.refs.startdate.state.value,
+                                        startDate,
                                         this.refs.email.getDOMNode().value,
                                         this.state.student.is_teacher);
         }
