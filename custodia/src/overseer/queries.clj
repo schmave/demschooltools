@@ -32,7 +32,7 @@
 (defn get-years
   ([] (get-all-years))
   ([names]
-   ((filter (fn [y] (= names {:name y})) (get-all-years)))))
+   (filter (fn [y] (= names {:name y})) (get-all-years))))
 
 (defn get-all-students []
   (db/q get-students-y {:school_id db/*school-id*}))
