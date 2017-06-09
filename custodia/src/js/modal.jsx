@@ -23,8 +23,8 @@ module.exports = React.createClass({
         this.unbindEsc();
     },
     render: function () {
-        return <Skylight ref="modal" dialogStyles={{backgroundColor: '', boxShadow: ''}}>
-            <div className="panel panel-primary" style={{height: '95%'}}>
+        return <Skylight ref="modal" dialogStyles={{height: '450px', backgroundColor: '', boxShadow: ''}}>
+            <div className="inner-large-content panel panel-primary" style={{height: '100%'}}>
                 <div className="panel-heading">{this.props.title}</div>
                 <div className="panel-body">
                     {this.props.children}
