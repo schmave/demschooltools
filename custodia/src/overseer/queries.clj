@@ -37,6 +37,10 @@
 (defn get-all-students []
   (db/q get-students-y {:school_id db/*school-id*}))
 
+(defn get-student [student_id]
+  (db/q get-student-y {:student_id student_id
+                       :school_id db/*school-id*}))
+
 (defn get-all-classes-and-students []
   {:classes (get-classes)
    :students (map (fn [s] {:name (:name s) :_id (:_id s)})
@@ -88,7 +92,7 @@
 ;; (get-students )
 (defn get-students
   ([] (sort-by :name (get-all-students)))
-  ([id] (db/get-* "students" id "_id")))
+  ([id] (get-student id)))
 
 (defn get-class-by-name
   ([name] (first (db/get-* "classes" name "name"))))

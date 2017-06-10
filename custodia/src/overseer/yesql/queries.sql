@@ -176,6 +176,9 @@ SELECT _id from overseer.classes where active = true and school_id = :school_id;
 -- name: get-students-y
 SELECT * from overseer.students where school_id = :school_id;
 
+-- name: get-student-y
+SELECT * from overseer.students where _id = :student_id and school_id = :school_id;
+
 -- name: get-years-y
 SELECT * from overseer.years where school_id = :school_id;
 
