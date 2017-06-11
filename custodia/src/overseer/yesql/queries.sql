@@ -193,3 +193,5 @@ LEFT JOIN overseer.students s ON (cXs.student_id = s._id)
 WHERE c.school_id = :school_id
 ORDER BY c.name;
 
+-- name: get-class-y
+SELECT * from overseer.classes where name = :name;

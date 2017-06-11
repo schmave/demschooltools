@@ -95,7 +95,7 @@
   ([id] (get-student id)))
 
 (defn get-class-by-name
-  ([name] (first (db/get-* "classes" name "name"))))
+  ([name] (first (db/q get-class-y {:name name}))))
 
 (defn- thing-not-yet-created [name getter]
   (empty? (filter #(= name (:name %)) (getter))))
