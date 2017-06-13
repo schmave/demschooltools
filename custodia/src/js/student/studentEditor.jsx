@@ -31,7 +31,7 @@ module.exports = React.createClass({
 
     saveChange: function () {
         this.savingShow();
-        var startDate = this.refs.startdate.state.value || new Date();
+        var startDate = this.refs.startdate.props.value || new Date();
         if (this.state.student._id == null) {
             actionCreator.createStudent(this.refs.name.getDOMNode().value,
                                         startDate,
