@@ -1,26 +1,17 @@
 package controllers;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.sql.Connection;
 import java.util.*;
 
 import com.avaje.ebean.Ebean;
-import com.avaje.ebean.Expr;
-import com.avaje.ebean.RawSql;
-import com.avaje.ebean.RawSqlBuilder;
 import com.avaje.ebean.SqlUpdate;
-import com.feth.play.module.pa.PlayAuthenticate;
 import com.google.inject.Inject;
 
 import models.*;
 
-import play.*;
 import play.db.Database;
 import play.data.*;
-import play.libs.Json;
 import play.mvc.*;
-import play.mvc.Http.Context;
 
 @With(DumpOnError.class)
 public class ApplicationEditing extends Controller {

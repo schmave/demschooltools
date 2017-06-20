@@ -4,11 +4,7 @@ import java.util.*;
 import java.util.concurrent.CompletionStage;
 
 import play.*;
-import play.data.*;
-import play.libs.F;
-import play.libs.Json;
 import play.mvc.*;
-import play.mvc.Http.Context;
 
 
 public class DumpOnError extends Action.Simple {
@@ -18,7 +14,7 @@ public class DumpOnError extends Action.Simple {
                 e.printStackTrace();
                 StringBuilder sb = new StringBuilder();
 
-                sb.append("Error for request at " + ctx.request().uri() + "\n");
+                sb.append("Error for request at " + ctx.request().host() + " " + ctx.request().uri() + "\n");
                 sb.append("Headers: \n");
                 Map<String, String[]> headers = ctx.request().headers();
                 for (String key : headers.keySet()) {
