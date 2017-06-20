@@ -1,0 +1,15 @@
+{
+  "name": "demschooltools",
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "handlebars": "^4.0.10",
+    "jquery": "^3.2.1",
+    "jquery-form": "^4.2.1",
+    "jquery-ui": "^1.12.1",
+    "webpack": "^3.0.0"
+  },
+  "scripts": {
+    "w": "node_modules/.bin/webpack",
+    "w-debug": "node_modules/.bin/webpack --display-modules"
+  }
+}
