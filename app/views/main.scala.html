@@ -112,12 +112,11 @@
                 href="@routes.Attendance.index">Home</a>
             <a>View/edit week of: <input class="date" type="textfield"></input></a>
             <script type="text/javascript">
-            requirejs(["utils"], function(utils) {
-                function dateSelected(str_date, datepicker) {
-                    location.href = "@routes.Attendance.viewWeek()" + "?date=" + str_date;
-                }
-
-                $("input.date").datepicker("option", "onSelect", dateSelected);
+            function dateSelected(str_date, datepicker) {
+                location.href = "@routes.Attendance.viewWeek()" + "?date=" + str_date;
+            }
+            $(function() {
+                $('input.date').datepicker('option', 'onSelect', dateSelected);
             });
             </script>
             <a href="@routes.Attendance.download">Download data to spreadsheet</a>

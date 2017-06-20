@@ -32,8 +32,9 @@ app.initial_data = {
 }
 
 config = @Html(Utils.toJson(OrgConfig.get()));
-
-requirejs(['utils', 'edit_attendance_week'], function() {});
+$(function() {
+    initAttendanceWeek();
+});
 </script>
 
 <h3>Editing week of @Application.yymmddDate(monday)</h3>

@@ -1,4 +1,4 @@
-require('./utils');
+var utils = require('./utils');
 var Handlebars = require('handlebars');
 
 SAVE_TIMEOUT = 2000;

@@ -1,5 +1,4 @@
-import RjsKeys._
-import WebJs._
+//import WebJs._
 
 name := "DemSchoolTools"
 
@@ -17,9 +16,7 @@ scalaVersion := "2.11.7"
 
 // javacOptions in Compile ++= Seq("-Xlint:unchecked", "-Xlint:deprecation")
 
-pipelineStages := Seq(rjs, digest, gzip)
-
-RjsKeys.mainModule := "utils"
+pipelineStages := Seq(digest, gzip)
 
 // resolvers += Resolver.sonatypeRepo("snapshots")
 

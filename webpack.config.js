@@ -2,9 +2,10 @@ const path = require('path');
 const webpack = require('webpack');
 
 module.exports = {
+    context: __dirname + '/app/assets/javascripts',
     entry: './main.js',
     output: {
-        filename: 'bundle.js'
+        filename: './app/assets/javascripts/bundle.js'
     },
     resolve: {
         alias: {

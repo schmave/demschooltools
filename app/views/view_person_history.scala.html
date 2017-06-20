@@ -6,13 +6,11 @@
 @main(p.getDisplayName() + "'s " + OrgConfig.get().str_jc_name_short + " history", "jc") {
 
 <script type="text/javascript">
-requirejs(['utils'], function() {
-	$(function() {
-		$("table.sortable").each(function (i) {
-			sorttable.init();
-			sorttable.innerSortFunction.apply($(this).find("th")[1], []);
-		});
-	});
+$(function() {
+    $("table.sortable").each(function (i) {
+        sorttable.init();
+        sorttable.innerSortFunction.apply($(this).find("th")[1], []);
+    });
 });
 </script>
 

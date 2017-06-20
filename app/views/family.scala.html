@@ -75,7 +75,7 @@
 	<label style="display:inline; padding-left: 25px"><input type="checkbox" name="send_email">Email note to @comment_email</label>
 	</div>
 	<script type="text/javascript">
-        requirejs(['utils'], function() {
+        $(function() {
             $("#comment_form").ajaxForm({"success" : function(response, status) {
                                              $("#comments").prepend(response);
                                              $("#new_comment textarea").val("");

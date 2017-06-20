@@ -16,7 +16,9 @@ app.initial_data = {
 
 config = @Html(Utils.toJson(OrgConfig.get()));
 
-requirejs(['utils', 'edit_rp_list'], function() {});
+$(function() {
+    initRpList();
+});
 </script>
 
 <p><a href="#" onclick="print();return false;" class="no-print btn btn-success">
