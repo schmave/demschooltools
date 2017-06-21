@@ -44,10 +44,10 @@ function removeTag(el, person_id, tag_id)
     );
 };
 
-requirejs(['utils'], function(utils) {
-    utils.enableTagBox("#person_tag_entry_@person.person_id",
-    			 "#person_tags_@person.person_id",
-                 @person.person_id);
+$(function() {
+enableTagBox("#person_tag_entry_@person.person_id",
+  			 "#person_tags_@person.person_id",
+             @person.person_id);
 });
 </script>
 

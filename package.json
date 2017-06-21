@@ -1,0 +1,16 @@
+{
+  "name": "demschooltools",
+  "dependencies": {
+    "bootstrap": "3.3.7",
+    "handlebars": "4.0.10",
+    "jquery": "3.2.1",
+    "jquery-form": "4.2.1",
+    "jquery-ui": "1.12.1",
+    "spectrum-colorpicker": "^1.8.0",
+    "webpack": "3.0.0"
+  },
+  "scripts": {
+    "compile": "node_modules/.bin/webpack",
+    "watch": "node_modules/.bin/webpack --watch --env.debug=true"
+  }
+}

@@ -18,9 +18,9 @@
 <tr><td>@u.name</td><td>@u.email</td>
 @for( role <- UserRole.ALL_ROLES ) {
 	<td>@if( u.hasRole(role) ) {
-	<img height=18 src="@routes.Assets.at("images/check.png")"/>
+	<img height=18 src="@routes.Assets.versioned("images/check.png")"/>
 		 } else {
-	<img height=18 src="@routes.Assets.at("images/x-check.png")"/>
+	<img height=18 src="@routes.Assets.versioned("images/x-check.png")"/>
 		}</td>
 }
 <td><a class="edit-link" href="@routes.Settings.editUser(u.id)">Edit</a></td>

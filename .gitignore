@@ -8,6 +8,10 @@ dist
 
 /.idea/
 
+# JS stuff
+node_modules/
+app/assets/javascripts/gen
+
 # School-specific files
 fairhaven/*
 the_circle_school/*

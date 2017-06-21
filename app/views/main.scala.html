@@ -7,12 +7,11 @@
     <head>
         <title>@title</title>
         <script type="text/javascript"
-            src="@routes.Assets.at("javascripts/require.js")"
-            data-main="@routes.Assets.at("javascripts/utils")"></script>
+            src="@routes.Assets.versioned("javascripts/gen/bundle.js")"></script>
 
-        <link rel="stylesheet" media="all" href="@routes.Assets.at("stylesheets/main.css")" />
+        <link rel="stylesheet" media="all" href="@routes.Assets.versioned("stylesheets/main.css")" />
 
-        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")" />
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
     </head>
     <body>
@@ -113,12 +112,11 @@
                 href="@routes.Attendance.index">Home</a>
             <a>View/edit week of: <input class="date" type="textfield"></input></a>
             <script type="text/javascript">
-            requirejs(["utils"], function(utils) {
-                function dateSelected(str_date, datepicker) {
-                    location.href = "@routes.Attendance.viewWeek()" + "?date=" + str_date;
-                }
-
-                $("input.date").datepicker("option", "onSelect", dateSelected);
+            function dateSelected(str_date, datepicker) {
+                location.href = "@routes.Attendance.viewWeek()" + "?date=" + str_date;
+            }
+            $(function() {
+                $('input.date').datepicker('option', 'onSelect', dateSelected);
             });
             </script>
             <a href="@routes.Attendance.download">Download data to spreadsheet</a>

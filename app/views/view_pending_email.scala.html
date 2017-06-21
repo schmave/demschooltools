@@ -4,7 +4,7 @@
 
 @main("Pending Email", "crm") {
 
-<script src="@routes.Assets.at("javascripts/send_email.js")" type="text/javascript">
+<script src="@routes.Assets.versioned("javascripts/send_email.js")" type="text/javascript">
 </script>
 
 <h3>Pending email</h3>
@@ -21,7 +21,7 @@
 		<option value="@address">@address</option>
 	}
 </select>
-<img src="@routes.Assets.at("/images/loading.gif")" id="loading-indicator-test" style="display:none" />
+<img src="@routes.Assets.versioned("/images/loading.gif")" id="loading-indicator-test" style="display:none" />
 <button type="button" id="send-button-test" class="btn btn-warning btn-sm"
 onclick="sendTestEmail('@routes.CRM.sendTestEmail()', @email.id);">Send test email</button>
 
@@ -54,7 +54,7 @@ onclick="deleteEmail('@routes.CRM.deleteEmail()', @email.id);">Delete this messa
 </select>
 
 <p>
-<img src="@routes.Assets.at("/images/loading.gif")" id="loading-indicator" style="display:none" />
+<img src="@routes.Assets.versioned("/images/loading.gif")" id="loading-indicator" style="display:none" />
 <button type="button" id="send-button" class="btn btn-warning btn-sm"
 onclick="sendEmail('@routes.CRM.sendEmail()', @email.id);">3. SEND!</button>
 

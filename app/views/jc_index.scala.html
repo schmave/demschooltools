@@ -4,40 +4,40 @@ rules : List[ Entry ])
 @import helper._
 
 <script type="text/javascript">
-requirejs(["utils"], function(utils) {
+$(function() {
     var meeting_info = [ @Html(
-    	meetings.map( m => "{ date: \"" + Application.yymmddDate(m.date) +
-    			"\", link: \"" + routes.Application.viewMeeting(m.id) +
-    			"\", case_count: " + m.cases.size() + "}").mkString(",")) ];
+        meetings.map( m => "{ date: \"" + Application.yymmddDate(m.date) +
+                "\", link: \"" + routes.Application.viewMeeting(m.id) +
+                "\", case_count: " + m.cases.size() + "}").mkString(",")) ];
 
     function hasMeeting(date)
     {
-    	var str_date = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
-    	for (i in meeting_info) {
-    		if (meeting_info[i].date == str_date) {
-    			return [true, "", "" + meeting_info[i].case_count + " cases"];
-    		}
-    	}
+        var str_date = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+        for (i in meeting_info) {
+            if (meeting_info[i].date == str_date) {
+                return [true, "", "" + meeting_info[i].case_count + " cases"];
+            }
+        }
 
-    	return [false, "", ""];
+        return [false, "", ""];
     }
 
     function meetingSelected(str_date, datepicker) {
-    	for (i in meeting_info) {
-    		if (meeting_info[i].date == str_date) {
-    			location.href = meeting_info[i].link;
-    		}
-    	}
+        for (i in meeting_info) {
+            if (meeting_info[i].date == str_date) {
+                location.href = meeting_info[i].link;
+            }
+        }
     }
 
-   	$("#month-picker").datepicker({
-		changeMonth: true,
-		changeYear: true,
-		dateFormat: 'yy-m-d',
-		constrainInput: true,
-		beforeShowDay: hasMeeting,
-		onSelect: meetingSelected
-	});
+    $("#month-picker").datepicker({
+        changeMonth: true,
+        changeYear: true,
+        dateFormat: 'yy-m-d',
+        constrainInput: true,
+        beforeShowDay: hasMeeting,
+        onSelect: meetingSelected
+    });
 });
 </script>
 

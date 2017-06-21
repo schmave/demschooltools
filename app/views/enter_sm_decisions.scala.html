@@ -4,17 +4,6 @@
 
 @main("Enter School Meeting charges", "jc") {
 
-<script type="text/javascript">
-requirejs(['utils'], function() {
-    $(function() {
-        $(".date").datepicker({
-            showOtherMonths: true,
-            selectOtherMonths: true,
-            dateFormat: "yy-mm-dd"});
-    });
-});
-</script>
-
 <h3> Charges awaiting School Meeting decision</h3>
 
 @if( sm_charges.size() > 0 ) {
