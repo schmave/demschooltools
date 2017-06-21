@@ -1,5 +1,3 @@
-//import WebJs._
-
 name := "DemSchoolTools"
 
 version := "1.1"
@@ -35,3 +33,26 @@ libraryDependencies ++= Seq(
 // Disable javadoc
 sources in (Compile, doc) := Seq.empty
 publishArtifact in (Compile, packageDoc) := false
+
+// Run webpack
+lazy val webpack = taskKey[Unit]("Run webpack when packaging the application")
+
+def runWebpack(file: File) = {
+  val command = Seq("npm", "run", "compile")
+  val os = sys.props("os.name").toLowerCase
+  val makeCmd = os match {
+    case x if x contains "windows" => Seq("cmd", "/C") ++ command
+    case _ => command
+  }
+  makeCmd.!
+}
+
+webpack := {
+  if(runWebpack(baseDirectory.value) != 0) throw new Exception("Something went wrong when running webpack.")
+}
+
+dist <<= dist dependsOn webpack
+
+stage <<= stage dependsOn webpack
+
+PlayKeys.playRunHooks <+= baseDirectory.map(Webpack.apply)

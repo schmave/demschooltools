@@ -40,9 +40,9 @@
 		@for( c <- tag.changes ) {
 			<tr><td>
 			@if( c.was_add ) {
-				<img height=18 src="@routes.Assets.at("images/plus.png")"/>
+				<img height=18 src="@routes.Assets.versioned("images/plus.png")"/>
 			} else {
-				<img height=18 src="@routes.Assets.at("images/minus.png")"/>
+				<img height=18 src="@routes.Assets.versioned("images/minus.png")"/>
 			}
 			<a href="@routes.CRM.person(c.person.person_id)">
 				@c.person.first_name @c.person.last_name

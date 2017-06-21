@@ -10,7 +10,7 @@
     "webpack": "3.0.0"
   },
   "scripts": {
-    "w": "node_modules/.bin/webpack",
-    "w-debug": "node_modules/.bin/webpack --display-modules"
+    "compile": "node_modules/.bin/webpack",
+    "watch": "node_modules/.bin/webpack --watch --env.debug=true"
   }
 }

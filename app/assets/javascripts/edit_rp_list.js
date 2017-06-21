@@ -1,9 +1,9 @@
 var utils = require('./utils');
 var Handlebars = require('handlebars');
 
-var module = {};
+var login_message_shown = false;
 
-module.insertIntoSortedList = function(charge, list, parent_el) {
+var insertIntoSortedList = function(charge, list, parent_el) {
     if (list.length === 0) {
         parent_el.append(charge.el);
         list.push(charge);
@@ -27,7 +27,7 @@ module.insertIntoSortedList = function(charge, list, parent_el) {
     }
 };
 
-module.indexOfCharge = function(list, charge) {
+var indexOfCharge = function(list, charge) {
     for (var i = 0; i < list.length; i++) {
         if (list[i].id == charge.id) {
             return i;
@@ -37,11 +37,9 @@ module.indexOfCharge = function(list, charge) {
     return -1;
 };
 
-module.login_message_shown = false;
-
-module.checkboxChanged = function(charge) {
+var checkboxChanged = function(charge) {
     charge.checkbox.prop("disabled", true);
-    var i = module.indexOfCharge(app.active_rps, charge);
+    var i = indexOfCharge(app.active_rps, charge);
 
     url = "/setResolutionPlanComplete?id=" + charge.id +
         "&complete=" + (i >= 0);
@@ -50,10 +48,10 @@ module.checkboxChanged = function(charge) {
             // We expect an empty response. If it is not empty, the user
             // probably got redirected to the login page.
             if (data !== "") {
-                if (!module.login_message_shown) {
+                if (!login_message_shown) {
                     alert("Your change was not saved. You may not be logged in.");
                 }
-                module.login_message_shown = true;
+                login_message_shown = true;
                 return;
             }
             charge.el.addClass("rp-moved");
@@ -61,15 +59,15 @@ module.checkboxChanged = function(charge) {
                 charge.el.fadeOut("slow", function() {
                     charge.el.detach();
                     app.active_rps.splice(i, 1);
-                    module.insertIntoSortedList(charge, app.completed_rps, $(".completed-rps"));
+                    insertIntoSortedList(charge, app.completed_rps, $(".completed-rps"));
                     charge.el.show();
                 });
             } else {
-                i = module.indexOfCharge(app.completed_rps, charge);
+                i = indexOfCharge(app.completed_rps, charge);
                 charge.el.fadeOut("slow", function() {
                     charge.el.detach();
                     app.completed_rps.splice(i, 1);
-                    module.insertIntoSortedList(charge, app.active_rps, $(".active-rps"));
+                    insertIntoSortedList(charge, app.active_rps, $(".active-rps"));
                     charge.el.show();
                 });
             }
@@ -81,7 +79,7 @@ module.checkboxChanged = function(charge) {
         });
 };
 
-module.Charge = function(data, el) {
+Charge = function(data, el) {
     var self = this;
 
     this.removeCharge = function() {
@@ -97,11 +95,11 @@ module.Charge = function(data, el) {
     self.checkbox.prop("checked", data.rp_complete);
 
     self.checkbox.change(function() {
-        module.checkboxChanged(self);
+        checkboxChanged(self);
     });
 };
 
-module.addCharge = function(data, parent_el) {
+addCharge = function(data, parent_el) {
     template_data = {
         "name": utils.displayName(data.person),
         "case_number": data.the_case.case_number,
@@ -124,7 +122,7 @@ module.addCharge = function(data, parent_el) {
     var new_charge_el = parent_el.append(
         app.rp_template(template_data)).children(":last-child");
 
-    return new module.Charge(data, new_charge_el);
+    return new Charge(data, new_charge_el);
 };
 
 var id_to_charge = {};
@@ -152,8 +150,8 @@ function loadCharge(charge_data, list, parent_el) {
         charge_data.the_case = id_to_case[charge_data.the_case];
     }
 
-    module.insertIntoSortedList(
-        module.addCharge(charge_data, parent_el),
+    insertIntoSortedList(
+        addCharge(charge_data, parent_el),
         list,
         parent_el);
 }
