@@ -16,9 +16,6 @@ var init = function() {
     modalWindow.style.marginLeft = (-modalWindow.offsetWidth)/2 + "px";
     e.preventDefault ? e.preventDefault() : e.returnValue = false;
     if (e.stopPropagation) e.stopPropagation();
-
-    var textArea = $('#modal_feedback textarea');
-    textArea.val(textArea.val() + '\n\n---------------------\nFeedback sent from: ' + window.location);
   };
 
   var closeModal = function(e)
