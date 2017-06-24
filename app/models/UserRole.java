@@ -16,15 +16,17 @@ public class UserRole extends Model {
 
     public static final String ROLE_VIEW_JC = "view-jc";
     public static final String ROLE_EDIT_MANUAL = "edit-manual";
+    public static final String ROLE_EDIT_RESOLUTION_PLANS = "edit-rps";
     public static final String ROLE_EDIT_RECENT_JC = "edit-recent-jc";
     public static final String ROLE_EDIT_ALL_JC = "edit-all-jc";
     public static final String ROLE_ALL_ACCESS = "all-access";
 
     public static final String[] ALL_ROLES = {
         ROLE_VIEW_JC,
-        ROLE_EDIT_MANUAL,
+        ROLE_EDIT_RESOLUTION_PLANS,
         ROLE_EDIT_RECENT_JC,
         ROLE_EDIT_ALL_JC,
+        ROLE_EDIT_MANUAL,
         ROLE_ALL_ACCESS,
     };
 
@@ -49,9 +51,11 @@ public class UserRole extends Model {
             return true;
         } else if (greater_role.equals(ROLE_EDIT_ALL_JC)) {
             return lesser_role.equals(ROLE_EDIT_RECENT_JC) ||
-                lesser_role.equals(ROLE_VIEW_JC);
+                lesser_role.equals(ROLE_VIEW_JC) ||
+                lesser_role.equals(ROLE_EDIT_RESOLUTION_PLANS);
         } else if (greater_role.equals(ROLE_EDIT_RECENT_JC)) {
-            return lesser_role.equals(ROLE_VIEW_JC);
+            return lesser_role.equals(ROLE_VIEW_JC) ||
+                lesser_role.equals(ROLE_EDIT_RESOLUTION_PLANS);
         }
 
         return false;
@@ -63,8 +67,10 @@ public class UserRole extends Model {
             return "View " + jc_name + " records & rules";
         } else if (role.equals(ROLE_EDIT_MANUAL)) {
             return "Edit " + OrgConfig.get().str_manual_title_short;
+        } else if (role.equals(ROLE_EDIT_RESOLUTION_PLANS)) {
+            return "Check off " + jc_name + " " + OrgConfig.get().str_res_plans;
         } else if (role.equals(ROLE_EDIT_RECENT_JC)) {
-            return "Edit recent " + jc_name + " records + the active " + OrgConfig.get().str_res_plans;
+            return "Edit recent " + jc_name + " records";
         } else if (role.equals(ROLE_EDIT_ALL_JC)) {
             return "Edit all " + jc_name + " records";
         } else if (role.equals(ROLE_ALL_ACCESS)) {

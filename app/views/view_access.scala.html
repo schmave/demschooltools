@@ -11,13 +11,13 @@
 <table class="table" style="width: 400px">
 <thead><th>Name</th><th>Email</th>
 	@for( role <- UserRole.ALL_ROLES ) {
-		<th>@UserRole.getDescription(role)</th>
+		<th class="center">@UserRole.getDescription(role)</th>
 	}
 <th></th></thead>
 @for( u <- users ) { @if( u.active ) {
 <tr><td>@u.name</td><td>@u.email</td>
 @for( role <- UserRole.ALL_ROLES ) {
-	<td>@if( u.hasRole(role) ) {
+	<td class="center">@if( u.hasRole(role) ) {
 	<img height=18 src="@routes.Assets.versioned("images/check.png")"/>
 		 } else {
 	<img height=18 src="@routes.Assets.versioned("images/x-check.png")"/>

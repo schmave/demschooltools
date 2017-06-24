@@ -2,8 +2,6 @@ package controllers;
 
 import java.lang.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.CompletableFuture;
 
@@ -20,7 +18,6 @@ import models.User;
 import models.UserRole;
 
 import play.Logger;
-import play.libs.F;
 import play.mvc.Action;
 import play.mvc.Http.Context;
 import play.mvc.Http.Session;

@@ -179,7 +179,7 @@ public class ApplicationEditing extends Controller {
         return ok();
     }
 
-    @Secured.Auth(UserRole.ROLE_EDIT_RECENT_JC)
+    @Secured.Auth(UserRole.ROLE_EDIT_RESOLUTION_PLANS)
     public Result setResolutionPlanComplete(Integer chargeId, Boolean complete) {
         Charge c = Charge.findById(chargeId);
         c.setRPComplete(complete);

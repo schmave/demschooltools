@@ -6,7 +6,7 @@
 @main(p.first_name + " " + p.last_name, "crm") {
 
 @if(p.family != null) {
-	<p class="family-info">
+	<p class="center">
 	@if(!p.family.first_name.equals("") || !p.family.last_name.equals("")) {
 		<span class="family-name">@p.family.first_name @p.family.last_name</span>
 	}
