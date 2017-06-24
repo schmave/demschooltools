@@ -1115,6 +1115,45 @@ public class Application extends Controller {
         return redirect(routes.Application.viewFiles());
     }
 
+    public Result sendFeedbackEmail() {
+        final Map<String, String[]> values = request().body().asFormUrlEncoded();
+
+        play.libs.mailer.Email mail = new play.libs.mailer.Email();
+
+        String source = "a DemSchoolTools user";
+        if (values.containsKey("name")) {
+            source = values.get("name")[0];
+            if (source.length() > 30) {
+                source = source.substring(0, 30);
+            }
+        }
+        mail.setSubject("DST Feedback from " + source);
+        mail.addTo("schmave@gmail.com");
+        mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
+
+        StringBuilder body = new StringBuilder();
+        if (values.containsKey("name")) {
+            body.append("Name: " + values.get("name")[0] + "\n");
+        }
+        if (values.containsKey("email")) {
+            body.append("Email: " + values.get("email")[0] + "\n");
+        }
+        if (values.containsKey("message")) {
+            body.append("Feedback:\n\n---\n" + values.get("message")[0] + "\n---\n\n");
+        }
+
+        try {
+            body.append(Utils.toJson(request().headers()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        mail.setBodyText(body.toString());
+        play.libs.mailer.MailerPlugin.send(mail);
+
+        return ok();
+    }
+
     public static void copyFileUsingStream(File source, File dest) throws IOException {
         InputStream is = null;
         OutputStream os = null;

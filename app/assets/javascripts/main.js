@@ -9,6 +9,7 @@ require('./edit_attendance_week');
 require('./edit_entry');
 require('./edit_minutes');
 require('./edit_rp_list');
+var feedback_modal = require('./feedback_modal');
 require('./sorttable');
 
 $(function() {
@@ -69,4 +70,6 @@ $(function() {
         dateFormat: 'yy-mm-dd'});
 
     utils.limitHeight('.should-limit');
+
+    feedback_modal.init();
 });

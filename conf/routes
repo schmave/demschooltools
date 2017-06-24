@@ -128,6 +128,8 @@ POST	/sendTestEmail				  controllers.CRM.sendTestEmail()
 POST	/deleteEmail				  controllers.CRM.deleteEmail()
 POST	/sendEmail				  controllers.CRM.sendEmail()
 
+POST      /sendFeedbackEmail          controllers.Application.sendFeedbackEmail()
+
 GET     /mailchimpSettings	controllers.CRM.viewMailchimpSettings()
 POST	/mailchimpSettings	controllers.CRM.saveMailchimpSettings()
 GET	/syncMailchimp		controllers.Public.syncMailchimp()
