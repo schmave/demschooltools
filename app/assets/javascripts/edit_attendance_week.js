@@ -67,9 +67,9 @@ function Day(data, start_input, end_input) {
         self.end_input.val("");
         self.end_input.hide();
         if (app.codes[the_code]) {
-            self.end_input.parent().css("background-color", app.codes[the_code].color);
+            self.color_bar.css("background-color", app.codes[the_code].color).show();
         } else {
-            self.end_input.parent().css("background-color", "");
+            self.color_bar.hide();
         }
 
         self.code_mode = true;
@@ -78,7 +78,7 @@ function Day(data, start_input, end_input) {
     self.deactivateCode = function() {
         self.code_mode = false;
         self.end_input.show();
-        self.end_input.parent().css("background-color", "");
+        self.color_bar.hide();
     };
 
     self.checkForCode = function() {
@@ -115,6 +115,7 @@ function Day(data, start_input, end_input) {
 
     self.start_input = $(start_input);
     self.end_input = $(end_input);
+    self.color_bar = self.end_input.parent().find('.color-bar');
     self.id = data.id;
     self.dirty = false;
     self.code_mode = false;
