@@ -16,7 +16,10 @@
 </p>
 
 <table class="attendance-view table sortable">
-<tr><th width=200>Name</th><th colspan=2>Monday</th>
+<tr>
+	<th class="sorttable_sorted_reverse">First<br/>Name<span id="sorttable_sortrevind">&nbsp;▴</span></th>
+	<th>Last<br/>Name</th>
+	<th colspan=2>Monday</th>
 	<th colspan=2>Tuesday</th>
 	<th colspan=2>Wednesday</th>
 	<th colspan=2>Thursday</th>
@@ -28,7 +31,7 @@
 	</tr>
 
 @for( p <- people ) {
-<tr><td>@p.first_name @p.last_name</td>
+	<tr><td>@p.first_name</td><td>@p.last_name</td>
 	@if( days.containsKey(p)) {
 		@for( day <- days.get(p) ) {
 			@if( day.code != null ) {

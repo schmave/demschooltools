@@ -1,5 +1,7 @@
-var utils = require('./utils');
 var Handlebars = require('handlebars');
+var sorttable = require('./sorttable');
+
+var utils = require('./utils');
 
 function zeroPad(minutes) {
     if (minutes < 10) {
@@ -49,7 +51,7 @@ function typedToUserTime(s) {
     }
 
     var ampm = "AM";
-    if (hours == 12 || hours <= 7) {
+    if (hours == 12 || hours <= 6) {
         ampm = "PM";
     }
 
@@ -220,7 +222,8 @@ function loadRow(person, days, week, dest_el) {
     }
     var new_row_el = $($.parseHTML(
         app.person_row_template({
-            "name": person.first_name + " " + person.last_name
+            "first_name": person.first_name,
+            "last_name": person.last_name,
         })));
     if (insert_before_i !== undefined) {
         app.person_rows[insert_before_i].el.before(new_row_el);
@@ -282,9 +285,7 @@ window.initAttendanceWeek = function() {
     app.additional_person_template =
         Handlebars.compile($("#additional-person-template").html());
 
-    var dest_el = $(".table");
-
-    var no_school_buttons = dest_el.find("button.no-school");
+    var no_school_buttons = $("button.no-school");
     for (var i = 0; i < 5; i++) {
         var button = no_school_buttons[i];
         $(button).click(handleNoSchoolButton(i));
@@ -295,7 +296,7 @@ window.initAttendanceWeek = function() {
         loadRow(person,
                 app.initial_data.days[person.person_id],
                 app.initial_data.weeks[person.person_id],
-                dest_el);
+                $('.attendance-view tbody'));
     }
 
     for (i in app.initial_data.additional_people) {

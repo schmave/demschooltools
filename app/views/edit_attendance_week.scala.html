@@ -39,22 +39,19 @@ $(function() {
 
 <h3>Editing week of @Application.yymmddDate(monday)</h3>
 <p><a href="@routes.Attendance.viewWeek()?date=@Application.yymmddDate(monday)">Finish editing, return to viewing</a></p>
-<table id="attendance-editing" class="table attendance-view">
-<thead><tr><th>Name</th>
-<th colspan=2>Monday</th>
-<th colspan=2>Tuesday</th>
-<th colspan=2>Wednesday</th>
-<th colspan=2>Thursday</th>
-<th colspan=2>Friday</th>
-<th>Extra hours</th></tr>
-<tr><td></td>
-	<td colspan=2><button class="no-school">No school this day</td>
-	<td colspan=2><button class="no-school">No school this day</td>
-	<td colspan=2><button class="no-school">No school this day</td>
-	<td colspan=2><button class="no-school">No school this day</td>
-	<td colspan=2><button class="no-school">No school this day</td>
-	</tr>
+<table id="attendance-editing" class="table attendance-view sortable">
+<thead><tr>
+    <th>First<br/>Name</th>
+    <th>Last<br/>Name</th>
+    <th colspan=2><button class="no-school">No school this day</button><br/>Monday</th>
+    <th colspan=2><button class="no-school">No school this day</button><br/>Tuesday</th>
+    <th colspan=2><button class="no-school">No school this day</button><br/>Wednesday</th>
+    <th colspan=2><button class="no-school">No school this day</button><br/>Thursday</th>
+    <th colspan=2><button class="no-school">No school this day</button><br/>Friday</th>
+    <th>Extra hours</th>
+</tr>
 </thead>
+<tbody></tbody>
 </table>
 
 <div>If you want to enter attendance records for any of the following people, click on a
@@ -69,7 +66,8 @@ $(function() {
 
 <script id="person-row-template" type="text/x-handlebars-template">
 <tr>
-	<td>{{name}}<img src="/assets/images/x.png"/></td>
+	<td>{{first_name}}<img class="x" title="click to remove this person" src="/assets/images/x.png"/></td>
+	<td>{{last_name}}</td>
     <td><input type="text" class="attendance-time-cell"></td>
 	<td><input type="text" class="attendance-time-cell"></td>
 	<td><input type="text" class="attendance-time-cell"></td>

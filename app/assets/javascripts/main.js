@@ -2,6 +2,7 @@ require('bootstrap');
 require('jquery-form');
 require('jquery-ui/ui/widgets/autocomplete');
 require('jquery-ui/ui/widgets/datepicker');
+require('jquery-ui/ui/widgets/dialog');
 require('spectrum-colorpicker');
 
 var utils = require('./utils');
