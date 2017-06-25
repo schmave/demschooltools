@@ -1132,17 +1132,18 @@ public class Application extends Controller {
         mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
 
         StringBuilder body = new StringBuilder();
+        if (values.containsKey("message")) {
+            body.append(values.get("message")[0] + "\n---\n");
+        }
         if (values.containsKey("name")) {
-            body.append("Name: " + values.get("name")[0] + "\n");
+            body.append(values.get("name")[0] + "\n");
         }
         if (values.containsKey("email")) {
-            body.append("Email: " + values.get("email")[0] + "\n");
-        }
-        if (values.containsKey("message")) {
-            body.append("Feedback:\n\n---\n" + values.get("message")[0] + "\n---\n\n");
+            body.append(values.get("email")[0] + "\n");
         }
 
         try {
+            body.append("\n\n=========================\n");
             body.append(Utils.toJson(request().headers()));
         } catch (Exception e) {
             e.printStackTrace();
