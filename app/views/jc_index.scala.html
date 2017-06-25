@@ -58,10 +58,8 @@ $(function() {
 		<th align=right width=50>Charge count</thead>
 @for( p <- people ) {
 	<tr><td width=@if(OrgConfig.get().track_writer){200}else{250}>
-		@if(!OrgConfig.get().track_writer){
-			<a href="@routes.Application.viewPersonHistory(p.person_id)">}
+		<a href="@routes.Application.viewPersonHistory(p.person_id)">
 		@p.getDisplayName()
-		@if(!OrgConfig.get().track_writer){</a>}
 	@if(OrgConfig.get().track_writer){
 		<td align=right width=50><a class="cases-written-link" href="@routes.Application.viewPersonsWriteups(p.person_id)">@p.getThisYearCasesWrittenUp().size()</a>
 	}
