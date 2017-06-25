@@ -135,7 +135,9 @@ POST	/mailchimpSettings	controllers.CRM.saveMailchimpSettings()
 GET	/syncMailchimp		controllers.Public.syncMailchimp()
 
 
-GET     /settings/notifications controllers.Settings.viewNotifications()
+GET     /settings               controllers.Settings.viewSettings()
+GET     /settings/notifications controllers.Settings.viewSettings()
+POST    /settings               controllers.Settings.editSettings()
 POST    /settings/notifications controllers.Settings.editNotifications()
 
 GET     /settings/checklists    controllers.Settings.viewTaskLists()

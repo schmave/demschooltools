@@ -769,7 +769,7 @@ public class Application extends Controller {
 
     public Result viewWeeklyReport(String date_string) {
         Calendar start_date = Utils.parseDateOrNow(date_string);
-        Utils.adjustToPreviousDay(start_date, Calendar.WEDNESDAY);
+        Utils.adjustToPreviousDay(start_date, OrgConfig.get().org.jc_reset_day + 1);
 
         Calendar end_date = (Calendar)start_date.clone();
         end_date.add(GregorianCalendar.DATE, 6);

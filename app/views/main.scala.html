@@ -52,7 +52,7 @@
                 <a href="@routes.Application.viewManual()">@OrgConfig.get().str_manual_title_short</a>
             </li>
             <li @if(menu.equals("settings")) { class="active" } class="dropdown">
-                <a href="@routes.Settings.viewNotifications()">Settings</a>
+                <a href="@routes.Settings.viewSettings()">Settings</a>
             </li>
             @if(OrgConfig.get().enable_file_sharing) {
                 <li @if(menu.equals("misc")) { class="active" } class="dropdown">
@@ -200,8 +200,8 @@
         @if(menu.equals("settings")) {
         <div class="tab-pane active" id="settings">
             <div class="subnav">
-            <a @if(selectedBtn.equals("settings_notifications")) { class="active" }
-                href="@routes.Settings.viewNotifications()">Notifications</a>
+            <a @if(selectedBtn.equals("settings")) { class="active" }
+                href="@routes.Settings.viewSettings()">Settings</a>
             @* <a href="@routes.CRM.viewMailchimpSettings()">Mailchimp</a> *@
             <a @if(selectedBtn.equals("settings_checklists")) { class="active" }
                 href="@routes.Settings.viewTaskLists()">Checklists</a>

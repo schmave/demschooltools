@@ -1,0 +1,59 @@
+@(notifications : List [ NotificationRule ], jc_reset_day: Integer)
+
+@main("Settings", "settings", "settings") {
+
+<h2>Notifications</h2>
+
+<h4>Existing notification rules</h4>
+<ul>
+@for( n <- notifications ) {
+    @if( n.the_type == NotificationRule.TYPE_TAG) {
+    <li>When people are added to or removed from tag
+        <label class="label label-success">@n.tag.title</label>, email <u>@n.email</u>
+    }
+    @if( n.the_type == NotificationRule.TYPE_COMMENT) {
+        <li>When a comment about a person is added, optionally email <u>@n.email</u>
+    }
+    @helper.form(routes.Settings.editNotifications(), 'style -> "display: inline") {
+        <input type="hidden" name="remove_notification_id" value=@n.id>
+        <input type="submit" value="Remove">
+    }
+    </li>
+}
+</ul>
+
+<h4>Add a new notification</h4>
+
+@helper.form(routes.Settings.editNotifications()) {
+When people are added to or removed from tag
+<span id="tags-entered"></span><input type="text" id="tag-entry">,
+email <input type="text" name="email"/>
+<input type="submit" value="Create"/>
+}
+
+@helper.form(routes.Settings.editNotifications()) {
+When a comment about a person is entered,
+email <input type="text" name="email"/>
+<input type="hidden" name="comment"/>
+<input type="submit" value="Create"/>
+}
+
+<script type="text/javascript">
+enableNoPersonTagBox("#tag-entry", "#tags-entered", true);
+</script>
+
+}
+
+
+<h2>@OrgConfig.get().str_jc_name_short</h2>
+<h4>Weekly Report</h4>
+@helper.form(routes.Settings.editSettings()) {
+    <p>The @OrgConfig.get().str_jc_name_short Weekly Report includes five full school days.</p>
+    <p>Reset the report every <select name="jc_reset_day">
+        <option value="1" @if(jc_reset_day == 1){selected}>Monday</option>
+        <option value="2" @if(jc_reset_day == 2){selected}>Tuesday</option>
+        <option value="3" @if(jc_reset_day == 3){selected}>Wednesday</option>
+        <option value="4" @if(jc_reset_day == 4){selected}>Thursday</option>
+        <option value="5" @if(jc_reset_day == 5){selected}>Friday</option>
+    </select> morning. <input type="submit" value="Save"/></p>
+}

@@ -34,6 +34,8 @@ public class Organization extends Model {
 
     public String printer_email;
 
+    public Integer jc_reset_day;
+
     @OneToMany(mappedBy="organization")
     @JsonIgnore
     public List<NotificationRule> notification_rules;
@@ -89,6 +91,11 @@ public class Organization extends Model {
 
     public void setPrinterEmail(String email) {
         this.printer_email = email;
+        this.save();
+    }
+
+    public void setJcResetDay(int day) {
+        this.jc_reset_day = day;
         this.save();
     }
 }

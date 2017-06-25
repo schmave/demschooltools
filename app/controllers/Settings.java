@@ -18,13 +18,21 @@ import play.mvc.*;
 @Secured.Auth(UserRole.ROLE_ALL_ACCESS)
 public class Settings extends Controller {
 
-    public Result viewNotifications() {
+    public Result viewSettings() {
         List<NotificationRule> rules = NotificationRule.find.where()
             .eq("organization", OrgConfig.get().org)
             .order("the_type DESC, tag.id")
             .findList();
 
-        return ok(views.html.view_notifications.render(rules));
+        return ok(views.html.view_settings.render(rules, OrgConfig.get().org.jc_reset_day));
+    }
+
+    public Result editSettings() {
+        final Map<String, String[]> values = request().body().asFormUrlEncoded();
+        if (values.containsKey("jc_reset_day")) {
+            OrgConfig.get().org.setJcResetDay(Integer.parseInt(values.get("jc_reset_day")[0]));
+        }
+        return redirect(routes.Settings.viewSettings());
     }
 
     public Result editNotifications() {
@@ -37,7 +45,7 @@ public class Settings extends Controller {
 			String email = values.get("email")[0];
 			if (!email.matches("^\\S+@\\S+.\\S+$")) {
 				flash("error", "'" + email + "' does not seem to be a valid email address. Notification not created.");
-				return redirect(routes.Settings.viewNotifications());
+				return redirect(routes.Settings.viewSettings());
 			}
 
 			if (values.containsKey("tag_id")) {
@@ -50,7 +58,7 @@ public class Settings extends Controller {
 			}
 		}
 
-        return redirect(routes.Settings.viewNotifications());
+        return redirect(routes.Settings.viewSettings());
     }
 
     public Result viewTaskLists() {

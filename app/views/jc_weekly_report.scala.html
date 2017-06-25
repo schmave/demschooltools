@@ -8,7 +8,9 @@ minor_referral_destinations : List[ String ])
 <h3> Weekly report </h3>
 <p><a href="@routes.Application.viewWeeklyReport(Application.yymmddDate(Application.addWeek(end_date, -1)))">&lt;&lt; Prev week</a>
 &nbsp;&nbsp;&nbsp;&nbsp;
-Period from Wed. @Application.formatDateShort(start_date) to Tue. @{Application.formatDateShort(end_date)}, inclusive.
+Period from
+@Application.formatDayOfWeek(start_date) @Application.formatDateShort(start_date) to
+@Application.formatDayOfWeek(end_date) @Application.formatDateShort(end_date), inclusive.
 &nbsp;&nbsp;&nbsp;&nbsp;
 <a href="@routes.Application.viewWeeklyReport(Application.yymmddDate(Application.addWeek(end_date, 1)))">Next week &gt;&gt;</a>
 <p>
