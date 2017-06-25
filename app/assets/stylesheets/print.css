@@ -36,8 +36,13 @@ a[href]:after {
     border-top: 1px solid #ddd;
 }
 
-body {
+body, h1 {
     font-family: "Garamond";
+    font-weight: normal;
+}
+
+body {
+    font-size: 13px;
 }
 
 .man-last-modify-date, .man-entry-change-history {
