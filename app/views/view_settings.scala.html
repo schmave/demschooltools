@@ -58,6 +58,21 @@ enableNoPersonTagBox("#tag-entry", "#tags-entered", true);
     </select> morning. <input type="submit" value="Save"/></p>
 }
 
+<h4>Other @OrgConfig.get().str_jc_name_short options</h4>
+<p>The following behaviors of the @OrgConfig.get().str_jc_name_short system can be changed easily by Evan, but not
+    yet directly by you. Please <a class="feedback_open">contact me</a> if you would like to change any of them.
+<ul>
+    <li>The format of case numbers, e.g. 2017-03-02-11</li>
+    <li>Whether to include the @OrgConfig.get().str_findings in the list of @OrgConfig.get().str_res_plans</li>
+    <li>Whether to track and display who wrote up a particular complaint</li>
+    <li>Whether to have the ability to refer charges to a destination of your choice (there's a text input next to
+    each charge for this)</li>
+    <li>Whether to include the ability to rate charges by severity, e.g. "mild", "moderate", "serious", "severe"</li>
+    <li>Whether to include the plea options "No Contest" and/or "N/A"</li>
+    <li>The words that your school uses, e.g. "@OrgConfig.get().str_jc_name", "@OrgConfig.get().str_manual_title",
+        "@OrgConfig.get().str_findings", etc.</li>
+</ul>
+
 <h2>@OrgConfig.get().str_manual_title</h2>
 @helper.form(routes.Settings.editSettings()) {
 <h4>Printing options</h4>

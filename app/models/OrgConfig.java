@@ -23,7 +23,7 @@ public class OrgConfig {
     public boolean show_no_contest_plea = false;
     public boolean show_na_plea = false;
     public boolean show_severity = false;
-    public boolean use_minor_referrals = false;
+    public boolean use_minor_referrals = true;
     public boolean show_checkbox_for_res_plan = true;
     public boolean track_writer = true;
     public boolean filter_no_charge_cases = false;
@@ -77,7 +77,6 @@ class ThreeRiversVillageSchool extends OrgConfig {
         str_res_plans = "resolution plans";
         str_res_plans_cap = "Resolution plans";
         str_jc_name = "Justice Committee";
-        use_minor_referrals = true;
 
         show_checkbox_for_res_plan = false;
 
@@ -110,7 +109,6 @@ class PhillyFreeSchool extends OrgConfig {
         show_no_contest_plea = true;
         show_na_plea = true;
         show_severity = true;
-        use_minor_referrals = true;
 
         OrgConfig.register(name, this);
     }
@@ -137,7 +135,6 @@ class Fairhaven extends OrgConfig {
         str_res_plans_cap = "Sentences";
 		str_findings = "JC Report";
 
-        use_minor_referrals = true;
         show_findings_in_rp_list = false;
         use_year_in_case_number = true;
 
@@ -166,7 +163,6 @@ class TheCircleSchool extends OrgConfig {
         str_res_plans_cap = "Sentences";
 		str_findings = "Findings";
 
-        use_minor_referrals = true;
         track_writer = false;
         filter_no_charge_cases = true;
 
@@ -211,8 +207,6 @@ class MakariosLearningCommunity extends OrgConfig {
         str_res_plans_cap = "Sentences";
         str_findings = "Findings";
 
-        use_minor_referrals = true;
-
         OrgConfig.register(name, this);
     }
 
@@ -241,8 +235,6 @@ class TheOpenSchool extends OrgConfig {
         str_jc_name = "Civics Board";
         str_jc_name_short = "CB";
 
-        use_minor_referrals = true;
-
         OrgConfig.register(name, this);
     }
 
@@ -269,7 +261,6 @@ class Houston extends OrgConfig {
         str_res_plans_cap = "Sentences";
         str_findings = "Findings";
 
-        use_minor_referrals = true;
         track_writer = false;
         use_year_in_case_number = true;
 
@@ -300,7 +291,6 @@ class Sandbox extends OrgConfig {
         str_res_plans_cap = "Sentences";
         str_findings = "Findings";
 
-        use_minor_referrals = true;
         track_writer = true;
         enable_file_sharing = true;
 
@@ -330,7 +320,6 @@ class Clearview extends OrgConfig {
         str_res_plans_cap = "Sentences";
         str_findings = "Findings";
 
-        use_minor_referrals = true;
         track_writer = false;
 
         OrgConfig.register(name, this);
