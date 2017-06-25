@@ -24,14 +24,12 @@ public class Settings extends Controller {
             .order("the_type DESC, tag.id")
             .findList();
 
-        return ok(views.html.view_settings.render(rules, OrgConfig.get().org.jc_reset_day));
+        return ok(views.html.view_settings.render(rules, OrgConfig.get().org));
     }
 
     public Result editSettings() {
         final Map<String, String[]> values = request().body().asFormUrlEncoded();
-        if (values.containsKey("jc_reset_day")) {
-            OrgConfig.get().org.setJcResetDay(Integer.parseInt(values.get("jc_reset_day")[0]));
-        }
+        OrgConfig.get().org.updateFromForm(values);
         return redirect(routes.Settings.viewSettings());
     }
 

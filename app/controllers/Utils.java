@@ -107,6 +107,10 @@ public class Utils
     public static Html newlineToBr(String input) {
         return HtmlFormat.raw(HtmlFormat.escape(input.trim()).body().replace("\n", "<br/>"));
     }
+
+    public static boolean getBooleanFromFormValue(String form_value) {
+        return form_value != null && (form_value.equals("true") || form_value.equals("on"));
+    }
 }
 
 //class PersonKeySerializer extends JsonSerializer<Person>

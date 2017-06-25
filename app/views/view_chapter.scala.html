@@ -22,26 +22,29 @@ Printed on @Application.yymmddDate().
 		<a name="entry_@entry.id"></a>
 		<p class="man-entry-num">@entry.getNumber() @entry.title <a class="no-print man-edit" href="@routes.ApplicationEditing.editEntry(entry.id)">Edit</a>
 			@if( entry.changes.size() > 0 ) {
-				<span class="man-last-modify-date">changed @Application.yymmddDate(entry.changes.get(entry.changes.size()-1).date_entered)</span>
+				<span class="man-last-modify-date @if(!OrgConfig.get().org.show_last_modified_in_print){no-print}">
+                    changed @Application.yymmddDate(entry.changes.get(entry.changes.size()-1).date_entered)
+                </span>
 			}
 									</p>
 		<div class="man-entry-content">@Html(Application.markdown(entry.content))
 
 			@defining(entry.changes) { changes =>
 			@if( changes.size() > 1) {
-			<p class="man-entry-change-history">@for( i <- 0 to changes.size() - 1) {
-				@if( (i == 0) ||
-					(changes.get(i).date_entered.getDate() != changes.get(i-1).date_entered.getDate() ||
-					 changes.get(i).date_entered.getMonth() != changes.get(i-1).date_entered.getMonth() ||
-					 changes.get(i).date_entered.getYear() != changes.get(i-1).date_entered.getYear())) {
-					@defining(changes.get(i)) { change =>
-						@if( change.was_created ) { Adopted
-						} else { @if( change.was_deleted ) { Repealed
-						} else { Amended } }
-						@Application.yymmddDate(change.date_entered);
-					}
-				}
-			}
+			<p class="man-entry-change-history @if(!OrgConfig.get().org.show_history_in_print){no-print}">
+				@for( i <- 0 to changes.size() - 1) {
+                    @if( (i == 0) ||
+                        (changes.get(i).date_entered.getDate() != changes.get(i-1).date_entered.getDate() ||
+                         changes.get(i).date_entered.getMonth() != changes.get(i-1).date_entered.getMonth() ||
+                         changes.get(i).date_entered.getYear() != changes.get(i-1).date_entered.getYear())) {
+                        @defining(changes.get(i)) { change =>
+                            @if( change.was_created ) { Adopted
+                            } else { @if( change.was_deleted ) { Repealed
+                            } else { Amended } }
+                            @Application.yymmddDate(change.date_entered);
+                        }
+                    }
+                }
 			</p>
 			}
 			}

@@ -1,4 +1,4 @@
-@(notifications : List [ NotificationRule ], jc_reset_day: Integer)
+@(notifications : List [ NotificationRule ], org: Organization)
 
 @main("Settings", "settings", "settings") {
 
@@ -50,10 +50,25 @@ enableNoPersonTagBox("#tag-entry", "#tags-entered", true);
 @helper.form(routes.Settings.editSettings()) {
     <p>The @OrgConfig.get().str_jc_name_short Weekly Report includes five full school days.</p>
     <p>Reset the report every <select name="jc_reset_day">
-        <option value="1" @if(jc_reset_day == 1){selected}>Monday</option>
-        <option value="2" @if(jc_reset_day == 2){selected}>Tuesday</option>
-        <option value="3" @if(jc_reset_day == 3){selected}>Wednesday</option>
-        <option value="4" @if(jc_reset_day == 4){selected}>Thursday</option>
-        <option value="5" @if(jc_reset_day == 5){selected}>Friday</option>
+        <option value="1" @if(org.jc_reset_day == 1){selected}>Monday</option>
+        <option value="2" @if(org.jc_reset_day == 2){selected}>Tuesday</option>
+        <option value="3" @if(org.jc_reset_day == 3){selected}>Wednesday</option>
+        <option value="4" @if(org.jc_reset_day == 4){selected}>Thursday</option>
+        <option value="5" @if(org.jc_reset_day == 5){selected}>Friday</option>
     </select> morning. <input type="submit" value="Save"/></p>
+}
+
+<h2>@OrgConfig.get().str_manual_title</h2>
+@helper.form(routes.Settings.editSettings()) {
+<h4>Printing options</h4>
+<p><label><input type="checkbox" name="show_last_modified_in_print"
+        @if(org.show_last_modified_in_print){ checked }>
+    Include the date of the last change for each rule, e.g. "changed 2017-3-4"</label>
+<br/>
+<label><input type="checkbox" name="show_history_in_print"
+        @if(org.show_history_in_print){ checked }>
+    Include the date of each change for each rule, e.g. "Adopted 2016-1-2; Amended 2016-3-25"</label>
+</p>
+<input type="hidden" name="manual_settings" value="true"/>
+<input type="submit" value="Save"/></p>
 }

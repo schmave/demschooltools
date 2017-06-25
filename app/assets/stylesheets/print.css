@@ -35,3 +35,11 @@ a[href]:after {
 .table td {
     border-top: 1px solid #ddd;
 }
+
+body {
+    font-family: "Garamond";
+}
+
+.man-last-modify-date, .man-entry-change-history {
+    font-style: italic;
+}

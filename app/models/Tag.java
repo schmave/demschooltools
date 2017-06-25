@@ -7,6 +7,7 @@ import javax.persistence.*;
 import com.avaje.ebean.Model;
 import com.avaje.ebean.Model.Finder;
 
+import controllers.Utils;
 import play.data.*;
 
 @Entity
@@ -70,16 +71,11 @@ public class Tag extends Model {
         return t;
     }
 
-    public static boolean getBooleanFromForm(Form<?> form, String field_name) {
-        String val = form.field(field_name).value();
-        return val != null && val.equals("true");
-    }
-
     public void updateFromForm(Form<Tag> form) {
         title = form.field("title").value();
-        use_student_display = getBooleanFromForm(form, "use_student_display");
-        show_in_jc = getBooleanFromForm(form, "show_in_jc");
-        show_in_menu = getBooleanFromForm(form, "show_in_menu");
+        use_student_display = Utils.getBooleanFromFormValue(form.field("use_student_display").value());
+        show_in_jc = Utils.getBooleanFromFormValue(form.field("show_in_jc").value());
+        show_in_menu = Utils.getBooleanFromFormValue(form.field("show_in_menu").value());
         save();
     }
 

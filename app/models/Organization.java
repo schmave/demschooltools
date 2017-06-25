@@ -10,10 +10,10 @@ import com.avaje.ebean.SqlRow;
 
 import com.fasterxml.jackson.annotation.*;
 
+import controllers.Utils;
 import play.cache.Cache;
 import play.Logger;
 import com.avaje.ebean.Model;
-import com.avaje.ebean.Model.Finder;
 import play.mvc.Http.Context;
 
 @Entity
@@ -35,6 +35,8 @@ public class Organization extends Model {
     public String printer_email;
 
     public Integer jc_reset_day;
+    public Boolean show_last_modified_in_print;
+    public Boolean show_history_in_print;
 
     @OneToMany(mappedBy="organization")
     @JsonIgnore
@@ -94,8 +96,22 @@ public class Organization extends Model {
         this.save();
     }
 
-    public void setJcResetDay(int day) {
-        this.jc_reset_day = day;
+    public void updateFromForm(Map<String, String[]> values) {
+        if (values.containsKey("jc_reset_day")) {
+            this.jc_reset_day = Integer.parseInt(values.get("jc_reset_day")[0]);
+        }
+        if (values.containsKey("manual_settings")) {
+            if (values.containsKey("show_last_modified_in_print")) {
+                this.show_last_modified_in_print = Utils.getBooleanFromFormValue(values.get("show_last_modified_in_print")[0]);
+            } else {
+                this.show_last_modified_in_print = false;
+            }
+            if (values.containsKey("show_history_in_print")) {
+                this.show_history_in_print = Utils.getBooleanFromFormValue(values.get("show_history_in_print")[0]);
+            } else {
+                this.show_history_in_print = false;
+            }
+        }
         this.save();
     }
 }
