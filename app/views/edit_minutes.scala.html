@@ -71,6 +71,10 @@ View printable minutes</a>
 <div id="meeting-cases">
 </div>
 
+<div style="display:none" id="dialog-confirm" title="Are you sure?">
+    <p>This will erase all data stored for this case. It cannot be undone.</p>
+</div>
+
 </script>
 
 <script id="person-template" type="text/x-handlebars-template">
@@ -147,12 +151,11 @@ View printable minutes</a>
 
 <script id="case-template" type="text/x-handlebars-template">
 <div class="case panel panel-info">
-<div class="panel-heading"><h4>Case #{{num}}
-    <div class="continued"><label>
-    <input type="checkbox" class="continued"><span>To be continued</span></input>
-    </label></div>
-        </h4>
-    </div>
+<div class="panel-heading">
+    <h4>Case #{{num}}
+        <button class="btn btn-danger btn-xs clear-case">Erase Case</button>
+    </h4>
+</div>
 <div class="panel-body">
 
 <table>
@@ -175,6 +178,10 @@ View printable minutes</a>
 <div class="charges"></div>
 <button class="add-charges">Add charges</button>
 
+<div class="continued"><label>
+    <input type="checkbox" class="continued"><span>To be continued</span></input>
+	</label>
+</div>
 </div>
 </div>
 </script>

@@ -111,6 +111,12 @@ function PeopleChooser(el, on_add, on_remove) {
         return p;
     };
 
+    this.clear = function() {
+        while (self.people.length > 0) {
+            self.removePerson(self.people[0]);
+        }
+    };
+
     this.removePerson = function(person) {
         $(person.el).remove();
 
@@ -148,9 +154,10 @@ function RuleChooser(el, on_change) {
 
     this.search_box = el.find(".rule_search");
     this.search_box.autocomplete({
-        source: app.rules,
-        delay: 0,
         autoFocus: true,
+        delay: 0,
+        minLength: 2,
+        source: app.rules,
     });
 
     this.search_box.bind( "autocompleteselect", function(event, ui) {
@@ -309,12 +316,13 @@ function Charge(charge_id, el) {
     };
 
     this.removeCharge = function() {
-        self.el.remove();
-        $.post("/removeCharge?id=" + charge_id);
-        // Don't try to save any remaining modifications if
-        // this charge has been removed.
-        self.is_modified = false;
-        // TODO: remove from Case.charges list
+        $.post("/removeCharge?id=" + charge_id, function() {
+            self.el.remove();
+            // Don't try to save any remaining modifications if
+            // this charge has been removed.
+            self.is_modified = false;
+            // TODO: remove from Case.charges list
+        });
     };
 
     this.markAsModified = function() {
@@ -456,8 +464,6 @@ function Case (id, el) {
         return new_charge;
     };
 
-    self.old_findings = null;
-
     this.checkText = function() {
         if (el.find(".findings").val() !== self.old_findings) {
             self.markAsModified();
@@ -465,8 +471,44 @@ function Case (id, el) {
         }
     };
 
+    this.clearCase = function() {
+        $( "#dialog-confirm" ).dialog({
+              resizable: false,
+              height: 240,
+              modal: true,
+              buttons: {
+                "Erase case": function() {
+                    self.clearCaseNoConfirm();
+                    $( this ).dialog( "close" );
+                },
+                "Cancel": function() {
+                     $( this ).dialog( "close" );
+                }
+              }
+            });
+     }
+
+     this.clearCaseNoConfirm = function() {
+        el.find(".location").val('');
+        el.find(".date").val('');
+        el.find(".time").val('');
+        el.find(".findings").val('');
+        el.find("input.continued").prop("checked", false);
+
+        self.testifier_chooser.clear();
+        self.writer_chooser.clear();
+
+        for (var i = 0; i < self.charges.length; i++) {
+            self.charges[i].removeCharge();
+        }
+        self.charges = [];
+        self.markAsModified();
+    };
+
     this.id = id;
     this.el = el;
+    this.old_findings = null;
+
     if (config.track_writer) {
         this.writer_chooser = new PeopleChooser(el.find(".writer"),
             function(person) {
@@ -504,6 +546,7 @@ function Case (id, el) {
     el.find("input.continued").change(self.markAsModified);
 
     el.find(".add-charges").click(self.addCharge);
+    el.find(".clear-case").click(self.clearCase);
 
     window.setTimeout(self.saveIfNeeded, SAVE_TIMEOUT);
 }
@@ -635,7 +678,7 @@ window.initMinutesPage = function() {
         }
 
         if (dirty) {
-            return "UNsaved changes! Please give me a few more seconds...";
+            return "Unsaved changes! Please give me a few more seconds...";
         }
         return null;
     };
