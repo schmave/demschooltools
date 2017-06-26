@@ -1,4 +1,4 @@
-@(code_form : Form[AttendanceCode], destination : play.api.mvc.Call, submit_title : String)
+@(code_form : Form[AttendanceCode], destination : play.api.mvc.Call, is_editing: Boolean)
 
 @import helper._
 
@@ -38,7 +38,11 @@ $(function() {
 @inputText(code_form("description"), '_label -> "Description", 'class -> "form-control")
 
 @inputText(code_form("color"), '_label -> "Color", 'class -> "colorpicker")
-<input type="submit" value="@submit_title">
+
+@if(is_editing) {
+    <input type="submit" class="btn btn-danger" name="delete" value="Delete" />
+}
+<input type="submit" class="btn btn-primary" value="@if(is_editing){Save} else {Create}">
 
 </div>
 

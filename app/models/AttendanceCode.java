@@ -52,6 +52,10 @@ public class AttendanceCode extends Model {
     }
 
     public void edit(Form<AttendanceCode> form) {
+        if (form.field("delete").value() != null) {
+            this.delete();
+            return;
+        }
         description = form.field("description").value();
         code = form.field("code").value();
         color = form.field("color").value();
