@@ -190,8 +190,11 @@ public class ApplicationEditing extends Controller {
     @Secured.Auth(UserRole.ROLE_EDIT_RECENT_JC)
     public Result removeCharge(int id) {
         Charge c = Charge.findById(id);
-        c.delete();
+        if (c == null) {
+            return notFound();
+        }
 
+        c.delete();
         return ok();
     }
 

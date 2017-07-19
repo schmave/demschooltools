@@ -1005,6 +1005,10 @@ public class Application extends Controller {
     public Result renderMarkdown() {
         Map<String, String[]> form_data = request().body().asFormUrlEncoded();
 
+        if (form_data == null || form_data.get("markdown") == null) {
+            return ok("");
+        }
+
         String markdown = form_data.get("markdown")[0];
         return ok(markdown(markdown));
     }
