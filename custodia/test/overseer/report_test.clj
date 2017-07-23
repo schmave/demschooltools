@@ -7,7 +7,8 @@
             [clj-time.coerce :as c]
             [clojure.tools.trace :as trace]
             [overseer.db :as db]
-            [overseer.database :as data]
+            [overseer.queries :as queries]
+            [overseer.commands :as cmd]
             [overseer.helpers-test :refer :all]
             [overseer.attendance :as att]
             [overseer.helpers :as h]
@@ -29,17 +30,17 @@
   "Report is defined without a class but will use the default one"
   (do (sample-db)
       (let [class-id (get-class-id-by-name "2014-2015")
-            other-class (data/make-class "test")
-            activated (db/activate-class (:_id other-class))
-            today-str (dates/get-current-year-string (data/get-years))
-            {sid :_id} (data/make-student "test")
-            {sid2 :_id} (data/make-student "test2")]
-        (data/add-student-to-class sid class-id)
+            other-class (cmd/make-class "test")
+            activated (cmd/activate-class (:_id other-class))
+            today-str (dates/get-current-year-string (queries/get-years))
+            {sid :_id} (cmd/make-student "test")
+            {sid2 :_id} (cmd/make-student "test2")]
+        (cmd/add-student-to-class sid class-id)
         (add-3good-2short-swipes sid)
-        (data/swipe-in sid2 _2014_10_19)
-        (data/swipe-in sid2 _2014_10_20)
+        (cmd/swipe-in sid2 _2014_10_19)
+        (cmd/swipe-in sid2 _2014_10_20)
 
-        (let [att (db/get-report today-str class-id)
+        (let [att (queries/get-report today-str class-id)
               student1 (first (filter #(= sid (:_id %)) att))
               student2 (first (filter #(= sid2 (:_id %)) att))]
 
@@ -55,28 +56,28 @@
             (is (= student2 nil)))
           )
         (testing "an older date string shows no attendance in that time"
-          (is (= '() (db/get-report "06-01-2013 05-01-2014")))))) 
+          (is (= '() (queries/get-report "06-01-2013 05-01-2014")))))) 
   )
 
 
 (deftest swipe-attendence-test
   (do (sample-db)
-      (let [today-str (dates/get-current-year-string (data/get-years))
+      (let [today-str (dates/get-current-year-string (queries/get-years))
             class-id (get-class-id-by-name "2014-2015")
-            {sid :_id} (data/make-student "test")
-            {sid2 :_id} (data/make-student "test2")]
+            {sid :_id} (cmd/make-student "test")
+            {sid2 :_id} (cmd/make-student "test2")]
         ;; good today
         (add-3good-2short-swipes sid)
-        (data/override-date sid "2014-10-18")
-        (data/excuse-date sid "2014-10-20")
+        (cmd/override-date sid "2014-10-18")
+        (cmd/excuse-date sid "2014-10-20")
 
-        (data/swipe-in sid2 _2014_10_19)
-        (data/swipe-in sid2 _2014_10_20)
+        (cmd/swipe-in sid2 _2014_10_19)
+        (cmd/swipe-in sid2 _2014_10_20)
 
-        (data/add-student-to-class sid class-id)
-        (data/add-student-to-class sid2 class-id)
+        (cmd/add-student-to-class sid class-id)
+        (cmd/add-student-to-class sid2 class-id)
 
-        (let [att (db/get-report today-str)
+        (let [att (queries/get-report today-str)
               student1 (first (filter #(= sid (:_id %)) att))
               student2 (first (filter #(= sid2 (:_id %)) att))]
           (student-report-is student1 4 1 1 1 1 26M)
@@ -88,6 +89,6 @@
                    5)))
           )
         (testing "an older date string shows no attendance in that time"
-          (is (= '() (db/get-report "06-01-2013 05-01-2014")))))) 
+          (is (= '() (queries/get-report "06-01-2013 05-01-2014")))))) 
   )
 

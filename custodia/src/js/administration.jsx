@@ -12,26 +12,25 @@ var exports = React.createClass({
         router: React.PropTypes.func
     },
     getInitialState: function () {
-        return {schemas: userStore.getSchemas(),
+        return {schools: userStore.getSchools(),
                 users: userStore.getUsers(),
-                selectedSchema: userStore.getSuperSchema()};
+                selectedSchool: userStore.getSelectedSchool()};
     },
     componentDidMount: function () {
         userStore.addChangeListener(this._onChange);
-        //this.setState({student: studentStore.getStudent(this.state.studentId)});
     },
     componentWillUnmount: function () {
         userStore.removeChangeListener(this._onChange);
     },
-    selectSchema: function(s) {
-        userStore.setSuperSchema(s);
-        this.setState({selectedSchema:s});
+    selectSchool: function(s) {
+        userStore.setSuperSchool(s);
+        this.setState({selectedSchool:s});
     },
     makeItems: function() {
         var that = this;
-        return this.state.schemas.map(function(schema){
-            return (<li><a onClick={that.selectSchema.bind(that,schema)}>
-                     {schema}</a></li>);
+        return this.state.schools.map(function(school){
+            return (<li><a onClick={that.selectSchool.bind(that,school)}>
+                     {school.name}</a></li>);
         });
     },
     makeDropDown: function() {
@@ -39,7 +38,7 @@ var exports = React.createClass({
             <button className="btn btn-default dropdown-toggle"
             type="button" id="dropdownMenu1"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-            {this.state.selectedSchema}
+            {this.state.selectedSchool?this.state.selectedSchool.name:""}
                 <span className="caret"></span>
             </button>
             <ul className="dropdown-menu" aria-labelledby="dropdownMenu1">
@@ -73,6 +72,7 @@ var exports = React.createClass({
     render: function () {
         return <SuperItem>
             <div>Administration
+                {this.state.selectedSchool?this.state.selectedSchool.name:""}
                 {this.makeDropDown()}
                 <div>
                     <h2>Make User</h2>
@@ -115,9 +115,9 @@ var exports = React.createClass({
             </SuperItem>
     },
     _onChange: function () {
-        this.setState({schemas: userStore.getSchemas(),
+        this.setState({schools: userStore.getSchools(),
                        users: userStore.getUsers(),
-                       selectedSchema: userStore.getSuperSchema()});
+                       selectedSchool: userStore.getSelectedSchool()});
     }
 });
 

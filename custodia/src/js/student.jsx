@@ -155,14 +155,6 @@ var exports = React.createClass({
         }
     },
 
-    saveChange: function () {
-        actionCreator.updateStudent(this.state.student._id,
-                                    this.refs.name.getDOMNode().value,
-                                    this.refs.missing_datepicker.state.value,
-                                    this.refs.email.getDOMNode().value);
-        this.toggleEdit();
-    },
-
     getActiveDay: function (student) {
         if (this.context.router.getCurrentParams().day) {
             return this.context.router.getCurrentParams().day;

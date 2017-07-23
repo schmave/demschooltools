@@ -11,14 +11,15 @@ module.exports = React.createClass({
     getInitialState: function() {
         var that = this;
         dispatcher.register(function(action){
-            if (action.type == constants.studentEvents.STUDENT_LOADED) {
+            if (action.type == constants.studentEvents.STUDENT_LOADED
+                || action.type == constants.studentEvents.ALL_LOADED) {
                 that.savingHide();
                 that.close();
             }
         });
         return {saving: false,
                 student: {start_date: null, guardian_email: "", name : "", olderdate: null},
-                startdate_datepicker: null};
+                startdate_datepicker: new Date()};
     },
 
     savingShow: function () {
@@ -30,29 +31,46 @@ module.exports = React.createClass({
 
     saveChange: function () {
         this.savingShow();
-        actionCreator.updateStudent(this.state.student._id,
-                                    this.refs.name.getDOMNode().value,
-                                    this.refs.startdate.state.value,
-                                    this.refs.email.getDOMNode().value);
+        var startDate = this.refs.startdate.props.value || new Date();
+        if (this.state.student._id == null) {
+            actionCreator.createStudent(this.refs.name.getDOMNode().value,
+                                        startDate,
+                                        this.refs.email.getDOMNode().value,
+                                        this.state.student.is_teacher);
+        } else {
+            actionCreator.updateStudent(this.state.student._id,
+                                        this.refs.name.getDOMNode().value,
+                                        startDate,
+                                        this.refs.email.getDOMNode().value,
+                                        this.state.student.is_teacher);
+        }
     },
 
-
     edit: function(student) {
+        var s = jQuery.extend({}, student);
         this.setState(
-            {student: jQuery.extend({}, student),
-             startdate_datepicker: (student.start_date) ? new Date(student.start_date) : null})
+            {student: s,
+             creating: (!s._id),
+             startdate_datepicker: (s.start_date) ? new Date(s.start_date) : new Date()})
         this.refs.studentEditor.show();
     },
 
     toggleHours: function () {
-        this.state.student.olderdate = !!!this.state.student.olderdate;
-        actionCreator.toggleHours(this.state.student._id);
+        if (this.state.student._id > 0) {
+            this.state.student.olderdate = !!!this.state.student.olderdate;
+            actionCreator.toggleHours(this.state.student._id);
+        }
     },
 
     close: function () {
         if (this.refs.studentEditor) {
             this.refs.studentEditor.hide();
         }
+    },
+
+    handleTeacherChange: function(state) {
+        this.state.student.is_teacher = !this.state.student.is_teacher;
+        this.setState({student: this.state.student});
     },
 
     handleDateChange: function(d) {
@@ -69,44 +87,58 @@ module.exports = React.createClass({
     },
 
     render: function()  {
+        var title = ((this.state.creating) ? "Create" :  "Edit") + " Student"
         return <div className="row">
           <Modal ref="studentEditor"
-                 title="Edit Student">
+                 title={title}>
             {(this.state.saving) ?
-             <div>
-               <p style={{'text-align':'center'}}>
-                 <img src="/images/spinner.gif" />
-               </p>
-             </div>
+            <div>
+              <p style={{'text-align':'center'}}>
+                <img src="/images/spinner.gif" />
+              </p>
+            </div>
              : <form className="form">
-               <div className="form-group" id="nameRow">
-                 <label htmlFor="name">Name:</label>
-                 <input ref="name" className="form-control" id="name"
-                        onChange={this.handleChange}
-                        value={this.state.student.name}/>
-                 <label htmlFor="email">Parent Email:</label>
-                 <input ref="email" className="form-control" id="guardian_email"
-                        onChange={this.handleChange}
-                        value={this.state.student.guardian_email}/>
-                 <div><input type="radio" id="older" onChange={this.toggleHours}
-                             checked={!this.state.student.olderdate}/> 300 Minutes
-                 </div>
-                 <div><input type="radio" id="older" onChange={this.toggleHours}
-                             checked={this.state.student.olderdate}/> 330 Minutes
-                 </div>
-                 <b>Student Start Date:</b>
-                 <DateTimePicker id="missing" value={this.state.startdate_datepicker}
-                                 ref="startdate" onChange={this.handleDateChange}
-                                 calendar={true}
-                                 time={false} />
-               </div>
-               <button onClick={this.saveChange} className="btn btn-success">
-                 <i id="save-name" className="fa fa-check icon-large"> Save</i>
-               </button>
-               <button id="cancel-name" onClick={ this.close } className="btn btn-danger">
-                 <i className="fa fa-times"> Cancel</i>
-               </button>
-             </form>
+                <div className="form-group" id="nameRow">
+                <label htmlFor="name">Name:</label>
+                <input ref="name" className="form-control" id="name"
+                onChange={this.handleChange}
+                value={this.state.student.name}/>
+                <label htmlFor="email">Parent Email:</label>
+                <input ref="email" className="form-control" id="guardian_email"
+                onChange={this.handleChange}
+                value={this.state.student.guardian_email}/>
+
+                { (!this.state.creating) ?
+                  <div>
+                   <label htmlFor="email">Required Hours:</label>
+                    <div><input type="radio" id="older" onChange={this.toggleHours}
+                                checked={!this.state.student.olderdate}/> 300 Minutes
+                    </div>
+                    <div><input type="radio" id="older" onChange={this.toggleHours}
+                                checked={this.state.student.olderdate}/> 330 Minutes
+                    </div>
+                  </div>
+                : <div></div>
+                }
+                <div>
+                  <label htmlFor="is_teacher">Is Teacher:</label>
+                  <div><input type="checkbox" id="is_teacher" onChange={this.handleTeacherChange}
+                              checked={this.state.student.is_teacher}/> Is Teacher?
+                  </div>
+                </div>
+                <b>Student Start Date:</b>
+                <DateTimePicker id="missing" value={this.state.startdate_datepicker}
+                                ref="startdate" onChange={this.handleDateChange}
+                                calendar={true}
+                                time={false} />
+        </div>
+        <button onClick={this.saveChange} className="btn btn-success">
+          <i id="save-name" className="fa fa-check icon-large"> Save</i>
+        </button>
+        <button id="cancel-name" onClick={ this.close } className="btn btn-danger">
+          <i className="fa fa-times"> Cancel</i>
+        </button>
+       </form>
             }
           </Modal></div>;
     },

@@ -1,10 +1,26 @@
 var React = require('react'),
     Router = require('react-router'),
     Link = Router.Link,
+    userStore = require('./userstore'),
     SuperWrapper = require('./superwrapper.jsx'),
     AdminWrapper = require('./adminwrapper.jsx');
 
 module.exports = React.createClass({
+
+    getInitialState: function () {
+        return {selectedSchool: userStore.getSelectedSchool()};
+    },
+
+    componentDidMount: function () {
+        userStore.addChangeListener(this._onChange);
+    },
+    componentWillUnmount: function () {
+        userStore.removeChangeListener(this._onChange);
+    },
+
+    _onChange: function () {
+        this.setState({selectedSchool: userStore.getSelectedSchool()});
+    },
     render: function () {
         return <nav className="navbar navbar-inverse navbar-fixed-top" role="navigation">
             <div className="container">
@@ -17,7 +33,7 @@ module.exports = React.createClass({
                         <span className="icon-bar"></span>
                         <span className="icon-bar"></span>
                     </button>
-                    <Link to="students" id="home" className="navbar-brand">Custodia</Link>
+                    <Link to="students" id="home" className="navbar-brand">{this.state.selectedSchool?this.state.selectedSchool.name:""} Custodia</Link>
                 </div>
                 <div id="navbar" className="collapse navbar-collapse">
                     <ul className="nav navbar-nav">

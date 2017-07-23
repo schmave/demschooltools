@@ -9,6 +9,7 @@
             [clojure.tools.trace :as trace]
             [overseer.database.connection :as conn]
             [overseer.db :as d]
+            [overseer.queries :as queries]
             [overseer.attendance :as att]
             [overseer.helpers :as h]
             [overseer.helpers-test :as testhelpers]
@@ -17,7 +18,7 @@
             [overseer.database.users :as users]
             [overseer.migrations :as migrations]
             [overseer.db :as db]
-            [overseer.database :as data]
+            [overseer.commands :as cmd]
             [clojure.java.jdbc :as jdbc]
             [clojure.pprint :refer :all]
             ))
@@ -35,16 +36,16 @@
         stu (first x)
         perf (goat/get-fperf-data)]
     (testing "days all came back" (is (= 199 (count (:days stu)))))
-    (:total-time (get perf 'overseer.db/get-student-page))))
+    (:total-time (get perf 'overseer.queries/get-student-page))))
 
 (defn ^:performance massive-timing []
   (conn/init-pg)
   (users/drop-all-tables)
   (sh/sh "make" "load-massive-dump")
   (migrate-test-db)
-  (data/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 9))))
-  (let [students (data/get-students)]
-    (doall (map #(data/add-student-to-class (:_id %) 1)
+  (cmd/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 9))))
+  (let [students (queries/get-students)]
+    (doall (map #(cmd/add-student-to-class (:_id %) 1)
                 students)))
   (let [students (time (att/get-student-list))]
     (testing "found all students" (is (= 80 (count students)))))
@@ -52,6 +53,7 @@
   (goat/reset-instrumentation!)
   (goat/instrument-functions! 'overseer.attendance)
   (goat/instrument-functions! 'overseer.db)
+  (goat/instrument-functions! 'overseer.queries)
   (goat/instrument-functions! 'overseer.database)
 
   #_(goat/get-top-fperf 15 )

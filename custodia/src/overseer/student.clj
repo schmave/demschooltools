@@ -4,7 +4,8 @@
             [ring.util.response :as resp]
             [clojure.tools.trace :as trace]
             [overseer.db :as db]
-            [overseer.database :as data]
+            [overseer.queries :as queries]
+            [overseer.commands :as cmd]
             [overseer.database.users :as users]
             [overseer.dates :as dates]
             [overseer.attendance :as att]
@@ -25,7 +26,7 @@
 (defroutes student-routes
   (GET "/allstudents" req
     (friend/authorize #{roles/admin}
-                      (resp/response (data/get-students))))
+                      (resp/response (queries/get-students))))
   (GET "/students" req
        (friend/authorize #{roles/user}
                          (resp/response {:today (dates/today-string)
@@ -34,10 +35,10 @@
   (GET "/students/:id" [id :<< as-int]
        (friend/authorize #{roles/user} (student-page-response id)))
 
-  (POST "/students" [name email]
+  (POST "/students" [name start_date email is_teacher]
         (friend/authorize #{roles/admin}
-                          (resp/response {:made (data/make-student-starting-today name email)
-                                          :students (get-student-list)})))
+                          (resp/response {:made (cmd/make-student name start_date email is_teacher)
+                                          :students (queries/get-students)})))
 
   (PUT "/user" [name password]
     (friend/authorize #{roles/super}
@@ -46,40 +47,45 @@
     (friend/authorize #{roles/super}
                       (resp/response {:users (users/get-users)})))
 
-  (PUT "/students/:id" [id :<< as-int name start_date email]
+  (PUT "/students/:id" [id :<< as-int name start_date email is_teacher]
        (friend/authorize #{roles/admin}
-                         (data/edit-student id name start_date email))
+                         (cmd/edit-student id name start_date email is_teacher))
        (student-page-response id))
 
   (POST "/students/:id/togglehours" [id :<< as-int]
         (friend/authorize #{roles/admin}
-                          (do (data/toggle-student-older id)
+                          (do (cmd/toggle-student-older id)
                               (student-page-response id))))
 
   (POST "/students/:id/absent" [id :<< as-int]
         (friend/authorize #{roles/user}
-                          (do (data/toggle-student-absent id)
+                          (do (cmd/toggle-student-absent id)
                               (student-page-response id))))
+
+  ;; (POST "/students/:id/maketeacher" [id :<< as-int]
+  ;;       (friend/authorize #{roles/user}
+  ;;                         (do (cmd/toggle-student-teacher id)
+  ;;                             (student-page-response id))))
 
   (POST "/students/:id/excuse" [id :<< as-int day]
         (friend/authorize #{roles/admin}
-                          (data/excuse-date id day))
+                          (cmd/excuse-date id day))
         (student-page-response id))
 
   (POST "/students/:id/override" [id :<< as-int day]
         (friend/authorize #{roles/admin}
-                          (data/override-date id day))
+                          (cmd/override-date id day))
         (student-page-response id))
 
   (POST "/students/:id/swipe/delete" [id :<< as-int swipe]
         (friend/authorize #{roles/admin}
-                          (data/delete-swipe swipe)
+                          (cmd/delete-swipe swipe)
                           (student-page-response id)))
   (POST "/students/:id/swipe" [id :<< as-int direction  missing]
         (friend/authorize #{roles/user}
                           (if (= direction "in")
-                            (do (when missing (data/swipe-out id missing))
-                                (data/swipe-in id))
-                            (do (when missing (data/swipe-in id missing))
-                                (data/swipe-out id))))
+                            (do (when missing (cmd/swipe-out id missing))
+                                (cmd/swipe-in id))
+                            (do (when missing (cmd/swipe-in id missing))
+                                (cmd/swipe-out id))))
         (resp/response {:students (get-student-list)})))

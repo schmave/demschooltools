@@ -11,22 +11,21 @@
             [compojure.core :as compojure]
             [compojure.coercions :refer [as-int]]
             [clojure.java.io :as io]
-            ;;[clojure.tools.nrepl.server :as nrepl-server]
-            ;; [refactor-nrepl.middleware :as refactor]
             [jdbc-ring-session.core :refer [jdbc-store]]
-            ;;[cider.nrepl :refer (cider-nrepl-handler)]
-            ;;[cider.nrepl :as nrepl]
             [ring.adapter.jetty :as jetty]
             [ring.util.response :as resp]
             [clojure.tools.logging :as log]
             [clojure.pprint :as pp]
             [overseer.db :as db]
+            [overseer.queries :as queries]
             [overseer.database.sample-db :as sampledb]
             [overseer.dates :as dates]
             [overseer.classes :refer [class-routes]]
             [overseer.student :refer [student-routes]]
             [overseer.reports :refer [report-routes]]
             [overseer.database.connection :as conn]
+
+            [overseer.migrations :as migrations]
             [overseer.database.users :as users]
             [overseer.roles :as roles]
             [cemerick.friend :as friend]
@@ -34,7 +33,8 @@
                              [credentials :as creds])
             [stencil.core :refer [render-string]]
             [environ.core :refer [env]]
-            )
+
+            [overseer.db :as d])
   (:gen-class))
 
 (defn read-template [filename]
@@ -49,13 +49,18 @@
     (friend/authenticated
      (render-string (read-template "index.html") {:id start-id})))
 
-  (PUT "/schema/:schema" [schema]
+  (PUT "/school/:school_id" [school_id :<< as-int]
     (friend/authorize #{roles/super}
-                      (users/set-user-schema "super" schema)))
+                      (users/set-user-school (:user_id (users/get-user "super")) school_id)))
 
-  (GET "/schemas" [name]
+  (GET "/schools" []
     (friend/authorize #{roles/super}
-                      (resp/response db/current-schemas)))
+                      (resp/response
+                       (let [schools (queries/get-schools)
+                             superSchool (queries/get-current-school)]
+                         {:schools schools
+                          :school superSchool}))))
+
   (GET "/hello" []
     (friend/authorize #{roles/super}
                       (resp/response "there")))
@@ -75,13 +80,16 @@
   (GET "/users/logout" req
     (friend/logout* (resp/redirect (log/spyf "Logout: %s" "/users/login"))))
   (GET "/users/is-user" req
-    (friend/authorize #{roles/user} "You're a user!"))
+       (friend/authorize #{roles/user} {:message "You're a user!"
+                                        :school (queries/get-current-school)}))
   (GET "/users/is-admin" req
-    (resp/response {:admin (-> req friend/current-authentication :roles roles/admin)}))
+       (resp/response
+        {:admin (-> req friend/current-authentication :roles roles/admin)
+         :school (queries/get-current-school)}))
   (GET "/users/is-super" req
     (let [user (users/get-user "super")]
       (resp/response {:super (-> req friend/current-authentication :roles roles/super)
-                      :schema (:schema_name user)})))
+                      :school (queries/get-current-school)})))
 
   (GET "/js/gen/:id{.+}/app.js" req
     (io/resource "public/js/gen/app.js"))
@@ -92,13 +100,13 @@
 (defn my-middleware [app]
   (fn [req]
     (let [auth (friend/current-authentication req)
-          schema (:schema_name auth)
+          schema (:school_id auth)
           username (:username auth)]
       (if (= "super" username)
-        (let [schema (:schema_name (users/get-user username))]
-          (binding [db/*school-schema* schema]
+        (let [schema (:school_id (users/get-user username))]
+          (binding [db/*school-id* schema]
             (app req)))
-        (binding [db/*school-schema* schema]
+        (binding [db/*school-id* schema]
           (app req))))))
 
 (defn wrap-exception-handling
@@ -132,7 +140,9 @@
 ;;(start-site 5000)
 (defn start-site [port]
   (conn/init-pg)
-  (if (env :migratedb)
+  (when (env :migratedb)
+    (migrations/migrate-db @conn/pgdb))
+  (when (env :newdb)
     (do (users/reset-db)
         (sampledb/sample-db)))
   (users/init-users)

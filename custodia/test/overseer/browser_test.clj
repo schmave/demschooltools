@@ -1,7 +1,7 @@
 (ns overseer.browser-test
   (:require [clojure.test :refer :all]
             [clojure.java.shell :as sh]
-            [overseer.database :as data]
+            [overseer.commands :as cmd]
             [clj-time.core :as t]
             [overseer.helpers-test :refer :all]
             [clj-webdriver.taxi :refer :all]))
@@ -138,7 +138,7 @@
   (sample-db)
   (login-to-site)
 
-  (data/swipe-in 1 (t/minus (t/now) (t/days 1)))
+  (cmd/swipe-in 1 (t/minus (t/now) (t/days 1)))
   (assert-student-in-not-in-col 1)
   (click-student 1)
   (sign-in)

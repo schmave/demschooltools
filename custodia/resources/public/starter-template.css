@@ -123,6 +123,18 @@ a {
     }
 }
 
+.is_teacher {
+    font-weight: bold;
+    color: black;
+}
+
+.student-listing-classes {
+    font-size: 1.4em;
+    /* padding: 2px 10px 3px 10px; */
+    margin: 0px 5% 0px 5% !important;
+    width: 90%;
+}
+
 .student-listing {
     font-size: 1.4em;
     /* padding: 2px 10px 3px 10px; */

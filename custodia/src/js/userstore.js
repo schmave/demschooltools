@@ -6,8 +6,8 @@ var EventEmitter = require('events').EventEmitter,
 var isAdmin;
 var isSuper;
 var users =[];
-var schemas = [];
-var superSchema;
+var schools = [];
+var currentSchool;
 var CHANGE_EVENT = "CHANGE!";
 
 var exports = assign({}, EventEmitter.prototype, {
@@ -20,16 +20,16 @@ var exports = assign({}, EventEmitter.prototype, {
     getUsers: function () {
         return users;
     },
-    getSchemas: function () {
-        return schemas;
+    getSchools: function () {
+        return schools;
     },
-    getSuperSchema: function() {
-        return superSchema;
+    getSelectedSchool: function() {
+        return currentSchool;
     },
-    setSuperSchema: function(name) {
-        var route = 'schema/' + name;
+    setSuperSchool: function(school) {
+        var route = 'school/' + school._id;
         ajax.put(route).then(function (data) {
-            superSchema = name;
+            currentSchool = school;
             exports.emitChange();
         }.bind(this));
     },
@@ -46,6 +46,7 @@ var exports = assign({}, EventEmitter.prototype, {
 
 ajax.get('/users/is-admin').then(function (data) {
     isAdmin = data.admin;
+    currentSchool = data.school;
     exports.emitChange();
 }, function (data) {
     isAdmin = false;
@@ -54,7 +55,7 @@ ajax.get('/users/is-admin').then(function (data) {
 
 ajax.get('/users/is-super').then(function (data) {
     isSuper = data.super;
-    superSchema = data.schema;
+    currentSchool = data.school;
     exports.emitChange();
     if (data.super) {
         ajax.get('/user').then(function (data) {
@@ -62,8 +63,9 @@ ajax.get('/users/is-super').then(function (data) {
             exports.emitChange();
         }, function (data) {});
 
-        ajax.get('/schemas').then(function (data) {
-            schemas = data;
+        ajax.get('/schools').then(function (data) {
+            schools = data.schools;
+            currentSchool = data.school;
             exports.emitChange();
         }, function (data) {
             exports.emitChange();

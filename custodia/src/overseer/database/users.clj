@@ -12,8 +12,7 @@
             [overseer.roles :as roles]
 
             [overseer.migrations :as migrations]
-            [overseer.queries.demo :as demo]
-            [overseer.queries.phillyfreeschool :as pfs]
+            ;; [overseer.queries.demo :as demo]
             [yesql.core :refer [defqueries]]
             [overseer.db :as db]
 
@@ -37,32 +36,36 @@
 
 ;;(set-user-schema "super" "TEST")
 ;;(get-user "super")
-(defn set-user-schema [username schema]
-  (jdbc/update! @pgdb :overseer.users {:schema_name schema} ["username=?" username]))
+(defn set-user-school [_id school]
+  (jdbc/update! @pgdb :users {:school_id school} ["user_id=?" _id]))
+
+(defn make-new-school [school]
+  (db/persist! {:type :schools :name school}))
 
 (defn make-user
   ([username password roles]
-   (make-user username password roles db/*school-schema*))
-  ([username password roles schema]
+   (make-user username password roles db/*school-id*))
+  ([username password roles school]
    (if-not (get-user username)
      (jdbc/insert! @pgdb :overseer.users
                    {:username username
                     :password (creds/hash-bcrypt password)
-                    :schema_name schema
+                    :school_id school
                     :roles  (str (conj roles roles/user))}))))
 
 (defn init-users []
-  (make-user "admin" (env :admin) #{roles/admin roles/user} "phillyfreeschool")
-  (make-user "super" (env :admin) #{roles/admin roles/user roles/super}  "phillyfreeschool")
-  (make-user "user" (env :userpass) #{roles/user} "phillyfreeschool")
-  (make-user "admin2" (env :admin) #{roles/admin roles/user} "demo")
-  (make-user "demo" (env :userpass) #{roles/admin roles/user} "demo")
+  (make-user "admin" (env :admin) #{roles/admin roles/user} 1)
+  (make-user "super" (env :admin) #{roles/admin roles/user roles/super} 1)
+  (make-user "user" (env :userpass) #{roles/user} 1)
+  (make-user "admin2" (env :admin) #{roles/admin roles/user} 2)
+  (make-user "demo" (env :userpass) #{roles/admin roles/user} 2)
   )
 
 (defn drop-all-tables []
   (jdbc/execute! @pgdb [(str "DROP SCHEMA IF EXISTS overseer CASCADE;"
                              "DROP TABLE IF EXISTS schema_migrations; "
                              "DROP SCHEMA IF EXISTS phillyfreeschool CASCADE;"
+                             "DROP SCHEMA IF EXISTS overseer CASCADE;"
                              "DROP SCHEMA IF EXISTS demo CASCADE;")]))
 
 ;;(reset-db)
