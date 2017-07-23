@@ -35,7 +35,31 @@
    (filter (fn [y] (= names {:name y})) (get-all-years))))
 
 (defn get-all-students []
-  (db/q get-students-y {:school_id db/*school-id*}))
+  (let [students (db/q get-students-y {:school_id db/*school-id*})
+        new-students (filter #(= (:dst_id %) nil) students)]
+    (println students)
+    (println "new")
+    (println new-students)
+    (println (count new-students))
+    (let
+      [ack (map
+        #(let [new-el {:type :students
+                   :name (str (:first_name %) " " (:last_name %))
+                   :school_id db/*school-id*
+                   :dst_id (:person_id %)
+                   :start_date nil
+                   :guardian_email nil
+                   :olderdate nil
+                   :is_teacher false
+                   :show_as_absent nil}]
+          (println "hi")
+          (println new-el)
+          (db/persist! new-el))
+          new-students)]
+          (println ack)
+          (if (empty? new-students)
+            students
+            (db/q get-students-y {:school_id db/*school-id*})))))
 
 (defn get-student [student_id]
   (db/q get-student-y {:student_id student_id

@@ -1,0 +1,4 @@
+* allow cookie-jwt-based authentication that specifies organization + user ID + access permissions
+* what is a class?
+* add all current people to the current year's class, creating it if needed
+* get organization name from org_config
