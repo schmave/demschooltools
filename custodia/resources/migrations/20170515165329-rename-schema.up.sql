@@ -1,3 +1,6 @@
+ALTER TABLE overseer.users set schema phillyfreeschool;
+--;;
+
 DROP SCHEMA IF EXISTS overseer CASCADE;
 
 --;;

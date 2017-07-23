@@ -48,7 +48,6 @@
             [lein-environ "1.1.0"]]
   :migratus {:store :database
              :migration-dir "migrations"
-             :migration-table-name "overseer.migratus"
              :db {:classname "org.postgresql.Driver",
                   :subprotocol "postgresql",
                   :user "",
