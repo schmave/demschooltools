@@ -22,3 +22,6 @@ pom.xml
 /log/app.log
 /hs_err_pid20615.log
 /test/log4j.properties
+
+*.sublime-project
+*.sublime-workspace
