@@ -10,7 +10,7 @@
             [clj-time.coerce :as c]
             [schema.core :as s]))
 
-(defqueries "overseer/yesql/commands.sql" )
+(defqueries "overseer/yesql/queries.sql" )
 
 (defn activate-class [id]
   (db/q activate-class-y! {:id id :school_id db/*school-id*} ))
@@ -170,3 +170,42 @@
           :school_id db/*school-id*
           :name name}
          db/persist!)))
+
+(defn get-start-of-year []
+  (let [now (t/now)
+        year-adjustment (if (< (t/month now) 8) -1 0)]
+    (t/date-time (+ year-adjustment (t/year now)) 8 1)))
+
+(defn update-all-students []
+  (let [students (db/q get-students-with-dst-y {:school_id db/*school-id*})
+        new-students (filter #(= (:dst_id %) nil) students)
+        start-of-year (get-start-of-year)
+        class-name (str (t/year start-of-year) "-" (+ 1 (t/year start-of-year)))
+        end-of-year (t/date-time (+ 1 (t/year start-of-year)) 7 31)
+        ignored (make-class class-name start-of-year end-of-year)
+        {class-id :_id} (queries/get-class-by-name class-name)]
+    ; (println students)
+
+    ; Create student records for people who don't exist
+    ; and add them to a class
+    (dorun (map
+        #(let [new-el {:type :students
+                   :name (str (:first_name %) " " (:last_name %))
+                   :school_id db/*school-id*
+                   :dst_id (:person_id %)
+                   :start_date nil
+                   :guardian_email nil
+                   :olderdate nil
+                   :is_teacher false
+                   :show_as_absent nil}
+               {student-id :_id} (db/persist! new-el)]
+          (add-student-to-class student-id class-id))
+        new-students))
+
+    ; TODO: Add students to the class if they are not in it
+
+    ; TODO: Remove students from the class who are not in students list
+
+    ; TODO: Update students names if they don't match the DST name
+
+    (queries/get-all-students)))

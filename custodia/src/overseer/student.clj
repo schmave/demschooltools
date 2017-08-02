@@ -24,6 +24,10 @@
   (att/get-student-list (show-archived?)))
 
 (defroutes student-routes
+  ; TODO: make this POST?
+  (GET "/updatestudents" req
+    (friend/authorize #{roles/admin}
+                      (resp/response (cmd/update-all-students))))
   (GET "/allstudents" req
     (friend/authorize #{roles/admin}
                       (resp/response (queries/get-students))))

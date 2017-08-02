@@ -26,6 +26,7 @@
 
 ;; (get-user "admin2")
 (defn get-user [username]
+  (println "get-user" username)
   (if-let [u (first (get-user-y { :username username} {:connection @pgdb}))]
     (assoc u :roles (read-string (:roles u)))))
 

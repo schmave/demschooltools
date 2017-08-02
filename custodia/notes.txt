@@ -1,4 +1,22 @@
-* allow cookie-jwt-based authentication that specifies organization + user ID + access permissions
-* what is a class?
-* add all current people to the current year's class, creating it if needed
-* get organization name from org_config
+* add manual creation of entry in "schools" table to some checklist somewhere
+* modify update-all-students to process all schools (should not be authenticated)
+
+
+
+each school will have two auto-generated accounts:
+1. trvs
+2. trvs-admin
+
+
+for admin access, put an iframe in a new E-Attendance tab, post login credentials
+using an ajax form to the iframe:
+
+https://stackoverflow.com/questions/168455/how-do-you-post-to-an-iframe
+
+
+
+
+in DST, add a setting for the password for the signin sheet (non-admin) account
+
+password for each school's admin account will be the same, and will be stored
+in an environment variable for DST to read

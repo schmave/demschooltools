@@ -102,6 +102,7 @@
     (let [auth (friend/current-authentication req)
           schema (:school_id auth)
           username (:username auth)]
+      (print "current-auth" auth)
       (if (= "super" username)
         (let [schema (:school_id (users/get-user username))]
           (binding [db/*school-id* schema]
