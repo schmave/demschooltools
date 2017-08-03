@@ -213,3 +213,8 @@ SELECT p.first_name, p.last_name, p.person_id, stu.*
   left join overseer.students stu on stu.dst_id=p.person_id
   where t.show_in_jc=true and p.organization_id=:school_id
   GROUP BY p.person_id, stu._id;
+
+-- name: get-schools-with-dst-y
+SELECT *
+  from organization o
+  left join overseer.schools s on o.id=s._id;

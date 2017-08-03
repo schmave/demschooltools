@@ -1,6 +1,8 @@
 (ns overseer.commands
   (:require [overseer.db :as db]
+            [overseer.database.users :as users]
             [overseer.queries :as queries]
+            [overseer.roles :as roles]
             [yesql.core :refer [defqueries]]
             [overseer.dates :as dates]
             [clojure.tools.logging :as log]
@@ -176,7 +178,19 @@
         year-adjustment (if (< (t/month now) 8) -1 0)]
     (t/date-time (+ year-adjustment (t/year now)) 8 1)))
 
-(defn update-all-students []
+(defn update-schools-from-dst []
+  (let [schools (db/q get-schools-with-dst-y {})
+        new-schools (filter #(= (:_id %) nil) schools)]
+    (dorun (map (fn [school]
+        (db/persist! {:type :schools :name (:name school) :_id (:id school)}))
+      new-schools))
+    (dorun (map (fn [school]
+        (users/make-user (str (:short_name school) "-admin") "web" #{roles/admin roles/user} (:id school))
+        (users/make-user (str (:short_name school)) "web" #{roles/user} (:id school)))
+      schools))
+  ))
+
+(defn update-all-students-from-dst []
   (let [students (db/q get-students-with-dst-y {:school_id db/*school-id*})
         new-students (filter #(= (:dst_id %) nil) students)
         start-of-year (get-start-of-year)
@@ -207,5 +221,9 @@
     ; TODO: Remove students from the class who are not in students list
 
     ; TODO: Update students names if they don't match the DST name
+    ))
 
-    (queries/get-all-students)))
+(defn update-from-dst []
+  (update-schools-from-dst)
+  ; TODO call next function for each school
+  (update-all-students-from-dst))

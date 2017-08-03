@@ -1,22 +1,20 @@
-* add manual creation of entry in "schools" table to some checklist somewhere
+* set "schools" table's time zone entry manually
+
+
 * modify update-all-students to process all schools (should not be authenticated)
+* remove logout button from admin page
 
-
-
-each school will have two auto-generated accounts:
-1. trvs
-2. trvs-admin
-
-
-for admin access, put an iframe in a new E-Attendance tab, post login credentials
-using an ajax form to the iframe:
-
-https://stackoverflow.com/questions/168455/how-do-you-post-to-an-iframe
-
-
+* write deployment script (set DATABASE_URL environment variable)
+* add nginx config for signin.demschooltools.com
 
 
 in DST, add a setting for the password for the signin sheet (non-admin) account
+add setting to enable disable both attendance systems
 
 password for each school's admin account will be the same, and will be stored
 in an environment variable for DST to read
+
+
+clojure nginx
+https://stackoverflow.com/questions/20666497/can-i-use-clojure-with-nginx?rq=1
+https://mmcgrana.github.io/2010/07/develop-deploy-clojure-web-applications.html
