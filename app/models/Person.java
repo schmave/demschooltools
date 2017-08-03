@@ -141,6 +141,11 @@ public class Person extends Model implements Comparable<Person> {
             .eq("person_id", id).findUnique();
     }
 
+    @Override
+    public int hashCode() {
+        return person_id.hashCode();
+    }
+
     public static List<Person> all() {
         return find.where()
             .eq("organization", Organization.getByHost())

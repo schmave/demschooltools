@@ -7,7 +7,6 @@ import java.util.TimeZone;
 
 public class OrgConfig {
     public String name;
-    public String short_name;
     public String people_url;
     public String str_manual_title;
     public String str_manual_title_short;
@@ -66,7 +65,6 @@ class ThreeRiversVillageSchool extends OrgConfig {
 
     public ThreeRiversVillageSchool() {
         name = "Three Rivers Village School";
-        short_name = "TRVS";
         people_url = "https://trvs.demschooltools.com";
 
         str_manual_title = "Management Manual";
@@ -95,7 +93,6 @@ class PhillyFreeSchool extends OrgConfig {
 
     public PhillyFreeSchool() {
         name = "Philly Free School";
-        short_name = "PFS";
         people_url = "https://pfs.demschooltools.com";
 
         str_manual_title = "Lawbook";
@@ -123,7 +120,6 @@ class Fairhaven extends OrgConfig {
 
     public Fairhaven() {
         name = "Fairhaven School";
-        short_name = "Fairhaven";
         people_url = "https://fairhaven.demschooltools.com";
 
         str_manual_title = "Lawbook";
@@ -151,7 +147,6 @@ class TheCircleSchool extends OrgConfig {
 
     public TheCircleSchool() {
         name = "The Circle School";
-        short_name = "TCS";
         people_url = "https://tcs.demschooltools.com";
 
         str_manual_title = "Management Manual";
@@ -194,7 +189,6 @@ class MakariosLearningCommunity extends OrgConfig {
 
     public MakariosLearningCommunity() {
         name = "Makarios Learning Community";
-        short_name = "MLC";
         people_url = "https://mlc.demschooltools.com";
         time_zone = TimeZone.getTimeZone("US/Central");
 
@@ -220,7 +214,6 @@ class TheOpenSchool extends OrgConfig {
 
     public TheOpenSchool() {
         name = "The Open School";
-        short_name = "TOS";
         people_url = "https://tos.demschooltools.com";
         time_zone = TimeZone.getTimeZone("US/Pacific");
 
@@ -249,7 +242,6 @@ class Houston extends OrgConfig {
 
     public Houston() {
         name = "Houston Sudbury School";
-        short_name = "HSS";
         people_url = "https://hss.demschooltools.com";
 
         str_manual_title = "Lawbook";
@@ -279,7 +271,6 @@ class Sandbox extends OrgConfig {
 
     public Sandbox() {
         name = "DemSchoolTools sandbox area";
-        short_name = "Sandbox";
         people_url = "https://sandbox.demschooltools.com";
 
         str_manual_title = "Lawbook";
@@ -308,7 +299,6 @@ class Clearview extends OrgConfig {
 
     public Clearview() {
         name = "Clearview Sudbury School";
-        short_name = "CSS";
         people_url = "https://css.demschooltools.com";
 
         str_manual_title = "Lawbook";

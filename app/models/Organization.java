@@ -38,6 +38,8 @@ public class Organization extends Model {
     public Boolean show_last_modified_in_print;
     public Boolean show_history_in_print;
 
+    public String short_name;
+
     @OneToMany(mappedBy="organization")
     @JsonIgnore
     public List<NotificationRule> notification_rules;

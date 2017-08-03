@@ -45,6 +45,9 @@
             <li @if(menu.equals("attendance")) { class="active" }>
                 <a href="@routes.Attendance.index()">Attendance</a>
             </li>
+            <li @if(menu.equals("signin")) { class="active" }>
+                <a href="@routes.Attendance.viewCustodiaAdmin()">Signin</a>
+            </li>
             <li @if(menu.equals("jc")) { class="active" }>
                 <a href="@routes.Application.index()">@OrgConfig.get().str_jc_name_short</a>
             </li>

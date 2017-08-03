@@ -6,23 +6,15 @@ import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.Expr;
-import com.avaje.ebean.Expression;
-import com.avaje.ebean.FetchConfig;
-import com.avaje.ebean.RawSql;
-import com.avaje.ebean.RawSqlBuilder;
-import com.avaje.ebean.SqlUpdate;
 import com.csvreader.CsvWriter;
-
-import controllers.Utils;
 
 import models.*;
 
 import play.*;
 import play.data.*;
 import play.mvc.*;
-import play.mvc.Http.Context;
+
+import static controllers.Application.getConfiguration;
 
 @With(DumpOnError.class)
 @Secured.Auth(UserRole.ROLE_ALL_ACCESS)
@@ -399,6 +391,23 @@ public class Attendance extends Controller {
         }
 
         return codes;
+    }
+
+    public Result viewCustodiaAdmin() {
+        Map<String, Object> scopes = new HashMap<>();
+        Configuration conf = getConfiguration();
+        scopes.put("custodiaUrl", conf.getString("custodia_url"));
+        scopes.put("custodiaUsername", OrgConfig.get().org.short_name + "-admin");
+        scopes.put("custodiaPassword", conf.getString("custodia_password"));
+        Result result = ok(views.html.main_with_mustache.render(
+                "Sign in system",
+                "signin",
+                "",
+                "custodia_admin.html",
+                scopes));
+        response().discardCookie("ring-session");
+//        return result.(Http.Cookie.builder("ring-session", "").build());
+        return result;
     }
 
     public Result viewCodes() {

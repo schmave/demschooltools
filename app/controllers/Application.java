@@ -100,11 +100,11 @@ public class Application extends Controller {
             .eq("organization", Organization.getByHost())
             .findList();
 
-        List<Person> people = new ArrayList<>();
+        Set<Person> people = new HashSet<>();
         for (Tag tag : tags) {
             people.addAll(tag.people);
         }
-        return people;
+        return new ArrayList<>(people);
     }
 
     public Result index() {
@@ -125,7 +125,7 @@ public class Application extends Controller {
             .eq("organization", Organization.getByHost())
             .findList();
 
-        List<Person> people = Person.find
+        Set<Person> peopleSet = Person.find
             .fetch("charges")
             .fetch("charges.the_case")
             .fetch("charges.the_case.meeting")
@@ -134,8 +134,9 @@ public class Application extends Controller {
             .fetch("cases_involved_in.the_case.meeting", new FetchConfig().query())
             .where()
             .in("tags", tags)
-            .findList();
+            .findSet();
 
+        List<Person> people = new ArrayList<>(peopleSet);
         Collections.sort(people, Person.SORT_DISPLAY_NAME);
 
         List<Entry> entries = Entry.find

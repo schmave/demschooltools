@@ -3,7 +3,7 @@
 @import helper._
 @import com.feth.play.module.pa.views.html._
 
-@main("DemSchoolTools login (" + OrgConfig.get().short_name + ")", "none") {
+@main("DemSchoolTools login (" + OrgConfig.get().org.short_name + ")", "none") {
 
 	<div class="container" style="padding-top:100px;">
 	@if( notice != null ) { <div class="alert alert-warning"><strong>@notice</strong></div> }

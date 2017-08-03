@@ -74,3 +74,19 @@ $(function() {
 
     feedback_modal.init();
 });
+
+window.initCustodiaAdmin = function(url, username, password) {
+    $.ajax({
+        url: url + '/users/login',
+        data: {
+            password: password,
+            username: username,
+        },
+        method: 'POST',
+        xhrFields: {
+            withCredentials: true
+        }
+    }).always(function() {
+        $('iframe').attr('src', url + '/#/reports');
+    });
+};
