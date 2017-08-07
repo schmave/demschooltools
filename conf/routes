@@ -80,7 +80,7 @@ GET /editEntry/:id		controllers.ApplicationEditing.editEntry(id : Integer)
 POST /saveEntry		controllers.ApplicationEditing.saveEntry()
 POST /renderMarkdown	controllers.Application.renderMarkdown()
 
-GET     /signin                   controllers.Attendance.viewCustodiaAdmin()
+GET     /custodia                   controllers.Attendance.viewCustodiaAdmin()
 
 GET     /jsonPeople               controllers.CRM.jsonPeople(term ?= "")
 GET     /people                   controllers.CRM.recentComments()

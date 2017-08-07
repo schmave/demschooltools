@@ -39,6 +39,9 @@ public class Organization extends Model {
     public Boolean show_history_in_print;
 
     public String short_name;
+    public String custodia_password;
+    public Boolean show_custodia;
+    public Boolean show_attendance;
 
     @OneToMany(mappedBy="organization")
     @JsonIgnore

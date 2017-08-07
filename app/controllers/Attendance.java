@@ -401,7 +401,7 @@ public class Attendance extends Controller {
         scopes.put("custodiaPassword", conf.getString("custodia_password"));
         Result result = ok(views.html.main_with_mustache.render(
                 "Sign in system",
-                "signin",
+                "custodia",
                 "",
                 "custodia_admin.html",
                 scopes));

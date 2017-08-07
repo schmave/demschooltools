@@ -15,6 +15,15 @@ update organization set short_name='HSS' where id=7;
 update organization set short_name='CSS' where id=8;
 update organization set short_name='Sandbox' where id=9;
 
+create role custodia login password '123';
+grant all on schema overseer to custodia;
+grant all on all tables in schema overseer to custodia;
+
+grant select on all tables in schema public to custodia;
+grant all on schema_migrations to custodia;
+
+grant all on all sequences in schema overseer to custodia;
+grant select on all tables in schema public to custodia;
 
 # --- !Downs
 
@@ -22,3 +31,5 @@ ALTER TABLE organization DROP COLUMN show_custodia;
 ALTER TABLE organization DROP COLUMN show_attendance;
 ALTER TABLE organization DROP COLUMN short_name;
 ALTER TABLE organization DROP COLUMN custodia_password;
+
+drop role custodia;
