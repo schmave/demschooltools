@@ -16,14 +16,18 @@ update organization set short_name='CSS' where id=8;
 update organization set short_name='Sandbox' where id=9;
 
 create role custodia login password '123';
+
+grant select on all tables in schema public to custodia;
+
+create schema if not exists overseer;
 grant all on schema overseer to custodia;
 grant all on all tables in schema overseer to custodia;
-
-grant select on all tables in schema public to custodia;
-grant all on schema_migrations to custodia;
-
 grant all on all sequences in schema overseer to custodia;
-grant select on all tables in schema public to custodia;
+
+create schema if not exists demo;
+grant all on schema demo to custodia;
+grant all on all sequences in schema demo to custodia;
+grant all on all tables in schema demo to custodia;
 
 # --- !Downs
 
@@ -31,5 +35,15 @@ ALTER TABLE organization DROP COLUMN show_custodia;
 ALTER TABLE organization DROP COLUMN show_attendance;
 ALTER TABLE organization DROP COLUMN short_name;
 ALTER TABLE organization DROP COLUMN custodia_password;
+
+revoke select on all tables in schema public from custodia;
+
+revoke all on schema overseer from custodia;
+revoke all on all tables in schema overseer from custodia;
+revoke all on all sequences in schema overseer from custodia;
+
+revoke all on schema demo from custodia;
+revoke all on all sequences in schema demo from custodia;
+revoke all on all tables in schema demo from custodia;
 
 drop role custodia;
