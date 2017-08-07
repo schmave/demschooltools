@@ -13,16 +13,18 @@
       :_id))
 
 ;; (get-classes)
-(defn get-classes []
-  (let [classes (db/q get-classes-y {:school_id db/*school-id*} )
-        grouped (vals (group-by :name classes))]
-    (map (fn [class-group]
-           (let [base (dissoc (first class-group) :student_id :student_name)
-                 ids (filter (comp not nil?) (map :student_id class-group))
-                 names (filter (comp not nil?) (map :student_name class-group))
-                 students (map (fn [id name] {:student_id id :name name}) ids names)]
-             (assoc base :students students)))
-         grouped)))
+(defn get-classes
+  ([] (get-classes db/*school-id*))
+  ([school_id]
+    (let [classes (db/q get-classes-y {:school_id school_id} )
+          grouped (vals (group-by :name classes))]
+      (map (fn [class-group]
+             (let [base (dissoc (first class-group) :student_id :student_name)
+                   ids (filter (comp not nil?) (map :student_id class-group))
+                   names (filter (comp not nil?) (map :student_name class-group))
+                   students (map (fn [id name] {:student_id id :name name}) ids names)]
+               (assoc base :students students)))
+           grouped))))
 
 (defn get-all-years []
   (db/q get-years-y {:school_id db/*school-id*}))
@@ -95,7 +97,8 @@
   ([id] (get-student id)))
 
 (defn get-class-by-name
-  ([name] (first (db/q get-class-y {:name name}))))
+  ([name] (get-class-by-name name db/*school-id*))
+  ([name school_id] (first (db/q get-class-y {:name name :school_id school_id}))))
 
 (defn- thing-not-yet-created [name getter]
   (empty? (filter #(= name (:name %)) (getter))))
@@ -103,8 +106,8 @@
 (defn student-not-yet-created [name]
   (thing-not-yet-created name get-students))
 
-(defn class-not-yet-created [name]
-  (thing-not-yet-created name get-classes))
+(defn class-not-yet-created [name school-id]
+  (thing-not-yet-created name #(get-classes school-id)))
 
 (defn lookup-last-swipe-for-day [id day]
   (let [last (lookup-last-swipe id)]

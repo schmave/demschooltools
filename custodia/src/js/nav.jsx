@@ -22,7 +22,7 @@ module.exports = React.createClass({
         this.setState({selectedSchool: userStore.getSelectedSchool()});
     },
     render: function () {
-        return <nav className="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        return <nav className="navbar navbar-fixed-top" role="navigation">
             <div className="container">
                 <div className="navbar-header">
                     <button type="button" className="navbar-toggle collapsed" data-toggle="collapse"

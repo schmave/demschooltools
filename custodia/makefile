@@ -1,30 +1,14 @@
+ifeq ($(OS),Windows_NT)
+    LEIN=lein.bat
+else
+    LEIN=lein
+endif
+
 philly-prod-git := git@heroku.com:shining-overseer.git
 web-test-git := git@heroku.com:shining-overseer-test.git
 
 T :
-	@echo deploy-test
-	@echo deploy-philly
-	@echo log-philly
-	@echo unit-test
-	@echo "sql-philly - connect to philly postgres prod database"
-	@echo "setup-prod-demo-data - fill the demo database with safe data"
-	@echo webdriver-test
-	@echo drop-tables
-	@echo load-massive-dump
-	@echo load-aliased-dump
-	@echo backup-aliased-dump "for backing up a database after migrating"
-	@echo sql-backup-local-restore
-	@echo sql-local - connect to local database
-	@echo "sql-philly-backup - make backup of philly prod database"
-	@echo "logs - tail of local logs"
-	@echo "start - start a running overseer site"
-
-	@echo generate-sequence-reset
-	@echo run-sequence-reset
-	@echo deploy-philly
-	@echo minify
-	@echo js
-	@echo watch
+	grep '^[^[:space:]].*:$$' makefile
 
 # example of ls and echo
 hello :
@@ -64,17 +48,23 @@ logs :
 	tail -f log/app.log
 
 start :
-	lein run -m overseer.web
-# lein ring server-headless 5000
+	${LEIN} run -m overseer.web
+    # ${LEIN} ring server-headless 5000
 
 debug :
-	lein with-profile debug run -m overseer.web
+	${LEIN} with-profile debug run -m overseer.web
 
 unit-test :
-	lein test
+	${LEIN} test
 
 webdriver-test :
-	lein test :integration
+	${LEIN} test :integration
+
+deploy-dst:
+	${LEIN} uberjar
+	scp target/overseer-standalone.jar custodia@demschooltools.com:~/overseer-new.jar
+	scp dst_server/* custodia@demschooltools.com:~/
+	ssh custodia@demschooltools.com ./run_server.sh
 
 # createuser jack -U postgres
 # grant all privileges on database swipes to jack;

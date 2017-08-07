@@ -111,9 +111,11 @@
 (defn make-class
   ([name] (make-class name nil nil))
   ([name from_date to_date]
-   (let [active (-> (queries/get-classes) seq boolean not)]
-     (when (queries/class-not-yet-created name)
-       (db/persist! {:type :classes :name name :active active :school_id db/*school-id*})))))
+    (make-class name from_date to_date db/*school-id*))
+  ([name from_date to_date school_id]
+   (let [active (-> (queries/get-classes school_id) seq boolean not)]
+     (when (queries/class-not-yet-created name school_id)
+       (db/persist! {:type :classes :name name :active active :school_id school_id})))))
 
 (defn add-student-to-class [student-id class-id]
   (db/persist! {:type :classes_X_students :student_id student-id :class_id class-id}))
@@ -190,14 +192,14 @@
       schools))
   ))
 
-(defn update-all-students-from-dst []
-  (let [students (db/q get-students-with-dst-y {:school_id db/*school-id*})
+(defn update-all-students-from-dst [school_id]
+  (let [students (db/q get-students-with-dst-y {:school_id school_id})
         new-students (filter #(= (:dst_id %) nil) students)
         start-of-year (get-start-of-year)
         class-name (str (t/year start-of-year) "-" (+ 1 (t/year start-of-year)))
         end-of-year (t/date-time (+ 1 (t/year start-of-year)) 7 31)
-        ignored (make-class class-name start-of-year end-of-year)
-        {class-id :_id} (queries/get-class-by-name class-name)]
+        ignored (make-class class-name start-of-year end-of-year school_id)
+        {class-id :_id} (queries/get-class-by-name class-name school_id)]
     ; (println students)
 
     ; Create student records for people who don't exist
@@ -205,7 +207,7 @@
     (dorun (map
         #(let [new-el {:type :students
                    :name (str (:first_name %) " " (:last_name %))
-                   :school_id db/*school-id*
+                   :school_id school_id
                    :dst_id (:person_id %)
                    :start_date nil
                    :guardian_email nil
@@ -225,5 +227,8 @@
 
 (defn update-from-dst []
   (update-schools-from-dst)
-  ; TODO call next function for each school
-  (update-all-students-from-dst))
+
+  (let [schools (db/q get-schools-with-dst-y {})]
+    (dorun (map (fn [school]
+        (update-all-students-from-dst (:_id school)))
+      schools))))
