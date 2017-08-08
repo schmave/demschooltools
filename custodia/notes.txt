@@ -1,16 +1,11 @@
 * set "schools" table's time zone entry manually
 * remove logout button from admin page
 
-* write deployment script (set DATABASE_URL environment variable)
-
-* check nagios config -- does it complain if *.demschooltools.com returns a 4xx or 5xx?
-
-* disable password authentication in production PG -- only peer
-
-* enable gzip compression for custodia.dst
 * why is app.js 4.5MB for custodia.dst?
-* make sure that ring is serving in prod mode
 
+* change admin user password
+
+* check custodia logs for errors when backing up
 
 in DST, add a setting for the password for the signin sheet (non-admin) account
 add setting to enable disable both attendance systems

@@ -117,7 +117,18 @@
       (handler request)
       (catch Exception e
         (log/error e "Exception")
-        {:status 400 :body "Invalid data"}))))
+        {:status 500 :body "Server Error"}))))
+
+(def production?
+  (= "production" (env :appenv)))
+
+(def development?
+  (not production?))
+
+(defn wrap-if [handler pred wrapper & args]
+  (if pred
+    (apply wrapper handler args)
+    handler))
 
 (defn tapp []
   (-> #'app
@@ -127,7 +138,7 @@
                             :default-landing-uri "/"
                             :workflows [(workflows/interactive-form)]})
       (compojure/wrap-routes my-middleware)
-      wrap-reload
+      (wrap-if development? wrap-reload)
       (wrap-session {:store (jdbc-store @conn/pgdb {:table :overseer.session_store})
                      :cookie-attrs {:max-age (* 3 365 24 3600)}})
       wrap-not-modified
