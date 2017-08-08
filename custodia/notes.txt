@@ -1,11 +1,9 @@
 * set "schools" table's time zone entry manually
 * remove logout button from admin page
 
-* why is app.js 4.5MB for custodia.dst?
-
-* change admin user password
-
 * check custodia logs for errors when backing up
+
+
 
 in DST, add a setting for the password for the signin sheet (non-admin) account
 add setting to enable disable both attendance systems

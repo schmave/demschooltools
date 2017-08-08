@@ -55,10 +55,10 @@
                     :roles  (str (conj roles roles/user))}))))
 
 (defn init-users []
-  (make-user "admin" (env :admin) #{roles/admin roles/user} 1)
-  (make-user "super" (env :admin) #{roles/admin roles/user roles/super} 1)
+  (make-user "admin" (env :adminpass) #{roles/admin roles/user} 1)
+  (make-user "super" (env :adminpass) #{roles/admin roles/user roles/super} 1)
   (make-user "user" (env :userpass) #{roles/user} 1)
-  (make-user "admin2" (env :admin) #{roles/admin roles/user} 2)
+  (make-user "admin2" (env :adminpass) #{roles/admin roles/user} 2)
   (make-user "demo" (env :userpass) #{roles/admin roles/user} 2)
   )
 

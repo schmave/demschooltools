@@ -8,7 +8,7 @@ philly-prod-git := git@heroku.com:shining-overseer.git
 web-test-git := git@heroku.com:shining-overseer-test.git
 
 T :
-	grep '^[^[:space:]].*:$$' makefile
+	grep '^[^[:space:]].* :' makefile
 
 # example of ls and echo
 hello :
@@ -60,7 +60,10 @@ unit-test :
 webdriver-test :
 	${LEIN} test :integration
 
-deploy-dst:
+connect-dst :
+	ssh custodia@demschooltools.com -L 5433:localhost:5432
+
+deploy-dst : minify
 	${LEIN} uberjar
 	scp target/overseer-standalone.jar custodia@demschooltools.com:~/overseer-new.jar
 	scp dst_server/* custodia@demschooltools.com:~/

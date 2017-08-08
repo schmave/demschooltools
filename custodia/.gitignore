@@ -15,6 +15,7 @@ pom.xml
 *.iml
 .idea/
 /node_modules/
+/resources/public/js/gen
 /src/overseer/queries/demo.sql
 /src/js/.tern-port
 /src/overseer/queries/generated-demo.sql

@@ -10,7 +10,9 @@
             [clj-time.local :as l]
             [clj-time.core :as t]
             [clj-time.coerce :as c]
-            [schema.core :as s]))
+            [schema.core :as s]
+            [environ.core :refer [env]]
+            ))
 
 (defqueries "overseer/yesql/queries.sql" )
 
@@ -187,8 +189,8 @@
         (db/persist! {:type :schools :name (:name school) :_id (:id school)}))
       new-schools))
     (dorun (map (fn [school]
-        (users/make-user (str (:short_name school) "-admin") "web" #{roles/admin roles/user} (:id school))
-        (users/make-user (str (:short_name school)) "web" #{roles/user} (:id school)))
+        (users/make-user (str (:short_name school) "-admin") (env :adminpass) #{roles/admin roles/user} (:id school))
+        (users/make-user (str (:short_name school)) (env :userpass) #{roles/user} (:id school)))
       schools))
   ))
 
