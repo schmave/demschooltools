@@ -16,8 +16,10 @@
 
 (defqueries "overseer/yesql/queries.sql" )
 
-(defn activate-class [id]
-  (db/q activate-class-y! {:id id :school_id db/*school-id*} ))
+(defn activate-class
+  ([id] (activate-class id db/*school-id*))
+  ([id school-id]
+    (db/q activate-class-y! {:id id :school_id school-id})))
 
 (defn delete-student-from-class [student-id class-id]
   (db/q delete-student-from-class-y! {:student_id student-id :class_id class-id} ))
@@ -194,22 +196,22 @@
       schools))
   ))
 
-(defn update-all-students-from-dst [school_id]
-  (let [students (db/q get-students-with-dst-y {:school_id school_id})
+(defn update-all-students-from-dst [school-id]
+  (let [students (db/q get-students-with-dst-y {:school_id school-id})
         new-students (filter #(= (:dst_id %) nil) students)
         start-of-year (get-start-of-year)
         class-name (str (t/year start-of-year) "-" (+ 1 (t/year start-of-year)))
         end-of-year (t/date-time (+ 1 (t/year start-of-year)) 7 31)
-        ignored (make-class class-name start-of-year end-of-year school_id)
-        {class-id :_id} (queries/get-class-by-name class-name school_id)]
-    ; (println students)
+        ignored (make-class class-name start-of-year end-of-year school-id)
+        {class-id :_id} (queries/get-class-by-name class-name school-id)]
+    (activate-class class-id school-id)
 
     ; Create student records for people who don't exist
     ; and add them to a class
     (dorun (map
         #(let [new-el {:type :students
                    :name (str (:first_name %) " " (:last_name %))
-                   :school_id school_id
+                   :school_id school-id
                    :dst_id (:person_id %)
                    :start_date nil
                    :guardian_email nil
@@ -220,17 +222,17 @@
           (add-student-to-class student-id class-id))
         new-students))
 
-    ; TODO: Add students to the class if they are not in it
+    ; TODO: Add students to the class if their student record already existed
+    ; but they are not in the class.
 
-    ; TODO: Remove students from the class who are not in students list
+    ; TODO: Remove students from the class who are not in `students`
 
-    ; TODO: Update students names if they don't match the DST name
+    ; TODO: Update students' names if they don't match the DST name
     ))
 
 (defn update-from-dst []
   (update-schools-from-dst)
-
-  (let [schools (db/q get-schools-with-dst-y {})]
-    (dorun (map (fn [school]
+  (dorun
+    (map (fn [school]
         (update-all-students-from-dst (:_id school)))
-      schools))))
+      (db/q get-schools-with-dst-y {}))))

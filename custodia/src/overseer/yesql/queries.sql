@@ -194,7 +194,7 @@ WHERE c.school_id = :school_id
 ORDER BY c.name;
 
 -- name: get-class-y
-SELECT * from overseer.classes where name = :name and :school_id = :school_id;
+SELECT * from overseer.classes where name = :name and school_id = :school_id;
 
 -- name: activate-class-y!
 -- Set a single class to be active, and unactivate all others

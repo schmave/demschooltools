@@ -1,4 +1,3 @@
-* fix updatefromdst
-
 * test time zones
 * documentation
+* bring over PFS's data
