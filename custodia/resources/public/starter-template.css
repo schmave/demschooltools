@@ -251,4 +251,16 @@ a {
     padding: 5px;
     background-color: #ebe2ff;
     margin-bottom: 5px;
+    min-height: 0;
+}
+
+.navbar-nav>li>a {
+    padding-bottom: 0;
+    padding-top: 0;
+}
+
+.navbar-brand {
+    padding-bottom: 0;
+    padding-top: 0;
+    height: inherit;
 }

@@ -50,7 +50,7 @@ module.exports = React.createClass({
                             <li><Link id="class-link" to="admin">Site Admin</Link> </li>
                         </SuperWrapper>
                     </ul>
-                    <ul className="nav navbar-nav navbar-right">
+                    <ul className="nav navbar-nav">
                         <li><a href="/users/logout">Logout</a></li>
                     </ul>
                 </div>
