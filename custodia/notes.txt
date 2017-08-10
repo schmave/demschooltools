@@ -1,17 +1,4 @@
-* set "schools" table's time zone entry manually
-* remove logout button from admin page
+* fix updatefromdst
 
-* check custodia logs for errors when backing up
-
-
-
-in DST, add a setting for the password for the signin sheet (non-admin) account
-add setting to enable disable both attendance systems
-
-password for each school's admin account will be the same, and will be stored
-in an environment variable for DST to read
-
-
-clojure nginx
-https://stackoverflow.com/questions/20666497/can-i-use-clojure-with-nginx?rq=1
-https://mmcgrana.github.io/2010/07/develop-deploy-clojure-web-applications.html
+* test time zones
+* documentation

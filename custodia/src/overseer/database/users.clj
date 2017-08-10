@@ -26,7 +26,6 @@
 
 ;; (get-user "admin2")
 (defn get-user [username]
-  (println "get-user" username)
   (if-let [u (first (get-user-y { :username username} {:connection @pgdb}))]
     (assoc u :roles (read-string (:roles u)))))
 
@@ -53,6 +52,10 @@
                     :password (creds/hash-bcrypt password)
                     :school_id school
                     :roles  (str (conj roles roles/user))}))))
+
+(defn change-password [username password]
+  (jdbc/update! @pgdb :overseer.users {:password (creds/hash-bcrypt password)}
+                                      ["username=?" username]))
 
 (defn init-users []
   (make-user "admin" (env :adminpass) #{roles/admin roles/user} 1)

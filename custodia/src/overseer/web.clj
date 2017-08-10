@@ -17,6 +17,7 @@
             [clojure.tools.logging :as log]
             [clojure.pprint :as pp]
             [overseer.db :as db]
+            [overseer.commands :as cmd]
             [overseer.queries :as queries]
             [overseer.database.sample-db :as sampledb]
             [overseer.dates :as dates]
@@ -45,6 +46,10 @@
 (def start-id (subs (uuid) 0 7))
 
 (defroutes app
+  (POST "/updatefromdst" req
+    (friend/authorize #{roles/admin}
+                      (resp/response (cmd/update-from-dst))))
+
   (GET "/" []
     (friend/authenticated
      (render-string (read-template "index.html") {:id start-id})))
@@ -75,6 +80,9 @@
 
   (GET "/about" req
     (io/resource "about.html"))
+  (POST "/users/password" [username password]
+    (friend/authorize #{roles/admin}
+      (users/change-password username password)))
   (GET "/users/login" req
     (io/resource "login.html"))
   (GET "/users/logout" req
@@ -102,7 +110,6 @@
     (let [auth (friend/current-authentication req)
           schema (:school_id auth)
           username (:username auth)]
-      (print "current-auth" auth)
       (if (= "super" username)
         (let [schema (:school_id (users/get-user username))]
           (binding [db/*school-id* schema]
