@@ -22,7 +22,7 @@ public class Settings extends Controller {
             .order("the_type DESC, tag.id")
             .findList();
 
-        return ok(views.html.view_settings.render(rules, OrgConfig.get().org));
+        return ok(views.html.view_settings.render(rules, OrgConfig.get().org, Application.getConfiguration()));
     }
 
     public Result editSettings() {

@@ -87,6 +87,6 @@ window.initCustodiaAdmin = function(url, username, password) {
             withCredentials: true
         }
     }).always(function() {
-        $('iframe').attr('src', url + '/#/reports');
+        $('iframe').attr('src', url);
     });
 };

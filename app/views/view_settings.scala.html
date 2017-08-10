@@ -1,4 +1,4 @@
-@(notifications : List [ NotificationRule ], org: Organization)
+@(notifications : List [ NotificationRule ], org: Organization, play_config: play.Configuration)
 
 @main("Settings", "settings", "settings") {
 
@@ -60,7 +60,7 @@ to have both enabled at once.</p>
     <label><input type="checkbox" name="show_custodia"
                   @if(org.show_custodia){ checked }>
     Enable the "Custodia" tab</label></p>
-<p>The Custodia <a target="_blank" href="https://custodia.demschooltools.com">student dashboard</a> username is
+<p>The Custodia <a target="_blank" href="@play_config.getString("custodia_url")">electronic sign-in sheet</a> username is
     "@OrgConfig.get().org.short_name" (case-sensitive). To reset the password, enter a new one here:
     <br>
     <input type="text" size="30" placeholder="New password" name="custodia_student_password" />

@@ -50,6 +50,7 @@ public abstract class CachedPage {
         remove(JC_INDEX);
         remove(MANUAL_INDEX);
         remove(RECENT_COMMENTS);
+        Utils.updateCustodia();
     }
 
     public static void onPeopleChanged() {
