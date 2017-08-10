@@ -8,6 +8,9 @@ export MIGRATEDB="true"
 
 # kill existing java process (if any)
 kill $(ps -u custodia | grep java |  grep -o '^[0-9 ]*')
+sleep 3
+kill -9 $(ps -u custodia | grep java |  grep -o '^[0-9 ]*')
+sleep 3
 
 cp overseer-new.jar overseer.jar
 nohup java -jar overseer.jar

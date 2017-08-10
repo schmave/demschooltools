@@ -37,7 +37,7 @@
 ;;(set-user-schema "super" "TEST")
 ;;(get-user "super")
 (defn set-user-school [_id school]
-  (jdbc/update! @pgdb :users {:school_id school} ["user_id=?" _id]))
+  (jdbc/update! @pgdb :overseer.users {:school_id school} ["user_id=?" _id]))
 
 (defn make-new-school [school]
   (db/persist! {:type :schools :name school}))
