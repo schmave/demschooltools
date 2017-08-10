@@ -146,9 +146,9 @@ public class Utils
         }
     }
 
-    private static void loginToCustodia(CloseableHttpClient client, OrgConfig config, Configuration play_config) {
+    private static void loginToCustodia(CloseableHttpClient client, Configuration play_config) {
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-        nvps.add(new BasicNameValuePair("username", config.org.short_name + "-admin"));
+        nvps.add(new BasicNameValuePair("username", "admin"));
         nvps.add(new BasicNameValuePair("password", play_config.getString("custodia_password")));
         makeCustodiaPost(client, play_config.getString("custodia_url") + "/users/login", nvps);
     }
@@ -160,7 +160,7 @@ public class Utils
             public void run() {
                 try {
                     CloseableHttpClient httpclient = HttpClients.createDefault();
-                    loginToCustodia(httpclient, config, play_config);
+                    loginToCustodia(httpclient, play_config);
 
                     List<NameValuePair> nvps = new ArrayList<NameValuePair>();
                     nvps.add(new BasicNameValuePair("username", config.org.short_name));
@@ -176,12 +176,11 @@ public class Utils
     }
 
     public static void updateCustodia() {
-        final OrgConfig config = OrgConfig.get();
         final Configuration play_config = Application.getConfiguration();
         sCustodiaService.submit(new Runnable() {
             public void run() {
                 CloseableHttpClient httpclient = HttpClients.createDefault();
-                loginToCustodia(httpclient, config, play_config);
+                loginToCustodia(httpclient, play_config);
 
                 makeCustodiaPost(httpclient,
                         play_config.getString("custodia_url") + "/updatefromdst",
