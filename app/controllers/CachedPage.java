@@ -1,12 +1,15 @@
 package controllers;
 
-import java.util.*;
-
 import models.*;
 
 import play.cache.Cache;
 
 public abstract class CachedPage {
+    public static final String ATTENDANCE_INDEX = "Attendance-index-";
+    public static final String JC_INDEX = "Application-index-";
+    public static final String MANUAL_INDEX = "Application-viewManual-";
+    public static final String RECENT_COMMENTS = "CRM-recentComments-";
+
     public String title;
     public String menu;
     public String selected_button;
@@ -41,4 +44,18 @@ public abstract class CachedPage {
     }
 
     abstract String render();
+
+    public static void clearAll() {
+        remove(ATTENDANCE_INDEX);
+        remove(JC_INDEX);
+        remove(MANUAL_INDEX);
+        remove(RECENT_COMMENTS);
+    }
+
+    public static void onPeopleChanged() {
+        remove(ATTENDANCE_INDEX);
+        remove(JC_INDEX);
+        remove(RECENT_COMMENTS);
+        Utils.updateCustodia();
+    }
 }

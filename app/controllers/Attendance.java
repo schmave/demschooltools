@@ -20,8 +20,6 @@ import static controllers.Application.getConfiguration;
 @Secured.Auth(UserRole.ROLE_ALL_ACCESS)
 public class Attendance extends Controller {
 
-    public static final String CACHE_INDEX = "Attendance-index-";
-
     static Form<AttendanceCode> code_form;
 
     static Form<AttendanceCode> getCodeForm() {
@@ -33,7 +31,7 @@ public class Attendance extends Controller {
 
     public Result index() {
         return ok(views.html.cached_page.render(
-            new CachedPage(CACHE_INDEX,
+            new CachedPage(CachedPage.ATTENDANCE_INDEX,
                 "Attendance",
                 "attendance",
                 "attendance_home") {
@@ -204,7 +202,7 @@ public class Attendance extends Controller {
     }
 
     public Result createPersonWeek() {
-        CachedPage.remove(CACHE_INDEX);
+        CachedPage.remove(CachedPage.ATTENDANCE_INDEX);
 
         Map<String,String[]> data = request().body().asFormUrlEncoded();
         Calendar start_date = Utils.parseDateOrNow(data.get("monday")[0]);
@@ -262,7 +260,7 @@ public class Attendance extends Controller {
     }
 
     public Result deletePersonWeek(int person_id, String monday) {
-        CachedPage.remove(CACHE_INDEX);
+        CachedPage.remove(CachedPage.ATTENDANCE_INDEX);
 
         Calendar start_date = Utils.parseDateOrNow(monday);
         Calendar end_date = (Calendar)start_date.clone();
@@ -362,7 +360,7 @@ public class Attendance extends Controller {
     }
 
     public Result saveWeek(Integer week_id, Double extra_hours) {
-        CachedPage.remove(CACHE_INDEX);
+        CachedPage.remove(CachedPage.ATTENDANCE_INDEX);
 
         AttendanceWeek.find.byId(week_id).edit(extra_hours);
         return ok();
@@ -370,7 +368,7 @@ public class Attendance extends Controller {
 
     public Result saveDay(Integer day_id, String code,
         String start_time, String end_time) throws Exception {
-        CachedPage.remove(CACHE_INDEX);
+        CachedPage.remove(CachedPage.ATTENDANCE_INDEX);
 
         AttendanceDay.find.byId(day_id).edit(code, start_time, end_time);
         return ok();
@@ -405,8 +403,6 @@ public class Attendance extends Controller {
                 "",
                 "custodia_admin.html",
                 scopes));
-        response().discardCookie("ring-session");
-//        return result.(Http.Cookie.builder("ring-session", "").build());
         return result;
     }
 
@@ -421,7 +417,7 @@ public class Attendance extends Controller {
         Form<AttendanceCode> filled_form = getCodeForm().bindFromRequest();
         ac.edit(filled_form);
 
-        CachedPage.remove(CACHE_INDEX);
+        CachedPage.remove(CachedPage.ATTENDANCE_INDEX);
 
         return redirect(routes.Attendance.viewCodes());
     }
@@ -438,7 +434,7 @@ public class Attendance extends Controller {
             Integer.parseInt(filled_form.field("id").value()));
         ac.edit(filled_form);
 
-        CachedPage.remove(CACHE_INDEX);
+        CachedPage.remove(CachedPage.ATTENDANCE_INDEX);
 
         return redirect(routes.Attendance.viewCodes());
     }

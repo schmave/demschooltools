@@ -117,6 +117,18 @@ public class Organization extends Model {
                 this.show_history_in_print = false;
             }
         }
+        if (values.containsKey("attendance_settings")) {
+            if (values.containsKey("show_attendance")) {
+                this.show_attendance = Utils.getBooleanFromFormValue(values.get("show_attendance")[0]);
+            } else {
+                this.show_attendance = false;
+            }
+            if (values.containsKey("show_custodia")) {
+                this.show_custodia = Utils.getBooleanFromFormValue(values.get("show_custodia")[0]);
+            } else {
+                this.show_custodia = false;
+            }
+        }
         this.save();
     }
 }

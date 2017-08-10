@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -15,23 +14,17 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
 import com.avaje.ebean.Expression;
 import com.avaje.ebean.FetchConfig;
-import com.avaje.ebean.RawSql;
-import com.avaje.ebean.RawSqlBuilder;
-import com.avaje.ebean.SqlUpdate;
 import com.csvreader.CsvWriter;
 import com.ecwid.mailchimp.*;
 import com.ecwid.mailchimp.method.v2_0.lists.ListMethodResult;
-import com.feth.play.module.pa.PlayAuthenticate;
 import com.google.inject.Inject;
 
 import models.*;
 
-import play.*;
 import play.data.*;
 import play.data.validation.ValidationError;
 import play.libs.Json;
 import play.mvc.*;
-import play.mvc.Http.Context;
 
 
 @With(DumpOnError.class)
@@ -45,11 +38,9 @@ public class CRM extends Controller {
         mApplication = app;
     }
 
-    public static final String CACHE_RECENT_COMMENTS = "CRM-recentComments-";
-
     public Result recentComments() {
         return ok(views.html.cached_page.render(
-            new CachedPage(CACHE_RECENT_COMMENTS,
+            new CachedPage(CachedPage.RECENT_COMMENTS,
                 "All people",
                 "crm",
                 "recent_comments") {
@@ -240,8 +231,7 @@ public class CRM extends Controller {
 	}
 
     public Result addTag(Integer tagId, String title, Integer personId) {
-        CachedPage.remove(Application.CACHE_INDEX);
-        CachedPage.remove(Attendance.CACHE_INDEX);
+        CachedPage.onPeopleChanged();
 
         Person p = Person.findById(personId);
         if (p == null) {
@@ -269,9 +259,7 @@ public class CRM extends Controller {
 
         notifyAboutTag(the_tag, p, true);
 
-        CachedPage.remove(Application.CACHE_INDEX);
-        CachedPage.remove(Attendance.CACHE_INDEX);
-        CachedPage.remove(CACHE_RECENT_COMMENTS);
+        CachedPage.onPeopleChanged();
 
         return ok(views.html.tag_fragment.render(the_tag, p));
     }
@@ -346,9 +334,7 @@ public class CRM extends Controller {
             Tag t = Tag.findById(Integer.parseInt(form.field("id").value()));
             t.updateFromForm(form);
 
-            CachedPage.remove(Application.CACHE_INDEX);
-            CachedPage.remove(Attendance.CACHE_INDEX);
-            CachedPage.remove(CACHE_RECENT_COMMENTS);
+            CachedPage.onPeopleChanged();
 
             return redirect(routes.CRM.viewTag(t.id));
         }
@@ -597,8 +583,7 @@ public class CRM extends Controller {
     }
 
     public Result savePersonEdits() {
-        CachedPage.remove(Application.CACHE_INDEX);
-        CachedPage.remove(Attendance.CACHE_INDEX);
+        CachedPage.onPeopleChanged();
 
         Form<Person> personForm = Form.form(Person.class);
         Form<Person> filledForm = personForm.bindFromRequest();
@@ -630,7 +615,7 @@ public class CRM extends Controller {
     }
 
     public Result addComment() {
-        CachedPage.remove(CACHE_RECENT_COMMENTS);
+        CachedPage.remove(CachedPage.RECENT_COMMENTS);
         Form<Comment> filledForm = Form.form(Comment.class).bindFromRequest();
         Comment new_comment = new Comment();
 

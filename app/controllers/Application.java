@@ -13,13 +13,9 @@ import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
-import com.avaje.ebean.Expression;
 import com.avaje.ebean.FetchConfig;
-import com.avaje.ebean.RawSql;
-import com.avaje.ebean.RawSqlBuilder;
 import com.avaje.ebean.SqlQuery;
 import com.avaje.ebean.SqlRow;
-import com.avaje.ebean.SqlUpdate;
 import com.csvreader.CsvWriter;
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.google.inject.Inject;
@@ -27,7 +23,6 @@ import com.google.inject.Inject;
 import models.*;
 
 import play.*;
-import play.data.*;
 import play.libs.Json;
 import play.mvc.*;
 import play.mvc.Http.Context;
@@ -47,9 +42,6 @@ public class Application extends Controller {
         mAuth = auth;
         sInstance = this;
     }
-
-    public static final String CACHE_INDEX = "Application-index-";
-    public static final String CACHE_MANUAL = "Application-viewManual-";
 
     public static Date getDateFromString(String date_string) {
         if (!date_string.equals("")) {
@@ -109,7 +101,7 @@ public class Application extends Controller {
 
     public Result index() {
         return ok(views.html.cached_page.render(
-            new CachedPage(CACHE_INDEX,
+            new CachedPage(CachedPage.JC_INDEX,
                 "JC database",
                 "jc",
                 "jc_home") {
@@ -516,7 +508,7 @@ public class Application extends Controller {
 
     static play.twirl.api.Html renderManualTOC() {
         return views.html.cached_page.render(
-            new CachedPage(CACHE_MANUAL,
+            new CachedPage(CachedPage.MANUAL_INDEX,
                 OrgConfig.get().str_manual_title,
                 "manual",
                 "toc") {

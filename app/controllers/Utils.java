@@ -11,7 +11,20 @@ import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.MustacheFactory;
 
 import java.sql.SQLException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+import models.OrgConfig;
+import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
+import play.Configuration;
 import play.Play;
 import play.twirl.api.Html;
 import play.twirl.api.HtmlFormat;
@@ -19,6 +32,8 @@ import play.twirl.api.HtmlFormat;
 public class Utils
 {
     static MustacheFactory sMustache = new DefaultMustacheFactory();
+
+    static ExecutorService sCustodiaService = Executors.newFixedThreadPool(1);
 
     public static Calendar parseDateOrNow(String date_string) {
         Calendar result = new GregorianCalendar();
@@ -110,6 +125,69 @@ public class Utils
 
     public static boolean getBooleanFromFormValue(String form_value) {
         return form_value != null && (form_value.equals("true") || form_value.equals("on"));
+    }
+
+    private static void makeCustodiaPost(CloseableHttpClient client, String url, List<NameValuePair> data) {
+        CloseableHttpResponse response = null;
+        try {
+            try {
+                HttpPost httpPost = new HttpPost(url);
+                httpPost.setEntity(new UrlEncodedFormEntity(data));
+                response = client.execute(httpPost);
+                HttpEntity entity = response.getEntity();
+                EntityUtils.consume(entity);
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void loginToCustodia(CloseableHttpClient client, OrgConfig config, Configuration play_config) {
+        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+        nvps.add(new BasicNameValuePair("username", config.org.short_name + "-admin"));
+        nvps.add(new BasicNameValuePair("password", play_config.getString("custodia_password")));
+        makeCustodiaPost(client, play_config.getString("custodia_url") + "/users/login", nvps);
+    }
+
+    public static void setCustodiaPassword(String new_password) {
+        final OrgConfig config = OrgConfig.get();
+        final Configuration play_config = Application.getConfiguration();
+        sCustodiaService.submit(new Runnable() {
+            public void run() {
+                try {
+                    CloseableHttpClient httpclient = HttpClients.createDefault();
+                    loginToCustodia(httpclient, config, play_config);
+
+                    List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+                    nvps.add(new BasicNameValuePair("username", config.org.short_name));
+                    nvps.add(new BasicNameValuePair("password", new_password));
+                    makeCustodiaPost(httpclient,
+                            play_config.getString("custodia_url") + "/users/password",
+                            nvps);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public static void updateCustodia() {
+        final OrgConfig config = OrgConfig.get();
+        final Configuration play_config = Application.getConfiguration();
+        sCustodiaService.submit(new Runnable() {
+            public void run() {
+                CloseableHttpClient httpclient = HttpClients.createDefault();
+                loginToCustodia(httpclient, config, play_config);
+
+                makeCustodiaPost(httpclient,
+                        play_config.getString("custodia_url") + "/updatefromdst",
+                        new ArrayList<NameValuePair>());
+            }
+        });
     }
 }
 

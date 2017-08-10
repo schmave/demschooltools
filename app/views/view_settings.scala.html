@@ -2,7 +2,7 @@
 
 @main("Settings", "settings", "settings") {
 
-<h2>Notifications</h2>
+<h2>Notifications about people and tags</h2>
 
 <h4>Existing notification rules</h4>
 <ul>
@@ -44,7 +44,32 @@ enableNoPersonTagBox("#tag-entry", "#tags-entered", true);
 
 }
 
+<hr/>
+<h2>Attendance and Custodia</h2>
+<p class="instructions">DemSchoolTools has two separate attendance tracking systems. "Attendance" is the original one, and allows
+you to manually enter students' arrival and departure times, as well as absence reasons. "Custodia" (new as of Fall 2017)
+lets students and staff sign in and out using a web interface, so there is no manual entry of arrival and departure times.
+The two attendance systems do not share data with each other, so you will probably only want to use one of them. It is totally fine
+to have both enabled at once.</p>
 
+@helper.form(routes.Settings.editSettings()) {
+<p><label><input type="checkbox" name="show_attendance"
+                 @if(org.show_attendance){ checked }>
+    Enable the "Attendance" tab</label>
+    <br/>
+    <label><input type="checkbox" name="show_custodia"
+                  @if(org.show_custodia){ checked }>
+    Enable the "Custodia" tab</label></p>
+<p>The Custodia <a target="_blank" href="https://custodia.demschooltools.com">student dashboard</a> username is
+    "@OrgConfig.get().org.short_name" (case-sensitive). To reset the password, enter a new one here:
+    <br>
+    <input type="text" size="30" placeholder="New password" name="custodia_student_password" />
+</p>
+<input type="hidden" name="attendance_settings" value="true"/>
+<input type="submit" value="Save Attendance settings"/>
+}
+
+<hr/>
 <h2>@OrgConfig.get().str_jc_name_short</h2>
 <h4>Weekly Report</h4>
 @helper.form(routes.Settings.editSettings()) {
@@ -59,7 +84,7 @@ enableNoPersonTagBox("#tag-entry", "#tags-entered", true);
 }
 
 <h4>Other @OrgConfig.get().str_jc_name_short options</h4>
-<p>The following behaviors of the @OrgConfig.get().str_jc_name_short system can be changed easily by Evan, but not
+<p class="instructions">The following behaviors of the @OrgConfig.get().str_jc_name_short system can be changed easily by Evan, but not
     yet directly by you. Please <a class="feedback_open">contact me</a> if you would like to change any of them.
 <ul>
     <li>The format of case numbers, e.g. 2017-03-02-11</li>
@@ -73,6 +98,7 @@ enableNoPersonTagBox("#tag-entry", "#tags-entered", true);
         "@OrgConfig.get().str_findings", etc.</li>
 </ul>
 
+<hr/>
 <h2>@OrgConfig.get().str_manual_title</h2>
 @helper.form(routes.Settings.editSettings()) {
 <h4>Printing options</h4>
@@ -85,5 +111,5 @@ enableNoPersonTagBox("#tag-entry", "#tags-entered", true);
     Include the date of each change for each rule, e.g. "Adopted 2016-1-2; Amended 2016-3-25"</label>
 </p>
 <input type="hidden" name="manual_settings" value="true"/>
-<input type="submit" value="Save"/></p>
+<input type="submit" value="Save @OrgConfig.get().str_manual_title settings"/></p>
 }

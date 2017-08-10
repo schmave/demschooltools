@@ -29,7 +29,7 @@ public class ApplicationEditing extends Controller {
             .eq("organization", Organization.getByHost())
             .eq("date", new Date()).findUnique();
         if (the_meeting == null) {
-            CachedPage.remove(Application.CACHE_INDEX);
+            CachedPage.remove(CachedPage.JC_INDEX);
             the_meeting = Meeting.create(new Date());
             the_meeting.save();
         }
@@ -104,7 +104,7 @@ public class ApplicationEditing extends Controller {
 
     @Secured.Auth(UserRole.ROLE_EDIT_RECENT_JC)
     public Result saveCase(Integer id) {
-        CachedPage.remove(Application.CACHE_INDEX);
+        CachedPage.remove(CachedPage.JC_INDEX);
         Case c = Case.findById(id);
 
         c.edit(request().body().asFormUrlEncoded());
@@ -141,7 +141,7 @@ public class ApplicationEditing extends Controller {
     @Secured.Auth(UserRole.ROLE_EDIT_RECENT_JC)
     public Result addPersonAtCase(Integer case_id, Integer person_id, Integer role)
     {
-        CachedPage.remove(Application.CACHE_INDEX);
+        CachedPage.remove(CachedPage.JC_INDEX);
         PersonAtCase.create(Case.find.ref(case_id), Person.find.ref(person_id), role);
         return ok();
     }
@@ -170,7 +170,7 @@ public class ApplicationEditing extends Controller {
 
     @Secured.Auth(UserRole.ROLE_EDIT_RECENT_JC)
     public Result saveCharge(int id) {
-        CachedPage.remove(Application.CACHE_INDEX);
+        CachedPage.remove(CachedPage.JC_INDEX);
         Charge c = Charge.findById(id);
 
         c.edit(request().queryString());
@@ -216,7 +216,7 @@ public class ApplicationEditing extends Controller {
 
     @Secured.Auth(UserRole.ROLE_EDIT_RECENT_JC)
     public Result saveSchoolMeetingDecisions() {
-        CachedPage.remove(Application.CACHE_INDEX);
+        CachedPage.remove(CachedPage.JC_INDEX);
         Map<String, String[]> form_data = request().body().asFormUrlEncoded();
 
         Integer charge_id = Integer.parseInt(form_data.get("charge_id")[0]);
@@ -231,7 +231,7 @@ public class ApplicationEditing extends Controller {
     }
 
     void onManualChange() {
-        CachedPage.remove(Application.CACHE_MANUAL);
+        CachedPage.remove(CachedPage.MANUAL_INDEX);
         try {
             Connection conn = mDatabase.getConnection();
             conn.prepareStatement("REFRESH MATERIALIZED VIEW entry_index WITH DATA").execute();

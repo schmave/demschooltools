@@ -1,6 +1,5 @@
 package controllers;
 
-import java.io.*;
 import java.util.*;
 
 import com.avaje.ebean.Ebean;
@@ -10,7 +9,6 @@ import com.avaje.ebean.SqlUpdate;
 
 import models.*;
 
-import play.*;
 import play.data.*;
 import play.mvc.*;
 
@@ -30,6 +28,16 @@ public class Settings extends Controller {
     public Result editSettings() {
         final Map<String, String[]> values = request().body().asFormUrlEncoded();
         OrgConfig.get().org.updateFromForm(values);
+        CachedPage.clearAll();
+
+        String new_password = null;
+        if (values.containsKey("custodia_student_password")) {
+            new_password = values.get("custodia_student_password")[0];
+        }
+        if (new_password != null && !new_password.trim().isEmpty()) {
+            Utils.setCustodiaPassword(new_password);
+        }
+
         return redirect(routes.Settings.viewSettings());
     }
 
