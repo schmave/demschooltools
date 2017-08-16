@@ -40,7 +40,7 @@ GIT. Add in the following:
                       [org.apache.httpcomponents/httpclient "4.3.5"]
                       [org.seleniumhq.selenium/selenium-java "2.48.1"]]
        :env {:database-url "postgres://USER:PASSWORD@localhost:5432/DATABASE"
-             :admin "web"
+             :adminpass "web"
              :userpass "web"
              :dev true
              :newdb false

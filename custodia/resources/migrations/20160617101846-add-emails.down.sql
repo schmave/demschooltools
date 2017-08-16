@@ -1,1 +1,1 @@
-DROP TABLE emails;
+DROP TABLE overseer.emails;

@@ -194,4 +194,27 @@ WHERE c.school_id = :school_id
 ORDER BY c.name;
 
 -- name: get-class-y
-SELECT * from overseer.classes where name = :name;
+SELECT * from overseer.classes where name = :name and school_id = :school_id;
+
+-- name: activate-class-y!
+-- Set a single class to be active, and unactivate all others
+UPDATE overseer.classes SET active = (_id = :id) where school_id = :school_id;
+
+-- name: delete-student-from-class-y!
+DELETE FROM overseer.classes_X_students
+WHERE student_id = :student_id
+      AND class_id = :class_id;
+
+-- name: get-students-with-dst-y
+SELECT p.first_name, p.last_name, p.person_id, stu.*
+  from tag t
+  join person_tag pt on t.id=pt.tag_id
+  join person p on pt.person_id=p.person_id
+  left join overseer.students stu on stu.dst_id=p.person_id
+  where t.show_in_jc=true and p.organization_id=:school_id
+  GROUP BY p.person_id, stu._id;
+
+-- name: get-schools-with-dst-y
+SELECT *
+  from organization o
+  left join overseer.schools s on o.id=s._id;

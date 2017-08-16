@@ -22,7 +22,7 @@
 
 ;; (insert-email "test@test.com")
 (logh/deftrace insert-email [email]
-  (jdbc/insert! @pgdb :emails {:email email}))
+  (jdbc/insert! @pgdb :overseer.emails {:email email}))
 
 ;; (get-user "admin2")
 (defn get-user [username]
@@ -31,13 +31,13 @@
 
 ;;(get-users)
 (defn get-users []
-  (->> (jdbc/query @pgdb ["select * from users;"])
+  (->> (jdbc/query @pgdb ["select * from overseer.users;"])
        (map #(dissoc % :password))))
 
 ;;(set-user-schema "super" "TEST")
 ;;(get-user "super")
 (defn set-user-school [_id school]
-  (jdbc/update! @pgdb :users {:school_id school} ["user_id=?" _id]))
+  (jdbc/update! @pgdb :overseer.users {:school_id school} ["user_id=?" _id]))
 
 (defn make-new-school [school]
   (db/persist! {:type :schools :name school}))
@@ -47,25 +47,27 @@
    (make-user username password roles db/*school-id*))
   ([username password roles school]
    (if-not (get-user username)
-     (jdbc/insert! @pgdb "users"
+     (jdbc/insert! @pgdb :overseer.users
                    {:username username
                     :password (creds/hash-bcrypt password)
                     :school_id school
                     :roles  (str (conj roles roles/user))}))))
 
+(defn change-password [username password]
+  (jdbc/update! @pgdb :overseer.users {:password (creds/hash-bcrypt password)}
+                                      ["username=?" username]))
+
 (defn init-users []
-  (make-user "admin" (env :admin) #{roles/admin roles/user} 1)
-  (make-user "super" (env :admin) #{roles/admin roles/user roles/super} 1)
+  (make-user "admin" (env :adminpass) #{roles/admin roles/user} 1)
+  (make-user "super" (env :adminpass) #{roles/admin roles/user roles/super} 1)
   (make-user "user" (env :userpass) #{roles/user} 1)
-  (make-user "admin2" (env :admin) #{roles/admin roles/user} 2)
+  (make-user "admin2" (env :adminpass) #{roles/admin roles/user} 2)
   (make-user "demo" (env :userpass) #{roles/admin roles/user} 2)
   )
 
 (defn drop-all-tables []
-  (jdbc/execute! @pgdb [(str "DROP TABLE IF EXISTS schema_migrations;"
-                             "DROP TABLE IF EXISTS users; "
-                             "DROP TABLE IF EXISTS emails; "
-                             "DROP TABLE IF EXISTS session_store;"
+  (jdbc/execute! @pgdb [(str "DROP SCHEMA IF EXISTS overseer CASCADE;"
+                             "DROP TABLE IF EXISTS schema_migrations; "
                              "DROP SCHEMA IF EXISTS phillyfreeschool CASCADE;"
                              "DROP SCHEMA IF EXISTS overseer CASCADE;"
                              "DROP SCHEMA IF EXISTS demo CASCADE;")]))

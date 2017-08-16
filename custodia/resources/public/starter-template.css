@@ -243,3 +243,24 @@ a {
 .cal-heatmap-container text.now{
     fill: #0086b3;
 }
+
+.navbar {
+    border-bottom: 1px #a67ffa solid;
+    border-left: 1px #a67ffa solid;
+    border-right: 1px #a67ffa solid;
+    padding: 5px;
+    background-color: #ebe2ff;
+    margin-bottom: 5px;
+    min-height: 0;
+}
+
+.navbar-nav>li>a {
+    padding-bottom: 0;
+    padding-top: 0;
+}
+
+.navbar-brand {
+    padding-bottom: 0;
+    padding-top: 0;
+    height: inherit;
+}

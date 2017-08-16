@@ -1,4 +1,4 @@
-CREATE TABLE users(
+CREATE TABLE overseer.users(
   user_id BIGSERIAL PRIMARY KEY,
   username VARCHAR(255),
   password VARCHAR(255),

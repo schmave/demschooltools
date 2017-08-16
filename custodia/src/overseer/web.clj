@@ -17,6 +17,7 @@
             [clojure.tools.logging :as log]
             [clojure.pprint :as pp]
             [overseer.db :as db]
+            [overseer.commands :as cmd]
             [overseer.queries :as queries]
             [overseer.database.sample-db :as sampledb]
             [overseer.dates :as dates]
@@ -45,6 +46,10 @@
 (def start-id (subs (uuid) 0 7))
 
 (defroutes app
+  (POST "/updatefromdst" req
+    (friend/authorize #{roles/admin}
+                      (resp/response (cmd/update-from-dst))))
+
   (GET "/" []
     (friend/authenticated
      (render-string (read-template "index.html") {:id start-id})))
@@ -75,6 +80,9 @@
 
   (GET "/about" req
     (io/resource "about.html"))
+  (POST "/users/password" [username password]
+    (friend/authorize #{roles/admin}
+      (users/change-password username password)))
   (GET "/users/login" req
     (io/resource "login.html"))
   (GET "/users/logout" req
@@ -116,7 +124,18 @@
       (handler request)
       (catch Exception e
         (log/error e "Exception")
-        {:status 400 :body "Invalid data"}))))
+        {:status 500 :body "Server Error"}))))
+
+(def production?
+  (= "production" (env :appenv)))
+
+(def development?
+  (not production?))
+
+(defn wrap-if [handler pred wrapper & args]
+  (if pred
+    (apply wrapper handler args)
+    handler))
 
 (defn tapp []
   (-> #'app
@@ -126,8 +145,8 @@
                             :default-landing-uri "/"
                             :workflows [(workflows/interactive-form)]})
       (compojure/wrap-routes my-middleware)
-      wrap-reload
-      (wrap-session {:store (jdbc-store @conn/pgdb)
+      (wrap-if development? wrap-reload)
+      (wrap-session {:store (jdbc-store @conn/pgdb {:table :overseer.session_store})
                      :cookie-attrs {:max-age (* 3 365 24 3600)}})
       wrap-not-modified
       wrap-keyword-params
@@ -137,7 +156,7 @@
       wrap-exception-handling
       ))
 
-;;(start-site 5000)  
+;;(start-site 5000)
 (defn start-site [port]
   (conn/init-pg)
   (when (env :migratedb)
