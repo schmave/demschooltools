@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS overseer.users;
+DROP TABLE IF EXISTS users;

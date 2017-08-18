@@ -43,9 +43,9 @@ REFERENCES overseer.schools(_id);
 
 --;;
 
-ALTER TABLE overseer.users ADD COLUMN school_id bigserial;
+ALTER TABLE users ADD COLUMN school_id bigserial;
 
 --;;
 
-UPDATE overseer.users SET school_id=1;
+UPDATE users SET school_id=1;
 

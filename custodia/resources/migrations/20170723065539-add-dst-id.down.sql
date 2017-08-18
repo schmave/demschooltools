@@ -1,3 +1,15 @@
+ALTER TABLE emails set schema public;
+
+--;;
+
+ALTER TABLE session_store set schema public;
+
+--;;
+
+ALTER TABLE users set schema public;
+
+--;;
+
 ALTER TABLE overseer.students DROP COLUMN dst_id;
 
 --;;

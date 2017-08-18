@@ -1,4 +1,4 @@
-create schema if not exists demo;
+create schema demo;
 --;;
 create table demo.students(
   _id bigserial primary key,
