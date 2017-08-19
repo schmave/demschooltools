@@ -93,6 +93,9 @@
   (when-let [year (first (queries/get-years year))]
     (db/delete! year)))
 
+(defn delete-student [id]
+  (db/delete! {:type "students" :_id id}))
+
 (defn edit-student
   ([_id name start-date email] (edit-student _id name start-date email false))
   ([_id name start-date email is_teacher]

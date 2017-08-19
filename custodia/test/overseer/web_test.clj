@@ -43,6 +43,13 @@
                           (dates/make-date-string (t/minus (t/now)
                                                            (t/days 1)))])))))
 
+(deftest delete-students
+  (sample-db false)
+  (testing "delete student"
+    (let [student (cmd/make-student "namename2")
+          found (first (queries/get-student (:_id student)))]
+      (is (= (:name found) (:name student))))))
+
 (deftest make-swipe-out
   (testing "sanitize"
     (testing "sanitize swipe out no times"
