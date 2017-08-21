@@ -32,10 +32,10 @@ sql-philly-backup :
 	curl -o latest.dump `heroku pg:backups public-url -a shining-overseer`
 
 sql-backup-local-restore :
-	pg_restore --verbose --clean --no-acl --no-owner -h localhost -U postgres -d swipes latest.dump
+	pg_restore --verbose --clean --no-acl --no-owner -h localhost -U postgres -d school_crm latest.dump
 
 generate-sequence-reset :
-	psql -h localhost -U postgres -d swipes -Atq -f reset.sql -o genreset.sql
+	psql -h localhost -U postgres -d school_crm -Atq -f reset.sql -o genreset.sql
 
 run-sequence-reset :
 	psql -f genreset.sql
@@ -70,23 +70,23 @@ deploy-dst : minify
 	ssh custodia@demschooltools.com ./run_server.sh
 
 # createuser jack -U postgres
-# grant all privileges on database swipes to jack;
+# grant all privileges on database school_crm to jack;
 # ALTER USER jack WITH SUPERUSER;
 # insert into classes_X_students (class_id, student_id) select 1, _id from students;
 drop-tables :
-	psql -d swipes -c "DROP SCHEMA IF EXISTS public CASCADE; DROP SCHEMA IF EXISTS phillyfreeschool CASCADE; DROP SCHEMA IF EXISTS overseer CASCADE; CREATE schema public; "
+	psql -d school_crm -c "DROP SCHEMA IF EXISTS phillyfreeschool CASCADE; DROP SCHEMA IF EXISTS overseer CASCADE; "
 
 sql-local :
-	psql -d swipes
+	psql -d school_crm
 
 load-massive-dump : drop-tables
-	psql swipes < massive.dump
+	psql school_crm < massive.dump
 
 load-aliased-dump : drop-tables
-	psql swipes < dumps/updated-students-aliased.dump
+	psql school_crm < dumps/updated-students-aliased.dump
 
 backup-aliased-dump :
-	pg_dump swipes > dumps/updated-students-aliased.dump
+	pg_dump school_crm > dumps/updated-students-aliased.dump
 
 minify :
 	./node_modules/.bin/browserify -t babelify -t reactify -t uglifyify ./src/js/app.jsx -o ./resources/public/js/gen/app.js
