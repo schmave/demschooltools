@@ -58,12 +58,16 @@
 	@if(weeks.containsKey(p)) {
 		<td>@weeks.get(p).extra_hours</td>
 	} else {
-		<td>0</td>
+		<td>--</td>
 	}
 
-	<td>@Attendance.format(Attendance.getDaysPresent(days.get(p)))</td>
-	<td>@Attendance.format(Attendance.getTotalHours(days.get(p), weeks.get(p)))</td>
-	<td>@Attendance.format(Attendance.getAverageHours(days.get(p), weeks.get(p)))</td>
+    @if( days.containsKey(p) && weeks.containsKey(p) ) {
+        <td>@Attendance.format(Attendance.getDaysPresent(days.get(p)))</td>
+        <td>@Attendance.format(Attendance.getTotalHours(days.get(p), weeks.get(p)))</td>
+        <td>@Attendance.format(Attendance.getAverageHours(days.get(p), weeks.get(p)))</td>
+    } else {
+        <td>--</td><td>--</td><td>--</td>
+    }
 	</tr>
 }
 </table>
