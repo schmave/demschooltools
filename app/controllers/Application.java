@@ -935,6 +935,10 @@ public class Application extends Controller {
         return new SimpleDateFormat("MM/dd").format(d);
     }
 
+    public static String formatDateMdy(Date d) {
+        return new SimpleDateFormat("MM/dd/yyyy").format(d);
+    }
+
     public static String formatMeetingDate(Date d) {
         return new SimpleDateFormat("EE--MMMM dd, yyyy").format(d);
     }

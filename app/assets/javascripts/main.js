@@ -39,12 +39,19 @@ $(function() {
     });
 
     $( "#navbar_people_search" ).autocomplete({
-        source: "/jsonPeople",
-        minLength: 2
+        minLength: 2,
+        select: function(event, ui) {
+            window.location.href="/people/" + ui.item.id;
+        },
+        source: "/jsonPeople"
     });
 
-    $( "#navbar_people_search" ).bind( "autocompleteselect", function(event, ui) {
-        window.location.href="/people/" + ui.item.id;
+    $( "#navbar_attendance_people_search" ).autocomplete({
+        minLength: 2,
+        select: function(event, ui) {
+            window.location.href="/attendance/forPerson/" + ui.item.id;
+        },
+        source: "/attendance/jsonPeople"
     });
 
     $( ".task_checkbox" ).click( function (event) {
@@ -73,6 +80,12 @@ $(function() {
     utils.limitHeight('.should-limit');
 
     feedback_modal.init();
+
+    $(function() {
+        $('input.date.attendance-week').datepicker('option', 'onSelect', function(str_date) {
+             location.href = "/attendance/viewWeek?date=" + str_date;
+        });
+    });
 });
 
 window.initCustodiaAdmin = function(url, username, password) {

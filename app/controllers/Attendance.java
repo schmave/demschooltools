@@ -3,15 +3,18 @@ package controllers;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.sql.Time;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import com.avaje.ebean.Expr;
 import com.csvreader.CsvWriter;
 
 import models.*;
 
 import play.*;
 import play.data.*;
+import play.libs.Json;
 import play.mvc.*;
 
 import static controllers.Application.getConfiguration;
@@ -166,24 +169,76 @@ public class Attendance extends Controller {
         }
     }
 
-    public Result viewPersonReport(Integer person_id) {
+    public Result jsonPeople(String term) {
+        List<Person> name_matches =
+                Person.find.where()
+                    .add(Expr.or(Expr.ilike("last_name", "%" + term + "%"),
+                                 Expr.ilike("first_name", "%" + term + "%")))
+                    .eq("organization", Organization.getByHost())
+                    .eq("is_family", false)
+                    .findList();
+
+        List<Person> selected_people = new ArrayList<>();
+        for (Person p : name_matches) {
+            if (!p.attendance_days.isEmpty()) {
+                selected_people.add(p);
+            }
+        }
+        selected_people.sort(Person.SORT_FIRST_NAME);
+
+        List<Map<String, String>> result = new ArrayList<>();
+        for (Person p : selected_people) {
+            HashMap<String, String> values = new HashMap<>();
+            String label = p.first_name;
+            if (p.last_name != null) {
+                label = label + " " + p.last_name;
+            }
+            values.put("label", label);
+            values.put("id", "" + p.person_id);
+            result.add(values);
+        }
+
+        return ok(Json.stringify(Json.toJson(result)));
+    }
+
+    public Result viewPersonReport(Integer person_id, String start_date_str, String end_date_str) {
         Person p = Person.findById(person_id);
 
-        Calendar now = new GregorianCalendar();
+        Date start_date = Application.getStartOfYear();
+        Date end_date = new Date();
+
+        if (!start_date_str.trim().isEmpty() || !end_date_str.trim().isEmpty()) {
+            try {
+                start_date = new SimpleDateFormat("yyyy-M-d").parse(start_date_str);
+                end_date = new SimpleDateFormat("yyyy-M-d").parse(end_date_str);
+            } catch (ParseException e) {
+            }
+        } else {
+            AttendanceDay last_day =
+                    AttendanceDay.find.where()
+                            .eq("person", p)
+                            .order("day DESC")
+                            .setMaxRows(1)
+                            .findUnique();
+            if (last_day != null) {
+                end_date = last_day.day;
+                start_date = Application.getStartOfYear(end_date);
+            }
+        }
 
         List<AttendanceDay> days =
             AttendanceDay.find.where()
                 .eq("person", p)
-                .ge("day", Application.getStartOfYear())
-                .le("day", now.getTime())
+                .ge("day", start_date)
+                .le("day", end_date)
                 .order("day ASC")
                 .findList();
 
         List<AttendanceWeek> weeks =
             AttendanceWeek.find.where()
                 .eq("person", p)
-                .ge("monday", Application.getStartOfYear())
-                .le("monday", now.getTime())
+                .ge("monday", start_date)
+                .le("monday", end_date)
                 .findList();
 
         Map<String, AttendanceCode> codes = getCodesMap(true);
@@ -198,7 +253,10 @@ public class Attendance extends Controller {
             days,
             day_to_week,
             new ArrayList<String>(codes.keySet()),
-            codes));
+            codes,
+            start_date,
+            end_date
+        ));
     }
 
     public Result createPersonWeek() {

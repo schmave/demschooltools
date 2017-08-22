@@ -95,12 +95,14 @@ public class CRM extends Controller {
     }
 
     public Result jsonPeople(String query) {
-		Expression search_expr = null;
-
-		HashSet<Person> selected_people = new HashSet<Person>();
+		HashSet<Person> selected_people = new HashSet<>();
 		boolean first_time = true;
 
 		for (String term : query.split(" ")) {
+		    term = term.trim();
+		    if (term.length() < 2) {
+		        continue;
+            }
 			List<Person> people_matched_this_round;
 
 			Expression this_expr =
@@ -134,9 +136,16 @@ public class CRM extends Controller {
 			first_time = false;
 		}
 
-        List<Map<String, String> > result = new ArrayList<Map<String, String> > ();
-        for (Person p : selected_people) {
-            HashMap<String, String> values = new HashMap<String, String>();
+		List<Person> sorted_people = new ArrayList<>();
+		sorted_people.addAll(selected_people);
+		sorted_people.sort(Person.SORT_FIRST_NAME);
+		if (sorted_people.size() > 30) {
+            sorted_people = sorted_people.subList(0, 29);
+        }
+
+        List<Map<String, String> > result = new ArrayList<>();
+        for (Person p : sorted_people) {
+            HashMap<String, String> values = new HashMap<>();
             String label = p.first_name;
             if (p.last_name != null) {
                 label = label + " " + p.last_name;
