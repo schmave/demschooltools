@@ -74,7 +74,7 @@ deploy-dst : minify
 # ALTER USER jack WITH SUPERUSER;
 # insert into classes_X_students (class_id, student_id) select 1, _id from students;
 drop-tables :
-	psql -d school_crm -c "DROP SCHEMA IF EXISTS phillyfreeschool CASCADE; DROP SCHEMA IF EXISTS overseer CASCADE; "
+	psql -d school_crm -c "DROP SCHEMA IF EXISTS phillyfreeschool CASCADE; DROP SCHEMA IF EXISTS overseer CASCADE; DROP SCHEMA IF EXISTS public CASCADE; CREATE SCHEMA public;"
 
 sql-local :
 	psql -d school_crm

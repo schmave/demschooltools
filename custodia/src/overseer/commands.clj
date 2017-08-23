@@ -14,7 +14,7 @@
             [environ.core :refer [env]]
             ))
 
-(defqueries "overseer/yesql/queries.sql" )
+(defqueries "overseer/yesql/commands.sql" )
 
 (defn activate-class
   ([id] (activate-class id db/*school-id*))
@@ -199,13 +199,16 @@
       schools))
   ))
 
+(defn delete-removed-students [students-to-keep]
+  (db/q delete-inactive-students-y! {:students_to_keep students-to-keep}))
+
 (defn update-all-students-from-dst [school-id]
-  (let [students (db/q get-students-with-dst-y {:school_id school-id})
+  (let [students (queries/get-students-with-dst school-id)
         new-students (filter #(= (:dst_id %) nil) students)
         start-of-year (get-start-of-year)
         class-name (str (t/year start-of-year) "-" (+ 1 (t/year start-of-year)))
         end-of-year (t/date-time (+ 1 (t/year start-of-year)) 7 31)
-        ignored (make-class class-name start-of-year end-of-year school-id)
+        _ (make-class class-name start-of-year end-of-year school-id)
         {class-id :_id} (queries/get-class-by-name class-name school-id)]
     (activate-class class-id school-id)
 
@@ -229,6 +232,7 @@
     ; but they are not in the class.
 
     ; TODO: Remove students from the class who are not in `students`
+    (delete-removed-students (map :_id students))
 
     ; TODO: Update students' names if they don't match the DST name
     ))

@@ -113,3 +113,6 @@
   (let [last (lookup-last-swipe id)]
     (when (= day (dates/make-date-string (:in_time last)))
       last)))
+
+(defn get-students-with-dst [school-id]
+  (db/q get-students-with-dst-y {:school_id school-id}))

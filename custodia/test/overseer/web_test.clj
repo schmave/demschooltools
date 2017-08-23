@@ -43,6 +43,24 @@
                           (dates/make-date-string (t/minus (t/now)
                                                            (t/days 1)))])))))
 
+(deftest delete-students-not-in-list
+  (testing "delete removed students"
+    (do (sample-db false)
+        (let [{id1 :_id} (cmd/make-student "saved1")
+              _ (cmd/add-student-to-class id1 (get-class-id-by-name "2014-2015"))
+              _ (cmd/swipe-in id1)
+              {id2 :_id} (cmd/make-student "deleted2")
+              _ (cmd/add-student-to-class id2 (get-class-id-by-name "2014-2015"))
+              _ (cmd/swipe-in id2)
+              {id3 :_id} (cmd/make-student "saved3")
+              _ (cmd/add-student-to-class id3 (get-class-id-by-name "2014-2015"))
+              _ (cmd/swipe-in id3)
+              _ (cmd/delete-removed-students [id1 id3])]
+          (do
+            (is (= id1 (-> id1 queries/get-student first :_id)))
+            (is (= nil (-> id2 queries/get-student first :_id)))
+            (is (= id3 (-> id3 queries/get-student first :_id))))))))
+
 (deftest delete-students
   (sample-db false)
   (testing "delete student"
