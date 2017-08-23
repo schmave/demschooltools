@@ -96,6 +96,9 @@
 (defn delete-student [id]
   (db/delete! {:type "students" :_id id}))
 
+(defn rename-student [{_id :_id name :name}]
+  (db/update! :students _id {:name name}))
+
 (defn edit-student
   ([_id name start-date email] (edit-student _id name start-date email false))
   ([_id name start-date email is_teacher]
@@ -202,9 +205,13 @@
 (defn delete-removed-students [students-to-keep]
   (db/q delete-inactive-students-y! {:students_to_keep students-to-keep}))
 
+(defn bulk-update-student-names [students]
+  (dorun (map rename-student students)))
+
 (defn update-all-students-from-dst [school-id]
   (let [students (queries/get-students-with-dst school-id)
-        new-students (filter #(= (:dst_id %) nil) students)
+        new-students (filter #(= nil (:dst_id %) ) students)
+        existing-students (filter #(not= nil (:dst_id %)) students)
         start-of-year (get-start-of-year)
         class-name (str (t/year start-of-year) "-" (+ 1 (t/year start-of-year)))
         end-of-year (t/date-time (+ 1 (t/year start-of-year)) 7 31)
@@ -231,10 +238,9 @@
     ; TODO: Add students to the class if their student record already existed
     ; but they are not in the class.
 
-    ; TODO: Remove students from the class who are not in `students`
     (delete-removed-students (map :_id students))
 
-    ; TODO: Update students' names if they don't match the DST name
+    (bulk-update-student-names existing-students)
     ))
 
 (defn update-from-dst []
