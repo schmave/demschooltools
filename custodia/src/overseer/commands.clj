@@ -133,6 +133,10 @@
 (defn- has-name [n]
   (not= "" (clojure.string/trim n)))
 
+(defn make-student-starting-today
+  ([name] (make-student-starting-today name ""))
+  ([name email] (make-student name (dates/today-string) email)))
+
 (defn make-student
   ([name] (make-student name nil))
   ([name start-date] (make-student name start-date ""))
@@ -149,9 +153,6 @@
                    :is_teacher is_teacher
                    :show_as_absent nil}))))
 
-(defn make-student-starting-today
-  ([name] (make-student-starting-today name ""))
-  ([name email] (make-student name (dates/today-string) email)))
 
 (defn- toggle-date [older]
   (if older nil (make-sqldate (str (t/now)))))
@@ -193,24 +194,49 @@
 (defn update-schools-from-dst []
   (let [schools (db/q get-schools-with-dst-y {})
         new-schools (filter #(= (:_id %) nil) schools)]
-    (dorun (map (fn [school]
-        (db/persist! {:type :schools :name (:name school) :_id (:id school)}))
-      new-schools))
-    (dorun (map (fn [school]
-        (users/make-user (str (:short_name school) "-admin") (env :adminpass) #{roles/admin roles/user} (:id school))
-        (users/make-user (str (:short_name school)) (env :userpass) #{roles/user} (:id school)))
-      schools))
-  ))
+    (run! (fn [school]
+            (db/persist! {:type :schools :name (:name school) :_id (:id school)}))
+          new-schools)
+    (run! (fn [school]
+            (users/make-user (str (:short_name school) "-admin") (env :adminpass) #{roles/admin roles/user} (:id school))
+            (users/make-user (str (:short_name school)) (env :userpass) #{roles/user} (:id school)))
+          schools)))
 
 (defn delete-removed-students [students-to-keep]
   (db/q delete-inactive-students-y! {:students_to_keep students-to-keep}))
 
 (defn bulk-update-student-names [students]
-  (dorun (map rename-student students)))
+  (run! rename-student students))
+
+(def DstStudent {:person_id s/Num
+                 :first_name s/Str
+                 :last_name s/Str})
+
+(s/defn create-dst-student :- s/Any
+  [name :- s/Str dst-id :- s/Num school-id :- s/Num]
+  (let [new-el {:type :students
+                :name name
+                :school_id school-id
+                :dst_id dst-id
+                :start_date nil
+                :guardian_email nil
+                :olderdate nil
+                :is_teacher false
+                :show_as_absent nil}]
+    (db/persist! new-el)))
+
+(s/defn bulk-create-students-in-class :- s/Any
+  [dst-students :- [DstStudent] class-id :- s/Num school-id :- s/Num]
+  (run! (fn [dst]
+          (let [name (str (:first_name dst) " " (:last_name dst))
+                dst-id (:person_id dst)
+                {student-id :_id} (create-dst-student name dst-id school-id)]
+            (add-student-to-class student-id class-id)))
+        dst-students))
 
 (defn update-all-students-from-dst [school-id]
   (let [students (queries/get-students-with-dst school-id)
-        new-students (filter #(= nil (:dst_id %) ) students)
+        new-students (filter #(= nil (:dst_id %)) students)
         existing-students (filter #(not= nil (:dst_id %)) students)
         start-of-year (get-start-of-year)
         class-name (str (t/year start-of-year) "-" (+ 1 (t/year start-of-year)))
@@ -221,19 +247,7 @@
 
     ; Create student records for people who don't exist
     ; and add them to a class
-    (dorun (map
-        #(let [new-el {:type :students
-                   :name (str (:first_name %) " " (:last_name %))
-                   :school_id school-id
-                   :dst_id (:person_id %)
-                   :start_date nil
-                   :guardian_email nil
-                   :olderdate nil
-                   :is_teacher false
-                   :show_as_absent nil}
-               {student-id :_id} (db/persist! new-el)]
-          (add-student-to-class student-id class-id))
-        new-students))
+    (bulk-create-students-in-class new-students class-id school-id)
 
     ; TODO: Add students to the class if their student record already existed
     ; but they are not in the class.
@@ -245,7 +259,6 @@
 
 (defn update-from-dst []
   (update-schools-from-dst)
-  (dorun
-    (map (fn [school]
-        (update-all-students-from-dst (:_id school)))
-      (db/q get-schools-with-dst-y {}))))
+  (run! (fn [school]
+          (update-all-students-from-dst (:_id school)))
+        (db/q get-schools-with-dst-y {})))

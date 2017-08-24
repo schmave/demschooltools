@@ -42,6 +42,21 @@
                                                            (t/days 2)))
                           (dates/make-date-string (t/minus (t/now)
                                                            (t/days 1)))])))))
+
+(deftest bulk-create-students-test
+  (sample-db false)
+  (let [active-class (queries/get-active-class)
+        _ (cmd/bulk-create-students-in-class [{:person_id 1 :first_name "a" :last_name "b"}
+                                              {:person_id 2 :first_name "c" :last_name "d"}]
+                                             active-class
+                                             db/*school-id*)
+        students (att/get-student-list)]
+    (is (= 4 (count students)))
+    (is (= "a b" (->> students (filter (fn [s] (= (:_id s) 3))) first :name)))
+    (is (= "c d" (->> students (filter (fn [s] (= (:_id s) 4))) first :name)))
+    ;;(is (= nil students))
+    ))
+
 (deftest bulk-update-student-names
   (sample-db false)
   (let [{id1 :_id} (cmd/make-student "1")
