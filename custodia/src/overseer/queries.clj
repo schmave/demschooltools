@@ -116,3 +116,6 @@
 
 (defn get-students-with-dst [school-id]
   (db/q get-students-with-dst-y {:school_id school-id}))
+
+(defn get-schools-with-dst []
+  (db/q get-schools-with-dst-y {}))

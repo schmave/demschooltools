@@ -134,10 +134,6 @@
 (defn- has-name [n]
   (not= "" (clojure.string/trim n)))
 
-(defn make-student-starting-today
-  ([name] (make-student-starting-today name ""))
-  ([name email] (make-student name (dates/today-string) email)))
-
 (defn make-student
   ([name] (make-student name nil))
   ([name start-date] (make-student name start-date ""))
@@ -154,6 +150,9 @@
                    :is_teacher is_teacher
                    :show_as_absent nil}))))
 
+(defn make-student-starting-today
+  ([name] (make-student-starting-today name ""))
+  ([name email] (make-student name (dates/today-string) email)))
 
 (defn- toggle-date [older]
   (if older nil (make-sqldate (str (t/now)))))
@@ -193,7 +192,7 @@
     (t/date-time (+ year-adjustment (t/year now)) 8 1)))
 
 (defn update-schools-from-dst []
-  (let [schools (db/q get-schools-with-dst-y {})
+  (let [schools (queries/get-schools-with-dst)
         new-schools (filter #(= (:_id %) nil) schools)]
     (run! (fn [school]
             (db/persist! {:type :schools :name (:name school) :_id (:id school)}))
@@ -257,8 +256,6 @@
     ; and add them to a class
     (bulk-insert-new-students new-students class-id school-id)
 
-    ; TODO: Add students to the class if their student record already existed
-    ; but they are not in the class.
     (ensure-existing-students-in-class existing-students class-id)
 
     (delete-removed-students (map :_id students))
@@ -270,4 +267,4 @@
   (update-schools-from-dst)
   (run! (fn [school]
           (update-all-students-from-dst (:_id school)))
-        (db/q get-schools-with-dst-y {})))
+        (queries/get-schools-with-dst)))
