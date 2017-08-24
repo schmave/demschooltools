@@ -46,16 +46,30 @@
 (deftest bulk-create-students-test
   (sample-db false)
   (let [active-class (queries/get-active-class)
-        _ (cmd/bulk-create-students-in-class [{:person_id 1 :first_name "a" :last_name "b"}
-                                              {:person_id 2 :first_name "c" :last_name "d"}]
-                                             active-class
-                                             db/*school-id*)
+        _ (cmd/bulk-insert-new-students [{:person_id 1 :first_name "a" :last_name "b"}
+                                         {:person_id 2 :first_name "c" :last_name "d"}]
+                                        active-class
+                                        db/*school-id*)
         students (att/get-student-list)]
     (is (= 4 (count students)))
     (is (= "a b" (->> students (filter (fn [s] (= (:_id s) 3))) first :name)))
     (is (= "c d" (->> students (filter (fn [s] (= (:_id s) 4))) first :name)))
     ;;(is (= nil students))
     ))
+
+(deftest ensure-existing-students-in-class-test
+  (sample-db false)
+  (let [active-class (queries/get-active-class)
+        {id1 :_id} (cmd/make-student "1")
+        _ (cmd/add-student-to-class id1 active-class)
+        {id2 :_id} (cmd/make-student "2")
+        {id3 :_id} (cmd/make-student "3")
+        _ (cmd/ensure-existing-students-in-class [id1 id2 id3] active-class)
+        students-in-class (->> (queries/get-all-classes-and-students)
+                               :classes first :students (map :student_id) set)]
+    (do
+      (is (= students-in-class (set (concat students-in-class [id1 id2 id3]))))
+      )))
 
 (deftest bulk-update-student-names
   (sample-db false)
@@ -73,14 +87,15 @@
 
 (deftest delete-students-not-in-list
   (do (sample-db false)
-      (let [{id1 :_id} (cmd/make-student "saved1")
-            _ (cmd/add-student-to-class id1 (get-class-id-by-name "2014-2015"))
+      (let [active-class (queries/get-active-class)
+            {id1 :_id} (cmd/make-student "saved1")
+            _ (cmd/add-student-to-class id1 active-class)
             _ (cmd/swipe-in id1)
             {id2 :_id} (cmd/make-student "deleted2")
-            _ (cmd/add-student-to-class id2 (get-class-id-by-name "2014-2015"))
+            _ (cmd/add-student-to-class id2 active-class)
             _ (cmd/swipe-in id2)
             {id3 :_id} (cmd/make-student "saved3")
-            _ (cmd/add-student-to-class id3 (get-class-id-by-name "2014-2015"))
+            _ (cmd/add-student-to-class id3 active-class)
             _ (cmd/swipe-in id3)
             _ (cmd/delete-removed-students [id1 id3])]
         (do

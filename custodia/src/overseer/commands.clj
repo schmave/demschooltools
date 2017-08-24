@@ -8,6 +8,7 @@
             [clojure.tools.logging :as log]
             [clj-time.format :as f]
             [clj-time.local :as l]
+            [clojure.set :as set]
             [clj-time.core :as t]
             [clj-time.coerce :as c]
             [schema.core :as s]
@@ -202,18 +203,17 @@
             (users/make-user (str (:short_name school)) (env :userpass) #{roles/user} (:id school)))
           schools)))
 
-(defn delete-removed-students [students-to-keep]
+(s/defn delete-removed-students [students-to-keep :- [s/Num]]
   (db/q delete-inactive-students-y! {:students_to_keep students-to-keep}))
 
-(defn bulk-update-student-names [students]
+(s/defn bulk-update-student-names [students :- [{:_id s/Num :name s/Str}]]
   (run! rename-student students))
 
 (def DstStudent {:person_id s/Num
                  :first_name s/Str
                  :last_name s/Str})
 
-(s/defn create-dst-student :- s/Any
-  [name :- s/Str dst-id :- s/Num school-id :- s/Num]
+(s/defn create-dst-student [name :- s/Str dst-id :- s/Num school-id :- s/Num]
   (let [new-el {:type :students
                 :name name
                 :school_id school-id
@@ -225,14 +225,22 @@
                 :show_as_absent nil}]
     (db/persist! new-el)))
 
-(s/defn bulk-create-students-in-class :- s/Any
-  [dst-students :- [DstStudent] class-id :- s/Num school-id :- s/Num]
+(s/defn bulk-insert-new-students [dst-students :- [DstStudent] class-id :- s/Num school-id :- s/Num]
   (run! (fn [dst]
           (let [name (str (:first_name dst) " " (:last_name dst))
                 dst-id (:person_id dst)
                 {student-id :_id} (create-dst-student name dst-id school-id)]
             (add-student-to-class student-id class-id)))
         dst-students))
+
+(s/defn ensure-existing-students-in-class
+  [student-ids :- [s/Num] class-id :- s/Num]
+  (let [students-in-class (->> (queries/get-all-classes-and-students)
+                               :classes first :students (map :student_id) set)
+        students-not-in-class (set/difference (set student-ids) students-in-class)]
+    (run! (fn [student-id]
+            (add-student-to-class student-id class-id))
+          students-not-in-class)))
 
 (defn update-all-students-from-dst [school-id]
   (let [students (queries/get-students-with-dst school-id)
@@ -247,10 +255,11 @@
 
     ; Create student records for people who don't exist
     ; and add them to a class
-    (bulk-create-students-in-class new-students class-id school-id)
+    (bulk-insert-new-students new-students class-id school-id)
 
     ; TODO: Add students to the class if their student record already existed
     ; but they are not in the class.
+    (ensure-existing-students-in-class existing-students class-id)
 
     (delete-removed-students (map :_id students))
 
