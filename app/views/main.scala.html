@@ -134,12 +134,13 @@
         <div class="tab-pane active" id="attendance">
             <div class="subnav">
             <a @if(selectedBtn.equals("attendance_home")) { class="active" }
-                href="@routes.Attendance.index">All year</a>
-            <a>View/edit week of: <input class="date attendance-week" type="textfield"></input></a>
-            <a>View for person:
-            <input id="navbar_attendance_people_search" type="search" placeholder="Search people..."/></a>
-            <a href="@routes.Attendance.download">Download data to spreadsheet</a>
-            <a @if(selectedBtn.equals("attendance_codes")) { class="active" }
+                href="@routes.Attendance.index("")">By year
+            </a><a class="not-link @if(selectedBtn.equals("week")) { active }">
+                View/edit week of: <input class="date attendance-week" type="textfield"></input>
+            </a><a class="not-link @if(selectedBtn.equals("person")) { active }">
+                By person:
+                <input id="navbar_attendance_people_search" type="search" placeholder="Search people..."/>
+            </a><a @if(selectedBtn.equals("attendance_codes")) { class="active" }
                 href="@routes.Attendance.viewCodes">Absence codes</a>
             </div>
         </div>

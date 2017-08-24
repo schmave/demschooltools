@@ -6,7 +6,7 @@
 
 @import helper._
 
-@main("Attendance data", "attendance") {
+@main("Attendance data", "attendance", "week") {
 
 <h3>Attendance weekly report @Application.yymmddDate(monday)
 <a class="edit-link" href="@routes.Attendance.editWeek()?date=@Application.yymmddDate(monday)">Edit</a>

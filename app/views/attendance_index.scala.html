@@ -1,5 +1,6 @@
 @(people : List[Person], person_to_stats : Map[Person, AttendanceStats],
-  codes : List[String], codes_map : Map[String, AttendanceCode], current_people: List[Person])
+  codes : List[String], codes_map : Map[String, AttendanceCode], current_people: List[Person],
+  start_date: Date, prev_date: Date, next_date: Date)
 
 @import helper._
 
@@ -39,12 +40,25 @@ $(function() {
 });
 </script>
 
-<h3>Attendance Summary
-</h3>
-<div id="attendance-student-picker">
-	<label><input type="radio" name="type" value="current"> Show only current students and staff</label><br>
-	<label><input type="radio" name="type" value="all" checked> Show all people who have attended this school year</label>
-</div>
+<h3>Attendance Summary</h3>
+<h4>For one year starting @Application.yymmddDate(start_date)
+    <a href="@routes.Attendance.download(Application.yymmddDate(start_date))" class="download-link">
+        <span class="glyphicon glyphicon-download-alt"></span>Download as spreadsheet
+    </a>
+</h4>
+<p>
+    <a href="@routes.Attendance.index(Application.yymmddDate(prev_date))">⇐ Previous Year</a>
+    @if( next_date != null ) {
+        <a href="@routes.Attendance.index(Application.yymmddDate(next_date))"
+           style="margin-left: 100px;">Next Year ⇒</a>
+    }
+</p>
+@if( next_date == null ) {
+	<div id="attendance-student-picker">
+		<label><input type="radio" name="type" value="current"> Show only current students and staff</label><br>
+		<label><input type="radio" name="type" value="all" checked> Show all people who have attended this school year</label>
+	</div>
+}
 <p style="margin-bottom: 30px;">Click on a column title to sort by that column. Click again to sort in the opposite direction.
 <table class="attendance-view table sortable">
 <thead>
@@ -66,7 +80,15 @@ $(function() {
 @if( !current_people.contains(p)) {
 	class="inactive"
 }
-><td><a href="@routes.Attendance.viewPersonReport(p.person_id)">@p.first_name</a></td>
+><td>
+    @if( next_date == null ) {
+        <a href="@routes.Attendance.viewPersonReport(p.person_id)">
+    } else {
+        <a href="@routes.Attendance.viewPersonReport(
+            p.person_id, Application.yymmddDate(start_date), Application.yymmddDate(next_date))">
+    }
+    @p.first_name</a>
+</td>
 	<td>@p.last_name</td>
 	@for( code <- codes ) {
 		@if( person_to_stats.get(p).absence_counts.containsKey(codes_map.get(code)) ) {

@@ -944,11 +944,11 @@ public class Application extends Controller {
     }
 
     public static String yymmddDate(Date d) {
-        return new SimpleDateFormat("yyyy-M-d").format(d);
+        return new SimpleDateFormat("yyyy-MM-dd").format(d);
     }
 
     public static String yymmddDate() {
-        return new SimpleDateFormat("yyyy-M-d").format(new Date());
+        return new SimpleDateFormat("yyyy-MM-dd").format(new Date());
     }
 
     public static String currentUsername() {

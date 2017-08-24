@@ -32,25 +32,18 @@ public class Attendance extends Controller {
         return code_form;
     }
 
-    public Result index() {
-        return ok(views.html.cached_page.render(
-            new CachedPage(CachedPage.ATTENDANCE_INDEX,
-                "Attendance",
-                "attendance",
-                "attendance_home") {
-                @Override
-                String render() {
-        Map<Person, AttendanceStats> person_to_stats =
-            new HashMap<Person, AttendanceStats>();
-
+    String renderIndexContent(Date start_date) {
+        Date end_date = new Date(start_date.getTime());
+        end_date.setYear(end_date.getYear() + 1);
+        Map<Person, AttendanceStats> person_to_stats = new HashMap<>();
         Map<String, AttendanceCode> codes_map = getCodesMap(false);
 
         List<AttendanceDay> days =
-            AttendanceDay.find.where()
-                .eq("person.organization", OrgConfig.get().org)
-                .ge("day", Application.getStartOfYear())
-                .le("day", new GregorianCalendar().getTime())
-                .findList();
+                AttendanceDay.find.where()
+                        .eq("person.organization", OrgConfig.get().org)
+                        .ge("day", start_date)
+                        .le("day", end_date)
+                        .findList();
 
         for (AttendanceDay day : days) {
             if (!person_to_stats.containsKey(day.person)) {
@@ -69,10 +62,11 @@ public class Attendance extends Controller {
         }
 
         List<AttendanceWeek> weeks =
-            AttendanceWeek.find.where()
-                .eq("person.organization", OrgConfig.get().org)
-                .ge("monday", Application.getStartOfYear())
-                .findList();
+                AttendanceWeek.find.where()
+                        .eq("person.organization", OrgConfig.get().org)
+                        .ge("monday", start_date)
+                        .le("monday", end_date)
+                        .findList();
 
         for (AttendanceWeek week : weeks) {
             if (!person_to_stats.containsKey(week.person)) {
@@ -83,15 +77,53 @@ public class Attendance extends Controller {
             stats.total_hours += week.extra_hours;
         }
 
-        List<Person> all_people = new ArrayList<Person>(person_to_stats.keySet());
+        List<Person> all_people = new ArrayList<>(person_to_stats.keySet());
         Collections.sort(all_people, Person.SORT_FIRST_NAME);
 
-        List<String> all_codes = new ArrayList<String>(codes_map.keySet());
+        List<String> all_codes = new ArrayList<>(codes_map.keySet());
+
+        Date prev_date = new Date(start_date.getTime());
+        prev_date.setYear(prev_date.getYear() - 1);
+        Date next_date = new Date(start_date.getTime());
+        next_date.setYear(next_date.getYear() + 1);
+        if (start_date.getYear() == Application.getStartOfYear().getYear()) {
+            next_date = null;
+        }
 
         return views.html.attendance_index.render(
-            all_people, person_to_stats, all_codes, codes_map,
-            Application.allPeople()).toString();
-                }}));
+                all_people, person_to_stats, all_codes, codes_map,
+                Application.allPeople(), start_date, prev_date, next_date).toString();
+    }
+
+    public Result index(String start_date) {
+        if (start_date.equals("")) {
+            return ok(views.html.cached_page.render(
+                    new CachedPage(CachedPage.ATTENDANCE_INDEX,
+                            "Attendance",
+                            "attendance",
+                            "attendance_home") {
+                        @Override
+                        String render() {
+                            return renderIndexContent(Application.getStartOfYear());
+                        }
+                    }));
+        } else {
+            return ok(views.html.cached_page.render(
+                    new CachedPage("",
+                            "Attendance",
+                            "attendance",
+                            "attendance_home") {
+                        @Override
+                        public String getPage() {
+                            return renderIndexContent(Utils.parseDateOrNow(start_date).getTime());
+                        }
+
+                        @Override
+                        String render() {
+                            throw new RuntimeException("This shouldn't be called");
+                        }
+                    }));
+        }
     }
 
     public Result viewOrEditWeek(String date, boolean do_view) {
@@ -348,7 +380,14 @@ public class Attendance extends Controller {
         return ok();
     }
 
-    public Result download() throws IOException {
+    public Result download(String start_date_str) throws IOException {
+        Date start_date = Application.getStartOfYear();
+        if (!start_date_str.equals("")) {
+            start_date = Utils.parseDateOrNow(start_date_str).getTime();
+        }
+        Date end_date = new Date(start_date.getTime());
+        end_date.setYear(end_date.getYear() + 1);
+
         response().setHeader("Content-Type", "text/csv; charset=utf-8");
         response().setHeader("Content-Disposition",
             "attachment; filename=Attendance.csv");
@@ -368,7 +407,8 @@ public class Attendance extends Controller {
         List<AttendanceDay> days =
             AttendanceDay.find.where()
                 .eq("person.organization", OrgConfig.get().org)
-                .ge("day", Application.getStartOfYear())
+                .ge("day", start_date)
+                .le("day", end_date)
                 .findList();
 
         for (AttendanceDay day : days) {
@@ -390,7 +430,8 @@ public class Attendance extends Controller {
         List<AttendanceWeek> weeks =
             AttendanceWeek.find.where()
                 .eq("person.organization", OrgConfig.get().org)
-                .ge("monday", Application.getStartOfYear())
+                .ge("monday", start_date)
+                .le("monday", end_date)
                 .findList();
 
         for (AttendanceWeek week : weeks) {
