@@ -85,7 +85,7 @@
       (is (= "2" (-> id2 queries/get-student first :name)))
       (is (= "33" (-> id3 queries/get-student first :name))))))
 
-(deftest delete-students-not-in-list
+(deftest bulk-drop-class-students-not-in-list
   (do (sample-db false)
       (let [active-class (queries/get-active-class)
             {id1 :_id} (cmd/make-student "saved1")

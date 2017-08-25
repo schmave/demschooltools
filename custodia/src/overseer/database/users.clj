@@ -65,7 +65,7 @@
   (make-user "demo" (env :userpass) #{roles/admin roles/user} 2)
   )
 
-(defn drop-all-tables []
+(logh/deftrace drop-all-tables []
   (jdbc/execute! @pgdb [(str "DROP SCHEMA IF EXISTS overseer CASCADE;"
                              "DROP TABLE IF EXISTS schema_migrations; "
                              "DROP SCHEMA IF EXISTS public CASCADE; "
@@ -75,7 +75,8 @@
                              "DROP SCHEMA IF EXISTS demo CASCADE;")]))
 
 ;;(reset-db)
-(defn reset-db []
+(logh/deftrace reset-db []
   (drop-all-tables)
-  (migrations/migrate-db @pgdb)
+  (migrations/migrate-db)
+  (migrations/create-dst-tables)
   (init-users))
