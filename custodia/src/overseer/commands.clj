@@ -258,7 +258,10 @@
 
     (ensure-existing-students-in-class existing-students class-id)
 
-    (delete-removed-students (map :_id students))
+    ;; he wasn't intending the students to get deleted, just
+    ;; deactivated but still showing in the Reports page.
+    ;; For now this will have to wait for student end dates...
+    ;;(delete-removed-students (map :_id students))
 
     (bulk-update-student-names existing-students)
     ))
