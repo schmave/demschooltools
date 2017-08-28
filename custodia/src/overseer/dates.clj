@@ -8,14 +8,15 @@
             [clj-time.core :as t]
             [clj-time.coerce :as c]
             [schema.core :as s]
-            ))
+
+            [overseer.queries :as queries]))
 
 (def DateTime org.joda.time.DateTime)
 
 (def date-format (f/formatter "yyyy-MM-dd"))
 (def time-format (f/formatter "hh:mm:ss"))
 ;; TODO make this configurable?
-(def local-time-zone-id (t/time-zone-for-id "America/New_York"))
+(def local-time-zone-id (t/time-zone-for-id (queries/get-school-time-zone)))
 
 (defn format-to-local [f d]
   (f/unparse (f/with-zone f local-time-zone-id) d))
