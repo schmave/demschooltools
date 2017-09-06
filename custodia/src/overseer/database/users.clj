@@ -2,7 +2,6 @@
   (:import [java.sql PreparedStatement]
            [java.util Date Calendar TimeZone])
   (:require [clojure.java.jdbc :as jdbc]
-            [overseer.helpers :as logh]
             [overseer.database.connection :refer [pgdb]]
 
             (cemerick.friend [workflows :as workflows]
@@ -21,7 +20,7 @@
 (defqueries "overseer/base.sql" )
 
 ;; (insert-email "test@test.com")
-(logh/deftrace insert-email [email]
+(defn insert-email [email]
   (jdbc/insert! @pgdb :overseer.emails {:email email}))
 
 ;; (get-user "admin2")
@@ -65,7 +64,7 @@
   (make-user "demo" (env :userpass) #{roles/admin roles/user} 2)
   )
 
-(logh/deftrace drop-all-tables []
+(defn drop-all-tables []
   (jdbc/execute! @pgdb [(str "DROP SCHEMA IF EXISTS overseer CASCADE;"
                              "DROP TABLE IF EXISTS schema_migrations; "
                              "DROP SCHEMA IF EXISTS public CASCADE; "
@@ -75,7 +74,7 @@
                              "DROP SCHEMA IF EXISTS demo CASCADE;")]))
 
 ;;(reset-db)
-(logh/deftrace reset-db []
+(defn reset-db []
   (drop-all-tables)
   (migrations/migrate-db)
   (migrations/create-dst-tables)

@@ -7,6 +7,7 @@
 
 (defqueries "overseer/yesql/queries.sql" )
 
+
 (defn get-active-class []
   (-> (db/q get-active-class-y {:school_id db/*school-id*} )
       first
@@ -72,7 +73,7 @@
   (get-schools db/*school-id*))
 
 (defn get-school-time-zone []
-  (:timezone (get-current-school)))
+  db/*school-timezone*)
 
 (defn get-school-days [year-name]
   (db/q get-school-days-y {:year_name year-name :school_id db/*school-id* :timezone (get-school-time-zone)} ))
@@ -119,3 +120,5 @@
 
 (defn get-schools-with-dst []
   (db/q get-schools-with-dst-y {}))
+
+

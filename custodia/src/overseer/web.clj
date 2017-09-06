@@ -47,46 +47,46 @@
 
 (defroutes app
   (POST "/updatefromdst" req
-    (friend/authorize #{roles/admin}
-                      (resp/response (cmd/update-from-dst))))
+        (friend/authorize #{roles/admin}
+                          (resp/response (cmd/update-from-dst))))
 
   (GET "/" []
-    (friend/authenticated
-     (render-string (read-template "index.html") {:id start-id})))
+       (friend/authenticated
+        (render-string (read-template "index.html") {:id start-id})))
 
   (PUT "/school/:school_id" [school_id :<< as-int]
-    (friend/authorize #{roles/super}
-                      (users/set-user-school (:user_id (users/get-user "super")) school_id)))
+       (friend/authorize #{roles/super}
+                         (users/set-user-school (:user_id (users/get-user "super")) school_id)))
 
   (GET "/schools" []
-    (friend/authorize #{roles/super}
-                      (resp/response
-                       (let [schools (queries/get-schools)
-                             superSchool (queries/get-current-school)]
-                         {:schools schools
-                          :school superSchool}))))
+       (friend/authorize #{roles/super}
+                         (resp/response
+                          (let [schools (queries/get-schools)
+                                superSchool (queries/get-current-school)]
+                            {:schools schools
+                             :school superSchool}))))
 
   (GET "/hello" []
-    (friend/authorize #{roles/super}
-                      (resp/response "there")))
+       (friend/authorize #{roles/super}
+                         (resp/response "there")))
 
   student-routes
   class-routes
   report-routes
 
   (POST "/email" [email]
-    (users/insert-email email)
-    (resp/redirect "/users/login"))
+        (users/insert-email email)
+        (resp/redirect "/users/login"))
 
   (GET "/about" req
-    (io/resource "about.html"))
+       (io/resource "about.html"))
   (POST "/users/password" [username password]
-    (friend/authorize #{roles/admin}
-      (users/change-password username password)))
+        (friend/authorize #{roles/admin}
+                          (users/change-password username password)))
   (GET "/users/login" req
-    (io/resource "login.html"))
+       (io/resource "login.html"))
   (GET "/users/logout" req
-    (friend/logout* (resp/redirect (log/spyf "Logout: %s" "/users/login"))))
+       (friend/logout* (resp/redirect (log/spyf "Logout: %s" "/users/login"))))
   (GET "/users/is-user" req
        (friend/authorize #{roles/user} {:message "You're a user!"
                                         :school (queries/get-current-school)}))
@@ -95,27 +95,29 @@
         {:admin (-> req friend/current-authentication :roles roles/admin)
          :school (queries/get-current-school)}))
   (GET "/users/is-super" req
-    (let [user (users/get-user "super")]
-      (resp/response {:super (-> req friend/current-authentication :roles roles/super)
-                      :school (queries/get-current-school)})))
+       (let [user (users/get-user "super")]
+         (resp/response {:super (-> req friend/current-authentication :roles roles/super)
+                         :school (queries/get-current-school)})))
 
   (GET "/js/gen/:id{.+}/app.js" req
-    (io/resource "public/js/gen/app.js"))
+       (io/resource "public/js/gen/app.js"))
   (route/resources "/")
   (ANY "*" []
-    (route/not-found (slurp (io/resource "404.html")))))
+       (route/not-found (slurp (io/resource "404.html")))))
+
+(defn bind-session-school [school-id app req]
+  (binding [db/*school-id* school-id
+            db/*school-timezone* (:timezone (queries/get-schools school-id))]
+    (app req)))
 
 (defn my-middleware [app]
   (fn [req]
     (let [auth (friend/current-authentication req)
-          schema (:school_id auth)
+          school-id (:school_id auth)
           username (:username auth)]
       (if (= "super" username)
-        (let [schema (:school_id (users/get-user username))]
-          (binding [db/*school-id* schema]
-            (app req)))
-        (binding [db/*school-id* schema]
-          (app req))))))
+        (bind-session-school (:school_id (users/get-user username)) app req)
+        (bind-session-school school-id app req)))))
 
 (defn wrap-exception-handling
   [handler]

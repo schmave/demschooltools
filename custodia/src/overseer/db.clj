@@ -2,10 +2,13 @@
   (:import [java.sql PreparedStatement]
            [java.util Date Calendar TimeZone])
   (:require [clj-time.coerce :as timec]
+            [clj-time.core :as t]
             [clojure.java.jdbc :as jdbc]
             [overseer.database.connection :refer [pgdb init-pg]]))
 
 (def ^:dynamic *school-id* 1)
+;; defaulted for unit tests
+(def ^:dynamic *school-timezone* "America/New_York")
 
 (extend-type Date
   jdbc/ISQLParameter

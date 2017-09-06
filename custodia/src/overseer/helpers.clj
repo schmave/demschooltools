@@ -5,6 +5,7 @@
 
 ;; Borrowed from the clojure.trace library, because I want it
 ;; to use logging instead of trace
+(comment 
 (defmacro deftrace
   "Use in place of defn; traces each call/return of this fn, including
    arguments. Nested calls to deftrace'd functions will print a
@@ -18,6 +19,7 @@
        (let [f# (fn ~@fn-form)]
          (defn ~name ~doc-string [& args#]
            (clojure.tools.logging/spyf '~name f# args#))))))
+ )
 
 
 (defn wrap-args-with-trace [[symb val]]
