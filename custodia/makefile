@@ -18,8 +18,8 @@ hello :
 deploy-test :
 	git push $(web-test-git) master
 
-setup-prod-demo-data :
-	heroku pg:psql --app shining-overseer < demo/demo-data.sql
+# setup-prod-demo-data :
+# 	heroku pg:psql --app shining-overseer < demo/demo-data.sql
 
 log-philly :
 	heroku logs --app shining-overseer
