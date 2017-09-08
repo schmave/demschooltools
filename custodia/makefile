@@ -31,7 +31,7 @@ sql-philly-backup :
 	heroku pg:backups capture --app shining-overseer
 	curl -o latest.dump `heroku pg:backups public-url -a shining-overseer`
 
-sql-backup-local-restore :
+sql-backup-local-restore : drop-tables
 	pg_restore --verbose --clean --no-acl --no-owner -h localhost -U postgres -d school_crm latest.dump
 
 generate-sequence-reset :
