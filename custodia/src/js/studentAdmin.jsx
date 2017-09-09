@@ -1,6 +1,7 @@
 var React = require('react'),
     Router = require('react-router'),
     actionCreator = require('./studentactioncreator'),
+    userStore = require('./userstore'),
     Link = Router.Link,
     StudentEditor = require('./student/studentEditor.jsx'),
     AdminWrapper = require('./adminwrapper.jsx'),

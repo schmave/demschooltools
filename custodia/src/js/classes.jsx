@@ -2,6 +2,7 @@ var React = require('react'),
     Router = require('react-router'),
     helpers= require('./helpers/some'),
     classStore = require('./classstore'),
+    userStore = require('./userstore'),
     actionCreator = require('./classactioncreator'),
     Link = Router.Link,
     AdminWrapper = require('./adminwrapper.jsx'),
@@ -149,6 +150,11 @@ var exports = React.createClass({
         var classActivateButton = (this.state.selectedClass.active !== true)
                                 ? <span><button id={("activate-" + this.state.selectedClass.name)} className="btn btn-sm btn-primary" onClick={this.activateClass}>Activate Class</button></span>
                                 : <span></span>;
+        var createClassLink = <tr><td>
+                                  </td></tr>;
+        if(userStore.isDstMode()){
+            var createClassLink = <Link style={{verticalAlign: "text-bottom"}} className="btn btn-primary btn-xs" id="create-class" to="createaclass">Add new</Link>;
+        }
         return <div>
                           <div className="row margined class-listing new-class">
                             <div className="col-sm-2 column">
@@ -162,7 +168,7 @@ var exports = React.createClass({
                                 </thead>
                                 <tbody>
                                   <tr><td>
-                                    <Link style={{verticalAlign: "text-bottom"}} className="btn btn-primary btn-xs" id="create-class" to="createaclass">Add new</Link>
+                                    {this.createClassLink}
                                   </td></tr>
                                   {this.classRows()}
                                 </tbody>
