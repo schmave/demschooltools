@@ -93,7 +93,7 @@
   (GET "/users/is-admin" req
        (resp/response
         {:admin (-> req friend/current-authentication :roles roles/admin)
-         :dst-mode (env :dstMode)
+         :dstMode (env :dst-mode)
          :school (queries/get-current-school)}))
   (GET "/users/is-super" req
        (let [user (users/get-user "super")]

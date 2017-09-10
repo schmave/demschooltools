@@ -150,10 +150,9 @@ var exports = React.createClass({
         var classActivateButton = (this.state.selectedClass.active !== true)
                                 ? <span><button id={("activate-" + this.state.selectedClass.name)} className="btn btn-sm btn-primary" onClick={this.activateClass}>Activate Class</button></span>
                                 : <span></span>;
-        var createClassLink = <tr><td>
-                                  </td></tr>;
+        var createClassLink = <Link style={{verticalAlign: "text-bottom"}} className="btn btn-primary btn-xs" id="create-class" to="createaclass">Add new</Link>;
         if(userStore.isDstMode()){
-            var createClassLink = <Link style={{verticalAlign: "text-bottom"}} className="btn btn-primary btn-xs" id="create-class" to="createaclass">Add new</Link>;
+            createClassLink = null;
         }
         return <div>
                           <div className="row margined class-listing new-class">
@@ -168,7 +167,7 @@ var exports = React.createClass({
                                 </thead>
                                 <tbody>
                                   <tr><td>
-                                    {this.createClassLink}
+                                    {createClassLink}
                                   </td></tr>
                                   {this.classRows()}
                                 </tbody>

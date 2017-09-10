@@ -7,7 +7,6 @@ var exports = React.createClass({
     },
 
     render: function () {
-        var 
         return <div className="row">
             <div className="col-sm-4"></div>
             <div className="col-sm-4">

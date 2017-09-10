@@ -64,16 +64,20 @@ var exports = React.createClass({
     },
 
     render: function () {
+        var createStudentLink = <span onClick={this.toggleEdit}
+                                     className="btn btn-primary btn" id="create-student">
+                                 Add Student
+                               </span>;
+        if(userStore.isDstMode()){
+           createStudentLink = <p>Use DemSchoolTools to add students</p>;
+        }
         return <div>
                           <StudentEditor ref="studentEditor">
                           </StudentEditor>
                           <div className="row margined class-listing new-class">
                             <div className="col-sm-10 column">
                               <div className="col-sm-2 column">
-                                <span onClick={this.toggleEdit}
-                                      className="btn btn-primary btn" id="create-student">
-                                  Add Student
-                                </span>
+                                {createStudentLink}
                               </div>
                               <div className="col-sm-10 column">
                                 <FilterBox onFilterChange={this.filterChanged} />

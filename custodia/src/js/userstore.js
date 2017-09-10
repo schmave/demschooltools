@@ -50,7 +50,7 @@ var exports = assign({}, EventEmitter.prototype, {
 
 ajax.get('/users/is-admin').then(function (data) {
     isAdmin = data.admin;
-    isDstMode = data.isDstMode;
+    isDstMode = data.dstMode;
     currentSchool = data.school;
     exports.emitChange();
 }, function (data) {
@@ -60,7 +60,7 @@ ajax.get('/users/is-admin').then(function (data) {
 
 ajax.get('/users/is-super').then(function (data) {
     isSuper = data.super;
-    isDstMode = data.isDstMode;
+    isDstMode = data.dstMode;
     currentSchool = data.school;
     exports.emitChange();
     if (data.super) {
