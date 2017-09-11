@@ -286,6 +286,7 @@ public class CRM extends Controller {
                 false);
         }
 
+        CachedPage.onPeopleChanged();
         notifyAboutTag(t, p, false);
 
         return ok();
