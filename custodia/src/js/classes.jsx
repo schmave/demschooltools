@@ -161,9 +161,6 @@ var exports = React.createClass({
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  <tr><td>
-                                    <Link style={{verticalAlign: "text-bottom"}} className="btn btn-primary btn-xs" id="create-class" to="createaclass">Add new</Link>
-                                  </td></tr>
                                   {this.classRows()}
                                 </tbody>
                               </table>
