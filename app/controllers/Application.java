@@ -951,6 +951,10 @@ public class Application extends Controller {
         return new SimpleDateFormat("yyyy-MM-dd").format(new Date());
     }
 
+    public static String yymdDate(Date d) {
+        return new SimpleDateFormat("yyyy-M-d").format(d);
+    }
+
     public static String currentUsername() {
         return Context.current().request().username();
     }

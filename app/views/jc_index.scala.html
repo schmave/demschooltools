@@ -6,7 +6,7 @@ rules : List[ Entry ])
 <script type="text/javascript">
 $(function() {
     var meeting_info = [ @Html(
-        meetings.map( m => "{ date: \"" + Application.yymmddDate(m.date) +
+        meetings.map( m => "{ date: \"" + Application.yymdDate(m.date) +
                 "\", link: \"" + routes.Application.viewMeeting(m.id) +
                 "\", case_count: " + m.cases.size() + "}").mkString(",")) ];
 
