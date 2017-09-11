@@ -16,8 +16,8 @@
 ;; (get-classes)
 (defn get-classes
   ([] (get-classes db/*school-id*))
-  ([school_id]
-    (let [classes (db/q get-classes-y {:school_id school_id} )
+  ([school-id]
+    (let [classes (db/q get-classes-y {:school_id school-id} )
           grouped (vals (group-by :name classes))]
       (map (fn [class-group]
              (let [base (dissoc (first class-group) :student_id :student_name)
@@ -37,17 +37,21 @@
   ([names]
    (filter (fn [y] (= names {:name y})) (get-all-years))))
 
-(defn get-all-students []
-  (db/q get-students-y {:school_id db/*school-id*}))
+(defn get-all-students
+  ([] (get-all-students db/*school-id*))
+  ([school-id]
+    (db/q get-students-y {:school_id school-id})))
 
 (defn get-student [student_id]
   (db/q get-student-y {:student_id student_id
                        :school_id db/*school-id*}))
 
-(defn get-all-classes-and-students []
-  {:classes (get-classes)
-   :students (map (fn [s] {:name (:name s) :_id (:_id s)})
-                  (get-all-students))})
+(defn get-all-classes-and-students
+  ([] (get-all-classes-and-students db/*school-id*))
+  ([school-id]
+    {:classes (get-classes school-id)
+     :students (map (fn [s] {:name (:name s) :_id (:_id s)})
+                    (get-all-students school-id))}))
 
 (defn get-students-for-class [class-id]
   (db/q get-classes-and-students-y {:class_id class-id :school_id db/*school-id*} ))
