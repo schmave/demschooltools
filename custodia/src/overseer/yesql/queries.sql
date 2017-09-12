@@ -197,7 +197,7 @@ ORDER BY c.name;
 SELECT * from overseer.classes where name = :name and school_id = :school_id;
 
 -- name: get-students-with-dst-y
-SELECT p.first_name, p.last_name, p.person_id, stu.*
+SELECT p.first_name, p.last_name, p.display_name, p.person_id, stu.*
   from tag t
   join person_tag pt on t.id=pt.tag_id
   join person p on pt.person_id=p.person_id

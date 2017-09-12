@@ -27,6 +27,10 @@
         id (:_id doc)]
     (jdbc/delete! @pgdb table ["_id=?" id])))
 
+(defn delete-where! [table where-clause]
+  (let [table (append-schema (name table))]
+    (jdbc/delete! @pgdb table where-clause)))
+
 (defn update!
   ([table id fields]
    (update! table id fields "_id"))
