@@ -97,8 +97,17 @@
 (defn delete-student [id]
   (db/delete! {:type "students" :_id id}))
 
-(defn rename-student [{_id :_id name :name}]
-  (db/update! :students _id {:name name}))
+(defn get-name-from-dst-fields [student school]
+  (if (:use_display_name school)
+    (if (> (count (:display_name student)) 0)
+      (:display_name student)
+      (:first_name student))
+    (str (:first_name student) " " (:last_name student))))
+
+(defn ensure-correct-student-name [student school]
+  (let [dst-name (get-name-from-dst-fields student school)]
+    (if (not (= (:name student) dst-name))
+      (db/update! :students (:_id student) {:name dst-name}))))
 
 (defn edit-student
   ([_id name start-date email] (edit-student _id name start-date email false))
@@ -130,6 +139,11 @@
 
 (defn add-student-to-class [student-id class-id]
   (db/persist! {:type :classes_X_students :student_id student-id :class_id class-id}))
+
+(defn remove-student-from-class [student-id class-id]
+  (db/delete-where!
+    :classes_X_students
+    ["student_id=? AND class_id=?" student-id class-id]))
 
 (defn- has-name [n]
   (not= "" (clojure.string/trim n)))
@@ -205,8 +219,8 @@
 (s/defn delete-removed-students [students-to-keep :- [s/Num]]
   (db/q delete-inactive-students-y! {:students_to_keep students-to-keep}))
 
-(s/defn bulk-update-student-names [students :- [{:_id s/Num :name s/Str}]]
-  (run! rename-student students))
+(s/defn bulk-update-student-names [students :- [{:_id s/Num :name s/Str}] school]
+  (run! #(ensure-correct-student-name % school) students))
 
 (def DstStudent {:person_id s/Num
                  :first_name s/Str
@@ -224,25 +238,35 @@
                 :show_as_absent nil}]
     (db/persist! new-el)))
 
-(s/defn bulk-insert-new-students [dst-students :- [DstStudent] class-id :- s/Num school-id :- s/Num]
+(s/defn bulk-insert-new-students [dst-students :- [DstStudent] class-id :- s/Num school]
   (run! (fn [dst]
-          (let [name (str (:first_name dst) " " (:last_name dst))
+          (let [name (get-name-from-dst-fields dst school)
                 dst-id (:person_id dst)
-                {student-id :_id} (create-dst-student name dst-id school-id)]
+                {student-id :_id} (create-dst-student name dst-id (:_id school))]
             (add-student-to-class student-id class-id)))
         dst-students))
 
 (s/defn ensure-existing-students-in-class
-  [student-ids :- [s/Num] class-id :- s/Num]
-  (let [students-in-class (->> (queries/get-all-classes-and-students)
-                               :classes first :students (map :student_id) set)
-        students-not-in-class (set/difference (set student-ids) students-in-class)]
+  [student-ids :- [s/Num] class-id :- s/Num school-id :- s/Num]
+  (let [students-in-class (->> (queries/get-all-classes-and-students school-id)
+                               :classes
+                               (filter #(= (:_id %) class-id))
+                               first
+                               :students
+                               (map :student_id)
+                               set)
+        students-not-in-class (set/difference (set student-ids) students-in-class)
+        students-to-remove (set/difference students-in-class (set student-ids))]
     (run! (fn [student-id]
             (add-student-to-class student-id class-id))
-          students-not-in-class)))
+          students-not-in-class)
+    (run! (fn [student-id]
+          (remove-student-from-class student-id class-id))
+        students-to-remove)))
 
-(defn update-all-students-from-dst [school-id]
-  (let [students (queries/get-students-with-dst school-id)
+(defn update-all-students-from-dst [school]
+  (let [school-id (:_id school)
+        students (queries/get-students-with-dst school-id)
         new-students (filter #(= nil (:dst_id %)) students)
         existing-students (filter #(not= nil (:dst_id %)) students)
         start-of-year (get-start-of-year)
@@ -254,20 +278,13 @@
 
     ; Create student records for people who don't exist
     ; and add them to a class
-    (bulk-insert-new-students new-students class-id school-id)
-
-    (ensure-existing-students-in-class existing-students class-id)
-
-    ;; he wasn't intending the students to get deleted, just
-    ;; deactivated but still showing in the Reports page.
-    ;; For now this will have to wait for student end dates...
-    ;;(delete-removed-students (map :_id students))
-
-    (bulk-update-student-names existing-students)
+    (bulk-insert-new-students new-students class-id school)
+    (ensure-existing-students-in-class (map :_id existing-students) class-id school-id)
+    (bulk-update-student-names existing-students school)
     ))
 
 (defn update-from-dst []
   (update-schools-from-dst)
   (run! (fn [school]
-          (update-all-students-from-dst (:_id school)))
+          (update-all-students-from-dst school))
         (queries/get-schools-with-dst)))
