@@ -6,6 +6,9 @@
 
 <h4>Existing notification rules</h4>
 <ul>
+@if( notifications.size() == 0 ) {
+    <p><i>There are no existing notification rules. You can add some below.</i></p>
+}
 @for( n <- notifications ) {
     @if( n.the_type == NotificationRule.TYPE_TAG) {
     <li>When people are added to or removed from tag
