@@ -186,21 +186,26 @@ View printable minutes</a>
 </div>
 </script>
 
-<p><button class="add-case">Add a case</button>
-
+<p><button class="btn btn-primary add-case">Add a new case</button>
 @if( open_cases.size() > 0) {
-	<hr/>
-	<p>The following open cases have been marked "to be continued". To edit them,
-	click the "continue" button next to the case you would like to edit.</p>
-	<ul class="continue-cases">
-		@for( c <- open_cases) {
-			@if( c.meeting != meeting) {
-				<li id="continue-case-@c.id">@c.case_number | @c.location | @c.findings.substring(0, scala.math.min(c.findings.length(), 50))...
-					<button>Continue</button>
-					</li>
-			}
-		}
-	</ul>
+    <div class="case panel panel-success">
+        <div class="panel-heading">
+            <h4>Cases to be continued</h4>
+        </div>
+        <div class="panel-body">
+            <p>The following open cases have been marked "to be continued". To edit them,
+                click the "continue" button next to the case you would like to edit.</p>
+            <ul class="continue-cases">
+                @for( c <- open_cases) {
+                @if( c.meeting != meeting) {
+                <li id="continue-case-@c.id">@c.case_number | @c.location | @c.findings.substring(0, scala.math.min(c.findings.length(), 80))...
+                    <button class="btn btn-xs btn-success">Continue</button>
+                </li>
+                }
+                }
+            </ul>
+        </div>
+    </div>
 }
 
 }
