@@ -7,7 +7,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
+import com.avaje.ebean.SqlRow;
 import com.csvreader.CsvWriter;
 
 import models.*;
@@ -258,6 +260,15 @@ public class Attendance extends Controller {
             }
         }
 
+        String sql = "select min(day) as min_date, max(day) as max_date from attendance_day where " +
+                "person_id=:person_id and " +
+                "((code is not null and code != '_NS_') or " +
+                "(start_time is not null and end_time is not null)) " +
+                "group by person_id";
+        SqlRow row = Ebean.createSqlQuery(sql)
+                .setParameter("person_id", p.person_id)
+                .findUnique();
+
         List<AttendanceDay> days =
             AttendanceDay.find.where()
                 .eq("person", p)
@@ -273,7 +284,20 @@ public class Attendance extends Controller {
                 .le("monday", end_date)
                 .findList();
 
-        Map<String, AttendanceCode> codes = getCodesMap(true);
+        Map<String, AttendanceCode> codes_map = getCodesMap(true);
+        AttendanceStats stats = new AttendanceStats();
+        for (AttendanceDay day : days) {
+            if (day.code != null || day.start_time == null || day.end_time == null) {
+                stats.incrementCodeCount(codes_map.get(day.code));
+            } else {
+                stats.total_hours += day.getHours();
+                stats.days_present++;
+            }
+        }
+
+        for (AttendanceWeek week : weeks) {
+            stats.total_hours += week.extra_hours;
+        }
 
         Map<Date, AttendanceWeek> day_to_week = new HashMap<Date, AttendanceWeek>();
         for (AttendanceWeek w : weeks) {
@@ -284,10 +308,13 @@ public class Attendance extends Controller {
             p,
             days,
             day_to_week,
-            new ArrayList<String>(codes.keySet()),
-            codes,
+            new ArrayList<String>(codes_map.keySet()),
+            codes_map,
+            stats,
             start_date,
-            end_date
+            end_date,
+            row.getDate("min_date"),
+            row.getDate("max_date")
         ));
     }
 

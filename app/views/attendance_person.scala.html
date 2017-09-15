@@ -1,21 +1,67 @@
 @(person : Person, days : List[AttendanceDay], weeks: Map[Date, AttendanceWeek],
-  codes : List[String], codes_map : Map[String, AttendanceCode], start_date: Date, end_date: Date)
+  codes : List[String], codes_map : Map[String, AttendanceCode], stats: AttendanceStats,
+  start_date: Date, end_date: Date, min_date: Date, max_date: Date)
 
 @import helper._
 
-@main(person.first_name + " attendance", "attendance", "person") {
+@main(person.first_name + " " + person.last_name + " attendance", "attendance", "person") {
 
+<h2>@person.first_name @person.last_name attendance</h2>
+
+<p>@person.first_name's first recorded day at school was @Application.formatDateMdy(min_date), and
+last recorded day at school was @Application.formatDateMdy(max_date).</p>
 <form method="GET">
 	<p>Show @person.first_name's attendance from
 		<input class="date" type="text" name="start_date" value="@Application.yymmddDate(start_date)"> to
 		<input class="date" type="text" name="end_date" value="@Application.yymmddDate(end_date)">
-		<input type="submit">
+		<input class="btn btn-xs btn-primary" type="submit">
 	</p>
 </form>
 
-<h3>@person.first_name @person.last_name attendance</h3>
+<h3>Summary</h3>
+<p>
+<button class="btn btn-xs btn-primary" id="check-all">Show all codes</button>
+<button class="btn btn-xs btn-primary" id="uncheck-all">Hide all codes</button>
+</p>
+<table class="attendance-view table">
+<thead>
+    @for( code <- codes ) {
+    <th width=100 class="attendance-code" style="background-color:@codes_map.get(code).color">
+        <label>@codes_map.get(code).description<br/>
+            <input type="checkbox" checked data-code="@code"/></label>
+    </th>
+    }
+    <th width=100 class="attendance-code">
+        <label>Unknown/missing code<br/>
+        <input type="checkbox" checked data-code="__null"/></label>
+    </th>
+    <th width=100><label>Days Present<br/>
+        <input type="checkbox" checked data-code="__present"/></label>
+    </th>
+    <th width=100>Total hours</th>
+    <th width=100>Avg. hours per day</th>
+</thead>
+
+@for( code <- codes ) {
+    @if( stats.absence_counts.containsKey(codes_map.get(code)) ) {
+        <td align="center" style="background-color:@codes_map.get(code).color">@stats.absence_counts.get(codes_map.get(code))</td>
+    } else {
+        <td align="center" class="empty">0</td>
+    }
+}
+@if( stats.absence_counts.containsKey(null) ) {
+    <td align="center">@stats.absence_counts.get(null)</td>
+} else {
+    <td align="center" class="empty">0</td>
+}
+<td align="center">@stats.days_present</td>
+<td align="center">@Attendance.format(stats.total_hours)</td>
+<td align="center">@Attendance.format(stats.total_hours / stats.days_present)</td>
+</table>
+
+<h3>Details</h3>
 <table class="attendance-view table" style="max-width: 700px;">
-<thead><th width=100>Date</th>
+<thead><th colspan=2 width=100>Date</th>
 	<th width=50>Hours</th>
 	<th width=75>Arrival time</th>
 	<th width=75>Departure time</th>
@@ -24,7 +70,13 @@
 	</thead>
 
 @for( d <- days ) {
-<tr><td>@Application.formatDayOfWeek(d.day) @Application.formatDateMdy(d.day)</td>
+<tr class="@if(d.code != null) { @if(
+            codes_map.contains(d.code) ){ code-@d.code } else { code-__null } } else {
+        @if( d.start_time == null || d.end_time == null ) { code-__null } else { code-__present } } @if(
+
+        d.day.getDay() == 5 ) { friday-row } ">
+    <td width="25">@Application.formatDayOfWeek(d.day)
+    <td width="75">@Application.formatDateMdy(d.day)</td>
 	<td>@if(d.start_time != null && d.end_time != null) {
 			@Attendance.format(d.getHours())
 		} else {
@@ -57,3 +109,8 @@
 
 }
 
+<script type="text/javascript">
+$(function() {
+    initAttendancePerson();
+});
+</script>

@@ -92,19 +92,19 @@ $(function() {
 	<td>@p.last_name</td>
 	@for( code <- codes ) {
 		@if( person_to_stats.get(p).absence_counts.containsKey(codes_map.get(code)) ) {
-			<td>@person_to_stats.get(p).absence_counts.get(codes_map.get(code))</td>
+			<td align="center">@person_to_stats.get(p).absence_counts.get(codes_map.get(code))</td>
 		} else {
-			<td class="empty">0</td>
+			<td align="center" class="empty">0</td>
 		}
 	}
 	@if( person_to_stats.get(p).absence_counts.containsKey(null) ) {
-		<td>@person_to_stats.get(p).absence_counts.get(null)</td>
+		<td align="center">@person_to_stats.get(p).absence_counts.get(null)</td>
 	} else {
-		<td class="empty">0</td>
+		<td align="center" class="empty">0</td>
 	}
-	<td>@person_to_stats.get(p).days_present</td>
-	<td>@Attendance.format(person_to_stats.get(p).total_hours)</td>
-	<td>@Attendance.format(person_to_stats.get(p).total_hours / person_to_stats.get(p).days_present)</td>
+	<td align="center">@person_to_stats.get(p).days_present</td>
+	<td align="center">@Attendance.format(person_to_stats.get(p).total_hours)</td>
+	<td align="center">@Attendance.format(person_to_stats.get(p).total_hours / person_to_stats.get(p).days_present)</td>
 }
 
 </table>
