@@ -318,6 +318,74 @@ public class Attendance extends Controller {
         ));
     }
 
+    public Result importFromCustodia() {
+        Map<String,String[]> data = request().body().asFormUrlEncoded();
+        Calendar start_date = Utils.parseDateOrNow(data.get("monday")[0]);
+        Calendar end_date = (Calendar) start_date.clone();
+        end_date.add(Calendar.DAY_OF_MONTH, 4);
+
+        List<AttendanceDay> days =
+                AttendanceDay.find.where()
+                        .eq("person.organization", OrgConfig.get().org)
+                        .ge("day", start_date.getTime())
+                        .le("day", end_date.getTime())
+                        .findList();
+
+        Set<Person> people = new HashSet<>();
+        for (AttendanceDay day : days) {
+            people.add(day.person);
+        }
+
+        List<Integer> person_ids = new ArrayList<>();
+        for (Person person : people) {
+            person_ids.add(person.person_id);
+        }
+
+        if (!person_ids.isEmpty()) {
+            String sql = "select dst_id, swipe_day, " +
+                    "min(in_time) at time zone :time_zone as in_time, " +
+                    "max(out_time) at time zone :time_zone as out_time " +
+                    "from overseer.swipes sw join overseer.students stu on sw.student_id=stu._id " +
+                    "where in_time is not null and out_time is not null " +
+                    "and dst_id in (:person_ids) " +
+                    "and swipe_day >= :first_date and swipe_day <= :last_date " +
+                    "group by dst_id, swipe_day";
+
+            List<SqlRow> custodiaRows = Ebean.createSqlQuery(sql)
+                    .setParameter("time_zone", OrgConfig.get().time_zone.getID())
+                    .setParameter("person_ids", person_ids)
+                    .setParameter("first_date", start_date.getTime())
+                    .setParameter("last_date", end_date.getTime())
+                    .findList();
+
+            Map<Integer, Map<Date, SqlRow>> person_day_custodia = new HashMap<>();
+            for (SqlRow row : custodiaRows) {
+                int person_id = row.getInteger("dst_id");
+                Date day = row.getDate("swipe_day");
+                if (!person_day_custodia.containsKey(person_id)) {
+                    person_day_custodia.put(person_id, new HashMap<>());
+                }
+                person_day_custodia.get(person_id).put(day, row);
+            }
+
+            for (AttendanceDay day : days) {
+                if (day.code == null && day.start_time == null && day.end_time == null
+                        && person_day_custodia.containsKey(day.person.person_id)
+                        && person_day_custodia.get(day.person.person_id).containsKey(day.day)) {
+                    SqlRow row = person_day_custodia.get(day.person.person_id).get(day.day);
+                    day.start_time = new Time(row.getDate("in_time").getTime());
+                    day.end_time = new Time(row.getDate("out_time").getTime());
+                    day.save();
+                }
+            }
+
+            CachedPage.remove(CachedPage.ATTENDANCE_INDEX);
+        }
+
+        return redirect(routes.Attendance.editWeek(Application.yymmddDate(start_date.getTime())));
+    }
+
+
     public Result createPersonWeek() {
         CachedPage.remove(CachedPage.ATTENDANCE_INDEX);
 

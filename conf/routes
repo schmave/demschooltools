@@ -106,6 +106,8 @@ POST    /attendance/deletePersonWeek  controllers.Attendance.deletePersonWeek(pe
 POST    /attendance/saveWeek          controllers.Attendance.saveWeek(week_id : Integer, extra_hours : Double)
 POST    /attendance/saveDay           controllers.Attendance.saveDay(day_id : Integer, code ?= "", start_time ?= "", end_time ?= "")
 
+POST    /attendance/importFromCustodia     controllers.Attendance.importFromCustodia()
+
 GET     /people/edit/:id          controllers.CRM.editPerson(id: Integer)
 POST    /people/edit              controllers.CRM.savePersonEdits()
 
