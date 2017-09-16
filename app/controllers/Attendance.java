@@ -6,6 +6,8 @@ import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
@@ -483,10 +485,6 @@ public class Attendance extends Controller {
         Date end_date = new Date(start_date.getTime());
         end_date.setYear(end_date.getYear() + 1);
 
-        response().setHeader("Content-Type", "text/csv; charset=utf-8");
-        response().setHeader("Content-Disposition",
-            "attachment; filename=Attendance.csv");
-
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Charset charset = Charset.forName("UTF-8");
         CsvWriter writer = new CsvWriter(baos, ',', charset);
@@ -540,9 +538,64 @@ public class Attendance extends Controller {
         }
 
         writer.close();
+
+        response().setHeader("Content-Type", "application/zip");
+        response().setHeader("Content-Disposition",
+                "attachment; filename=attendance.zip");
+
+        ByteArrayOutputStream zipBytes = new ByteArrayOutputStream();
+        ZipOutputStream zos = new ZipOutputStream(zipBytes);
+        zos.putNextEntry(new ZipEntry("attendance/all_data.csv"));
         // Adding the BOM here causes Excel 2010 on Windows to realize
         // that the file is Unicode-encoded.
-        return ok("\ufeff" + new String(baos.toByteArray(), charset));
+        zos.write("\ufeff".getBytes(charset));
+        zos.write(baos.toByteArray());
+        zos.closeEntry();
+
+        TreeSet<Date> allDates = new TreeSet<>();
+        TreeMap<String, HashMap<Date, AttendanceDay>> person_date_attendance = new TreeMap<>();
+        for (AttendanceDay day : days) {
+            allDates.add(day.day);
+
+            String name = day.person.first_name + " " + day.person.last_name;
+            if (!person_date_attendance.containsKey(name)) {
+                person_date_attendance.put(name, new HashMap<>());
+            }
+            person_date_attendance.get(name).put(day.day, day);
+        }
+
+        baos = new ByteArrayOutputStream();
+        writer = new CsvWriter(baos, ',', charset);
+        writer.write("Name");
+        for (Date d : allDates) {
+            writer.write(Application.yymmddDate(d));
+        }
+        writer.endRecord();
+
+        for (String name : person_date_attendance.keySet()) {
+            writer.write(name);
+            for (Date date : allDates) {
+                AttendanceDay day = person_date_attendance.get(name).get(date);
+                if (day == null || day.start_time == null || day.end_time == null) {
+                    writer.write("");
+                } else {
+                    writer.write(String.format("%.2f", day.getHours()));
+                }
+            }
+            writer.endRecord();
+        }
+
+        writer.close();
+
+        zos.putNextEntry(new ZipEntry("attendance/daily_hours.csv"));
+        // Adding the BOM here causes Excel 2010 on Windows to realize
+        // that the file is Unicode-encoded.
+        zos.write("\ufeff".getBytes(charset));
+        zos.write(baos.toByteArray());
+        zos.closeEntry();
+        zos.close();
+
+        return ok(zipBytes.toByteArray());
     }
 
     public Result viewWeek(String date) {
