@@ -553,31 +553,52 @@ public class Attendance extends Controller {
         zos.closeEntry();
 
         TreeSet<Date> allDates = new TreeSet<>();
-        TreeMap<String, HashMap<Date, AttendanceDay>> person_date_attendance = new TreeMap<>();
+        TreeMap<String, HashMap<Date, AttendanceDay>> personDateAttendance = new TreeMap<>();
         for (AttendanceDay day : days) {
             allDates.add(day.day);
 
             String name = day.person.first_name + " " + day.person.last_name;
-            if (!person_date_attendance.containsKey(name)) {
-                person_date_attendance.put(name, new HashMap<>());
+            if (!personDateAttendance.containsKey(name)) {
+                personDateAttendance.put(name, new HashMap<>());
             }
-            person_date_attendance.get(name).put(day.day, day);
+            personDateAttendance.get(name).put(day.day, day);
         }
 
-        baos = new ByteArrayOutputStream();
-        writer = new CsvWriter(baos, ',', charset);
+        zos.putNextEntry(new ZipEntry("attendance/daily_hours.csv"));
+        // Adding the BOM here causes Excel 2010 on Windows to realize
+        // that the file is Unicode-encoded.
+        zos.write("\ufeff".getBytes(charset));
+        zos.write(getDailyHoursFile(allDates, personDateAttendance, charset));
+        zos.closeEntry();
+
+        zos.putNextEntry(new ZipEntry("attendance/daily_signins.csv"));
+        // Adding the BOM here causes Excel 2010 on Windows to realize
+        // that the file is Unicode-encoded.
+        zos.write("\ufeff".getBytes(charset));
+        zos.write(getDailySigninsFile(allDates, personDateAttendance, charset));
+        zos.closeEntry();
+
+        zos.close();
+        return ok(zipBytes.toByteArray());
+    }
+
+    private byte[] getDailyHoursFile(TreeSet<Date> allDates,
+                                     TreeMap<String, HashMap<Date, AttendanceDay>> personDateAttendance,
+                                     Charset charset) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        CsvWriter writer = new CsvWriter(baos, ',', charset);
         writer.write("Name");
         for (Date d : allDates) {
             writer.write(Application.yymmddDate(d));
         }
         writer.endRecord();
 
-        for (String name : person_date_attendance.keySet()) {
+        for (String name : personDateAttendance.keySet()) {
             writer.write(name);
             for (Date date : allDates) {
-                AttendanceDay day = person_date_attendance.get(name).get(date);
+                AttendanceDay day = personDateAttendance.get(name).get(date);
                 if (day == null || day.start_time == null || day.end_time == null) {
-                    writer.write("");
+                    writer.write(day == null || day.code == null ? "" : day.code);
                 } else {
                     writer.write(String.format("%.2f", day.getHours()));
                 }
@@ -586,16 +607,38 @@ public class Attendance extends Controller {
         }
 
         writer.close();
+        return baos.toByteArray();
+    }
 
-        zos.putNextEntry(new ZipEntry("attendance/daily_hours.csv"));
-        // Adding the BOM here causes Excel 2010 on Windows to realize
-        // that the file is Unicode-encoded.
-        zos.write("\ufeff".getBytes(charset));
-        zos.write(baos.toByteArray());
-        zos.closeEntry();
-        zos.close();
+    private byte[] getDailySigninsFile(TreeSet<Date> allDates,
+            TreeMap<String, HashMap<Date, AttendanceDay>> personDateAttendance,
+            Charset charset) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        CsvWriter writer = new CsvWriter(baos, ',', charset);
+        writer.write("Name");
+        for (Date d : allDates) {
+            writer.write(Application.yymmddDate(d));
+        }
+        writer.endRecord();
 
-        return ok(zipBytes.toByteArray());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+        for (String name : personDateAttendance.keySet()) {
+            for (int x = 0; x < 2; x++) {
+                writer.write(x == 0 ? name : "");
+                for (Date date : allDates) {
+                    AttendanceDay day = personDateAttendance.get(name).get(date);
+                    if (day == null || day.start_time == null || day.end_time == null) {
+                        writer.write(day == null || day.code == null ? "" : day.code);
+                    } else {
+                        writer.write(dateFormat.format(x == 0 ? day.start_time : day.end_time));
+                    }
+                }
+                writer.endRecord();
+            }
+        }
+
+        writer.close();
+        return baos.toByteArray();
     }
 
     public Result viewWeek(String date) {
