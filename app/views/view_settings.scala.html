@@ -49,11 +49,11 @@ enableNoPersonTagBox("#tag-entry", "#tags-entered", true);
 
 <hr/>
 <h2>Attendance and Custodia</h2>
-<p class="instructions">DemSchoolTools has two separate attendance tracking systems. "Attendance" is the original one, and allows
+<p class="instructions">DemSchoolTools has two attendance tracking systems. "Attendance" is the original one, and allows
 you to manually enter students' arrival and departure times, as well as absence reasons. "Custodia" (new as of Fall 2017)
 lets students and staff sign in and out using a web interface, so there is no manual entry of arrival and departure times.
-The two attendance systems do not share data with each other, so you will probably only want to use one of them. It is totally fine
-to have both enabled at once.</p>
+It is totally fine to have both enabled at once. Data in Custodia can be imported into Attendance, but not
+the other way around.</p>
 
 @helper.form(routes.Settings.editSettings()) {
 <p><label><input type="checkbox" name="show_attendance"
