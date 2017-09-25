@@ -67,19 +67,27 @@ var exports = React.createClass({
         return this.state.classes.map(function (classval, i) {
             var boundClick = this.classSelected.bind(this, classval),
                 selected = (classval._id === this.state.selectedClass._id)  ? "selected" : "";
+            var activateClassButton = null;
+            if (classval.active) {
+                activateClassButton = <span className="pull-right margined badge badge-green">Active</span>;
+            } else {
+                 activateClassButton = <span onClick={this.activateClass.bind(this, classval._id)}
+                         id={"activate-"+classval.name}
+                         className="pull-right margined badge">
+                   Activate
+                 </span>;
+            }
+
+            if(userStore.isDstMode()){
+                activateClassButton = null;
+            }
             return (<tr key={classval._id}
                         id={classval.name}
                         onClick={boundClick}
                         className={selected}>
               <td>
                 <span className="pull-left">{classval.name}</span>
-                {classval.active ?
-                 <span className="pull-right margined badge badge-green">Active</span>
-                 : <span onClick={this.activateClass.bind(this, classval._id)}
-                         id={"activate-"+classval.name}
-                         className="pull-right margined badge">
-                   Activate
-                 </span>}
+                {activateClassButton}
               </td>
             </tr>);
         }.bind(this));
@@ -91,15 +99,15 @@ var exports = React.createClass({
         });
     },
 
-    deleteFromClass:function(student) {
+    deleteFromClass: function(student) {
         actionCreator.deleteStudentFromClass(student.student_id, this.state.selectedClass._id);
     },
 
-    addToClass:function(student) {
+    addToClass: function(student) {
         actionCreator.addStudentToClass(student._id, this.state.selectedClass._id);
     },
 
-    activateClass:function(_id) {
+    activateClass: function(_id) {
         actionCreator.activateClass(_id);
     },
 
@@ -147,9 +155,6 @@ var exports = React.createClass({
         this.setState({filterText: filter});
     },
     render: function () {
-        var classActivateButton = (this.state.selectedClass.active !== true)
-                                ? <span><button id={("activate-" + this.state.selectedClass.name)} className="btn btn-sm btn-primary" onClick={this.activateClass}>Activate Class</button></span>
-                                : <span></span>;
         var createClassLink = <Link style={{verticalAlign: "text-bottom"}} className="btn btn-primary btn-xs" id="create-class" to="createaclass">Add new</Link>;
         if(userStore.isDstMode()){
             createClassLink = null;
@@ -174,23 +179,27 @@ var exports = React.createClass({
                               </table>
                             </div>
                             <div className="col-sm-10 column">
-                              <div className="col-sm-10 column">
-                                <FilterBox onFilterChange={this.filterChanged} />
-                              </div>
-                              <div className="col-sm-12 column">
-                                <div className="col-sm-6 column">
-                                  <div className="panel panel-info">
-                                    <div className="panel-heading absent"><b>In Class</b></div>
-                                    {this.getStudentRowsInCurrentClass()}
+                              <div className="panel panel-info">
+                                <div className="panel-heading absent"><b> { this.state.selectedClass.name } </b></div>
+                                <div className="blah col-sm-10 column">
+                                  <FilterBox onFilterChange={this.filterChanged} />
+                                </div>
+                                <div className="col-sm-12 column">
+                                  <div className="col-sm-6 column">
+                                    <div className="panel panel-info">
+                                      <div className="panel-heading absent"><b>In Class</b></div>
+                                      {this.getStudentRowsInCurrentClass()}
+                                    </div>
+                                  </div>
+                                  <div className="col-sm-6 column">
+                                    <div className="panel panel-info">
+                                      <div className="panel-heading absent"><b>Not In Class</b></div>
+                                      {this.getStudentRowsNotInCurrentClass()}
+                                    </div>
                                   </div>
                                 </div>
-                                <div className="col-sm-6 column">
-                                  <div className="panel panel-info">
-                                    <div className="panel-heading absent"><b>Not In Class</b></div>
-                                    {this.getStudentRowsNotInCurrentClass()}
-                                  </div>
-                                </div>
                               </div>
+
                             </div>
                           </div>
         </div>;
