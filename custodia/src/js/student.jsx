@@ -171,8 +171,8 @@ var exports = React.createClass({
     },
 
     showingStudentName: function () {
-        return <div className="col-sm-8" id="studentName">
-                <span id="edit-name" onClick={this.toggleEdit}>
+        return <div className="col-sm-8" id="studentName" >
+                <span id="edit-name" >
                     <h1 className="pull-left">{this.state.student.name}</h1>
                     <span className="fa fa-pencil edit-student"></span>
                 </span>
@@ -196,10 +196,9 @@ var exports = React.createClass({
 
             <div className="col-sm-1"></div>
             <div className="col-sm-10">
-                <div className="panel panel-info">
+                <div className="panel panel-info" >
                     <div className="panel-heading">
-                        <div className="row">
-                          {/* {!this.state.editing ? this.showingStudentName() : this.editingStudentName()} */}
+                        <div className="row" onClick={this.toggleEdit}>
                             { this.showingStudentName() }
                             <div className="col-sm-4">
                                 <div id="hd-attended" className="col-sm-6"><b>Attended:</b> {attended}</div>
