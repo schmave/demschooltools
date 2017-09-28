@@ -7,6 +7,7 @@
             [clojure.test :refer :all]
             [overseer.attendance :as att]
             [overseer.commands :as cmd]
+            [overseer.dst-imports :as dst]
             [overseer.queries :as queries]
             [overseer.database.users :as users]
             [overseer.database.connection :as conn]
@@ -46,7 +47,7 @@
 (deftest bulk-create-students-test
   (sample-db false)
   (let [active-class (queries/get-active-class)
-        _ (cmd/bulk-insert-new-students [{:person_id 1 :first_name "a" :last_name "b"}
+        _ (dst/bulk-insert-new-students [{:person_id 1 :first_name "a" :last_name "b"}
                                          {:person_id 2 :first_name "c" :last_name "d"}]
                                         active-class
                                         db/*school-id*)
@@ -64,7 +65,7 @@
         _ (cmd/add-student-to-class id1 active-class)
         {id2 :_id} (cmd/make-student "2")
         {id3 :_id} (cmd/make-student "3")
-        _ (cmd/ensure-existing-students-in-class [id1 id2 id3] active-class)
+        _ (dst/ensure-existing-students-in-class [id1 id2 id3] active-class)
         students-in-class (->> (queries/get-all-classes-and-students)
                                :classes first :students (map :student_id) set)]
     (do
@@ -76,7 +77,7 @@
   (let [{id1 :_id} (cmd/make-student "1")
         {id2 :_id} (cmd/make-student "2")
         {id3 :_id} (cmd/make-student "3")
-        _ (cmd/bulk-update-student-names [{:_id id1 :name "11"}
+        _ (dst/bulk-update-student-names [{:_id id1 :name "11"}
                                           {:_id id2 :name "2"}
                                           {:_id id3 :name "33"}
                                           ])]
@@ -148,6 +149,21 @@
 (deftest no-student-name-invalid
   (testing "Email is set"
     (is (= nil (cmd/make-student "  ")))))
+
+(deftest edit-class-test
+  (sample-db true)
+  (let [{sid :_id } (cmd/make-class "test")
+        from "2015-10-20"
+        to "2016-10-20"
+        ]
+    (cmd/edit-class sid "test2" from to 500)
+    (let [cls (->> (queries/get-classes) (filter #(= (:name %) "test2")) first)]
+      (testing "fields are set"
+        (is (= (c/to-sql-time to) (:to_date cls)))
+        (is (= (c/to-sql-time from) (:from_date cls)))
+        (is (= 500 (:required_minutes cls)))
+
+        ))))
 
 (deftest set-student-email
   (sample-db true)

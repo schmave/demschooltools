@@ -20,7 +20,7 @@
 (defn activate-class
   ([id] (activate-class id db/*school-id*))
   ([id school-id]
-    (db/q activate-class-y! {:id id :school_id school-id})))
+   (db/q activate-class-y! {:id id :school_id school-id})))
 
 (defn delete-student-from-class [student-id class-id]
   (db/q delete-student-from-class-y! {:student_id student-id :class_id class-id} ))
@@ -116,10 +116,18 @@
                 :student_id id
                 :date (make-sqldate date-string)}))
 
+(defn edit-class
+  ([_id name from-date to-date minutes]
+   (db/update! :classes _id
+               {:name name
+                :from_date (make-sqldate from-date)
+                :to_date (make-sqldate to-date)
+                :required_minutes minutes})))
+
 (defn make-class
   ([name] (make-class name nil nil))
   ([name from_date to_date]
-    (make-class name from_date to_date db/*school-id*))
+   (make-class name from_date to_date db/*school-id*))
   ([name from_date to_date school_id]
    (let [active (-> (queries/get-classes school_id) seq boolean not)]
      (when (queries/class-not-yet-created name school_id)
@@ -130,8 +138,8 @@
 
 (defn remove-student-from-class [student-id class-id]
   (db/delete-where!
-    :classes_X_students
-    ["student_id=? AND class_id=?" student-id class-id]))
+   :classes_X_students
+   ["student_id=? AND class_id=?" student-id class-id]))
 
 (defn- has-name [n]
   (not= "" (clojure.string/trim n)))
