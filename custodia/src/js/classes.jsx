@@ -7,6 +7,7 @@ var React = require('react'),
     Link = Router.Link,
     AdminWrapper = require('./adminwrapper.jsx'),
     studentStore = require('./StudentStore'),
+    ClassEditor = require('./classes/classEditor.jsx'),
     FilterBox = require('./filterbox.jsx');
 
 var exports = React.createClass({
@@ -14,6 +15,7 @@ var exports = React.createClass({
     getInitialState: function () {
         return {classes:classStore.getClasses(true),
                 filterText: '',
+                editing: false,
                 students: studentStore.getAllStudents(true),
                 selectedClass: {students:[]}};
     },
@@ -148,6 +150,16 @@ var exports = React.createClass({
         this.setState({filterText: filter});
     },
 
+    toggleEdit: function () {
+        if(userStore.isAdmin()) {
+            var edit = !this.state.editing;
+            this.setState({editing: edit});
+            if (edit) {
+               this.refs.classEditor.edit(this.state.selectedClass);
+            }
+        }
+    },
+
     render: function () {
         var createClassLink = <Link style={{verticalAlign: "text-bottom"}} className="btn btn-primary btn-xs" id="create-class" to="createaclass">Add new</Link>;
         if(userStore.isDstMode()){
@@ -174,6 +186,8 @@ var exports = React.createClass({
         }
 
         return <div>
+            <ClassEditor ref="classEditor">
+            </ClassEditor>
               <div className="row margined class-listing new-class">
                 <div className="col-sm-2 column">
                   <table className="table table-striped center">
@@ -197,6 +211,10 @@ var exports = React.createClass({
                     <div className="panel-heading absent"><b> { this.state.selectedClass.name } </b>
 
                       {activateClassButton}
+                      
+                        <div className="row" onClick={this.toggleEdit}>
+                          EDIT
+                        </div>
                     </div>
                     <div className="col-sm-10 column">
                       <FilterBox onFilterChange={this.filterChanged} />
