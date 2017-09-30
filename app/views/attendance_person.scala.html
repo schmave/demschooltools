@@ -8,8 +8,10 @@
 
 <h2>@person.first_name @person.last_name attendance</h2>
 
-<p>@person.first_name's first recorded day at school was @Application.formatDateMdy(min_date), and
-last recorded day at school was @Application.formatDateMdy(max_date).</p>
+@if( min_date != null && max_date != null ) {
+    <p>@person.first_name's first recorded day at school was @Application.formatDateMdy(min_date), and
+    last recorded day at school was @Application.formatDateMdy(max_date).</p>
+}
 <form method="GET">
 	<p>Show @person.first_name's attendance from
 		<input class="date" type="text" name="start_date" value="@Application.yymmddDate(start_date)"> to

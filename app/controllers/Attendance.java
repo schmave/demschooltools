@@ -315,8 +315,8 @@ public class Attendance extends Controller {
             stats,
             start_date,
             end_date,
-            row.getDate("min_date"),
-            row.getDate("max_date")
+            row == null ? null : row.getDate("min_date"),
+            row == null ? null : row.getDate("max_date")
         ));
     }
 
