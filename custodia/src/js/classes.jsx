@@ -70,17 +70,20 @@ var exports = React.createClass({
             var boundClick = this.classSelected.bind(this, classval),
                 selected = (classval._id === this.state.selectedClass._id)  ? "selected" : "";
 
-            var activeTag = null;
-            if (classval.active) {
-                activeTag = <span className="pull-right margined badge badge-green">Active</span>;
-            }
+            var bnp = this.makeActivateClassButtonAndPanel(classval);
+            var activeTag = bnp.panel;
+            var button = bnp.button;
+            /* var activeTag = null;
+             * if (classval.active) {
+             *     activeTag = <span className="pull-right margined badge badge-green">Active</span>;
+             * }*/
             return (<tr key={classval._id}
                         id={classval.name}
                         onClick={boundClick}
                         className={selected}>
               <td>
                 <span className="pull-left">{classval.name}</span>
-                {activeTag}
+                {button}
               </td>
             </tr>);
         }.bind(this));
@@ -150,33 +153,28 @@ var exports = React.createClass({
         this.setState({filterText: filter});
     },
 
-    toggleEdit: function () {
+    toggleEdit: function (selectedClass) {
         if(userStore.isAdmin()) {
             var edit = !this.state.editing;
             this.setState({editing: edit});
             if (edit) {
-               this.refs.classEditor.edit(this.state.selectedClass);
+               this.refs.classEditor.edit(selectedClass);
             }
         }
     },
 
-    render: function () {
-        var createClassLink = <Link style={{verticalAlign: "text-bottom"}} className="btn btn-primary btn-xs" id="create-class" to="createaclass">Add new</Link>;
-        if(userStore.isDstMode()){
-            createClassLink = null;
-        }
-
+    makeActivateClassButtonAndPanel: function(selectedClass) {
         var activateClassButton = null;
         var activeClassPanel = "panel-danger";
 
-        if (this.state.selectedClass.active) {
-            activateClassButton = <span className=" margined badge badge-green">Active</span>;
+        if (selectedClass.active) {
+            activateClassButton = <span className=" margined badge badge-green pull-right">Active</span>;
             activeClassPanel = "panel-success";
         }
         else {
-            activateClassButton = <button onClick={this.activateClass.bind(this, this.state.selectedClass._id)}
-                                        id={"activate-"+this.state.selectedClass.name}
-                                        className="margined btn btn-primary btn-xs">
+            activateClassButton = <button onClick={this.activateClass.bind(this, selectedClass._id)}
+                                        id={"activate-"+selectedClass.name}
+                                        className="margined btn btn-primary btn-xs pull-right">
                           Activate
             </button>;
         }
@@ -184,6 +182,19 @@ var exports = React.createClass({
         if(userStore.isDstMode()){
             activateClassButton = null;
         }
+        return {button:activateClassButton, panel:activeClassPanel};
+    },
+
+    render: function () {
+
+        var createClassLink =
+            <button className="btn btn-primary btn-sm" onClick={this.toggleEdit.bind(this, null)}>Add new</button>;
+            {/* <Link style={{verticalAlign: "text-bottom"}} className="btn btn-primary btn-xs" id="create-class" to="createaclass">Add new</Link>; */}
+        if(userStore.isDstMode()){
+            createClassLink = null;
+        }
+
+        var panel = this.makeActivateClassButtonAndPanel(this.state.selectedClass).panel;
 
         return <div>
             <ClassEditor ref="classEditor">
@@ -207,27 +218,23 @@ var exports = React.createClass({
                   </table>
                 </div>
                 <div className="col-sm-10 column">
-                  <div className= { "panel " + activeClassPanel }>
+                  <div className= { "panel " + panel }>
                     <div className="panel-heading absent"><b> { this.state.selectedClass.name } </b>
 
-                      {activateClassButton}
-                      
-                        <div className="row" onClick={this.toggleEdit}>
-                          EDIT
-                        </div>
+                        <button className="btn btn-primary btn-sm" onClick={this.toggleEdit.bind(this, this.state.selectedClass)}>Edit</button>
                     </div>
                     <div className="col-sm-10 column">
                       <FilterBox onFilterChange={this.filterChanged} />
                     </div>
                     <div className="col-sm-12 column">
                       <div className="col-sm-6 column">
-                        <div className= { "panel " + activeClassPanel }>
+                        <div className= { "panel " + panel }>
                           <div className="panel-heading absent"><b>In Class</b></div>
                           {this.getStudentRowsInCurrentClass()}
                         </div>
                       </div>
                       <div className="col-sm-6 column">
-                        <div className= { "panel " + activeClassPanel }>
+                        <div className= { "panel " + panel }>
                           <div className="panel-heading absent"><b>Not In Class</b></div>
                           {this.getStudentRowsNotInCurrentClass()}
                         </div>

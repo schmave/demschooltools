@@ -12,7 +12,7 @@ module.exports = React.createClass({
         var that = this;
         dispatcher.register(function(action){
             if (action.type == constants.classEvents.CLASS_CREATED
-           //     || action.type == constants.classEvents.ALL_LOADED
+                //     || action.type == constants.classEvents.ALL_LOADED
             ) {
                 that.savingHide();
                 that.close();
@@ -20,8 +20,6 @@ module.exports = React.createClass({
         });
         return {saving: false,
                 _class: {to_date: null, from_date: null, name : "", required_minutes: 345},
-                todate_datepicker: new Date(),
-                fromdate_datepicker: new Date(),
                 selectedClass: {}
         };
     },
@@ -35,44 +33,27 @@ module.exports = React.createClass({
 
     saveChange: function () {
         this.savingShow();
-        var startDate = this.refs.startdate.props.value || new Date();
-        /* actionCreator.createClass(
-         *     this.state.student._id == null,
-         *     this.refs.name.getDOMNode().value,
-         *     startDate,
-         *     this.refs.email.getDOMNode().value,
-         *     this.state.student.is_teacher);*/
+        actionCreator.createClass(
+            this.state.selectedClass._id,
+            this.refs.name.getDOMNode().value,
+            null,
+            null,
+            this.refs.required_minutes.getDOMNode().value,
+        );
     },
 
     edit: function(selectedClass) {
         var s = jQuery.extend({}, selectedClass);
         this.setState(
             {selectedClass: s,
-             creating: (!s._id),
-             startdate_datepicker: (s.start_date) ? new Date(s.start_date) : new Date()})
+             creating: (!s._id)})
         this.refs.classEditor.show();
-    },
-
-    toggleHours: function () {
-        if (this.state.selectedClass._id > 0) {
-            this.state.selectedClass.olderdate = !!!this.state.selectedClass.olderdate;
-            actionCreator.toggleHours(this.state.selectedClass._id);
-        }
     },
 
     close: function () {
         if (this.refs.classEditor) {
             this.refs.classEditor.hide();
         }
-    },
-
-    handleTeacherChange: function(state) {
-        this.state.selectedClass.is_teacher = !this.state.selectedClass.is_teacher;
-        this.setState({selectedClass: this.state.selectedClass});
-    },
-
-    handleDateChange: function(d) {
-        this.setState({startdate_datepicker: d});
     },
 
     handleChange: function(event) {
@@ -101,34 +82,12 @@ module.exports = React.createClass({
                  <input ref="name" className="form-control" id="name"
                         onChange={this.handleChange}
                         value={this.state.selectedClass.name}/>
-                 <label htmlFor="email">Parent Email:</label>
-                 <input ref="email" className="form-control" id="guardian_email"
-                        onChange={this.handleChange}
-                        value={this.state.selectedClass.guardian_email}/>
-
-                 { (!this.state.creating) ?
-                   <div>
-                     <label htmlFor="email">Required Hours:</label>
-                     <div><input type="radio" id="older" onChange={this.toggleHours}
-                                 checked={!this.state.selectedClass.olderdate}/> 300 Minutes
-                     </div>
-                     <div><input type="radio" id="older" onChange={this.toggleHours}
-                                 checked={this.state.selectedClass.olderdate}/> 330 Minutes
-                     </div>
+                 <div>
+                   <label htmlFor="required_minutes">Default Required Minutes:</label>
+                   <div><input ref="required_minutes" id="required_minutes" onChange={this.handleChange}
+                               checked={this.state.selectedClass.required_minutes}/>
                    </div>
-                   : <div></div>
-                 }
-                   <div>
-                     <label htmlFor="is_teacher">Is Teacher:</label>
-                     <div><input type="checkbox" id="is_teacher" onChange={this.handleTeacherChange}
-                                 checked={this.state.selectedClass.is_teacher}/> Is Teacher?
-                     </div>
-                   </div>
-                   <b>Student Start Date:</b>
-                   <DateTimePicker id="missing" value={this.state.startdate_datepicker}
-                                   ref="startdate" onChange={this.handleDateChange}
-                                   calendar={true}
-                                   time={false} />
+                 </div>
                </div>
                <button onClick={this.saveChange} className="btn btn-success">
                  <i id="save-name" className="fa fa-check icon-large"> Save</i>
