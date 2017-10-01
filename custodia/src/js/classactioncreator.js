@@ -16,21 +16,24 @@ var exports = {
         });
     },
     createClass: function (id, name, to_date, from_date, minutes) {
-        var onSave = function (data) {
-            dispatcher.dispatch({
-                type: constants.systemEvents.FLASH,
-                message: 'Successfully created class ' + name
-            });
-            dispatcher.dispatch({
-                type: constants.classEvents.CLASS_CREATED,
-                data: data
-            });
-            router.get().transitionTo('classes');
-        };
+        var onSave =
+                function(message) {
+                    return function (data) {
+                        dispatcher.dispatch({
+                            type: constants.systemEvents.FLASH,
+                            message: 'Successfully ' + message + ' class ' + name
+                        });
+                        dispatcher.dispatch({
+                            type: constants.classEvents.CLASS_CREATED,
+                            data: data
+                        });
+                        router.get().transitionTo('classes');
+                    };
+                };
         if(id > 0) {
-            ajax.post('/classes/'+id, {name: name, to_date:to_date, from_date:from_date, minutes:minutes}).then(onSave);
+            ajax.post('/classes/'+id, {name: name, to_date:to_date, from_date:from_date, minutes:minutes}).then(onSave("edited"));
         } else {
-            ajax.post('/classes', {name: name, to_date:to_date, from_date:from_date, minutes:minutes}).then(onSave);
+            ajax.post('/classes', {name: name, to_date:to_date, from_date:from_date, minutes:minutes}).then(onSave("created"));
         }
     },
     deleteStudentFromClass: function (studentId, classId) {

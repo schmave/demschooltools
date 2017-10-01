@@ -19,8 +19,7 @@ module.exports = React.createClass({
             }
         });
         return {saving: false,
-                _class: {to_date: null, from_date: null, name : "", required_minutes: 345},
-                selectedClass: {}
+                selectedClass: {name : "", required_minutes: 345}
         };
     },
 
@@ -43,7 +42,7 @@ module.exports = React.createClass({
     },
 
     edit: function(selectedClass) {
-        var s = jQuery.extend({}, selectedClass);
+        var s = jQuery.extend(this.state.selectedClass, selectedClass);
         this.setState(
             {selectedClass: s,
              creating: (!s._id)})
@@ -84,8 +83,8 @@ module.exports = React.createClass({
                         value={this.state.selectedClass.name}/>
                  <div>
                    <label htmlFor="required_minutes">Default Required Minutes:</label>
-                   <div><input ref="required_minutes" id="required_minutes" onChange={this.handleChange}
-                               checked={this.state.selectedClass.required_minutes}/>
+                   <div><input type="number" ref="required_minutes" id="required_minutes" onChange={this.handleChange}
+                               value={this.state.selectedClass.required_minutes}/>
                    </div>
                  </div>
                </div>
