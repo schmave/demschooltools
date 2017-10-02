@@ -15,7 +15,6 @@ var exports = React.createClass({
     getInitialState: function () {
         return {classes:classStore.getClasses(true),
                 filterText: '',
-                editing: false,
                 students: studentStore.getAllStudents(true),
                 selectedClass: {students:[]}};
     },
@@ -155,11 +154,7 @@ var exports = React.createClass({
 
     toggleEdit: function (selectedClass) {
         if(userStore.isAdmin()) {
-            var edit = !this.state.editing;
-            this.setState({editing: edit});
-            if (edit) {
-               this.refs.classEditor.edit(selectedClass);
-            }
+           this.refs.classEditor.edit(selectedClass);
         }
     },
 
