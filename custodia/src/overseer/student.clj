@@ -54,7 +54,7 @@
 
   (POST "/students/:id/togglehours" [id :<< as-int]
         (friend/authorize #{roles/admin}
-                          (do (cmd/toggle-student-older id)
+                          (do (cmd/edit-student-required-minutes id)
                               (student-page-response id))))
 
   (POST "/students/:id/absent" [id :<< as-int]

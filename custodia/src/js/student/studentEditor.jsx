@@ -55,13 +55,6 @@ module.exports = React.createClass({
         this.refs.studentEditor.show();
     },
 
-    toggleHours: function () {
-        if (this.state.student._id > 0) {
-            this.state.student.olderdate = !!!this.state.student.olderdate;
-            actionCreator.toggleHours(this.state.student._id);
-        }
-    },
-
     close: function () {
         if (this.refs.studentEditor) {
             this.refs.studentEditor.hide();
@@ -108,18 +101,6 @@ module.exports = React.createClass({
                 onChange={this.handleChange}
                 value={this.state.student.guardian_email}/>
 
-                { (!this.state.creating) ?
-                  <div>
-                   <label htmlFor="email">Required Hours:</label>
-                    <div><input type="radio" id="older" onChange={this.toggleHours}
-                                checked={!this.state.student.olderdate}/> 300 Minutes
-                    </div>
-                    <div><input type="radio" id="older" onChange={this.toggleHours}
-                                checked={this.state.student.olderdate}/> 330 Minutes
-                    </div>
-                  </div>
-                : <div></div>
-                }
                 <div>
                   <label htmlFor="is_teacher">Is Teacher:</label>
                   <div><input type="checkbox" id="is_teacher" onChange={this.handleTeacherChange}

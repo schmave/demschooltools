@@ -97,9 +97,18 @@
 (defn delete-student [id]
   (db/delete! {:type "students" :_id id}))
 
+(defn edit-student-required-minutes
+  ([student_id minutes] (edit-student-required-minutes student_id minutes (str (t/now))))
+  ([student_id minutes fromdate]
+   (db/persist! {:type :students_required_minutes
+                 :student_id student_id
+                 :fromdate (make-sqldate fromdate)
+                 :required_minutes minutes})))
+
 (defn edit-student
-  ([_id name start-date email] (edit-student _id name start-date email false))
-  ([_id name start-date email is_teacher]
+  ([_id name start-date email] (edit-student _id name start-date email false nil))
+  ([_id name start-date email is_teacher minutes]
+   (if (not= nil minutes) (edit-student-required-minutes _id minutes))
    (db/update! :students _id
                {:name name
                 :start_date (make-sqldate start-date)
@@ -173,8 +182,6 @@
     (db/update! :students _id {field newVal})
     (assoc student field newVal)))
 
-(defn toggle-student-older [_id]
-  (modify-student _id :olderdate #(toggle-date (:olderdate %))))
 
 (defn set-student-start-date [_id date]
   (modify-student _id  :start_date (fn [_] (make-sqldate date))))

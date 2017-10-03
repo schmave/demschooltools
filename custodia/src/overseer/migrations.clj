@@ -19,7 +19,7 @@
    (migratus/migrate {:store :database
                       :db con})))
 
-;; (migratus/create {:store :database :db @pgdb} "add is teacher")
+;; (migratus/create {:store :database :db @pgdb} "remove student minutes")
 
 (comment
   (migratus/migrate {:store :database
