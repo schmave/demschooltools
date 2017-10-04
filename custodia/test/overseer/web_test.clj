@@ -612,7 +612,7 @@
 (deftest older-student-required-minutes
   (do (sample-db)
       (let [sid (:_id (cmd/make-student "test"))
-            _ (cmd/edit-student-required-minutes sid 400)
+            _ (cmd/edit-student-required-minutes sid 100)
             _ (first (queries/get-students sid))
             tomorrow (-> (today-at-utc 10 0) (t/plus (t/days 1)))
             day-after-next (-> (today-at-utc 10 0) (t/plus (t/days 2)))
@@ -620,10 +620,10 @@
 
         (cmd/add-student-to-class sid (get-class-id-by-name "2014-2015"))
         (cmd/swipe-in sid tomorrow)
-        (cmd/swipe-out sid (t/plus tomorrow (t/minutes 399)))
+        (cmd/swipe-out sid (t/plus tomorrow (t/minutes 99)))
 
-        (cmd/swipe-in sid (t/plus tomorrow (t/days 2)))
-        (cmd/swipe-out sid (t/plus tomorrow (t/days 2) (t/minutes 401)))
+        (cmd/swipe-in sid day-after-next)
+        (cmd/swipe-out sid (t/plus day-after-next (t/minutes 101)))
 
         (let [att (get-att sid)]
           (pp/pprint att)

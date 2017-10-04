@@ -21,8 +21,8 @@ BEGIN
     RETURN QUERY
     SELECT a.days, s._id student_id
            , s.archived
-           , (CASE WHEN c.required_minutes IS NULL
-           THEN stumin.required_minutes ELSE c.required_minutes END) as requiredmin
+           , (CASE WHEN stumin.required_minutes IS NULL
+           THEN c.required_minutes ELSE stumin.required_minutes END) as requiredmin
     FROM temp1 AS a
     JOIN overseer.students s ON (s._id = $1)
     LEFT JOIN (SELECT MAX(srm.fromdate) AS fromdate, srm.required_minutes
@@ -53,8 +53,8 @@ BEGIN
   BEGIN
     RETURN QUERY
     SELECT a.days, s._id student_id, s.archived
-    , (CASE WHEN c.required_minutes IS NULL
-       THEN stumin.required_minutes ELSE c.required_minutes END) as requiredmin
+    , (CASE WHEN stumin.required_minutes IS NULL
+       THEN c.required_minutes ELSE stumin.required_minutes END) as requiredmin
     FROM temp1 AS a
     JOIN overseer.classes_X_students cXs ON (cXs.class_id = $2)
     JOIN overseer.students s ON (s._id = cXs.student_id)
