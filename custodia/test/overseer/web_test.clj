@@ -611,10 +611,9 @@
 
 (deftest older-student-required-minutes
   (do (sample-db)
-      (let [s (cmd/make-student "test")
-            sid (:_id s)
-            s (cmd/edit-student-required-minutes sid 400)
-            s (first (queries/get-students sid))
+      (let [sid (:_id (cmd/make-student "test"))
+            _ (cmd/edit-student-required-minutes sid 400)
+            _ (first (queries/get-students sid))
             tomorrow (-> (today-at-utc 10 0) (t/plus (t/days 1)))
             day-after-next (-> (today-at-utc 10 0) (t/plus (t/days 2)))
             ]
@@ -627,7 +626,7 @@
         (cmd/swipe-out sid (t/plus tomorrow (t/days 2) (t/minutes 401)))
 
         (let [att (get-att sid)]
-          ;; (pp/pprint att)
+          (pp/pprint att)
           (testing "Total Valid Day Count"
             (is (= 1 (-> att :total_days)))))))
   )

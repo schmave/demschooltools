@@ -36,13 +36,10 @@ SELECT
   , s.intervalmin
   , o._id has_override
   , e._id has_excuse
-  , schooldays.olderdate
   , s._id
   , schooldays.archived
   , (CASE WHEN s._id IS NOT NULL THEN 'swipes' ELSE '' END) as type
-  , (CASE WHEN schooldays.olderdate IS NULL
-               OR schooldays.olderdate > schooldays.days
-               THEN 300 ELSE 330 END) as requiredmin
+  , schooldays.requiredmin
   , schooldays.days AS day
 FROM overseer.student_school_days(:student_id, :year_name, :class_id) AS schooldays
 LEFT JOIN overseer.swipes s
@@ -127,10 +124,7 @@ FROM (
         , max(s._id) anyswipes
         , max(o._id) oid
         , max(e._id) eid
-        , schooldays.olderdate
-        , (CASE WHEN schooldays.olderdate IS NULL
-                     OR schooldays.olderdate > schooldays.days
-                     THEN 300 ELSE 330 END) as requiredmin
+        , schooldays.requiredmin
         , sum(s.intervalmin) as intervalmin
         , schooldays.days AS day
       FROM overseer.school_days(:year_name, :class_id) as schooldays
@@ -142,7 +136,7 @@ FROM (
       LEFT JOIN overseer.excuses e
                 ON (schooldays.days = e.date AND e.student_id = schooldays.student_id)
       WHERE schooldays.days IS NOT NULL
-      GROUP BY schooldays.student_id, day, schooldays.olderdate
+      GROUP BY schooldays.student_id, day, requiredmin
   ) AS stu
 GROUP BY stu.student_id;
 

@@ -5,7 +5,7 @@ CREATE TABLE overseer.students_required_minutes (student_id BIGINT NOT NULL, req
 DROP FUNCTION IF EXISTS overseer.student_school_days(bigint,text,bigint);
 --;;
 CREATE OR REPLACE FUNCTION overseer.student_school_days(stu_id BIGINT, y_name TEXT, cls_id BIGINT)
-RETURNS TABLE (days date, student_id BIGINT, archived boolean, required_minutes int) AS $$
+RETURNS TABLE (days date, student_id BIGINT, archived boolean, requiredmin int) AS $$
 BEGIN
   BEGIN
     CREATE TEMP TABLE temp1 ON COMMIT DROP AS
@@ -19,12 +19,16 @@ BEGIN
   END;
   BEGIN
     RETURN QUERY
-    SELECT a.days, s._id student_id, s.archived, c.required_minutes as class_minutes, stuMin.required_minutes as stu_minutes
+    SELECT a.days, s._id student_id
+           , s.archived
+           , (CASE WHEN c.required_minutes IS NULL
+           THEN stumin.required_minutes ELSE c.required_minutes END) as requiredmin
     FROM temp1 AS a
     JOIN overseer.students s ON (s._id = $1)
-    LEFT JOIN (select MAX(srm.fromdate)
-              from overseer.students_required_minutes srm
-              where srm.student_id = $1) stuMin ON (stuMin.fromdate < a.days)
+    LEFT JOIN (SELECT MAX(srm.fromdate) AS fromdate, srm.required_minutes
+              FROM overseer.students_required_minutes srm
+              WHERE srm.student_id = $1
+              GROUP BY srm.fromdate, srm.required_minutes) stumin ON (stumin.fromdate < a.days)
     JOIN overseer.classes c ON (c._id = $3)
     WHERE (s.start_date < a.days OR s.start_date is null);
   END;
@@ -34,7 +38,7 @@ $$
 LANGUAGE plpgsql;
 --;;
 CREATE OR REPLACE FUNCTION overseer.school_days(year_name TEXT, class_id BIGINT)
-  RETURNS TABLE (days date, student_id BIGINT, archived boolean, required_minutes int) AS $$
+  RETURNS TABLE (days date, student_id BIGINT, archived boolean, requiredmin int) AS $$
 BEGIN
   BEGIN
     CREATE TEMP TABLE temp1 ON COMMIT DROP AS
@@ -48,14 +52,18 @@ BEGIN
   END;
   BEGIN
     RETURN QUERY
-    SELECT a.days, s._id student_id, s.archived, c.required_minutes as class_minutes, stuMin.required_minutes as stu_minutes
+    SELECT a.days, s._id student_id, s.archived
+    , (CASE WHEN c.required_minutes IS NULL
+       THEN stumin.required_minutes ELSE c.required_minutes END) as requiredmin
     FROM temp1 AS a
     JOIN overseer.classes_X_students cXs ON (cXs.class_id = $2)
     JOIN overseer.students s ON (s._id = cXs.student_id)
     JOIN overseer.classes c ON (c._id = $2)
-    LEFT JOIN (select MAX(srm.fromdate)
-              from overseer.students_required_minutes srm
-              where srm.student_id = s._id) stuMin ON (stuMin.fromdate < a.days)
+    LEFT JOIN (SELECT MAX(srm.fromdate) AS fromdate, srm.required_minutes
+              FROM overseer.students_required_minutes srm
+              WHERE srm.student_id = s._id
+              GROUP BY srm.fromdate, srm.required_minutes
+              ) stumin ON (stumin.fromdate < a.days)
     WHERE cXs.class_id = $2
     AND (s.start_date < a.days OR s.start_date is null);
   END;
