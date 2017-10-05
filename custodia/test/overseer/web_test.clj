@@ -609,13 +609,47 @@
           (is (= (->> att (filter (complement :in_today)) count) 3))
           ))))
 
+(deftest student-no-required-minutes-default-345
+  (do (sample-db)
+      (let [sid (:_id (cmd/make-student "test"))
+            today (today-at-utc 10 0)
+            yesterday (-> today (t/minus (t/days 1)))
+            tomorrow (-> today (t/plus (t/days 1)))
+            day-after-next (-> today (t/plus (t/days 2)))
+            _ (cmd/edit-student-required-minutes sid 100 day-after-next)
+            _ (first (queries/get-students sid))
+            ]
+
+        (cmd/add-student-to-class sid (get-class-id-by-name "2014-2015"))
+        (cmd/swipe-in sid today)
+        (cmd/swipe-out sid (t/plus today (t/minutes 101)))
+
+        (let [att (get-att sid)]
+          (testing "Total Valid Day Count"
+            (is (= 0 (-> att :total_days)))))
+
+        (cmd/swipe-in sid day-after-next)
+        (cmd/swipe-out sid (t/plus day-after-next (t/minutes 50)))
+
+        (cmd/swipe-in sid (t/plus day-after-next (t/minutes 51)))
+        (cmd/swipe-out sid (t/plus day-after-next (t/minutes 102)))
+
+        (let [att (get-att sid)]
+          (pp/pprint att)
+          (testing "Total Valid Day Count"
+            (is (= 1 (-> att :total_days)))))))
+  )
+
 (deftest older-student-required-minutes
   (do (sample-db)
       (let [sid (:_id (cmd/make-student "test"))
-            _ (cmd/edit-student-required-minutes sid 100)
+            today (today-at-utc 10 0)
+            yesterday (-> today (t/minus (t/days 1)))
+            tomorrow (-> today (t/plus (t/days 1)))
+            day-after-next (-> today (t/plus (t/days 2)))
+            _ (cmd/edit-student-required-minutes sid 400 yesterday)
+            _ (cmd/edit-student-required-minutes sid 100 today)
             _ (first (queries/get-students sid))
-            tomorrow (-> (today-at-utc 10 0) (t/plus (t/days 1)))
-            day-after-next (-> (today-at-utc 10 0) (t/plus (t/days 2)))
             ]
 
         (cmd/add-student-to-class sid (get-class-id-by-name "2014-2015"))

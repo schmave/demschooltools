@@ -25,10 +25,11 @@ BEGIN
            THEN c.required_minutes ELSE stumin.required_minutes END) as requiredmin
     FROM temp1 AS a
     JOIN overseer.students s ON (s._id = $1)
-    LEFT JOIN (SELECT MAX(srm.fromdate) AS fromdate, srm.required_minutes
+    LEFT JOIN (SELECT fromdate, srm.required_minutes
               FROM overseer.students_required_minutes srm
               WHERE srm.student_id = $1
-              GROUP BY srm.fromdate, srm.required_minutes) stumin ON (stumin.fromdate < a.days)
+              AND fromdate = (SELECT MAX(fromdate) FROM overseer.students_required_minutes WHERE srm.student_id = $1)
+              ) stumin ON (stumin.fromdate <= a.days)
     JOIN overseer.classes c ON (c._id = $3)
     WHERE (s.start_date < a.days OR s.start_date is null);
   END;
@@ -59,11 +60,11 @@ BEGIN
     JOIN overseer.classes_X_students cXs ON (cXs.class_id = $2)
     JOIN overseer.students s ON (s._id = cXs.student_id)
     JOIN overseer.classes c ON (c._id = $2)
-    LEFT JOIN (SELECT MAX(srm.fromdate) AS fromdate, srm.required_minutes
-              FROM overseer.students_required_minutes srm
-              WHERE srm.student_id = s._id
-              GROUP BY srm.fromdate, srm.required_minutes
-              ) stumin ON (stumin.fromdate < a.days)
+    LEFT JOIN (SELECT fromdate, srm.required_minutes
+               FROM overseer.students_required_minutes srm
+               WHERE srm.student_id = $1
+               AND fromdate = (SELECT MAX(fromdate) FROM overseer.students_required_minutes WHERE srm.student_id = $1)
+              ) stumin ON (stumin.fromdate <= a.days)
     WHERE cXs.class_id = $2
     AND (s.start_date < a.days OR s.start_date is null);
   END;
