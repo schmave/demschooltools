@@ -36,12 +36,14 @@ module.exports = React.createClass({
             actionCreator.createStudent(this.refs.name.getDOMNode().value,
                                         startDate,
                                         this.refs.email.getDOMNode().value,
+                                        this.refs.minutes.getDOMNode().value,
                                         this.state.student.is_teacher);
         } else {
             actionCreator.updateStudent(this.state.student._id,
                                         this.refs.name.getDOMNode().value,
                                         startDate,
                                         this.refs.email.getDOMNode().value,
+                                        this.refs.minutes.getDOMNode().value,
                                         this.state.student.is_teacher);
         }
     },
@@ -100,6 +102,11 @@ module.exports = React.createClass({
                 <input ref="email" className="form-control" id="guardian_email"
                 onChange={this.handleChange}
                 value={this.state.student.guardian_email}/>
+
+                <label htmlFor="minutes">Required Minutes:</label>
+                <input ref="minutes" className="form-control" id="minutes"
+                onChange={this.handleChange}
+                value={this.state.student.required_minutes}/>
 
                 <div>
                   <label htmlFor="is_teacher">Is Teacher:</label>

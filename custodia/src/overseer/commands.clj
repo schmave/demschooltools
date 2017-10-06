@@ -156,18 +156,21 @@
 (defn make-student
   ([name] (make-student name nil))
   ([name start-date] (make-student name start-date ""))
-  ([name start-date email] (make-student name start-date email false))
-  ([name start-date email is_teacher]
+  ([name start-date email] (make-student name start-date email false nil))
+  ([name start-date email is_teacher minutes]
    (when (and (has-name name)
               (queries/student-not-yet-created name))
-     (db/persist! {:type :students
-                   :name name
-                   :school_id db/*school-id*
-                   :start_date (make-sqldate start-date)
-                   :guardian_email email
-                   :olderdate nil
-                   :is_teacher is_teacher
-                   :show_as_absent nil}))))
+     (let [student (db/persist! {:type :students
+                                 :name name
+                                 :school_id db/*school-id*
+                                 :start_date (make-sqldate start-date)
+                                 :guardian_email email
+                                 :olderdate nil
+                                 :is_teacher is_teacher
+                                 :show_as_absent nil})]
+       (if (not= nil minutes)
+         (edit-student-required-minutes (:_id student) minutes))
+       student))))
 
 (defn make-student-starting-today
   ([name] (make-student-starting-today name ""))

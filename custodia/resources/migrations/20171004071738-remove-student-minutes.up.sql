@@ -5,6 +5,10 @@ CREATE TABLE overseer.students_required_minutes (student_id BIGINT NOT NULL, req
 DROP FUNCTION IF EXISTS overseer.student_school_days(bigint,text,bigint);
 --;;
 CREATE OR REPLACE FUNCTION overseer.student_school_days(stu_id BIGINT, y_name TEXT, cls_id BIGINT)
+--;;
+DROP FUNCTION IF EXISTS overseer.student_school_days(bigint,text,bigint);
+--;;
+CREATE OR REPLACE FUNCTION overseer.student_school_days(stu_id BIGINT, y_name TEXT, cls_id BIGINT)
 RETURNS TABLE (days date, student_id BIGINT, archived boolean, requiredmin int) AS $$
 BEGIN
   BEGIN

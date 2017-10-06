@@ -12,11 +12,8 @@
             [overseer.roles :as roles]
             [cemerick.friend :as friend]))
 
-(defn student-attendence [student-id]
-  (first (att/get-student-with-att student-id)))
-
 (defn student-page-response [student-id]
-  (resp/response {:student (student-attendence student-id)}))
+  (resp/response {:student (first (att/get-student-with-att student-id))}))
 
 (defn show-archived? [] true)
 
@@ -35,7 +32,7 @@
   (GET "/students/:id" [id :<< as-int]
        (friend/authorize #{roles/user} (student-page-response id)))
 
-  (POST "/students" [name start_date email is_teacher]
+  (POST "/students" [name start_date email minutes :<< as-int is_teacher]
         (friend/authorize #{roles/admin}
                           (resp/response {:made (cmd/make-student name start_date email is_teacher)
                                           :students (queries/get-students)})))
@@ -47,9 +44,9 @@
     (friend/authorize #{roles/super}
                       (resp/response {:users (users/get-users)})))
 
-  (PUT "/students/:id" [id :<< as-int name start_date email is_teacher]
+  (PUT "/students/:id" [id :<< as-int name start_date email minutes :<< as-int is_teacher]
        (friend/authorize #{roles/admin}
-                         (cmd/edit-student id name start_date email is_teacher))
+                         (cmd/edit-student id name start_date email is_teacher minutes))
        (student-page-response id))
 
   (POST "/students/:id/togglehours" [id :<< as-int]

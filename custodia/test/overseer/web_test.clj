@@ -617,8 +617,10 @@
             tomorrow (-> today (t/plus (t/days 1)))
             day-after-next (-> today (t/plus (t/days 2)))
             _ (cmd/edit-student-required-minutes sid 100 day-after-next)
-            _ (first (queries/get-students sid))
+            student (first (queries/get-students sid))
             ]
+
+
 
         (cmd/add-student-to-class sid (get-class-id-by-name "2014-2015"))
         (cmd/swipe-in sid today)
@@ -637,8 +639,16 @@
         (let [att (get-att sid)]
           (pp/pprint att)
           (testing "Total Valid Day Count"
-            (is (= 1 (-> att :total_days)))))))
-  )
+            (is (= 1 (-> att :total_days)))))
+
+        (testing "Student minute count"
+          (is (= 345
+                 (:required_minutes (queries/get-class-by-name "2014-2015"))
+                 (-> student :required_minutes)))
+          (cmd/edit-student-required-minutes sid 346)
+          (let [student (first (queries/get-students sid))]
+            (is (= 346 (-> student :required_minutes)))
+            (is (= 345 (:required_minutes (queries/get-class-by-name "2014-2015")))))))))
 
 (deftest older-student-required-minutes
   (do (sample-db)
