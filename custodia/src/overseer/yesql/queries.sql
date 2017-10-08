@@ -170,7 +170,6 @@ SELECT _id from overseer.classes where active = true and school_id = :school_id;
 -- name: get-students-y
 SELECT s.*
 from overseer.students s
-LEFT JOIN (overseer.student_newest_required_minutes(s._id,a.days)) stumin ON (1=1)
 where s.school_id = :school_id;
 
 JOIN overseer.students s ON (s._id = $1)
