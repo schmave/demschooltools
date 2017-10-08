@@ -1,47 +1,63 @@
-select * from students;
-
-
-SELECT 
+WITH days AS (
+       SELECT DISTINCT s.swipe_day as days
+       FROM overseer.swipes s
+       JOIN overseer.classes_X_students cXs
+           ON (cXs.class_id = 1 AND s.student_id = cXs.student_id)
+       INNER JOIN overseer.years y
+             ON (s.swipe_day BETWEEN y.from_date AND y.to_date)
+       WHERE y.name = '2014-06-01 2017-10-21'
+       ORDER BY s.swipe_day
+    ),
+    student_newest_required_minutes as (
+      SELECT fromdate, srm.required_minutes, srm.student_id
+      FROM overseer.students_required_minutes srm
+      WHERE fromdate = (SELECT MAX(fromdate)
+                        FROM overseer.students_required_minutes isrm
+                        WHERE isrm.student_id = 3)
+    ),
+    student_school_days AS (
+      SELECT a.days, s._id student_id
+      , s.archived
+      , (CASE WHEN stumin.required_minutes IS NULL
+         THEN c.required_minutes ELSE stumin.required_minutes END) as requiredmin
+      FROM days AS a
+      JOIN overseer.students s ON (s._id = 3)
+      LEFT JOIN student_newest_required_minutes stumin ON (
+        stumin.student_id = 3
+        AND stumin.fromdate <= a.days
+      )
+      JOIN overseer.classes c ON (c._id = 1)
+      WHERE (s.start_date < a.days OR s.start_date IS NULL)
+  )
+SELECT
   schooldays.student_id
-  , to_char(s.in_time at time zone 'America/New_York', 'HH:MI:SS') as nice_in_time
-  , to_char(s.out_time at time zone 'America/New_York', 'HH:MI:SS') as nice_out_time
-  , s.out_time 
+  , to_char(s.in_time at time zone 'America/New York', 'HH:MI:SS') as nice_in_time
+  , to_char(s.out_time at time zone 'America/New York', 'HH:MI:SS') as nice_out_time
+  , s.out_time
   , s.in_time
-  , extract(EPOCH FROM (s.out_time - s.in_time)::INTERVAL)/60 as intervalmin
+  , s.rounded_out_time
+  , s.rounded_in_time
+  , s.intervalmin
   , o._id has_override
   , e._id has_excuse
-  , schooldays.olderdate
-  , (CASE WHEN schooldays.olderdate IS NULL 
-               OR schooldays.olderdate > schooldays.days
-               THEN 300 ELSE 330 END) as requiredmin
+  , s._id
+  , schooldays.archived
+  , (CASE WHEN s._id IS NOT NULL THEN 'swipes' ELSE '' END) as type
+  , schooldays.requiredmin
   , schooldays.days AS day
-    FROM ( 
-      SELECT a.days, students._id student_id, students.olderdate FROM (SELECT DISTINCT days2.days
-      FROM (SELECT
-                (CASE WHEN date(s.in_time at time zone 'America/New_York')  IS NULL 
-                THEN date(s.out_time at time zone 'America/New_York')
-                ELSE date(s.in_time at time zone 'America/New_York') END) as days
-            FROM swipes s
-            INNER JOIN years y 
-            ON ((s.out_time BETWEEN y.from_date AND y.to_date)
-            OR (s.in_time BETWEEN y.from_date AND y.to_date))
-            WHERE y.name= '2014-06-01 2015-06-01') days2
-      ORDER BY days2.days) as a
-      JOIN students on (1=1)
-      where students._id = 1
-    ) as schooldays
-    LEFT JOIN swipes s
+FROM student_school_days AS schooldays
+LEFT JOIN overseer.swipes s
       ON (
-       ((schooldays.days = date(s.in_time at time zone 'America/New_York'))
+       ((schooldays.days = date(s.in_time AT TIME ZONE 'America/New York'))
        OR
-        (schooldays.days = date(s.out_time at time zone 'America/New_York')))
-        AND schooldays.student_id = s.student_id) 
-    LEFT JOIN overrides o 
-      ON (schooldays.days = o.date AND o.student_id = schooldays.student_id)
-    LEFT JOIN excuses e 
-      ON (schooldays.days = e.date AND e.student_id = schooldays.student_id)
-    where schooldays.days is not null
-    and schooldays.student_id = 1;
+        (schooldays.days = date(s.out_time AT TIME ZONE 'America/New York')))
+        AND s.student_id = 3)
+LEFT JOIN overseer.overrides o
+     ON (schooldays.days = o.date AND o.student_id = schooldays.student_id)
+LEFT JOIN overseer.excuses e
+     ON (schooldays.days = e.date AND e.student_id = schooldays.student_id)
+WHERE schooldays.days IS NOT NULL
+ORDER BY schooldays.days DESC;
 
 
 
