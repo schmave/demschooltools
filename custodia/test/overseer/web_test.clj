@@ -620,8 +620,6 @@
             student (first (queries/get-students sid))
             ]
 
-
-
         (cmd/add-student-to-class sid (get-class-id-by-name "2014-2015"))
         (cmd/swipe-in sid today)
         (cmd/swipe-out sid (t/plus today (t/minutes 101)))
@@ -642,9 +640,9 @@
             (is (= 1 (-> att :total_days)))))
 
         (testing "Student minute count"
-          (is (= 345
-                 (:required_minutes (queries/get-class-by-name "2014-2015"))
-                 (-> student :required_minutes)))
+
+          (is (= nil (-> student :required_minutes)))
+          (is (= 345 (:required_minutes (queries/get-class-by-name "2014-2015"))))
           (cmd/edit-student-required-minutes sid 346)
           (let [student (first (queries/get-students sid))]
             (is (= 346 (-> student :required_minutes)))
