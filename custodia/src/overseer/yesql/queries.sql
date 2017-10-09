@@ -139,6 +139,7 @@ WITH days AS (
     ),
     student_newest_required_minutes as (
       SELECT fromdate, srm.required_minutes, srm.student_id
+
       FROM overseer.students_required_minutes srm
       WHERE fromdate = (SELECT MAX(fromdate)
                         FROM overseer.students_required_minutes isrm

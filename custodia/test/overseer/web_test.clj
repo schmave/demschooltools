@@ -641,8 +641,10 @@
 
         (testing "Student minute count"
 
-          (is (= nil (-> student :required_minutes)))
-          (is (= 345 (:required_minutes (queries/get-class-by-name "2014-2015"))))
+          (is (= 345
+                 (:required_minutes (queries/get-class-by-name "2014-2015"))
+                 (-> student :required_minutes)
+                 ))
           (cmd/edit-student-required-minutes sid 346)
           (let [student (first (queries/get-students sid))]
             (is (= 346 (-> student :required_minutes)))
