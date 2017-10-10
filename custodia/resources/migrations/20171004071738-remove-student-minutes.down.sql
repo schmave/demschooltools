@@ -56,3 +56,6 @@ END;
 $$
 LANGUAGE plpgsql;
 --;;
+DROP VIEW overseer.school_days;
+--;;
+DROP VIEW overseer.student_newest_required_minutes;
