@@ -43,6 +43,8 @@
   ([school-id]
     (db/q get-students-y {:school_id school-id})))
 
+;;(get-all-students)
+
 (defn get-student [student_id]
   (db/q get-student-y {:student_id student_id
                        :school_id db/*school-id*}))

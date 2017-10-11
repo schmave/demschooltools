@@ -36,9 +36,13 @@ WITH student_school_days AS (
       FROM overseer.school_days AS a
       JOIN overseer.students s ON (s._id = :student_id)
       LEFT JOIN overseer.student_newest_required_minutes stumin
-           ON (stumin.student_id = student_id AND stumin.fromdate <= days)
+           ON (stumin.student_id = student_id
+              AND stumin.fromdate = (SELECT MAX(isrm.fromdate)
+                                     FROM overseer.students_required_minutes isrm
+                                     WHERE isrm.fromdate <= a.school_day
+                                     AND stumin.student_id = isrm.student_id))
       JOIN overseer.classes c ON (c._id = :class_id)
-      WHERE (s.start_date < days OR s.start_date IS NULL)
+      WHERE (s.start_date < a.school_day OR s.start_date IS NULL)
             AND a.class_id = :class_id
             AND a.year_name = :year_name
     )
@@ -126,8 +130,10 @@ WITH
       JOIN overseer.classes c ON (c._id = :class_id)
       LEFT JOIN overseer.student_newest_required_minutes AS stumin ON (
            stumin.student_id = s._id
-           AND stumin.fromdate <= a.days
-      )
+           AND stumin.fromdate = (SELECT MAX(isrm.fromdate)
+                                 FROM overseer.students_required_minutes isrm
+                                 WHERE isrm.fromdate <= a.days
+                                 AND stumin.student_id = isrm.student_id))
       WHERE cXs.class_id = :class_id
       AND a.class_id = :class_id
       AND a.year_name = :year_name
@@ -206,14 +212,22 @@ SELECT _id from overseer.classes where active = true and school_id = :school_id;
 SELECT s.* , snrm.required_minutes
 FROM overseer.students s
 LEFT JOIN overseer.student_newest_required_minutes snrm
-     ON (snrm.student_id = s._id AND snrm.fromday <= current_date)
+     ON (snrm.student_id = s._id
+         AND snrm.fromdate = (SELECT MAX(isrm.fromdate)
+                              FROM overseer.students_required_minutes isrm
+                              WHERE isrm.fromdate <= current_date
+                              AND snrm.student_id = isrm.student_id))
 WHERE s.school_id = :school_id;
 
 -- name: get-student-y
-SELECT s.* , snrm.required_minutes
+SELECT s.*, snrm.required_minutes
 FROM overseer.students s
-LEFT JOIN student_newest_required_minutes snrm
-     ON (snrm.student_id = s._id AND snrm.fromday <= current_date)
+LEFT JOIN overseer.student_newest_required_minutes snrm
+     ON (snrm.student_id = s._id
+         AND snrm.fromdate = (SELECT MAX(isrm.fromdate)
+                              FROM overseer.students_required_minutes isrm
+                              WHERE isrm.fromdate <= current_date
+                              AND snrm.student_id = isrm.student_id))
 WHERE s._id = :student_id
 AND s.school_id = :school_id;
 
