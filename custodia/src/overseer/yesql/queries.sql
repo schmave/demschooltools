@@ -119,7 +119,7 @@ FROM (SELECT
 ORDER BY days2.days;
 
 -- name: student-report-y
-WITH 
+WITH
     school_days AS (
       SELECT a.school_day, s._id student_id, s.archived
       , (CASE WHEN stumin.required_minutes IS NULL
