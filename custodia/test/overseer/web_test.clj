@@ -193,6 +193,7 @@
         (cmd/override-date sid "2014-10-14")
         (let [att (get-att sid)]
           (testing "Total Valid Day Count"
+
             (is (= (:total_days att)
                    1)))
           (testing "Total Abs Count"
@@ -200,7 +201,7 @@
                    0)))
           (testing "Total Hours"
             (is (= (:total_hours att)
-                   5)))
+                   (/ 23 4))))
           (testing "Override"
             (is (= (-> att :days first :override)
                    true)))
@@ -436,7 +437,7 @@
                    1)))
           (testing "Total Hours"
             (is (= (:total_hours att)
-                   26.5M)))
+                   27.25M)))
           (testing "Days sorted correctly"
             (is (= (-> att :days first :day)
                    "2014-10-20")))
@@ -518,7 +519,7 @@
 
         (cmd/add-student-to-class sid (get-class-id-by-name "2014-2015"))
         (cmd/swipe-in sid _2014_10-14_9-14am)
-        (cmd/swipe-out sid (t/plus _2014_10-14_9-14am (t/minutes 331)))
+        (cmd/swipe-out sid (t/plus _2014_10-14_9-14am (t/minutes 345)))
 
         (let [att  (att/get-student-with-att sid)]
           (testing "has one valid"
