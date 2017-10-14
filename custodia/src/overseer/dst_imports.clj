@@ -14,16 +14,25 @@
             [clj-time.coerce :as c]
             [schema.core :as s]
             [environ.core :refer [env]]
+            [overseer.records :as r]
             ))
 
-(defn get-name-from-dst-fields [student school]
+(def DstStudent
+  (merge r/Student {
+                    :person_id s/Num
+                    :first_name s/Str
+                    :display_name s/Str
+                    :last_name s/Str
+                    }))
+
+(s/defn get-name-from-dst-fields [student :- DstStudent school :- r/SchoolRecord]
   (if (:use_display_name school)
     (if (> (count (:display_name student)) 0)
       (:display_name student)
       (:first_name student))
     (str (:first_name student) " " (:last_name student))))
 
-(defn ensure-correct-student-name [student school]
+(s/defn ensure-correct-student-name [student :- DstStudent school :- r/SchoolRecord]
   (let [dst-name (get-name-from-dst-fields student school)]
     (if (not (= (:name student) dst-name))
       (db/update! :students (:_id student) {:name dst-name}))))
@@ -40,12 +49,11 @@
             (users/make-user (str (:short_name school)) (env :userpass) #{roles/user} (:id school)))
           schools)))
 
-(s/defn bulk-update-student-names [students :- [{:_id s/Num :name s/Str}] school]
+
+(s/defn bulk-update-student-names [students :- [DstStudent]
+                                   school :- r/SchoolRecord]
   (run! #(ensure-correct-student-name % school) students))
 
-(def DstStudent {:person_id s/Num
-                 :first_name s/Str
-                 :last_name s/Str})
 
 (s/defn create-dst-student [name :- s/Str dst-id :- s/Num school-id :- s/Num]
   (let [new-el {:type :students
@@ -83,8 +91,8 @@
             (cmd/add-student-to-class student-id class-id))
           students-not-in-class)
     (run! (fn [student-id]
-          (cmd/remove-student-from-class student-id class-id))
-        students-to-remove)))
+            (cmd/remove-student-from-class student-id class-id))
+          students-to-remove)))
 
 (defn get-start-of-year []
   (let [now (t/now)
@@ -103,8 +111,8 @@
         {class-id :_id} (queries/get-class-by-name class-name school-id)]
     (cmd/activate-class class-id school-id)
 
-    ; Create student records for people who don't exist
-    ; and add them to a class
+                                        ; Create student records for people who don't exist
+                                        ; and add them to a class
     (bulk-insert-new-students new-students class-id school)
     (ensure-existing-students-in-class (map :_id existing-students) class-id school-id)
     (bulk-update-student-names existing-students school)

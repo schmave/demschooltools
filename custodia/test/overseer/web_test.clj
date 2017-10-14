@@ -65,7 +65,7 @@
         _ (cmd/add-student-to-class id1 active-class)
         {id2 :_id} (cmd/make-student "2")
         {id3 :_id} (cmd/make-student "3")
-        _ (dst/ensure-existing-students-in-class [id1 id2 id3] active-class)
+        _ (dst/ensure-existing-students-in-class [id1 id2 id3] active-class db/*school-id*)
         students-in-class (->> (queries/get-all-classes-and-students)
                                :classes first :students (map :student_id) set)]
     (do
@@ -74,17 +74,21 @@
 
 (deftest bulk-update-student-names
   (sample-db false)
-  (let [{id1 :_id} (cmd/make-student "1")
-        {id2 :_id} (cmd/make-student "2")
-        {id3 :_id} (cmd/make-student "3")
-        _ (dst/bulk-update-student-names [{:_id id1 :name "11"}
-                                          {:_id id2 :name "2"}
-                                          {:_id id3 :name "33"}
-                                          ])]
+  (let [s1 (cmd/make-student "1")
+        s2 (cmd/make-student "2")
+        s3 (cmd/make-student "3")
+        _ (dst/bulk-update-student-names [(assoc s1 :use_display_name false :display_name "ape"
+                                                 :first_name "1" :last_name "1")
+                                          (assoc s2 :use_display_name true :display_name "ape"
+                                                 :first_name "2" :last_name "2")
+                                          (assoc s3 :use_display_name false :display_name "ape"
+                                                 :first_name "3" :last_name "3")
+                                          ]
+                                         db/*school-id*)]
     (do
-      (is (= "11" (-> id1 queries/get-student first :name)))
-      (is (= "2" (-> id2 queries/get-student first :name)))
-      (is (= "33" (-> id3 queries/get-student first :name))))))
+      (is (= "1 1" (-> (:_id s1) queries/get-student first :name)))
+      (is (= "ape" (-> (:_id s2) queries/get-student first :name)))
+      (is (= "3 3" (-> (:_id s3) queries/get-student first :name))))))
 
 (deftest bulk-drop-class-students-not-in-list
   (do (sample-db false)
