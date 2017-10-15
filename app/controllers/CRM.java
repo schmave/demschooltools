@@ -3,7 +3,6 @@ package controllers;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -14,13 +13,15 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
 import com.avaje.ebean.Expression;
 import com.avaje.ebean.FetchConfig;
-import com.csvreader.CsvWriter;
 import com.ecwid.mailchimp.*;
 import com.ecwid.mailchimp.method.v2_0.lists.ListMethodResult;
 import com.google.inject.Inject;
 
 import models.*;
 
+import models.Comment;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import play.data.*;
 import play.data.validation.ValidationError;
 import play.libs.Json;
@@ -371,6 +372,24 @@ public class CRM extends Controller {
             the_tag, people, people_with_family, the_tag.use_student_display, true));
     }
 
+    private static void createCell(Row row, int j, Object value, CellStyle style) {
+        Cell cell = row.createCell(j);
+        if (value != null) {
+            if (value instanceof String && ((String)value).trim().length() > 0) {
+                cell.setCellValue((String) value);
+            } else if (value instanceof Date) {
+                cell.setCellValue((Date) value);
+            }
+        }
+        if (style != null) {
+            cell.setCellStyle(style);
+        }
+    }
+
+    private void createCell(Row row, int j, Object value) {
+        createCell(row, j, value, null);
+    }
+
     public Result downloadTag(Integer id) throws IOException {
         Tag the_tag = Tag.find
             .fetch("people")
@@ -378,76 +397,107 @@ public class CRM extends Controller {
             .where().eq("organization", Organization.getByHost())
             .eq("id", id).findUnique();
 
-        response().setHeader("Content-Type", "text/csv; charset=utf-8");
+        response().setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response().setHeader("Content-Disposition", "attachment; filename=" +
-            the_tag.title + ".csv");
+            the_tag.title + ".xlsx");
 
         List<Person> people = the_tag.people;
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Charset charset = Charset.forName("UTF-8");
-        CsvWriter writer = new CsvWriter(baos, ',', charset);
+        Workbook wb = new XSSFWorkbook();
+        Sheet sheet = wb.createSheet("People");
 
-        writer.write("First name");
-        writer.write("Last name");
-        writer.write("Display (JC) name");
-        writer.write("Gender");
-        writer.write("DOB");
-        writer.write("Email");
-        writer.write("Phone 1");
-        writer.write("Phone 1 comment");
-        writer.write("Phone 2");
-        writer.write("Phone 2 comment");
-        writer.write("Phone 3");
-        writer.write("Phone 3 comment");
-        writer.write("Neighborhood");
-        writer.write("Street");
-        writer.write("City");
-        writer.write("State");
-        writer.write("ZIP");
-        writer.write("Notes");
-        writer.write("Previous school");
-        writer.write("School district");
-        writer.write("Grade");
-        writer.endRecord();
+        Row row = sheet.createRow(0);
+        CellStyle headerStyle = wb.createCellStyle();
+        Font headerFont = wb.createFont();
+        headerFont.setBold(true);
+        headerStyle.setAlignment(HorizontalAlignment.CENTER);
+        headerStyle.setFont(headerFont);
+        int j = 0;
+        createCell(row, j++, "First name", headerStyle);
+        createCell(row, j++, "Last name", headerStyle);
+        createCell(row, j++, "Display (JC) name", headerStyle);
+        createCell(row, j++, "Family name", headerStyle);
+        createCell(row, j++, "Gender", headerStyle);
+        createCell(row, j++, "DOB", headerStyle);
+        createCell(row, j++, "Email", headerStyle);
+        createCell(row, j++, "Phone 1", headerStyle);
+        createCell(row, j++, "Phone 1 comment", headerStyle);
+        createCell(row, j++, "Phone 2", headerStyle);
+        createCell(row, j++, "Phone 2 comment", headerStyle);
+        createCell(row, j++, "Phone 3", headerStyle);
+        createCell(row, j++, "Phone 3 comment", headerStyle);
+        createCell(row, j++, "Neighborhood", headerStyle);
+        createCell(row, j++, "Address", headerStyle);
+        createCell(row, j++, "City", headerStyle);
+        createCell(row, j++, "State", headerStyle);
+        createCell(row, j++, "ZIP", headerStyle);
+        createCell(row, j++, "Notes", headerStyle);
+        createCell(row, j++, "Previous school", headerStyle);
+        createCell(row, j++, "School district", headerStyle);
+        createCell(row, j++, "Grade", headerStyle);
+        for (int j2 = 0; j2 < j; j2++) {
+            sheet.autoSizeColumn(j);
+        }
 
+        CellStyle wordWrapStyle = wb.createCellStyle();
+        wordWrapStyle.setWrapText(true);
+
+        CellStyle dateStyle = wb.createCellStyle();
+        DataFormat df = wb.createDataFormat();
+        dateStyle.setDataFormat(df.getFormat("m/d/yyyy"));
+
+        int i = 1;
         for (Person p : people) {
-            writer.write(p.first_name);
-            writer.write(p.last_name);
-            writer.write(p.getDisplayName());
-            writer.write(p.gender);
-            if (p.dob != null) {
-                writer.write(Application.yymmddDate(p.dob));
-            } else {
-                writer.write("");
+            row = sheet.createRow(i);
+            j = 0;
+            createCell(row, j++, p.first_name);
+            createCell(row, j++, p.last_name);
+            createCell(row, j++, p.getDisplayName());
+            String family_name = null;
+            if (p.family != null) {
+                family_name = p.family.first_name + " " + p.family.last_name;
             }
-            writer.write(p.email);
-            for (int i = 0; i < 3; i++) {
-                if (i < p.phone_numbers.size()) {
-                    writer.write(p.phone_numbers.get(i).number);
-                    writer.write(p.phone_numbers.get(i).comment);
+            if (family_name != null && family_name.trim().length() > 0) {
+                createCell(row, j++, family_name);
+            } else {
+                j++;
+            }
+            createCell(row, j++, p.gender);
+            createCell(row, j++, p.dob, dateStyle);
+            createCell(row, j++, p.email);
+            for (int n = 0; n < 3; n++) {
+                if (n < p.phone_numbers.size()) {
+                    createCell(row, j++, p.phone_numbers.get(n).number);
+                    createCell(row, j++, p.phone_numbers.get(n).comment);
                 } else {
-                    writer.write("");
-                    writer.write("");
+                    j += 2;
                 }
             }
 
-            writer.write(p.neighborhood);
-            writer.write(p.address);
-            writer.write(p.city);
-            writer.write(p.state);
-            writer.write(p.zip);
-            writer.write(p.notes);
-            writer.write(p.previous_school);
-            writer.write(p.school_district);
-            writer.write(p.grade);
-            writer.endRecord();
+            createCell(row, j++, p.neighborhood);
+            createCell(row, j++, p.address);
+            createCell(row, j++, p.city);
+            createCell(row, j++, p.state);
+            createCell(row, j++, p.zip);
+            createCell(row, j++, p.notes, wordWrapStyle);
+            createCell(row, j++, p.previous_school);
+            createCell(row, j++, p.school_district);
+            createCell(row, j++, p.grade);
+            i++;
         }
 
-        writer.close();
-        // Adding the BOM here causes Excel 2010 on Windows to realize
-        // that the file is Unicode-encoded.
-        return ok("\ufeff" + new String(baos.toByteArray(), charset));
+        // Auto size all name columns
+        sheet.autoSizeColumn(0);
+        sheet.autoSizeColumn(1);
+        sheet.autoSizeColumn(2);
+        sheet.autoSizeColumn(3);
+        // Set "notes" column to 50 characters width
+        sheet.setColumnWidth(18, 256 * 50);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        wb.write(baos);
+        baos.close();
+        return ok(baos.toByteArray());
     }
 
     public Result newPerson() {

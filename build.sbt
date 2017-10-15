@@ -27,7 +27,8 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-mailer" % "5.0.0",
   "com.ecwid" % "ecwid-mailchimp" % "2.0.1.0",
   "org.xhtmlrenderer" % "flying-saucer-pdf" % "9.0.7",
-  "com.github.spullara.mustache.java" % "compiler" % "0.9.2"
+  "com.github.spullara.mustache.java" % "compiler" % "0.9.2",
+  "org.apache.poi" % "poi-ooxml" % "3.17"
 )
 
 // Disable javadoc
