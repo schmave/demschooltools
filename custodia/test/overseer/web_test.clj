@@ -87,7 +87,8 @@
                                          db/*school-id*)]
     (do
       (is (= "1 1" (-> (:_id s1) queries/get-student first :name)))
-      (is (= "ape" (-> (:_id s2) queries/get-student first :name)))
+      (is (= "2 2" (-> (:_id s2) queries/get-student first :name)))
+      ;; (is (= "ape" (-> (:_id s2) queries/get-student first :name)))
       (is (= "3 3" (-> (:_id s3) queries/get-student first :name))))))
 
 (deftest bulk-drop-class-students-not-in-list

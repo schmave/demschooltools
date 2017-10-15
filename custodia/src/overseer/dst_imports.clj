@@ -25,14 +25,14 @@
                     :last_name s/Str
                     }))
 
-(s/defn get-name-from-dst-fields [student :- DstStudent school :- r/SchoolRecord]
+(defn get-name-from-dst-fields [student school]
   (if (:use_display_name school)
-    (if (> (count (:display_name student)) 0)
-      (:display_name student)
-      (:first_name student))
+    (comment (if (> (count (:display_name student)) 0)
+               (:display_name student)
+               (:first_name student)))
     (str (:first_name student) " " (:last_name student))))
 
-(s/defn ensure-correct-student-name [student :- DstStudent school :- r/SchoolRecord]
+(defn ensure-correct-student-name [student school]
   (let [dst-name (get-name-from-dst-fields student school)]
     (if (not (= (:name student) dst-name))
       (db/update! :students (:_id student) {:name dst-name}))))
@@ -50,8 +50,8 @@
           schools)))
 
 
-(s/defn bulk-update-student-names [students :- [DstStudent]
-                                   school :- r/SchoolRecord]
+(defn bulk-update-student-names [students
+                                   school]
   (run! #(ensure-correct-student-name % school) students))
 
 
