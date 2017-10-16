@@ -1,20 +1,21 @@
 (ns overseer.dst-imports
-  (:require [overseer.db :as db]
-            [overseer.database.users :as users]
-            [overseer.commands :as cmd]
-            [overseer.queries :as queries]
-            [overseer.roles :as roles]
-            [yesql.core :refer [defqueries]]
-            [overseer.dates :as dates]
-            [clojure.tools.logging :as log]
+  (:require [clj-time.coerce :as c]
+            [clj-time.core :as t]
             [clj-time.format :as f]
             [clj-time.local :as l]
+            [clojure.pprint :as pp]
             [clojure.set :as set]
-            [clj-time.core :as t]
-            [clj-time.coerce :as c]
+            [clojure.tools.logging :as log]
             [environ.core :refer [env]]
-            [schema.core :as s]
+            [overseer.commands :as cmd]
+            [overseer.database.users :as users]
+            [overseer.dates :as dates]
+            [overseer.db :as db]
+            [overseer.queries :as queries]
             [overseer.records :as r]
+            [overseer.roles :as roles]
+            [schema.core :as s]
+            [yesql.core :refer [defqueries]]
             ))
 
 (def DstStudent
@@ -72,6 +73,7 @@
   (run! (fn [dst]
           (let [name (get-name-from-dst-fields dst school)
                 dst-id (:person_id dst)
+                ;; _ (pp/pprint {:name name :dst_id dst-id :school school})
                 {student-id :_id} (create-dst-student name dst-id (:_id school))]
             (cmd/add-student-to-class student-id class-id)))
         dst-students))

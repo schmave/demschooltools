@@ -47,10 +47,11 @@
 (deftest bulk-create-students-test
   (sample-db false)
   (let [active-class (queries/get-active-class)
+        _ (pp/pprint active-class)
         _ (dst/bulk-insert-new-students [{:person_id 1 :first_name "a" :last_name "b"}
                                          {:person_id 2 :first_name "c" :last_name "d"}]
                                         active-class
-                                        db/*school-id*)
+                                        {:_id db/*school-id*})
         students (att/get-student-list)]
     (is (= 4 (count students)))
     (is (= "a b" (->> students (filter (fn [s] (= (:_id s) 3))) first :name)))
@@ -523,6 +524,7 @@
         (cmd/swipe-out sid (t/plus _2014_10-14_9-14am (t/minutes 345)))
 
         (let [att  (att/get-student-with-att sid)]
+          (pp/pprint att)
           (testing "has one valid"
             (is (=  (-> att first :total_days) 1 )))
           (testing "students with att doesn't throw exceptions"

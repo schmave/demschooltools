@@ -14,7 +14,7 @@
 (def DayInformation
   {:student_id s/Num
    :day s/Str
-   :requiredmin (s/enum 300 330)
+   :requiredmin s/Num
    :has_excuse s/Bool
    :has_override s/Bool})
 
