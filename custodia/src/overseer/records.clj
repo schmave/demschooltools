@@ -8,7 +8,6 @@
               :_id s/Num
               :name s/Str
               :display_name s/Str
-              :school_id
               })
 
 (def SchoolRecord {:_id s/Num :use_display_name s/Bool})

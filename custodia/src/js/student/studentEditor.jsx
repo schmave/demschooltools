@@ -31,19 +31,19 @@ module.exports = React.createClass({
 
     saveChange: function () {
         this.savingShow();
-        var startDate = this.refs.startdate.props.value || new Date();
+        var startDate = this.refs.startdate.props.value;
         if (this.state.student._id == null) {
             actionCreator.createStudent(this.refs.name.getDOMNode().value,
                                         startDate,
                                         this.refs.email.getDOMNode().value,
-                                        this.refs.minutes.getDOMNode().value,
+                                        this.refs.required_minutes.getDOMNode().value,
                                         this.state.student.is_teacher);
         } else {
             actionCreator.updateStudent(this.state.student._id,
                                         this.refs.name.getDOMNode().value,
                                         startDate,
                                         this.refs.email.getDOMNode().value,
-                                        this.refs.minutes.getDOMNode().value,
+                                        this.refs.required_minutes.getDOMNode().value,
                                         this.state.student.is_teacher);
         }
     },
@@ -53,7 +53,7 @@ module.exports = React.createClass({
         this.setState(
             {student: s,
              creating: (!s._id),
-             startdate_datepicker: (s.start_date) ? new Date(s.start_date) : new Date()})
+             startdate_datepicker: (s.start_date) ? new Date(s.start_date) : null})
         this.refs.studentEditor.show();
     },
 
@@ -103,8 +103,8 @@ module.exports = React.createClass({
                 onChange={this.handleChange}
                 value={this.state.student.guardian_email}/>
 
-                <label htmlFor="minutes">Required Minutes:</label>
-                <input ref="minutes" className="form-control" id="minutes"
+                <label htmlFor="required_minutes">Required Minutes:</label>
+                <input ref="required_minutes" className="form-control" id="required_minutes"
                 onChange={this.handleChange}
                 value={this.state.student.required_minutes}/>
 

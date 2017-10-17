@@ -32,10 +32,11 @@
   (GET "/students/:id" [id :<< as-int]
        (friend/authorize #{roles/user} (student-page-response id)))
 
-  (POST "/students" [name start_date email minutes :<< as-int is_teacher]
+  (POST "/students" [name start_date email minutes is_teacher]
         (friend/authorize #{roles/admin}
-                          (resp/response {:made (cmd/make-student name start_date email is_teacher)
-                                          :students (queries/get-students)})))
+                          (let [minutes (if (not= nil minutes) (read-string minutes) nil)]
+                            (resp/response {:made (cmd/make-student name start_date email is_teacher minutes)
+                                            :students (queries/get-students)}))))
 
   (PUT "/user" [name password]
     (friend/authorize #{roles/super}
