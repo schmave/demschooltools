@@ -28,6 +28,7 @@ public class OrgConfig {
     public boolean filter_no_charge_cases = false;
     public boolean show_findings_in_rp_list = true;
     public boolean use_year_in_case_number = false;
+    public boolean hide_location_for_print = false;
 
     public boolean enable_file_sharing = false;
 
@@ -160,6 +161,7 @@ class TheCircleSchool extends OrgConfig {
 
         track_writer = false;
         filter_no_charge_cases = true;
+        hide_location_for_print = true;
 
         OrgConfig.register(name, this);
     }

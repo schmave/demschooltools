@@ -11,7 +11,10 @@
 			p.role == PersonAtCase.ROLE_WRITER).map { tr =>
 				@tr.person.getDisplayName()}.mkString(", ").
 	}
-	<i>Location</i>: @if(!c.location.equals("")) {@c.location} else {unknown}.</p></td>
+    <span class=@if( OrgConfig.get().hide_location_for_print ) { "no-print" } else { "" }>
+        <i>Location</i>: @if(!c.location.equals("")) {@c.location} else {unknown}.
+    </span>
+    </p></td>
 	<td valign="top"><p>
 		<i>Testifiers</i>:
 		@if( c.charges.size() == 0 && OrgConfig.get().filter_no_charge_cases ) {
