@@ -1,15 +1,8 @@
 package models;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
 import javax.persistence.*;
 
 import com.avaje.ebean.Model;
-import com.avaje.ebean.Model.Finder;
 
 @Entity
 public class PersonAtMeeting extends Model {
@@ -29,6 +22,7 @@ public class PersonAtMeeting extends Model {
     public final static int ROLE_JC_MEMBER = 1;
     public final static int ROLE_NOTE_TAKER = 2;
     public final static int ROLE_JC_SUB = 3;
+    public final static int ROLE_RUNNER = 4;
     public Integer role;
 
     public static PersonAtMeeting create(Meeting m, Person p, Integer role)

@@ -27,8 +27,10 @@ Edit minutes</a></p>
 
 <b>Subs: </b>
 @meeting_people(m.people_at_meeting, PersonAtMeeting.ROLE_JC_SUB)
-</p>
 
+<b>Runners: </b>
+@meeting_people(m.people_at_meeting, PersonAtMeeting.ROLE_RUNNER)
+</p>
 
 <h4>&nbsp;<br/>Case Notes</h4>
 @caseTableOpen()

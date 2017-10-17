@@ -19,6 +19,7 @@ app.ROLE_JC_CHAIR = @PersonAtMeeting.ROLE_JC_CHAIR
 app.ROLE_JC_MEMBER = @PersonAtMeeting.ROLE_JC_MEMBER
 app.ROLE_NOTE_TAKER = @PersonAtMeeting.ROLE_NOTE_TAKER
 app.ROLE_JC_SUB = @PersonAtMeeting.ROLE_JC_SUB
+app.ROLE_RUNNER = @PersonAtMeeting.ROLE_RUNNER
 app.ROLE_TESTIFIER = @PersonAtCase.ROLE_TESTIFIER
 app.ROLE_WRITER = @PersonAtCase.ROLE_WRITER
 
@@ -30,6 +31,7 @@ app.initial_data = {
 	chair : @Html(meeting.getJsonPeople(PersonAtMeeting.ROLE_JC_CHAIR)),
 	notetaker : @Html(meeting.getJsonPeople(PersonAtMeeting.ROLE_NOTE_TAKER)),
 	sub : @Html(meeting.getJsonPeople(PersonAtMeeting.ROLE_JC_SUB)),
+	runners : @Html(meeting.getJsonPeople(PersonAtMeeting.ROLE_RUNNER)),
 	cases: [],
 }
 
@@ -67,6 +69,8 @@ View printable minutes</a>
 {{render "people-chooser" clazz="chair"}}
 <br>Notetaker:
 {{render "people-chooser" clazz="notetaker"}}
+<br>Runners:
+{{render "people-chooser" clazz="runner"}}
 
 <div id="meeting-cases">
 </div>
