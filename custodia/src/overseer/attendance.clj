@@ -95,7 +95,7 @@
         min-minutes (-> records first :requiredmin)]
     {:valid (and (not has-excuse?)
                  (or has-override?
-                     (> int-mins min-minutes)))
+                     (>= int-mins min-minutes)))
      :short (boolean (or (and (not has-override?)
                               (not has-excuse?)
                               (seq (only-swipes records)))
@@ -189,6 +189,8 @@
                     :last_swipe_type last-swipe-type
                     :last_swipe_date last-swipe-date
                     :days summed-days})))
+
+;; (queries/get-student-page 3 (get-current-year-string (queries/get-years)))
 
 (defn get-student-with-att
   ([id] (get-student-with-att id (get-current-year-string (queries/get-years))))
