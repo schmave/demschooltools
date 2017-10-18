@@ -132,12 +132,12 @@ WITH
            stumin.student_id = s._id
            AND stumin.fromdate = (SELECT MAX(isrm.fromdate)
                                  FROM overseer.students_required_minutes isrm
-                                 WHERE isrm.fromdate <= a.days
+                                 WHERE isrm.fromdate <= a.school_day
                                  AND stumin.student_id = isrm.student_id))
       WHERE cXs.class_id = :class_id
       AND a.class_id = :class_id
       AND a.year_name = :year_name
-      AND (s.start_date < a.days OR s.start_date IS NULL)
+      AND (s.start_date < a.school_day OR s.start_date IS NULL)
   ), eachDay AS (
       SELECT
       schooldays.student_id
