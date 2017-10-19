@@ -77,18 +77,14 @@
   (let [s1 (cmd/make-student "1")
         s2 (cmd/make-student "2")
         s3 (cmd/make-student "3")
-        _ (dst/bulk-update-student-names [(assoc s1 :use_display_name false :display_name "ape"
-                                                 :first_name "1" :last_name "1")
-                                          (assoc s2 :use_display_name true :display_name "ape"
-                                                 :first_name "2" :last_name "2")
-                                          (assoc s3 :use_display_name false :display_name "ape"
-                                                 :first_name "3" :last_name "3")
+        _ (dst/bulk-update-student-names [(assoc s1 :display_name "ape" :first_name "1" :last_name "1")
+                                          (assoc s2 :display_name "ape" :first_name "2" :last_name "2")
+                                          (assoc s3 :display_name "ape" :first_name "3" :last_name "3")
                                           ]
-                                         db/*school-id*)]
+                                          db/*school-id*)]
     (do
       (is (= "1 1" (-> (:_id s1) queries/get-student first :name)))
       (is (= "2 2" (-> (:_id s2) queries/get-student first :name)))
-      ;; (is (= "ape" (-> (:_id s2) queries/get-student first :name)))
       (is (= "3 3" (-> (:_id s3) queries/get-student first :name))))))
 
 (deftest bulk-drop-class-students-not-in-list

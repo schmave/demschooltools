@@ -12,8 +12,8 @@
             [clojure.set :as set]
             [clj-time.core :as t]
             [clj-time.coerce :as c]
-            [schema.core :as s]
             [environ.core :refer [env]]
+            [schema.core :as s]
             [overseer.records :as r]
             ))
 
@@ -27,9 +27,9 @@
 
 (defn get-name-from-dst-fields [student school]
   (if (:use_display_name school)
-    (comment (if (> (count (:display_name student)) 0)
-               (:display_name student)
-               (:first_name student)))
+    (if (> (count (:display_name student)) 0)
+      (:display_name student)
+      (:first_name student))
     (str (:first_name student) " " (:last_name student))))
 
 (defn ensure-correct-student-name [student school]
@@ -51,7 +51,7 @@
 
 
 (defn bulk-update-student-names [students
-                                   school]
+                                 school]
   (run! #(ensure-correct-student-name % school) students))
 
 
@@ -68,7 +68,7 @@
     (db/persist! new-el)))
 
 
-(s/defn bulk-insert-new-students [dst-students :- [DstStudent] class-id :- s/Num school]
+(s/defn bulk-insert-new-students [dst-students class-id :- s/Num school]
   (run! (fn [dst]
           (let [name (get-name-from-dst-fields dst school)
                 dst-id (:person_id dst)
