@@ -7,21 +7,22 @@
 
 @if(p.family != null) {
 	<p class="center">
-	@if(!p.family.first_name.equals("") || !p.family.last_name.equals("")) {
-		<span class="family-name">@p.family.first_name @p.family.last_name</span>
-	}
     <span class="family-id">Family ID #@p.family.person_id</span>
+	@if(!p.family.first_name.equals("")) {
+		<span class="family-name">@p.family.first_name</span>
+	}
+    <span class="edit"><a href="@routes.CRM.editPerson(p.family.person_id)">Edit</a></span>
 	</p>
 }
 
 @defining(if(family_members.size() >= 2){ "col-xs-6 col-md-3" } else {"col-xs-6 col-md-6"}) { size =>
 <div class="row">
 	<div class="@size">
-	@person(p)
+	@person(p, true)
 	</div>
 
 	@for( family_member <- family_members ) {
-		<div class="@size">@person(family_member)</div>
+		<div class="@size">@person(family_member, false)</div>
 	}
 </div>
 }

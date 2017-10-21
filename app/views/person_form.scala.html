@@ -12,6 +12,12 @@
 @if(personForm("person_id").value()) {
 	<input type="hidden" name="person_id" value="@personForm("person_id").value()"/>
 }
+<input type="hidden" name="is_family" value="@personForm("is_family").value()"/>
+
+@if( Utils.getBooleanFromFormValue(personForm("is_family")) ) {
+    <h3>Editing family</h3>
+    @inputText(personForm("first_name"), '_label -> "Family Name", 'class -> "form-control")
+} else {
         @inputText(personForm("first_name"), '_label -> "First Name", 'class -> "form-control")
         @inputText(personForm("last_name"), '_label -> "Last Name", 'class -> "form-control")
 		@select(personForm("gender"), options = options(Seq("Unknown", "Female", "Male", "Other")), '_label -> "Gender", 'class -> "form-control")
@@ -61,10 +67,11 @@
 		<hr/>
 		@inputText(personForm("same_family_name"), '_label -> "Same family as: ", 'class -> "form-control")
 		<input type="hidden" id = "same_family_id" name="same_family_id"/>
-
+}
         <input type="submit" value="@submit_title">
 
 </div>
+@if( ! Utils.getBooleanFromFormValue(personForm("is_family")) ) {
 <div class="col-sm-6">
 
 <p><h4>Student Info</h4>
@@ -78,5 +85,6 @@
 
 
 </div>
+}
 }
 </div>

@@ -269,18 +269,20 @@ public class Person extends Model implements Comparable<Person> {
         Person p = form.get();
         p.attachToPersonAsFamily(form.field("same_family_id").value());
 
-        // Remove all existing phone numbers -- they are not loaded
-        // into the object, so we have to go direct to the DB to get them.
-        List<PhoneNumber> numbers = PhoneNumber.find.where().eq("person_id", p.person_id).findList();
-        for (PhoneNumber number : numbers) {
-            number.delete();
-        }
+        if (!p.is_family) {
+            // Remove all existing phone numbers -- they are not loaded
+            // into the object, so we have to go direct to the DB to get them.
+            List<PhoneNumber> numbers = PhoneNumber.find.where().eq("person_id", p.person_id).findList();
+            for (PhoneNumber number : numbers) {
+                number.delete();
+            }
 
-        p.addPhoneNumbers(form);
+            p.addPhoneNumbers(form);
 
-        Person old_p = Person.findById(p.person_id);
-        if (!old_p.email.equals(p.email)) {
-            PersonChange.create(old_p, p.email);
+            Person old_p = Person.findById(p.person_id);
+            if (!old_p.email.equals(p.email)) {
+                PersonChange.create(old_p, p.email);
+            }
         }
 
 		p.trimSpaces();

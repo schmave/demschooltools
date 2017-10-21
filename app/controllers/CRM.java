@@ -639,7 +639,8 @@ public class CRM extends Controller {
     }
 
     public Result editPerson(Integer id) {
-        return ok(views.html.edit_person.render(Person.findById(id).fillForm()));
+        Person p = Person.findById(id);
+        return ok(views.html.edit_person.render(p.fillForm()));
     }
 
     public Result savePersonEdits() {
@@ -660,7 +661,9 @@ public class CRM extends Controller {
             );
         }
 
-        return redirect(routes.CRM.person(Person.updateFromForm(filledForm).person_id));
+        Person updatedPerson = Person.updateFromForm(filledForm);
+        return redirect(routes.CRM.person(
+                (updatedPerson.is_family ? updatedPerson.family_members.get(0) : updatedPerson).person_id));
     }
 
     public static String getInitials(Person p) {

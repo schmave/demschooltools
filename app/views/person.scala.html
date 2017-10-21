@@ -1,8 +1,8 @@
-@(person: Person)
+@(person: Person, is_primary: Boolean)
 
 @import helper._
 
-<div class="person">
+<div class="person @if(is_primary) { primary } else { }">
 @if(person.gender.equals("Male")) {
 	<div class="male">M</div>
 }

@@ -26,6 +26,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import play.Configuration;
 import play.Play;
+import play.data.Form;
 import play.twirl.api.Html;
 import play.twirl.api.HtmlFormat;
 
@@ -125,6 +126,10 @@ public class Utils
 
     public static boolean getBooleanFromFormValue(String form_value) {
         return form_value != null && (form_value.equals("true") || form_value.equals("on"));
+    }
+
+    public static boolean getBooleanFromFormValue(Form.Field field) {
+        return getBooleanFromFormValue(field.value());
     }
 
     private static void makeCustodiaPost(CloseableHttpClient client, String url, List<NameValuePair> data) {
