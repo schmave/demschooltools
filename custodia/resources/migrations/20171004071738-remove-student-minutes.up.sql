@@ -1,6 +1,22 @@
-ALTER TABLE overseer.students DROP COLUMN olderdate DATE;
---;;
 CREATE TABLE overseer.students_required_minutes (student_id BIGINT NOT NULL, required_minutes INT NOT NULL, fromdate DATE NOT NULL);
+--;;
+INSERT INTO overseer.students_required_minutes
+SELECT
+  _id AS student_id, 300 AS required_minutes, date '2000, 1, 1' AS fromdate
+FROM
+  overseer.students
+WHERE
+  olderdate IS NULL;
+--;;
+INSERT INTO overseer.students_required_minutes
+SELECT
+_id AS student_id, 330 AS required_minutes, olderdate AS fromdate
+FROM
+overseer.students
+WHERE
+olderdate IS NOT NULL;
+--;;
+ALTER TABLE overseer.students DROP COLUMN olderdate DATE;
 --;;
 DROP FUNCTION IF EXISTS overseer.student_school_days(bigint,text,bigint);
 --;;
@@ -25,3 +41,4 @@ SELECT DISTINCT fromdate, srm.required_minutes, srm.student_id
 FROM overseer.students_required_minutes srm
 GROUP BY fromdate, required_minutes, student_id
 );
+-- MAKE MIGRATION FOR PREVIOUS STUDENTS!!!
