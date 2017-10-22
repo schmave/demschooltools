@@ -59,18 +59,22 @@ $(function () {
 
 <script id="meeting-template" type="text/x-handlebars-template">
 <h2>@OrgConfig.get().str_jc_name minutes<br>@Application.formatMeetingDate(meeting.date)</h2>
-<p><a href="@routes.Application.viewMeeting(meeting.id)" class="btn btn-warning">
-View printable minutes</a>
-<p>Committee:
-{{render "people-chooser" clazz="committee"}}
-<br>Subs:
-{{render "people-chooser" clazz="sub"}}
-<br>Chair:
-{{render "people-chooser" clazz="chair"}}
-<br>Notetaker:
-{{render "people-chooser" clazz="notetaker"}}
-<br>Runners:
-{{render "people-chooser" clazz="runner"}}
+<p>
+    <a href="@routes.Application.viewMeeting(meeting.id)" class="btn btn-warning">
+        View printable minutes</a>
+</p>
+<table class="edit-minutes-members">
+<tr><td>Committee:
+    <td>{{render "people-chooser" clazz="committee"}}
+<tr><td>Subs:
+    <td>{{render "people-chooser" clazz="sub"}}
+<tr><td>Chair:
+    <td>{{render "people-chooser" clazz="chair"}}
+<tr><td>Notetaker:
+    <td>{{render "people-chooser" clazz="notetaker"}}
+<tr><td>Runners:
+    <td>{{render "people-chooser" clazz="runner"}}
+</table>
 
 <div id="meeting-cases">
 </div>
