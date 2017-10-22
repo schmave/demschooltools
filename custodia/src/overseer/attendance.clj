@@ -120,7 +120,7 @@
   ([] (get-student-list false))
   ([show-archived]
    (let [today-string (make-date-string (t/now))
-         inout (queries/get-student-list-in-out show-archived)
+         inout (trace/trace "student-list-in-out" (queries/get-student-list-in-out show-archived))
          inout (map #(assoc %
                             :in_today (= today-string
                                          (make-date-string (:last_swipe_date %)))

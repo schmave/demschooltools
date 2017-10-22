@@ -41,4 +41,3 @@ SELECT DISTINCT fromdate, srm.required_minutes, srm.student_id
 FROM overseer.students_required_minutes srm
 GROUP BY fromdate, required_minutes, student_id
 );
--- MAKE MIGRATION FOR PREVIOUS STUDENTS!!!

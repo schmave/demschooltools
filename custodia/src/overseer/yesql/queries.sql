@@ -77,11 +77,12 @@ WHERE schooldays.days IS NOT NULL
 ORDER BY schooldays.days DESC;
 
 -- name: student-list-in-out-y
-select stu.name
+SELECT stu.name
        , stu._id
        , stu.show_as_absent
        , stu.is_teacher
        , stu.archived
+       , c.late_time as late_time
        , CASE WHEN l.outs >= l.ins THEN 'out'
          ELSE 'in'
          END AS last_swipe_type
@@ -96,8 +97,8 @@ LEFT JOIN (SELECT max(s.in_time) AS ins
            GROUP BY s.student_id
            ORDER BY ins, outs) AS l
      ON (l.student_id = stu._id)
-     INNER JOIN overseer.classes c ON (1=1)
-     INNER JOIN overseer.classes_X_students cXs ON (cXs.student_id = stu._id AND cXs.class_id = c._id)
+INNER JOIN overseer.classes c ON (1=1)
+INNER JOIN overseer.classes_X_students cXs ON (cXs.student_id = stu._id AND cXs.class_id = c._id)
 WHERE (stu.archived = :show_archived
        OR stu.archived = FALSE)
 AND c.active = TRUE
