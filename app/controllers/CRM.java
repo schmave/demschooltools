@@ -256,10 +256,8 @@ public class CRM extends Controller {
     }
 
     public void addTag(Tag tag, Person person) {
-        for (Person p : tag.people) {
-            if (p.person_id.equals(person.person_id)) {
-                return;
-            }
+        if (tag.people.contains(person)) {
+            return;
         }
 
         Ebean.execute(new TxRunnable() {
@@ -275,7 +273,6 @@ public class CRM extends Controller {
                         true);
 
                 person.tags.add(tag);
-
                 notifyAboutTag(tag, person, true);
             }
         });
@@ -285,19 +282,30 @@ public class CRM extends Controller {
         Tag t = Tag.findById(tag_id);
         Person p = Person.findById(person_id);
 
-        if (Ebean.createSqlUpdate("DELETE from person_tag where person_id=" + person_id +
-            " AND tag_id=" + tag_id).execute() == 1) {
-            PersonTagChange ptc = PersonTagChange.create(
-                t,
-                p,
-                mApplication.getCurrentUser(),
-                false);
-        }
-
+        removeTag(t, p);
         CachedPage.onPeopleChanged();
-        notifyAboutTag(t, p, false);
 
         return ok();
+    }
+
+    public void removeTag(Tag tag, Person person) {
+        if (!tag.people.contains(person)) {
+            return;
+        }
+        Ebean.execute(new TxRunnable() {
+            @Override
+            public void run() {
+                if (Ebean.createSqlUpdate("DELETE from person_tag where person_id=" + person.person_id +
+                        " AND tag_id=" + tag.id).execute() == 1) {
+                    PersonTagChange ptc = PersonTagChange.create(
+                            tag,
+                            person,
+                            mApplication.getCurrentUser(),
+                            false);
+                }
+                notifyAboutTag(tag, person, false);
+            }
+        });
     }
 
     public static void notifyAboutTag(Tag t, Person p, boolean was_add) {
@@ -383,6 +391,53 @@ public class CRM extends Controller {
 
         CachedPage.onPeopleChanged();
         return redirect(routes.CRM.viewTag(dest_tag.id));
+    }
+
+    public Result removePeopleFromTag() {
+        final Map<String, String[]> values = request().body().asFormUrlEncoded();
+        Tag tag = Tag.findById(Integer.parseInt(values.get("tag_id")[0]));
+
+        String prefix = "person-";
+        for (String key_name : values.keySet()) {
+            if (key_name.startsWith(prefix) && values.get(key_name)[0].equals("on")) {
+                Person p = Person.findById(Integer.parseInt(key_name.substring(prefix.length())));
+                removeTag(tag, p);
+            }
+        }
+
+        CachedPage.onPeopleChanged();
+        return redirect(routes.CRM.viewTag(tag.id));
+    }
+
+    public Result undoTagChanges() {
+        final Map<String, String[]> values = request().body().asFormUrlEncoded();
+        Tag tag = Tag.findById(Integer.parseInt(values.get("tag_id")[0]));
+
+        String prefix = "tag-change-";
+        for (String key_name : values.keySet()) {
+            if (key_name.startsWith(prefix) && values.get(key_name)[0].equals("on")) {
+                PersonTagChange change =
+                    PersonTagChange.find.byId(Integer.parseInt(key_name.substring(prefix.length())));
+                Ebean.execute(new TxRunnable() {
+                    @Override
+                    public void run() {
+                        if (change.was_add) {
+                            tag.people.remove(change.person);
+                        } else {
+                            if (!tag.people.contains(change.person)) {
+                                tag.people.add(change.person);
+                            }
+                        }
+                        tag.save();
+                        change.delete();
+                        notifyAboutTag(tag, change.person, !change.was_add);
+                    }
+                });
+            }
+        }
+
+        CachedPage.onPeopleChanged();
+        return redirect(routes.CRM.viewTag(tag.id).url() + "#!history");
     }
 
     public Result viewTag(Integer id) {

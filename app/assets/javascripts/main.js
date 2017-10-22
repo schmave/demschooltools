@@ -113,3 +113,11 @@ window.initPeopleChooser = function(selector, onAdd, onRemove) {
         onRemove,
         '/jsonPeople');
 };
+
+window.enableButtonForCheckboxes = function(btn_selector, checkbox_class) {
+    var checkbox_selector = 'input[type=checkbox].' + checkbox_class;
+    $(checkbox_selector).change(function() {
+        var count = $(checkbox_selector + ':checked').length;
+        $(btn_selector).prop("disabled", (count == 0));
+    });
+};

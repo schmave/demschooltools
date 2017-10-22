@@ -31,30 +31,47 @@
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="tag-people">
-		@if(use_student_display) {
-			@student_list(people)
-		} else {
-			@people_list(people)
-		}
-
-		@tag_extras(people, people_with_family)
+        @helper.form(routes.CRM.removePeopleFromTag()) {
+            <input type="hidden" name="tag_id" value="@tag.id">
+            <p style="margin-top: 15px; margin-left: 15px">
+                <input id="remove-people" class="btn btn-warning" disabled="disabled"
+                       type="submit" value="Remove selected people"/>
+            </p>
+            @if(use_student_display) {
+                @student_list(people)
+            } else {
+                @people_list(people, true)
+            }
+        }
 	</div>
     <div class="tab-pane" id="history">
 		<table class="table" style="width: 400px;">
-		<thead><th>Name<th>Date of change</thead><tbody>
-		@for( c <- tag.changes ) {
-			<tr><td>
-			@if( c.was_add ) {
-				<img height=18 src="@routes.Assets.versioned("images/plus.png")"/>
-			} else {
-				<img height=18 src="@routes.Assets.versioned("images/minus.png")"/>
-			}
-			<a href="@routes.CRM.person(c.person.person_id)">
-				@c.person.first_name @c.person.last_name
-			</a></td>
-			<td>@Application.yymmddDate(c.time)</td>
-			</tr>
-		}
+		<thead><th><th>Name<th>Date of change<th>Changed by</thead><tbody>
+        @helper.form(routes.CRM.undoTagChanges()) {
+            <p style="margin-top: 15px; margin-left: 15px">
+                <input id="undo-changes" class="btn btn-warning" disabled="disabled"
+                       type="submit" value="Undo selected changes"/>
+                Changes made in the last 7 days can be undone.
+            </p>
+            <input type="hidden" name="tag_id" value="@tag.id">
+            @for( c <- tag.changes ) {
+                <tr>
+                <td><input type="checkbox" class="tag-change" name="tag-change-@c.id"
+                        @if( ! Utils.lessThanDaysOld(c.time, 7) ) { disabled="disabled" }></td>
+                <td>
+                @if( c.was_add ) {
+                    <img height=18 src="@routes.Assets.versioned("images/plus.png")"/>
+                } else {
+                    <img height=18 src="@routes.Assets.versioned("images/minus.png")"/>
+                }
+                <a href="@routes.CRM.person(c.person.person_id)">
+                    @c.person.first_name @c.person.last_name
+                </a></td>
+                <td>@Application.yymmddDate(c.time)</td>
+                <td>@c.creator.name</td>
+                </tr>
+            }
+        }
 		</tbody></table>
 	</div>
     <div class="tab-pane" id="bulk-add">
@@ -91,20 +108,23 @@
             <input class="btn btn-primary" type="submit" value="Add from this tag"/>
         }
 	</div>
-      <script type="text/javascript">
-            initPeopleChooser('.people_chooser',
-                function(person) {
-                    var existing = $('.people_chooser [value="' + person.id + '"]');
-                    if (existing.length == 0) {
-                        $('.people_chooser').append('<input type="hidden" name="person_id" value="'
-                            + person.id + '">');
-                    }
-                },
-                function(person) {
-                    $('.people_chooser [value="' + person.id + '"]').remove();
-                });
-            enableNoPersonTagBox("#tag-entry", "#tags-entered", true);
-      </script>
   </div>
 </div>
 }
+
+<script type="text/javascript">
+    initPeopleChooser('.people_chooser',
+        function(person) {
+            var existing = $('.people_chooser [value="' + person.id + '"]');
+            if (existing.length == 0) {
+                $('.people_chooser').append('<input type="hidden" name="person_id" value="'
+                    + person.id + '">');
+            }
+        },
+        function(person) {
+            $('.people_chooser [value="' + person.id + '"]').remove();
+        });
+    enableNoPersonTagBox("#tag-entry", "#tags-entered", true);
+    enableButtonForCheckboxes('#remove-people', 'person');
+    enableButtonForCheckboxes('#undo-changes', 'tag-change');
+</script>

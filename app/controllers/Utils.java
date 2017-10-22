@@ -132,6 +132,13 @@ public class Utils
         return getBooleanFromFormValue(field.value());
     }
 
+    public static boolean lessThanDaysOld(Date date, int num_days) {
+        Date now = new Date();
+        long diff = now.getTime() - date.getTime();
+        long one_day = 24 * 60 * 60 * 1000;
+        return diff < one_day * num_days;
+    }
+
     private static void makeCustodiaPost(CloseableHttpClient client, String url, List<NameValuePair> data) {
         CloseableHttpResponse response = null;
         try {

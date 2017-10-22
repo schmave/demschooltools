@@ -2,10 +2,11 @@
 
 
 <table class="table sortable">
-<tr><th>Student<th>School District<th>DOB<th>Age at start of school year<th>Grade<th>Gender<th># of siblings<th>Address<th>Phone Number
+<tr><th><th>Student<th>School District<th>DOB<th>Age at start of school year<th>Grade<th>Gender<th># of siblings<th>Address<th>Phone Number
 
 @for( p <- people ) {
        <tr>
+       <td><input type="checkbox" class="person" name="person-@p.person_id"></td>
        <td><a href="@routes.CRM.person(p.person_id)">@p.first_name @p.last_name</a>
        <td>@p.school_district
        <td>@CRM.formatDob(p.dob)

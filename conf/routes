@@ -125,6 +125,8 @@ POST    /saveTag                controllers.CRM.saveTag()
 GET     /downloadTag/:id	  controllers.CRM.downloadTag(id: Integer)
 POST    /addPeopleFromTag        controllers.CRM.addPeopleFromTag()
 POST    /addPeopleToTag          controllers.CRM.addPeopleToTag()
+POST    /removePeopleFromTag     controllers.CRM.removePeopleFromTag()
+POST    /undoTagChanges          controllers.CRM.undoTagChanges()
 
 GET     /viewTaskList/:id         controllers.CRM.viewTaskList(id: Integer)
 

@@ -1,10 +1,15 @@
-@(people : List[Person])
+@(people : List[Person], show_checkboxes: Boolean)
 
 <table class="table sortable">
-<tr><th width=150 >Name<th>Email<th width=150>Phone #<th>Notes
+<tr>@if( show_checkboxes ) { <th> }
+	<th width=150 >Name<th>Email<th width=150>Phone #<th>Notes
 
 @for( p <- people ) {
-	<tr><td><a href="@routes.CRM.person(p.person_id)">@p.first_name @p.last_name</a>
+	<tr>
+    @if( show_checkboxes ) {
+        <td><input type="checkbox" class="person" name="person-@p.person_id"></td>
+    }
+    <td><a href="@routes.CRM.person(p.person_id)">@p.first_name @p.last_name</a>
 	<td>@p.email
 	<td>
 	        @for(num <- p.phone_numbers) {
