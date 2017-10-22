@@ -644,6 +644,7 @@ public class CRM extends Controller {
         Form<Person> personForm = Form.form(Person.class);
         Form<Person> filledForm = personForm.bindFromRequest();
         if(filledForm.hasErrors()) {
+            System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
             return badRequest(
                 views.html.new_person.render(filledForm)
             );
@@ -784,7 +785,7 @@ public class CRM extends Controller {
         Form<Person> personForm = Form.form(Person.class);
         Form<Person> filledForm = personForm.bindFromRequest();
         if(filledForm.hasErrors()) {
-            System.out.println("ERRORS!");
+            System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
             for (Map.Entry<String, List<ValidationError>> error : filledForm.errors().entrySet()) {
                 System.out.println(error.getKey());
                 for (ValidationError error2 : error.getValue()) {

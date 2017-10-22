@@ -175,6 +175,10 @@ public class ApplicationEditing extends Controller {
         CachedPage.remove(CachedPage.JC_INDEX);
         Charge c = Charge.findById(id);
 
+        if (c == null) {
+            return notFound();
+        }
+
         c.edit(request().queryString());
         c.save();
 

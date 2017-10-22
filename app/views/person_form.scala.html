@@ -11,8 +11,10 @@
 
 @if(personForm("person_id").value()) {
 	<input type="hidden" name="person_id" value="@personForm("person_id").value()"/>
+    <input type="hidden" name="is_family" value="@personForm("is_family").value()"/>
+} else {
+    <input type="hidden" name="is_family" value="false"/>
 }
-<input type="hidden" name="is_family" value="@personForm("is_family").value()"/>
 
 @if( Utils.getBooleanFromFormValue(personForm("is_family")) ) {
     <h3>Editing family</h3>

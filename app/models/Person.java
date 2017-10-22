@@ -172,7 +172,9 @@ public class Person extends Model implements Comparable<Person> {
         return find.where()
             .eq("organization", Organization.getByHost())
             .eq("is_family", Boolean.FALSE)
-            .orderBy("last_name, first_name ASC").findList();
+            .orderBy("last_name, first_name ASC")
+            .fetch("phone_numbers", new FetchConfig().query())
+            .findList();
     }
 
     @JsonIgnore
