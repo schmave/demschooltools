@@ -120,7 +120,7 @@
     border-bottom-color: transparent;
 }
 
-#meeting .form-control
+#meeting .form-control, .people-input-area .form-control
 {
     display:inline;
     width: auto;
@@ -215,6 +215,17 @@ div.continued
 
 span {}
 
+.people-input-area {
+    background: #eee;
+    border: 1px solid #ccc;
+    line-height: 2.5em;
+    padding: 10px;
+}
+
+.people-input-area .name .label {
+    cursor: auto;
+}
+
 .people_chooser .people {
     display: inline;
 }
@@ -225,8 +236,9 @@ span {}
 
 .name .label
 {
-    font-size: inherit;
     cursor: pointer;
+    font-size: inherit;
+    margin-left: 5px;
 }
 
 img.x {

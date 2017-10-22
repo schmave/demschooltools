@@ -123,6 +123,8 @@ GET     /viewTag/:id              controllers.CRM.viewTag(id: Integer)
 GET     /editTag/:id            controllers.CRM.editTag(id: Integer)
 POST    /saveTag                controllers.CRM.saveTag()
 GET     /downloadTag/:id	  controllers.CRM.downloadTag(id: Integer)
+POST    /addPeopleFromTag        controllers.CRM.addPeopleFromTag()
+POST    /addPeopleToTag          controllers.CRM.addPeopleToTag()
 
 GET     /viewTaskList/:id         controllers.CRM.viewTaskList(id: Integer)
 

@@ -27,6 +27,7 @@
   <ul class="nav nav-tabs">
     <li class="active"><a href="#tag-people" data-toggle="tab">People</a></li>
     <li><a href="#history" data-toggle="tab">History</a></li>
+    <li><a href="#bulk-add" data-toggle="tab">Add people in bulk</a></li>
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="tag-people">
@@ -56,11 +57,54 @@
 		}
 		</tbody></table>
 	</div>
+    <div class="tab-pane" id="bulk-add">
+        <h3>Add people by name</h3>
+        @helper.form(routes.CRM.addPeopleToTag()) {
+            <input type="hidden" name="dest_id" value="@tag.id">
+            <div class="row">
+                <div class="col-sm-2">
+                    Enter names to add:
+                </div>
+                <div class="col-sm-6 col-xs-12 people-input-area">
+                    <div class="people_chooser">
+                        <div class="people"></div>
+                        <input class="form-control person_search" type="text">
+                        <span class="glyphicon glyphicon-user"></span>
+                    </div>
+                </div>
+            </div>
+        <div class="row" style="margin-top: 5px;">
+            <div class="col-sm-2"></div>
+            <div class="col-sm-6 col-xs-12">
+                <input class="btn btn-primary" type="submit" value="Add these people"/>
+            </div>
+        </div>
+        }
+        <h3>Add people by tag</h3>
+        @helper.form(routes.CRM.addPeopleFromTag()) {
+            <input type="hidden" name="dest_id" value="@tag.id">
+            Add everyone who is already tagged
+            <span id="tags-entered"></span>
+            <input type="text" id="tag-entry">
+
+            <br/>
+            <input class="btn btn-primary" type="submit" value="Add from this tag"/>
+        }
+	</div>
+      <script type="text/javascript">
+            initPeopleChooser('.people_chooser',
+                function(person) {
+                    var existing = $('.people_chooser [value="' + person.id + '"]');
+                    if (existing.length == 0) {
+                        $('.people_chooser').append('<input type="hidden" name="person_id" value="'
+                            + person.id + '">');
+                    }
+                },
+                function(person) {
+                    $('.people_chooser [value="' + person.id + '"]').remove();
+                });
+            enableNoPersonTagBox("#tag-entry", "#tags-entered", true);
+      </script>
   </div>
 </div>
-
-
-
-
 }
-

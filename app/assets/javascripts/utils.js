@@ -105,11 +105,17 @@ var parseDate = function(date_str) {
     return new Date(parts[0], parts[1]-1, parts[2]); // Note: months are 0-based
 };
 
+var selectNextInput = function(cur_input) {
+    var next = $(":input:eq(" + ($(":input").index(cur_input) + 1) + ")");
+    next.focus();
+};
+
 module.exports = {
     displayName: displayName,
     limitHeight: limitHeight,
     parseDate: parseDate,
     reformatDate: reformatDate,
+    selectNextInput: selectNextInput,
     // These events should capture all possible ways to change the text
     // in a textfield.
     TEXT_AREA_EVENTS: "change keyup paste cut",

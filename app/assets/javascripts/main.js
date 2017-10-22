@@ -13,6 +13,7 @@ require('./edit_minutes');
 require('./edit_rp_list');
 var feedback_modal = require('./feedback_modal');
 require('./sorttable');
+var people_chooser = require('./people_chooser');
 
 $(function() {
     // Fix for bootstrap tabs not remembering their active tab
@@ -103,4 +104,12 @@ window.initCustodiaAdmin = function(url, username, password) {
     }).always(function() {
         $('iframe').attr('src', url);
     });
+};
+
+window.initPeopleChooser = function(selector, onAdd, onRemove) {
+    return new people_chooser.PeopleChooser(
+        $(selector),
+        onAdd,
+        onRemove,
+        '/jsonPeople');
 };

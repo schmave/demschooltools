@@ -1,5 +1,7 @@
-var utils = require('./utils');
 var Handlebars = require('handlebars');
+
+var utils = require('./utils');
+var people_chooser = require('./people_chooser');
 
 SAVE_TIMEOUT = 2000;
 
@@ -28,124 +30,6 @@ function showPersonHistoryInSidebar(person) {
 
 function showRuleHistoryInSidebar(rule_id) {
     showSomethingInSidebar("/ruleHistory/" + rule_id);
-}
-
-function selectNextInput(cur_input) {
-    var next = $(":input:eq(" + ($(":input").index(cur_input) + 1) + ")");
-    next.focus();
-}
-
-function Person(id, name) {
-    this.name = name;
-    this.id = id;
-    var self = this;
-
-    this.render = function() {
-        return app.person_template({"name": name});
-    };
-
-    // called by PeopleChooser after self.el has been
-    // initialized.
-    this.activateClick = function() {
-        self.el.click(
-            function() {
-                showPersonHistoryInSidebar(self);
-            }
-        );
-    };
-}
-
-function PeopleChooser(el, on_add, on_remove) {
-    this.el = el;
-    this.people = [];
-    var self = this;
-
-    this.search_box = el.find(".person_search");
-    this.search_box.autocomplete({
-        source: app.people,
-        delay: 0,
-        autoFocus: true,
-    });
-
-    self.one_person_mode = false;
-
-//  el.mouseleave(function() {
-//      if (self.people.length > 0) {
-//          self.search_box.fadeOut();
-//      } } );
-//  el.mouseenter(function() { self.search_box.fadeIn(); } );
-//
-    this.search_box.bind( "autocompleteselect", function(event, ui) {
-        new_person = self.addPerson(ui.item.id, ui.item.label);
-
-        if (on_add && new_person) {
-            on_add(new_person);
-        }
-
-        self.search_box.val('');
-        event.preventDefault(); // keep jquery from inserting name into textbox
-    });
-
-    this.addPerson = function(id, name) {
-
-        // Don't add people who have already been added.
-        for (var i in self.people) {
-            if (id == self.people[i].id) {
-                return;
-            }
-        }
-
-        if (self.one_person_mode) {
-            self.search_box.hide();
-            self.el.find(".glyphicon").hide();
-            selectNextInput(self.search_box);
-        }
-
-        var p = new Person(id, name);
-        self.people.push(p);
-        p.el = self.el.find(".people").append(p.render()).children(":last-child");
-        p.activateClick();
-
-        p.el.find("img").click(function() { self.removePerson(p); });
-
-        return p;
-    };
-
-    this.clear = function() {
-        while (self.people.length > 0) {
-            self.removePerson(self.people[0]);
-        }
-    };
-
-    this.removePerson = function(person) {
-        $(person.el).remove();
-
-        for (var i in self.people) {
-            if (self.people[i] == person) {
-                self.people.splice(i, 1);
-            }
-        }
-
-        if (self.one_person_mode) {
-            self.search_box.show();
-            self.el.find(".glyphicon").show();
-        }
-
-        if (on_remove) {
-            on_remove(person);
-        }
-    };
-
-    this.loadPeople = function(people) {
-        for (var i in people) {
-            self.addPerson(people[i].id, people[i].name);
-        }
-    };
-
-    this.setOnePersonMode = function(one_person_mode) {
-        self.one_person_mode = one_person_mode;
-        return self;
-    };
 }
 
 function RuleChooser(el, on_change) {
@@ -183,7 +67,7 @@ function RuleChooser(el, on_change) {
 
         self.rule_el.find("img").click(function() { self.unsetRule(); });
 
-        selectNextInput(self.search_box);
+        utils.selectNextInput(self.search_box);
     };
 
     this.unsetRule = function() {
@@ -379,9 +263,10 @@ function Charge(charge_id, el) {
     el.find(".minor-referral-destination").change(self.markAsModified);
     el.find(".minor-referral-destination").on(utils.TEXT_AREA_EVENTS, self.markAsModified);
 
-    self.people_chooser = new PeopleChooser(el.find(".people_chooser"),
+    self.people_chooser = new people_chooser.PeopleChooser(el.find(".people_chooser"),
                                             self.markAsModified,
-                                            self.markAsModified);
+                                            self.markAsModified,
+                                            app.people);
     self.people_chooser.setOnePersonMode(true);
 
     self.rule_chooser = new RuleChooser(el.find(".rule_chooser"),
@@ -510,7 +395,7 @@ function Case (id, el) {
     this.old_findings = null;
 
     if (config.track_writer) {
-        this.writer_chooser = new PeopleChooser(el.find(".writer"),
+        this.writer_chooser = new people_chooser.PeopleChooser(el.find(".writer"),
             function(person) {
                 $.post("/addPersonAtCase?case_id=" + id +
                        "&person_id=" + person.id +
@@ -520,10 +405,11 @@ function Case (id, el) {
                 $.post("/removePersonAtCase?case_id=" + id +
                        "&person_id=" + person.id +
                        "&role=" + app.ROLE_WRITER);
-            });
+            },
+            app.people);
     }
 
-    this.testifier_chooser = new PeopleChooser(
+    this.testifier_chooser = new people_chooser.PeopleChooser(
         el.find(".testifier"),
         function(person) {
             $.post("/addPersonAtCase?case_id=" + id +
@@ -534,7 +420,8 @@ function Case (id, el) {
             $.post("/removePersonAtCase?case_id=" + id +
                    "&person_id=" + person.id +
                    "&role=" + app.ROLE_TESTIFIER);
-        });
+        },
+        app.people);
     this.is_modified = false;
     this.charges = [];
 
@@ -564,10 +451,11 @@ function removePersonAtMeeting(person, role) {
 }
 
 function makePeopleChooser(selector, role) {
-    return new PeopleChooser(
+    return new people_chooser.PeopleChooser(
         $(selector),
         function(person) { addPersonAtMeeting(person, role); },
-        function(person) { removePersonAtMeeting(person, role); });
+        function(person) { removePersonAtMeeting(person, role); },
+        app.people);
 }
 
 function loadInitialData() {
@@ -642,7 +530,6 @@ window.initMinutesPage = function() {
     Handlebars.registerPartial("rule-chooser", $("#rule-chooser").html());
 
     app.case_template = Handlebars.compile($("#case-template").html());
-    app.person_template = Handlebars.compile($("#person-template").html());
     app.charge_template = Handlebars.compile($("#charge-template").html());
     app.rule_template = Handlebars.compile($("#rule-template").html());
 

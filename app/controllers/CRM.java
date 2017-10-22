@@ -9,10 +9,7 @@ import java.util.*;
 import javax.mail.*;
 import javax.mail.internet.*;
 
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.Expr;
-import com.avaje.ebean.Expression;
-import com.avaje.ebean.FetchConfig;
+import com.avaje.ebean.*;
 import com.ecwid.mailchimp.*;
 import com.ecwid.mailchimp.method.v2_0.lists.ListMethodResult;
 import com.google.inject.Inject;
@@ -241,8 +238,6 @@ public class CRM extends Controller {
 	}
 
     public Result addTag(Integer tagId, String title, Integer personId) {
-        CachedPage.onPeopleChanged();
-
         Person p = Person.findById(personId);
         if (p == null) {
             return badRequest();
@@ -255,23 +250,35 @@ public class CRM extends Controller {
             the_tag = Tag.find.ref(tagId);
         }
 
-        the_tag.people.add(p);
-        the_tag.save();
-
-        PersonTagChange ptc = PersonTagChange.create(
-            the_tag,
-            p,
-            mApplication.getCurrentUser(),
-            true);
-
-
-        p.tags.add(the_tag);
-
-        notifyAboutTag(the_tag, p, true);
-
+        addTag(the_tag, p);
         CachedPage.onPeopleChanged();
-
         return ok(views.html.tag_fragment.render(the_tag, p));
+    }
+
+    public void addTag(Tag tag, Person person) {
+        for (Person p : tag.people) {
+            if (p.person_id.equals(person.person_id)) {
+                return;
+            }
+        }
+
+        Ebean.execute(new TxRunnable() {
+            @Override
+            public void run() {
+                tag.people.add(person);
+                tag.save();
+
+                PersonTagChange ptc = PersonTagChange.create(
+                        tag,
+                        person,
+                        mApplication.getCurrentUser(),
+                        true);
+
+                person.tags.add(tag);
+
+                notifyAboutTag(tag, person, true);
+            }
+        });
     }
 
     public Result removeTag(Integer person_id, Integer tag_id) {
@@ -352,7 +359,33 @@ public class CRM extends Controller {
         return redirect(routes.CRM.recentComments());
     }
 
-	public Result viewTag(Integer id) {
+    public Result addPeopleFromTag() {
+        final Map<String, String[]> values = request().body().asFormUrlEncoded();
+        Tag dest_tag = Tag.findById(Integer.parseInt(values.get("dest_id")[0]));
+        Tag src_tag = Tag.findById(Integer.parseInt(values.get("tag_id")[0]));
+
+        for (Person p : src_tag.people) {
+            addTag(dest_tag, p);
+        }
+
+        CachedPage.onPeopleChanged();
+        return redirect(routes.CRM.viewTag(dest_tag.id));
+    }
+
+    public Result addPeopleToTag() {
+        final Map<String, String[]> values = request().body().asFormUrlEncoded();
+        Tag dest_tag = Tag.findById(Integer.parseInt(values.get("dest_id")[0]));
+
+        for (String person_id_str : values.get("person_id")) {
+            Person p = Person.findById(Integer.parseInt(person_id_str));
+            addTag(dest_tag, p);
+        }
+
+        CachedPage.onPeopleChanged();
+        return redirect(routes.CRM.viewTag(dest_tag.id));
+    }
+
+    public Result viewTag(Integer id) {
         Tag the_tag = Tag.find
             .fetch("people")
             .fetch("people.phone_numbers", new FetchConfig().query())
