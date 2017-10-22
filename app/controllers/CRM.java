@@ -444,6 +444,8 @@ public class CRM extends Controller {
         Tag the_tag = Tag.find
             .fetch("people")
             .fetch("people.phone_numbers", new FetchConfig().query())
+            .fetch("people.family", new FetchConfig().query())
+            .fetch("people.family.family_members", new FetchConfig().query())
             .where().eq("organization", Organization.getByHost())
             .eq("id", id).findUnique();
 
@@ -464,17 +466,19 @@ public class CRM extends Controller {
         Cell cell = row.createCell(j);
         if (value != null) {
             if (value instanceof String && ((String)value).trim().length() > 0) {
-                cell.setCellValue((String) value);
+                cell.setCellValue(((String) value).trim());
             } else if (value instanceof Date) {
                 cell.setCellValue((Date) value);
             }
         }
         if (style != null) {
             cell.setCellStyle(style);
+        } else if (row.getRowStyle() != null) {
+            cell.setCellStyle(row.getRowStyle());
         }
     }
 
-    private void createCell(Row row, int j, Object value) {
+    private static void createCell(Row row, int j, Object value) {
         createCell(row, j, value, null);
     }
 
@@ -482,6 +486,8 @@ public class CRM extends Controller {
         Tag the_tag = Tag.find
             .fetch("people")
             .fetch("people.phone_numbers", new FetchConfig().query())
+            .fetch("people.family", new FetchConfig().query())
+            .fetch("people.family.family_members", new FetchConfig().query())
             .where().eq("organization", Organization.getByHost())
             .eq("id", id).findUnique();
 
@@ -503,10 +509,12 @@ public class CRM extends Controller {
         int j = 0;
         createCell(row, j++, "First name", headerStyle);
         createCell(row, j++, "Last name", headerStyle);
-        createCell(row, j++, "Display (JC) name", headerStyle);
         createCell(row, j++, "Family name", headerStyle);
+        createCell(row, j++, "Address of", headerStyle);
+        createCell(row, j++, "Display (JC) name", headerStyle);
         createCell(row, j++, "Gender", headerStyle);
         createCell(row, j++, "DOB", headerStyle);
+        final int DOB_COLUMN = j - 1;
         createCell(row, j++, "Email", headerStyle);
         createCell(row, j++, "Phone 1", headerStyle);
         createCell(row, j++, "Phone 1 comment", headerStyle);
@@ -520,6 +528,7 @@ public class CRM extends Controller {
         createCell(row, j++, "State", headerStyle);
         createCell(row, j++, "ZIP", headerStyle);
         createCell(row, j++, "Notes", headerStyle);
+        final int NOTES_COLUMN = j - 1;
         createCell(row, j++, "Previous school", headerStyle);
         createCell(row, j++, "School district", headerStyle);
         createCell(row, j++, "Grade", headerStyle);
@@ -534,44 +543,80 @@ public class CRM extends Controller {
         DataFormat df = wb.createDataFormat();
         dateStyle.setDataFormat(df.getFormat("m/d/yyyy"));
 
+        CellStyle topBorderStyle = wb.createCellStyle();
+        topBorderStyle.setBorderTop(BorderStyle.THICK);
+
+        // Sort people who have multiple addresses at the end
+        people.sort(new Comparator<Person>() {
+            @Override
+            public int compare(Person p1, Person p2) {
+                if (p1.hasMultipleAddresses() != p2.hasMultipleAddresses()) {
+                    return p1.hasMultipleAddresses() ? 1 : -1;
+                }
+                return p1.compareTo(p2);
+            }
+        });
+
         int i = 1;
+        boolean startedMultipleAddresses = false;
         for (Person p : people) {
-            row = sheet.createRow(i);
-            j = 0;
-            createCell(row, j++, p.first_name);
-            createCell(row, j++, p.last_name);
-            createCell(row, j++, p.getDisplayName());
-            String family_name = null;
-            if (p.family != null) {
-                family_name = p.family.first_name + " " + p.family.last_name;
-            }
-            if (family_name != null && family_name.trim().length() > 0) {
-                createCell(row, j++, family_name);
+            List<Person> address_people = new ArrayList<>();
+            if (p.family == null || !p.address.isEmpty()) {
+                address_people.add(p);
             } else {
-                j++;
-            }
-            createCell(row, j++, p.gender);
-            createCell(row, j++, p.dob, dateStyle);
-            createCell(row, j++, p.email);
-            for (int n = 0; n < 3; n++) {
-                if (n < p.phone_numbers.size()) {
-                    createCell(row, j++, p.phone_numbers.get(n).number);
-                    createCell(row, j++, p.phone_numbers.get(n).comment);
-                } else {
-                    j += 2;
+                for (Person p2 : p.family.family_members) {
+                    if (!p2.address.isEmpty()) {
+                        address_people.add(p2);
+                    }
                 }
             }
+            for (Person address_person : address_people) {
+                row = sheet.createRow(i);
+                if (!startedMultipleAddresses && p.hasMultipleAddresses()) {
+                    row.setRowStyle(topBorderStyle);
+                    startedMultipleAddresses = true;
+                }
+                j = 0;
+                createCell(row, j++, p.first_name);
+                createCell(row, j++, p.last_name);
+                String family_name = null;
+                if (p.family != null) {
+                    family_name = p.family.first_name + " " + p.family.last_name;
+                }
+                if (family_name != null && family_name.trim().length() > 0) {
+                    createCell(row, j++, family_name);
+                } else {
+                    j++;
+                }
+                if (p != address_person) {
+                    createCell(row, j++, address_person.first_name + " " + address_person.last_name);
+                } else {
+                    j++;
+                }
+                createCell(row, j++, p.getDisplayName());
+                createCell(row, j++, p.gender);
+                createCell(row, j++, p.dob, dateStyle);
+                createCell(row, j++, p.email);
+                for (int n = 0; n < 3; n++) {
+                    if (n < p.phone_numbers.size()) {
+                        createCell(row, j++, p.phone_numbers.get(n).number);
+                        createCell(row, j++, p.phone_numbers.get(n).comment);
+                    } else {
+                        j += 2;
+                    }
+                }
 
-            createCell(row, j++, p.neighborhood);
-            createCell(row, j++, p.address);
-            createCell(row, j++, p.city);
-            createCell(row, j++, p.state);
-            createCell(row, j++, p.zip);
-            createCell(row, j++, p.notes, wordWrapStyle);
-            createCell(row, j++, p.previous_school);
-            createCell(row, j++, p.school_district);
-            createCell(row, j++, p.grade);
-            i++;
+                createCell(row, j++, address_person.neighborhood);
+                createCell(row, j++, address_person.address);
+                createCell(row, j++, address_person.city);
+                createCell(row, j++, address_person.state);
+                createCell(row, j++, address_person.zip);
+                createCell(row, j++, p.notes, wordWrapStyle);
+                createCell(row, j++, p.previous_school);
+                createCell(row, j++, p.school_district);
+                createCell(row, j++, p.grade);
+                i++;
+            }
         }
 
         // Auto size all name columns
@@ -579,8 +624,10 @@ public class CRM extends Controller {
         sheet.autoSizeColumn(1);
         sheet.autoSizeColumn(2);
         sheet.autoSizeColumn(3);
+        sheet.autoSizeColumn(4);
+        sheet.autoSizeColumn(DOB_COLUMN);
         // Set "notes" column to 50 characters width
-        sheet.setColumnWidth(18, 256 * 50);
+        sheet.setColumnWidth(NOTES_COLUMN, 256 * 50);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         wb.write(baos);

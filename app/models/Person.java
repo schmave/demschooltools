@@ -141,6 +141,19 @@ public class Person extends Model implements Comparable<Person> {
             .eq("person_id", id).findUnique();
     }
 
+    public boolean hasMultipleAddresses() {
+        if (!this.address.isEmpty() || this.family == null) {
+            return false;
+        }
+        int addressCount = 0;
+        for (Person p2 : this.family.family_members) {
+            if (!p2.address.isEmpty()) {
+                addressCount++;
+            }
+        }
+        return addressCount > 1;
+    }
+
     @Override
     public int hashCode() {
         return person_id.hashCode();
