@@ -43,6 +43,9 @@
 (defn- make-sqldate [t]
   (->> t str (f/parse) c/to-sql-date))
 
+(defn- make-sqltime [t]
+  (->> t str (f/parse) c/to-sql-time))
+
 (defn swipe-in
   ([id] (swipe-in id (t/now)))
   ([id in-time]
@@ -126,12 +129,16 @@
                 :date (make-sqldate date-string)}))
 
 (defn edit-class
-  ([_id name from-date to-date minutes]
-   (db/update! :classes _id
-               {:name name
+  ([_id name from-date to-date minutes] (edit-class nil))
+  ([_id name from-date to-date minutes late-time]
+   (let [class {:name name
                 :from_date (make-sqldate from-date)
                 :to_date (make-sqldate to-date)
-                :required_minutes minutes})))
+                :required_minutes minutes}
+         class (if (not= nil late-time)
+                 (assoc class :late_time (make-sqltime late-time))
+                 class)]
+     (db/update! :classes _id class))))
 
 (defn make-class
   ([name] (make-class name nil nil))

@@ -164,6 +164,17 @@
         (is (= (c/to-sql-time from) (:from_date cls)))
         (is (= 500 (:required_minutes cls)))))))
 
+(deftest edit-class-late-time-test
+  (sample-db true)
+  (let [{sid :_id } (cmd/make-class "test")
+        from "2015-10-20"
+        to "2016-10-20"]
+    (cmd/edit-class sid "test2" from to 500 "10:45")
+    (let [cls (->> (queries/get-classes) (filter #(= (:name %) "test2")) first)]
+      (testing "fields are set with correct timezone"
+        (is (= (c/to-sql-date "15:45") (:late_time cls)))
+        ))))
+
 (deftest set-student-email
   (sample-db true)
   (let [{sid :_id date :start_date} (cmd/make-student "test")
