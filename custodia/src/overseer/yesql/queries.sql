@@ -77,34 +77,40 @@ WHERE schooldays.days IS NOT NULL
 ORDER BY schooldays.days DESC;
 
 -- name: student-list-in-out-y
-SELECT stu.name
-       , stu._id
-       , stu.show_as_absent
-       , stu.is_teacher
-       , stu.archived
-       , c.late_time as late_time
-       , CASE WHEN l.outs >= l.ins THEN 'out'
-         ELSE 'in'
-         END AS last_swipe_type
-       , CASE WHEN l.outs >= l.ins THEN l.outs
-         ELSE l.ins
-         END AS last_swipe_date
-         FROM overseer.students stu
-LEFT JOIN (SELECT max(s.in_time) AS ins
-                , max(s.out_time) AS outs
-                , s.student_id
-                FROM overseer.swipes s
-           GROUP BY s.student_id
-           ORDER BY ins, outs) AS l
-     ON (l.student_id = stu._id)
-INNER JOIN overseer.classes c ON (1=1)
-INNER JOIN overseer.classes_X_students cXs ON (cXs.student_id = stu._id AND cXs.class_id = c._id)
-WHERE (stu.archived = :show_archived
-       OR stu.archived = FALSE)
-AND c.active = TRUE
-AND stu.school_id = :school_id
-ORDER BY stu.name
-;
+SELECT
+  stu.name,
+  stu._id,
+  stu.show_as_absent,
+  stu.is_teacher,
+  stu.archived,
+  c.late_time AS late_time,
+  l.last_swipe_type,
+  l.last_swipe_date,
+  l.last_swipe_date > current_date as swiped_today,
+  l.last_swipe_date > (current_date + c.late_time) as swiped_today_late
+FROM
+  overseer.students stu
+  LEFT JOIN (
+  (SELECT
+      CASE WHEN subl.outs >= subl.ins THEN 'out' ELSE 'in' END AS last_swipe_type,
+      CASE WHEN subl.outs >= subl.ins THEN subl.outs ELSE subl.ins END AS last_swipe_date,
+      subl.student_id
+      FROM (SELECT
+              max(s.in_time) AS ins,
+              max(s.out_time) AS outs,
+              s.student_id
+            FROM overseer.swipes s
+            GROUP BY s.student_id
+            ORDER BY ins, outs) as subl)) AS l ON (l.student_id = stu._id)
+  INNER JOIN overseer.classes c ON (1 = 1)
+  INNER JOIN overseer.classes_X_students cXs ON (cXs.student_id = stu._id
+          AND cXs.class_id = c._id)
+  WHERE (stu.archived = :show_archived
+        OR stu.archived = FALSE)
+    AND c.active = TRUE
+    AND stu.school_id = 1
+  ORDER BY
+      stu.name;
 
 -- name: get-school-days-y
 SELECT DISTINCT days2.days

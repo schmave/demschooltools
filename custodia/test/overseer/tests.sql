@@ -8,8 +8,7 @@ SELECT
   l.last_swipe_type,
   l.last_swipe_date,
   l.last_swipe_date > current_date as swiped_today,
-  --l.last_swipe_date > (current_date + c.late_time) as swiped_today
-  l.last_swipe_date > (current_date + time '02:00') as swiped_today
+  l.last_swipe_date > (current_date + c.late_time) as swiped_today_late
 FROM
   overseer.students stu
   LEFT JOIN (

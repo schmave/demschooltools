@@ -4,6 +4,7 @@
             [clj-time.format :as f]
             [clj-time.local :as l]
             [clojure.pprint :as pp]
+            [clojure.tools.trace :as trace]
             [clojure.test :refer :all]
             [overseer.attendance :as att]
             [overseer.commands :as cmd]
@@ -166,14 +167,32 @@
 
 (deftest edit-class-late-time-test
   (sample-db true)
-  (let [{sid :_id } (cmd/make-class "test")
+  (let [{cid :_id } (cmd/make-class "test")
+        {sid :_id} (cmd/make-student "test")
+        {sid2 :_id} (cmd/make-student "test2")
+        _late (today-at-utc 10 55)
+        _early (today-at-utc 10 35)
         from "2015-10-20"
         to "2016-10-20"]
-    (cmd/edit-class sid "test2" from to 500 "10:45")
-    (let [cls (->> (queries/get-classes) (filter #(= (:name %) "test2")) first)]
+
+    (cmd/activate-class cid)
+
+    (cmd/add-student-to-class sid cid)
+    (cmd/add-student-to-class sid2 cid)
+    (cmd/edit-class cid "test" from to 500 "10:45")
+
+    (cmd/swipe-in sid _late)
+    (cmd/swipe-in sid2 _early)
+
+    (let [in-out (queries/get-student-list-in-out false)]
+      (trace/trace in-out)
+      (testing "Student 'late'"
+        (is (= true (->> in-out (filter #(= (:_id %) sid)) first :swiped_today_late)))
+        (is (= false (->> in-out (filter #(= (:_id %) sid2)) first :swiped_today_late)))))
+
+    (let [cls (->> (queries/get-classes) (filter #(= (:name %) "test")) first)]
       (testing "fields are set with correct timezone"
-        (is (= (c/to-sql-date "15:45") (:late_time cls)))
-        ))))
+        (is (= (c/to-sql-date "14:45") (:late_time cls)))))))
 
 (deftest set-student-email
   (sample-db true)
