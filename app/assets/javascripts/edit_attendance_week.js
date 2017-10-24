@@ -1,5 +1,4 @@
 var Handlebars = require('handlebars');
-var sorttable = require('./sorttable');
 
 var utils = require('./utils');
 
@@ -103,7 +102,7 @@ function Day(data, start_input, end_input) {
 
     this.save = function() {
         self.dirty = false;
-        url = "/attendance/saveDay?day_id=" + self.id;
+        var url = "/attendance/saveDay?day_id=" + self.id;
         if (self.code_mode) {
             url += "&code=" + self.start_input.val();
         } else {
@@ -251,7 +250,7 @@ function handleNoSchoolButton(day_num) {
     return function() {
         $( "#dialog-confirm" ).dialog({
               resizable: false,
-              height:240,
+              height: 240,
               modal: true,
               buttons: {
                 "Erase existing data": function() {
@@ -301,11 +300,11 @@ window.initAttendanceWeek = function() {
     }
 
     for (i in app.initial_data.additional_people) {
-        var person = app.initial_data.additional_people[i];
+        person = app.initial_data.additional_people[i];
         addAdditionalPerson(person);
     }
 
     saveIfNeeded();
 
     $("button.add-all").click(addAllAdditionalPeople);
-}
+};

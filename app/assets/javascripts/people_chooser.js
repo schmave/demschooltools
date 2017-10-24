@@ -8,7 +8,7 @@ var person_template_str =
 
 var person_template = Handlebars.compile(person_template_str);
 
-var Person = function(id, name) {
+var Person = function(id, name, onClickPerson) {
     this.name = name;
     this.id = id;
     var self = this;
@@ -20,15 +20,17 @@ var Person = function(id, name) {
     // called by PeopleChooser after self.el has been
     // initialized.
     this.activateClick = function() {
-        self.el.click(
-            function() {
-                showPersonHistoryInSidebar(self);
-            }
-        );
+        if (onClickPerson) {
+            self.el.click(
+                function() {
+                    onClickPerson(self);
+                }
+            );
+        }
     };
 };
 
-var PeopleChooser = function(el, on_add, on_remove, autocomplete_source) {
+var PeopleChooser = function(el, on_add, on_remove, autocomplete_source, onClickPerson) {
     this.el = el;
     this.people = [];
     var self = this;
@@ -49,7 +51,7 @@ var PeopleChooser = function(el, on_add, on_remove, autocomplete_source) {
 //  el.mouseenter(function() { self.search_box.fadeIn(); } );
 //
     this.search_box.bind( "autocompleteselect", function(event, ui) {
-        new_person = self.addPerson(ui.item.id, ui.item.label);
+        var new_person = self.addPerson(ui.item.id, ui.item.label);
 
         if (on_add && new_person) {
             on_add(new_person);
@@ -60,7 +62,6 @@ var PeopleChooser = function(el, on_add, on_remove, autocomplete_source) {
     });
 
     this.addPerson = function(id, name) {
-
         // Don't add people who have already been added.
         for (var i in self.people) {
             if (id == self.people[i].id) {
@@ -74,7 +75,7 @@ var PeopleChooser = function(el, on_add, on_remove, autocomplete_source) {
             utils.selectNextInput(self.search_box);
         }
 
-        var p = new Person(id, name);
+        var p = new Person(id, name, onClickPerson);
         self.people.push(p);
         p.el = self.el.find(".people").append(p.render()).children(":last-child");
         p.activateClick();

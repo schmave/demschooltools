@@ -3,7 +3,7 @@ var Handlebars = require('handlebars');
 var utils = require('./utils');
 var people_chooser = require('./people_chooser');
 
-SAVE_TIMEOUT = 2000;
+const SAVE_TIMEOUT = 2000;
 
 function showSomethingInSidebar(url) {
     $("#sidebar").html("<h2>Loading...</h2>");
@@ -58,8 +58,8 @@ function RuleChooser(el, on_change) {
 
         self.rule = id;
         self.rule_el =
-            self.el.prepend(app.rule_template({name: title})).
-                children(":first-child");
+            self.el.prepend(app.rule_template({name: title}))
+                .children(":first-child");
 
         self.rule_el.find(".label").click(function() {
             showRuleHistoryInSidebar(self.rule);
@@ -91,7 +91,7 @@ function Charge(charge_id, el) {
 
     var SEVERITIES = {
         "mild": "Mild",
-        "moderate" : "Moderate",
+        "moderate": "Moderate",
         "serious": "Serious",
         "severe": "Severe"
     };
@@ -147,7 +147,7 @@ function Charge(charge_id, el) {
             return;
         }
 
-        url = "/saveCharge?id=" + charge_id;
+        var url = "/saveCharge?id=" + charge_id;
 
         if (self.people_chooser.people.length > 0) {
             url += "&person_id=" + self.people_chooser.people[0].id;
@@ -161,7 +161,7 @@ function Charge(charge_id, el) {
             }
         }
 
-        plea = el.find(".plea-guilty");
+        var plea = el.find(".plea-guilty");
         if (plea.prop("checked")) {
             url += "&plea=Guilty";
         }
@@ -181,10 +181,10 @@ function Charge(charge_id, el) {
             url += "&plea=N/A";
         }
 
-        refer = el.find(".refer-to-sm");
+        var refer = el.find(".refer-to-sm");
         url += "&referred_to_sm=" + refer.prop("checked");
 
-        minor_referral_destination = el.find(".minor-referral-destination");
+        var minor_referral_destination = el.find(".minor-referral-destination");
         if (minor_referral_destination.length > 0) {
             url += "&minor_referral_destination=" +
                 encodeURIComponent(minor_referral_destination.val());
@@ -216,9 +216,8 @@ function Charge(charge_id, el) {
             el.find(".last-rp").html("");
         }
 
-        if (self.people_chooser.people.length == 1 &&
-            self.rule_chooser.rule) {
-            url = "/getLastRp";
+        if (self.people_chooser.people.length == 1 && self.rule_chooser.rule) {
+            var url = "/getLastRp";
             url += "/" + self.people_chooser.people[0].id;
             url += "/" + self.rule_chooser.rule;
             $.get(url, function (data) {
@@ -263,10 +262,9 @@ function Charge(charge_id, el) {
     el.find(".minor-referral-destination").change(self.markAsModified);
     el.find(".minor-referral-destination").on(utils.TEXT_AREA_EVENTS, self.markAsModified);
 
-    self.people_chooser = new people_chooser.PeopleChooser(el.find(".people_chooser"),
-                                            self.markAsModified,
-                                            self.markAsModified,
-                                            app.people);
+    self.people_chooser = new people_chooser.PeopleChooser(
+        el.find(".people_chooser"), self.markAsModified, self.markAsModified,
+        app.people, showPersonHistoryInSidebar);
     self.people_chooser.setOnePersonMode(true);
 
     self.rule_chooser = new RuleChooser(el.find(".rule_chooser"),
@@ -314,7 +312,7 @@ function Case (id, el) {
         el.find("input.continued").prop("checked", data.date_closed === null);
 
         for (var i in data.people_at_case) {
-            pac = data.people_at_case[i];
+            var pac = data.people_at_case[i];
             if (pac.role == app.ROLE_TESTIFIER) {
                 self.testifier_chooser.addPerson(
                     pac.person.person_id,
@@ -327,8 +325,8 @@ function Case (id, el) {
         }
 
         for (i in data.charges) {
-            ch = data.charges[i];
-            new_charge = self.addChargeNoServer(ch.id);
+            var ch = data.charges[i];
+            var new_charge = self.addChargeNoServer(ch.id);
             new_charge.loadData(ch);
         }
     };
@@ -394,7 +392,7 @@ function Case (id, el) {
     this.el = el;
     this.old_findings = null;
 
-    if (config.track_writer) {
+    if (config.track_writer) { // eslint-disable-line
         this.writer_chooser = new people_chooser.PeopleChooser(el.find(".writer"),
             function(person) {
                 $.post("/addPersonAtCase?case_id=" + id +
@@ -406,7 +404,7 @@ function Case (id, el) {
                        "&person_id=" + person.id +
                        "&role=" + app.ROLE_WRITER);
             },
-            app.people);
+            app.people, showPersonHistoryInSidebar);
     }
 
     this.testifier_chooser = new people_chooser.PeopleChooser(
@@ -421,7 +419,7 @@ function Case (id, el) {
                    "&person_id=" + person.id +
                    "&role=" + app.ROLE_TESTIFIER);
         },
-        app.people);
+        app.people, showPersonHistoryInSidebar);
     this.is_modified = false;
     this.charges = [];
 
@@ -455,7 +453,7 @@ function makePeopleChooser(selector, role) {
         $(selector),
         function(person) { addPersonAtMeeting(person, role); },
         function(person) { removePersonAtMeeting(person, role); },
-        app.people);
+        app.people, showPersonHistoryInSidebar);
 }
 
 function loadInitialData() {
@@ -466,8 +464,8 @@ function loadInitialData() {
     app.runner_chooser.loadPeople(app.initial_data.runners);
 
     for (var i in app.initial_data.cases) {
-        data = app.initial_data.cases[i];
-        new_case = addCaseNoServer(data.id, data.case_number);
+        var data = app.initial_data.cases[i];
+        var new_case = addCaseNoServer(data.id, data.case_number);
         new_case.loadData(data);
     }
 }
@@ -517,9 +515,9 @@ function continueCase(event) {
 
 window.initMinutesPage = function() {
     Handlebars.registerHelper('render', function(partialId, options) {
-      var selector = 'script[type="text/x-handlebars-template"]#' + partialId,
-          source = $(selector).html(),
-          html = Handlebars.compile(source)(options.hash);
+      var selector = 'script[type="text/x-handlebars-template"]#' + partialId;
+      var source = $(selector).html();
+      var html = Handlebars.compile(source)(options.hash);
 
       return new Handlebars.SafeString(html);
     });
@@ -576,11 +574,10 @@ window.initMinutesPage = function() {
     checkDirties();
 };
 
-function addCaseNoServer(id, number)
-{
-    new_case = $("#meeting-cases").append(
-        app.case_template({"num": number})).
-        children(":last-child");
+function addCaseNoServer(id, number) {
+    var new_case = $("#meeting-cases")
+        .append(app.case_template({"num": number}))
+        .children(":last-child");
 
     var case_obj = new Case(id, new_case);
     app.cases.push(case_obj);
@@ -594,11 +591,10 @@ function addCaseNoServer(id, number)
     return case_obj;
 }
 
-function addCase()
-{
+function addCase() {
     $.post("/newCase?meeting_id=" + app.meeting_id, "",
            function(data, textStatus, jqXHR) {
-        id_num_pair = $.parseJSON(data);
+        var id_num_pair = $.parseJSON(data);
         var new_case = addCaseNoServer(id_num_pair[0], id_num_pair[1]);
         $('body').animate({'scrollTop': new_case.el.offset().top + 500}, 'slow');
     });

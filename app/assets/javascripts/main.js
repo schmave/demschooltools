@@ -43,7 +43,7 @@ $(function() {
     $( "#navbar_people_search" ).autocomplete({
         minLength: 2,
         select: function(event, ui) {
-            window.location.href="/people/" + ui.item.id;
+            window.location.href = "/people/" + ui.item.id;
         },
         source: "/jsonPeople"
     });
@@ -61,10 +61,10 @@ $(function() {
         $("#comment_tasks").empty();
         $("#comment_task_ids").empty();
 
-        checked_boxes = $(".task_checkbox");
-        for (i = 0; i < checked_boxes.length; i++) {
-            box = checked_boxes[i];
-            id = box.id.split("_")[2];
+        var checked_boxes = $(".task_checkbox");
+        for (var i = 0; i < checked_boxes.length; i++) {
+            var box = checked_boxes[i];
+            var id = box.id.split("_")[2];
             if (!box.disabled && box.checked) {
                 $("#comment_tasks").append("<span class='label label-info'>" + $('label[for=' + box.id + ']').text() + "</span><br>");
                 $("#comment_task_ids").append("," + id);

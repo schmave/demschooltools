@@ -1,5 +1,3 @@
-var utils = require('./utils');
-
 function checkAll() {
     $('input[type=checkbox]').prop('checked', true);
     $('input[type=checkbox]').change();

@@ -34,11 +34,10 @@ window.enableTagBox = function(input_box, destination_div, person_id) {
     });
 };
 
-var tag_template = Handlebars.compile('\
-    <span id="tag-{{num}}" style="white-space: nowrap;"><input type=hidden name=tag_id value={{tag_id}}><span \
-        class="label label-success">{{name}} \
-       </span><a class="tag_x"><img src="/assets/images/x.png"></a> \
-            </span>');
+var tag_template = Handlebars.compile(
+    '<span id="tag-{{num}}" style="white-space: nowrap;"><input type=hidden name=tag_id value={{tag_id}}>' +
+    '<span class="label label-success">{{name}} ' +
+    '</span><a class="tag_x"><img src="/assets/images/x.png"></a></span>');
 
 window.enableNoPersonTagBox = function(input_box, destination_div, limit_one) {
     var self = this;
@@ -94,7 +93,7 @@ var reformatDate = function(format, date_str) {
         return undefined;
     }
 
-    date = parseDate(date_str);
+    var date = parseDate(date_str);
     return $.datepicker.formatDate(format, date);
 };
 

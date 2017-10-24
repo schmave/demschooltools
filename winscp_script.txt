@@ -1,0 +1,4 @@
+open evan@45.79.171.180:/home/evan/ -privatekey=C:\.ssh\id_rsa.ppk
+option confirm off
+put target\universal\demschooltools-1.1.zip
+exit

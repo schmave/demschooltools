@@ -4,7 +4,7 @@ var last_content = $("#content").val();
 var needs_render = true;
 
 function contentChanged() {
-    new_content = $("#content").val();
+    var new_content = $("#content").val();
     if (new_content != last_content) {
         last_content = new_content;
         needs_render = true;
@@ -20,7 +20,7 @@ function renderContent() {
     needs_render = false;
 
     $.post("/renderMarkdown",
-           {markdown : last_content},
+           {markdown: last_content},
            function(data) {
         $("#markdown_preview").html(data);
     });

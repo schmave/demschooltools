@@ -41,7 +41,7 @@ var checkboxChanged = function(charge) {
     charge.checkbox.prop("disabled", true);
     var i = indexOfCharge(app.active_rps, charge);
 
-    url = "/setResolutionPlanComplete?id=" + charge.id +
+    var url = "/setResolutionPlanComplete?id=" + charge.id +
         "&complete=" + (i >= 0);
     $.post(url)
         .done(function(data) {
@@ -79,7 +79,7 @@ var checkboxChanged = function(charge) {
         });
 };
 
-Charge = function(data, el) {
+var Charge = function(data, el) {
     var self = this;
 
     this.removeCharge = function() {
@@ -99,8 +99,8 @@ Charge = function(data, el) {
     });
 };
 
-addCharge = function(data, parent_el) {
-    template_data = {
+var addCharge = function(data, parent_el) {
+    var template_data = {
         "name": utils.displayName(data.person),
         "case_number": data.the_case.case_number,
         "closed_date": utils.reformatDate('m/dd', data.the_case.date_closed),

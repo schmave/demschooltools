@@ -11,6 +11,8 @@ dist
 # JS stuff
 node_modules/
 app/assets/javascripts/gen
+.eslintcache
+npm-debug.log
 
 # School-specific files
 fairhaven/*
@@ -19,9 +21,6 @@ trvs/*
 makarios_learning_community/*
 
 *~
-connect_to_server.bat
-copy_release_to_server.bat
-winscp_script.txt
 
 # Sublime Text files
 *.sublime-workspace
