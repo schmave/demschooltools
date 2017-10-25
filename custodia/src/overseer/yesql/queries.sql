@@ -245,8 +245,18 @@ SELECT * from overseer.years where school_id = :school_id;
 SELECT * from overseer.schools;
 
 -- name: get-classes-y
-SELECT c.name, c._id, c.from_date, c.to_date, c.active, cXs.student_id, s.name student_name, c.required_minutes, c.late_time
-FROM overseer.classes c
+SELECT
+  c.name,
+  c._id,
+  c.from_date,
+  c.to_date,
+  c.active,
+  cXs.student_id,
+  s.name student_name,
+  c.required_minutes,
+  (current_date + c.late_time) as late_time
+FROM
+  overseer.classes c
 LEFT JOIN overseer.classes_X_students cXs ON (cXs.class_id = c._id)
 LEFT JOIN overseer.students s ON (cXs.student_id = s._id)
 WHERE c.school_id = :school_id

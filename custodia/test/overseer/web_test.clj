@@ -192,7 +192,7 @@
 
     (let [cls (->> (queries/get-classes) (filter #(= (:name %) "test")) first)]
       (testing "fields are set with correct timezone"
-        (is (= (c/to-sql-date "14:45") (:late_time cls)))))))
+        (is (= "10:45:00" (:late_time cls)))))))
 
 (deftest set-student-email
   (sample-db true)

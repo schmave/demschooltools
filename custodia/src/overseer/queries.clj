@@ -14,11 +14,15 @@
       first
       :_id))
 
+
 ;; (get-classes)
 (defn get-classes
   ([] (get-classes db/*school-id*))
   ([school-id]
     (let [classes (db/q get-classes-y {:school_id school-id} )
+          classes (map (fn [c] (assoc c :late_time
+                                      (dates/from-sql-time (:late_time c))))
+                       classes)
           grouped (vals (group-by :name classes))]
       (map (fn [class-group]
              (let [base (dissoc (first class-group) :student_id :student_name)
