@@ -14,7 +14,6 @@
       first
       :_id))
 
-
 ;; (get-classes)
 (defn get-classes
   ([] (get-classes db/*school-id*))

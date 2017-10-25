@@ -123,6 +123,10 @@ a {
     }
 }
 
+.late {
+    background-color: lightpink;
+}
+
 .is_teacher {
     font-weight: bold;
     color: black;

@@ -46,7 +46,8 @@ module.exports = React.createClass({
                      {student.name}
                    </Link>;
         var button = this.getSwipeButton(student, way);
-        return <div className="panel panel-info student-listing col-sm-11">
+        var late = student.swiped_today_late ? "late" : "";
+        return <div className={late + " panel panel-info student-listing col-sm-11"}>
             <div >{link}</div>
             <div className="attendance-button">
                 {button}
