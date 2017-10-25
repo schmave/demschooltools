@@ -20,6 +20,7 @@ public class Tag extends Model {
     public boolean use_student_display;
     public boolean show_in_menu;
     public boolean show_in_jc;
+    public boolean show_in_attendance;
 
     @ManyToMany(cascade=CascadeType.ALL)
     @JoinTable(name="person_tag",
@@ -68,6 +69,7 @@ public class Tag extends Model {
         t.put("title", title);
         t.put("show_in_menu", show_in_menu);
         t.put("show_in_jc", show_in_jc);
+        t.put("show_in_attendance", show_in_attendance);
         return t;
     }
 
@@ -75,6 +77,7 @@ public class Tag extends Model {
         title = form.field("title").value();
         use_student_display = Utils.getBooleanFromFormValue(form.field("use_student_display").value());
         show_in_jc = Utils.getBooleanFromFormValue(form.field("show_in_jc").value());
+        show_in_attendance = Utils.getBooleanFromFormValue(form.field("show_in_attendance").value());
         show_in_menu = Utils.getBooleanFromFormValue(form.field("show_in_menu").value());
         save();
     }
