@@ -33,8 +33,7 @@ import play.twirl.api.HtmlFormat;
 public class Utils
 {
     static MustacheFactory sMustache = new DefaultMustacheFactory();
-
-    static ExecutorService sCustodiaService = Executors.newFixedThreadPool(1);
+    static ExecutorService sCustodiaService = Executors.newSingleThreadExecutor();
 
     public static Calendar parseDateOrNow(String date_string) {
         Calendar result = new GregorianCalendar();

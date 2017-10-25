@@ -2,6 +2,8 @@ package controllers;
 
 import java.sql.Connection;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.SqlUpdate;
@@ -17,6 +19,9 @@ import play.mvc.*;
 public class ApplicationEditing extends Controller {
 
     private Database mDatabase;
+
+    static ExecutorService sExecutor = Executors.newFixedThreadPool(2);
+    static Set<Integer> sAlreadyEmailedCharges = new HashSet<>();
 
     @Inject
     public ApplicationEditing(Database db) {
@@ -179,7 +184,45 @@ public class ApplicationEditing extends Controller {
             return notFound();
         }
 
+        boolean was_referred_to_sm = c.referred_to_sm;
         c.edit(request().queryString());
+        if (!was_referred_to_sm && c.referred_to_sm &&
+                !sAlreadyEmailedCharges.contains(c.id) &&
+                !NotificationRule.findByType(NotificationRule.TYPE_SCHOOL_MEETING).isEmpty()) {
+            final OrgConfig org_config = OrgConfig.get();
+            sExecutor.submit(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(1000 * 60 * 5);
+                        Charge c = Charge.find.byId(id);
+                        if (c.referred_to_sm && !sAlreadyEmailedCharges.contains(c.id)) {
+                            sAlreadyEmailedCharges.add(c.id);
+                            List<NotificationRule> rules = NotificationRule.findByType(
+                                    NotificationRule.TYPE_SCHOOL_MEETING, org_config);
+                            for (NotificationRule rule : rules) {
+                                play.libs.mailer.Email mail = new play.libs.mailer.Email();
+                                mail.addTo(rule.email);
+                                mail.setSubject(c.person.getInitials() + "'s charge"
+                                        + " referred to School Meeting in case #" + c.the_case.case_number);
+                                mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
+                                mail.setBodyText(
+                                    "" + c.person.getDisplayName()
+                                    + " was charged with " + c.getRuleTitle()
+                                    + " and the charge was referred to School Meeting in case #" + c.the_case.case_number + ".\n\n"
+                                    + "For more information, view today's minutes:\n\n"
+                                    + org_config.people_url + routes.Application.viewMeeting(c.the_case.meeting.id).toString()
+                                    + "\n\n"
+                                );
+                                play.libs.mailer.MailerPlugin.send(mail);
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
         c.save();
 
         return ok();

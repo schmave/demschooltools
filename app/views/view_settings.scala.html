@@ -17,6 +17,9 @@
     @if( n.the_type == NotificationRule.TYPE_COMMENT) {
         <li>When a comment about a person is added, optionally email <u>@n.email</u>
     }
+    @if( n.the_type == NotificationRule.TYPE_SCHOOL_MEETING) {
+    <li>When a JC charge is referred to School Meeting, email <u>@n.email</u>
+    }
     @helper.form(routes.Settings.editNotifications(), 'style -> "display: inline") {
         <input type="hidden" name="remove_notification_id" value=@n.id>
         <input type="submit" value="Remove">
@@ -38,6 +41,13 @@ email <input type="text" name="email"/>
 When a comment about a person is entered,
 email <input type="text" name="email"/>
 <input type="hidden" name="comment"/>
+<input type="submit" value="Create"/>
+}
+
+@helper.form(routes.Settings.editNotifications()) {
+When a JC charge is referred to School Meeting,
+email <input type="text" name="email"/>
+<input type="hidden" name="school_meeting"/>
 <input type="submit" value="Create"/>
 }
 

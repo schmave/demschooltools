@@ -4,8 +4,6 @@ import java.util.*;
 
 import javax.persistence.*;
 
-import play.data.*;
-import play.data.validation.Constraints.*;
 import com.avaje.ebean.Model;
 
 
@@ -22,6 +20,7 @@ public class NotificationRule extends Model {
     public static final int TYPE_TAG = 0;
     // public static final int TYPE_DONATION = 1;
     public static final int TYPE_COMMENT = 2;
+    public static final int TYPE_SCHOOL_MEETING = 3;
 
     public int the_type;
 
@@ -43,6 +42,11 @@ public class NotificationRule extends Model {
     public static List<NotificationRule> findByType(int type) {
         return find.where().eq("organization", OrgConfig.get().org)
             .eq("the_type", type).findList();
+    }
+
+    public static List<NotificationRule> findByType(int type, OrgConfig org_config) {
+        return find.where().eq("organization", org_config.org)
+                .eq("the_type", type).findList();
     }
 
     public static NotificationRule create(int type, Tag tag, String email) {

@@ -2,21 +2,14 @@ package models;
 
 import controllers.*;
 
-import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.avaje.ebean.Model;
-import com.avaje.ebean.Model.Finder;
 
 @Entity
 @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")

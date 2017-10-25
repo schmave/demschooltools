@@ -312,9 +312,9 @@ public class CRM extends Controller {
         for (NotificationRule rule : t.notification_rules) {
             play.libs.mailer.Email mail = new play.libs.mailer.Email();
             if (was_add) {
-                mail.setSubject(getInitials(p) + " added to tag " + t.title);
+                mail.setSubject(p.getInitials() + " added to tag " + t.title);
             } else {
-                mail.setSubject(getInitials(p) + " removed from tag " + t.title);
+                mail.setSubject(p.getInitials() + " removed from tag " + t.title);
             }
             mail.addTo(rule.email);
             mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
@@ -802,17 +802,6 @@ public class CRM extends Controller {
                 (updatedPerson.is_family ? updatedPerson.family_members.get(0) : updatedPerson).person_id));
     }
 
-    public static String getInitials(Person p) {
-        String result = "";
-        if (p.first_name != null && p.first_name.length() > 0) {
-            result += p.first_name.charAt(0);
-        }
-        if (p.last_name != null && p.last_name.length() > 0) {
-            result += p.last_name.charAt(0);
-        }
-        return result;
-    }
-
     public Result addComment() {
         CachedPage.remove(CachedPage.RECENT_COMMENTS);
         Form<Comment> filledForm = Form.form(Comment.class).bindFromRequest();
@@ -841,7 +830,7 @@ public class CRM extends Controller {
                 for (NotificationRule rule :
                         NotificationRule.findByType(NotificationRule.TYPE_COMMENT)) {
                     play.libs.mailer.Email mail = new play.libs.mailer.Email();
-                    mail.setSubject("DemSchoolTools comment: " + new_comment.user.name + " & " + getInitials(new_comment.person));
+                    mail.setSubject("DemSchoolTools comment: " + new_comment.user.name + " & " + new_comment.person.getInitials());
                     mail.addTo(rule.email);
                     mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
                     mail.setBodyHtml(views.html.comment_email.render(Comment.find.byId(new_comment.id)).toString());

@@ -141,6 +141,18 @@ public class Person extends Model implements Comparable<Person> {
             .eq("person_id", id).findUnique();
     }
 
+    @JsonIgnore
+    public String getInitials() {
+        String result = "";
+        if (this.first_name != null && this.first_name.length() > 0) {
+            result += this.first_name.charAt(0);
+        }
+        if (this.last_name != null && this.last_name.length() > 0) {
+            result += this.last_name.charAt(0);
+        }
+        return result;
+    }
+
     public boolean hasMultipleAddresses() {
         if (!this.address.isEmpty() || this.family == null) {
             return false;
