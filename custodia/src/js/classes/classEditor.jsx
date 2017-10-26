@@ -38,7 +38,8 @@ module.exports = React.createClass({
             null,
             null,
             this.refs.required_minutes.getDOMNode().value,
-            this.refs.late_time.getDOMNode().value
+            "10:30:00"
+            // this.refs.late_time.getDOMNode().value
         );
     },
 
@@ -93,15 +94,15 @@ module.exports = React.createClass({
                  <input ref="name" className="form-control" id="name"
                         onChange={this.handleChange}
                         value={this.state.selectedClass.name}/>
+                 {/* <div>
+                 <label htmlFor="late_time">Highlight student arrival after:</label>
                  <div>
-                   <label htmlFor="late_time">Highlight student arrival after:</label>
-                   <div>
-                     <DateTimePicker id="missing" value={this.state.selectedClass.late_time}
-                                     parse={['HH:mm:ss']}
-                                     ref="late_time" onChange={this.handleChange}
-                                     calendar={false} time={true} />
-                   </div>
+                 <DateTimePicker id="missing" value={this.state.selectedClass.late_time}
+                 parse={['HH:mm:ss']}
+                 ref="late_time" onChange={this.handleChange}
+                 calendar={false} time={true} />
                  </div>
+                 </div> */}
                </div>
 
 

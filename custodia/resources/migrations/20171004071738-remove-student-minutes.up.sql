@@ -16,7 +16,7 @@ overseer.students
 WHERE
 olderdate IS NOT NULL;
 --;;
-ALTER TABLE overseer.students DROP COLUMN olderdate DATE;
+ALTER TABLE overseer.students DROP COLUMN olderdate;
 --;;
 DROP FUNCTION IF EXISTS overseer.student_school_days(bigint,text,bigint);
 --;;
