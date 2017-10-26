@@ -20,9 +20,9 @@
                           (cmd/make-class name from_date to_date)
                           (resp/response (queries/get-all-classes-and-students))))
 
-  (POST "/classes/:cid" [cid :<< as-int name from_date to_date minutes :<< as-int]
+  (POST "/classes/:cid" [cid :<< as-int name from_date to_date minutes :<< as-int late_time]
         (friend/authorize #{roles/admin}
-                          (cmd/edit-class cid name from_date to_date minutes)
+                          (cmd/edit-class cid name from_date to_date minutes late_time)
                           (resp/response (queries/get-all-classes-and-students))))
 
   (POST "/classes/:cid/student/:sid/add" [cid :<< as-int sid :<< as-int]

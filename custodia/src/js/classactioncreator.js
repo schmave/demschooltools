@@ -15,7 +15,7 @@ var exports = {
             });
         });
     },
-    createClass: function (id, name, to_date, from_date, minutes) {
+    createClass: function (id, name, to_date, from_date, minutes, late_time) {
         var onSave =
                 function(message) {
                     return function (data) {
@@ -31,9 +31,9 @@ var exports = {
                     };
                 };
         if(id > 0) {
-            ajax.post('/classes/'+id, {name: name, to_date:to_date, from_date:from_date, minutes:minutes}).then(onSave("edited"));
+            ajax.post('/classes/'+id, {name: name, to_date:to_date, from_date:from_date, minutes:minutes, late_time:late_time}).then(onSave("edited"));
         } else {
-            ajax.post('/classes', {name: name, to_date:to_date, from_date:from_date, minutes:minutes}).then(onSave("created"));
+            ajax.post('/classes', {name: name, to_date:to_date, from_date:from_date, minutes:minutes, late_time:late_time}).then(onSave("created"));
         }
     },
     deleteStudentFromClass: function (studentId, classId) {
