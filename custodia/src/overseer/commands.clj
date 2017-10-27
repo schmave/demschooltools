@@ -129,7 +129,7 @@
                 :date (make-sqldate date-string)}))
 
 (defn edit-class
-  ([_id name from-date to-date minutes] (edit-class nil))
+  ([_id name from-date to-date minutes] (edit-class _id name from-date to-date minutes nil))
   ([_id name from-date to-date minutes late-time]
    (let [class {:name name
                 :from_date (make-sqldate from-date)
@@ -172,7 +172,6 @@
                                  :school_id db/*school-id*
                                  :start_date (make-sqldate start-date)
                                  :guardian_email email
-                                 :olderdate nil
                                  :is_teacher is_teacher
                                  :show_as_absent nil})]
        (if (not= nil minutes)

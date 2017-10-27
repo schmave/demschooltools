@@ -63,7 +63,6 @@
                 :dst_id dst-id
                 :start_date nil
                 :guardian_email nil
-                :olderdate nil
                 :is_teacher false
                 :show_as_absent nil}]
     (db/persist! new-el)))
