@@ -146,7 +146,6 @@
         (is (= (:in_time passed) (:in_time result)))
         (is (= (:in_time passed) (:out_time result)))))
     )
-
   )
 
 (deftest no-student-name-invalid

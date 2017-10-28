@@ -10,7 +10,7 @@
 (defn create-dst-tables
   ([] (create-dst-tables @pgdb))
   ([con]
-   (let [dst-migration (slurp "resources/migrations/dst_migration.sql")]
+   (let [dst-migration (slurp "resources/dst/dst_migration.sql")]
      (jdbc/execute! con [dst-migration]))))
 
 (defn migrate-db
