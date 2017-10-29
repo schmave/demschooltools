@@ -3,7 +3,7 @@
            [java.util Date Calendar TimeZone])
   (:require [yesql.core :refer [defqueries] ]
             [overseer.dates :as dates]
-            [clojure.tools.trace :as trace]
+            [clojure.tools.logging :as log]
             [overseer.db :as db]))
 
 (defqueries "overseer/yesql/queries.sql" )
@@ -89,7 +89,7 @@
   (db/q get-school-days-y {:year_name year-name :school_id db/*school-id* :timezone (get-school-time-zone)} ))
 
 
-(trace/deftrace get-student-page
+(defn get-student-page
   ([student-id year] (get-student-page student-id year (get-active-class)))
   ([student-id year class-id]
    (db/q get-student-page-y {:year_name year :student_id student-id :class_id class-id :timezone (get-school-time-zone)} )))
