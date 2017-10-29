@@ -95,5 +95,29 @@ To run the backend, run ```make start```.
 If both the frontend and backend are running, the app will be available at
 [localhost:5000](http://localhost:5000/).
 
+### Logging 
+
+Exception and debugging logging can be added to the system via the
+```log4j.properties``` in the ```src/``` directory.
+
+An example that logs all INFO messages to a file but only WARN to the console
+would look like this:
+
+```
+log4j.rootLogger=INFO, A1, CA
+
+log4j.appender.CA=org.apache.log4j.ConsoleAppender
+log4j.appender.CA.layout=org.apache.log4j.PatternLayout
+log4j.appender.CA.layout.ConversionPattern=%-4r [%t] %-5p %c %x - %m%n
+log4j.appender.CA.Threshold = WARN
+
+log4j.appender.A1=org.apache.log4j.RollingFileAppender
+log4j.appender.A1.File=log/app.log
+log4j.appender.A1.MaxFileSize=500MB
+log4j.appender.A1.MaxBackupIndex=2
+log4j.appender.A1.layout=org.apache.log4j.PatternLayout
+log4j.appender.A1.layout.ConversionPattern=%d [%t] %-5p%c - %m%n
+```
+
 
 License: GPL-3.0+
