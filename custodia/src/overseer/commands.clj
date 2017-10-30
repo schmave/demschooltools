@@ -1,6 +1,7 @@
 (ns overseer.commands
   (:require [overseer.db :as db]
             [overseer.database.users :as users]
+            [overseer.helpers :as h]
             [overseer.queries :as queries]
             [overseer.roles :as roles]
             [yesql.core :refer [defqueries]]
@@ -46,7 +47,7 @@
 (defn- make-sqltime [t]
   (->> t str (f/parse) c/to-sql-time))
 
-(defn swipe-in
+(h/deflog swipe-in
   ([id] (swipe-in id (t/now)))
   ([id in-time]
    (let [in-timestamp (make-timestamp in-time)
@@ -69,7 +70,7 @@
              :rounded_out_time (:rounded_in_time swipe))
       swipe)))
 
-(defn swipe-out
+(h/deflog swipe-out
   ([id] (swipe-out id (t/now)))
   ([id out-time]
    (let [rounded-out-time (dates/round-swipe-time out-time)
@@ -108,7 +109,7 @@
                  :fromdate (make-sqldate fromdate)
                  :required_minutes minutes})))
 
-(defn edit-student
+(h/deflog edit-student
   ([_id name start-date email] (edit-student _id name start-date email false nil))
   ([_id name start-date email is_teacher minutes]
    (if (not= nil minutes) (edit-student-required-minutes _id minutes))
@@ -128,7 +129,7 @@
                 :student_id id
                 :date (make-sqldate date-string)}))
 
-(defn edit-class
+(h/deflog edit-class
   ([_id name from-date to-date minutes] (edit-class _id name from-date to-date minutes nil))
   ([_id name from-date to-date minutes late-time]
    (let [class {:name name
@@ -149,7 +150,7 @@
      (when (queries/class-not-yet-created name school_id)
        (db/persist! {:type :classes :name name :active active :school_id school_id})))))
 
-(defn add-student-to-class [student-id class-id]
+(h/deflog add-student-to-class [student-id class-id]
   (db/persist! {:type :classes_X_students :student_id student-id :class_id class-id}))
 
 (defn remove-student-from-class [student-id class-id]

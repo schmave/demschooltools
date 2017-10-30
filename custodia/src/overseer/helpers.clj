@@ -29,12 +29,12 @@ may be rebound to do anything you like. 'name' is optional."
     (let [value (binding [*trace-depth* (inc *trace-depth*)]
                   (apply f args))
           output-log (tracer id (str (trace-indent) "=> " (pr-str value))) ]
-      (log/info (str "\n" fn-log "\n" output-log) )
+      (log/info (str "\n" fn-log "\n" output-log "\n--------------------------------------------------------------------------------"))
       value)))
 
 ;; Borrowed from the clojure.trace library, because I want it
 ;; to use logging instead of trace
-(defmacro deftrace
+(defmacro deflog
   "Use in place of defn; traces each call/return of this fn, including
    arguments. Nested calls to deftrace'd functions will print a
    tree-like structure.

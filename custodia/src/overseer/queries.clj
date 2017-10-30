@@ -3,11 +3,11 @@
            [java.util Date Calendar TimeZone])
   (:require [yesql.core :refer [defqueries] ]
             [overseer.dates :as dates]
+            [overseer.helpers :as h]
             [clojure.tools.logging :as log]
             [overseer.db :as db]))
 
 (defqueries "overseer/yesql/queries.sql" )
-
 
 (defn get-active-class []
   (-> (db/q get-active-class-y {:school_id db/*school-id*} )
@@ -15,7 +15,7 @@
       :_id))
 
 ;; (get-classes)
-(defn get-classes
+(h/deflog get-classes
   ([] (get-classes db/*school-id*))
   ([school-id]
     (let [classes (db/q get-classes-y {:school_id school-id} )
@@ -48,11 +48,11 @@
 
 ;;(get-all-students)
 
-(defn get-student [student_id]
+(h/deflog get-student [student_id]
   (db/q get-student-y {:student_id student_id
                        :school_id db/*school-id*}))
 
-(defn get-all-classes-and-students
+(h/deflog get-all-classes-and-students
   ([] (get-all-classes-and-students db/*school-id*))
   ([school-id]
     {:classes (get-classes school-id)
@@ -89,12 +89,12 @@
   (db/q get-school-days-y {:year_name year-name :school_id db/*school-id* :timezone (get-school-time-zone)} ))
 
 
-(defn get-student-page
+(h/deflog get-student-page
   ([student-id year] (get-student-page student-id year (get-active-class)))
   ([student-id year class-id]
    (db/q get-student-page-y {:year_name year :student_id student-id :class_id class-id :timezone (get-school-time-zone)} )))
 
-(defn get-report
+(h/deflog get-report
   ([year-name] (get-report year-name (get-active-class)))
   ([year-name class-id]
    (db/q student-report-y { :year_name year-name :class_id class-id :timezone (get-school-time-zone)} )))
@@ -103,7 +103,7 @@
   (db/q swipes-in-year-y {:year_name year-name :student_id student-id :school_id db/*school-id*  :timezone (get-school-time-zone)} ))
 
 ;; (get-students )
-(defn get-students
+(h/deflog get-students
   ([] (sort-by :name (get-all-students)))
   ([id] (get-student id)))
 
