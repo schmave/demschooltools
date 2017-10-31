@@ -4,7 +4,6 @@
             [clj-time.format :as f]
             [clj-time.local :as l]
             [clojure.pprint :as pp]
-            [clojure.tools.trace :as trace]
             [clojure.test :refer :all]
             [overseer.attendance :as att]
             [overseer.commands :as cmd]
@@ -15,7 +14,8 @@
             [overseer.dates :as dates]
             [overseer.db :as db]
             [overseer.helpers-test :refer :all]
-            [schema.test :as tests]))
+            [schema.test :as tests]
+            [clojure.tools.logging :as log]))
 
 (comment
   (run-tests 'overseer.web-test)
@@ -184,7 +184,7 @@
     (cmd/swipe-in sid2 _early)
 
     (let [in-out (queries/get-student-list-in-out false)]
-      (trace/trace in-out)
+      (log/debug in-out)
       (testing "Student 'late'"
         (is (= true (->> in-out (filter #(= (:_id %) sid)) first :swiped_today_late)))
         (is (= false (->> in-out (filter #(= (:_id %) sid2)) first :swiped_today_late)))))

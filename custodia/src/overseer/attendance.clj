@@ -4,13 +4,13 @@
             [overseer.queries :as queries]
             [overseer.dates :refer :all]
             [overseer.commands :as cmd]
-            [clojure.tools.trace :as trace]
             [clj-time.format :as f]
             [clj-time.local :as l]
             [clj-time.core :as t]
             [schema.core :as s]
             [clj-time.coerce :as c]
-            ))
+
+            [clojure.tools.logging :as log]))
 (def DayInformation
   {:student_id s/Num
    :day s/Str
@@ -120,7 +120,7 @@
   ([] (get-student-list false))
   ([show-archived]
    (let [today-string (make-date-string (t/now))
-         inout (trace/trace "student-list-in-out" (queries/get-student-list-in-out show-archived))
+         inout (log/debug "student-list-in-out" (queries/get-student-list-in-out show-archived))
          inout (map #(assoc %
                             :in_today (= today-string
                                          (make-date-string (:last_swipe_date %)))
