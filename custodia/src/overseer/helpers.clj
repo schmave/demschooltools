@@ -28,8 +28,9 @@ may be rebound to do anything you like. 'name' is optional."
         fn-log (tracer id (str (trace-indent) (pr-str (cons name args))))]
     (let [value (binding [*trace-depth* (inc *trace-depth*)]
                   (apply f args))
-          output-log (tracer id (str (trace-indent) "=> " (pr-str value))) ]
-      (log/debug (str "\n" fn-log "\n" output-log "\n--------------------------------------------------------------------------------"))
+          output-log (tracer id (str (trace-indent) "=> " (pr-str value)))
+          _ (log/debug (str "\n" fn-log "\n" output-log
+                            "\n--------------------------------------------------------------------------------"))]
       value)))
 
 ;; Borrowed from the clojure.trace library, because I want it
