@@ -620,7 +620,7 @@
         (cmd/swipe-in sid (t/minus _3pm (t/hours 1)))
         (cmd/swipe-out sid _3pm)
         (cmd/add-student-to-class sid (get-class-id-by-name "2014-2015"))
-        (let [att  (att/get-student-list)
+        (let [att (att/get-student-list)
               our-hero (filter #(= sid (:_id %)) att)]
           (testing "Student Count"
             (is (= (->> our-hero count) 1))

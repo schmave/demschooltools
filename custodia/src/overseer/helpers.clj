@@ -29,7 +29,7 @@ may be rebound to do anything you like. 'name' is optional."
     (let [value (binding [*trace-depth* (inc *trace-depth*)]
                   (apply f args))
           output-log (tracer id (str (trace-indent) "=> " (pr-str value)))
-          _ (log/debug (str "\n" fn-log "\n" output-log
+          _ (log/info (str "\n" fn-log "\n" output-log
                             "\n--------------------------------------------------------------------------------"))]
       value)))
 
