@@ -216,7 +216,10 @@ ORDER BY s.name;
 SELECT _id from overseer.classes where active = true and school_id = :school_id;
 
 -- name: get-students-y
-SELECT s.* , snrm.required_minutes
+SELECT s.*
+       , (CASE WHEN snrm.required_minutes IS NULL
+          THEN c.required_minutes ELSE snrm.required_minutes END)
+           AS required_minutes
 FROM overseer.students s
 LEFT JOIN overseer.student_newest_required_minutes snrm
      ON (snrm.student_id = s._id
@@ -224,10 +227,17 @@ LEFT JOIN overseer.student_newest_required_minutes snrm
                               FROM overseer.students_required_minutes isrm
                               WHERE isrm.fromdate <= current_date
                               AND snrm.student_id = isrm.student_id))
+LEFT JOIN overseer.classes c ON (c.active = true)
+LEFT JOIN overseer.classes_X_students cXs
+     ON (cXs.student_id = s._id AND cXs.class_id = c._id)
 WHERE s.school_id = :school_id;
 
+
 -- name: get-student-y
-SELECT s.*, snrm.required_minutes
+SELECT s.*
+       , (CASE WHEN snrm.required_minutes IS NULL
+         THEN c.required_minutes ELSE snrm.required_minutes END)
+         AS required_minutes
 FROM overseer.students s
 LEFT JOIN overseer.student_newest_required_minutes snrm
      ON (snrm.student_id = s._id
@@ -235,6 +245,9 @@ LEFT JOIN overseer.student_newest_required_minutes snrm
                               FROM overseer.students_required_minutes isrm
                               WHERE isrm.fromdate <= current_date
                               AND snrm.student_id = isrm.student_id))
+LEFT JOIN overseer.classes c ON (c.active = true)
+LEFT JOIN overseer.classes_X_students cXs
+     ON (cXs.student_id = s._id AND cXs.class_id = c._id)
 WHERE s._id = :student_id
 AND s.school_id = :school_id;
 

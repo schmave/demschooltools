@@ -673,7 +673,7 @@
             (is (= 1 (-> att :total_days)))))
 
         (testing "Student minute count"
-          (is (= nil (-> student :required_minutes)))
+          (is (= 345 (-> student :required_minutes)))
           (is (= 345 (:required_minutes (queries/get-class-by-name "2014-2015"))))
 
           (cmd/edit-student-required-minutes sid 346)
