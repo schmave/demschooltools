@@ -181,7 +181,7 @@ var exports = React.createClass({
             var activeDate = this.getActiveDay(this.state.student);
             var attended = (this.state.student.total_days + this.state.student.total_short).toString()
                          + " (" + this.state.student.total_short +  ")",
-                requiredMinutes = this.state.student.requiredMinutes;
+                requiredMinutes = this.state.student.required_minutes;
             return <div className="row">
 
           <StudentEditor ref="studentEditor">
