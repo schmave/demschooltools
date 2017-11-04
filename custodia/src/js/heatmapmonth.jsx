@@ -4,21 +4,20 @@ var React = require('react'),
 
 var exports = React.createClass({
     map: null,
-    formatDays: function (days) {
+    formatDays: function (days, requiredMinutes) {
         var formatted = {};
         days.forEach(function (day) {
             formatted[moment(day.day).unix()] = day.total_mins;
-            if(day.excused) {
-                formatted[moment(day.day).unix()] = 285;
-            }
-            if(!day.absent && day.total_mins == 0) {
+            if(day.excused || day.override) {
+                formatted[moment(day.day).unix()] = requiredMinutes;
+            } else if(!day.absent && day.total_mins == 0) {
                 formatted[moment(day.day).unix()] = 1;
             }
         });
         return formatted;
     },
     loadHeatmap: function () {
-        var data = this.formatDays(this.props.days);
+        var data = this.formatDays(this.props.days, this.props.requiredMinutes);
         if (this.map) {
             this.map = this.map.destroy();
         }
@@ -44,7 +43,7 @@ var exports = React.createClass({
             subDomain: 'x_day',
             subDomainTextFormat: "%d",
             range: 4,
-            legend: [0,this.props.requiredMinutes-15,this.props.requiredMinutes],
+            legend: [0,this.props.requiredMinutes-15,this.props.requiredMinutes-1],
             legendVerticalPosition: 'center',
             legendCellSize: 8,
             itemName: ['minute', 'minutes'],
