@@ -546,14 +546,33 @@
       (testing "students with att"
         (is (not= '() (att/get-student-with-att 1))))
       (let [s (cmd/make-student "test")
-            sid (:_id s)]
+            sid (:_id s)
+            {sid2 :_id} (cmd/make-student "test2")
+            {sid3 :_id} (cmd/make-student "test3")
+            ]
 
-        (cmd/add-student-to-class sid (get-class-id-by-name "2014-2015"))
-        (cmd/swipe-in sid _2014_10-14_9-14am)
-        (cmd/swipe-out sid (t/plus _2014_10-14_9-14am (t/minutes 345)))
+        (run! (fn [sid]
+                (cmd/add-student-to-class sid (get-class-id-by-name "2014-2015"))
 
-        (let [att  (att/get-student-with-att sid)]
-          (pp/pprint att)
+                (cmd/swipe-in sid (t/plus _2014_10-14_9-14am (t/years -2)))
+                (cmd/swipe-out sid (t/plus _2014_10-14_9-14am (t/years -2) (t/minutes 345)))
+
+                (cmd/swipe-in sid (t/plus _2014_10-14_9-14am (t/years -1)))
+                (cmd/swipe-out sid (t/plus _2014_10-14_9-14am (t/years -1) (t/minutes 345)))
+
+                (cmd/swipe-in sid _2014_10-14_9-14am)
+                (cmd/swipe-out sid (t/plus _2014_10-14_9-14am (t/minutes 345)))
+
+
+                )
+             [sid sid2 sid3])
+
+        (let [att  (att/get-student-with-att sid)
+              student-days (queries/get-student-page 3 (dates/get-current-year-string (queries/get-years)))]
+          ;;(pp/pprint att)
+          (pp/pprint student-days)
+          (testing "only one day of swipes"
+            (is (= 1 (count student-days))))
           (testing "has one valid"
             (is (=  (-> att first :total_days) 1 )))
           (testing "students with att doesn't throw exceptions"

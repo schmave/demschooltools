@@ -1,37 +1,57 @@
+WITH student_school_days AS (
+      SELECT
+      a.school_day AS days,
+      s._id        AS student_id
+      , s.archived
+      , (CASE WHEN stumin.required_minutes IS NULL
+              THEN c.required_minutes ELSE stumin.required_minutes END)
+              AS requiredmin
+      FROM overseer.school_days AS a
+      JOIN overseer.students s ON (s._id = 4)
+      LEFT JOIN overseer.student_newest_required_minutes stumin
+           ON (stumin.student_id = student_id
+              AND stumin.fromdate = (SELECT MAX(isrm.fromdate)
+                                     FROM overseer.students_required_minutes isrm
+                                     WHERE isrm.fromdate <= a.school_day
+                                     AND stumin.student_id = isrm.student_id))
+      JOIN overseer.classes c ON (c._id = 5)
+      WHERE (s.start_date < a.school_day OR s.start_date IS NULL)
+            AND a.class_id = 5
+            AND a.year_name =  '2017-08-07 2018-07-31'
+      GROUP BY days, s._id, s.archived, requiredmin
+    )
 SELECT
-  stu.name,
-  stu._id,
-  stu.show_as_absent,
-  stu.is_teacher,
-  stu.archived,
-  c.late_time AS late_time,
-  l.last_swipe_type,
-  l.last_swipe_date,
-  l.last_swipe_date > current_date as swiped_today,
-  l.last_swipe_date > (current_date + c.late_time) as swiped_today_late
-FROM
-  overseer.students stu
-  LEFT JOIN (
-  (SELECT
-      CASE WHEN subl.outs >= subl.ins THEN 'out' ELSE 'in' END AS last_swipe_type,
-      CASE WHEN subl.outs >= subl.ins THEN subl.outs ELSE subl.ins END AS last_swipe_date,
-      subl.student_id
-      FROM (SELECT
-              max(s.in_time) AS ins,
-              max(s.out_time) AS outs,
-              s.student_id
-            FROM overseer.swipes s
-            GROUP BY s.student_id
-            ORDER BY ins, outs) as subl)) AS l ON (l.student_id = stu._id)
-  INNER JOIN overseer.classes c ON (1 = 1)
-  INNER JOIN overseer.classes_X_students cXs ON (cXs.student_id = stu._id
-          AND cXs.class_id = c._id)
-     WHERE (stu.archived = FALSE
-        OR stu.archived = FALSE)
-      AND c.active = TRUE
-      AND stu.school_id = 1
-    ORDER BY
-      stu.name;
+  schooldays.student_id
+  --, to_char(s.in_time at time zone :timezone, 'HH:MI:SS') as nice_in_time
+  --, to_char(s.out_time at time zone :timezone, 'HH:MI:SS') as nice_out_time
+  , s.out_time
+  , s.in_time
+  , s.rounded_out_time
+  , s.rounded_in_time
+  , s.intervalmin
+  , o._id has_override
+  , e._id has_excuse
+  , s._id
+  , schooldays.archived
+  , (CASE WHEN s._id IS NOT NULL THEN 'swipes' ELSE '' END) as type
+  , schooldays.requiredmin
+  , schooldays.days AS day
+FROM student_school_days AS schooldays
+LEFT JOIN overseer.swipes s
+      ON (
+       ((schooldays.days = date(s.in_time AT TIME ZONE 'America/New_York'))
+       OR
+       (schooldays.days = date(s.out_time AT TIME ZONE  'America/New_York')))
+        AND s.student_id = 4)
+LEFT JOIN overseer.overrides o
+     ON (schooldays.days = o.date AND o.student_id = schooldays.student_id)
+LEFT JOIN overseer.excuses e
+     ON (schooldays.days = e.date AND e.student_id = schooldays.student_id)
+WHERE schooldays.days IS NOT NULL
+      AND schooldays.student_id = 4
+ORDER BY schooldays.days DESC;
+
+
 
 
 
