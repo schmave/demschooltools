@@ -88,7 +88,6 @@
 (defn get-school-days [year-name]
   (db/q get-school-days-y {:year_name year-name :school_id db/*school-id* :timezone (get-school-time-zone)} ))
 
-
 (h/deflog get-student-page
   ([student-id year] (get-student-page student-id year (get-active-class)))
   ([student-id year class-id]
@@ -99,8 +98,7 @@
   ([year-name class-id]
    (db/q student-report-y { :year_name year-name :class_id class-id :timezone (get-school-time-zone)} )))
 
-(defn get-swipes-in-year [year-name student-id]
-  (db/q swipes-in-year-y {:year_name year-name :student_id student-id :school_id db/*school-id*  :timezone (get-school-time-zone)} ))
+;;(defn get-swipes-in-year [year-name student-id] (db/q swipes-in-year-y {:year_name year-name :student_id student-id :school_id db/*school-id*  :timezone (get-school-time-zone)} )) 
 
 ;; (get-students )
 (h/deflog get-students

@@ -36,7 +36,7 @@ WITH student_school_days AS (
       FROM overseer.school_days AS a
       JOIN overseer.students s ON (s._id = :student_id)
       LEFT JOIN overseer.student_newest_required_minutes stumin
-           ON (stumin.student_id = student_id
+           ON (stumin.student_id = :student_id
               AND stumin.fromdate = (SELECT MAX(isrm.fromdate)
                                      FROM overseer.students_required_minutes isrm
                                      WHERE isrm.fromdate <= a.school_day

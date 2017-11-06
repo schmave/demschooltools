@@ -154,7 +154,8 @@
 
 (deftest edit-class-test
   (sample-db true)
-  (let [{sid :_id } (cmd/make-class "test")
+  (let [
+        {sid :_id } (cmd/make-class "test")
         from "2015-10-20"
         to "2016-10-20"]
     (cmd/edit-class sid "test2" from to 500)
@@ -549,21 +550,16 @@
             sid (:_id s)
             {sid2 :_id} (cmd/make-student "test2")
             {sid3 :_id} (cmd/make-student "test3")
+
+            ;;{cid :_id } (cmd/make-class "test")
             ]
 
         (run! (fn [sid]
                 (cmd/add-student-to-class sid (get-class-id-by-name "2014-2015"))
-
-                (cmd/swipe-in sid (t/plus _2014_10-14_9-14am (t/years -2)))
-                (cmd/swipe-out sid (t/plus _2014_10-14_9-14am (t/years -2) (t/minutes 345)))
-
-                (cmd/swipe-in sid (t/plus _2014_10-14_9-14am (t/years -1)))
-                (cmd/swipe-out sid (t/plus _2014_10-14_9-14am (t/years -1) (t/minutes 345)))
+                (cmd/edit-student-required-minutes sid 325 (t/plus _2014_10-14_9-14am (t/years -1)))
 
                 (cmd/swipe-in sid _2014_10-14_9-14am)
                 (cmd/swipe-out sid (t/plus _2014_10-14_9-14am (t/minutes 345)))
-
-
                 )
              [sid sid2 sid3])
 
