@@ -123,6 +123,10 @@ a {
     }
 }
 
+.graph-rect {
+    fill: white !important;
+}
+
 .late {
     background-color: lightpink;
 }

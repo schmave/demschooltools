@@ -108,7 +108,7 @@ FROM
   WHERE (stu.archived = :show_archived
         OR stu.archived = FALSE)
     AND c.active = TRUE
-    AND stu.school_id = 1
+    AND stu.school_id = :school_id
   ORDER BY
       stu.name;
 
