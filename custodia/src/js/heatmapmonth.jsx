@@ -16,8 +16,19 @@ var exports = React.createClass({
         });
         return formatted;
     },
+    getHighlights: function (days, requiredMinutes) {
+        //var hights = ['now'];
+        var hights = [];
+        days.forEach(function (day) {
+            if(day.excused) {
+                hights.push(moment(day.day).toDate());
+            }
+        });
+        return hights;
+    },
     loadHeatmap: function () {
         var data = this.formatDays(this.props.days, this.props.requiredMinutes);
+        var highlight = this.getHighlights(this.props.days, this.props.requiredMinutes);
         if (this.map) {
             this.map = this.map.destroy();
         }
@@ -48,7 +59,7 @@ var exports = React.createClass({
             legendCellSize: 8,
             itemName: ['minute', 'minutes'],
             legendOrientation: 'vertical',
-            highlight: ['now'],
+            highlight: highlight,
             cellSize: 15
         });
     },

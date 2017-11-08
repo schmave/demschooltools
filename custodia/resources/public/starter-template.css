@@ -122,6 +122,9 @@ a {
         width: 1300px;
     }
 }
+rect.highlight {
+    fill: orange !important;
+}
 
 .graph-rect {
     fill: white !important;
