@@ -542,6 +542,28 @@
           (testing "swiping out on another day just is an out"
             (is (= 2 (-> att :days count))))))))
 
+(deftest only-one-required-minutes-per-day
+  (do (sample-db)
+      (let [{sid :_id} (cmd/make-student "test")]
+
+        (cmd/add-student-to-class sid (get-class-id-by-name "2014-2015"))
+
+        (cmd/edit-student-required-minutes sid 325 (t/plus _2014_10-14_9-14am (t/minutes -15)))
+        (cmd/edit-student-required-minutes sid 425 (t/plus _2014_10-14_9-14am (t/minutes -13)))
+        (cmd/edit-student-required-minutes sid 525 (t/plus _2014_10-14_9-14am (t/minutes -10)))
+
+        (cmd/swipe-in sid _2014_10-14_9-14am)
+        (cmd/swipe-out sid (t/plus _2014_10-14_9-14am (t/minutes 524)))
+
+        (let [att  (att/get-student-with-att sid)
+              student-days (queries/get-student-page 3 (dates/get-current-year-string (queries/get-years)))]
+          (pp/pprint att)
+          (testing "has one valid"
+            (is (= (count att) 1 ))
+            (is (= (-> att first :required_minuts) 524)))
+          )))
+  )
+
 (deftest students-with-att
   (do (sample-db)
       (testing "students with att"
