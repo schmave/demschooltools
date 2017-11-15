@@ -76,6 +76,9 @@ LEFT JOIN overseer.excuses e
 WHERE schooldays.days IS NOT NULL
 ORDER BY schooldays.days DESC;
 
+-- name: students-required-minutes-y
+SELECT * FROM overseer.students_required_minutes WHERE student_id = :student_id AND fromdate = :fromdate;
+
 -- name: student-list-in-out-y
 SELECT
   stu.name,

@@ -104,10 +104,17 @@
 (defn edit-student-required-minutes
   ([student_id minutes] (edit-student-required-minutes student_id minutes (str (t/now))))
   ([student_id minutes fromdate]
-   (db/persist! {:type :students_required_minutes
-                 :student_id student_id
-                 :fromdate (make-sqldate fromdate)
-                 :required_minutes minutes})))
+   (let [existing (queries/get-students-required-minutes student_id (make-sqldate fromdate))]
+     (if (= 0 (count existing))
+       (db/persist! {:type :students_required_minutes
+                     :student_id student_id
+                     :fromdate (make-sqldate fromdate)
+                     :required_minutes minutes})
+       (do (log/error existing)
+           (db/update-many! :students_required_minutes {:required_minutes minutes}
+                            (str :student_id " = ? AND " :fromdate " = ?")
+                            [student_id (make-sqldate fromdate)]
+                            ))))))
 
 (h/deflog edit-student
   ([_id name start-date email] (edit-student _id name start-date email false nil))

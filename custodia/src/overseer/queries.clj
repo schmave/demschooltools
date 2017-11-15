@@ -129,4 +129,7 @@
 (defn get-schools-with-dst []
   (db/q get-schools-with-dst-y {}))
 
+(defn get-students-required-minutes [student-id fromdate]
+  (db/q students-required-minutes-y {:student_id student-id :fromdate fromdate}))
+
 

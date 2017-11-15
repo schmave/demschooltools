@@ -3,6 +3,7 @@
            [java.util Date Calendar TimeZone])
   (:require [clj-time.coerce :as timec]
             [clj-time.core :as t]
+            [overseer.helpers :as h]
             [clojure.java.jdbc :as jdbc]
             [overseer.database.connection :refer [pgdb init-pg]]))
 
@@ -30,6 +31,11 @@
 (defn delete-where! [table where-clause]
   (let [table (append-schema (name table))]
     (jdbc/delete! @pgdb table where-clause)))
+
+(h/deflog update-many! [table fields where-clause where-values]
+  (let [fields (dissoc fields :type)
+        table (append-schema (name table))]
+    (jdbc/update! @pgdb table fields (concat where-clause where-values))))
 
 (defn update!
   ([table id fields]
