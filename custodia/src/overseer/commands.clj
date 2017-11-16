@@ -14,7 +14,8 @@
             [clj-time.coerce :as c]
             [schema.core :as s]
             [environ.core :refer [env]]
-            ))
+
+            [clojure.string :as str]))
 
 (defqueries "overseer/yesql/commands.sql" )
 
@@ -42,10 +43,10 @@
 
 ;; (make-sqldate "2015-03-30")
 (defn- make-sqldate [t]
-  (->> t str (f/parse) c/to-sql-date))
+  (->> t str f/parse c/to-sql-date))
 
 (defn- make-sqltime [t]
-  (->> t str (f/parse) c/to-sql-time))
+  (->> t str f/parse c/to-sql-time))
 
 (h/deflog swipe-in
   ([id] (swipe-in id (t/now)))
@@ -110,11 +111,12 @@
                      :student_id student_id
                      :fromdate (make-sqldate fromdate)
                      :required_minutes minutes})
-       (do (log/error existing)
-           (db/update-many! :students_required_minutes {:required_minutes minutes}
-                            (str :student_id " = ? AND " :fromdate " = ?")
-                            [student_id (make-sqldate fromdate)]
-                            ))))))
+       (db/update-passthrough! :students_required_minutes
+                               {:required_minutes minutes}
+                               ["student_id = ? AND fromdate = ?"
+                                student_id
+                                (make-sqldate (dates/make-date-string fromdate))])))))
+
 
 (h/deflog edit-student
   ([_id name start-date email] (edit-student _id name start-date email false nil))

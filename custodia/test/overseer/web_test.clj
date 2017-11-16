@@ -566,8 +566,8 @@
               student-days (queries/get-student-page 3 (dates/get-current-year-string (queries/get-years)))]
           (testing "has one valid, kept last for same day s1, and didn't update s2"
             (is (= (count att) 1 ))
-            (is (= (-> att first :required_minutes) 524))
-            (is (= (-> att2 first :required_minutes) 400))
+            (is (= 525 (-> att first :required_minutes)))
+            (is (= 400 (-> att2 first :required_minutes)))
 
             )
           )))
