@@ -25,7 +25,7 @@ module.exports = React.createClass({
         return <nav className="navbar" role="navigation">
             <div className="container">
                 <div className="navbar-header">
-                    <Link to="students" id="home" className="navbar-brand">{this.state.selectedSchool?this.state.selectedSchool.name:""} Custodia</Link>
+                    <Link to="students" id="home" className="navbar-brand">{this.state.selectedSchool?this.state.selectedSchool.name:""} Custodia &mdash; Home</Link>
                 </div>
                 <div id="navbar">
                     <ul className="nav navbar-nav">
