@@ -1,6 +1,7 @@
 (ns overseer.commands
   (:require [overseer.db :as db]
             [overseer.database.users :as users]
+            [overseer.helpers :as h]
             [overseer.queries :as queries]
             [overseer.roles :as roles]
             [yesql.core :refer [defqueries]]
@@ -13,14 +14,15 @@
             [clj-time.coerce :as c]
             [schema.core :as s]
             [environ.core :refer [env]]
-            ))
+
+            [clojure.string :as str]))
 
 (defqueries "overseer/yesql/commands.sql" )
 
 (defn activate-class
   ([id] (activate-class id db/*school-id*))
   ([id school-id]
-    (db/q activate-class-y! {:id id :school_id school-id})))
+   (db/q activate-class-y! {:id id :school_id school-id})))
 
 (defn delete-student-from-class [student-id class-id]
   (db/q delete-student-from-class-y! {:student_id student-id :class_id class-id} ))
@@ -41,9 +43,12 @@
 
 ;; (make-sqldate "2015-03-30")
 (defn- make-sqldate [t]
-  (->> t str (f/parse) c/to-sql-date))
+  (->> t str f/parse c/to-sql-date))
 
-(defn swipe-in
+(defn- make-sqltime [t]
+  (->> t str f/parse c/to-sql-time))
+
+(h/deflog swipe-in
   ([id] (swipe-in id (t/now)))
   ([id in-time]
    (let [in-timestamp (make-timestamp in-time)
@@ -66,7 +71,7 @@
              :rounded_out_time (:rounded_in_time swipe))
       swipe)))
 
-(defn swipe-out
+(h/deflog swipe-out
   ([id] (swipe-out id (t/now)))
   ([id out-time]
    (let [rounded-out-time (dates/round-swipe-time out-time)
@@ -97,21 +102,26 @@
 (defn delete-student [id]
   (db/delete! {:type "students" :_id id}))
 
-(defn get-name-from-dst-fields [student school]
-  (if (:use_display_name school)
-    (if (> (count (:display_name student)) 0)
-      (:display_name student)
-      (:first_name student))
-    (str (:first_name student) " " (:last_name student))))
+(defn edit-student-required-minutes
+  ([student_id minutes] (edit-student-required-minutes student_id minutes (str (t/now))))
+  ([student_id minutes fromdate]
+   (let [existing (queries/get-students-required-minutes student_id (make-sqldate fromdate))]
+     (if (= 0 (count existing))
+       (db/persist! {:type :students_required_minutes
+                     :student_id student_id
+                     :fromdate (make-sqldate fromdate)
+                     :required_minutes minutes})
+       (db/update-passthrough! :students_required_minutes
+                               {:required_minutes minutes}
+                               ["student_id = ? AND fromdate = ?"
+                                student_id
+                                (make-sqldate (dates/make-date-string fromdate))])))))
 
-(defn ensure-correct-student-name [student school]
-  (let [dst-name (get-name-from-dst-fields student school)]
-    (if (not (= (:name student) dst-name))
-      (db/update! :students (:_id student) {:name dst-name}))))
 
-(defn edit-student
-  ([_id name start-date email] (edit-student _id name start-date email false))
-  ([_id name start-date email is_teacher]
+(h/deflog edit-student
+  ([_id name start-date email] (edit-student _id name start-date email false nil))
+  ([_id name start-date email is_teacher minutes]
+   (if (not= nil minutes) (edit-student-required-minutes _id minutes))
    (db/update! :students _id
                {:name name
                 :start_date (make-sqldate start-date)
@@ -128,22 +138,34 @@
                 :student_id id
                 :date (make-sqldate date-string)}))
 
+(h/deflog edit-class
+  ([_id name from-date to-date minutes] (edit-class _id name from-date to-date minutes nil))
+  ([_id name from-date to-date minutes late-time]
+   (let [class {:name name
+                :from_date (make-sqldate from-date)
+                :to_date (make-sqldate to-date)
+                :required_minutes minutes}
+         class (if (not= nil late-time)
+                 (assoc class :late_time (make-sqltime late-time))
+                 class)]
+     (db/update! :classes _id class))))
+
 (defn make-class
   ([name] (make-class name nil nil))
   ([name from_date to_date]
-    (make-class name from_date to_date db/*school-id*))
+   (make-class name from_date to_date db/*school-id*))
   ([name from_date to_date school_id]
    (let [active (-> (queries/get-classes school_id) seq boolean not)]
      (when (queries/class-not-yet-created name school_id)
        (db/persist! {:type :classes :name name :active active :school_id school_id})))))
 
-(defn add-student-to-class [student-id class-id]
+(h/deflog add-student-to-class [student-id class-id]
   (db/persist! {:type :classes_X_students :student_id student-id :class_id class-id}))
 
 (defn remove-student-from-class [student-id class-id]
   (db/delete-where!
-    :classes_X_students
-    ["student_id=? AND class_id=?" student-id class-id]))
+   :classes_X_students
+   ["student_id=? AND class_id=?" student-id class-id]))
 
 (defn- has-name [n]
   (not= "" (clojure.string/trim n)))
@@ -151,18 +173,20 @@
 (defn make-student
   ([name] (make-student name nil))
   ([name start-date] (make-student name start-date ""))
-  ([name start-date email] (make-student name start-date email false))
-  ([name start-date email is_teacher]
+  ([name start-date email] (make-student name start-date email false nil))
+  ([name start-date email is_teacher minutes]
    (when (and (has-name name)
               (queries/student-not-yet-created name))
-     (db/persist! {:type :students
-                   :name name
-                   :school_id db/*school-id*
-                   :start_date (make-sqldate start-date)
-                   :guardian_email email
-                   :olderdate nil
-                   :is_teacher is_teacher
-                   :show_as_absent nil}))))
+     (let [student (db/persist! {:type :students
+                                 :name name
+                                 :school_id db/*school-id*
+                                 :start_date (make-sqldate start-date)
+                                 :guardian_email email
+                                 :is_teacher is_teacher
+                                 :show_as_absent nil})]
+       (if (not= nil minutes)
+         (edit-student-required-minutes (:_id student) minutes))
+       student))))
 
 (defn make-student-starting-today
   ([name] (make-student-starting-today name ""))
@@ -177,8 +201,6 @@
     (db/update! :students _id {field newVal})
     (assoc student field newVal)))
 
-(defn toggle-student-older [_id]
-  (modify-student _id :olderdate #(toggle-date (:olderdate %))))
 
 (defn set-student-start-date [_id date]
   (modify-student _id  :start_date (fn [_] (make-sqldate date))))
@@ -200,91 +222,6 @@
           :name name}
          db/persist!)))
 
-(defn get-start-of-year []
-  (let [now (t/now)
-        year-adjustment (if (< (t/month now) 8) -1 0)]
-    (t/date-time (+ year-adjustment (t/year now)) 8 1)))
-
-(defn update-schools-from-dst []
-  (let [schools (queries/get-schools-with-dst)
-        new-schools (filter #(= (:_id %) nil) schools)]
-    (run! (fn [school]
-            (db/persist! {:type :schools :name (:name school) :_id (:id school)}))
-          new-schools)
-    (run! (fn [school]
-            (users/make-user (str (:short_name school) "-admin") (env :adminpass) #{roles/admin roles/user} (:id school))
-            (users/make-user (str (:short_name school)) (env :userpass) #{roles/user} (:id school)))
-          schools)))
 
 (s/defn delete-removed-students [students-to-keep :- [s/Num]]
   (db/q delete-inactive-students-y! {:students_to_keep students-to-keep}))
-
-(s/defn bulk-update-student-names [students :- [{:_id s/Num :name s/Str}] school]
-  (run! #(ensure-correct-student-name % school) students))
-
-(def DstStudent {:person_id s/Num
-                 :first_name s/Str
-                 :last_name s/Str})
-
-(s/defn create-dst-student [name :- s/Str dst-id :- s/Num school-id :- s/Num]
-  (let [new-el {:type :students
-                :name name
-                :school_id school-id
-                :dst_id dst-id
-                :start_date nil
-                :guardian_email nil
-                :olderdate nil
-                :is_teacher false
-                :show_as_absent nil}]
-    (db/persist! new-el)))
-
-(s/defn bulk-insert-new-students [dst-students :- [DstStudent] class-id :- s/Num school]
-  (run! (fn [dst]
-          (let [name (get-name-from-dst-fields dst school)
-                dst-id (:person_id dst)
-                {student-id :_id} (create-dst-student name dst-id (:_id school))]
-            (add-student-to-class student-id class-id)))
-        dst-students))
-
-(s/defn ensure-existing-students-in-class
-  [student-ids :- [s/Num] class-id :- s/Num school-id :- s/Num]
-  (let [students-in-class (->> (queries/get-all-classes-and-students school-id)
-                               :classes
-                               (filter #(= (:_id %) class-id))
-                               first
-                               :students
-                               (map :student_id)
-                               set)
-        students-not-in-class (set/difference (set student-ids) students-in-class)
-        students-to-remove (set/difference students-in-class (set student-ids))]
-    (run! (fn [student-id]
-            (add-student-to-class student-id class-id))
-          students-not-in-class)
-    (run! (fn [student-id]
-          (remove-student-from-class student-id class-id))
-        students-to-remove)))
-
-(defn update-all-students-from-dst [school]
-  (let [school-id (:_id school)
-        students (queries/get-students-with-dst school-id)
-        new-students (filter #(= nil (:dst_id %)) students)
-        existing-students (filter #(not= nil (:dst_id %)) students)
-        start-of-year (get-start-of-year)
-        class-name (str (t/year start-of-year) "-" (+ 1 (t/year start-of-year)))
-        end-of-year (t/date-time (+ 1 (t/year start-of-year)) 7 31)
-        _ (make-class class-name start-of-year end-of-year school-id)
-        {class-id :_id} (queries/get-class-by-name class-name school-id)]
-    (activate-class class-id school-id)
-
-    ; Create student records for people who don't exist
-    ; and add them to a class
-    (bulk-insert-new-students new-students class-id school)
-    (ensure-existing-students-in-class (map :_id existing-students) class-id school-id)
-    (bulk-update-student-names existing-students school)
-    ))
-
-(defn update-from-dst []
-  (update-schools-from-dst)
-  (run! (fn [school]
-          (update-all-students-from-dst school))
-        (queries/get-schools-with-dst)))

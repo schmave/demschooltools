@@ -2,10 +2,12 @@ var React = require('react'),
     Router = require('react-router'),
     helpers= require('./helpers/some'),
     classStore = require('./classstore'),
+    userStore = require('./userstore'),
     actionCreator = require('./classactioncreator'),
     Link = Router.Link,
     AdminWrapper = require('./adminwrapper.jsx'),
     studentStore = require('./StudentStore'),
+    ClassEditor = require('./classes/classEditor.jsx'),
     FilterBox = require('./filterbox.jsx');
 
 var exports = React.createClass({
@@ -66,19 +68,21 @@ var exports = React.createClass({
         return this.state.classes.map(function (classval, i) {
             var boundClick = this.classSelected.bind(this, classval),
                 selected = (classval._id === this.state.selectedClass._id)  ? "selected" : "";
+
+            var bnp = this.makeActivateClassButtonAndPanel(classval);
+            var activeTag = bnp.panel;
+            var button = bnp.button;
+            /* var activeTag = null;
+             * if (classval.active) {
+             *     activeTag = <span className="pull-right margined badge badge-green">Active</span>;
+             * }*/
             return (<tr key={classval._id}
                         id={classval.name}
                         onClick={boundClick}
                         className={selected}>
               <td>
                 <span className="pull-left">{classval.name}</span>
-                {classval.active ?
-                 <span className="pull-right margined badge badge-green">Active</span>
-                 : <span onClick={this.activateClass.bind(this, classval._id)}
-                         id={"activate-"+classval.name}
-                         className="pull-right margined badge">
-                   Activate
-                 </span>}
+                {button}
               </td>
             </tr>);
         }.bind(this));
@@ -90,15 +94,15 @@ var exports = React.createClass({
         });
     },
 
-    deleteFromClass:function(student) {
+    deleteFromClass: function(student) {
         actionCreator.deleteStudentFromClass(student.student_id, this.state.selectedClass._id);
     },
 
-    addToClass:function(student) {
+    addToClass: function(student) {
         actionCreator.addStudentToClass(student._id, this.state.selectedClass._id);
     },
 
-    activateClass:function(_id) {
+    activateClass: function(_id) {
         actionCreator.activateClass(_id);
     },
 
@@ -119,13 +123,14 @@ var exports = React.createClass({
               <div>
                 <div className="name"> {stu.name} </div>
                 <div className="attendance-button">
-                  <button onClick={this.deleteFromClass.bind(this, stu)} className="btn btn-sm btn-primary"><i className="fa fa-arrow-right">&nbsp;</i></button>
+                  <button onClick={this.deleteFromClass.bind(this, stu)} className="btn btn-xs btn-primary"><i className="fa fa-arrow-right">&nbsp;</i></button>
                 </div>
               </div>
                     </div>;
                     }.bind(this));
         return t;
     },
+
     getStudentRowsNotInCurrentClass: function() {
         var filtered = this.state.students.sort(this.rankAlphabetically)
                            .filter(this.selectedStudentContains);
@@ -134,7 +139,7 @@ var exports = React.createClass({
                         return <div key={"NOTCLASS-" + stu._id} className="out-class panel panel-info student-listing col-sm-11">
                       <div>
                         <div className="attendance-button">
-                          <button id={("add-" + stu._id)} onClick={this.addToClass.bind(this, stu)} className="btn btn-sm btn-primary"><i className="fa fa-arrow-left">&nbsp;</i></button>
+                          <button id={("add-" + stu._id)} onClick={this.addToClass.bind(this, stu)} className="btn btn-xs btn-primary"><i className="fa fa-arrow-left">&nbsp;</i></button>
                         </div>
                         <div className="name"> {stu.name} </div>
                       </div>
@@ -142,49 +147,98 @@ var exports = React.createClass({
                     }.bind(this));
         return t;
     },
+
     filterChanged: function(filter){
         this.setState({filterText: filter});
     },
+
+    toggleEdit: function (selectedClass) {
+        if(userStore.isAdmin()) {
+           this.refs.classEditor.edit(selectedClass);
+        }
+    },
+
+    makeActivateClassButtonAndPanel: function(selectedClass) {
+        var activateClassButton = null;
+        var activeClassPanel = "panel-danger";
+
+        if (selectedClass.active) {
+            activateClassButton = <span className=" margined badge badge-green pull-right">Active</span>;
+            activeClassPanel = "panel-success";
+        }
+        else {
+            activateClassButton = <button onClick={this.activateClass.bind(this, selectedClass._id)}
+                                        id={"activate-"+selectedClass.name}
+                                        className="margined btn btn-primary btn-xs pull-right">
+                          Activate
+            </button>;
+        }
+
+        if(userStore.isDstMode()){
+            activateClassButton = null;
+        }
+        return {button:activateClassButton, panel:activeClassPanel};
+    },
+
     render: function () {
-        var classActivateButton = (this.state.selectedClass.active !== true)
-                                ? <span><button id={("activate-" + this.state.selectedClass.name)} className="btn btn-sm btn-primary" onClick={this.activateClass}>Activate Class</button></span>
-                                : <span></span>;
+
+        var createClassLink =
+            <button className="btn btn-primary btn-sm" onClick={this.toggleEdit.bind(this, null)}>Add new</button>;
+            {/* <Link style={{verticalAlign: "text-bottom"}} className="btn btn-primary btn-xs" id="create-class" to="createaclass">Add new</Link>; */}
+        if(userStore.isDstMode()){
+            createClassLink = null;
+        }
+
+        var panel = this.makeActivateClassButtonAndPanel(this.state.selectedClass).panel;
+
         return <div>
-                          <div className="row margined class-listing new-class">
-                            <div className="col-sm-2 column">
-                              <table className="table table-striped center">
-                                <thead>
-                                  <tr>
-                                    <th className="center">
-                                      <span className="h2">Classes</span>&nbsp;
-                                    </th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {this.classRows()}
-                                </tbody>
-                              </table>
-                            </div>
-                            <div className="col-sm-10 column">
-                              <div className="col-sm-10 column">
-                                <FilterBox onFilterChange={this.filterChanged} />
-                              </div>
-                              <div className="col-sm-12 column">
-                                <div className="col-sm-6 column">
-                                  <div className="panel panel-info">
-                                    <div className="panel-heading absent"><b>In Class</b></div>
-                                    {this.getStudentRowsInCurrentClass()}
-                                  </div>
-                                </div>
-                                <div className="col-sm-6 column">
-                                  <div className="panel panel-info">
-                                    <div className="panel-heading absent"><b>Not In Class</b></div>
-                                    {this.getStudentRowsNotInCurrentClass()}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
+            <ClassEditor ref="classEditor">
+            </ClassEditor>
+              <div className="row margined class-listing new-class">
+                <div className="col-sm-2 column">
+                  <table className="table table-striped center">
+                    <thead>
+                      <tr>
+                        <th className="center">
+                          <span className="h2">Classes</span>&nbsp;
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>
+                        {createClassLink}
+                      </td></tr>
+                      {this.classRows()}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="col-sm-10 column">
+                  <div className= { "panel " + panel }>
+                    <div className="panel-heading absent"><b> { this.state.selectedClass.name } </b>
+
+                        <button className="btn btn-primary btn-sm" onClick={this.toggleEdit.bind(this, this.state.selectedClass)}>Edit</button>
+                    </div>
+                    <div className="col-sm-10 column">
+                      <FilterBox onFilterChange={this.filterChanged} />
+                    </div>
+                    <div className="col-sm-12 column">
+                      <div className="col-sm-6 column">
+                        <div className= { "panel " + panel }>
+                          <div className="panel-heading absent"><b>In Class</b></div>
+                          {this.getStudentRowsInCurrentClass()}
+                        </div>
+                      </div>
+                      <div className="col-sm-6 column">
+                        <div className= { "panel " + panel }>
+                          <div className="panel-heading absent"><b>Not In Class</b></div>
+                          {this.getStudentRowsNotInCurrentClass()}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
         </div>;
     }
 });

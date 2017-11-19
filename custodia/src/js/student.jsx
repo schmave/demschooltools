@@ -25,7 +25,6 @@ var exports = React.createClass({
         var studentId = this.context.router.getCurrentParams().studentId;
         return {
             studentId: studentId,
-            editing: false,
             student: studentStore.getStudent(studentId)
         };
     },
@@ -107,15 +106,15 @@ var exports = React.createClass({
             var selected = day.day === this.getActiveDay(this.state.student) ? "selected" : "";
             var clsName = hide + " " + selected;
             return <tr className={clsName}>
-                <td>
-                    <Link to="student"
-                          onClick={this.openMonth.bind(this, month)}
-                          id={"day-"+day.day}
-                          className={this.getDayClass(day)}
-                          params={{studentId: this.state.studentId, day: day.day}}>
-                        {day.day} {this.getDayStatus(day)}
-                    </Link>
-                </td>
+              <td>
+                <Link to="student"
+                      onClick={this.openMonth.bind(this, month)}
+                      id={"day-"+day.day}
+                      className={this.getDayClass(day)}
+                      params={{studentId: this.state.studentId, day: day.day}}>
+                  {day.day} {this.getDayStatus(day)}
+                </Link>
+              </td>
             </tr>;
         }.bind(this));
     },
@@ -129,29 +128,25 @@ var exports = React.createClass({
         var months = Object.keys(groupedDays);
         return months.map(function(month){
             var cls = (month===this.state.selectedMonth)
-                ? "glyphicon glyphicon-chevron-down"
+                    ? "glyphicon glyphicon-chevron-down"
                     : "glyphicon glyphicon-chevron-right";
             return <span>
-            <tr style={{fontWeight:"bold"}}>
+              <tr style={{fontWeight:"bold"}}>
                 <td onClick={this.toggleMonth.bind(this, month)}
                     style={{fontWeight:"bold"}}>
-                    <span className={cls}
-                          style={{"padding-right":"3px"}} ></span>
-                    {month}
+                  <span className={cls}
+                        style={{"padding-right":"3px"}} ></span>
+                  {month}
                 </td>
-            </tr>
-            {this.listMonth(groupedDays[month], (this.state.selectedMonth == month), month)}
+              </tr>
+              {this.listMonth(groupedDays[month], (this.state.selectedMonth == month), month)}
             </span>;
         }.bind(this));
     },
 
     toggleEdit: function () {
         if(userStore.isAdmin()) {
-            var edit = !this.state.editing;
-            this.setState({editing: edit});
-            if (edit) {
-               this.refs.studentEditor.edit(this.state.student);
-            }
+            this.refs.studentEditor.edit(this.state.student);
         }
     },
 
@@ -171,13 +166,13 @@ var exports = React.createClass({
     },
 
     showingStudentName: function () {
-        return <div className="col-sm-8" id="studentName">
-                <span id="edit-name" onClick={this.toggleEdit}>
-                    <h1 className="pull-left">{this.state.student.name}</h1>
-                    <span className="fa fa-pencil edit-student"></span>
-                </span>
+        return <div className="col-sm-8" id="studentName" >
+              <span id="edit-name" >
+                <h1 className="pull-left">{this.state.student.name}</h1>
+                <span className="fa fa-pencil edit-student"></span>
+              </span>
 
-                <h2 className="badge badge-red">{(!this.studentInToday() && this.state.student.absent_today) ? 'Absent' : ''}</h2>
+              <h2 className="badge badge-red">{(!this.studentInToday() && this.state.student.absent_today) ? 'Absent' : ''}</h2>
         </div>;
     },
 
@@ -185,64 +180,63 @@ var exports = React.createClass({
         if (this.state.student) {
             var activeDate = this.getActiveDay(this.state.student);
             var attended = (this.state.student.total_days + this.state.student.total_short).toString()
-                + " (" + this.state.student.total_short +  ")",
-                requiredMinutes = this.state.student.olderdate ? 330 : 300;
+                         + " (" + this.state.student.total_short +  ")",
+                requiredMinutes = this.state.student.required_minutes;
             return <div className="row">
 
-            <StudentEditor ref="studentEditor">
-            </StudentEditor>
-            <SwipeHelpers ref="missingSwipeCollector">
-            </SwipeHelpers>
+          <StudentEditor ref="studentEditor">
+          </StudentEditor>
+          <SwipeHelpers ref="missingSwipeCollector">
+          </SwipeHelpers>
 
-            <div className="col-sm-1"></div>
-            <div className="col-sm-10">
-                <div className="panel panel-info">
-                    <div className="panel-heading">
-                        <div className="row">
-                          {/* {!this.state.editing ? this.showingStudentName() : this.editingStudentName()} */}
-                            { this.showingStudentName() }
-                            <div className="col-sm-4">
-                                <div id="hd-attended" className="col-sm-6"><b>Attended:</b> {attended}</div>
-                                <div id="hd-absent" className="col-sm-6"><b>Unexcused:</b> {this.state.student.total_abs}</div>
-                                <div id="hd-excused" className="col-sm-6"><b>Excused:</b> {this.state.student.total_excused}</div>
-                                <div id="hd-given" className="col-sm-6"><b>Override:</b> {this.state.student.total_overrides}
-                                </div>
-                                <div id="hd-required-mins" className="col-sm-6"><b>Required
-                                    Minutes:</b> {requiredMinutes}</div>
-                            </div>
-                        </div>
+          <div className="col-sm-1"></div>
+          <div className="col-sm-10">
+            <div className="panel panel-info" >
+              <div className="panel-heading">
+                <div className="row" onClick={this.toggleEdit}>
+                  { this.showingStudentName() }
+                  <div className="col-sm-4">
+                    <div id="hd-attended" className="col-sm-6"><b>Attended:</b> {attended}</div>
+                    <div id="hd-absent" className="col-sm-6"><b>Unexcused:</b> {this.state.student.total_abs}</div>
+                    <div id="hd-excused" className="col-sm-6"><b>Excused:</b> {this.state.student.total_excused}</div>
+                    <div id="hd-given" className="col-sm-6"><b>Override:</b> {this.state.student.total_overrides}
                     </div>
-                    <div className="panel-body">
-                        <div className="row">
-                            <div className="col-sm-7">
-                                <div className="row">
-                                    {this.getActionButtons()}
-                                </div>
-                                <Heatmap days={this.state.student.days}
-                                         requiredMinutes={requiredMinutes} />
-                            </div>
-                            <div className="col-sm-2">
-                                <table className="table table-striped center">
-                                    <thead>
-                                        <tr>
-                                            <th className="center">Attendance</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {this.getPreviousDays()}
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div className="col-sm-2">
-                                {activeDate && this.state.student
-                                 ? <Swipes student={this.state.student} day={activeDate}/>
-                                 : ''}
-                            </div>
-                        </div>
-                    </div>
+                    <div id="hd-required-mins" className="col-sm-6"><b>Required
+                      Minutes:</b> {requiredMinutes}</div>
+                  </div>
                 </div>
+              </div>
+              <div className="panel-body">
+                <div className="row">
+                  <div className="col-sm-7">
+                    <div className="row">
+                      {this.getActionButtons()}
+                    </div>
+                    <Heatmap days={this.state.student.days}
+                             requiredMinutes={requiredMinutes} />
+                  </div>
+                  <div className="col-sm-2">
+                    <table className="table table-striped center">
+                      <thead>
+                        <tr>
+                          <th className="center">Attendance</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {this.getPreviousDays()}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="col-sm-2">
+                    {activeDate && this.state.student
+                     ? <Swipes student={this.state.student} day={activeDate}/>
+                     : ''}
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="col-sm-1"></div>
+          </div>
+          <div className="col-sm-1"></div>
             </div>;
 
         } else {

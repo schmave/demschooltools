@@ -25,6 +25,27 @@ INNER JOIN overseer.years y
 WHERE y.name= :year_name AND e.student_id = :student_id;
 
 -- name: get-student-page-y
+WITH student_school_days AS (
+      SELECT
+      a.school_day AS days,
+      s._id        AS student_id
+      , s.archived
+      , (CASE WHEN stumin.required_minutes IS NULL
+              THEN c.required_minutes ELSE stumin.required_minutes END)
+              AS requiredmin
+      FROM overseer.school_days AS a
+      JOIN overseer.students s ON (s._id = :student_id)
+      LEFT JOIN overseer.student_newest_required_minutes stumin
+           ON (stumin.student_id = :student_id
+              AND stumin.fromdate = (SELECT MAX(isrm.fromdate)
+                                     FROM overseer.students_required_minutes isrm
+                                     WHERE isrm.fromdate <= a.school_day
+                                     AND stumin.student_id = isrm.student_id))
+      JOIN overseer.classes c ON (c._id = :class_id)
+      WHERE (s.start_date < a.school_day OR s.start_date IS NULL)
+            AND a.class_id = :class_id
+            AND a.year_name = :year_name
+    )
 SELECT
   schooldays.student_id
   , to_char(s.in_time at time zone :timezone, 'HH:MI:SS') as nice_in_time
@@ -36,15 +57,12 @@ SELECT
   , s.intervalmin
   , o._id has_override
   , e._id has_excuse
-  , schooldays.olderdate
   , s._id
   , schooldays.archived
   , (CASE WHEN s._id IS NOT NULL THEN 'swipes' ELSE '' END) as type
-  , (CASE WHEN schooldays.olderdate IS NULL
-               OR schooldays.olderdate > schooldays.days
-               THEN 300 ELSE 330 END) as requiredmin
+  , schooldays.requiredmin
   , schooldays.days AS day
-FROM overseer.student_school_days(:student_id, :year_name, :class_id) AS schooldays
+FROM student_school_days AS schooldays
 LEFT JOIN overseer.swipes s
       ON (
        ((schooldays.days = date(s.in_time AT TIME ZONE :timezone))
@@ -58,34 +76,44 @@ LEFT JOIN overseer.excuses e
 WHERE schooldays.days IS NOT NULL
 ORDER BY schooldays.days DESC;
 
+-- name: students-required-minutes-y
+SELECT * FROM overseer.students_required_minutes WHERE student_id = :student_id AND fromdate = :fromdate;
+
 -- name: student-list-in-out-y
-select stu.name
-       , stu._id
-       , stu.show_as_absent
-       , stu.is_teacher
-       , stu.archived
-       , CASE WHEN l.outs >= l.ins THEN 'out'
-         ELSE 'in'
-         END AS last_swipe_type
-       , CASE WHEN l.outs >= l.ins THEN l.outs
-         ELSE l.ins
-         END AS last_swipe_date
-         FROM overseer.students stu
-LEFT JOIN (SELECT max(s.in_time) AS ins
-                , max(s.out_time) AS outs
-                , s.student_id
-                FROM overseer.swipes s
-           GROUP BY s.student_id
-           ORDER BY ins, outs) AS l
-     ON (l.student_id = stu._id)
-     INNER JOIN overseer.classes c ON (1=1)
-     INNER JOIN overseer.classes_X_students cXs ON (cXs.student_id = stu._id AND cXs.class_id = c._id)
-WHERE (stu.archived = :show_archived
-       OR stu.archived = FALSE)
-AND c.active = TRUE
-AND stu.school_id = :school_id
-ORDER BY stu.name
-;
+SELECT
+  stu.name,
+  stu._id,
+  stu.show_as_absent,
+  stu.is_teacher,
+  stu.archived,
+  c.late_time AS late_time,
+  l.last_swipe_type,
+  l.last_swipe_date,
+  l.last_swipe_date > current_date as swiped_today,
+  l.last_swipe_date > (current_date + c.late_time) as swiped_today_late
+FROM
+  overseer.students stu
+  LEFT JOIN (
+  (SELECT
+      CASE WHEN subl.outs >= subl.ins THEN 'out' ELSE 'in' END AS last_swipe_type,
+      CASE WHEN subl.outs >= subl.ins THEN subl.outs ELSE subl.ins END AS last_swipe_date,
+      subl.student_id
+      FROM (SELECT
+              max(s.in_time) AS ins,
+              max(s.out_time) AS outs,
+              s.student_id
+            FROM overseer.swipes s
+            GROUP BY s.student_id
+            ORDER BY ins, outs) as subl)) AS l ON (l.student_id = stu._id)
+  INNER JOIN overseer.classes c ON (1 = 1)
+  INNER JOIN overseer.classes_X_students cXs ON (cXs.student_id = stu._id
+          AND cXs.class_id = c._id)
+  WHERE (stu.archived = :show_archived
+        OR stu.archived = FALSE)
+    AND c.active = TRUE
+    AND stu.school_id = :school_id
+  ORDER BY
+      stu.name;
 
 -- name: get-school-days-y
 SELECT DISTINCT days2.days
@@ -101,6 +129,45 @@ FROM (SELECT
 ORDER BY days2.days;
 
 -- name: student-report-y
+WITH
+    school_days AS (
+      SELECT a.school_day, s._id student_id, s.archived
+      , (CASE WHEN stumin.required_minutes IS NULL
+         THEN c.required_minutes ELSE stumin.required_minutes END) AS requiredmin
+      FROM overseer.school_days AS a
+      JOIN overseer.classes_X_students cXs ON (cXs.class_id = :class_id)
+      JOIN overseer.students s ON (s._id = cXs.student_id)
+      JOIN overseer.classes c ON (c._id = :class_id)
+      LEFT JOIN overseer.student_newest_required_minutes AS stumin ON (
+           stumin.student_id = s._id
+           AND stumin.fromdate = (SELECT MAX(isrm.fromdate)
+                                 FROM overseer.students_required_minutes isrm
+                                 WHERE isrm.fromdate <= a.school_day
+                                 AND stumin.student_id = isrm.student_id))
+      WHERE cXs.class_id = :class_id
+      AND a.class_id = :class_id
+      AND a.year_name = :year_name
+      AND (s.start_date < a.school_day OR s.start_date IS NULL)
+  ), eachDay AS (
+      SELECT
+      schooldays.student_id
+      , max(s._id) anyswipes
+      , max(o._id) oid
+      , max(e._id) eid
+      , schooldays.requiredmin
+      , sum(s.intervalmin) as intervalmin
+      , schooldays.school_day AS day
+      FROM school_days as schooldays
+      LEFT JOIN overseer.swipes s
+      ON (schooldays.school_day = date(s.in_time AT TIME ZONE :timezone)
+      AND schooldays.student_id = s.student_id)
+      LEFT JOIN overseer.overrides o
+      ON (schooldays.school_day = o.date AND o.student_id = schooldays.student_id)
+      LEFT JOIN overseer.excuses e
+      ON (schooldays.school_day = e.date AND e.student_id = schooldays.student_id)
+      WHERE schooldays.school_day IS NOT NULL
+      GROUP BY schooldays.student_id, day, requiredmin
+)
 SELECT
   stu.student_id
     , stu.student_id as _id
@@ -121,29 +188,7 @@ SELECT
                    AND eid IS NULL
                    AND oid IS NULL
            THEN 1 ELSE 0 END) as unexcused
-FROM (
-      SELECT
-        schooldays.student_id
-        , max(s._id) anyswipes
-        , max(o._id) oid
-        , max(e._id) eid
-        , schooldays.olderdate
-        , (CASE WHEN schooldays.olderdate IS NULL
-                     OR schooldays.olderdate > schooldays.days
-                     THEN 300 ELSE 330 END) as requiredmin
-        , sum(s.intervalmin) as intervalmin
-        , schooldays.days AS day
-      FROM overseer.school_days(:year_name, :class_id) as schooldays
-      LEFT JOIN overseer.swipes s
-                      ON (schooldays.days = date(s.in_time AT TIME ZONE :timezone)
-                          AND schooldays.student_id = s.student_id)
-      LEFT JOIN overseer.overrides o
-                ON (schooldays.days = o.date AND o.student_id = schooldays.student_id)
-      LEFT JOIN overseer.excuses e
-                ON (schooldays.days = e.date AND e.student_id = schooldays.student_id)
-      WHERE schooldays.days IS NOT NULL
-      GROUP BY schooldays.student_id, day, schooldays.olderdate
-  ) AS stu
+FROM eachDay AS stu
 GROUP BY stu.student_id;
 
 -- name: swipes-in-year-y
@@ -174,10 +219,40 @@ ORDER BY s.name;
 SELECT _id from overseer.classes where active = true and school_id = :school_id;
 
 -- name: get-students-y
-SELECT * from overseer.students where school_id = :school_id;
+SELECT s.*
+       , (CASE WHEN snrm.required_minutes IS NULL
+          THEN c.required_minutes ELSE snrm.required_minutes END)
+           AS required_minutes
+FROM overseer.students s
+LEFT JOIN overseer.student_newest_required_minutes snrm
+     ON (snrm.student_id = s._id
+         AND snrm.fromdate = (SELECT MAX(isrm.fromdate)
+                              FROM overseer.students_required_minutes isrm
+                              WHERE isrm.fromdate <= current_date
+                              AND snrm.student_id = isrm.student_id))
+LEFT JOIN overseer.classes c ON (c.active = true)
+LEFT JOIN overseer.classes_X_students cXs
+     ON (cXs.student_id = s._id AND cXs.class_id = c._id)
+WHERE s.school_id = :school_id;
+
 
 -- name: get-student-y
-SELECT * from overseer.students where _id = :student_id and school_id = :school_id;
+SELECT s.*
+       , (CASE WHEN snrm.required_minutes IS NULL
+         THEN c.required_minutes ELSE snrm.required_minutes END)
+         AS required_minutes
+FROM overseer.students s
+LEFT JOIN overseer.student_newest_required_minutes snrm
+     ON (snrm.student_id = s._id
+         AND snrm.fromdate = (SELECT MAX(isrm.fromdate)
+                              FROM overseer.students_required_minutes isrm
+                              WHERE isrm.fromdate <= current_date
+                              AND snrm.student_id = isrm.student_id))
+LEFT JOIN overseer.classes c ON (c.active = true)
+LEFT JOIN overseer.classes_X_students cXs
+     ON (cXs.student_id = s._id AND cXs.class_id = c._id)
+WHERE s._id = :student_id
+AND s.school_id = :school_id;
 
 -- name: get-years-y
 SELECT * from overseer.years where school_id = :school_id;
@@ -186,8 +261,18 @@ SELECT * from overseer.years where school_id = :school_id;
 SELECT * from overseer.schools;
 
 -- name: get-classes-y
-SELECT c.name, c._id, c.active, cXs.student_id, s.name student_name
-FROM overseer.classes c
+SELECT
+  c.name,
+  c._id,
+  c.from_date,
+  c.to_date,
+  c.active,
+  cXs.student_id,
+  s.name student_name,
+  c.required_minutes,
+  (current_date + c.late_time) as late_time
+FROM
+  overseer.classes c
 LEFT JOIN overseer.classes_X_students cXs ON (cXs.class_id = c._id)
 LEFT JOIN overseer.students s ON (cXs.student_id = s._id)
 WHERE c.school_id = :school_id

@@ -2,7 +2,6 @@
   (:require [compojure.core :refer [defroutes GET PUT POST DELETE ANY]]
             [compojure.coercions :refer [as-int]]
             [ring.util.response :as resp]
-            [clojure.tools.trace :as trace]
             [overseer.db :as db]
             [overseer.queries :as queries]
             [overseer.commands :as cmd]

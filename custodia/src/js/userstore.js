@@ -4,6 +4,7 @@ var EventEmitter = require('events').EventEmitter,
     ajax = require('./ajaxhelper');
 
 var isAdmin;
+var isDstMode;
 var isSuper;
 var users =[];
 var schools = [];
@@ -11,6 +12,9 @@ var currentSchool;
 var CHANGE_EVENT = "CHANGE!";
 
 var exports = assign({}, EventEmitter.prototype, {
+    isDstMode: function () {
+        return isDstMode;
+    },
     isAdmin: function () {
         return isAdmin;
     },
@@ -46,6 +50,7 @@ var exports = assign({}, EventEmitter.prototype, {
 
 ajax.get('/users/is-admin').then(function (data) {
     isAdmin = data.admin;
+    isDstMode = data.dstMode;
     currentSchool = data.school;
     exports.emitChange();
 }, function (data) {
@@ -55,6 +60,7 @@ ajax.get('/users/is-admin').then(function (data) {
 
 ajax.get('/users/is-super').then(function (data) {
     isSuper = data.super;
+    isDstMode = data.dstMode;
     currentSchool = data.school;
     exports.emitChange();
     if (data.super) {

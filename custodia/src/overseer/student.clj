@@ -2,7 +2,6 @@
   (:require [compojure.core :refer [defroutes GET PUT POST DELETE ANY]]
             [compojure.coercions :refer [as-int]]
             [ring.util.response :as resp]
-            [clojure.tools.trace :as trace]
             [overseer.db :as db]
             [overseer.queries :as queries]
             [overseer.commands :as cmd]
@@ -12,11 +11,8 @@
             [overseer.roles :as roles]
             [cemerick.friend :as friend]))
 
-(defn student-attendence [student-id]
-  (first (att/get-student-with-att student-id)))
-
 (defn student-page-response [student-id]
-  (resp/response {:student (student-attendence student-id)}))
+  (resp/response {:student (first (att/get-student-with-att student-id))}))
 
 (defn show-archived? [] true)
 
@@ -35,10 +31,11 @@
   (GET "/students/:id" [id :<< as-int]
        (friend/authorize #{roles/user} (student-page-response id)))
 
-  (POST "/students" [name start_date email is_teacher]
+  (POST "/students" [name start_date email minutes is_teacher]
         (friend/authorize #{roles/admin}
-                          (resp/response {:made (cmd/make-student name start_date email is_teacher)
-                                          :students (queries/get-students)})))
+                          (let [minutes (if (not= nil minutes) (read-string minutes) nil)]
+                            (resp/response {:made (cmd/make-student name start_date email is_teacher minutes)
+                                            :students (queries/get-students)}))))
 
   (PUT "/user" [name password]
     (friend/authorize #{roles/super}
@@ -47,14 +44,14 @@
     (friend/authorize #{roles/super}
                       (resp/response {:users (users/get-users)})))
 
-  (PUT "/students/:id" [id :<< as-int name start_date email is_teacher]
+  (PUT "/students/:id" [id :<< as-int name start_date email minutes :<< as-int is_teacher]
        (friend/authorize #{roles/admin}
-                         (cmd/edit-student id name start_date email is_teacher))
+                         (cmd/edit-student id name start_date email is_teacher minutes))
        (student-page-response id))
 
   (POST "/students/:id/togglehours" [id :<< as-int]
         (friend/authorize #{roles/admin}
-                          (do (cmd/toggle-student-older id)
+                          (do (cmd/edit-student-required-minutes id)
                               (student-page-response id))))
 
   (POST "/students/:id/absent" [id :<< as-int]

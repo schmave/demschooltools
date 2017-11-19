@@ -34,11 +34,12 @@ var exports = {
                 });
             });
     },
-    createStudent: function (name, start_date, email, is_teacher) {
+    createStudent: function (name, start_date, email, minutes, is_teacher) {
         ajax.post('/students', {
             name: name,
             email: email,
             start_date: start_date,
+            minutes: minutes,
             is_teacher: is_teacher
         }).then(function (data) {
             dispatcher.dispatch({
@@ -77,11 +78,12 @@ var exports = {
             });
         }.bind(this));
     },
-    updateStudent: function (id, name, start_date, email, is_teacher) {
+    updateStudent: function (id, name, start_date, email, minutes, is_teacher) {
         ajax.put('/students/' + id, {
             name: name,
             start_date: start_date,
             email: email,
+            minutes: minutes,
             is_teacher: is_teacher
         }).then(function (data) {
             this.loadStudents();

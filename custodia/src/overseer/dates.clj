@@ -2,7 +2,6 @@
   (:require [com.ashafa.clutch :as couch]
             [overseer.db :as db]
             [overseer.helpers :refer :all]
-            [clojure.tools.trace :as trace]
             [clj-time.format :as f]
             [clj-time.local :as l]
             [clj-time.core :as t]
@@ -33,6 +32,9 @@
     (if (and out-time in-time)
       (t/in-minutes (t/interval in-time out-time))
       0M)))
+
+(defn from-sql-time [inst]
+  (f/unparse (f/with-zone time-format local-time-zone-id) (c/from-sql-date inst)))
 
 (defn make-date-string-without-timezone [d]
   (when d

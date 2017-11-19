@@ -18,6 +18,7 @@
             [clojure.pprint :as pp]
             [overseer.db :as db]
             [overseer.commands :as cmd]
+            [overseer.dst-imports :as dst]
             [overseer.queries :as queries]
             [overseer.database.sample-db :as sampledb]
             [overseer.dates :as dates]
@@ -48,7 +49,7 @@
 (defroutes app
   (POST "/updatefromdst" req
         (friend/authorize #{roles/admin}
-                          (resp/response (cmd/update-from-dst))))
+                          (resp/response (dst/update-from-dst))))
 
   (GET "/" []
        (friend/authenticated
@@ -93,10 +94,12 @@
   (GET "/users/is-admin" req
        (resp/response
         {:admin (-> req friend/current-authentication :roles roles/admin)
+         :dstMode (env :dst-mode)
          :school (queries/get-current-school)}))
   (GET "/users/is-super" req
        (let [user (users/get-user "super")]
          (resp/response {:super (-> req friend/current-authentication :roles roles/super)
+                         :dstMode (env :dst-mode)
                          :school (queries/get-current-school)})))
 
   (GET "/js/gen/:id{.+}/app.js" req

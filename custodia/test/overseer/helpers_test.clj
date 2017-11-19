@@ -13,12 +13,14 @@
 
 
 (defn today-at-utc [h m]
-  (t/plus (t/today-at h m) (t/hours 4)))
+  (t/to-time-zone (l/to-local-date-time (t/today-at h m)) t/utc))
+
 
 (defn get-att [id]
   (first (att/get-student-with-att id)))
 
-(def _2014_10-14_9-14am (t/date-time 2014 10 14 14 9 27 246)) 
+
+(def _2014_10-14_9-14am (t/date-time 2014 10 14 14 9 27 246))
 (def _2014_10_15 (t/plus _2014_10-14_9-14am (t/days 1)))
 (def _2014_10_16 (t/plus _2014_10-14_9-14am (t/days 2)))
 (def _2014_10_17 (t/plus _2014_10-14_9-14am (t/days 3)))

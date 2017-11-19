@@ -1,4 +1,5 @@
 pom.xml
+*.log
 *.dump
 *.swp
 /classes/

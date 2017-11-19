@@ -4,17 +4,17 @@
             [overseer.queries :as queries]
             [overseer.dates :refer :all]
             [overseer.commands :as cmd]
-            [clojure.tools.trace :as trace]
             [clj-time.format :as f]
             [clj-time.local :as l]
             [clj-time.core :as t]
             [schema.core :as s]
             [clj-time.coerce :as c]
-            ))
+
+            [clojure.tools.logging :as log]))
 (def DayInformation
   {:student_id s/Num
    :day s/Str
-   :requiredmin (s/enum 300 330)
+   :requiredmin s/Num
    :has_excuse s/Bool
    :has_override s/Bool})
 
@@ -95,7 +95,7 @@
         min-minutes (-> records first :requiredmin)]
     {:valid (and (not has-excuse?)
                  (or has-override?
-                     (> int-mins min-minutes)))
+                     (>= int-mins min-minutes)))
      :short (boolean (or (and (not has-override?)
                               (not has-excuse?)
                               (seq (only-swipes records)))
@@ -121,6 +121,7 @@
   ([show-archived]
    (let [today-string (make-date-string (t/now))
          inout (queries/get-student-list-in-out show-archived)
+         _ (log/debug "student-list-in-out" inout)
          inout (map #(assoc %
                             :in_today (= today-string
                                          (make-date-string (:last_swipe_date %)))
@@ -189,6 +190,8 @@
                     :last_swipe_type last-swipe-type
                     :last_swipe_date last-swipe-date
                     :days summed-days})))
+
+;; (queries/get-student-page 3 (get-current-year-string (queries/get-years)))
 
 (defn get-student-with-att
   ([id] (get-student-with-att id (get-current-year-string (queries/get-years))))

@@ -5,13 +5,13 @@ var exports = React.createClass({
     submit: function(){
         actionCreator.createClass(this.refs.name.getDOMNode().value);
     },
+
     render: function () {
         return <div className="row">
             <div className="col-sm-4"></div>
             <div className="col-sm-4">
                 <div className="panel panel-success">
                     <div className="panel-heading">
-                        <h3 className="panel-title">Add Class</h3>
                     </div>
                     <div className="panel-body">
                         <form>

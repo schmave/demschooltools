@@ -7,13 +7,15 @@
             [clojure.test :refer :all]
             [overseer.attendance :as att]
             [overseer.commands :as cmd]
+            [overseer.dst-imports :as dst]
             [overseer.queries :as queries]
             [overseer.database.users :as users]
             [overseer.database.connection :as conn]
             [overseer.dates :as dates]
             [overseer.db :as db]
             [overseer.helpers-test :refer :all]
-            [schema.test :as tests]))
+            [schema.test :as tests]
+            [clojure.tools.logging :as log]))
 
 (comment
   (run-tests 'overseer.web-test)
@@ -46,10 +48,11 @@
 (deftest bulk-create-students-test
   (sample-db false)
   (let [active-class (queries/get-active-class)
-        _ (cmd/bulk-insert-new-students [{:person_id 1 :first_name "a" :last_name "b"}
+        _ (pp/pprint active-class)
+        _ (dst/bulk-insert-new-students [{:person_id 1 :first_name "a" :last_name "b"}
                                          {:person_id 2 :first_name "c" :last_name "d"}]
                                         active-class
-                                        db/*school-id*)
+                                        {:_id db/*school-id*})
         students (att/get-student-list)]
     (is (= 4 (count students)))
     (is (= "a b" (->> students (filter (fn [s] (= (:_id s) 3))) first :name)))
@@ -64,7 +67,7 @@
         _ (cmd/add-student-to-class id1 active-class)
         {id2 :_id} (cmd/make-student "2")
         {id3 :_id} (cmd/make-student "3")
-        _ (cmd/ensure-existing-students-in-class [id1 id2 id3] active-class)
+        _ (dst/ensure-existing-students-in-class [id1 id2 id3] active-class db/*school-id*)
         students-in-class (->> (queries/get-all-classes-and-students)
                                :classes first :students (map :student_id) set)]
     (do
@@ -73,17 +76,18 @@
 
 (deftest bulk-update-student-names
   (sample-db false)
-  (let [{id1 :_id} (cmd/make-student "1")
-        {id2 :_id} (cmd/make-student "2")
-        {id3 :_id} (cmd/make-student "3")
-        _ (cmd/bulk-update-student-names [{:_id id1 :name "11"}
-                                          {:_id id2 :name "2"}
-                                          {:_id id3 :name "33"}
-                                          ])]
+  (let [s1 (cmd/make-student "1")
+        s2 (cmd/make-student "2")
+        s3 (cmd/make-student "3")
+        _ (dst/bulk-update-student-names [(assoc s1 :display_name "ape" :first_name "1" :last_name "1")
+                                          (assoc s2 :display_name "ape" :first_name "2" :last_name "2")
+                                          (assoc s3 :display_name "ape" :first_name "3" :last_name "3")
+                                          ]
+                                          db/*school-id*)]
     (do
-      (is (= "11" (-> id1 queries/get-student first :name)))
-      (is (= "2" (-> id2 queries/get-student first :name)))
-      (is (= "33" (-> id3 queries/get-student first :name))))))
+      (is (= "1 1" (-> (:_id s1) queries/get-student first :name)))
+      (is (= "2 2" (-> (:_id s2) queries/get-student first :name)))
+      (is (= "3 3" (-> (:_id s3) queries/get-student first :name))))))
 
 (deftest bulk-drop-class-students-not-in-list
   (do (sample-db false)
@@ -142,12 +146,53 @@
         (is (= (:in_time passed) (:in_time result)))
         (is (= (:in_time passed) (:out_time result)))))
     )
-
   )
 
 (deftest no-student-name-invalid
   (testing "Email is set"
     (is (= nil (cmd/make-student "  ")))))
+
+(deftest edit-class-test
+  (sample-db true)
+  (let [
+        {sid :_id } (cmd/make-class "test")
+        from "2015-10-20"
+        to "2016-10-20"]
+    (cmd/edit-class sid "test2" from to 500)
+    (let [cls (->> (queries/get-classes) (filter #(= (:name %) "test2")) first)]
+      (testing "fields are set"
+        (is (= (c/to-sql-time to) (:to_date cls)))
+        (is (= (c/to-sql-time from) (:from_date cls)))
+        (is (= 500 (:required_minutes cls)))))))
+
+(deftest edit-class-late-time-test
+  (sample-db true)
+  (let [{cid :_id } (cmd/make-class "test")
+        {sid :_id} (cmd/make-student "test")
+        {sid2 :_id} (cmd/make-student "test2")
+        _late (today-at-utc 10 55)
+        _early (today-at-utc 10 35)
+        from "2015-10-20"
+        to "2016-10-20"]
+
+    (cmd/activate-class cid)
+
+    (cmd/add-student-to-class sid cid)
+    (cmd/add-student-to-class sid2 cid)
+    (cmd/edit-class cid "test" from to 500 "10:45")
+
+    (cmd/swipe-in sid _late)
+    (cmd/swipe-in sid2 _early)
+
+    (let [in-out (queries/get-student-list-in-out false)]
+      (log/debug in-out)
+      (testing "Student 'late'"
+        (is (= true (->> in-out (filter #(= (:_id %) sid)) first :swiped_today_late)))
+        (is (= false (->> in-out (filter #(= (:_id %) sid2)) first :swiped_today_late)))))
+
+    (let [cls (->> (queries/get-classes) (filter #(= (:name %) "test")) first)]
+      (testing "fields are set with correct timezone"
+        (is (= "10:45:00" (:late_time cls)))))))
 
 (deftest set-student-email
   (sample-db true)
@@ -180,6 +225,7 @@
         (cmd/override-date sid "2014-10-14")
         (let [att (get-att sid)]
           (testing "Total Valid Day Count"
+
             (is (= (:total_days att)
                    1)))
           (testing "Total Abs Count"
@@ -187,7 +233,7 @@
                    0)))
           (testing "Total Hours"
             (is (= (:total_hours att)
-                   5)))
+                   (/ 23 4))))
           (testing "Override"
             (is (= (-> att :days first :override)
                    true)))
@@ -423,7 +469,7 @@
                    1)))
           (testing "Total Hours"
             (is (= (:total_hours att)
-                   26.5M)))
+                   27.25M)))
           (testing "Days sorted correctly"
             (is (= (-> att :days first :day)
                    "2014-10-20")))
@@ -496,18 +542,64 @@
           (testing "swiping out on another day just is an out"
             (is (= 2 (-> att :days count))))))))
 
+(deftest only-one-required-minutes-per-day
+  (do (sample-db)
+      (let [
+            {sid :_id} (cmd/make-student "test")
+            {sid2 :_id} (cmd/make-student "test2")
+            ]
+
+        (cmd/add-student-to-class sid (get-class-id-by-name "2014-2015"))
+
+        (cmd/edit-student-required-minutes sid 325 (t/plus _2014_10-14_9-14am (t/minutes -15)))
+        (cmd/edit-student-required-minutes sid 425 (t/plus _2014_10-14_9-14am (t/minutes -13)))
+        (cmd/edit-student-required-minutes sid 525 (t/plus _2014_10-14_9-14am (t/minutes -10)))
+
+        (cmd/edit-student-required-minutes sid2 400 (t/plus _2014_10-14_9-14am (t/minutes -15)))
+
+        (cmd/swipe-in sid _2014_10-14_9-14am)
+        (cmd/swipe-out sid (t/plus _2014_10-14_9-14am (t/minutes 524)))
+
+        (let [
+              att  (att/get-student-with-att sid)
+              att2  (att/get-student-with-att sid2)
+              student-days (queries/get-student-page 3 (dates/get-current-year-string (queries/get-years)))]
+          (testing "has one valid, kept last for same day s1, and didn't update s2"
+            (is (= (count att) 1 ))
+            (is (= 525 (-> att first :required_minutes)))
+            (is (= 400 (-> att2 first :required_minutes)))
+
+            )
+          )))
+  )
+
 (deftest students-with-att
   (do (sample-db)
       (testing "students with att"
         (is (not= '() (att/get-student-with-att 1))))
       (let [s (cmd/make-student "test")
-            sid (:_id s)]
+            sid (:_id s)
+            {sid2 :_id} (cmd/make-student "test2")
+            {sid3 :_id} (cmd/make-student "test3")
 
-        (cmd/add-student-to-class sid (get-class-id-by-name "2014-2015"))
-        (cmd/swipe-in sid _2014_10-14_9-14am)
-        (cmd/swipe-out sid (t/plus _2014_10-14_9-14am (t/minutes 331)))
+            ;;{cid :_id } (cmd/make-class "test")
+            ]
 
-        (let [att  (att/get-student-with-att sid)]
+        (run! (fn [sid]
+                (cmd/add-student-to-class sid (get-class-id-by-name "2014-2015"))
+                (cmd/edit-student-required-minutes sid 325 (t/plus _2014_10-14_9-14am (t/years -1)))
+
+                (cmd/swipe-in sid _2014_10-14_9-14am)
+                (cmd/swipe-out sid (t/plus _2014_10-14_9-14am (t/minutes 345)))
+                )
+             [sid sid2 sid3])
+
+        (let [att  (att/get-student-with-att sid)
+              student-days (queries/get-student-page 3 (dates/get-current-year-string (queries/get-years)))]
+          ;;(pp/pprint att)
+          (pp/pprint student-days)
+          (testing "only one day of swipes"
+            (is (= 1 (count student-days))))
           (testing "has one valid"
             (is (=  (-> att first :total_days) 1 )))
           (testing "students with att doesn't throw exceptions"
@@ -574,7 +666,7 @@
         (cmd/swipe-in sid (t/minus _3pm (t/hours 1)))
         (cmd/swipe-out sid _3pm)
         (cmd/add-student-to-class sid (get-class-id-by-name "2014-2015"))
-        (let [att  (att/get-student-list)
+        (let [att (att/get-student-list)
               our-hero (filter #(= sid (:_id %)) att)]
           (testing "Student Count"
             (is (= (->> our-hero count) 1))
@@ -596,25 +688,67 @@
           (is (= (->> att (filter (complement :in_today)) count) 3))
           ))))
 
+(deftest student-no-required-minutes-default-345
+  (do (sample-db)
+      (let [sid (:_id (cmd/make-student "test"))
+            today (today-at-utc 10 0)
+            yesterday (-> today (t/minus (t/days 1)))
+            tomorrow (-> today (t/plus (t/days 1)))
+            day-after-next (-> today (t/plus (t/days 2)))
+            _ (cmd/edit-student-required-minutes sid 100 day-after-next)
+            student (first (queries/get-students sid))
+            ]
+
+        (cmd/add-student-to-class sid (get-class-id-by-name "2014-2015"))
+        (cmd/swipe-in sid today)
+        (cmd/swipe-out sid (t/plus today (t/minutes 101)))
+
+        (let [att (get-att sid)]
+          (testing "Total Valid Day Count"
+            (is (= 0 (-> att :total_days)))))
+
+        (cmd/swipe-in sid day-after-next)
+        (cmd/swipe-out sid (t/plus day-after-next (t/minutes 50)))
+
+        (cmd/swipe-in sid (t/plus day-after-next (t/minutes 51)))
+        (cmd/swipe-out sid (t/plus day-after-next (t/minutes 102)))
+
+        (let [att (get-att sid)]
+          (pp/pprint att)
+          (testing "Total Valid Day Count"
+            (is (= 1 (-> att :total_days)))))
+
+        (testing "Student minute count"
+          (is (= 345 (-> student :required_minutes)))
+          (is (= 345 (:required_minutes (queries/get-class-by-name "2014-2015"))))
+
+          (cmd/edit-student-required-minutes sid 346)
+          (let [student (first (queries/get-students sid))]
+            (is (= 346 (-> student :required_minutes)))
+            (is (= 345 (:required_minutes (queries/get-class-by-name "2014-2015")))))))))
+
+
 (deftest older-student-required-minutes
   (do (sample-db)
-      (let [s (cmd/make-student "test")
-            sid (:_id s)
-            s (cmd/toggle-student-older sid)
-            s (first (queries/get-students sid))
-            tomorrow (-> (today-at-utc 10 0) (t/plus (t/days 1)))
-            day-after-next (-> (today-at-utc 10 0) (t/plus (t/days 2)))
+      (let [sid (:_id (cmd/make-student "test"))
+            today (today-at-utc 10 0)
+            yesterday (-> today (t/minus (t/days 1)))
+            tomorrow (-> today (t/plus (t/days 1)))
+            day-after-next (-> today (t/plus (t/days 2)))
+            _ (cmd/edit-student-required-minutes sid 400 yesterday)
+            _ (cmd/edit-student-required-minutes sid 100 today)
+            _ (first (queries/get-students sid))
             ]
 
         (cmd/add-student-to-class sid (get-class-id-by-name "2014-2015"))
         (cmd/swipe-in sid tomorrow)
-        (cmd/swipe-out sid (t/plus tomorrow (t/minutes 331)))
+        (cmd/swipe-out sid (t/plus tomorrow (t/minutes 99)))
 
-        (cmd/swipe-in sid (t/plus tomorrow (t/days 2)))
-        (cmd/swipe-out sid (t/plus tomorrow (t/days 2) (t/minutes 329)))
+        (cmd/swipe-in sid day-after-next)
+        (cmd/swipe-out sid (t/plus day-after-next (t/minutes 101)))
 
         (let [att (get-att sid)]
-          ;; (pp/pprint att)
+          (pp/pprint att)
           (testing "Total Valid Day Count"
             (is (= 1 (-> att :total_days)))))))
   )

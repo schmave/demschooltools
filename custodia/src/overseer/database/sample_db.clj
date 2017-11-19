@@ -3,7 +3,6 @@
             [clj-time.core :as t]
             [clojure.test :refer :all]
             [overseer.db :as db]
-            [clojure.tools.trace :as trace]
             [overseer.commands :as cmd]
             [overseer.queries :as queries]
             [overseer.database.connection :as conn]

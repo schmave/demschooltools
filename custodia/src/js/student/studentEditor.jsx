@@ -31,17 +31,19 @@ module.exports = React.createClass({
 
     saveChange: function () {
         this.savingShow();
-        var startDate = this.refs.startdate.props.value || new Date();
+        var startDate = this.refs.startdate.props.value;
         if (this.state.student._id == null) {
             actionCreator.createStudent(this.refs.name.getDOMNode().value,
                                         startDate,
                                         this.refs.email.getDOMNode().value,
+                                        this.refs.required_minutes.getDOMNode().value,
                                         this.state.student.is_teacher);
         } else {
             actionCreator.updateStudent(this.state.student._id,
                                         this.refs.name.getDOMNode().value,
                                         startDate,
                                         this.refs.email.getDOMNode().value,
+                                        this.refs.required_minutes.getDOMNode().value,
                                         this.state.student.is_teacher);
         }
     },
@@ -51,15 +53,8 @@ module.exports = React.createClass({
         this.setState(
             {student: s,
              creating: (!s._id),
-             startdate_datepicker: (s.start_date) ? new Date(s.start_date) : new Date()})
+             startdate_datepicker: (s.start_date) ? new Date(s.start_date) : null})
         this.refs.studentEditor.show();
-    },
-
-    toggleHours: function () {
-        if (this.state.student._id > 0) {
-            this.state.student.olderdate = !!!this.state.student.olderdate;
-            actionCreator.toggleHours(this.state.student._id);
-        }
     },
 
     close: function () {
@@ -108,18 +103,11 @@ module.exports = React.createClass({
                 onChange={this.handleChange}
                 value={this.state.student.guardian_email}/>
 
-                { (!this.state.creating) ?
-                  <div>
-                   <label htmlFor="email">Required Hours:</label>
-                    <div><input type="radio" id="older" onChange={this.toggleHours}
-                                checked={!this.state.student.olderdate}/> 300 Minutes
-                    </div>
-                    <div><input type="radio" id="older" onChange={this.toggleHours}
-                                checked={this.state.student.olderdate}/> 330 Minutes
-                    </div>
-                  </div>
-                : <div></div>
-                }
+                <label htmlFor="required_minutes">Required Minutes:</label>
+                <input ref="required_minutes" className="form-control" id="required_minutes"
+                onChange={this.handleChange}
+                value={this.state.student.required_minutes}/>
+
                 <div>
                   <label htmlFor="is_teacher">Is Teacher:</label>
                   <div><input type="checkbox" id="is_teacher" onChange={this.handleTeacherChange}
