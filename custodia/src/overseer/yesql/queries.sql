@@ -230,11 +230,9 @@ LEFT JOIN overseer.student_newest_required_minutes snrm
                               FROM overseer.students_required_minutes isrm
                               WHERE isrm.fromdate <= current_date
                               AND snrm.student_id = isrm.student_id))
-LEFT JOIN overseer.classes c ON (c.active = true)
-LEFT JOIN overseer.classes_X_students cXs
-     ON (cXs.student_id = s._id AND cXs.class_id = c._id)
-WHERE s.school_id = :school_id;
-
+LEFT JOIN overseer.classes_X_students cXs ON cXs.student_id = s._id
+LEFT JOIN overseer.classes c ON cXs.class_id=c._id
+WHERE s.school_id = :school_id and c.active=true;
 
 -- name: get-student-y
 SELECT s.*
