@@ -89,8 +89,8 @@ SELECT
   c.late_time AS late_time,
   l.last_swipe_type,
   l.last_swipe_date,
-  l.last_swipe_date > (current_date at time zone sch.timezone)::date as swiped_today,
-  l.last_in > ((current_date at time zone sch.timezone)::date + c.late_time) as swiped_today_late
+  l.last_swipe_date > current_date as swiped_today,
+  l.last_in > (current_date + c.late_time) as swiped_today_late
 FROM
   overseer.students stu
   LEFT JOIN (
@@ -270,7 +270,7 @@ SELECT
   cXs.student_id,
   s.name student_name,
   c.required_minutes,
-  ((current_date at time zone sch.timezone)::date + c.late_time) as late_time
+  (current_date + c.late_time) as late_time
 FROM
   overseer.classes c
 LEFT JOIN overseer.schools sch on c.school_id = sch._id
