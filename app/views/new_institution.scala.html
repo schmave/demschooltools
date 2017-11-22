@@ -1,0 +1,10 @@
+@(institutionForm: Form[Institution])
+
+@import helper._
+
+@main("New Institution", "accounting") {
+	@helper.form(routes.Accounting.makeNewInstitution()) {
+		<h2>New Institution</h2>
+		@inputText(institutionForm("name"), '_label -> "Name", 'class -> "form-control")
+	}
+}

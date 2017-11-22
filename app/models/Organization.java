@@ -42,6 +42,7 @@ public class Organization extends Model {
     public String custodia_password;
     public Boolean show_custodia;
     public Boolean show_attendance;
+    public Boolean show_accounting;
 
     @OneToMany(mappedBy="organization")
     @JsonIgnore
@@ -127,6 +128,13 @@ public class Organization extends Model {
                 this.show_custodia = Utils.getBooleanFromFormValue(values.get("show_custodia")[0]);
             } else {
                 this.show_custodia = false;
+            }
+        }
+        if (values.containsKey("accounting_settings")) {
+            if (values.containsKey("show_accounting")) {
+                this.show_accounting = Utils.getBooleanFromFormValue(values.get("show_accounting")[0]);
+            } else {
+                this.show_accounting = false;
             }
         }
         this.save();

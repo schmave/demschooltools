@@ -108,6 +108,14 @@ POST    /attendance/saveDay           controllers.Attendance.saveDay(day_id : In
 
 POST    /attendance/importFromCustodia     controllers.Attendance.importFromCustodia()
 
+GET 	/accounting		  					controllers.Accounting.index()
+GET 	/accounting/transaction:id		  	controllers.Accounting.transaction(id: Integer)
+GET 	/accounting/newTransaction		  	controllers.Accounting.newTransaction()
+POST 	/accounting/newTransaction		  	controllers.Accounting.makeNewTransaction()
+GET 	/accounting/institution:id		  	controllers.Accounting.institution(id: Integer)
+GET 	/accounting/newInstitution		  	controllers.Accounting.newInstitution()
+POST 	/accounting/newInstitution			controllers.Accounting.makeNewInstitution()
+
 GET     /people/edit/:id          controllers.CRM.editPerson(id: Integer)
 POST    /people/edit              controllers.CRM.savePersonEdits()
 

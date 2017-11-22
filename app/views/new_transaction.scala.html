@@ -1,0 +1,13 @@
+@(transactionForm: Form[Transaction])
+
+@import helper._
+
+@main("New Transaction", "accounting") {
+	@helper.form(routes.Accounting.makeNewTransaction()) {
+		<h2>New Transaction</h2>
+		<div class="col-sm-6">
+			@inputText(transactionForm("from_account_id"), '_label -> "From Account", 'class -> "form-control")
+			@inputText(transactionForm("to_account_id"), '_label -> "To Account", 'class -> "form-control")
+		</div>
+	}
+}
