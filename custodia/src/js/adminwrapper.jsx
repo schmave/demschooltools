@@ -16,7 +16,7 @@ var exports = React.createClass({
             return this.props.children;
         }
 
-        return null;
+        return <div/>;
     },
     _onChange: function(){
         this.setState({permitted: userStore.isAdmin()});
