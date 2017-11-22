@@ -62,18 +62,6 @@
     (-> (t/date-time (t/year local-date) (t/month local-date) (t/day local-date) hour 0)
         (t/from-time-zone local-time-zone-id))))
 
-(defn nine-am [date] (in-local-time-at-hour date 9))
-
-(defn four-pm [date] (in-local-time-at-hour date 16))
-
-(s/defn round-swipe-time :- DateTime [time]
-  (let [time (cond-parse-date-string time)
-        nine-am (nine-am time)
-        four-pm (four-pm time)
-        time (if (t/after? time nine-am) time nine-am)
-        time (if (t/before? time four-pm) time four-pm)]
-    time))
-
 (defn append-interval [swipe]
   (if (and (:in_time swipe)
            (:out_time swipe))
