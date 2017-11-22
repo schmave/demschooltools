@@ -74,7 +74,7 @@ LEFT JOIN overseer.overrides o
 LEFT JOIN overseer.excuses e
      ON (schooldays.days = e.date AND e.student_id = schooldays.student_id)
 WHERE schooldays.days IS NOT NULL
-ORDER BY schooldays.days DESC;
+ORDER BY schooldays.days DESC, s.in_time ASC;
 
 -- name: students-required-minutes-y
 SELECT * FROM overseer.students_required_minutes WHERE student_id = :student_id AND fromdate = :fromdate;
@@ -89,21 +89,28 @@ SELECT
   c.late_time AS late_time,
   l.last_swipe_type,
   l.last_swipe_date,
-  l.last_swipe_date > ((current_date + current_time) at time zone sch.timezone)::date as swiped_today,
-  l.last_in > (((current_date + current_time) at time zone sch.timezone)::date + c.late_time) as swiped_today_late
+  l.last_swipe_date > (current_timestamp at time zone sch.timezone)::date as swiped_today,
+  l.first_in_today at time zone sch.timezone >
+       ((current_timestamp at time zone sch.timezone)::date + c.late_time) as swiped_today_late
 FROM
   overseer.students stu
   LEFT JOIN (
   (SELECT
       CASE WHEN subl.outs >= subl.ins THEN 'out' ELSE 'in' END AS last_swipe_type,
       CASE WHEN subl.outs >= subl.ins THEN subl.outs ELSE subl.ins END AS last_swipe_date,
-      subl.ins as last_in,
+      subl.min_in as first_in_today,
       subl.student_id
       FROM (SELECT
               max(s.in_time) AS ins,
               max(s.out_time) AS outs,
+              min(s.in_time) as min_in,
               s.student_id
             FROM overseer.swipes s
+            JOIN overseer.students stu on s.student_id = stu._id
+            JOIN overseer.schools sch on stu.school_id = sch._id
+            WHERE (s.in_time at time zone sch.timezone)::date =
+                      (current_timestamp at time zone sch.timezone)::date
+                AND sch._id = :school_id
             GROUP BY s.student_id
             ORDER BY ins, outs) as subl)) AS l ON (l.student_id = stu._id)
   INNER JOIN overseer.classes c ON (1 = 1)
@@ -248,9 +255,9 @@ LEFT JOIN overseer.student_newest_required_minutes snrm
                               FROM overseer.students_required_minutes isrm
                               WHERE isrm.fromdate <= current_date
                               AND snrm.student_id = isrm.student_id))
-LEFT JOIN overseer.classes c ON (c.active = true)
 LEFT JOIN overseer.classes_X_students cXs
-     ON (cXs.student_id = s._id AND cXs.class_id = c._id)
+     ON cXs.student_id = s._id
+LEFT JOIN overseer.classes c ON cXs.class_id = c._id
 WHERE s._id = :student_id
 AND s.school_id = :school_id;
 
@@ -270,7 +277,7 @@ SELECT
   cXs.student_id,
   s.name student_name,
   c.required_minutes,
-  (((current_date + current_time) at time zone sch.timezone)::date + c.late_time) as late_time
+  ((current_timestamp at time zone sch.timezone)::date + c.late_time) as late_time
 FROM
   overseer.classes c
 LEFT JOIN overseer.schools sch on c.school_id = sch._id
