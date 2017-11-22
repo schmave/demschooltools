@@ -259,7 +259,8 @@ LEFT JOIN overseer.classes_X_students cXs
      ON cXs.student_id = s._id
 LEFT JOIN overseer.classes c ON cXs.class_id = c._id
 WHERE s._id = :student_id
-AND s.school_id = :school_id;
+    AND s.school_id = :school_id
+    AND c.active = TRUE;
 
 -- name: get-years-y
 SELECT * from overseer.years where school_id = :school_id;
