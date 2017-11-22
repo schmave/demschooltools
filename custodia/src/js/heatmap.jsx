@@ -37,7 +37,8 @@ module.exports = React.createClass({
         return maps
     },
     makeHeatmapRow: function(dates, minutes) {
-            return <Heatmapmonth index="1"
+            return <Heatmapmonth key="1"
+                                 index="1"
                                  requiredMinutes={minutes}
                                  days={dates}></Heatmapmonth>;
     },
