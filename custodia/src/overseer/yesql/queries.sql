@@ -241,7 +241,7 @@ LEFT JOIN overseer.student_newest_required_minutes snrm
                               AND snrm.student_id = isrm.student_id))
 LEFT JOIN overseer.classes_X_students cXs ON cXs.student_id = s._id
 LEFT JOIN overseer.classes c ON cXs.class_id=c._id
-WHERE s.school_id = :school_id and c.active=true;
+WHERE s.school_id = :school_id;
 
 -- name: get-student-y
 SELECT s.*
@@ -259,8 +259,7 @@ LEFT JOIN overseer.classes_X_students cXs
      ON cXs.student_id = s._id
 LEFT JOIN overseer.classes c ON cXs.class_id = c._id
 WHERE s._id = :student_id
-    AND s.school_id = :school_id
-    AND c.active = TRUE;
+    AND s.school_id = :school_id;
 
 -- name: get-years-y
 SELECT * from overseer.years where school_id = :school_id;
