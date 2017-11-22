@@ -53,7 +53,7 @@
   ([id in-time]
    (let [in-timestamp (make-timestamp in-time)]
      (db/persist! (assoc (make-swipe id)
-                         :swipe_day (c/to-sql-date in-timestamp)
+                         :swipe_day (c/to-sql-date (dates/make-date-string in-timestamp))
                          :rounded_in_time in-timestamp
                          :in_time in-timestamp)))))
 
@@ -81,6 +81,7 @@
                     last-swipe
                     (make-swipe id))
          rounded-out-timestamp (make-timestamp rounded-out-time)
+         out-timestamp (make-timestamp out-time)
          out-swipe (assoc in-swipe
                           :out_time (make-timestamp out-time)
                           :rounded_out_time rounded-out-timestamp)
@@ -88,7 +89,7 @@
          interval (dates/calculate-interval out-swipe)
          out-swipe (assoc out-swipe
                           :intervalmin interval
-                          :swipe_day (c/to-sql-date rounded-out-timestamp))]
+                          :swipe_day (c/to-sql-date (dates/make-date-string out-timestamp)))]
      (if only-swiped-in?
        (db/update! :swipes (:_id out-swipe) out-swipe)
        (db/persist! out-swipe))
