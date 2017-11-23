@@ -54,7 +54,7 @@
             }
             @if(OrgConfig.get().org.show_accounting) {
                 <li @if(menu.equals("accounting")) { class="active" }>
-                    <a href="@routes.Accounting.index()">Accounting</a>
+                    <a href="@routes.Accounting.newTransaction()">Accounting</a>
                 </li>
             }
             <li @if(menu.equals("jc")) { class="active" }>
@@ -154,10 +154,10 @@
         @if(menu.equals("accounting")) {
             <div class="tab-pane active" id="finance">
                 <div class="subnav">
-                    <a @if(selectedBtn.equals("accounting_home")) { class="active" }
-                        href="@routes.Accounting.index()">Home
+                    <a href="@routes.Accounting.newTransaction()">Create Transaction</a>
+                    <a @if(selectedBtn.equals("accounting_institutions")) { class="active" }
+                        href="@routes.Accounting.institutions()">Institutions
                     </a>
-                    <a href="@routes.Accounting.newTransaction()">Add Transaction</a>
                 </div>
             </div>
         }

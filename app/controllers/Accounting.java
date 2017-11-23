@@ -9,10 +9,6 @@ import play.data.*;
 @Secured.Auth(UserRole.ROLE_ALL_ACCESS)
 public class Accounting extends Controller {
 
-    public Result index() {
-        return ok(views.html.accounting_index.render());
-    }
-
     public Result transaction(Integer id) {
         Transaction transaction = Transaction.findById(id);
         return ok(views.html.transaction.render(transaction));
@@ -37,9 +33,9 @@ public class Accounting extends Controller {
         }
     }
 
-    public Result institution(Integer id) {
-        Institution institution = Institution.findById(id);
-        return ok(views.html.institution.render(institution));
+    public Result institutions() {
+        List<Institution> institutions = Institution.all();
+        return ok(views.html.institutions.render(institutions));
     }
 
     public Result newInstitution() {
@@ -56,8 +52,16 @@ public class Accounting extends Controller {
                 views.html.new_institution.render(filledForm)
             );
         } else {
-            Institution institution = Institution.create(filledForm);
-            return redirect(routes.Accounting.institution(institution.id));
+            String name = filledForm.field("name").value();
+            InstitutionType type = parseInstitutionType(filledForm.field("type").value());
+            Institution institution = Institution.create(name, type);
+            return redirect(routes.Accounting.institutions());
         }
+    }
+
+    private InstitutionType parseInstitutionType(String value) {
+        return value == null || value == "" 
+            ? null 
+            : InstitutionType.values()[Integer.parseInt(value)];
     }
 }

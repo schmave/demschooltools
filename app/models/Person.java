@@ -100,6 +100,10 @@ public class Person extends Model implements Comparable<Person> {
     @JsonIgnore
     public List<AttendanceWeek> attendance_weeks;
 
+    @OneToMany(mappedBy="person")
+    @JsonIgnore
+    public List<Account> accounts;
+
 	public String grade = "";
 
     static Set<String> fieldsToUpdateExplicitly = new HashSet<String>();
