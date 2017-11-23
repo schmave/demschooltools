@@ -17,6 +17,7 @@ public class Account extends Model {
     public Organization organization;
 
     @ManyToOne()
+    @JoinColumn(name="person_id")
     public Person person;
 
     @ManyToOne()
@@ -32,7 +33,7 @@ public class Account extends Model {
 
     public AccountType type;
 
-    public BigDecimal initial_balance;
+    public BigDecimal initial_balance = new BigDecimal(0);
 
     public static Finder<Integer, Account> find = new Finder<Integer, Account>(
         Account.class

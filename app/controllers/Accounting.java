@@ -52,16 +52,8 @@ public class Accounting extends Controller {
                 views.html.new_institution.render(filledForm)
             );
         } else {
-            String name = filledForm.field("name").value();
-            InstitutionType type = parseInstitutionType(filledForm.field("type").value());
-            Institution institution = Institution.create(name, type);
+            Institution institution = Institution.create(filledForm);
             return redirect(routes.Accounting.institutions());
         }
-    }
-
-    private InstitutionType parseInstitutionType(String value) {
-        return value == null || value == "" 
-            ? null 
-            : InstitutionType.values()[Integer.parseInt(value)];
     }
 }

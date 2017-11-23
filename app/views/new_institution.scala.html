@@ -5,6 +5,16 @@
 @main("New Institution", "accounting") {
 	@helper.form(routes.Accounting.makeNewInstitution()) {
 		<h2>New Institution</h2>
-		@inputText(institutionForm("name"), '_label -> "Name", 'class -> "form-control")
+		<div class="col-sm-6">
+			@inputText(institutionForm("name"), '_label -> "Name", 'class -> "form-control")
+			@select(
+				institutionForm("type"),
+				options(InstitutionType.options()),
+				'_label -> "Type",
+				'_default -> "",
+				'class -> "form-control"
+			)
+			<input type="submit" value="Create">
+		</div>
 	}
 }

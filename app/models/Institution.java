@@ -23,6 +23,10 @@ public class Institution extends Model {
 
     public InstitutionType type;
 
+    public String typeName() {
+        return type.name();
+    }
+
     public static Finder<Integer, Institution> find = new Finder<Integer, Institution>(
         Institution.class
     );
@@ -39,10 +43,8 @@ public class Institution extends Model {
             .eq("id", id).findUnique();
     }
 
-    public static Institution create(String name, InstitutionType type) {
-        Institution institution = new Institution();
-        institution.name = name;
-        institution.type = type;
+    public static Institution create(Form<Institution> form) {
+        Institution institution = form.get();
         institution.organization = Organization.getByHost();
         institution.save();
         Account.create(null, institution, AccountType.Cash);
