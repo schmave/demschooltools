@@ -3,6 +3,13 @@
 @import helper._
 
 @main("New Transaction", "accounting") {
+
+	<script type="text/javascript">
+		app = {};
+		app.cashAccounts = @Html(Accounting.accounts(AccountType.Cash));
+		app.checkingAccounts = @Html(Accounting.accounts(AccountType.Checking));
+	</script>
+
 	@helper.form(routes.Accounting.makeNewTransaction()) {
 		<h2>New Transaction</h2>
 		<div class="col-sm-6">

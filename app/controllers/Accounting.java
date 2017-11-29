@@ -49,11 +49,25 @@ public class Accounting extends Controller {
         if(filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
             return badRequest(
-                views.html.new_institution.render(filledForm)
+                views.html.new_institution.render(filledForm);
             );
         } else {
             Institution institution = Institution.create(filledForm);
             return redirect(routes.Accounting.institutions());
         }
+    }
+
+    public static String accounts(AccountType type) {
+        List<Account> accounts = Account.findByType(type);
+
+        List<Map<String, String>> result = new ArrayList<Map<String, String>>();
+        for (Account a : accounts) {
+            HashMap<String, String> values = new HashMap<String, String>();
+            values.put("label", a.getName());
+            values.put("id", "" + a.id);
+            result.add(values);
+        }
+
+        return Json.stringify(Json.toJson(result));
     }
 }
