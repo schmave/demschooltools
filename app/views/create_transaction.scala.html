@@ -6,8 +6,8 @@
 
 	<script type="text/javascript">
 		app = {};
-		app.cashAccounts = @Html(Accounting.accounts(AccountType.Cash));
-		app.checkingAccounts = @Html(Accounting.accounts(AccountType.Checking));
+		app.cashAccounts = @Html(Accounting.cashAccountsJson());
+		app.digitalAccounts = @Html(Accounting.digitalAccountsJson());
 	</script>
 
 	@helper.form(routes.Accounting.makeNewTransaction()) {

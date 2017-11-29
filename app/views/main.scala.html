@@ -155,8 +155,8 @@
             <div class="tab-pane active" id="finance">
                 <div class="subnav">
                     <a href="@routes.Accounting.newTransaction()">Create Transaction</a>
-                    <a @if(selectedBtn.equals("accounting_institutions")) { class="active" }
-                        href="@routes.Accounting.institutions()">Institutions
+                    <a @if(selectedBtn.equals("accounting_accounts")) { class="active" }
+                        href="@routes.Accounting.accounts()">Manage Accounts
                     </a>
                 </div>
             </div>

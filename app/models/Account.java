@@ -20,9 +20,6 @@ public class Account extends Model {
     @JoinColumn(name="person_id")
     public Person person;
 
-    @ManyToOne()
-    public Institution institution;
-
     @OneToMany(mappedBy = "from_account")
     @JsonIgnore
     public List<Transaction> payment_transactions;
@@ -37,20 +34,45 @@ public class Account extends Model {
 
     public BigDecimal initial_balance = new BigDecimal(0);
 
-    // TODO account should have its own name field, with this value by default but overridable
     public String getName() {
+        if (name != null && name.trim().length() > 0) {
+            return name;
+        }
         if (person != null) {
             return person.getDisplayName();
         }
-        else if (institution != null) {
-            return institution.name;
-        }
-        else throw new Exception("account is not associated with either a person or an institution");
+        return name;
     }
 
-    public static Finder<Integer, Account> find = new Finder<Integer, Account>(
-        Account.class
-    );
+    public String getTypeName() {
+        return type.toString();
+    }
+
+    public boolean isCash() {
+        return type == AccountType.Cash;
+    }
+
+    private static Finder<Integer, Account> find = new Finder<Integer, Account>(Account.class);
+
+    public static List<Account> all() {
+        return find.where()
+            .eq("organization", Organization.getByHost())
+            .findList();
+    }
+
+    public static List<Account> allCash() {
+        return find.where()
+            .eq("organization", Organization.getByHost())
+            .eq("type", AccountType.Cash)
+            .findList();
+    }
+
+    public static List<Account> allDigital() {
+        return find.where()
+            .eq("organization", Organization.getByHost())
+            .ne("type", AccountType.Cash)
+            .findList();
+    }
 
     public static Account findById(Integer id) {
         return find.where()
@@ -59,21 +81,21 @@ public class Account extends Model {
             .findUnique();
     }
 
-    // TODO do we create accounts here if there exist people with no accounts?
-    public static List<Account> findByType(AccountType type) {
-        return find.where()
-            .eq("organization", Organization.getByHost())
-            .eq("type", type)
-            .findList();
-    }
-
-    public static Account create(Person person, Institution institution, AccountType type) {
+    public static Account create(AccountType type, String name, Person person) {
         Account account = new Account();
         account.person = person;
-        account.institution = institution;
+        account.name = name;
         account.type = type;
         account.organization = Organization.getByHost();
         account.save();
         return account;
     }
+
+    public static Account createFromForm(Form<Account> form) {
+        Account account = form.get();
+        account.organization = Organization.getByHost();
+        account.save();
+        return account;
+    }
+
 }

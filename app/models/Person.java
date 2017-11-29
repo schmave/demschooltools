@@ -190,6 +190,7 @@ public class Person extends Model implements Comparable<Person> {
             .eq("is_family", Boolean.FALSE)
             .orderBy("last_name, first_name ASC")
             .fetch("phone_numbers", new FetchConfig().query())
+            .fetch("accounts", new FetchConfig().query())
             .findList();
     }
 
@@ -292,6 +293,11 @@ public class Person extends Model implements Comparable<Person> {
 		person.trimSpaces();
         person.save();
 
+        if (OrgConfig.get().org.show_accounting) {
+            Account.create(AccountType.Cash, null, person);
+            Account.create(AccountType.PersonalChecking, null, person);
+        }
+
         person.addPhoneNumbers(form);
         return person;
     }
@@ -323,7 +329,11 @@ public class Person extends Model implements Comparable<Person> {
     }
 
     public static void delete(Integer id) {
-        find.ref(id).delete();
+        Person person = find.ref(id);
+        for (Account account : person.accounts) {
+            account.delete();
+        }
+        person.delete();
     }
 
     public boolean isStudent()
@@ -465,6 +475,10 @@ public class Person extends Model implements Comparable<Person> {
         }
 
         return numbers;
+    }
+
+    public boolean hasAccount(AccountType type) {
+        return accounts.stream().anyMatch(a -> a.type == type);
     }
 
     public String toString() {

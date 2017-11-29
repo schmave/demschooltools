@@ -1,0 +1,25 @@
+@(accounts : List[Account])
+
+@main("Manage Accounts", "accounting", "accounting_accounts") {
+
+	<h2>Manage Accounts</h2>
+	
+	<a href="@routes.Accounting.newAccount()">Add Account</a>
+	<br>
+	<br>
+
+	<table class="table sortable">
+		<tr>
+			<th>Name</th>
+			<th>Type</th>
+			<th>Current Balance</th>
+		</tr>
+		@for(account <- accounts) {
+			<tr>
+				<td>@account.getName()</td>
+				<td>@account.getTypeName()</td>
+				@if(account.isCash()) { <td>N/A</td> } else { <td>$0</td> }
+			</tr>
+		}
+	</table>
+}

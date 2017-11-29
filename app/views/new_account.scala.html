@@ -1,0 +1,20 @@
+@(accountForm: Form[Account])
+
+@import helper._
+
+@main("New Account", "accounting") {
+	@helper.form(routes.Accounting.makeNewAccount()) {
+		<h2>New Account</h2>
+		<div class="col-sm-6">
+			@inputText(accountForm("name"), '_label -> "Name", 'class -> "form-control")
+			@select(
+				accountForm("type"),
+				options(AccountType.options()),
+				'_label -> "Type",
+				'_default -> "",
+				'class -> "form-control"
+			)
+			<input type="submit" value="Create">
+		</div>
+	}
+}
