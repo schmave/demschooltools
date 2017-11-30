@@ -34,7 +34,7 @@ var exports = React.createClass({
         if (this.state.day && !this.swipesAreEmpty(this.state.day.swipes)) {
             this.state.day.swipes.map(function (swipe) {
                 if (swipe.nice_in_time || swipe.nice_out_time) {
-                    swipeRows.push(<tr>
+                    swipeRows.push(<tr key={swipe._id}>
                         <td>{swipe.nice_in_time}</td>
                         <td>{swipe.nice_out_time}</td>
                         <AdminItem>
@@ -43,8 +43,8 @@ var exports = React.createClass({
                     </tr>)
                 }
             }.bind(this))
-        }else{
-            return <td colSpan="2">No swipes available.</td>;
+        } else {
+            return <tr><td colSpan="2">No swipes available.</td></tr>;
         }
         return swipeRows;
     },
@@ -77,22 +77,21 @@ var exports = React.createClass({
                 </tbody>
             </table>
             {showOverrideExcuseButtons ?
-              <div className="action-buttons">
-                <div className="pull-left">
-                  <AdminItem>
+              <AdminItem>
+                <div className="action-buttons">
+                  <div className="pull-left">
                     <button type="button" id="override" onClick={this.override} className="btn btn-sm btn-info">
                         Override
                     </button>
-                  </AdminItem>
-                </div>
-                <div className="pull-right">
-                  <AdminItem>
+                  </div>
+                  <div className="pull-right">
                     <button type="button" onClick={this.excuse} className="btn btn-sm btn-info">Excuse</button>
-                  </AdminItem>
+                  </div>
                 </div>
-            </div> : ''}
-          </span>
-            ;
+              </AdminItem>
+              : ''
+            }
+            </span>;
     },
 
 

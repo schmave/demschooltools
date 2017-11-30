@@ -50,17 +50,17 @@ var exports = React.createClass({
         var buttons = [];
 
         if (!this.studentInToday() || this.state.student.last_swipe_type === 'out') {
-            buttons.push(<button type="button" id="sign-in" onClick={this.signIn}
+            buttons.push(<button key="sign-in" type="button" id="sign-in" onClick={this.signIn}
                                  className="btn btn-sm btn-info margined">Sign In
             </button>);
         }
         if (!this.studentInToday() || this.state.student.last_swipe_type === 'in') {
-            buttons.push(<button type="button" id="sign-out" onClick={this.signOut}
+            buttons.push(<button key="sign-out" type="button" id="sign-out" onClick={this.signOut}
                                  className="btn btn-sm btn-info margined">Sign Out
             </button>);
         }
         if (!this.state.student.absent_today) {
-            buttons.push(<button id="absent-button" type="button" onClick={this.markAbsent}
+            buttons.push(<button key="absent-button" id="absent-button" type="button" onClick={this.markAbsent}
                                  className="btn btn-sm btn-info margined">Absent
             </button>);
         }
@@ -105,7 +105,7 @@ var exports = React.createClass({
             var hide = (!show) ? "hidden" : "";
             var selected = day.day === this.getActiveDay(this.state.student) ? "selected" : "";
             var clsName = hide + " " + selected;
-            return <tr className={clsName}>
+            return <tr key={month + day.day} className={clsName}>
               <td>
                 <Link to="student"
                       onClick={this.openMonth.bind(this, month)}
@@ -130,12 +130,12 @@ var exports = React.createClass({
             var cls = (month===this.state.selectedMonth)
                     ? "glyphicon glyphicon-chevron-down"
                     : "glyphicon glyphicon-chevron-right";
-            return <span>
+            return <span key={month}>
               <tr style={{fontWeight:"bold"}}>
                 <td onClick={this.toggleMonth.bind(this, month)}
                     style={{fontWeight:"bold"}}>
                   <span className={cls}
-                        style={{"padding-right":"3px"}} ></span>
+                        style={{"paddingRight":"3px"}} ></span>
                   {month}
                 </td>
               </tr>
@@ -214,7 +214,7 @@ var exports = React.createClass({
                     </div>
                     <Heatmap days={this.state.student.days}
                              requiredMinutes={requiredMinutes} />
-                  </div>
+               </div>
                   <div className="col-sm-2">
                     <table className="table table-striped center">
                       <thead>
