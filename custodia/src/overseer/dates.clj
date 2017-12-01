@@ -62,16 +62,16 @@
     (-> (t/date-time (t/year local-date) (t/month local-date) (t/day local-date) hour 0)
         (t/from-time-zone local-time-zone-id))))
 
-(defn eight-am [date] (in-local-time-at-hour date 8))
+(defn earliest-time [date] (in-local-time-at-hour date 9))
 
-(defn four-pm [date] (in-local-time-at-hour date 16))
+(defn latest-time [date] (in-local-time-at-hour date 16))
 
 (s/defn round-swipe-time :- DateTime [time]
   (let [time (cond-parse-date-string time)
-        eight-am (eight-am time)
-        four-pm (four-pm time)
-        time (if (t/after? time eight-am) time eight-am)
-        time (if (t/before? time four-pm) time four-pm)]
+        early (earliest-time time)
+        late (latest-time time)
+        time (if (t/after? time early) time early)
+        time (if (t/before? time late) time late)]
     time))
 
 (defn append-interval [swipe]
