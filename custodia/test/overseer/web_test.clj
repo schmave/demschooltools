@@ -696,10 +696,11 @@
             tomorrow (-> today (t/plus (t/days 1)))
             day-after-next (-> today (t/plus (t/days 2)))
             _ (cmd/edit-student-required-minutes sid 100 day-after-next)
+            _ (cmd/add-student-to-class sid (get-class-id-by-name "2014-2015"))
             student (first (queries/get-students sid))
             ]
 
-        (cmd/add-student-to-class sid (get-class-id-by-name "2014-2015"))
+
         (cmd/swipe-in sid today)
         (cmd/swipe-out sid (t/plus today (t/minutes 101)))
 
