@@ -636,13 +636,14 @@
 (deftest student-list-when-last-swipe-sanitized2
   (do (sample-db)
       (let [s (cmd/make-student "test")
+            otherstudentid 1
             sid (:_id s)
             _3pm (today-at-utc 15 0)]
         (cmd/add-student-to-class sid (get-class-id-by-name "2014-2015"))
         ;; has an in, then missed two days, next in should
         ;; show a last swipe type
-        (cmd/swipe-in 1 (t/minus _3pm (t/days 2)))
-        (cmd/swipe-in 1 (t/minus _3pm (t/days 1)))
+        (cmd/swipe-in otherstudentid (t/minus _3pm (t/days 2)))
+        (cmd/swipe-in otherstudentid (t/minus _3pm (t/days 1)))
         (cmd/swipe-in sid (t/minus _3pm (t/days 3)))
         (let [att (first (att/get-student-with-att sid))]
           (testing "Student Att Count"

@@ -90,29 +90,34 @@ SELECT
   l.last_swipe_type,
   l.last_swipe_date,
   l.last_swipe_date > (current_timestamp at time zone sch.timezone)::date as swiped_today,
-  l.first_in_today at time zone sch.timezone >
-       ((current_timestamp at time zone sch.timezone)::date + c.late_time) as swiped_today_late
+  first_today_swipe.first_in_today at time zone sch.timezone >
+             ((current_timestamp at time zone sch.timezone)::date + c.late_time) as swiped_today_late
 FROM
   overseer.students stu
   LEFT JOIN (
-  (SELECT
+    (SELECT
       CASE WHEN subl.outs >= subl.ins THEN 'out' ELSE 'in' END AS last_swipe_type,
       CASE WHEN subl.outs >= subl.ins THEN subl.outs ELSE subl.ins END AS last_swipe_date,
-      subl.min_in as first_in_today,
       subl.student_id
       FROM (SELECT
               max(s.in_time) AS ins,
               max(s.out_time) AS outs,
-              min(s.in_time) as min_in,
               s.student_id
+            FROM overseer.swipes s
+            GROUP BY s.student_id
+            ORDER BY ins, outs) as subl)) AS l ON (l.student_id = stu._id)
+  LEFT JOIN (
+     (SELECT
+            min(s.in_time) as first_in_today,
+            s.student_id
             FROM overseer.swipes s
             JOIN overseer.students stu on s.student_id = stu._id
             JOIN overseer.schools sch on stu.school_id = sch._id
             WHERE (s.in_time at time zone sch.timezone)::date =
-                      (current_timestamp at time zone sch.timezone)::date
-                AND sch._id = :school_id
+            (current_timestamp at time zone sch.timezone)::date
+            AND sch._id = :school_id
             GROUP BY s.student_id
-            ORDER BY ins, outs) as subl)) AS l ON (l.student_id = stu._id)
+             )) AS first_today_swipe ON (first_today_swipe.student_id = stu._id)
   INNER JOIN overseer.classes c ON (1 = 1)
   INNER JOIN overseer.classes_X_students cXs ON (cXs.student_id = stu._id
           AND cXs.class_id = c._id)
