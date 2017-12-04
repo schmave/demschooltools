@@ -15,7 +15,7 @@ public enum AccountType
         for (AccountType type: AccountType.values()) {
             // don't include PersonalChecking -- that kind of account is generated and may not be created by users manually
             if (type != AccountType.PersonalChecking) {
-                vals.put(type.name(), type.toString());
+                vals.put(type.name(), type.name());
             }
         }
         return vals;

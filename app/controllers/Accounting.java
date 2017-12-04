@@ -48,11 +48,14 @@ public class Accounting extends Controller {
     public Result makeNewAccount() {
         Form<Account> form = Form.form(Account.class);
         Form<Account> filledForm = form.bindFromRequest();
-        if(filledForm.hasErrors()) {
+        if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
             return badRequest(views.html.new_account.render(filledForm));
-        } else {
-            Account account = Account.createFromForm(filledForm);
+        }
+        else {
+            String name = filledForm.field("name").value();
+            AccountType type = AccountType.valueOf(filledForm.field("type").value());
+            Account account = Account.create(type, name, null);
             return redirect(routes.Accounting.accounts());
         }
     }

@@ -294,8 +294,8 @@ public class Person extends Model implements Comparable<Person> {
         person.save();
 
         if (OrgConfig.get().org.show_accounting) {
-            Account.create(AccountType.Cash, null, person);
-            Account.create(AccountType.PersonalChecking, null, person);
+            Account.create(AccountType.Cash, "", person);
+            Account.create(AccountType.PersonalChecking, "", person);
         }
 
         person.addPhoneNumbers(form);

@@ -3,7 +3,7 @@
 @import helper._
 
 @main("New Account", "accounting") {
-	@helper.form(routes.Accounting.makeNewAccount()) {
+	@form(routes.Accounting.makeNewAccount()) {
 		<h2>New Account</h2>
 		<div class="col-sm-6">
 			@inputText(accountForm("name"), '_label -> "Name", 'class -> "form-control")
@@ -14,7 +14,7 @@
 				'_default -> "",
 				'class -> "form-control"
 			)
-			<input type="submit" value="Create">
+			<input type="submit" value="Create"/>
 		</div>
 	}
 }
