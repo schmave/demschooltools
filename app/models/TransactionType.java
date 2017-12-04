@@ -2,10 +2,10 @@ package models;
 
 public enum TransactionType
 {
-    CashTransfer,
+	CashDeposit,
     CashWithdrawal,
-    CashDeposit,
-    DigitalTransfer,
-    DigitalWithdrawal,
-    DigitalDeposit;
+    CashTransfer,
+    DigitalCredit,
+    DigitalPurchase,
+    DigitalTransfer;
 }

@@ -108,7 +108,7 @@ POST    /attendance/saveDay           controllers.Attendance.saveDay(day_id : In
 
 POST    /attendance/importFromCustodia     controllers.Attendance.importFromCustodia()
 
-GET 	/accounting/transaction:id		  	controllers.Accounting.transaction(id: Integer)
+GET 	/accounting/transaction/:id		  	controllers.Accounting.transaction(id: Integer)
 GET 	/accounting/createTransaction		controllers.Accounting.newTransaction()
 POST 	/accounting/createTransaction		controllers.Accounting.makeNewTransaction()
 GET 	/accounting/accounts			  	controllers.Accounting.accounts()

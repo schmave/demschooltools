@@ -14,6 +14,7 @@ require('./edit_rp_list');
 var feedback_modal = require('./feedback_modal');
 require('./sorttable');
 var people_chooser = require('./people_chooser');
+var create_transaction = require('./create_transaction');
 
 $(function() {
     // Fix for bootstrap tabs not remembering their active tab
@@ -120,4 +121,8 @@ window.enableButtonForCheckboxes = function(btn_selector, checkbox_class) {
         var count = $(checkbox_selector + ':checked').length;
         $(btn_selector).prop("disabled", (count == 0));
     });
+};
+
+window.initCreateTransaction = function(cashAccounts, digitalAccounts) {
+    return new create_transaction.init(cashAccounts, digitalAccounts);
 };

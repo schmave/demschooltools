@@ -46,8 +46,15 @@ public class Transaction extends Model {
 
     public static Transaction create(Form<Transaction> form) {
         Transaction transaction = form.get();
+        transaction.from_account = findAccountById(form.field("from_account_id").value());
+        transaction.to_account = findAccountById(form.field("to_account_id").value());
         transaction.organization = Organization.getByHost();
         transaction.save();
         return transaction;
+    }
+
+    private static Account findAccountById(String id) {
+        if (id == null || id.trim().length() == 0) return null;
+        return Account.findById(Integer.valueOf(id));
     }
 }

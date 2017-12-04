@@ -1,22 +1,65 @@
 var Handlebars = require('handlebars');
 
-// var accountInputString = '<input type="text" />';
-// var accountInputTemplate = Handlebars.compile(accountInputString);
+export function init(cashAccounts, digitalAccounts) {
 
-function renderCashAccountInput(container, autocompleteSource) {
-	var input = $('<input type="text" />');
-	container.html(input);
-	input.autocomplete({
-		source: autocompleteSource
+	var createTransactionTemplate = Handlebars.compile($("#create-transaction-template").html());
+
+	var modeSelectingOption = true;
+	$('.create-transaction-option').click(function() {
+		if (modeSelectingOption) {
+			modeSelectingOption = false;
+			$('.create-transaction-option').hide();
+			$(this).show().addClass('selected');
+			$('#create-transaction').show().html(renderTransactionCreator($(this).data('type')));
+		} else {
+			modeSelectingOption = true;
+			$('.create-transaction-option').show().removeClass('selected');
+			$('#create-transaction').hide();
+		}
 	});
-	input.bind("autocompleteselect", function(event, ui) {
-		var id = ui.item.id;
-		var label = ui.item.label;
-        // self.search_box.val('');
-        // event.preventDefault(); // keep jquery from inserting name into textbox
-    });
-}
 
-export function init() {
-	var source = app.cashAccounts;
+	function renderTransactionCreator(transactionType) {
+		var table = $(createTransactionTemplate({transactionType: transactionType}));
+		var fromRow = table.find('#create-transaction-from');
+		var toRow = table.find('#create-transaction-to');
+
+		if (transactionType === 'CashDeposit') {
+			registerAutocomplete(fromRow, cashAccounts);
+			registerAutocomplete(toRow, digitalAccounts);
+		}
+		else if (transactionType === 'CashWithdrawal') {
+			registerAutocomplete(fromRow, digitalAccounts);
+			registerAutocomplete(toRow, cashAccounts);
+		}
+		else if (transactionType === 'CashTransfer') {
+			registerAutocomplete(fromRow, cashAccounts);
+			registerAutocomplete(toRow, cashAccounts);
+		}
+		else if (transactionType === 'DigitalCredit') {
+			registerAutocomplete(toRow, digitalAccounts);
+		}
+		else if (transactionType === 'DigitalPurchase') {
+			registerAutocomplete(fromRow, digitalAccounts);
+		}
+		else if (transactionType === 'DigitalTransfer') {
+			registerAutocomplete(fromRow, digitalAccounts);
+			registerAutocomplete(toRow, digitalAccounts);
+		}
+		else throw 'invalid transaction type: ' + transactionType;
+
+		return table;
+	}
+
+	function registerAutocomplete(row, accounts) {
+		var textInput = row.find('.js-account-name');
+		var idInput = row.find('.js-account-id');
+		textInput.autocomplete({
+			source: accounts
+		});
+		textInput.bind("autocompleteselect", function(event, ui) {
+			var id = ui.item.id;
+			var label = ui.item.label;
+			idInput.val(id);
+	    });
+	}
 }
