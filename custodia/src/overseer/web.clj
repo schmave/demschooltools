@@ -173,8 +173,9 @@
   (if (env :notify)
     (do (print "Server started")
         (sh/sh "notify-send" "-u" "critical" "Server started")))
-  (let [port (Integer. (or port (env :port) 5000))]
-    (jetty/run-jetty (site (tapp)) {:port port :join? false})))
+  (let [port (Integer. (or port (env :port) 5000))
+        host (or "127.0.0.1" (env :host))]
+    (jetty/run-jetty (site (tapp)) {:port port :host host :join? false})))
 
 (defn -main [& [port]]
   (start-site port))
