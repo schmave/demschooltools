@@ -20,30 +20,31 @@ export function init(cashAccounts, digitalAccounts) {
 
 	function renderTransactionCreator(transactionType) {
 		var table = $(createTransactionTemplate({transactionType: transactionType}));
-		var fromRow = table.find('#create-transaction-from');
-		var toRow = table.find('#create-transaction-to');
+		var from = table.find('#create-transaction-from');
+		var to = table.find('#create-transaction-to');
+		var toRow = table.find('#create-transaction-to-row');
 
 		if (transactionType === 'CashDeposit') {
-			registerAutocomplete(fromRow, cashAccounts);
-			registerAutocomplete(toRow, digitalAccounts);
+			registerAutocomplete(from, cashAccounts);
+			registerAutocomplete(to, digitalAccounts);
 		}
 		else if (transactionType === 'CashWithdrawal') {
-			registerAutocomplete(fromRow, digitalAccounts);
-			registerAutocomplete(toRow, cashAccounts);
+			registerAutocomplete(from, digitalAccounts);
+			toRow.hide();
 		}
 		else if (transactionType === 'CashTransfer') {
-			registerAutocomplete(fromRow, cashAccounts);
-			registerAutocomplete(toRow, cashAccounts);
+			registerAutocomplete(from, cashAccounts);
+			registerAutocomplete(to, cashAccounts);
 		}
 		else if (transactionType === 'DigitalCredit') {
-			registerAutocomplete(toRow, digitalAccounts);
+			registerAutocomplete(to, digitalAccounts);
 		}
 		else if (transactionType === 'DigitalPurchase') {
-			registerAutocomplete(fromRow, digitalAccounts);
+			registerAutocomplete(from, digitalAccounts);
 		}
 		else if (transactionType === 'DigitalTransfer') {
-			registerAutocomplete(fromRow, digitalAccounts);
-			registerAutocomplete(toRow, digitalAccounts);
+			registerAutocomplete(from, digitalAccounts);
+			registerAutocomplete(to, digitalAccounts);
 		}
 		else throw 'invalid transaction type: ' + transactionType;
 
