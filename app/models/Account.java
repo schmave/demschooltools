@@ -52,6 +52,12 @@ public class Account extends Model {
         return type == AccountType.Cash;
     }
 
+    public BigDecimal getBalance() {
+        return initial_balance
+            .add(credit_transactions.stream().map(t -> t.amount).reduce(BigDecimal.ZERO, BigDecimal::add))
+            .subtract(payment_transactions.stream().map(t -> t.amount).reduce(BigDecimal.ZERO, BigDecimal::add));
+    }
+
     private static Finder<Integer, Account> find = new Finder<Integer, Account>(Account.class);
 
     public static List<Account> all() {

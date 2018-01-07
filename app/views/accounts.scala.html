@@ -18,7 +18,7 @@
 			<tr>
 				<td>@account.getName()</td>
 				<td>@account.getTypeName()</td>
-				@if(account.isCash()) { <td>N/A</td> } else { <td>$0</td> }
+				@if(account.isCash()) { <td></td> } else { <td>$@account.getBalance()</td> }
 			</tr>
 		}
 	</table>
