@@ -8,12 +8,12 @@ export function init(cashAccounts, digitalAccounts) {
 	$('.create-transaction-option').click(function() {
 		if (modeSelectingOption) {
 			modeSelectingOption = false;
-			$('.create-transaction-option').hide();
-			$(this).show().addClass('selected');
+			$('.create-transaction-option').not(this).hide(300);
+			$(this).addClass('selected');
 			$('#create-transaction').show().html(renderTransactionCreator($(this).data('type')));
 		} else {
 			modeSelectingOption = true;
-			$('.create-transaction-option').show().removeClass('selected');
+			$('.create-transaction-option').show(300).removeClass('selected');
 			$('#create-transaction').hide();
 		}
 	});

@@ -6,7 +6,7 @@
 
 	@helper.form(routes.Accounting.makeNewTransaction()) {
 		<h2>New Transaction</h2>
-		<div class="col-sm-6">
+		<div class="create-transaction">
 			<div id="create-transaction-options">
 				<div data-type="CashDeposit" class="create-transaction-option">Cash Deposit</div>
 				<div data-type="CashWithdrawal" class="create-transaction-option">Cash Withdrawal</div>
@@ -16,14 +16,13 @@
 				<div data-type="DigitalTransfer" class="create-transaction-option">Digital Transfer</div>
 			</div>
 			<div id="create-transaction"></div>
-			<!-- @inputText(transactionForm("from_account_id"), '_label -> "From Account", 'class -> "form-control")
-			@inputText(transactionForm("to_account_id"), '_label -> "To Account", 'class -> "form-control") -->
+			<br/><br/><br/>
 		</div>
 	}
 }
 
 <script id="create-transaction-template" type="text/x-handlebars-template">
-	<table>
+	<table class="create-transaction-table">
 		<tr>
 			<th>From</th>
 			<td id="create-transaction-from">
@@ -39,16 +38,16 @@
 			</td>
 		</tr>
 		<tr>
-			<th>For</th>
+			<th>Reason</th>
 			<td><input type="text" name="description"/></td>
 		</tr>
 		<tr>
 			<th>Amount</th>
-			<td>$<input type="number" name="amount" min="0" step="0.01"/></td>
+			<td>$ <input type="number" name="amount" min="0" step="0.01"/></td>
 		</tr>
 	</table>
 	<input type="hidden" name="type" value="{{transactionType}}">
-	<input type="submit" value="Create" class="create-transaction-submit">
+	<input type="submit" value="Create" class="create-transaction-submit btn btn-primary">
 </script>
 
 <script type="text/javascript">
