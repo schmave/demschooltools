@@ -4,6 +4,7 @@
 }
 
 .create-transaction-option {
+	position: relative;
 	background: #E8F2F4;
 	border: 1px solid #A2C9D3;
 	border-radius: 4px;
@@ -13,6 +14,18 @@
 
 	&:hover {
 		background: #DCE8EA;
+	}
+}
+
+.create-transaction-option-info {
+	position: absolute;
+	right: 12px;
+	top: 10px;
+	color: #7ab;
+	font-size: 1.2em;
+
+	&:hover {
+		color: #589;
 	}
 }
 
@@ -34,9 +47,28 @@
 	input[type=number] {
 		width: 70px;
 	}
+
+	.account-name-selected {
+		display: none;
+		margin-top: 3px;
+		margin-bottom: 10px;
+
+		.label {
+			margin-left: 0;
+		}
+
+		img {
+			margin-left: -4px;
+		}
+	}
 }
 
 .create-transaction-submit {
 	margin-top: 5px;
 	padding: 6px 18px;
+}
+
+.account-info-table {
+	font-size: 1.2em;
+	width: 100%;
 }

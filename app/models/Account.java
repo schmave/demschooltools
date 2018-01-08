@@ -44,6 +44,11 @@ public class Account extends Model {
         return name;
     }
 
+    public String getTitle() {
+        String typeName = type == AccountType.Cash || type == AccountType.PersonalChecking ? getTypeName() + " " : "";
+        return getName() + "'s " + typeName + "Account";
+    }
+
     public String getTypeName() {
         return type.toString();
     }
@@ -56,6 +61,23 @@ public class Account extends Model {
         return initial_balance
             .add(credit_transactions.stream().map(t -> t.amount).reduce(BigDecimal.ZERO, BigDecimal::add))
             .subtract(payment_transactions.stream().map(t -> t.amount).reduce(BigDecimal.ZERO, BigDecimal::add));
+    }
+
+    public List<Transaction> getTransactionsViewModel() {
+        List<Transaction> result = new ArrayList<Transaction>();
+        for (Transaction t : credit_transactions) {
+            t.description = "from " + t.from_name + " – " + t.description;
+            result.add(t);
+        }
+        for (Transaction t : payment_transactions) {
+            if (t.type != TransactionType.CashWithdrawal) {
+                t.description = "to " + t.to_name + " – " + t.description;
+            }
+            t.amount = BigDecimal.ZERO.subtract(t.amount);
+            result.add(t);
+        }
+        Collections.sort(result, (a, b) -> b.id.compareTo(a.id));
+        return result;
     }
 
     private static Finder<Integer, Account> find = new Finder<Integer, Account>(Account.class);

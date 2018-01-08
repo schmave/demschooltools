@@ -8,12 +8,42 @@
 		<h2>New Transaction</h2>
 		<div class="create-transaction">
 			<div id="create-transaction-options">
-				<div data-type="CashDeposit" class="create-transaction-option">Cash Deposit</div>
-				<div data-type="CashWithdrawal" class="create-transaction-option">Cash Withdrawal</div>
-				<div data-type="CashTransfer" class="create-transaction-option">Cash Transfer</div>
-				<div data-type="DigitalCredit" class="create-transaction-option">Digital Credit</div>
-				<div data-type="DigitalPurchase" class="create-transaction-option">Digital Purchase</div>
-				<div data-type="DigitalTransfer" class="create-transaction-option">Digital Transfer</div>
+				<div data-type="CashDeposit" class="create-transaction-option">
+					Cash Deposit
+					<div class="create-transaction-option-info glyphicon glyphicon-info-sign" data-toggle="tooltip"
+						title="Use Cash Deposit when someone is making a cash payment which will be credited to an account, or depositing cash into their own account. The cash will be added to the school's petty cash container.">
+					</div>
+				</div>
+				<div data-type="CashWithdrawal" class="create-transaction-option">
+					Cash Withdrawal
+					<div class="create-transaction-option-info glyphicon glyphicon-info-sign" data-toggle="tooltip"
+						title="Use Cash Withdrawal when a SMM or other school entity is withdrawing cash from their own checking account. The cash will be removed from the school's petty cash container.">
+					</div>
+				</div>
+				<div data-type="CashTransfer" class="create-transaction-option">
+					Cash Transfer
+					<div class="create-transaction-option-info glyphicon glyphicon-info-sign" data-toggle="tooltip"
+						title="Use Cash Transfer when a SMM or other school entity is making a cash payment to another school entity. The only time it is necessary to record this kind of transaction is if the paying party owes an IOU to the receiving party, in which case the IOU will automatically be paid down.">
+					</div>
+				</div>
+				<div data-type="DigitalCredit" class="create-transaction-option">
+					Digital Credit
+					<div class="create-transaction-option-info glyphicon glyphicon-info-sign" data-toggle="tooltip"
+						title="Use Digital Credit when an account is being credited digitally (i.e. not cash) from a source outside the school (i.e. not a school account). For example, a student is adding funds to his account using his credit card.">
+					</div>
+				</div>
+				<div data-type="DigitalPurchase" class="create-transaction-option">
+					Digital Purchase
+					<div class="create-transaction-option-info glyphicon glyphicon-info-sign" data-toggle="tooltip"
+						title="Use Digital Purchase when an account is being debited digitally; for example, a corporation is making a purchase using a school credit card.">
+					</div>
+				</div>
+				<div data-type="DigitalTransfer" class="create-transaction-option">
+					Digital Transfer
+					<div class="create-transaction-option-info glyphicon glyphicon-info-sign" data-toggle="tooltip"
+						title="Use Digital Transfer when funds are being transferred from one account to another; for example, a student is purchasing a cookie at a corporation bake sale using her checking account.">
+					</div>
+				</div>
 			</div>
 			<div id="create-transaction"></div>
 			<br/><br/><br/>
@@ -26,15 +56,23 @@
 		<tr>
 			<th>From</th>
 			<td id="create-transaction-from">
-				<input type="hidden" class="js-account-id" name="from_account_id"/>
+				<div class="js-account-name-selected account-name-selected name">
+					<span class="js-account-name-selected-text label label-primary"></span>
+					<img src="/assets/images/x.png">
+				</div>
 				<input type="text" class="js-account-name" name="from_name"/>
+				<input type="hidden" class="js-account-id" name="from_account_id"/>
 			</td>
 		</tr>
 		<tr id="create-transaction-to-row">
 			<th>To</th>
 			<td id="create-transaction-to">
-				<input type="hidden" class="js-account-id" name="to_account_id"/>
+				<div class="js-account-name-selected account-name-selected name">
+					<span class="js-account-name-selected-text label label-primary"></span>
+					<img src="/assets/images/x.png">
+				</div>
 				<input type="text" class="js-account-name" name="to_name"/>
+				<input type="hidden" class="js-account-id" name="to_account_id"/>
 			</td>
 		</tr>
 		<tr>
@@ -43,7 +81,7 @@
 		</tr>
 		<tr>
 			<th>Amount</th>
-			<td>$ <input type="number" name="amount" min="0" step="0.01"/></td>
+			<td>$ <input type="number" name="amount" min="0" step="0.01" required autocomplete="off" /></td>
 		</tr>
 	</table>
 	<input type="hidden" name="type" value="{{transactionType}}">

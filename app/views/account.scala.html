@@ -1,0 +1,38 @@
+@(account : Account)
+
+@main(account.getTitle(), "accounting") {
+
+	<h2>@account.getTitle</h2>
+
+	@if(!account.isCash()) {
+		<table class="account-info-table">
+			<tr>
+				<td>Current Balance: <strong>$@account.getBalance()</strong></td>
+				<td>Initial Balance: $@account.initial_balance</td>
+			</tr>
+		</table>
+		<br>
+		<br>
+	}
+
+	<table class="table sortable">
+		<tr>
+			<th>Transaction ID</th>
+			<th>Date</th>
+			<th>Type</th>
+			<th>Description</th>
+			<th>Amount</th>
+		</tr>
+		@for(transaction <- account.getTransactionsViewModel()) {
+			<tr>
+				<td><a href="@routes.Accounting.transaction(transaction.id)">@transaction.id</a></td>
+				<td>@transaction.getFormattedDate()</td>
+				<td>@transaction.getTypeName()</td>
+				<td>@transaction.description</td>
+				<td>@transaction.getFormattedAmount()</td>
+			</tr>
+		}
+	</table>
+	<br>
+	<br>
+}

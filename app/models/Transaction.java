@@ -1,5 +1,6 @@
 package models;
 
+import java.text.*;
 import java.util.*;
 import java.math.*;
 import javax.persistence.*;
@@ -34,6 +35,20 @@ public class Transaction extends Model {
     public Date date_created = new Date();
 
     public TransactionType type;
+
+    public String getTypeName() {
+        return type.toString();
+    }
+
+    public String getFormattedDate() {
+        return new SimpleDateFormat("M/d/yy h:mm aa").format(date_created);
+    }
+
+    public String getFormattedAmount() {
+        if (amount == BigDecimal.ZERO) return "0";
+        String prefix = amount.compareTo(BigDecimal.ZERO) > 0 ? "+" : "";
+        return prefix + new DecimalFormat("0.00").format(amount);
+    }
 
     public static Finder<Integer, Transaction> find = new Finder<Integer, Transaction>(
         Transaction.class

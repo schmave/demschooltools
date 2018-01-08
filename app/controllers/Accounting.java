@@ -34,6 +34,11 @@ public class Accounting extends Controller {
         }
     }
 
+    public Result account(Integer id) {
+        Account account = Account.findById(id);
+        return ok(views.html.account.render(account));
+    }
+
     public Result accounts() {
         List<Account> accounts = Account.all();
         Collections.sort(accounts, (a, b) -> a.getName().compareTo(b.getName()));

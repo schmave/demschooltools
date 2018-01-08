@@ -105,8 +105,13 @@ var parseDate = function(date_str) {
 };
 
 var selectNextInput = function(cur_input) {
-    var next = $(":input:eq(" + ($(":input").index(cur_input) + 1) + ")");
-    next.focus();
+    getNextInput(cur_input).focus();
+
+    function getNextInput(input) {
+        var next = $(":input:eq(" + ($(":input").index(input) + 1) + ")");
+        if (next.is(":visible")) return next;
+        return getNextInput(next);
+    }
 };
 
 module.exports = {

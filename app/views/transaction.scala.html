@@ -1,1 +1,40 @@
 @(transaction : Transaction)
+
+@main("Transaction #" + transaction.id, "accounting") {
+
+	<h2>Transaction #@transaction.id</h2>
+	<div class="create-transaction">
+		<table class="create-transaction-table">
+			<tr>
+				<th>Type</th>
+				<td>@transaction.getTypeName()</td>
+			</tr>
+			<tr>
+				<th>From</th>
+				@if(transaction.from_account != null) {
+					<td><a href="@routes.Accounting.account(transaction.from_account.id)">@transaction.from_name</a></td>
+				} else {
+					<td>@transaction.from_name</td>
+				}
+			</tr>
+			@if(transaction.getTypeName() != "Cash Withdrawal") {
+				<tr>
+					<th>To</th>
+					@if(transaction.to_account != null) {
+						<td><a href="@routes.Accounting.account(transaction.to_account.id)">@transaction.to_name</a></td>
+					} else {
+						<td>@transaction.to_name</td>
+					}
+				</tr>
+			}
+			<tr>
+				<th>Reason</th>
+				<td>@transaction.description</td>
+			</tr>
+			<tr>
+				<th>Amount</th>
+				<td>$@transaction.amount</td>
+			</tr>
+		</table>
+	</div>
+}

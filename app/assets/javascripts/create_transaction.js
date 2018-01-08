@@ -1,4 +1,5 @@
 var Handlebars = require('handlebars');
+var utils = require('./utils');
 
 export function init(cashAccounts, digitalAccounts) {
 
@@ -52,15 +53,32 @@ export function init(cashAccounts, digitalAccounts) {
 	}
 
 	function registerAutocomplete(row, accounts) {
+		var selected = row.find('.js-account-name-selected');
+		var selectedText = row.find('.js-account-name-selected-text');
 		var textInput = row.find('.js-account-name');
 		var idInput = row.find('.js-account-id');
+
 		textInput.autocomplete({
-			source: accounts
+			source: accounts,
+			delay: 0,
+        	autoFocus: true,
 		});
 		textInput.bind("autocompleteselect", function(event, ui) {
-			var id = ui.item.id;
-			var label = ui.item.label;
-			idInput.val(id);
+			select(ui.item);
+	    });
+
+	    function select(item) {
+	    	idInput.val(item.id);
+			utils.selectNextInput(idInput);
+			textInput.hide();
+			selectedText.html(item.label);
+			selected.show();
+	    }
+
+	    selected.find('img').click(() => {
+	    	selected.hide();
+	    	idInput.val('');
+	    	textInput.val('').show().focus();
 	    });
 	}
 }
