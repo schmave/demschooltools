@@ -1,5 +1,6 @@
 package models;
 
+import java.text.*;
 import java.util.*;
 import java.math.*;
 import javax.persistence.*;
@@ -63,6 +64,10 @@ public class Account extends Model {
             .subtract(payment_transactions.stream().map(t -> t.amount).reduce(BigDecimal.ZERO, BigDecimal::add));
     }
 
+    public String getFormattedBalance() {
+        return "$" + new DecimalFormat("0.00").format(getBalance());
+    }
+
     public List<Transaction> getTransactionsViewModel() {
         List<Transaction> result = new ArrayList<Transaction>();
         for (Transaction t : credit_transactions) {
@@ -99,6 +104,21 @@ public class Account extends Model {
         return find.where()
             .eq("organization", Organization.getByHost())
             .ne("type", AccountType.Cash)
+            .findList();
+    }
+
+    public static List<Account> allPersonalChecking() {
+        return find.where()
+            .eq("organization", Organization.getByHost())
+            .eq("type", AccountType.PersonalChecking)
+            .findList();
+    }
+
+    public static List<Account> allInstitutionalChecking() {
+        return find.where()
+            .eq("organization", Organization.getByHost())
+            .ne("type", AccountType.Cash)
+            .ne("type", AccountType.PersonalChecking)
             .findList();
     }
 

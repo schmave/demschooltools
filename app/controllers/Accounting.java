@@ -34,6 +34,14 @@ public class Accounting extends Controller {
         }
     }
 
+    public Result balances() {
+        List<Account> personalAccounts = Account.allPersonalChecking();
+        List<Account> institutionalAccounts = Account.allInstitutionalChecking();
+        Collections.sort(personalAccounts, (a, b) -> a.getName().compareTo(b.getName()));
+        Collections.sort(institutionalAccounts, (a, b) -> a.getName().compareTo(b.getName()));
+        return ok(views.html.balances.render(personalAccounts, institutionalAccounts));
+    }
+
     public Result account(Integer id) {
         Account account = Account.findById(id);
         return ok(views.html.account.render(account));

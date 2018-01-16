@@ -111,6 +111,7 @@ POST    /attendance/importFromCustodia     controllers.Attendance.importFromCust
 GET 	/accounting/transaction/:id		  	controllers.Accounting.transaction(id: Integer)
 GET 	/accounting/createTransaction		controllers.Accounting.newTransaction()
 POST 	/accounting/createTransaction		controllers.Accounting.makeNewTransaction()
+GET 	/accounting/balances			  	controllers.Accounting.balances()
 GET 	/accounting/accounts			  	controllers.Accounting.accounts()
 GET 	/accounting/account/:id		  		controllers.Accounting.account(id: Integer)
 GET 	/accounting/newAccount			  	controllers.Accounting.newAccount()
