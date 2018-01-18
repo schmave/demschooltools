@@ -23,22 +23,20 @@ module.exports = React.createClass({
         var sortedDates = Object.keys(groupedDays).sort();
 
         var i,j,temparray,chunk = 4;
-        var maps =[];
+        var maps = [];
         for (i=0,j=sortedDates.length; i<j; i+=chunk) {
             temparray = sortedDates.slice(i,i+chunk);
             var dates = temparray.map(function(d) {
                 return groupedDays[d];
             }).concatAll()
-            var m = this.makeHeatmapRow(dates, minutes);
+            var m = this.makeHeatmapRow(dates, minutes, i);
             maps.push(m);
         };
-        //var maps = groupedDates.map(function(dates, idx){
-        //maps = maps.concatAll();
-        return maps
+        return maps;
     },
-    makeHeatmapRow: function(dates, minutes) {
-            return <Heatmapmonth key="1"
-                                 index="1"
+    makeHeatmapRow: function(dates, minutes, key) {
+            return <Heatmapmonth key={key}
+                                 index={key}
                                  requiredMinutes={minutes}
                                  days={dates}></Heatmapmonth>;
     },

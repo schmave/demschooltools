@@ -64,7 +64,7 @@ var exports = React.createClass({
         });
     },
     render: function () {
-        return <div id={"heatmap" + this.props.index} className="col-sm-4"></div>;
+        return <div id={"heatmap" + this.props.index} className="col-sm-4" style={{float: "none"}}></div>;
     },
     componentDidMount: function () {
         this.loadHeatmap();
