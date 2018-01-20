@@ -177,22 +177,31 @@ rect.highlight {
 }
 /* absent */
 .q0, .q1 {
-    fill:		#F08080 !important;
+    fill: #c62828 !important;
+}
+
+/* way low */
+.q2 {
+    fill: #ff6659 !important;
+}
+
+.q3 {
+    fill: #EEE8AA !important;
 }
 .subdomain-text{
     fill: black !important;
 }
 /* short */
-.q2 {
-    fill: #EEE8AA !important;
+.q4 {
+    fill: #80e27e !important;
 }
 /* little short */
-.q3 {
-    fill: #9cc069 !important;
+.q5 {
+    fill: #4caf50 !important;
 }
 /* good */
-.q4 {
-    fill: green !important;
+.q6 {
+    fill: #087f23 !important;
 }
 
 .class-listing .panel,

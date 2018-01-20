@@ -104,6 +104,8 @@
 
   (GET "/js/gen/:id{.+}/app.js" req
        (io/resource "public/js/gen/app.js"))
+  (GET "/css/:id{.+}/starter-template.css" req
+       (io/resource "public/starter-template.css"))
   (route/resources "/")
   (ANY "*" []
        (route/not-found (slurp (io/resource "404.html")))))

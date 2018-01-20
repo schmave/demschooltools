@@ -54,7 +54,7 @@ var exports = React.createClass({
             subDomain: 'x_day',
             subDomainTextFormat: "%d",
             range: 4,
-            legend: [0,this.props.requiredMinutes-15,this.props.requiredMinutes-1],
+            legend: [0, 210, this.props.requiredMinutes-45, this.props.requiredMinutes-15, this.props.requiredMinutes-1],
             legendVerticalPosition: 'center',
             legendCellSize: 8,
             itemName: ['minute', 'minutes'],
