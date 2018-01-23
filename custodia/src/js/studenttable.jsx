@@ -7,6 +7,9 @@ var React = require('react'),
     studentStore = require('./StudentStore');
 
 module.exports = React.createClass({
+    contextTypes: {
+        router: React.PropTypes.func.isRequired
+    },
     getInitialState: function () {
         return {students: studentStore.getStudents(true),
                 today: null};
@@ -32,27 +35,43 @@ module.exports = React.createClass({
             buttonIcon = 'fa-arrow-left';
         }
         var iclassName = "fa " + buttonIcon + " sign-" + student._id;
-        if(this.isSigningIn(student)) {
-            return <button onClick={this.signIn.bind(this, student)} className="btn btn-sm btn-primary"><i className={iclassName}>&nbsp;</i></button>;
+        var is_teacher_class = student.is_teacher ? " is_teacher" : "";
+        var button_class = "btn-default name-button" +
+            (student.swiped_today_late ? " late" : "");
+        if (way === 'out') {
+            return <button onClick={this.signIn.bind(this, student)}
+                           className={"btn btn-sm " + button_class + is_teacher_class}>
+                <i className={iclassName}>&nbsp;</i>
+                <span className="name-span">{student.name}</span>
+             </button>;
         }else{
-            return <button onClick={this.signOut.bind(this, student)} className="btn btn-sm btn-info"><i className={iclassName}>&nbsp;</i></button>;
+            return <button onClick={this.signOut.bind(this, student)}
+                           className={"btn btn-sm " + button_class + is_teacher_class}>
+                <span className="name-span">{student.name}</span>
+                <i className={iclassName}>&nbsp;</i>
+             </button>;
         }
     },
     getStudent: function(student, way){
-        var is_teacher = student.is_teacher ? "is_teacher" : "";
-        var link = <Link to="student" params={{studentId: student._id}}
-                         className={is_teacher}
-                         id={"student-" + student._id}>
-                     {student.name}
-                   </Link>;
+        var link = <span className="glyphicon glyphicon-calendar"></span>;
         var button = this.getSwipeButton(student, way);
-        var late = student.swiped_today_late ? "late" : "";
-        return <div className={late + " panel panel-info student-listing col-sm-11"}>
-            <div >{link}</div>
-            <div className="attendance-button">
+        var calendar_button_class = "btn btn-default calendar-button";
+        var self = this;
+        if (way !== 'out') {
+            return <div className="btn-group student-listing col-sm-11" role={"group"}>
+                <div onClick={function() {
+                        self.context.router.transitionTo('student', {studentId: student._id})}}
+                        className={calendar_button_class}>{link}</div>
                 {button}
-            </div>
-        </div>;
+            </div>;
+        } else {
+            return <div className="btn-group student-listing col-sm-11" role={"group"}>
+                {button}
+                <div onClick={function() {
+                        self.context.router.transitionTo('student', {studentId: student._id})}}
+                        className={calendar_button_class}>{link}</div>
+            </div>;
+        }
     },
     render: function () {
         var absentCol = [],
@@ -82,25 +101,25 @@ module.exports = React.createClass({
         return <div className="row">
             <SwipeHelpers ref="missingSwipeCollector"></SwipeHelpers>
             <div className="row student-listing-table">
-                <div className="col-sm-3 column">
+                <div className="col-md-3 column">
                     <div className="panel panel-info absent">
                         <div className="panel-heading absent"><b>Not Coming In ({absentCol.length})</b></div>
                         <div className="panel-body row">{absentCol}</div>
                     </div>
                 </div>
-                <div className="col-sm-3 column not-in">
+                <div className="col-md-3 column not-in">
                     <div className="panel panel-info">
                         <div className="panel-heading"><b>Not Yet In ({notYetInCol.length})</b></div>
                         <div className="panel-body row">{notYetInCol}</div>
                     </div>
                 </div>
-                <div className="col-sm-3 column in">
+                <div className="col-md-3 column in">
                     <div className="panel panel-info">
                         <div className="panel-heading"><b>In ({inCol.length})</b></div>
                         <div className="panel-body row">{inCol}</div>
                     </div>
                 </div>
-                <div className="col-sm-3 column out">
+                <div className="col-md-3 column out">
                     <div className="panel panel-info">
                         <div className="panel-heading"><b>Out ({outCol.length})</b></div>
                         <div className="panel-body row">{outCol}</div>
