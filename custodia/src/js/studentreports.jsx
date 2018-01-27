@@ -134,7 +134,7 @@ var exports = React.createClass({
                                              {displayName: 'Attended',
                                               customComponent: StudentAttendendedComponent,
                                               columnName: 'good'},
-                                             {displayName: 'Gave Attendance', columnName: 'overrides'},
+                                             {displayName: 'Overrides', columnName: 'overrides'},
                                              {displayName: 'Unexcused', columnName: 'unexcused'},
                                              {displayName: 'Excused Absence', columnName: 'excuses'},
                                              {displayName: 'Short', columnName: 'short'},
