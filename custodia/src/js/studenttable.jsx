@@ -38,14 +38,15 @@ module.exports = React.createClass({
         var is_teacher_class = student.is_teacher ? " is_teacher" : "";
         var button_class = "btn-default name-button" +
             (student.swiped_today_late ? " late" : "");
+        var sign_function = this.isSigningIn(student) ? this.signIn : this.signOut;
         if (way === 'out') {
-            return <button onClick={this.signIn.bind(this, student)}
+            return <button onClick={sign_function.bind(this, student)}
                            className={"btn btn-sm " + button_class + is_teacher_class}>
                 <i className={iclassName}>&nbsp;</i>
                 <span className="name-span">{student.name}</span>
              </button>;
-        }else{
-            return <button onClick={this.signOut.bind(this, student)}
+        } else {
+            return <button onClick={sign_function.bind(this, student)}
                            className={"btn btn-sm " + button_class + is_teacher_class}>
                 <span className="name-span">{student.name}</span>
                 <i className={iclassName}>&nbsp;</i>
@@ -57,19 +58,19 @@ module.exports = React.createClass({
         var button = this.getSwipeButton(student, way);
         var calendar_button_class = "btn btn-default calendar-button";
         var self = this;
+        var calendar_button = <div onClick={function() {
+            self.context.router.transitionTo('student', {studentId: student._id})}}
+            className={calendar_button_class}>{link}</div>;
+
         if (way !== 'out') {
-            return <div className="btn-group student-listing col-sm-11" role={"group"}>
-                <div onClick={function() {
-                        self.context.router.transitionTo('student', {studentId: student._id})}}
-                        className={calendar_button_class}>{link}</div>
+            return <div key={student._id} className="btn-group student-listing col-sm-11" role={"group"}>
+                {calendar_button}
                 {button}
             </div>;
         } else {
-            return <div className="btn-group student-listing col-sm-11" role={"group"}>
+            return <div key={student._id} className="btn-group student-listing col-sm-11" role={"group"}>
                 {button}
-                <div onClick={function() {
-                        self.context.router.transitionTo('student', {studentId: student._id})}}
-                        className={calendar_button_class}>{link}</div>
+                {calendar_button}
             </div>;
         }
     },
