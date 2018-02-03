@@ -95,9 +95,6 @@ public class Secured {
         }
 
     	public String getUsername(final Context ctx, String role) {
-            if (1 == 1) {
-                return "Admin User";
-            }
             String username = getUsernameOrIP(ctx, true);
             User u = User.findByEmail(username);
 
