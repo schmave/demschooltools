@@ -5,30 +5,30 @@
 	<h2>Account Balances</h2>
 
 	<div class="col-sm-6">
-		<table class="table sortable">
+		<table class="balances-table table sortable">
 			<tr>
 				<th>Name</th>
-				<th>Current Balance</th>
+				<th class="balances-balance">Current Balance</th>
 			</tr>
 			@for(account <- personalAccounts) {
 				<tr>
 					<td><a href="@routes.Accounting.account(account.id)">@account.getName()</a></td>
-					<td>@account.getFormattedBalance()</td>
+					<td class="balances-balance">@account.getFormattedBalance()</td>
 				</tr>
 			}
 		</table>
 	</div>
 
 	<div class="col-sm-6">
-		<table class="table sortable">
+		<table class="balances-table table sortable">
 			<tr>
 				<th>Name</th>
-				<th>Current Balance</th>
+				<th class="balances-balance">Current Balance</th>
 			</tr>
 			@for(account <- institutionalAccounts) {
 				<tr>
 					<td><a href="@routes.Accounting.account(account.id)">@account.getName()</a></td>
-					<td>@account.getFormattedBalance()</td>
+					<td class="balances-balance">@account.getFormattedBalance()</td>
 				</tr>
 			}
 		</table>

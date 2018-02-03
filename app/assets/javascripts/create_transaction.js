@@ -33,17 +33,7 @@ export function init(cashAccounts, digitalAccounts) {
 			registerAutocomplete(from, digitalAccounts);
 			toRow.hide();
 		}
-		else if (transactionType === 'CashTransfer') {
-			registerAutocomplete(from, cashAccounts);
-			registerAutocomplete(to, cashAccounts);
-		}
-		else if (transactionType === 'DigitalCredit') {
-			registerAutocomplete(to, digitalAccounts);
-		}
-		else if (transactionType === 'DigitalPurchase') {
-			registerAutocomplete(from, digitalAccounts);
-		}
-		else if (transactionType === 'DigitalTransfer') {
+		else if (transactionType === 'DigitalTransaction') {
 			registerAutocomplete(from, digitalAccounts);
 			registerAutocomplete(to, digitalAccounts);
 		}

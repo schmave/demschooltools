@@ -25,12 +25,15 @@ public class Accounting extends Controller {
         Form<Transaction> filledForm = form.bindFromRequest();
         if(filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
-            return badRequest(
-                views.html.create_transaction.render(filledForm)
-            );
+            return badRequest(views.html.create_transaction.render(filledForm));
         } else {
-            Transaction transaction = Transaction.create(filledForm);
-            return redirect(routes.Accounting.transaction(transaction.id));
+            try {
+                Transaction transaction = Transaction.create(filledForm);
+                return redirect(routes.Accounting.transaction(transaction.id));
+            }
+            catch (Exception ex) {
+                return badRequest(ex.getMessage());
+            }
         }
     }
 

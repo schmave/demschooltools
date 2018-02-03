@@ -59,14 +59,19 @@ public class Transaction extends Model {
             .eq("id", id).findUnique();
     }
 
-    public static Transaction create(Form<Transaction> form) {
+    public static Transaction create(Form<Transaction> form) throws Exception {
         Transaction transaction = form.get();
         transaction.from_account = findAccountById(form.field("from_account_id").value());
         transaction.to_account = findAccountById(form.field("to_account_id").value());
-        // for cash withdrawals from personal accounts, the to_account is automatically the person's cash account
-        if (transaction.type == TransactionType.CashWithdrawal && transaction.from_account.person != null) {
-            List<Account> personAccounts = transaction.from_account.person.accounts;
-            transaction.to_account = personAccounts.stream().filter(a -> a.type == AccountType.Cash).findFirst().get();
+        if (transaction.type == TransactionType.CashWithdrawal) {
+            if (transaction.from_account == null) {
+                throw new Exception("A Cash Withdrawal must be from an account");
+            }
+            // for cash withdrawals from personal accounts, the to_account is automatically the person's cash account
+            if (transaction.from_account.person != null) {
+                List<Account> personAccounts = transaction.from_account.person.accounts;
+                transaction.to_account = personAccounts.stream().filter(a -> a.type == AccountType.Cash).findFirst().get();
+            }
         }
         transaction.organization = Organization.getByHost();
         transaction.save();

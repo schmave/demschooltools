@@ -65,7 +65,7 @@ public class Account extends Model {
     }
 
     public String getFormattedBalance() {
-        return "$" + new DecimalFormat("0.00").format(getBalance());
+        return new DecimalFormat("0.00").format(getBalance());
     }
 
     public List<Transaction> getTransactionsViewModel() {

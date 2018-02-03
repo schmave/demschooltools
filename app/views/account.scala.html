@@ -7,7 +7,7 @@
 	@if(!account.isCash()) {
 		<table class="account-info-table">
 			<tr>
-				<td>Current Balance: <strong>$@account.getBalance()</strong></td>
+				<td>Current Balance: <strong>$@account.getFormattedBalance()</strong></td>
 				<td>Initial Balance: $@account.initial_balance</td>
 			</tr>
 		</table>

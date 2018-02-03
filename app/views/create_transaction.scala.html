@@ -8,6 +8,12 @@
 		<h2>New Transaction</h2>
 		<div class="create-transaction">
 			<div id="create-transaction-options">
+				<div data-type="DigitalTransaction" class="create-transaction-option">
+					Digital Transaction
+					<div class="create-transaction-option-info glyphicon glyphicon-info-sign" data-toggle="tooltip"
+						title="A Digital Transaction is any transaction that does not involve cash.">
+					</div>
+				</div>
 				<div data-type="CashDeposit" class="create-transaction-option">
 					Cash Deposit
 					<div class="create-transaction-option-info glyphicon glyphicon-info-sign" data-toggle="tooltip"
@@ -18,30 +24,6 @@
 					Cash Withdrawal
 					<div class="create-transaction-option-info glyphicon glyphicon-info-sign" data-toggle="tooltip"
 						title="Use Cash Withdrawal when a SMM or other school entity is withdrawing cash from their own checking account. The cash will be removed from the school's petty cash balance.">
-					</div>
-				</div>
-				<!-- <div data-type="CashTransfer" class="create-transaction-option">
-					Cash Transfer
-					<div class="create-transaction-option-info glyphicon glyphicon-info-sign" data-toggle="tooltip"
-						title="Use Cash Transfer when a SMM or other school entity is making a cash payment to another school entity who then keeps the cash. The only time it is necessary to record this kind of transaction is if the paying party owes an IOU to the receiving party, in which case the IOU will automatically be paid down.">
-					</div>
-				</div> -->
-				<div data-type="DigitalCredit" class="create-transaction-option">
-					Digital Credit
-					<div class="create-transaction-option-info glyphicon glyphicon-info-sign" data-toggle="tooltip"
-						title="Use Digital Credit when an account is being credited digitally (i.e. not cash) from a source outside the school (i.e. not a school account). For example, a student is adding funds to his account using his credit card.">
-					</div>
-				</div>
-				<div data-type="DigitalPurchase" class="create-transaction-option">
-					Digital Purchase
-					<div class="create-transaction-option-info glyphicon glyphicon-info-sign" data-toggle="tooltip"
-						title="Use Digital Purchase when an account is being debited digitally; for example, a corporation is making a purchase using a school credit card.">
-					</div>
-				</div>
-				<div data-type="DigitalTransfer" class="create-transaction-option">
-					Digital Transfer
-					<div class="create-transaction-option-info glyphicon glyphicon-info-sign" data-toggle="tooltip"
-						title="Use Digital Transfer when funds are being transferred from one account to another; for example, a student is purchasing a cookie at a corporation bake sale using her checking account.">
 					</div>
 				</div>
 			</div>
@@ -85,7 +67,7 @@
 		</tr>
 	</table>
 	<input type="hidden" name="type" value="{{transactionType}}">
-	<input type="submit" value="Create" class="create-transaction-submit btn btn-primary">
+	<input type="submit" value="Create" class="create-transaction-submit js-create-transaction-submit btn btn-primary">
 </script>
 
 <script type="text/javascript">

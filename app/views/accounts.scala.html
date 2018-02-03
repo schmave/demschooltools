@@ -8,17 +8,17 @@
 	<br>
 	<br>
 
-	<table class="table sortable">
+	<table class="balances-table table sortable">
 		<tr>
 			<th>Name</th>
 			<th>Type</th>
-			<th>Current Balance</th>
+			<th class="balances-balance">Current Balance</th>
 		</tr>
 		@for(account <- accounts) {
 			<tr>
 				<td><a href="@routes.Accounting.account(account.id)">@account.getName()</a></td>
 				<td>@account.getTypeName()</td>
-				@if(account.isCash()) { <td></td> } else { <td>@account.getFormattedBalance()</td> }
+				@if(account.isCash()) { <td></td> } else { <td class="balances-balance">@account.getFormattedBalance()</td> }
 			</tr>
 		}
 	</table>
