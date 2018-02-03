@@ -58,6 +58,10 @@ public class Account extends Model {
         return type == AccountType.Cash;
     }
 
+    public boolean hasTransactions() {
+        return payment_transactions.size() > 0 || credit_transactions.size() > 0;
+    }
+
     public BigDecimal getBalance() {
         return initial_balance
             .add(credit_transactions.stream().map(t -> t.amount).reduce(BigDecimal.ZERO, BigDecimal::add))
@@ -146,4 +150,11 @@ public class Account extends Model {
         return account;
     }
 
+    public static void delete(Integer id) throws Exception {
+        Account account = find.ref(id);
+        if (account.hasTransactions()) {
+            throw new Exception("Can't delete an account that has transactions");
+        }
+        account.delete();
+    }
 }

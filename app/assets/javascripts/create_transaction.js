@@ -19,6 +19,14 @@ export function init(cashAccounts, digitalAccounts) {
 		}
 	});
 
+	$('body').on('input', '#amount', function() {
+		if (Number($('#balance').data('value')) - Number($(this).val()) < 0) {
+			$('#balance').addClass('warning');
+		} else {
+			$('#balance').removeClass('warning');
+		}
+	});
+
 	function renderTransactionCreator(transactionType) {
 		var table = $(createTransactionTemplate({transactionType: transactionType}));
 		var from = table.find('#create-transaction-from');
@@ -30,11 +38,11 @@ export function init(cashAccounts, digitalAccounts) {
 			registerAutocomplete(to, digitalAccounts);
 		}
 		else if (transactionType === 'CashWithdrawal') {
-			registerAutocomplete(from, digitalAccounts);
+			registerAutocomplete(from, digitalAccounts, true);
 			toRow.hide();
 		}
 		else if (transactionType === 'DigitalTransaction') {
-			registerAutocomplete(from, digitalAccounts);
+			registerAutocomplete(from, digitalAccounts, true);
 			registerAutocomplete(to, digitalAccounts);
 		}
 		else throw 'invalid transaction type: ' + transactionType;
@@ -42,7 +50,7 @@ export function init(cashAccounts, digitalAccounts) {
 		return table;
 	}
 
-	function registerAutocomplete(row, accounts) {
+	function registerAutocomplete(row, accounts, isFromDigitalAccount) {
 		var selected = row.find('.js-account-name-selected');
 		var selectedText = row.find('.js-account-name-selected-text');
 		var textInput = row.find('.js-account-name');
@@ -62,6 +70,12 @@ export function init(cashAccounts, digitalAccounts) {
 			utils.selectNextInput(idInput);
 			textInput.hide();
 			selectedText.html(item.label);
+			if (isFromDigitalAccount) {
+				$('#balance').data('value', item.balance).html(item.label + '\'s current balance: $' + item.balance);
+				if (Number(item.balance) - Number($('#amount').val()) < 0) {
+					$('#balance').addClass('warning');
+				}
+			}
 			selected.show();
 	    }
 
@@ -69,6 +83,9 @@ export function init(cashAccounts, digitalAccounts) {
 	    	selected.hide();
 	    	idInput.val('');
 	    	textInput.val('').show().focus();
+	    	if (isFromDigitalAccount) {
+	    		$('#balance').html('').removeClass('warning');	    			
+	    	}
 	    });
 	}
 }

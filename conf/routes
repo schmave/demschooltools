@@ -116,6 +116,7 @@ GET 	/accounting/accounts			  	controllers.Accounting.accounts()
 GET 	/accounting/account/:id		  		controllers.Accounting.account(id: Integer)
 GET 	/accounting/newAccount			  	controllers.Accounting.newAccount()
 POST 	/accounting/newAccount			  	controllers.Accounting.makeNewAccount()
+POST 	/accounting/deleteAccount		  	controllers.Accounting.deleteAccount(id: Integer)
 
 GET     /people/edit/:id          controllers.CRM.editPerson(id: Integer)
 POST    /people/edit              controllers.CRM.savePersonEdits()

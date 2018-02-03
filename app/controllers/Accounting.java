@@ -50,6 +50,11 @@ public class Accounting extends Controller {
         return ok(views.html.account.render(account));
     }
 
+    public Result deleteAccount(Integer id) throws Exception {
+        Account.delete(id);
+        return redirect(routes.Accounting.accounts());
+    }
+
     public Result accounts() {
         List<Account> accounts = Account.all();
         Collections.sort(accounts, (a, b) -> a.getName().compareTo(b.getName()));
@@ -90,6 +95,7 @@ public class Accounting extends Controller {
             HashMap<String, String> values = new HashMap<String, String>();
             values.put("label", a.getName());
             values.put("id", "" + a.id);
+            values.put("balance", a.getFormattedBalance());
             result.add(values);
         }
         return Json.stringify(Json.toJson(result));

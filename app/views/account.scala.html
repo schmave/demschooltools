@@ -4,6 +4,13 @@
 
 	<h2>@account.getTitle</h2>
 
+	@if(account.person == null && !account.hasTransactions()) {
+		<form action="@routes.Accounting.deleteAccount(account.id)" method="post">
+			<button type="submit" class="btn-link">Delete Account</button>
+		</form>
+		<br>
+	}
+
 	@if(!account.isCash()) {
 		<table class="account-info-table">
 			<tr>
