@@ -52,17 +52,17 @@
                     <a href="@routes.Attendance.viewCustodiaAdmin()">Custodia</a>
                 </li>
             }
-            @if(OrgConfig.get().org.show_accounting) {
-                <li @if(menu.equals("accounting")) { class="active" }>
-                    <a href="@routes.Accounting.newTransaction()">Accounting</a>
-                </li>
-            }
             <li @if(menu.equals("jc")) { class="active" }>
                 <a href="@routes.Application.index()">@OrgConfig.get().str_jc_name_short</a>
             </li>
             <li @if(menu.equals("manual")) { class="active" }>
                 <a href="@routes.Application.viewManual()">@OrgConfig.get().str_manual_title_short</a>
             </li>
+            @if(OrgConfig.get().org.show_accounting) {
+                <li @if(menu.equals("accounting")) { class="active" }>
+                    <a href="@routes.Accounting.newTransaction()">Accounting</a>
+                </li>
+            }
             <li @if(menu.equals("settings")) { class="active" } class="dropdown">
                 <a href="@routes.Settings.viewSettings()">Settings</a>
             </li>

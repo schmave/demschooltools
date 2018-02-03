@@ -5,6 +5,7 @@ import models.*;
 import play.mvc.*;
 import play.data.*;
 import play.libs.Json;
+import java.util.stream.Collectors;
 
 @With(DumpOnError.class)
 @Secured.Auth(UserRole.ROLE_ALL_ACCESS)
@@ -15,11 +16,13 @@ public class Accounting extends Controller {
         return ok(views.html.transaction.render(transaction));
     }
 
+    @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result newTransaction() {
         Form<Transaction> form = Form.form(Transaction.class);
         return ok(views.html.create_transaction.render(form));
     }
 
+    @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result makeNewTransaction() {
         Form<Transaction> form = Form.form(Transaction.class);
         Form<Transaction> filledForm = form.bindFromRequest();
@@ -38,7 +41,10 @@ public class Accounting extends Controller {
     }
 
     public Result balances() {
-        List<Account> personalAccounts = Account.allPersonalChecking();
+        List<Account> personalAccounts = Account.allPersonalChecking().stream()
+            .filter(a -> a.person.tags.stream().anyMatch(t -> t.show_in_account_balances))
+            .collect(Collectors.toList());
+
         List<Account> institutionalAccounts = Account.allInstitutionalChecking();
         Collections.sort(personalAccounts, (a, b) -> a.getName().compareTo(b.getName()));
         Collections.sort(institutionalAccounts, (a, b) -> a.getName().compareTo(b.getName()));
