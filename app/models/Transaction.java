@@ -1,5 +1,6 @@
 package models;
 
+import controllers.Application;
 import java.text.*;
 import java.util.*;
 import java.math.*;
@@ -26,6 +27,10 @@ public class Transaction extends Model {
     @JoinColumn(name = "to_account_id", referencedColumnName = "id")
     public Account to_account;
 
+    @ManyToOne()
+    @JoinColumn(name = "created_by_user_id", referencedColumnName = "id")
+    public User created_by_user;
+
     public String from_name = "";
     public String to_name = "";
     public String description = "";
@@ -39,6 +44,10 @@ public class Transaction extends Model {
     public String getTypeName() {
         return type.toString();
     }
+
+    public String getCreatedByUserName() {
+        return created_by_user == null ? "guest" : created_by_user.name;
+    }    
 
     public String getFormattedDate() {
         return new SimpleDateFormat("M/d/yy h:mm aa").format(date_created);
@@ -59,28 +68,37 @@ public class Transaction extends Model {
             .eq("id", id).findUnique();
     }
 
+    public static List<Transaction> allCashDeposits() {
+        return find.where()
+            .eq("organization", Organization.getByHost())
+            .eq("type", TransactionType.CashDeposit)
+            .findList();
+    }
+
+    public static List<Transaction> allCashWithdrawals() {
+        return find.where()
+            .eq("organization", Organization.getByHost())
+            .eq("type", TransactionType.CashWithdrawal)
+            .findList();
+    }
+
     public static Transaction create(Form<Transaction> form) throws Exception {
         Transaction transaction = form.get();
         transaction.from_account = findAccountById(form.field("from_account_id").value());
         transaction.to_account = findAccountById(form.field("to_account_id").value());
         if (transaction.type == TransactionType.CashWithdrawal) {
-            if (transaction.from_account == null) {
-                throw new Exception("A Cash Withdrawal must be from an account.");
-            }
             // for cash withdrawals from personal accounts, the to_account is automatically the person's cash account
             if (transaction.from_account.person != null) {
                 List<Account> personAccounts = transaction.from_account.person.accounts;
                 transaction.to_account = personAccounts.stream().filter(a -> a.type == AccountType.Cash).findFirst().get();
             }
         }
-        if (transaction.type == TransactionType.CashDeposit && transaction.to_account == null) {
-            throw new Exception("A Cash Deposit must be to an account.");
-        }
         if (transaction.type == TransactionType.DigitalTransaction 
             && transaction.from_account == null && transaction.to_account == null) {
             throw new Exception("A Digital Transaction must be either from an account or to an account.");
         }
         transaction.organization = Organization.getByHost();
+        transaction.created_by_user = Application.getCurrentUser();
         transaction.save();
         return transaction;
     }

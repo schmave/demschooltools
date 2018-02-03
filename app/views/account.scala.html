@@ -26,6 +26,7 @@
 		<tr>
 			<th>Transaction ID</th>
 			<th>Date</th>
+			<th>Created By User</th>
 			<th>Type</th>
 			<th>Description</th>
 			<th>Amount</th>
@@ -34,6 +35,7 @@
 			<tr>
 				<td><a href="@routes.Accounting.transaction(transaction.id)">@transaction.id</a></td>
 				<td>@transaction.getFormattedDate()</td>
+				<td>@transaction.getCreatedByUserName()</td>
 				<td>@transaction.getTypeName()</td>
 				<td>@transaction.description</td>
 				<td>@transaction.getFormattedAmount()</td>

@@ -75,18 +75,23 @@ public class Account extends Model {
     public List<Transaction> getTransactionsViewModel() {
         List<Transaction> result = new ArrayList<Transaction>();
         for (Transaction t : credit_transactions) {
-            t.description = "from " + t.from_name + " – " + t.description;
+            t.description = getFormattedDescription("from", t.from_name, t.description);
             result.add(t);
         }
         for (Transaction t : payment_transactions) {
-            if (t.type != TransactionType.CashWithdrawal) {
-                t.description = "to " + t.to_name + " – " + t.description;
-            }
+            t.description = getFormattedDescription("to", t.to_name, t.description);
             t.amount = BigDecimal.ZERO.subtract(t.amount);
             result.add(t);
         }
         Collections.sort(result, (a, b) -> b.id.compareTo(a.id));
         return result;
+    }
+
+    private String getFormattedDescription(String toFromPrefix, String toFromName, String description) {
+        if (toFromName.trim().isEmpty()) return description;
+        String toFrom = toFromPrefix + " " + toFromName;
+        if (description.trim().isEmpty()) return toFrom;
+        return toFrom + " – " + description;
     }
 
     private static Finder<Integer, Account> find = new Finder<Integer, Account>(Account.class);

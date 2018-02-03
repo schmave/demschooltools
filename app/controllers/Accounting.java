@@ -45,6 +45,10 @@ public class Accounting extends Controller {
         return ok(views.html.balances.render(personalAccounts, institutionalAccounts));
     }
 
+    public Result pettyCash() {
+        return ok(views.html.petty_cash.render(PettyCash.find()));
+    }
+
     public Result account(Integer id) {
         Account account = Account.findById(id);
         return ok(views.html.account.render(account));

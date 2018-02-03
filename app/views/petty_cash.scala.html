@@ -1,0 +1,34 @@
+@(model : PettyCash)
+
+@main("Petty Cash", "accounting", "accounting_petty_cash") {
+
+	<h2>Petty Cash</h2>
+
+	<div class="petty-cash-current-balance">
+		Current Balance: <strong>$@model.getFormattedBalance()</strong>
+	</div>
+	<br>
+
+	<table class="table sortable">
+		<tr>
+			<th>Transaction ID</th>
+			<th>Date</th>
+			<th>Created By User</th>
+			<th>Type</th>
+			<th>Description</th>
+			<th>Amount</th>
+		</tr>
+		@for(transaction <- model.getTransactionsViewModel()) {
+			<tr>
+				<td><a href="@routes.Accounting.transaction(transaction.id)">@transaction.id</a></td>
+				<td>@transaction.getFormattedDate()</td>
+				<td>@transaction.getCreatedByUserName()</td>
+				<td>@transaction.getTypeName()</td>
+				<td>@transaction.description</td>
+				<td>@transaction.getFormattedAmount()</td>
+			</tr>
+		}
+	</table>
+	<br>
+	<br>
+}
