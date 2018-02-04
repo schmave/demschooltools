@@ -41,10 +41,7 @@ public class Accounting extends Controller {
     }
 
     public Result balances() {
-        List<Account> personalAccounts = Account.allPersonalChecking().stream()
-            .filter(a -> a.person.tags.stream().anyMatch(t -> t.show_in_account_balances))
-            .collect(Collectors.toList());
-
+        List<Account> personalAccounts = filterAccounts(Account.allPersonalChecking());
         List<Account> institutionalAccounts = Account.allInstitutionalChecking();
         Collections.sort(personalAccounts, (a, b) -> a.getName().compareTo(b.getName()));
         Collections.sort(institutionalAccounts, (a, b) -> a.getName().compareTo(b.getName()));
@@ -92,11 +89,11 @@ public class Accounting extends Controller {
     }
 
     public static String cashAccountsJson() {
-        return accountsJson(Account.allCash());
+        return accountsJson(filterAccounts(Account.allCash()));
     }
 
     public static String digitalAccountsJson() {
-        return accountsJson(Account.allDigital());
+        return accountsJson(filterAccounts(Account.allDigital()));
     }
 
     private static String accountsJson(List<Account> accounts) {
@@ -109,5 +106,11 @@ public class Accounting extends Controller {
             result.add(values);
         }
         return Json.stringify(Json.toJson(result));
+    }
+
+    private static List<Account> filterAccounts(List<Account> accounts) {
+        return accounts.stream()
+            .filter(a -> a.person == null || a.person.tags.stream().anyMatch(t -> t.show_in_account_balances))
+            .collect(Collectors.toList());
     }
 }
