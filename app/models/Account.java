@@ -4,8 +4,9 @@ import java.text.*;
 import java.util.*;
 import java.math.*;
 import javax.persistence.*;
+
+import com.avaje.ebean.Query;
 import com.fasterxml.jackson.annotation.*;
-import play.data.*;
 import com.avaje.ebean.*;
 
 @Entity
@@ -34,6 +35,17 @@ public class Account extends Model {
     public String name = "";
 
     public BigDecimal initial_balance = new BigDecimal(0);
+
+    public static void createPersonalAccounts() {
+        for (Person person : allPeople()) {
+            if (!person.hasAccount(AccountType.Cash)) {
+                create(AccountType.Cash, "", person);
+            }
+            if (!person.hasAccount(AccountType.PersonalChecking)) {
+                create(AccountType.PersonalChecking, "", person);
+            }
+        }
+    }
 
     public String getName() {
         if (name != null && name.trim().length() > 0) {
@@ -97,38 +109,58 @@ public class Account extends Model {
     private static Finder<Integer, Account> find = new Finder<Integer, Account>(Account.class);
 
     public static List<Account> all() {
-        return find.where()
-            .eq("organization", Organization.getByHost())
-            .findList();
+        return baseQuery().where()
+                .eq("organization", Organization.getByHost())
+                .findList();
     }
 
     public static List<Account> allCash() {
-        return find.where()
-            .eq("organization", Organization.getByHost())
-            .eq("type", AccountType.Cash)
-            .findList();
+        return baseQuery().where()
+                .in("person", allPeople())
+                .eq("type", AccountType.Cash)
+                .findList();
     }
 
     public static List<Account> allDigital() {
-        return find.where()
-            .eq("organization", Organization.getByHost())
-            .ne("type", AccountType.Cash)
-            .findList();
+        return baseQuery().where()
+                .in("person", allPeople())
+                .ne("type", AccountType.Cash)
+                .findList();
     }
 
     public static List<Account> allPersonalChecking() {
-        return find.where()
-            .eq("organization", Organization.getByHost())
-            .eq("type", AccountType.PersonalChecking)
-            .findList();
+        return baseQuery().where()
+                .in("person", allPeople())
+                .eq("type", AccountType.PersonalChecking)
+                .findList();
     }
 
     public static List<Account> allInstitutionalChecking() {
-        return find.where()
-            .eq("organization", Organization.getByHost())
-            .ne("type", AccountType.Cash)
-            .ne("type", AccountType.PersonalChecking)
-            .findList();
+        return baseQuery().where()
+                .eq("organization", Organization.getByHost())
+                .ne("type", AccountType.Cash)
+                .ne("type", AccountType.PersonalChecking)
+                .findList();
+    }
+
+    private static Query<Account> baseQuery() {
+        return find
+                .fetch("person", new FetchConfig().query())
+                .fetch("payment_transactions", new FetchConfig().query())
+                .fetch("credit_transactions", new FetchConfig().query());
+    }
+
+    private static List<Person> allPeople() {
+        List<Tag> tags = Tag.find.where()
+                .eq("show_in_account_balances", true)
+                .eq("organization", Organization.getByHost())
+                .findList();
+
+        Set<Person> people = new HashSet<>();
+        for (Tag tag : tags) {
+            people.addAll(tag.people);
+        }
+        return new ArrayList<>(people);
     }
 
     public static Account findById(Integer id) {
@@ -143,13 +175,6 @@ public class Account extends Model {
         account.person = person;
         account.name = name;
         account.type = type;
-        account.organization = Organization.getByHost();
-        account.save();
-        return account;
-    }
-
-    public static Account createFromForm(Form<Account> form) {
-        Account account = form.get();
         account.organization = Organization.getByHost();
         account.save();
         return account;

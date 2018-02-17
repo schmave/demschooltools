@@ -190,7 +190,6 @@ public class Person extends Model implements Comparable<Person> {
             .eq("is_family", Boolean.FALSE)
             .orderBy("last_name, first_name ASC")
             .fetch("phone_numbers", new FetchConfig().query())
-            .fetch("accounts", new FetchConfig().query())
             .findList();
     }
 
