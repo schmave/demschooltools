@@ -8,7 +8,7 @@ import play.libs.Json;
 import java.util.stream.Collectors;
 
 @With(DumpOnError.class)
-@Secured.Auth(UserRole.ROLE_ALL_ACCESS)
+@Secured.Auth(UserRole.ROLE_VIEW_JC)
 public class Accounting extends Controller {
 
     public Result transaction(Integer id) {
