@@ -5,7 +5,6 @@ import models.*;
 import play.mvc.*;
 import play.data.*;
 import play.libs.Json;
-import java.util.stream.Collectors;
 
 @With(DumpOnError.class)
 @Secured.Auth(UserRole.ROLE_VIEW_JC)
@@ -41,7 +40,7 @@ public class Accounting extends Controller {
     }
 
     public Result balances() {
-        List<Account> personalAccounts = filterAccounts(Account.allPersonalChecking());
+        List<Account> personalAccounts = Account.allPersonalChecking();
         List<Account> institutionalAccounts = Account.allInstitutionalChecking();
         Collections.sort(personalAccounts, (a, b) -> a.getName().compareTo(b.getName()));
         Collections.sort(institutionalAccounts, (a, b) -> a.getName().compareTo(b.getName()));
@@ -83,7 +82,7 @@ public class Accounting extends Controller {
         else {
             String name = filledForm.field("name").value();
             AccountType type = AccountType.valueOf(filledForm.field("type").value());
-            Account account = Account.create(type, name, null);
+            Account.create(type, name, null);
             return redirect(routes.Accounting.accounts());
         }
     }
@@ -98,11 +97,5 @@ public class Accounting extends Controller {
             result.add(values);
         }
         return Json.stringify(Json.toJson(result));
-    }
-
-    private static List<Account> filterAccounts(List<Account> accounts) {
-        return accounts.stream()
-            .filter(a -> a.person == null || a.person.tags.stream().anyMatch(t -> t.show_in_account_balances))
-            .collect(Collectors.toList());
     }
 }

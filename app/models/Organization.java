@@ -134,7 +134,7 @@ public class Organization extends Model {
             if (values.containsKey("show_accounting")) {
                 this.show_accounting = Utils.getBooleanFromFormValue(values.get("show_accounting")[0]);
                 if (this.show_accounting) {
-                    this.createPersonalAccounts();
+                    Account.createPersonalAccounts();
                 }
             } else {
                 this.show_accounting = false;
@@ -143,12 +143,5 @@ public class Organization extends Model {
         this.save();
     }
 
-    public void createPersonalAccounts() {
-        for (Person person : Person.all()) {
-            if (!person.hasAccount(AccountType.PersonalChecking)) {
-                Account.create(AccountType.PersonalChecking, "", person);
-            }
-        }
-    }
 }
 
