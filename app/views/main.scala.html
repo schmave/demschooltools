@@ -60,7 +60,7 @@
             </li>
             @if(OrgConfig.get().org.show_accounting) {
                 <li @if(menu.equals("accounting")) { class="active" }>
-                    <a href="@routes.Accounting.newTransaction()">Accounting</a>
+                    <a href="@routes.Accounting.balances()">Accounting</a>
                 </li>
             }
             <li @if(menu.equals("settings")) { class="active" } class="dropdown">

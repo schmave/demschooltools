@@ -14,12 +14,12 @@
 		<table class="balances-table table sortable">
 			<tr>
 				<th>Name</th>
-				<th class="balances-balance">Current Balance</th>
+				<th class="balance">Current Balance</th>
 			</tr>
 			@for(account <- personalAccounts) {
 				<tr>
 					<td><a href="@routes.Accounting.account(account.id)">@account.getName()</a></td>
-					<td class="balances-balance">@account.getFormattedBalance()</td>
+					<td class="balance">@account.getFormattedBalance()</td>
 				</tr>
 			}
 		</table>
@@ -29,12 +29,12 @@
 		<table class="balances-table table sortable">
 			<tr>
 				<th>Name</th>
-				<th class="balances-balance">Current Balance</th>
+				<th class="balance">Current Balance</th>
 			</tr>
 			@for(account <- institutionalAccounts) {
 				<tr>
 					<td><a href="@routes.Accounting.account(account.id)">@account.getName()</a></td>
-					<td class="balances-balance">@account.getFormattedBalance()</td>
+					<td class="balance">@account.getFormattedBalance()</td>
 				</tr>
 			}
 		</table>

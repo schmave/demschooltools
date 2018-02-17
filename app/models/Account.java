@@ -42,20 +42,16 @@ public class Account extends Model {
         if (person != null) {
             return person.getDisplayName();
         }
-        return name;
+        return "<no name>";
     }
 
     public String getTitle() {
-        String typeName = type == AccountType.Cash || type == AccountType.PersonalChecking ? getTypeName() + " " : "";
+        String typeName = type == AccountType.PersonalChecking ? getTypeName() + " " : "";
         return getName() + "'s " + typeName + "Account";
     }
 
     public String getTypeName() {
         return type.toString();
-    }
-
-    public boolean isCash() {
-        return type == AccountType.Cash;
     }
 
     public boolean hasTransactions() {
@@ -70,6 +66,10 @@ public class Account extends Model {
 
     public String getFormattedBalance() {
         return new DecimalFormat("0.00").format(getBalance());
+    }
+
+    public String getFormattedInitialBalance() {
+        return new DecimalFormat("0.00").format(initial_balance);
     }
 
     public List<Transaction> getTransactionsViewModel() {
@@ -102,20 +102,6 @@ public class Account extends Model {
             .findList();
     }
 
-    public static List<Account> allCash() {
-        return find.where()
-            .eq("organization", Organization.getByHost())
-            .eq("type", AccountType.Cash)
-            .findList();
-    }
-
-    public static List<Account> allDigital() {
-        return find.where()
-            .eq("organization", Organization.getByHost())
-            .ne("type", AccountType.Cash)
-            .findList();
-    }
-
     public static List<Account> allPersonalChecking() {
         return find.where()
             .eq("organization", Organization.getByHost())
@@ -126,7 +112,6 @@ public class Account extends Model {
     public static List<Account> allInstitutionalChecking() {
         return find.where()
             .eq("organization", Organization.getByHost())
-            .ne("type", AccountType.Cash)
             .ne("type", AccountType.PersonalChecking)
             .findList();
     }

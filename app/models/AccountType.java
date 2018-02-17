@@ -25,7 +25,7 @@ public enum AccountType
    	public String toString() {
     	switch (this) {
     		case Cash: return "Cash";
-    		case PersonalChecking: return "Checking";
+    		case PersonalChecking: return "Personal";
     		case Committee: return "Committee";
     		case Corporation: return "Corporation";
     		case Clerk: return "Clerk";

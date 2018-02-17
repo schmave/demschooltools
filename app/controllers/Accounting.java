@@ -35,7 +35,7 @@ public class Accounting extends Controller {
                 return redirect(routes.Accounting.transaction(transaction.id));
             }
             catch (Exception ex) {
-                return badRequest(ex.getMessage());
+                return badRequest(ex.toString());
             }
         }
     }
@@ -88,17 +88,9 @@ public class Accounting extends Controller {
         }
     }
 
-    public static String cashAccountsJson() {
-        return accountsJson(filterAccounts(Account.allCash()));
-    }
-
-    public static String digitalAccountsJson() {
-        return accountsJson(filterAccounts(Account.allDigital()));
-    }
-
-    private static String accountsJson(List<Account> accounts) {
+    public static String accountsJson() {
         List<Map<String, String>> result = new ArrayList<Map<String, String>>();
-        for (Account a : accounts) {
+        for (Account a : Account.all()) {
             HashMap<String, String> values = new HashMap<String, String>();
             values.put("label", a.getName());
             values.put("id", "" + a.id);

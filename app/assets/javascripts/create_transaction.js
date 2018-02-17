@@ -1,7 +1,7 @@
 var Handlebars = require('handlebars');
 var utils = require('./utils');
 
-export function init(cashAccounts, digitalAccounts) {
+export function init(accounts) {
 
 	var createTransactionTemplate = Handlebars.compile($("#create-transaction-template").html());
 
@@ -34,16 +34,15 @@ export function init(cashAccounts, digitalAccounts) {
 		var toRow = table.find('#create-transaction-to-row');
 
 		if (transactionType === 'CashDeposit') {
-			registerAutocomplete(from, cashAccounts);
-			registerAutocomplete(to, digitalAccounts);
+			registerAutocomplete(to, accounts);
 		}
 		else if (transactionType === 'CashWithdrawal') {
-			registerAutocomplete(from, digitalAccounts, true);
+			registerAutocomplete(from, accounts, true);
 			toRow.hide();
 		}
 		else if (transactionType === 'DigitalTransaction') {
-			registerAutocomplete(from, digitalAccounts, true);
-			registerAutocomplete(to, digitalAccounts);
+			registerAutocomplete(from, accounts, true);
+			registerAutocomplete(to, accounts);
 		}
 		else throw 'invalid transaction type: ' + transactionType;
 

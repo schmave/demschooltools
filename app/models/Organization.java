@@ -145,9 +145,6 @@ public class Organization extends Model {
 
     public void createPersonalAccounts() {
         for (Person person : Person.all()) {
-            if (!person.hasAccount(AccountType.Cash)) {
-                Account.create(AccountType.Cash, "", person);
-            }
             if (!person.hasAccount(AccountType.PersonalChecking)) {
                 Account.create(AccountType.PersonalChecking, "", person);
             }

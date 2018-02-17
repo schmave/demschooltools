@@ -11,17 +11,15 @@
 		<br>
 	}
 
-	@if(!account.isCash()) {
-		<table class="account-info-table">
-			<tr>
-				<td>Current Balance: <strong>$@account.getFormattedBalance()</strong></td>
-				<td>Initial Balance: $@account.initial_balance</td>
-			</tr>
-		</table>
-		<br>
-	} else {
-		<div>(A cash account doesn't have a balance, but we still keep track of transactions.)</div>
-	}
+	<table class="account-info-table">
+		<tr>
+			<td>Current Balance: <strong>$@account.getFormattedBalance()</strong></td>
+			@if(account.initial_balance.signum() > 0) {
+				<td>Initial Balance: $@account.getFormattedInitialBalance()</td>
+			}
+		</tr>
+	</table>
+	<br>
 	<br>
 
 	<table class="table sortable">

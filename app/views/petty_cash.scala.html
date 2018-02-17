@@ -14,18 +14,18 @@
 			<th>Transaction ID</th>
 			<th>Date</th>
 			<th>Created By User</th>
-			<th>Type</th>
 			<th>Description</th>
-			<th>Amount</th>
+			<th class="balance">Amount</th>
+			<th class="balance">New Balance</th>
 		</tr>
-		@for(transaction <- model.getTransactionsViewModel()) {
+		@for(transaction <- model.transactions) {
 			<tr>
 				<td><a href="@routes.Accounting.transaction(transaction.id)">@transaction.id</a></td>
 				<td>@transaction.getFormattedDate()</td>
 				<td>@transaction.getCreatedByUserName()</td>
-				<td>@transaction.getTypeName()</td>
 				<td>@transaction.description</td>
-				<td>@transaction.getFormattedAmount()</td>
+				<td class="balance">@transaction.getFormattedAmount()</td>
+				<td class="balance">@model.getFormattedBalanceAsOfTransaction(transaction)</td>
 			</tr>
 		}
 	</table>

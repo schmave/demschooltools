@@ -42,7 +42,7 @@
 					<span class="js-account-name-selected-text label label-primary"></span>
 					<img src="/assets/images/x.png">
 				</div>
-				<input type="text" class="js-account-name" name="from_name"/>
+				<input type="text" class="js-account-name" name="from_name" autocomplete="off" />
 				<input type="hidden" class="js-account-id" name="from_account_id"/>
 			</td>
 		</tr>
@@ -53,7 +53,7 @@
 					<span class="js-account-name-selected-text label label-primary"></span>
 					<img src="/assets/images/x.png">
 				</div>
-				<input type="text" class="js-account-name" name="to_name"/>
+				<input type="text" class="js-account-name" name="to_name" autocomplete="off"/>
 				<input type="hidden" class="js-account-id" name="to_account_id"/>
 			</td>
 		</tr>
@@ -72,7 +72,6 @@
 </script>
 
 <script type="text/javascript">
-	var cashAccounts = @Html(Accounting.cashAccountsJson());
-	var digitalAccounts = @Html(Accounting.digitalAccountsJson());
-	initCreateTransaction(cashAccounts, digitalAccounts);
+	var accounts = @Html(Accounting.accountsJson());
+	initCreateTransaction(accounts);
 </script>
