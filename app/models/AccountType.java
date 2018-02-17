@@ -14,8 +14,8 @@ public enum AccountType
         LinkedHashMap<String, String> vals = new LinkedHashMap<String, String>();
         for (AccountType type: AccountType.values()) {
             // don't include PersonalChecking -- that kind of account is generated and may not be created by users manually
-            if (type != AccountType.PersonalChecking) {
-                vals.put(type.name(), type.name());
+            if (type != AccountType.PersonalChecking && type != AccountType.Cash) {
+                vals.put(type.name(), type.toString());
             }
         }
         return vals;
@@ -26,9 +26,9 @@ public enum AccountType
     	switch (this) {
     		case Cash: return "Cash";
     		case PersonalChecking: return "Personal";
-    		case Committee: return "Committee";
-    		case Corporation: return "Corporation";
-    		case Clerk: return "Clerk";
+    		case Committee: return OrgConfig.get().str_committee;
+    		case Corporation: return OrgConfig.get().str_corporation;
+    		case Clerk: return OrgConfig.get().str_clerk;
     		default: throw new IllegalArgumentException();
     	}
    	}
