@@ -83,6 +83,19 @@ the other way around.</p>
 }
 
 <hr/>
+<h2>Accounting</h2>
+@helper.form(routes.Settings.editSettings()) {
+    <p>
+        <label>
+            <input type="checkbox" name="show_accounting" @if(org.show_accounting){ checked }>
+            Enable the "Accounting" tab
+        </label>
+    </p>
+    <input type="hidden" name="accounting_settings" value="true"/>
+    <input type="submit" value="Save Accounting settings"/>
+}
+
+<hr/>
 <h2>@OrgConfig.get().str_jc_name_short</h2>
 <h4>Weekly Report</h4>
 @helper.form(routes.Settings.editSettings()) {

@@ -21,6 +21,7 @@ public class Tag extends Model {
     public boolean show_in_menu;
     public boolean show_in_jc;
     public boolean show_in_attendance;
+    public boolean show_in_account_balances;
 
     @ManyToMany(cascade=CascadeType.ALL)
     @JoinTable(name="person_tag",
@@ -79,6 +80,7 @@ public class Tag extends Model {
         show_in_jc = Utils.getBooleanFromFormValue(form.field("show_in_jc").value());
         show_in_attendance = Utils.getBooleanFromFormValue(form.field("show_in_attendance").value());
         show_in_menu = Utils.getBooleanFromFormValue(form.field("show_in_menu").value());
+        show_in_account_balances = Utils.getBooleanFromFormValue(form.field("show_in_account_balances").value());
         save();
     }
 

@@ -12,6 +12,7 @@ public class UserRole extends Model {
     @ManyToOne()
     public User user;
 
+    public static final String ROLE_ACCOUNTING = "accounting";
     public static final String ROLE_VIEW_JC = "view-jc";
     public static final String ROLE_EDIT_MANUAL = "edit-manual";
     public static final String ROLE_EDIT_RESOLUTION_PLANS = "edit-rps";
@@ -21,6 +22,7 @@ public class UserRole extends Model {
     public static final String ROLE_ALL_ACCESS = "all-access";
 
     public static final String[] ALL_ROLES = {
+        ROLE_ACCOUNTING,
         ROLE_VIEW_JC,
         ROLE_EDIT_RESOLUTION_PLANS,
         ROLE_EDIT_7_DAY_JC,
@@ -82,6 +84,8 @@ public class UserRole extends Model {
             return "Edit all " + jc_name + " records";
         } else if (role.equals(ROLE_ALL_ACCESS)) {
             return "View and Edit everything";
+        } else if (role.equals(ROLE_ACCOUNTING)) {
+            return "Manage accounts and create transactions";
         }
 
         throw new RuntimeException("unknown role: " + role);

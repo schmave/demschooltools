@@ -1,0 +1,55 @@
+@(personalAccounts : List[Account], institutionalAccounts: List[Account])
+
+@main("Account Balances", "accounting", "accounting_balances") {
+
+	<h2>Account Balances</h2>
+
+	<div class="no-print">
+		<input type="checkbox" id="hide-non-personal-accounts"> Hide non-personal accounts
+		<br>
+		<br>
+	</div>
+
+	<div class="col-sm-6">
+		<table class="balances-table table sortable">
+			<tr>
+				<th>Name</th>
+				<th class="balance">Current Balance</th>
+			</tr>
+			@for(account <- personalAccounts) {
+				<tr>
+					<td><a href="@routes.Accounting.account(account.id)">@account.getName()</a></td>
+					<td class="balance">@account.getFormattedBalance()</td>
+				</tr>
+			}
+		</table>
+	</div>
+
+	<div class="col-sm-6" id="non-personal-accounts">
+		<table class="balances-table table sortable">
+			<tr>
+				<th>Name</th>
+				<th class="balance">Current Balance</th>
+			</tr>
+			@for(account <- institutionalAccounts) {
+				<tr>
+					<td><a href="@routes.Accounting.account(account.id)">@account.getName()</a></td>
+					<td class="balance">@account.getFormattedBalance()</td>
+				</tr>
+			}
+		</table>
+	</div>
+
+	<br>
+	<br>
+}
+
+<script type="text/javascript">
+	$('#hide-non-personal-accounts').change(function() {
+		if (this.checked) {
+			$('#non-personal-accounts').hide();
+		} else {
+			$('#non-personal-accounts').show();
+		}
+	});
+</script>

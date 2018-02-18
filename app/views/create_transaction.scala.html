@@ -1,0 +1,77 @@
+@(transactionForm: Form[Transaction])
+
+@import helper._
+
+@main("New Transaction", "accounting", "new_transaction") {
+
+	@helper.form(routes.Accounting.makeNewTransaction()) {
+		<h2>New Transaction</h2>
+		<div class="create-transaction">
+			<div id="create-transaction-options">
+				<div data-type="DigitalTransaction" class="create-transaction-option">
+					Digital Transaction
+					<div class="create-transaction-option-info glyphicon glyphicon-info-sign" data-toggle="tooltip"
+						title="A Digital Transaction is any transaction that does not involve cash.">
+					</div>
+				</div>
+				<div data-type="CashDeposit" class="create-transaction-option">
+					Cash Deposit
+					<div class="create-transaction-option-info glyphicon glyphicon-info-sign" data-toggle="tooltip"
+						title="Use Cash Deposit when someone is making a cash payment which will be credited to an account, or depositing cash into their own account. The cash will be added to the school's petty cash balance. The 'From' field is optional, but you should enter who is making the deposit for your records.">
+					</div>
+				</div>
+				<div data-type="CashWithdrawal" class="create-transaction-option">
+					Cash Withdrawal
+					<div class="create-transaction-option-info glyphicon glyphicon-info-sign" data-toggle="tooltip"
+						title="Use Cash Withdrawal when a SMM or other school entity is withdrawing cash from their own checking account. The cash will be removed from the school's petty cash balance.">
+					</div>
+				</div>
+			</div>
+			<div id="create-transaction"></div>
+			<br/><br/><br/>
+		</div>
+	}
+}
+
+<script id="create-transaction-template" type="text/x-handlebars-template">
+	<table class="create-transaction-table">
+		<tr>
+			<th>From</th>
+			<td id="create-transaction-from">
+				<div class="js-account-name-selected account-name-selected name">
+					<span class="js-account-name-selected-text label label-primary"></span>
+					<img src="/assets/images/x.png">
+				</div>
+				<input type="text" class="js-account-name" name="from_name" autocomplete="off" />
+				<input type="hidden" class="js-account-id" name="from_account_id"/>
+			</td>
+		</tr>
+		<tr id="create-transaction-to-row">
+			<th>To</th>
+			<td id="create-transaction-to">
+				<div class="js-account-name-selected account-name-selected name">
+					<span class="js-account-name-selected-text label label-primary"></span>
+					<img src="/assets/images/x.png">
+				</div>
+				<input type="text" class="js-account-name" name="to_name" autocomplete="off"/>
+				<input type="hidden" class="js-account-id" name="to_account_id"/>
+			</td>
+		</tr>
+		<tr>
+			<th>Reason</th>
+			<td><input type="text" name="description"/></td>
+		</tr>
+		<tr>
+			<th>Amount</th>
+			<td>$ <input id="amount" type="number" name="amount" min="0" step="0.01" required autocomplete="off" /></td>
+		</tr>
+	</table>
+	<div id="balance" class="create-transaction-balance"></div>
+	<input type="hidden" name="type" value="{{transactionType}}">
+	<input type="submit" value="Create" class="create-transaction-submit js-create-transaction-submit btn btn-primary">
+</script>
+
+<script type="text/javascript">
+	var accounts = @Html(Accounting.accountsJson());
+	initCreateTransaction(accounts);
+</script>

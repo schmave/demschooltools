@@ -100,6 +100,10 @@ public class Person extends Model implements Comparable<Person> {
     @JsonIgnore
     public List<AttendanceWeek> attendance_weeks;
 
+    @OneToMany(mappedBy="person")
+    @JsonIgnore
+    public List<Account> accounts;
+
 	public String grade = "";
 
     static Set<String> fieldsToUpdateExplicitly = new HashSet<String>();
@@ -288,6 +292,10 @@ public class Person extends Model implements Comparable<Person> {
 		person.trimSpaces();
         person.save();
 
+        if (OrgConfig.get().org.show_accounting) {
+            Account.create(AccountType.PersonalChecking, "", person);
+        }
+
         person.addPhoneNumbers(form);
         return person;
     }
@@ -319,7 +327,11 @@ public class Person extends Model implements Comparable<Person> {
     }
 
     public static void delete(Integer id) {
-        find.ref(id).delete();
+        Person person = find.ref(id);
+        for (Account account : person.accounts) {
+            account.delete();
+        }
+        person.delete();
     }
 
     public boolean isStudent()
@@ -461,6 +473,10 @@ public class Person extends Model implements Comparable<Person> {
         }
 
         return numbers;
+    }
+
+    public boolean hasAccount(AccountType type) {
+        return accounts.stream().anyMatch(a -> a.type == type);
     }
 
     public String toString() {
