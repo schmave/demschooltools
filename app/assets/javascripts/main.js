@@ -123,6 +123,6 @@ window.enableButtonForCheckboxes = function(btn_selector, checkbox_class) {
     });
 };
 
-window.initCreateTransaction = function(cashAccounts, digitalAccounts) {
-    return new create_transaction.init(cashAccounts, digitalAccounts);
+window.initCreateTransaction = function(accounts) {
+    return create_transaction.init(accounts);
 };
