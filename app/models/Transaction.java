@@ -50,7 +50,9 @@ public class Transaction extends Model {
     }    
 
     public String getFormattedDate() {
-        return new SimpleDateFormat("M/d/yy h:mm aa").format(date_created);
+        SimpleDateFormat sdf = new SimpleDateFormat("M/d/yy");
+        sdf.setTimeZone(TimeZone.getTimeZone("EST"));
+        return sdf.format(date_created);
     }
 
     public String getFormattedAmount() {
