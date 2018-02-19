@@ -47,6 +47,7 @@ public class Accounting extends Controller {
         return ok(views.html.balances.render(personalAccounts, institutionalAccounts));
     }
 
+    @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result pettyCash() {
         return ok(views.html.petty_cash.render(PettyCash.find()));
     }
@@ -56,22 +57,26 @@ public class Accounting extends Controller {
         return ok(views.html.account.render(account));
     }
 
+    @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result deleteAccount(Integer id) throws Exception {
         Account.delete(id);
         return redirect(routes.Accounting.accounts());
     }
 
+    @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result accounts() {
         List<Account> accounts = Account.all();
         Collections.sort(accounts, (a, b) -> a.getName().compareTo(b.getName()));
         return ok(views.html.accounts.render(accounts));
     }
 
+    @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result newAccount() {
         Form<Account> form = Form.form(Account.class);
         return ok(views.html.new_account.render(form));
     }
 
+    @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result makeNewAccount() {
         Form<Account> form = Form.form(Account.class);
         Form<Account> filledForm = form.bindFromRequest();
@@ -87,12 +92,14 @@ public class Accounting extends Controller {
         }
     }
 
+    @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result editAccount(Integer id) {
         Account account = Account.findById(id);
         Form<Account> form = Form.form(Account.class).fill(account);
         return ok(views.html.edit_account.render(form));
     }
 
+    @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result saveAccount() {
         Form<Account> form = Form.form(Account.class).bindFromRequest();
         Account account = Account.findById(Integer.parseInt(form.field("id").value()));
