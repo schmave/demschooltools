@@ -8,6 +8,7 @@ import javax.persistence.*;
 import com.avaje.ebean.Query;
 import com.fasterxml.jackson.annotation.*;
 import com.avaje.ebean.*;
+import play.data.*;
 
 @Entity
 public class Account extends Model {
@@ -42,6 +43,14 @@ public class Account extends Model {
                 create(AccountType.PersonalChecking, "", person);
             }
         }
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public AccountType getType() {
+        return type;
     }
 
     public String getName() {
@@ -162,6 +171,12 @@ public class Account extends Model {
         account.organization = Organization.getByHost();
         account.save();
         return account;
+    }
+
+    public void updateFromForm(Form<Account> form) {
+        name = form.field("name").value();
+        type = AccountType.valueOf(form.field("type").value());
+        save();
     }
 
     public static void delete(Integer id) throws Exception {

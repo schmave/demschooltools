@@ -82,9 +82,22 @@ public class Accounting extends Controller {
         else {
             String name = filledForm.field("name").value();
             AccountType type = AccountType.valueOf(filledForm.field("type").value());
-            Account.create(type, name, null);
-            return redirect(routes.Accounting.accounts());
+            Account account = Account.create(type, name, null);
+            return redirect(routes.Accounting.account(account.id));
         }
+    }
+
+    public Result editAccount(Integer id) {
+        Account account = Account.findById(id);
+        Form<Account> form = Form.form(Account.class).fill(account);
+        return ok(views.html.edit_account.render(form));
+    }
+
+    public Result saveAccount() {
+        Form<Account> form = Form.form(Account.class).bindFromRequest();
+        Account account = Account.findById(Integer.parseInt(form.field("id").value()));
+        account.updateFromForm(form);
+        return redirect(routes.Accounting.account(account.id));
     }
 
     public static String accountsJson() {
