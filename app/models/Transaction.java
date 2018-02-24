@@ -37,6 +37,7 @@ public class Transaction extends Model {
 
     public BigDecimal amount;
 
+    @play.data.format.Formats.DateTime(pattern="MM/dd/yyyy")
     public Date date_created = new Date();
 
     public TransactionType type;
@@ -51,7 +52,8 @@ public class Transaction extends Model {
 
     public String getFormattedDate() {
         SimpleDateFormat sdf = new SimpleDateFormat("M/d/yy");
-        sdf.setTimeZone(TimeZone.getTimeZone("EST"));
+        // we don't need to worry about time zones because the transaction date is set in js on the client.
+        //sdf.setTimeZone(TimeZone.getTimeZone("EST"));
         return sdf.format(date_created);
     }
 
@@ -86,14 +88,21 @@ public class Transaction extends Model {
 
     public static Transaction create(Form<Transaction> form) throws Exception {
         Transaction transaction = form.get();
+
         transaction.from_account = findAccountById(form.field("from_account_id").value());
         transaction.to_account = findAccountById(form.field("to_account_id").value());
+
         if (transaction.type == TransactionType.DigitalTransaction 
             && transaction.from_account == null && transaction.to_account == null) {
             throw new Exception("A Digital Transaction must be either from an account or to an account.");
         }
+
+        DateFormat format = new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
+        transaction.date_created = format.parse(form.field("date_created").value());
+
         transaction.organization = Organization.getByHost();
         transaction.created_by_user = Application.getCurrentUser();
+
         transaction.save();
         return transaction;
     }
