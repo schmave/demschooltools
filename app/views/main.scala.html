@@ -158,6 +158,8 @@
                         href="@routes.Accounting.newTransaction()">Create Transaction</a>
                     <a @if(selectedBtn.equals("accounting_balances")) { class="active" }
                         href="@routes.Accounting.balances()">Balances</a>
+                    <a @if(selectedBtn.equals("accounting_report")) { class="active" }
+                        href="@routes.Accounting.report()">Report</a>
                     <a @if(selectedBtn.equals("accounting_accounts")) { class="active" }
                         href="@routes.Accounting.accounts()">Manage Accounts</a>
                     <a @if(selectedBtn.equals("accounting_petty_cash")) { class="active" }

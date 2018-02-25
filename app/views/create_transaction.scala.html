@@ -65,6 +65,10 @@
 			<th>Amount</th>
 			<td>$ <input id="amount" type="number" name="amount" min="0" step="0.01" required autocomplete="off" /></td>
 		</tr>
+		<tr>
+			<th>Date</th>
+			<td><input id="create-transaction-date" name="date_created" class="date" type="textfield"></input></td>
+		</tr>
 	</table>
 	<div id="balance" class="create-transaction-balance"></div>
 	<input type="hidden" name="type" value="{{transactionType}}">

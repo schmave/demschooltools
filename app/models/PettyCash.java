@@ -33,13 +33,17 @@ public class PettyCash {
         return new DecimalFormat("0.00").format(getBalanceAsOfTransaction(transaction));
     }
 
-    private static String getFormattedDescription(String from, String to, String description) {
+    private static String getFormattedDescription(TransactionType type, String from, String to, String description) {
         String result = "";
-        if (!from.trim().isEmpty()) {
-            result += "from " + from + " ";
-        }
-        if (!to.trim().isEmpty()) {
-            result += "to " + to + " ";
+        if (type == TransactionType.CashWithdrawal) {
+            result += from + " withdrawal ";
+        } else {
+            if (!from.trim().isEmpty()) {
+                result += "from " + from + " ";
+            }
+            if (!to.trim().isEmpty()) {
+                result += "to " + to + " ";
+            }
         }
         if (!description.trim().isEmpty()) {
             if (!result.isEmpty()) {
@@ -56,11 +60,11 @@ public class PettyCash {
         List<Transaction> deposit_transactions = Transaction.allCashDeposits();
         List<Transaction> withdrawal_transactions = Transaction.allCashWithdrawals();
         for (Transaction t : deposit_transactions) {
-            t.description = getFormattedDescription(t.from_name, t.to_name, t.description);
+            t.description = getFormattedDescription(t.type, t.from_name, t.to_name, t.description);
             model.transactions.add(t);
         }
         for (Transaction t : withdrawal_transactions) {
-            t.description = getFormattedDescription(t.from_name, t.to_name, t.description);
+            t.description = getFormattedDescription(t.type, t.from_name, t.to_name, t.description);
             t.amount = BigDecimal.ZERO.subtract(t.amount);
             model.transactions.add(t);
         }

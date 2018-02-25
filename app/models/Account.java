@@ -8,6 +8,7 @@ import javax.persistence.*;
 import com.avaje.ebean.Query;
 import com.fasterxml.jackson.annotation.*;
 import com.avaje.ebean.*;
+import play.data.*;
 
 @Entity
 public class Account extends Model {
@@ -44,6 +45,14 @@ public class Account extends Model {
         }
     }
 
+    public Integer getId() {
+        return id;
+    }
+
+    public AccountType getType() {
+        return type;
+    }
+
     public String getName() {
         if (name != null && name.trim().length() > 0) {
             return name;
@@ -71,6 +80,18 @@ public class Account extends Model {
         return initial_balance
             .add(credit_transactions.stream().map(t -> t.amount).reduce(BigDecimal.ZERO, BigDecimal::add))
             .subtract(payment_transactions.stream().map(t -> t.amount).reduce(BigDecimal.ZERO, BigDecimal::add));
+    }
+
+    public BigDecimal getBalanceAsOf(Date date) {
+        return initial_balance
+            .add(credit_transactions.stream()
+                .filter(t -> !t.date_created.after(date))
+                .map(t -> t.amount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add))
+            .subtract(payment_transactions.stream()
+                .filter(t -> !t.date_created.after(date))
+                .map(t -> t.amount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add));
     }
 
     public String getFormattedBalance() {
@@ -162,6 +183,12 @@ public class Account extends Model {
         account.organization = Organization.getByHost();
         account.save();
         return account;
+    }
+
+    public void updateFromForm(Form<Account> form) {
+        name = form.field("name").value();
+        type = AccountType.valueOf(form.field("type").value());
+        save();
     }
 
     public static void delete(Integer id) throws Exception {

@@ -1,0 +1,43 @@
+@(report: AccountingReport)
+
+@import helper._
+
+@main("Report", "accounting", "accounting_report") {
+
+	<h2>Accounting Report</h2>
+
+	@helper.form(routes.Accounting.runReport()) {
+		<table class="accounting-report-settings">
+			<tr>
+				<th>Report Date</th>
+				<td><input id="report-date" name="date" class="date" type="textfield"></input></td>
+			</tr>
+			<tr>
+				<th>Report Type</th>
+				<td>
+					<select name="type">
+						<option></option>
+						<option value="@AccountingReportType.TotalPersonalAccountsBalance">Total Personal Accounts Balance</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2"><button type="submit">Run Report</button></td>
+			</tr>
+		</table>
+	}
+
+	@if(report.result != "") {
+		<hr>
+		<div class="accounting-report-results">
+			@report.resultLabel <strong>@report.result</strong>
+		</div>
+	}
+
+	<br>
+	<br>
+}
+
+<script type="text/javascript">
+	$('#report-date').datepicker();
+</script>

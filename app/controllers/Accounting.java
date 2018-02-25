@@ -25,7 +25,7 @@ public class Accounting extends Controller {
     public Result makeNewTransaction() {
         Form<Transaction> form = Form.form(Transaction.class);
         Form<Transaction> filledForm = form.bindFromRequest();
-        if(filledForm.hasErrors()) {
+        if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
             return badRequest(views.html.create_transaction.render(filledForm));
         } else {
@@ -50,6 +50,23 @@ public class Accounting extends Controller {
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result pettyCash() {
         return ok(views.html.petty_cash.render(PettyCash.find()));
+    }
+
+    @Secured.Auth(UserRole.ROLE_ACCOUNTING)
+    public Result report() {
+        return ok(views.html.accounting_report.render(new AccountingReport()));
+    }
+
+    @Secured.Auth(UserRole.ROLE_ACCOUNTING)
+    public Result runReport() {
+        Form<AccountingReport> form = Form.form(AccountingReport.class);
+        Form<AccountingReport> filledForm = form.bindFromRequest();
+        if (filledForm.hasErrors()) {
+            System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
+            return badRequest(views.html.accounting_report.render(new AccountingReport()));
+        }
+        AccountingReport report = AccountingReport.create(filledForm);
+        return ok(views.html.accounting_report.render(report));
     }
 
     public Result account(Integer id) {
@@ -87,9 +104,24 @@ public class Accounting extends Controller {
         else {
             String name = filledForm.field("name").value();
             AccountType type = AccountType.valueOf(filledForm.field("type").value());
-            Account.create(type, name, null);
-            return redirect(routes.Accounting.accounts());
+            Account account = Account.create(type, name, null);
+            return redirect(routes.Accounting.account(account.id));
         }
+    }
+
+    @Secured.Auth(UserRole.ROLE_ACCOUNTING)
+    public Result editAccount(Integer id) {
+        Account account = Account.findById(id);
+        Form<Account> form = Form.form(Account.class).fill(account);
+        return ok(views.html.edit_account.render(form));
+    }
+
+    @Secured.Auth(UserRole.ROLE_ACCOUNTING)
+    public Result saveAccount() {
+        Form<Account> form = Form.form(Account.class).bindFromRequest();
+        Account account = Account.findById(Integer.parseInt(form.field("id").value()));
+        account.updateFromForm(form);
+        return redirect(routes.Accounting.account(account.id));
     }
 
     public static String accountsJson() {

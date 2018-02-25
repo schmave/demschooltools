@@ -31,6 +31,7 @@ export function init(accounts) {
         var from = table.find('#create-transaction-from');
         var to = table.find('#create-transaction-to');
         var toRow = table.find('#create-transaction-to-row');
+        var date = table.find('#create-transaction-date');
 
         if (transactionType === 'CashDeposit') {
             registerAutocomplete(to, accounts);
@@ -43,6 +44,8 @@ export function init(accounts) {
         } else {
             throw new Error('invalid transaction type: ' + transactionType);
         }
+
+        date.val($.datepicker.formatDate('mm/dd/yy', new Date())).datepicker();
 
         return table;
     }
