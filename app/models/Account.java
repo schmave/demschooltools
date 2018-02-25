@@ -82,6 +82,18 @@ public class Account extends Model {
             .subtract(payment_transactions.stream().map(t -> t.amount).reduce(BigDecimal.ZERO, BigDecimal::add));
     }
 
+    public BigDecimal getBalanceAsOf(Date date) {
+        return initial_balance
+            .add(credit_transactions.stream()
+                .filter(t -> !t.date_created.after(date))
+                .map(t -> t.amount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add))
+            .subtract(payment_transactions.stream()
+                .filter(t -> !t.date_created.after(date))
+                .map(t -> t.amount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add));
+    }
+
     public String getFormattedBalance() {
         return new DecimalFormat("0.00").format(getBalance());
     }

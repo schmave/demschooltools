@@ -25,7 +25,7 @@ public class Accounting extends Controller {
     public Result makeNewTransaction() {
         Form<Transaction> form = Form.form(Transaction.class);
         Form<Transaction> filledForm = form.bindFromRequest();
-        if(filledForm.hasErrors()) {
+        if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
             return badRequest(views.html.create_transaction.render(filledForm));
         } else {
@@ -50,6 +50,23 @@ public class Accounting extends Controller {
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result pettyCash() {
         return ok(views.html.petty_cash.render(PettyCash.find()));
+    }
+
+    @Secured.Auth(UserRole.ROLE_ACCOUNTING)
+    public Result report() {
+        return ok(views.html.accounting_report.render(new AccountingReport()));
+    }
+
+    @Secured.Auth(UserRole.ROLE_ACCOUNTING)
+    public Result runReport() {
+        Form<AccountingReport> form = Form.form(AccountingReport.class);
+        Form<AccountingReport> filledForm = form.bindFromRequest();
+        if (filledForm.hasErrors()) {
+            System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
+            return badRequest(views.html.accounting_report.render(new AccountingReport()));
+        }
+        AccountingReport report = AccountingReport.create(filledForm);
+        return ok(views.html.accounting_report.render(report));
     }
 
     public Result account(Integer id) {
