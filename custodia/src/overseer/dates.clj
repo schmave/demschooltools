@@ -1,6 +1,5 @@
 (ns overseer.dates
-  (:require [com.ashafa.clutch :as couch]
-            [overseer.db :as db]
+  (:require [overseer.db :as db]
             [overseer.helpers :refer :all]
             [clj-time.format :as f]
             [clj-time.local :as l]
