@@ -41,7 +41,7 @@ var exports = React.createClass({
     getActiveStudents: function(){
         var t = this.filterStudents(this.state.students)
                     .map(function (stu) {
-                        var link = <Link to="student" params={{studentId: stu._id}} id={"student-" + stu._id}>{stu.name}</Link>;
+                        var link = <Link to={"/students/" + stu._id} id={"student-" + stu._id}>{stu.name}</Link>;
                         return <div key={"t-" + stu._id}  className="col-sm-4">
                           <div>
                             <div className="name"> {link} </div>

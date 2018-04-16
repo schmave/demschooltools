@@ -47,7 +47,7 @@ var StudentLinkComponent = React.createClass({
     //url ="#speakers/" + props.rowData._id + "/" + this.props.data;
     var sid = this.props.rowData._id,
         name = this.props.data;
-    return <Link to="student" params={{studentId: sid}} id={"student-" + sid}>{name}</Link>;
+    return <Link to={"/students/" + sid} id={"student-" + sid}>{name}</Link>;
   }
 });
 

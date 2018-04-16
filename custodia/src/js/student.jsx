@@ -18,11 +18,8 @@ var groupingFunc = function (data) {
 };
 
 var exports = React.createClass({
-    contextTypes: {
-        router: React.PropTypes.func
-    },
     getInitialState: function () {
-        var studentId = this.context.router.getCurrentParams().studentId;
+        var studentId = this.props.params.studentId;
         return {
             studentId: studentId,
             student: studentStore.getStudent(studentId)
@@ -107,11 +104,10 @@ var exports = React.createClass({
             var clsName = hide + " " + selected;
             return <tr key={month + day.day} className={clsName}>
               <td>
-                <Link to="student"
+                <Link to={"/students/" + this.state.studentId + "/" + day.day}
                       onClick={this.openMonth.bind(this, month)}
                       id={"day-"+day.day}
-                      className={this.getDayClass(day)}
-                      params={{studentId: this.state.studentId, day: day.day}}>
+                      className={this.getDayClass(day)}>
                   {day.day} {this.getDayStatus(day)}
                 </Link>
               </td>
@@ -120,7 +116,7 @@ var exports = React.createClass({
     },
 
     getPreviousDays: function () {
-        var selectedDay = this.context.router.getCurrentParams().day;
+        var selectedDay = this.props.params.day;
         if (!selectedDay && this.state.day) {
             //routerc.get().transitionTo('swipes', {studentId :this.state.studentId, day: this.state.day});
         }
@@ -151,8 +147,8 @@ var exports = React.createClass({
     },
 
     getActiveDay: function (student) {
-        if (this.context.router.getCurrentParams().day) {
-            return this.context.router.getCurrentParams().day;
+        if (this.props.params.day) {
+            return this.props.params.day;
         } else if (student && student.days[0]) {
             return student.days[0].day;
         } else {

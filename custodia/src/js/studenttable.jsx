@@ -3,6 +3,7 @@ var React = require('react'),
     Link = Router.Link,
     AdminItem = require('./adminwrapper.jsx'),
     actionCreator = require('./studentactioncreator'),
+    myhistory = require('./myhistory.js'),
     SwipeHelpers = require('./swipeHelpers.jsx'),
     studentStore = require('./StudentStore');
 
@@ -57,9 +58,8 @@ module.exports = React.createClass({
         var link = <span className="glyphicon glyphicon-calendar"></span>;
         var button = this.getSwipeButton(student, way);
         var calendar_button_class = "btn btn-default calendar-button";
-        var self = this;
         var calendar_button = <div onClick={function() {
-            self.context.router.transitionTo('student', {studentId: student._id})}}
+            myhistory.replaceState(null, '/students/' + student._id); }}
             className={calendar_button_class}>{link}</div>;
 
         if (way !== 'out') {

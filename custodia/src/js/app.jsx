@@ -1,6 +1,8 @@
 var React = require('react'),
+    ReactDOM = require('react-dom'),
     Router = require('react-router'),
-    routerContainer = require('./routercontainer'),
+    Globalize = require('globalize'),
+    globalizeLocalizer = require('react-widgets-globalize'),
     Nav = require('./nav.jsx'),
     Flash = require('./flashnotification.jsx'),
     Student = require('./student.jsx'),
@@ -10,13 +12,19 @@ var React = require('react'),
     SwipeListing = require('./swipeslisting.jsx'),
     StudentReports = require('./studentreports.jsx'),
     Classes = require('./classes.jsx'),
-    StudentTable = require('./studenttable.jsx');
+    StudentTable = require('./studenttable.jsx'),
+    myhistory = require('./myhistory.js');
 
 
-var DefaultRoute = Router.DefaultRoute;
-var Link = Router.Link;
-var Route = Router.Route;
-var RouteHandler = Router.RouteHandler;
+Globalize.load(
+  require("cldr-data/main/en/ca-gregorian"),
+  require("cldr-data/main/en/numbers"),
+  require("cldr-data/supplemental/likelySubtags"),
+  require("cldr-data/supplemental/timeData"),
+  require("cldr-data/supplemental/weekData")
+);
+Globalize.locale('en');
+globalizeLocalizer();
 
 var App = React.createClass({
     render: function () {
@@ -25,29 +33,28 @@ var App = React.createClass({
                 <Nav />
                 <Flash />
                 <div className="content">
-                    <RouteHandler />
+                    {this.props.children}
                 </div>
             </div>
         );
     }
 });
 
-var routes = (
-    <Route path="/" handler={App}>
-        <Route name="students" path="students" handler={StudentTable}/>
-        <Route name="student" path="students/:studentId/:day?" handler={Student} />
-        <Route name="studentAdmin" path="studentAdmin" handler={StudentAdmin} />
-        <Route name="reports" path="reports" handler={StudentReports} />
-        <Route name="classes" path="classes" handler={Classes} />
-        <Route name="createaclass" path="class/new" handler={CreateAClass} />
-        <Route name="admin" path="administration" handler={Administration} />
 
-        <DefaultRoute handler={StudentTable}/>
-    </Route>
-);
+var Route = Router.Route;
 
-var router = Router.create(routes);
-routerContainer.set(router);
-router.run(function (Handler) {
-    React.render(<Handler />, document.body);
-});
+var router = <Router.Router history={myhistory}>
+        <Route path="/" component={App}>
+            <Route path="students" component={StudentTable}/>
+            <Route path="students/:studentId(/:day)" component={Student} />
+            <Route path="studentAdmin" component={StudentAdmin} />
+            <Route path="reports" component={StudentReports} />
+            <Route path="classes" component={Classes} />
+            <Route path="class/new" component={CreateAClass} />
+            <Route path="administration" component={Administration} />
+
+            <Router.IndexRoute component={StudentTable}/>
+        </Route>
+    </Router.Router>;
+
+ReactDOM.render(router, document.getElementById('react_container'));

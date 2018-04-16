@@ -25,21 +25,21 @@ module.exports = React.createClass({
         return <nav className="navbar" role="navigation">
             <div className="container">
                 <div className="navbar-header">
-                    <Link to="students" id="home" className="navbar-brand">{this.state.selectedSchool?this.state.selectedSchool.name:""} Custodia &mdash; Home</Link>
+                    <Link to="/students" id="home" className="navbar-brand">{this.state.selectedSchool?this.state.selectedSchool.name:""} Custodia &mdash; Home</Link>
                 </div>
                 <div id="navbar">
                     <ul className="nav navbar-nav">
                         <AdminWrapper>
-                            <li><Link id="totals-link" to="reports">Reports</Link></li>
+                            <li><Link id="totals-link" to="/reports">Reports</Link></li>
                         </AdminWrapper>
                         <AdminWrapper>
-                            <li><Link id="students-link" to="studentAdmin">Students</Link></li>
+                            <li><Link id="students-link" to="/studentAdmin">Students</Link></li>
                         </AdminWrapper>
                         <AdminWrapper>
-                            <li><Link id="class-link" to="classes">Classes</Link> </li>
+                            <li><Link id="class-link" to="/classes">Classes</Link> </li>
                         </AdminWrapper>
                         <SuperWrapper>
-                            <li><Link id="class-link" to="admin">Site Admin</Link> </li>
+                            <li><Link id="class-link" to="/administration">Site Admin</Link> </li>
                         </SuperWrapper>
                     </ul>
                     <ul className="nav navbar-nav">

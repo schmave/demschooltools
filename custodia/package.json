@@ -22,26 +22,30 @@
   "homepage": "https://github.com/thedreadpirate/overseer",
   "dependencies": {
     "cal-heatmap": "3.5.4",
+    "cldr-data": "latest",
     "d3": "3.5.6",
     "flux": "2.1.1",
-    "griddle-react": "0.2.14",
-    "jest-cli": "0.5.4",
+    "globalize": "1.x",
+    "griddle-react": "0.4.x",
+    "history": "1.17.x",
     "moment": "2.10.6",
     "object-assign": "3.0.0",
-    "react": "0.13.3",
-    "react-notification-system": "0.1.14",
-    "react-router": "0.13.3",
+    "react": "0.14.x",
+    "react-dom": "0.14.x",
+    "react-notification-system": "0.2.x",
+    "react-router": "1.0.x",
     "react-skylight": "0.2.0",
-    "react-widgets": "2.8.0",
+    "react-widgets": "3.0.x",
+    "react-widgets-globalize": "latest",
     "underscore": "1.8.3"
   },
   "devDependencies": {
     "babelify": "6.3.0",
     "browserify": "11.0.1",
     "concurrently": "2.0.0",
+    "jest-cli": "0.5.4",
     "reactify": "1.1.1",
     "uglifyify": "3.0.1",
-    "watchify": "3.4.0",
-    "npm-shrinkwrap": "6.0.1"
+    "watchify": "3.4.0"
   }
 }
