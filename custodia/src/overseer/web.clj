@@ -94,12 +94,12 @@
   (GET "/users/is-admin" req
        (resp/response
         {:admin (-> req friend/current-authentication :roles roles/admin)
-         :dstMode (env :dst-mode)
+         :dstMode (= "true" (env :dst-mode))
          :school (queries/get-current-school)}))
   (GET "/users/is-super" req
        (let [user (users/get-user "super")]
          (resp/response {:super (-> req friend/current-authentication :roles roles/super)
-                         :dstMode (env :dst-mode)
+                         :dstMode (= "true" (env :dst-mode))
                          :school (queries/get-current-school)})))
 
   (GET "/js/gen/:id{.+}/app.js" req
@@ -166,16 +166,16 @@
 ;;(start-site 5000)
 (defn start-site [port]
   (conn/init-pg)
-  (when (env :migratedb)
+  (when (= "true" (env :migratedb))
     (migrations/migrate-db @conn/pgdb))
-  (when (env :newdb)
+  (when (= "true" (env :newdb))
     (do (users/reset-db)
         (sampledb/sample-db)))
   (users/init-users)
-  (if (env :notify)
+  (if (= "true" (env :notify))
     (do (print "Server started")
         (sh/sh "notify-send" "-u" "critical" "Server started")))
-  (let [port (Integer. (or port (env :port) 5000))
+  (let [port (Integer. (or port (env :port) "5000"))
         host (or "127.0.0.1" (env :host))]
     (jetty/run-jetty (site (tapp)) {:port port :host host :join? false})))
 

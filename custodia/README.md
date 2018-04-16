@@ -42,10 +42,10 @@ GIT. Add in the following:
        :env {:database-url "postgres://USER:PASSWORD@localhost:5432/DATABASE"
              :adminpass "web"
              :userpass "web"
-             :dev true
-             :newdb false
-             :migratedb false
-             :notify false}}}
+             :dev "true"
+             :newdb "false"
+             :migratedb "false"
+             :notify "false"}}}
 ```
 
 Replace the following words in your profiles.clj:
@@ -95,7 +95,7 @@ To run the backend, run ```make start```.
 If both the frontend and backend are running, the app will be available at
 [localhost:5000](http://localhost:5000/).
 
-### Logging 
+### Logging
 
 Exception and debugging logging can be added to the system via the
 ```log4j.properties``` in the ```src/``` directory.
