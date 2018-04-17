@@ -2,11 +2,19 @@ export function init() {
 
 	var login_message_shown = false;
 
+	$('#hide-archived').click(function() {
+		var archivedRows = $('.js-archived');
+		if (Boolean($(this).is(':checked'))) {
+			archivedRows.hide(400);
+		} else {
+			archivedRows.show(400);
+		}
+	});
+
 	$('.js-archive').click(function() {
 
 		var checkbox = $(this);
 		var id = Number(checkbox.data('id'));
-    	//var archived = Boolean(checkbox.is(':checked'));
     	var row = checkbox.parents('.js-archivable');
 
         checkbox.prop("disabled", true);
@@ -22,7 +30,7 @@ export function init() {
 	                login_message_shown = true;
 	                return;
 	            }
-	            row.toggleClass('accounting-archived');
+	            row.toggleClass('js-archived accounting-archived');
 	        })
 	        .always(function() {
 	            checkbox.prop("disabled", false);

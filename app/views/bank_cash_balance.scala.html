@@ -9,6 +9,11 @@
 	</div>
 	<br>
 
+	<div>
+		<label><input type="checkbox" id="hide-archived"> Hide archived transactions</label>
+	</div>
+	<br>
+
 	<table class="table sortable">
 		<tr>
 			<th>Archived</th>
@@ -20,7 +25,7 @@
 			<th class="balance">New Balance</th>
 		</tr>
 		@for(transaction <- model.transactions) {
-			<tr class="@(if(transaction.archived) "js-archivable accounting-archived" else "js-archivable")">
+			<tr class="@(if(transaction.archived) "js-archivable js-archived accounting-archived" else "js-archivable")">
 				<td><input type="checkbox"
 						class="js-archive"
 						data-id="@transaction.id"
