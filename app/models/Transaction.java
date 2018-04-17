@@ -42,6 +42,8 @@ public class Transaction extends Model {
 
     public TransactionType type;
 
+    public Boolean archived;
+
     public String getTypeName() {
         return type.toString();
     }

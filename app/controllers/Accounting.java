@@ -58,6 +58,14 @@ public class Accounting extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
+    public Result toggleTransactionArchived(int id) {
+        Transaction transaction = Transaction.findById(id);
+        transaction.archived = !transaction.archived;
+        transaction.save();
+        return ok();
+    }
+
+    @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result report() {
         return ok(views.html.accounting_report.render(new AccountingReport()));
     }
