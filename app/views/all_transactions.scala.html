@@ -1,31 +1,26 @@
 @(model : TransactionList)
 
-@main("Bank Cash Balance", "accounting", "accounting_bank_cash_balance") {
+@main("All Transactions", "accounting", "accounting_all_transactions") {
 
-	<h2>Bank Cash Balance</h2>
-
-	<div class="transaction-list-current-balance">
-		Current Balance: <strong>$@model.getFormattedBalance()</strong>
-	</div>
-	<br>
+	<h2>All Transactions</h2>
 
 	<table class="table sortable">
 		<tr>
 			<th>Transaction ID</th>
 			<th>Date</th>
 			<th>Created By User</th>
+			<th>Type</th>
 			<th>Description</th>
 			<th class="balance">Amount</th>
-			<th class="balance">New Balance</th>
 		</tr>
 		@for(transaction <- model.transactions) {
 			<tr>
 				<td><a href="@routes.Accounting.transaction(transaction.id)">@transaction.id</a></td>
 				<td>@transaction.getFormattedDate()</td>
 				<td>@transaction.getCreatedByUserName()</td>
+				<td>@transaction.getTypeName()</td>
 				<td>@transaction.description</td>
-				<td class="balance">@transaction.getFormattedAmount(true)</td>
-				<td class="balance">@model.getFormattedBalanceAsOfTransaction(transaction)</td>
+				<td class="balance">@transaction.getFormattedAmount(false)</td>
 			</tr>
 		}
 	</table>

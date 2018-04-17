@@ -53,6 +53,11 @@ public class Accounting extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
+    public Result allTransactions() {
+        return ok(views.html.all_transactions.render(TransactionList.all()));
+    }
+
+    @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result report() {
         return ok(views.html.accounting_report.render(new AccountingReport()));
     }

@@ -71,4 +71,14 @@ public class TransactionList {
         Collections.sort(model.transactions, (a, b) -> b.id.compareTo(a.id));
         return model;
     }
+
+    public static TransactionList all() {
+        TransactionList model = new TransactionList();
+        model.transactions = Transaction.all();
+        for (Transaction t : model.transactions) {
+            t.description = getFormattedDescription(t.type, t.from_name, t.to_name, t.description);
+        }
+        Collections.sort(model.transactions, (a, b) -> b.id.compareTo(a.id));
+        return model;
+    }
 }
