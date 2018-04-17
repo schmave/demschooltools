@@ -48,8 +48,8 @@ public class Accounting extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result pettyCash() {
-        return ok(views.html.petty_cash.render(PettyCash.find()));
+    public Result bankCashBalance() {
+        return ok(views.html.bank_cash_balance.render(TransactionList.allCash()));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)

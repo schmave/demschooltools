@@ -1,10 +1,10 @@
-@(model : PettyCash)
+@(model : TransactionList)
 
-@main("Bank Cash Balance", "accounting", "accounting_petty_cash") {
+@main("Bank Cash Balance", "accounting", "accounting_bank_cash_balance") {
 
 	<h2>Bank Cash Balance</h2>
 
-	<div class="petty-cash-current-balance">
+	<div class="transaction-list-current-balance">
 		Current Balance: <strong>$@model.getFormattedBalance()</strong>
 	</div>
 	<br>

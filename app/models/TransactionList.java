@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.*;
 import play.data.*;
 import com.avaje.ebean.*;
 
-public class PettyCash {
+public class TransactionList {
 
     public List<Transaction> transactions;
 
@@ -54,8 +54,8 @@ public class PettyCash {
         return result;
     }
 
-    public static PettyCash find() {
-        PettyCash model = new PettyCash();
+    public static TransactionList allCash() {
+        TransactionList model = new TransactionList();
         model.transactions = new ArrayList<Transaction>();
         List<Transaction> deposit_transactions = Transaction.allCashDeposits();
         List<Transaction> withdrawal_transactions = Transaction.allCashWithdrawals();
