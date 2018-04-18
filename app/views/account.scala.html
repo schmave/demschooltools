@@ -21,6 +21,9 @@
 			@if(account.initial_balance.signum() > 0) {
 				<td>Initial Balance: $@account.getFormattedInitialBalance()</td>
 			}
+			@if(account.monthly_credit.signum() > 0) {
+				<td>Monthly Credit: $@account.getFormattedMonthlyCredit()</td>
+			}
 		</tr>
 	</table>
 	<br>

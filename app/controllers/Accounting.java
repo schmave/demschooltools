@@ -1,10 +1,11 @@
 package controllers;
 
 import java.util.*;
+import java.util.stream.*;
 import models.*;
 import play.mvc.*;
 import play.data.*;
-import play.libs.Json;
+import play.libs.*;
 
 @With(DumpOnError.class)
 @Secured.Auth(UserRole.ROLE_VIEW_JC)
@@ -17,6 +18,7 @@ public class Accounting extends Controller {
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result newTransaction() {
+        applyMonthlyCredits();
         Form<Transaction> form = Form.form(Transaction.class);
         return ok(views.html.create_transaction.render(form));
     }
@@ -40,6 +42,7 @@ public class Accounting extends Controller {
     }
 
     public Result balances() {
+        applyMonthlyCredits();
         List<Account> personalAccounts = Account.allPersonalChecking();
         List<Account> institutionalAccounts = Account.allInstitutionalChecking();
         Collections.sort(personalAccounts, (a, b) -> a.getName().compareTo(b.getName()));
@@ -49,11 +52,13 @@ public class Accounting extends Controller {
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result bankCashBalance() {
+        applyMonthlyCredits();
         return ok(views.html.bank_cash_balance.render(TransactionList.allCash()));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result allTransactions() {
+        applyMonthlyCredits();
         return ok(views.html.all_transactions.render(TransactionList.all()));
     }
 
@@ -67,6 +72,7 @@ public class Accounting extends Controller {
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result report() {
+        applyMonthlyCredits();
         return ok(views.html.accounting_report.render(new AccountingReport()));
     }
 
@@ -83,6 +89,7 @@ public class Accounting extends Controller {
     }
 
     public Result account(Integer id) {
+        applyMonthlyCredits();
         Account account = Account.findById(id);
         return ok(views.html.account.render(account));
     }
@@ -95,6 +102,7 @@ public class Accounting extends Controller {
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result accounts() {
+        applyMonthlyCredits();
         List<Account> accounts = Account.all();
         Collections.sort(accounts, (a, b) -> a.getName().compareTo(b.getName()));
         return ok(views.html.accounts.render(accounts));
@@ -147,5 +155,23 @@ public class Accounting extends Controller {
             result.add(values);
         }
         return Json.stringify(Json.toJson(result));
+    }
+
+    static void applyMonthlyCredits() {
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.DAY_OF_MONTH, 1);
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+        Date monthStartDate = c.getTime();
+
+        List<Account> accounts = Account.allWithMonthlyCredits().stream()
+            .filter(a -> a.date_last_monthly_credit == null || a.date_last_monthly_credit.before(monthStartDate))
+            .collect(Collectors.toList());
+
+        for (Account a : accounts) {
+            a.createMonthlyCreditTransaction(monthStartDate);
+        }
     }
 }

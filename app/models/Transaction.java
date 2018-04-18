@@ -42,7 +42,7 @@ public class Transaction extends Model {
 
     public TransactionType type;
 
-    public Boolean archived;
+    public Boolean archived = false;
 
     public String getTypeName() {
         return type.toString();
@@ -115,6 +115,18 @@ public class Transaction extends Model {
         transaction.organization = Organization.getByHost();
         transaction.created_by_user = Application.getCurrentUser();
 
+        transaction.save();
+        return transaction;
+    }
+
+    public static Transaction createMonthlyCreditTransaction(Account account, Date date) {
+        Transaction transaction = new Transaction();
+        transaction.to_account = account;
+        transaction.amount = account.monthly_credit;
+        transaction.type = TransactionType.DigitalTransaction;
+        transaction.description = new SimpleDateFormat("MMMM").format(date) + " monthly credit";
+        transaction.date_created = date;
+        transaction.organization = Organization.getByHost();
         transaction.save();
         return transaction;
     }
