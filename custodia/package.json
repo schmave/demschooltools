@@ -15,7 +15,7 @@
     "url": "https://github.com/thedreadpirate/overseer.git"
   },
   "author": "Steven Shogren, Keith O'Brien",
-  "license": "Proprietary",
+  "license": "GPL-3.0",
   "bugs": {
     "url": "https://github.com/thedreadpirate/overseer/issues"
   },
@@ -26,17 +26,17 @@
     "d3": "3.5.6",
     "flux": "2.1.1",
     "globalize": "1.x",
-    "griddle-react": "0.6.x",
-    "history": "2.1.2",
+    "griddle-react": "0.8.x",
+    "history": "3.x",
     "moment": "2.10.6",
     "object-assign": "3.0.0",
     "prop-types": "15.x",
-    "react": "15.x",
-    "react-dom": "15.x",
+    "react": "16.x",
+    "react-dom": "16.x",
     "react-notification-system": "0.2.x",
-    "react-router": "2.8.x",
-    "react-skylight": "0.4.1",
-    "react-widgets": "3.4.x",
+    "react-router": "3.x",
+    "react-skylight": "0.5.1",
+    "react-widgets": "4.x",
     "react-widgets-globalize": "latest",
     "underscore": "1.8.3"
   },

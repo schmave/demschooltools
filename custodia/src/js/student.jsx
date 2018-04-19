@@ -134,23 +134,22 @@ class Student extends React.Component {
         }
         var groupedDays = this.state.student.days.groupBy(groupingFunc);
         var months = Object.keys(groupedDays);
+        // This returns a list of lists (of lists?), which React appears to flatten.
         return months.map(function(month){
             var cls = (month===this.state.selectedMonth)
                     ? "glyphicon glyphicon-chevron-down"
                     : "glyphicon glyphicon-chevron-right";
-            // TODO: Use an array instead of a bogus span in React 16
-            //     see https://github.com/facebook/react/issues/2127
-            return <span key={month}>
-              <tr style={{fontWeight:"bold"}}>
+            return [
+              <tr key={month} style={{fontWeight:"bold"}}>
                 <td onClick={this.toggleMonth.bind(this, month)}
                     style={{fontWeight:"bold"}}>
                   <span className={cls}
                         style={{"paddingRight":"3px"}} ></span>
                   {month}
                 </td>
-              </tr>
-              {this.listMonth(groupedDays[month], (this.state.selectedMonth == month), month)}
-            </span>;
+              </tr>,
+              this.listMonth(groupedDays[month], (this.state.selectedMonth == month), month)
+            ];
         }.bind(this));
     };
 
