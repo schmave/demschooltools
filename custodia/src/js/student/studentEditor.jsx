@@ -8,9 +8,11 @@ var React = require('react'),
     actionCreator = require('../studentactioncreator'),
     Modal = require('../modal.jsx');
 
-module.exports = React.createClass({
-    displayName: 'StudentEditor',
-    getInitialState: function() {
+module.exports = class extends React.Component {
+    static displayName = 'StudentEditor';
+
+    constructor(props, context) {
+        super(props, context);
         var that = this;
         dispatcher.register(function(action){
             if (action.type == constants.studentEvents.STUDENT_LOADED
@@ -19,19 +21,21 @@ module.exports = React.createClass({
                 that.close();
             }
         });
-        return {saving: false,
+
+        this.state = {saving: false,
                 student: {start_date: null, guardian_email: "", name : "", olderdate: null},
                 startdate_datepicker: new Date()};
-    },
+    }
 
-    savingShow: function () {
+    savingShow = () => {
         this.setState({saving:true});
-    },
-    savingHide: function () {
-        this.setState({saving:false});
-    },
+    };
 
-    saveChange: function () {
+    savingHide = () => {
+        this.setState({saving:false});
+    };
+
+    saveChange = () => {
         this.savingShow();
         var startDate = this.refs.startdate.props.value;
         if (this.state.student._id == null) {
@@ -48,42 +52,42 @@ module.exports = React.createClass({
                                         ReactDOM.findDOMNode(this.refs.required_minutes).value,
                                         this.state.student.is_teacher);
         }
-    },
+    };
 
-    edit: function(student) {
+    edit = (student) => {
         var s = jQuery.extend({}, student);
         this.setState(
             {student: s,
              creating: (!s._id),
              startdate_datepicker: (s.start_date) ? new Date(s.start_date) : null})
         this.refs.studentEditor.show();
-    },
+    };
 
-    close: function () {
+    close = () => {
         if (this.refs.studentEditor) {
             this.refs.studentEditor.hide();
         }
-    },
+    };
 
-    handleTeacherChange: function(state) {
+    handleTeacherChange = (state) => {
         this.state.student.is_teacher = !this.state.student.is_teacher;
         this.setState({student: this.state.student});
-    },
+    };
 
-    handleDateChange: function(d) {
+    handleDateChange = (d) => {
         this.setState({startdate_datepicker: d});
-    },
+    };
 
-    handleChange: function(event) {
+    handleChange = (event) => {
         const target = event.target;
         const value = target.type === 'checkbox' ? target.checked : target.value;
         const name = target.id;
         var partialState = this.state.student;
         partialState[name] = value;
         this.setState(partialState);
-    },
+    };
 
-    render: function()  {
+    render() {
         var title = ((this.state.creating) ? "Create" :  "Edit") + " Student"
         return <div className="row">
           <Modal ref="studentEditor"
@@ -131,11 +135,11 @@ module.exports = React.createClass({
        </form>
             }
           </Modal></div>;
-    },
+    }
 
-    _onChange: function() {
+    _onChange = () => {
         if (this.refs.studentEditor) {
             this.refs.studentEditor.hide();
         }
-    }
-});
+    };
+};

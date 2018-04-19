@@ -7,31 +7,37 @@ var React = require('react'),
     SwipeHelpers = require('./swipeHelpers.jsx'),
     studentStore = require('./StudentStore');
 
-module.exports = React.createClass({
-    displayName: "StudentTable",
-    contextTypes: {
+module.exports = class extends React.Component {
+    static displayName = "StudentTable";
+
+    static contextTypes = {
         router: React.PropTypes.object.isRequired
-    },
-    getInitialState: function () {
-        return {students: studentStore.getStudents(true),
-                today: null};
-    },
-    componentDidMount: function () {
+    };
+
+    state = {students: studentStore.getStudents(true),
+            today: null};
+
+    componentDidMount() {
         studentStore.addChangeListener(this._onChange);
-    },
-    componentWillUnmount: function () {
+    }
+
+    componentWillUnmount() {
         studentStore.removeChangeListener(this._onChange);
-    },
-    signIn: function (student) {
+    }
+
+    signIn = (student) => {
         this.refs.missingSwipeCollector.validateSignDirection(student, 'in');
-    },
-    signOut: function (student) {
+    };
+
+    signOut = (student) => {
         this.refs.missingSwipeCollector.validateSignDirection(student, 'out');
-    },
-    isSigningIn: function(student) {
+    };
+
+    isSigningIn = (student) => {
         return !student.last_swipe_date || student.last_swipe_type === 'out' || !student.last_swipe_date.startsWith(studentStore.getToday());
-    },
-    getSwipeButton:  function(student, way){
+    };
+
+    getSwipeButton = (student, way) => {
         var buttonIcon = 'fa-arrow-right';
         if (way === 'out') {
             buttonIcon = 'fa-arrow-left';
@@ -54,8 +60,9 @@ module.exports = React.createClass({
                 <i className={iclassName}>&nbsp;</i>
              </button>;
         }
-    },
-    getStudent: function(student, way){
+    };
+
+    getStudent = (student, way) => {
         var link = <span className="glyphicon glyphicon-calendar"></span>;
         var button = this.getSwipeButton(student, way);
         var calendar_button_class = "btn btn-default calendar-button";
@@ -74,8 +81,9 @@ module.exports = React.createClass({
                 {calendar_button}
             </div>;
         }
-    },
-    render: function () {
+    };
+
+    render() {
         var absentCol = [],
             notYetInCol = [],
             inCol = [],
@@ -129,9 +137,10 @@ module.exports = React.createClass({
                 </div>
             </div>
         </div>;
-    },
-    _onChange: function () {
+    }
+
+    _onChange = () => {
         this.setState({students: studentStore.getStudents(),
                        today: studentStore.getToday()});
-    }
-});
+    };
+};

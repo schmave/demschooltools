@@ -2,12 +2,12 @@ var React = require('react'),
   AdminItem = require('./adminwrapper.jsx'),
   actionCreator = require('./studentactioncreator');
 
-var exports = React.createClass({
-    displayName: 'SwipesListing',
-    contextTypes: {
+class SwipesListing extends React.Component {
+    static contextTypes = {
         router: React.PropTypes.object
-    },
-    getCurrentDay: function (student, dayString) {
+    };
+
+    getCurrentDay = (student, dayString) => {
         if(student) {
             var day = student.days.find(function (day) {
                 return day.day === dayString;
@@ -16,21 +16,22 @@ var exports = React.createClass({
         }else{
             return {};
         }
-    },
-    componentWillReceiveProps: function(newProps){
+    };
+
+    componentWillReceiveProps(newProps) {
       this.setState({day: this.getCurrentDay(newProps.student, newProps.day)});
-    },
-    getInitialState: function(){
-        return {day: this.getCurrentDay(this.props.student, this.props.day)};
-    },
-    deleteSwipe: function (swipe) {
+    }
+
+    deleteSwipe = (swipe) => {
         actionCreator.deleteSwipe(swipe, this.props.student);
-    },
-    swipesAreEmpty: function(swipes){
+    };
+
+    swipesAreEmpty = (swipes) => {
         return swipes.length === 0 ||
             (swipes.length === 1 && swipes[0].in_time === null && swipes[0].out_time === null);
-    },
-    getSwipesForDay: function () {
+    };
+
+    getSwipesForDay = () => {
         var swipeRows = [];
         if (this.state.day && !this.swipesAreEmpty(this.state.day.swipes)) {
             this.state.day.swipes.map(function (swipe) {
@@ -48,14 +49,19 @@ var exports = React.createClass({
             return <tr><td colSpan="2">No swipes available.</td></tr>;
         }
         return swipeRows;
-    },
-    excuse: function (swipe) {
+    };
+
+    excuse = (swipe) => {
         actionCreator.excuse(this.props.student._id, this.props.day);
-    },
-    override: function () {
+    };
+
+    override = () => {
         actionCreator.override(this.props.student._id, this.props.day);
-    },
-    render: function () {
+    };
+
+    state = {day: this.getCurrentDay(this.props.student, this.props.day)};
+
+    render() {
         this.state.day.round_mins = parseFloat(this.state.day.total_mins).toFixed(0);
         var showOverrideExcuseButtons = this.state.day && !this.state.day.override
                                  && !this.state.day.excused && !this.state.day.valid;
@@ -93,9 +99,7 @@ var exports = React.createClass({
               : ''
             }
             </span>;
-    },
+    }
+}
 
-
-});
-
-module.exports = exports;
+module.exports = SwipesListing;

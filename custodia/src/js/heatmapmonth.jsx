@@ -2,10 +2,10 @@ var React = require('react'),
     heatmap = require('cal-heatmap'),
     moment = require('moment');
 
-var exports = React.createClass({
-    displayName: 'HeatmapMonth',
-    map: null,
-    formatDays: function (days, requiredMinutes) {
+class HeatmapMonth extends React.Component {
+    map = null;
+
+    formatDays = (days, requiredMinutes) => {
         var formatted = {};
         days.forEach(function (day) {
             formatted[moment(day.day).unix()] = day.total_mins;
@@ -16,8 +16,9 @@ var exports = React.createClass({
             }
         });
         return formatted;
-    },
-    getHighlights: function (days, requiredMinutes) {
+    };
+
+    getHighlights = (days, requiredMinutes) => {
         //var hights = ['now'];
         var hights = [];
         days.forEach(function (day) {
@@ -26,8 +27,9 @@ var exports = React.createClass({
             }
         });
         return hights;
-    },
-    loadHeatmap: function () {
+    };
+
+    loadHeatmap = () => {
         var data = this.formatDays(this.props.days, this.props.requiredMinutes);
         var highlight = this.getHighlights(this.props.days, this.props.requiredMinutes);
         if (this.map) {
@@ -63,13 +65,15 @@ var exports = React.createClass({
             highlight: highlight,
             cellSize: 15
         });
-    },
-    render: function () {
+    };
+
+    render() {
         return <div id={"heatmap" + this.props.index} className="col-sm-4" style={{float: "none"}}></div>;
-    },
-    componentDidMount: function () {
+    }
+
+    componentDidMount() {
         this.loadHeatmap();
     }
-});
+}
 
-module.exports = exports;
+module.exports = HeatmapMonth;

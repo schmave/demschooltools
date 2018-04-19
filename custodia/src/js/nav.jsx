@@ -5,24 +5,22 @@ var React = require('react'),
     SuperWrapper = require('./superwrapper.jsx'),
     AdminWrapper = require('./adminwrapper.jsx');
 
-module.exports = React.createClass({
-    displayName: "Nav",
+module.exports = class Nav extends React.Component {
+    state = {selectedSchool: userStore.getSelectedSchool()};
 
-    getInitialState: function () {
-        return {selectedSchool: userStore.getSelectedSchool()};
-    },
-
-    componentDidMount: function () {
+    componentDidMount() {
         userStore.addChangeListener(this._onChange);
-    },
-    componentWillUnmount: function () {
-        userStore.removeChangeListener(this._onChange);
-    },
+    }
 
-    _onChange: function () {
+    componentWillUnmount() {
+        userStore.removeChangeListener(this._onChange);
+    }
+
+    _onChange = () => {
         this.setState({selectedSchool: userStore.getSelectedSchool()});
-    },
-    render: function () {
+    };
+
+    render() {
         return <nav className="navbar" role="navigation">
             <div className="container">
                 <div className="navbar-header">
@@ -50,4 +48,4 @@ module.exports = React.createClass({
             </div>
         </nav>;
     }
-});
+};

@@ -5,14 +5,14 @@ var React = require('react'),
     actionCreator = require('./studentactioncreator'),
     Modal = require('./modal.jsx');
 
-module.exports = React.createClass({
-    displayName: "SwipeHelpers",
-    getInitialState: function() {
-        return {
-            missing_date: new Date(),
-        };
-    },
-    _getMissingSwipe : function(student) {
+module.exports = class extends React.Component {
+    static displayName = "SwipeHelpers";
+
+    state = {
+        missing_date: new Date(),
+    };
+
+    _getMissingSwipe = (student) => {
         var missingdirection = (student.last_swipe_type == "in") ? "out" : "in";
         if (!student.in_today && student.direction == "out") {
             missingdirection = "in";
@@ -22,17 +22,17 @@ module.exports = React.createClass({
         return missingdirection;
         // use ComponentDidUpdate to check the states then change them
         // use the onChange for the datepicker to mutate setState
-    },
+    };
 
-    _swipeWithMissing: function(missing) {
+    _swipeWithMissing = (missing) => {
         var student = this.state.student,
             missing = this.state.missing_date;
         actionCreator.swipeStudent(student, student.direction, missing);
         this.setState({student: {}, missingdirection: false})
         this.refs.missingSwipeCollector.hide();
-    },
+    };
 
-    validateSignDirection: function(student, direction) {
+    validateSignDirection = (student, direction) => {
         this.setState({student: student})
         student.direction = direction;
         var missing_in = ((student.last_swipe_type == "out"
@@ -48,8 +48,9 @@ module.exports = React.createClass({
         } else {
             actionCreator.swipeStudent(student, direction);
         }
-    },
-    _setCalendarTime: function(student, missingdirection) {
+    };
+
+    _setCalendarTime = (student, missingdirection) => {
         var d = new Date();
         if (!student) { return d;}
         if (student.last_swipe_date) {
@@ -70,8 +71,9 @@ module.exports = React.createClass({
         //    this.refs.missing_datepicker.state.value = d;
         //}
         return d;
-    },
-    render: function()  {
+    };
+
+    render() {
         var self = this;
         return <div className="row">
           <Modal ref="missingSwipeCollector"
@@ -94,11 +96,11 @@ module.exports = React.createClass({
               </div>
             </form>
           </Modal></div>;
-    },
+    }
 
-    _onChange: function() {
+    _onChange = () => {
         if (this.refs.missingSwipeCollector) {
             this.refs.missingSwipeCollector.hide();
         }
-    }
-});
+    };
+};

@@ -8,9 +8,11 @@ var React = require('react'),
     actionCreator = require('../classactioncreator'),
     Modal = require('../modal.jsx');
 
-module.exports = React.createClass({
-    displayName: 'ClassEditor',
-    getInitialState: function() {
+module.exports = class extends React.Component {
+    static displayName = 'ClassEditor';
+
+    constructor(props, context) {
+        super(props, context);
         var that = this;
         dispatcher.register(function(action){
             if (action.type == constants.classEvents.CLASS_CREATED
@@ -20,19 +22,21 @@ module.exports = React.createClass({
                 that.close();
             }
         });
-        return {saving: false,
+
+        this.state = {saving: false,
                 selectedClass: {name : "", required_minutes: 345}
         };
-    },
+    }
 
-    savingShow: function () {
+    savingShow = () => {
         this.setState({saving:true});
-    },
-    savingHide: function () {
-        this.setState({saving:false});
-    },
+    };
 
-    saveChange: function () {
+    savingHide = () => {
+        this.setState({saving:false});
+    };
+
+    saveChange = () => {
         this.savingShow();
         actionCreator.createClass(
             this.state.selectedClass._id,
@@ -43,32 +47,32 @@ module.exports = React.createClass({
             "10:30:00"
             // ReactDOM.findDOMNode(this.refs.late_time).value
         );
-    },
+    };
 
-    edit: function(selectedClass) {
+    edit = (selectedClass) => {
         var s = jQuery.extend(this.state.selectedClass, selectedClass);
         this.setState(
             {selectedClass: s,
              creating: (!s._id)})
         this.refs.classEditor.show();
-    },
+    };
 
-    close: function () {
+    close = () => {
         if (this.refs.classEditor) {
             this.refs.classEditor.hide();
         }
-    },
+    };
 
-    handleChange: function(event) {
+    handleChange = (event) => {
         const target = event.target;
         const value = target.type === 'checkbox' ? target.checked : target.value;
         const name = target.id;
         var partialState = this.state.selectedClass;
         partialState[name] = value;
         this.setState(partialState);
-    },
+    };
 
-    render: function()  {
+    render() {
         var title = ((this.state.creating) ? "Create" :  "Edit") + " Class"
         return <div className="row">
           <Modal ref="classEditor"
@@ -117,11 +121,11 @@ module.exports = React.createClass({
              </form>
             }
           </Modal></div>;
-    },
+    }
 
-    _onChange: function() {
+    _onChange = () => {
         if (this.refs.classEditor) {
             this.refs.classEditor.hide();
         }
-    }
-});
+    };
+};

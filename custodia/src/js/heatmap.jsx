@@ -16,9 +16,10 @@ var groupingFunc = function (data) {
     return data.day.split('-')[0] + '-' + data.day.split('-')[1] + '-' + '01';
 };
 
-module.exports = React.createClass({
-  displayName: 'Heatmap',
-    loadHeatmaps: function () {
+module.exports = class extends React.Component {
+    static displayName = 'Heatmap';
+
+    loadHeatmaps = () => {
         var groupedDays = this.props.days.groupBy(groupingFunc);
         var minutes = this.props.requiredMinutes;
         var sortedDates = Object.keys(groupedDays).sort();
@@ -34,20 +35,24 @@ module.exports = React.createClass({
             maps.push(m);
         };
         return maps;
-    },
-    makeHeatmapRow: function(dates, minutes, key) {
+    };
+
+    makeHeatmapRow = (dates, minutes, key) => {
             return <Heatmapmonth key={key}
                                  index={key}
                                  requiredMinutes={minutes}
                                  days={dates}></Heatmapmonth>;
-    },
-    render: function () {
+    };
+
+    render() {
         return <div className="row">{this.loadHeatmaps()}</div>;
-    },
-    componentDidMount: function () {
-        //this.loadHeatmap();
-    },
-    componentDidUpdate: function () {
+    }
+
+    componentDidMount() {
         //this.loadHeatmap();
     }
-});
+
+    componentDidUpdate() {
+        //this.loadHeatmap();
+    }
+};

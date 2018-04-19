@@ -88,11 +88,14 @@ load-aliased-dump : drop-tables
 backup-aliased-dump :
 	pg_dump school_crm > dumps/updated-students-aliased.dump
 
+
+BABEL_CMD = -t [ babelify --presets [ es2015 react stage-1 ] ]
+
 minify :
-	./node_modules/.bin/browserify -t babelify -t reactify -t uglifyify ./src/js/app.jsx -o ./resources/public/js/gen/app.js
+	./node_modules/.bin/browserify $(BABEL_CMD) -t reactify -t uglifyify ./src/js/app.jsx -o ./resources/public/js/gen/app.js
 
 js :
-	./node_modules/.bin/browserify -t babelify ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
+	./node_modules/.bin/browserify $(BABEL_CMD) ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
 
 watch :
-	./node_modules/.bin/watchify -v -t babelify ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
+	./node_modules/.bin/watchify -v $(BABEL_CMD) ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug

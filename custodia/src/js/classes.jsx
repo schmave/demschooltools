@@ -10,16 +10,13 @@ var React = require('react'),
     ClassEditor = require('./classes/classEditor.jsx'),
     FilterBox = require('./filterbox.jsx');
 
-var exports = React.createClass({
-    displayName: 'Classes',
-    getInitialState: function () {
-        return {classes:classStore.getClasses(true),
-                filterText: '',
-                students: studentStore.getAllStudents(true),
-                selectedClass: {students:[]}};
-    },
+module.exports = class Classes extends React.Component {
+    state = {classes:classStore.getClasses(true),
+            filterText: '',
+            students: studentStore.getAllStudents(true),
+            selectedClass: {students:[]}};
 
-    setupState: function (classes, students) {
+    setupState = (classes, students) => {
         var selectedClass = this.state.selectedClass;
         if(selectedClass && selectedClass._id) {
             var id = selectedClass._id,
@@ -40,31 +37,31 @@ var exports = React.createClass({
         this.setState({classes: classes,
                        students: students,
                        selectedClass: (selectedClass)?selectedClass:{students:[]}});
-    },
+    };
 
-    componentDidMount: function () {
+    componentDidMount() {
         classStore.addChangeListener(this._onClassChange);
         studentStore.addChangeListener(this._onStudentChange);
-    },
+    }
 
-    componentWillUnmount: function () {
+    componentWillUnmount() {
         studentStore.removeChangeListener(this._onStudentChange);
         classStore.removeChangeListener(this._onClassChange);
-    },
+    }
 
-    _onClassChange: function () {
+    _onClassChange = () => {
         this.setupState(classStore.getClasses().classes, this.state.students);
-    },
+    };
 
-    _onStudentChange: function () {
+    _onStudentChange = () => {
         this.setupState(this.state.classes, studentStore.getAllStudents());
-    },
+    };
 
-    classSelected: function (classval) {
+    classSelected = (classval) => {
         this.setState({selectedClass: classval});
-    },
+    };
 
-    classRows: function(){
+    classRows = () => {
         return this.state.classes.map(function (classval, i) {
             var boundClick = this.classSelected.bind(this, classval),
                 selected = (classval._id === this.state.selectedClass._id)  ? "selected" : "";
@@ -86,37 +83,37 @@ var exports = React.createClass({
               </td>
             </tr>);
         }.bind(this));
-    },
+    };
 
-    selectedStudentContains: function(stu) {
+    selectedStudentContains = (stu) => {
         return !this.state.selectedClass.students.some(function(istu){
             return istu.student_id === stu._id;
         });
-    },
+    };
 
-    deleteFromClass: function(student) {
+    deleteFromClass = (student) => {
         actionCreator.deleteStudentFromClass(student.student_id, this.state.selectedClass._id);
-    },
+    };
 
-    addToClass: function(student) {
+    addToClass = (student) => {
         actionCreator.addStudentToClass(student._id, this.state.selectedClass._id);
-    },
+    };
 
-    activateClass: function(_id) {
+    activateClass = (_id) => {
         actionCreator.activateClass(_id);
-    },
+    };
 
-    filterStudents: function(s) {
+    filterStudents = (s) => {
         return s.filter(function(s){ return s.name.toLocaleLowerCase().indexOf(this.state.filterText.toLocaleLowerCase()) > -1;}.bind(this));
-    },
+    };
 
-    rankAlphabetically: function(a, b) {
+    rankAlphabetically = (a, b) => {
         if(a.name < b.name) return -1;
         if(a.name > b.name) return 1;
         return 0;
-    },
+    };
 
-    getStudentRowsInCurrentClass: function(){
+    getStudentRowsInCurrentClass = () => {
         var a = 1;
         var t = this.filterStudents(this.state.selectedClass.students.sort(this.rankAlphabetically))
                     .map(function (stu) { return <div key={"t" + this.state.selectedClass._id + "-" + stu.student_id}  className="in-class panel panel-info student-listing col-sm-4">
@@ -129,9 +126,9 @@ var exports = React.createClass({
                     </div>;
                     }.bind(this));
         return t;
-    },
+    };
 
-    getStudentRowsNotInCurrentClass: function() {
+    getStudentRowsNotInCurrentClass = () => {
         var filtered = this.state.students.sort(this.rankAlphabetically)
                            .filter(this.selectedStudentContains);
         var t = this.filterStudents(filtered)
@@ -146,19 +143,19 @@ var exports = React.createClass({
                         </div>;
                     }.bind(this));
         return t;
-    },
+    };
 
-    filterChanged: function(filter){
+    filterChanged = (filter) => {
         this.setState({filterText: filter});
-    },
+    };
 
-    toggleEdit: function (selectedClass) {
+    toggleEdit = (selectedClass) => {
         if(userStore.isAdmin()) {
            this.refs.classEditor.edit(selectedClass);
         }
-    },
+    };
 
-    makeActivateClassButtonAndPanel: function(selectedClass) {
+    makeActivateClassButtonAndPanel = (selectedClass) => {
         var activateClassButton = null;
         var activeClassPanel = "panel-danger";
 
@@ -178,9 +175,9 @@ var exports = React.createClass({
             activateClassButton = null;
         }
         return {button:activateClassButton, panel:activeClassPanel};
-    },
+    };
 
-    render: function () {
+    render() {
 
         var createClassLink =
             <button className="btn btn-primary btn-sm" onClick={this.toggleEdit.bind(this, null)}>Add new</button>;
@@ -241,6 +238,4 @@ var exports = React.createClass({
               </div>
         </div>;
     }
-});
-
-module.exports = exports;
+}

@@ -27,8 +27,8 @@ Globalize.load(
 Globalize.locale('en');
 globalizeLocalizer();
 
-var App = React.createClass({
-    render: function () {
+class App extends React.Component {
+    render() {
         return (
             <div>
                 <Nav />
@@ -39,7 +39,7 @@ var App = React.createClass({
             </div>
         );
     }
-});
+}
 
 
 var Route = Router.Route;
