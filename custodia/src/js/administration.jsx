@@ -1,4 +1,5 @@
 var React = require('react'),
+  PropTypes = require('prop-types'),
   Modal = require('./modal.jsx'),
   actionCreator = require('./studentactioncreator'),
   studentStore = require('./StudentStore'),
@@ -9,7 +10,7 @@ var React = require('react'),
 
 class Administration extends React.Component {
     static contextTypes = {
-        router: React.PropTypes.func
+        router: PropTypes.func
     };
 
     state = {schools: userStore.getSchools(),

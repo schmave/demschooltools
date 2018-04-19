@@ -1,10 +1,11 @@
 var React = require('react'),
+  PropTypes = require('prop-types'),
   AdminItem = require('./adminwrapper.jsx'),
   actionCreator = require('./studentactioncreator');
 
 class SwipesListing extends React.Component {
     static contextTypes = {
-        router: React.PropTypes.object
+        router: PropTypes.object
     };
 
     getCurrentDay = (student, dayString) => {

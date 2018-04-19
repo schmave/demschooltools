@@ -30,6 +30,7 @@
     "history": "2.1.2",
     "moment": "2.10.6",
     "object-assign": "3.0.0",
+    "prop-types": "15.x",
     "react": "15.x",
     "react-dom": "15.x",
     "react-notification-system": "0.2.x",

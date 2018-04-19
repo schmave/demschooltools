@@ -1,4 +1,5 @@
 var React = require('react'),
+    PropTypes = require('prop-types'),
     Router = require('react-router'),
     Link = Router.Link,
     AdminItem = require('./adminwrapper.jsx'),
@@ -11,7 +12,7 @@ module.exports = class extends React.Component {
     static displayName = "StudentTable";
 
     static contextTypes = {
-        router: React.PropTypes.object.isRequired
+        router: PropTypes.object.isRequired
     };
 
     state = {students: studentStore.getStudents(true),
