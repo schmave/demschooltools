@@ -1,4 +1,5 @@
 var React = require('react'),
+    ReactDOM = require('react-dom'),
     Router = require('react-router'),
     AdminItem = require('../adminwrapper.jsx'),
     dispatcher = require('../appdispatcher'),
@@ -8,6 +9,7 @@ var React = require('react'),
     Modal = require('../modal.jsx');
 
 module.exports = React.createClass({
+    displayName: 'StudentEditor',
     getInitialState: function() {
         var that = this;
         dispatcher.register(function(action){
@@ -33,17 +35,17 @@ module.exports = React.createClass({
         this.savingShow();
         var startDate = this.refs.startdate.props.value;
         if (this.state.student._id == null) {
-            actionCreator.createStudent(this.refs.name.getDOMNode().value,
+            actionCreator.createStudent(ReactDOM.findDOMNode(this.refs.name).value,
                                         startDate,
-                                        this.refs.email.getDOMNode().value,
-                                        this.refs.required_minutes.getDOMNode().value,
+                                        ReactDOM.findDOMNode(this.refs.email).value,
+                                        ReactDOM.findDOMNode(this.refs.required_minutes).value,
                                         this.state.student.is_teacher);
         } else {
             actionCreator.updateStudent(this.state.student._id,
-                                        this.refs.name.getDOMNode().value,
+                                        ReactDOM.findDOMNode(this.refs.name).value,
                                         startDate,
-                                        this.refs.email.getDOMNode().value,
-                                        this.refs.required_minutes.getDOMNode().value,
+                                        ReactDOM.findDOMNode(this.refs.email).value,
+                                        ReactDOM.findDOMNode(this.refs.required_minutes).value,
                                         this.state.student.is_teacher);
         }
     },

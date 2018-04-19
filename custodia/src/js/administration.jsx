@@ -8,6 +8,7 @@ var React = require('react'),
   SuperItem = require('./superwrapper.jsx');
 
 var exports = React.createClass({
+    displayName: 'Administration',
     contextTypes: {
         router: React.PropTypes.func
     },

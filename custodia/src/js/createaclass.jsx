@@ -1,9 +1,11 @@
 var React = require('react'),
+    ReactDOM = require('react-dom'),
     actionCreator = require('./classactioncreator');
 
 var exports = React.createClass({
+    displayName: 'CreateAClass',
     submit: function(){
-        actionCreator.createClass(this.refs.name.getDOMNode().value);
+        actionCreator.createClass(ReactDOM.findDOMNode(this.refs.name).value);
     },
 
     render: function () {

@@ -2,6 +2,7 @@ var userStore = require('./userstore'),
 React = require('react');
 
 var exports = React.createClass({
+    displayName: 'SuperWrapper',
     getInitialState: function(){
         return {permitted: userStore.isSuper()};
     },

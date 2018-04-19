@@ -8,8 +8,9 @@ var React = require('react'),
     studentStore = require('./StudentStore');
 
 module.exports = React.createClass({
+    displayName: "StudentTable",
     contextTypes: {
-        router: React.PropTypes.func.isRequired
+        router: React.PropTypes.object.isRequired
     },
     getInitialState: function () {
         return {students: studentStore.getStudents(true),
@@ -59,7 +60,7 @@ module.exports = React.createClass({
         var button = this.getSwipeButton(student, way);
         var calendar_button_class = "btn btn-default calendar-button";
         var calendar_button = <div onClick={function() {
-            myhistory.replaceState(null, '/students/' + student._id); }}
+            myhistory.push('/students/' + student._id); }}
             className={calendar_button_class}>{link}</div>;
 
         if (way !== 'out') {

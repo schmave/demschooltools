@@ -17,6 +17,7 @@ var groupingFunc = function (data) {
 };
 
 module.exports = React.createClass({
+  displayName: 'Heatmap',
     loadHeatmaps: function () {
         var groupedDays = this.props.days.groupBy(groupingFunc);
         var minutes = this.props.requiredMinutes;

@@ -3,8 +3,9 @@ var React = require('react'),
   actionCreator = require('./studentactioncreator');
 
 var exports = React.createClass({
+    displayName: 'SwipesListing',
     contextTypes: {
-        router: React.PropTypes.func
+        router: React.PropTypes.object
     },
     getCurrentDay: function (student, dayString) {
         if(student) {

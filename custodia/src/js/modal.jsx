@@ -1,7 +1,8 @@
 var React = require('react'),
-    Skylight = require('react-skylight');
+    Skylight = require('react-skylight').default;
 
 module.exports = React.createClass({
+    displayName: 'Modal',
     show: function () {
         this.refs.modal.show();
         $(document.body).off('keydown');

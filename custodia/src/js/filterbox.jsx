@@ -1,6 +1,7 @@
 var React = require('react');
 
 var component = React.createClass({
+  displayName: 'FilterBox',
   filterChanged: function(event) {
     this
       .props

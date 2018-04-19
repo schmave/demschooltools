@@ -9,6 +9,7 @@ var React = require('react'),
     FilterBox = require('./filterbox.jsx');
 
 var exports = React.createClass({
+  displayName: 'StudentAdmin',
     getInitialState: function () {
         return {
             filterText: '',

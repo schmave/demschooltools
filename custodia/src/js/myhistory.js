@@ -1,5 +1,4 @@
-import createHashHistory from 'history/lib/createHashHistory'
+import { useRouterHistory } from 'react-router'
+import { createHashHistory } from 'history'
 
-export default createHashHistory({
-  queryKey: false
-})
+module.exports = useRouterHistory(createHashHistory)({ queryKey: false });

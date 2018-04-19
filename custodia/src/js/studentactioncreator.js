@@ -51,7 +51,7 @@ var exports = {
                     type: constants.systemEvents.FLASH,
                     message: 'Successfully created ' + data.made.name + '.'
                 });
-                myhistory.replaceState(null, 'studentAdmin');
+                myhistory.replace('studentAdmin');
             } else {
                 dispatcher.dispatch({
                     type: constants.systemEvents.FLASH,
@@ -107,7 +107,7 @@ var exports = {
                     message: student.name + ' swiped successfully!'
                 });
                 //student = null;
-                myhistory.replaceState(null, '/students');
+                myhistory.replace('/students');
             }.bind(this));
     },
     toggleArchived: function (id) {

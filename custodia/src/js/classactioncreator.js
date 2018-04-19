@@ -27,7 +27,7 @@ var exports = {
                             type: constants.classEvents.CLASS_CREATED,
                             data: data
                         });
-                        myhistory.replaceState(null, 'classes');
+                        myhistory.replace('classes');
                     };
                 };
         if(id > 0) {

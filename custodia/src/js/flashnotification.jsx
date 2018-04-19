@@ -4,6 +4,7 @@ var React = require('react'),
     constants = require('./appconstants');
 
 var exports = React.createClass({
+    displayName: 'FlashNotification',
     componentDidMount: function(){
         store.addChangeListener(this._onChange);
         this.notifications = this.refs.notifications;

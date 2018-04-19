@@ -3,7 +3,6 @@ var React = require('react'),
     userStore = require('./userstore'),
     AdminItem = require('./adminwrapper.jsx'),
     Modal = require('./modal.jsx'),
-    DateTimePicker = require('react-widgets').DateTimePicker,
     actionCreator = require('./studentactioncreator'),
     studentStore = require('./StudentStore'),
     Router = require('react-router'),
@@ -18,6 +17,7 @@ var groupingFunc = function (data) {
 };
 
 var exports = React.createClass({
+  displayName: 'Student',
     getInitialState: function () {
         var studentId = this.props.params.studentId;
         return {
@@ -126,6 +126,8 @@ var exports = React.createClass({
             var cls = (month===this.state.selectedMonth)
                     ? "glyphicon glyphicon-chevron-down"
                     : "glyphicon glyphicon-chevron-right";
+            // TODO: Use an array instead of a bogus span in React 16
+            //     see https://github.com/facebook/react/issues/2127
             return <span key={month}>
               <tr style={{fontWeight:"bold"}}>
                 <td onClick={this.toggleMonth.bind(this, month)}

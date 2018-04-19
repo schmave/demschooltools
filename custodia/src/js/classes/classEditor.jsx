@@ -1,4 +1,5 @@
 var React = require('react'),
+    ReactDOM = require('react-dom'),
     Router = require('react-router'),
     AdminItem = require('../adminwrapper.jsx'),
     dispatcher = require('../appdispatcher'),
@@ -8,6 +9,7 @@ var React = require('react'),
     Modal = require('../modal.jsx');
 
 module.exports = React.createClass({
+    displayName: 'ClassEditor',
     getInitialState: function() {
         var that = this;
         dispatcher.register(function(action){
@@ -34,12 +36,12 @@ module.exports = React.createClass({
         this.savingShow();
         actionCreator.createClass(
             this.state.selectedClass._id,
-            this.refs.name.getDOMNode().value,
+            ReactDOM.findDOMNode(this.refs.name).value,
             null,
             null,
-            this.refs.required_minutes.getDOMNode().value,
+            ReactDOM.findDOMNode(this.refs.required_minutes).value,
             "10:30:00"
-            // this.refs.late_time.getDOMNode().value
+            // ReactDOM.findDOMNode(this.refs.late_time).value
         );
     },
 
@@ -73,7 +75,7 @@ module.exports = React.createClass({
                  title={title}>
             {(this.state.saving) ?
              <div>
-               <p style={{'text-align':'center'}}>
+               <p style={{'textAlign':'center'}}>
                  <img src="/images/spinner.gif" />
                </p>
              </div>

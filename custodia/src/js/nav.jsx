@@ -6,6 +6,7 @@ var React = require('react'),
     AdminWrapper = require('./adminwrapper.jsx');
 
 module.exports = React.createClass({
+    displayName: "Nav",
 
     getInitialState: function () {
         return {selectedSchool: userStore.getSelectedSchool()};

@@ -6,8 +6,11 @@ var React = require('react'),
     Modal = require('./modal.jsx');
 
 module.exports = React.createClass({
+    displayName: "SwipeHelpers",
     getInitialState: function() {
-        return {};
+        return {
+            missing_date: new Date(),
+        };
     },
     _getMissingSwipe : function(student) {
         var missingdirection = (student.last_swipe_type == "in") ? "out" : "in";
@@ -23,7 +26,7 @@ module.exports = React.createClass({
 
     _swipeWithMissing: function(missing) {
         var student = this.state.student,
-            missing = this.refs.missing_datepicker.state.value;
+            missing = this.state.missing_date;
         actionCreator.swipeStudent(student, student.direction, missing);
         this.setState({student: {}, missingdirection: false})
         this.refs.missingSwipeCollector.hide();
@@ -60,21 +63,30 @@ module.exports = React.createClass({
         d.setHours((missingdirection == "in") ? 9 : 15);
         d.setMinutes(0);
 
-        if(this.refs.missing_datepicker) {
-            this.refs.missing_datepicker.state.value = d;
-        }
+
+        // TODO(Evan): This code is supposed to update the value of the time picker
+        //             but it doesn't.
+        // if(this.refs.missing_datepicker) {
+        //    this.refs.missing_datepicker.state.value = d;
+        //}
         return d;
     },
     render: function()  {
+        var self = this;
         return <div className="row">
           <Modal ref="missingSwipeCollector"
                  title={"What time did you sign " + this.state.missingdirection + "?"}>
             <form className="form-inline">
               <div className="form-group">
                 <label htmlFor="missing">What time did you sign {this.state.missingdirection}?</label>
-                <DateTimePicker id="missing" defaultValue={new Date()}
+                <DateTimePicker format="hh:mm a"
+                                id="missing" defaultValue={new Date()}
                                 ref="missing_datepicker"
-                                calendar={false}/>
+                                calendar={false}
+                                onChange={function(value) {
+                                    console.log(value);
+                                    self.setState({missing_date: value});
+                                }}/>
               </div>
               <div className="form-group" style={{marginLeft: '2em'}}>
                 <button id="submit-missing" className="btn btn-sm btn-primary" onClick={this._swipeWithMissing}>

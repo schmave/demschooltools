@@ -23,6 +23,7 @@ Globalize.load(
   require("cldr-data/supplemental/timeData"),
   require("cldr-data/supplemental/weekData")
 );
+
 Globalize.locale('en');
 globalizeLocalizer();
 

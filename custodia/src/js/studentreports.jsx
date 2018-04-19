@@ -3,7 +3,7 @@ var reportStore = require('./reportstore'),
     Modal = require('./modal.jsx'),
     Router = require('react-router'),
     Link = Router.Link,
-    DatePicker = require('react-widgets').DateTimePicker,
+    DateTimePicker = require('react-widgets').DateTimePicker,
     actionCreator = require('./reportactioncreator'),
     React = require('react'),
     Griddle = require('griddle-react');
@@ -52,6 +52,7 @@ var StudentLinkComponent = React.createClass({
 });
 
 var exports = React.createClass({
+    displayName: 'StudentReports',
     getInitialState: function () {
         return getState();
     },
@@ -147,13 +148,13 @@ var exports = React.createClass({
                         onChange={this.classSelected}
                         value={this.state.selectedClassId}>
                     {this.state.classes ? this.state.classes.map(function (cls) {
-                         return <option value={cls._id}>{cls.name}</option>;
+                         return <option key={cls._id} value={cls._id}>{cls.name}</option>;
                      }.bind(this)) : ""}
                 </select>
                 <select className="pull-left" onChange={this.yearSelected}
                         value={this.state.currentYear}>
                     {this.state.years ? this.state.years.years.map(function (year) {
-                         return <option value={year}> {year === this.state.years.current_year ? year + " (Current)" : year}
+                         return <option key={year} value={year}> {year === this.state.years.current_year ? year + " (Current)" : year}
                          </option>;
                      }.bind(this)) : ""}
                 </select>
@@ -168,8 +169,8 @@ var exports = React.createClass({
             <Modal ref="newSchoolYear" title="Create new period">
                 <form className="form-inline">
                     <div className="form-group">
-                        <label htmlFor="startDate">Start:</label> <DatePicker id="startDate" ref="newPeriodStartDate" onChange={this.newPeriodDateSelected} time={false}/>
-                        <label htmlFor="endDate">End:</label> <DatePicker ref="newPeriodEndDate" id="endDate" time={false}/>
+                        <label htmlFor="startDate">Start:</label> <DateTimePicker id="startDate" ref="newPeriodStartDate" onChange={this.newPeriodDateSelected} time={false}/>
+                        <label htmlFor="endDate">End:</label> <DateTimePicker ref="newPeriodEndDate" id="endDate" time={false}/>
                     </div>
                     <div className="form-group" style={{marginLeft: '2em'}}>
                         <button className="btn btn-sm btn-primary" onClick={this.createPeriod}>Create Period</button>

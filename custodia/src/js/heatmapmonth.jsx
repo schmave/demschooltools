@@ -3,6 +3,7 @@ var React = require('react'),
     moment = require('moment');
 
 var exports = React.createClass({
+    displayName: 'HeatmapMonth',
     map: null,
     formatDays: function (days, requiredMinutes) {
         var formatted = {};

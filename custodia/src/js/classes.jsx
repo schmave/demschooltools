@@ -11,7 +11,7 @@ var React = require('react'),
     FilterBox = require('./filterbox.jsx');
 
 var exports = React.createClass({
-
+    displayName: 'Classes',
     getInitialState: function () {
         return {classes:classStore.getClasses(true),
                 filterText: '',
