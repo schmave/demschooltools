@@ -88,6 +88,23 @@ public class Accounting extends Controller {
         return ok(views.html.accounting_report.render(report));
     }
 
+    @Secured.Auth(UserRole.ROLE_ACCOUNTING)
+    public Result report() {
+        return ok(views.html.accounting_report.render(new AccountingReport()));
+    }
+
+    @Secured.Auth(UserRole.ROLE_ACCOUNTING)
+    public Result runReport() {
+        Form<AccountingReport> form = Form.form(AccountingReport.class);
+        Form<AccountingReport> filledForm = form.bindFromRequest();
+        if (filledForm.hasErrors()) {
+            System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
+            return badRequest(views.html.accounting_report.render(new AccountingReport()));
+        }
+        AccountingReport report = AccountingReport.create(filledForm);
+        return ok(views.html.accounting_report.render(report));
+    }
+
     public Result account(Integer id) {
         applyMonthlyCredits();
         Account account = Account.findById(id);
