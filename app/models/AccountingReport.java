@@ -3,10 +3,7 @@ package models;
 import java.text.*;
 import java.util.*;
 import java.math.*;
-import javax.persistence.*;
-import com.fasterxml.jackson.annotation.*;
 import play.data.*;
-import com.avaje.ebean.*;
 
 public class AccountingReport {
 
