@@ -1,0 +1,51 @@
+@(model : TransactionList)
+
+@main("Bank Cash Balance", "accounting", "accounting_bank_cash_balance") {
+
+	<h2>Bank Cash Balance</h2>
+
+	<div class="transaction-list-current-balance">
+		Current Balance: <strong>$@model.getFormattedBalance()</strong>
+	</div>
+	<br>
+
+	<div>
+		<label><input type="checkbox" id="hide-archived"> Hide archived transactions</label>
+	</div>
+	<br>
+
+	<table class="table sortable">
+		<tr>
+			<th>Archived</th>
+			<th>Transaction ID</th>
+			<th>Date</th>
+			<th>Created By User</th>
+			<th>Description</th>
+			<th class="balance">Amount</th>
+			<th class="balance">New Balance</th>
+		</tr>
+		@for(transaction <- model.transactions) {
+			<tr class="@(if(transaction.archived) "js-archivable js-archived accounting-archived" else "js-archivable")">
+				<td><input type="checkbox"
+						class="js-archive"
+						data-id="@transaction.id"
+						name="archived"
+						value="@transaction.archived"
+						@if(transaction.archived){checked="checked"}
+						/></td>
+				<td><a href="@routes.Accounting.transaction(transaction.id)">@transaction.id</a></td>
+				<td>@transaction.getFormattedDate()</td>
+				<td>@transaction.getCreatedByUserName()</td>
+				<td>@transaction.description</td>
+				<td class="balance">@transaction.getFormattedAmount(true)</td>
+				<td class="balance">@model.getFormattedBalanceAsOfTransaction(transaction)</td>
+			</tr>
+		}
+	</table>
+	<br>
+	<br>
+}
+
+<script type="text/javascript">
+	initTransactionList();
+</script>

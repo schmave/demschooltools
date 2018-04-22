@@ -162,8 +162,10 @@
                         href="@routes.Accounting.report()">Report</a>
                     <a @if(selectedBtn.equals("accounting_accounts")) { class="active" }
                         href="@routes.Accounting.accounts()">Manage Accounts</a>
-                    <a @if(selectedBtn.equals("accounting_petty_cash")) { class="active" }
-                        href="@routes.Accounting.pettyCash()">Bank Cash Balance</a>
+                    <a @if(selectedBtn.equals("accounting_bank_cash_balance")) { class="active" }
+                        href="@routes.Accounting.bankCashBalance()">Bank Cash Balance</a>
+                    <a @if(selectedBtn.equals("accounting_all_transactions")) { class="active" }
+                        href="@routes.Accounting.allTransactions()">All Transactions</a>
                 </div>
             </div>
         }

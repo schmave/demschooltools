@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.*;
 import play.data.*;
 import com.avaje.ebean.*;
 
-public class PettyCash {
+public class TransactionList {
 
     public List<Transaction> transactions;
 
@@ -54,8 +54,8 @@ public class PettyCash {
         return result;
     }
 
-    public static PettyCash find() {
-        PettyCash model = new PettyCash();
+    public static TransactionList allCash() {
+        TransactionList model = new TransactionList();
         model.transactions = new ArrayList<Transaction>();
         List<Transaction> deposit_transactions = Transaction.allCashDeposits();
         List<Transaction> withdrawal_transactions = Transaction.allCashWithdrawals();
@@ -67,6 +67,16 @@ public class PettyCash {
             t.description = getFormattedDescription(t.type, t.from_name, t.to_name, t.description);
             t.amount = BigDecimal.ZERO.subtract(t.amount);
             model.transactions.add(t);
+        }
+        Collections.sort(model.transactions, (a, b) -> b.id.compareTo(a.id));
+        return model;
+    }
+
+    public static TransactionList all() {
+        TransactionList model = new TransactionList();
+        model.transactions = Transaction.all();
+        for (Transaction t : model.transactions) {
+            t.description = getFormattedDescription(t.type, t.from_name, t.to_name, t.description);
         }
         Collections.sort(model.transactions, (a, b) -> b.id.compareTo(a.id));
         return model;

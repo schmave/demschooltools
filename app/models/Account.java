@@ -3,6 +3,7 @@ package models;
 import java.text.*;
 import java.util.*;
 import java.math.*;
+import java.time.*;
 import javax.persistence.*;
 
 import com.avaje.ebean.Query;
@@ -37,6 +38,11 @@ public class Account extends Model {
 
     public BigDecimal initial_balance = new BigDecimal(0);
 
+    public BigDecimal monthly_credit = new BigDecimal(0);
+
+    @play.data.format.Formats.DateTime(pattern="MM/dd/yyyy")
+    public Date date_last_monthly_credit;
+
     public static void createPersonalAccounts() {
         for (Person person : allPeople()) {
             if (!person.hasAccount(AccountType.PersonalChecking)) {
@@ -51,6 +57,10 @@ public class Account extends Model {
 
     public AccountType getType() {
         return type;
+    }
+
+    public BigDecimal getMonthly_credit() {
+        return monthly_credit;
     }
 
     public String getName() {
@@ -102,6 +112,10 @@ public class Account extends Model {
         return new DecimalFormat("0.00").format(initial_balance);
     }
 
+    public String getFormattedMonthlyCredit() {
+        return new DecimalFormat("0.00").format(monthly_credit);
+    }
+
     public List<Transaction> getTransactionsViewModel() {
         List<Transaction> result = new ArrayList<Transaction>();
         for (Transaction t : credit_transactions) {
@@ -148,6 +162,13 @@ public class Account extends Model {
             .findList();
     }
 
+    public static List<Account> allWithMonthlyCredits() {
+        return baseQuery().where()
+                .eq("organization", Organization.getByHost())
+                .ne("monthly_credit", BigDecimal.ZERO)
+                .findList();
+    }
+
     private static Query<Account> baseQuery() {
         return find
             .fetch("person", new FetchConfig().query())
@@ -188,6 +209,17 @@ public class Account extends Model {
     public void updateFromForm(Form<Account> form) {
         name = form.field("name").value();
         type = AccountType.valueOf(form.field("type").value());
+        monthly_credit = new BigDecimal(form.field("monthly_credit").value());
+        // if we are changing the monthly credit, set the date last applied to today
+        if (monthly_credit.compareTo(BigDecimal.ZERO) != 0) {
+            date_last_monthly_credit = new Date();
+        }
+        save();
+    }
+
+    public void createMonthlyCreditTransaction(Date date) {
+        Transaction.createMonthlyCreditTransaction(this, date);
+        date_last_monthly_credit = date;
         save();
     }
 

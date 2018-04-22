@@ -15,6 +15,7 @@ var feedback_modal = require('./feedback_modal');
 require('./sorttable');
 var people_chooser = require('./people_chooser');
 var create_transaction = require('./create_transaction');
+var transaction_list = require('./transaction_list');
 
 $(function() {
     // Fix for bootstrap tabs not remembering their active tab
@@ -125,4 +126,8 @@ window.enableButtonForCheckboxes = function(btn_selector, checkbox_class) {
 
 window.initCreateTransaction = function(accounts) {
     return create_transaction.init(accounts);
+};
+
+window.initTransactionList = function() {
+    return transaction_list.init();
 };

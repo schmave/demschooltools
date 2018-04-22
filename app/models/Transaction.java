@@ -42,6 +42,8 @@ public class Transaction extends Model {
 
     public TransactionType type;
 
+    public Boolean archived = false;
+
     public String getTypeName() {
         return type.toString();
     }
@@ -57,10 +59,14 @@ public class Transaction extends Model {
         return sdf.format(date_created);
     }
 
-    public String getFormattedAmount() {
+    public String getFormattedAmount(boolean includePlusSign) {
         if (amount == BigDecimal.ZERO) return "0";
-        String prefix = amount.compareTo(BigDecimal.ZERO) > 0 ? "+" : "";
-        return prefix + new DecimalFormat("0.00").format(amount);
+        String formatted = new DecimalFormat("0.00").format(amount);
+        if (includePlusSign) {
+            String prefix = amount.compareTo(BigDecimal.ZERO) > 0 ? "+" : "";
+            return prefix + formatted;
+        }
+        return formatted;
     }
 
     public static Finder<Integer, Transaction> find = new Finder<Integer, Transaction>(
@@ -70,6 +76,12 @@ public class Transaction extends Model {
     public static Transaction findById(Integer id) {
         return find.where().eq("organization", Organization.getByHost())
             .eq("id", id).findUnique();
+    }
+
+    public static List<Transaction> all() {
+        return find.where()
+            .eq("organization", Organization.getByHost())
+            .findList();
     }
 
     public static List<Transaction> allCashDeposits() {
@@ -103,6 +115,18 @@ public class Transaction extends Model {
         transaction.organization = Organization.getByHost();
         transaction.created_by_user = Application.getCurrentUser();
 
+        transaction.save();
+        return transaction;
+    }
+
+    public static Transaction createMonthlyCreditTransaction(Account account, Date date) {
+        Transaction transaction = new Transaction();
+        transaction.to_account = account;
+        transaction.amount = account.monthly_credit;
+        transaction.type = TransactionType.DigitalTransaction;
+        transaction.description = new SimpleDateFormat("MMMM").format(date) + " monthly credit";
+        transaction.date_created = date;
+        transaction.organization = Organization.getByHost();
         transaction.save();
         return transaction;
     }
