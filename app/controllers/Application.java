@@ -952,7 +952,7 @@ public class Application extends Controller {
     }
 
     public static String formatDateTimeLong() {
-        return new SimpleDateFormat("EEEE, MMMM d, h:mm a").format(new Date());
+        return new SimpleDateFormat("EEEE, MMMM d, h:mm a").format(Utils.localNow());
     }
 
     public static String yymdDate(Date d) {

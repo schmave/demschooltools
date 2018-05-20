@@ -197,6 +197,11 @@ public class Utils
             }
         });
     }
+
+    public static Date localNow() {
+        Date utcNow = new Date();
+        return new Date(utcNow.getTime() + OrgConfig.get().time_zone.getOffset(utcNow.getTime()));
+    }
 }
 
 //class PersonKeySerializer extends JsonSerializer<Person>
