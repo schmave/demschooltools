@@ -71,8 +71,6 @@ public class Utils
 
         if (!sqlEx.getSQLState().equals("23505")) {
             throw pe;
-        } else {
-            System.out.println("Ate a 23505 error");
         }
     }
 
