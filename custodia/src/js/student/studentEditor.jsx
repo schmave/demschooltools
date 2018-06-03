@@ -123,7 +123,7 @@ module.exports = class extends React.Component {
                 <b>Student Start Date:</b>
                 <DateTimePicker id="missing" value={this.state.startdate_datepicker}
                                 ref="startdate" onChange={this.handleDateChange}
-                                calendar={true}
+                                date={true}
                                 time={false} />
         </div>
         <button onClick={this.saveChange} className="btn btn-success">
