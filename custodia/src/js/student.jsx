@@ -23,7 +23,7 @@ class Student extends React.Component {
 
         this.state = {
             studentId: studentId,
-            student: studentStore.getStudent(studentId)
+            student: studentStore.getStudent(studentId, true)
         };
     }
 
