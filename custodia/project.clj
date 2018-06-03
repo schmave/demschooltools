@@ -54,6 +54,6 @@
                  :port 9998}}
   ;; :main overseer.web
   :uberjar-name "overseer-standalone.jar"
-  :profiles {:debug { :jvm-opts ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"]}
+  :profiles {:debug { }
              :production {:env {:production true}}
              :uberjar {:main overseer.web :aot :all}})
