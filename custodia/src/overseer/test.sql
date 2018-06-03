@@ -12,7 +12,6 @@ create schema demo;
     _id bigserial primary key,
     student_id bigserial,
     in_time timestamp  with time zone,
-    inserted_date timestamp default now(),
     out_time timestamp with time zone
   );
 

@@ -48,7 +48,7 @@ class Student extends React.Component {
     };
 
     studentInToday = () => {
-        return this.state.student.last_swipe_date == this.state.student.today;
+        return this.state.student.in_today;
     };
 
     getActionButtons = () => {
@@ -59,7 +59,7 @@ class Student extends React.Component {
                                  className="btn btn-sm btn-info margined">Sign In
             </button>);
         }
-        if (!this.studentInToday() || this.state.student.last_swipe_type === 'in') {
+        if (this.studentInToday() && this.state.student.last_swipe_type === 'in') {
             buttons.push(<button key="sign-out" type="button" id="sign-out" onClick={this.signOut}
                                  className="btn btn-sm btn-info margined">Sign Out
             </button>);

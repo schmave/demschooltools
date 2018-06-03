@@ -35,7 +35,7 @@ module.exports = class extends React.Component {
     };
 
     isSigningIn = (student) => {
-        return !student.last_swipe_date || student.last_swipe_type === 'out' || !student.last_swipe_date.startsWith(studentStore.getToday());
+        return student.last_swipe_type === 'out' || !student.in_today;
     };
 
     getSwipeButton = (student, way) => {

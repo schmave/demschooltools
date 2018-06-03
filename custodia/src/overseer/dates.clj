@@ -12,10 +12,11 @@
 (def date-format (f/formatter "yyyy-MM-dd"))
 (def time-format (f/formatter "hh:mm:ss"))
 
-(def local-time-zone-id (t/time-zone-for-id db/*school-timezone*))
+(defn local-time-zone-id []
+  (t/time-zone-for-id db/*school-timezone*))
 
 (defn format-to-local [f d]
-  (f/unparse (f/with-zone f local-time-zone-id) d))
+  (f/unparse (f/with-zone f (local-time-zone-id)) d))
 
 (defn parse-date-string [d]
   (f/parse date-format d))
@@ -33,7 +34,7 @@
       0M)))
 
 (defn from-sql-time [inst]
-  (f/unparse (f/with-zone time-format local-time-zone-id) (c/from-sql-date inst)))
+  (f/unparse (f/with-zone time-format (local-time-zone-id)) (c/from-sql-date inst)))
 
 (defn make-date-string-without-timezone [d]
   (when d
@@ -59,7 +60,7 @@
 (defn in-local-time-at-hour [date hour]
   (let [local-date (f/parse (make-date-string date))]
     (-> (t/date-time (t/year local-date) (t/month local-date) (t/day local-date) hour 0)
-        (t/from-time-zone local-time-zone-id))))
+        (t/from-time-zone (local-time-zone-id)))))
 
 (defn earliest-time [date] (in-local-time-at-hour date 9))
 

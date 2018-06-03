@@ -52,7 +52,11 @@
   ([id] (swipe-in id (t/now)))
   ([id in-time]
    (let [in-timestamp (make-timestamp in-time)
-         rounded-in-timestamp (make-timestamp (dates/round-swipe-time in-time))]
+         rounded-in-timestamp
+            (make-timestamp
+              (if (= db/*school-id* 2)
+                (dates/round-swipe-time in-time)
+                in-time))]
      (db/persist! (assoc (make-swipe id)
                          :swipe_day (c/to-sql-date (dates/make-date-string in-timestamp))
                          :rounded_in_time rounded-in-timestamp
@@ -74,7 +78,10 @@
 (h/deflog swipe-out
   ([id] (swipe-out id (t/now)))
   ([id out-time]
-   (let [rounded-out-time (dates/round-swipe-time out-time)
+   (let [rounded-out-time
+            (if (= db/*school-id* 2)
+              (dates/round-swipe-time out-time)
+              out-time)
          out-time (dates/cond-parse-date-string out-time)
          last-swipe (log/spyf "Last Swipe: %s" (queries/lookup-last-swipe-for-day id (dates/make-date-string rounded-out-time)))
          only-swiped-in? (only-swiped-in? last-swipe)

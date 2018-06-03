@@ -126,7 +126,12 @@
                             :in_today (= today-string
                                          (make-date-string (:last_swipe_date %)))
                             :absent_today (= today-string
-                                             (make-date-string-without-timezone (:show_as_absent %)))) inout)
+                                             (make-date-string-without-timezone (:show_as_absent %)))
+                            :last_swipe_date (make-date-string (:last_swipe_date %))
+                            ; Clear some fields that are not needed by the frontend
+                            :show_as_absent nil
+                            :late_time nil)
+                    inout)
          ]
      inout)))
 
@@ -186,6 +191,7 @@
                     :total_excused (count (filter :excused summed-days))
                     :today today-string
                     :absent_today (boolean absent_today)
+                    :show_as_absent nil
                     :in_today in_today
                     :last_swipe_type last-swipe-type
                     :last_swipe_date last-swipe-date
