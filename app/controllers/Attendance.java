@@ -775,4 +775,8 @@ public class Attendance extends Controller {
     public static String format(double d) {
         return String.format("%,.1f", d);
     }
+
+    public static String formatAsPercent(double d) {
+        return String.format("%,.1f", d * 100) + "%";
+    }
 }

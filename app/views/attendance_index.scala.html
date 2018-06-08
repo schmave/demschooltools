@@ -73,6 +73,7 @@ $(function() {
 	<th width=100>Days Present</th>
 	<th width=100>Total hours</th>
 	<th width=100>Avg. hours per day</th>
+	<th width=100>Attendance Rate</th>
 	</thead>
 
 @for( p <- people ) {
@@ -104,7 +105,8 @@ $(function() {
 	}
 	<td align="center">@person_to_stats.get(p).days_present</td>
 	<td align="center">@Attendance.format(person_to_stats.get(p).total_hours)</td>
-	<td align="center">@Attendance.format(person_to_stats.get(p).total_hours / person_to_stats.get(p).days_present)</td>
+	<td align="center">@Attendance.format(person_to_stats.get(p).averageHoursPerDay())</td>
+	<td align="center">@Attendance.formatAsPercent(person_to_stats.get(p).attendanceRate())</td>
 }
 
 </table>

@@ -16,4 +16,20 @@ public class AttendanceStats {
         }
         absence_counts.put(code, absence_counts.get(code) + 1);
     }
+
+    public double averageHoursPerDay() {
+        return total_hours / days_present;
+    }
+
+    public int absenceCount() {
+        int sum = 0;
+        for (int val : absence_counts.values()) {
+            sum += val;
+        }
+        return sum;
+    }
+
+    public double attendanceRate() {
+        return (double)days_present / (days_present + absenceCount());
+    }
 }
