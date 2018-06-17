@@ -165,6 +165,10 @@ public class Accounting extends Controller {
         c.set(Calendar.SECOND, 0);
         c.set(Calendar.MILLISECOND, 0);
         Date monthStartDate = c.getTime();
+        int month = c.get(Calendar.MONTH) + 1;
+
+        // no credits in the months of July and August
+        if (month == 7 || month == 8) return;
 
         List<Account> accounts = Account.allWithMonthlyCredits().stream()
             .filter(a -> a.date_last_monthly_credit == null || a.date_last_monthly_credit.before(monthStartDate))
