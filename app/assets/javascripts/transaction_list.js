@@ -4,9 +4,22 @@ export function init() {
     $('#hide-archived').click(function() {
         var archivedRows = $('.js-archived');
         if ($(this).is(':checked')) {
+            archivedRows.addClass('js-archived-hidden');
             archivedRows.hide(400);
         } else {
-            archivedRows.show(400);
+            archivedRows.removeClass('js-archived-hidden');
+            archivedRows.not('.js-non-personal-hidden').show(400);
+        }
+    });
+
+    $('#hide-non-personal').click(function() {
+        var nonPersonalRows = $('.js-non-personal');
+        if ($(this).is(':checked')) {
+            nonPersonalRows.addClass('js-non-personal-hidden');
+            nonPersonalRows.hide(400);
+        } else {
+            nonPersonalRows.removeClass('js-non-personal-hidden');
+            nonPersonalRows.not('.js-archived-hidden').show(400);
         }
     });
 
