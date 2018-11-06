@@ -69,6 +69,22 @@ public class Transaction extends Model {
         return formatted;
     }
 
+    private Boolean isPersonal() {
+        return (to_account != null && to_account.type == AccountType.PersonalChecking)
+            || (from_account != null && from_account.type == AccountType.PersonalChecking);
+    }
+
+    public String getCssClass() {
+        String cssClass = "js-archivable";
+        if (archived) {
+            cssClass += " js-archived accounting-archived";
+        }
+        if (!isPersonal()) {
+            cssClass += " js-non-personal";
+        }
+        return cssClass;
+    }
+
     public static Finder<Integer, Transaction> find = new Finder<Integer, Transaction>(
         Transaction.class
     );
@@ -79,7 +95,10 @@ public class Transaction extends Model {
     }
 
     public static List<Transaction> all() {
-        return find.where()
+        return find
+            .fetch("to_account", new FetchConfig().query())
+            .fetch("from_account", new FetchConfig().query())
+            .where()
             .eq("organization", Organization.getByHost())
             .findList();
     }
