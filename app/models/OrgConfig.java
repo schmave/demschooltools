@@ -258,7 +258,7 @@ class Houston extends OrgConfig {
         str_res_plans_cap = "Sentences";
         str_findings = "Findings";
 
-        track_writer = false;
+        track_writer = true;
         use_year_in_case_number = true;
 
         OrgConfig.register(name, this);
