@@ -41,6 +41,12 @@ public class Accounting extends Controller {
         }
     }
 
+    @Secured.Auth(UserRole.ROLE_ACCOUNTING)
+    public Result deleteTransaction(Integer id) {
+        Transaction.delete(id);
+        return redirect(routes.Accounting.balances());
+    }
+
     public Result balances() {
         applyMonthlyCredits();
         List<Account> personalAccounts = Account.allPersonalChecking();

@@ -154,4 +154,9 @@ public class Transaction extends Model {
         if (id == null || id.trim().length() == 0) return null;
         return Account.findById(Integer.valueOf(id));
     }
+
+    public static void delete(Integer id) {
+        Transaction transaction = find.ref(id);
+        transaction.delete();
+    }
 }
