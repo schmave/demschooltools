@@ -3,6 +3,7 @@ package models;
 import controllers.Application;
 import java.text.*;
 import java.util.*;
+import java.util.stream.*;
 import java.math.*;
 import javax.persistence.*;
 import com.fasterxml.jackson.annotation.*;
@@ -79,9 +80,6 @@ public class Transaction extends Model {
         if (archived) {
             cssClass += " js-archived accounting-archived";
         }
-        if (!isPersonal()) {
-            cssClass += " js-non-personal";
-        }
         return cssClass;
     }
 
@@ -94,13 +92,27 @@ public class Transaction extends Model {
             .eq("id", id).findUnique();
     }
 
-    public static List<Transaction> all() {
+    public static List<Transaction> allWithConditions(
+            Boolean include_personal,
+            Boolean include_non_personal,
+            Boolean include_cash,
+            Boolean include_digital,
+            Boolean include_archived) {
+        
         return find
             .fetch("to_account", new FetchConfig().query())
             .fetch("from_account", new FetchConfig().query())
             .where()
             .eq("organization", Organization.getByHost())
-            .findList();
+            .findList()
+            .stream()
+            .filter(t -> 
+                (include_personal || !t.isPersonal()) &&
+                (include_non_personal || t.isPersonal()) &&
+                (include_cash || t.type == TransactionType.DigitalTransaction) &&
+                (include_digital || t.type != TransactionType.DigitalTransaction) &&
+                (include_archived || !t.archived))
+            .collect(Collectors.toList());
     }
 
     public static List<Transaction> allCashDeposits() {

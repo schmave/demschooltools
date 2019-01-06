@@ -12,6 +12,12 @@ public class TransactionList {
 
     public List<Transaction> transactions;
 
+    public Boolean include_personal = false;
+    public Boolean include_non_personal = false;
+    public Boolean include_cash = false;
+    public Boolean include_digital = false;
+    public Boolean include_archived = false;
+
     private BigDecimal getBalance() {
         return transactions.stream()
             .map(t -> t.amount)
@@ -72,9 +78,26 @@ public class TransactionList {
         return model;
     }
 
-    public static TransactionList all() {
+    public static TransactionList blank() {
         TransactionList model = new TransactionList();
-        model.transactions = Transaction.all();
+        model.include_personal = true;
+        model.include_non_personal = true;
+        model.include_cash = true;
+        model.include_digital = true;
+        model.include_archived = true;
+        return model;
+    }
+
+    public static TransactionList createFromForm(Form<TransactionList> form) {
+        TransactionList model = form.get();
+
+        model.transactions = Transaction.allWithConditions(
+            model.include_personal,
+            model.include_non_personal,
+            model.include_cash,
+            model.include_digital,
+            model.include_archived);
+
         for (Transaction t : model.transactions) {
             t.description = getFormattedDescription(t.type, t.from_name, t.to_name, t.description);
         }
