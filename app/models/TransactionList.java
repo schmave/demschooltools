@@ -109,11 +109,12 @@ public class TransactionList {
         Collections.sort(transactions, (a, b) -> (getTransactionSortValue(b)).compareTo(getTransactionSortValue(a)));
     }
 
-    private static String getTransactionSortValue(Transaction transaction) {
-        // millisec * sec * min * hours
-        // 1000 * 60 * 60 * 24 = 86400000
-        int hours = (int) (transaction.date_created.getTime() / 86400000L);
-        // this will sort by date, then by ID
-        return Integer.toString(hours) + Integer.toString(transaction.id);
+    private static Integer getTransactionSortValue(Transaction transaction) {
+        // Convert milliseconds to minutes so we can fit into an Integer
+        int minutes = (int) (transaction.date_created.getTime() / 60000);
+        // The goal is to sort by date, then by ID.
+        // This will work as long as the difference in minutes between two differently-dated transactions is always
+        // greater than the difference in ID numbers between them, which will practically always be the case.
+        return minutes + transaction.id;
     }
 }
