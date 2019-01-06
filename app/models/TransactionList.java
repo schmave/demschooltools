@@ -68,7 +68,7 @@ public class TransactionList {
             t.amount = BigDecimal.ZERO.subtract(t.amount);
             model.transactions.add(t);
         }
-        Collections.sort(model.transactions, (a, b) -> b.id.compareTo(a.id));
+        sortTransactions(model.transactions);
         return model;
     }
 
@@ -78,7 +78,19 @@ public class TransactionList {
         for (Transaction t : model.transactions) {
             t.description = getFormattedDescription(t.type, t.from_name, t.to_name, t.description);
         }
-        Collections.sort(model.transactions, (a, b) -> b.id.compareTo(a.id));
+        sortTransactions(model.transactions);
         return model;
+    }
+
+    public static void sortTransactions(List<Transaction> transactions) {
+        Collections.sort(transactions, (a, b) -> (getTransactionSortValue(b)).compareTo(getTransactionSortValue(a)));
+    }
+
+    private static String getTransactionSortValue(Transaction transaction) {
+        // millisec * sec * min * hours
+        // 1000 * 60 * 60 * 24 = 86400000
+        int hours = (int) (transaction.date_created.getTime() / 86400000L);
+        // this will sort by date, then by ID
+        return Integer.toString(hours) + Integer.toString(transaction.id);
     }
 }
