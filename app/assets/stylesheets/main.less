@@ -261,15 +261,21 @@ img.x {
     font-size: inherit;
 }
 
-.rule .label
+.rule_chooser .result .label,
+.case_chooser .result .label
 {
     cursor: pointer;
     display:inline-block;
     font-size: inherit;
+}
+
+.rule_chooser .result .label
+{
     width: 200px;
 }
 
-.rule
+.rule_chooser .result,
+.case_chooser .result
 {
     display:inline-block;
 }
@@ -668,6 +674,13 @@ a.not-link:hover {
 
 input.date {
     width: 90px;
+}
+
+.rp-preview {
+  display: inline-block;
+  width: 400px;
+  margin: 7px;
+  font-style: italic;
 }
 
 /***************************************************************************

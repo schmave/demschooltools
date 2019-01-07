@@ -228,7 +228,7 @@ public class Application extends Controller {
                 writer.write("");
             }
             writer.write(c.plea);
-            writer.write(c.resolution_plan);
+            writer.write(c.rp_text);
             writer.write("" + c.rp_complete);
             if (OrgConfig.get().show_severity) {
                 writer.write(c.severity);
@@ -344,7 +344,7 @@ public class Application extends Controller {
                             : Application.formatDayOfWeek(charge.the_case.meeting.date))
                         + ")");
                     writer.write(charge.rule.title);
-                    writer.write(charge.resolution_plan);
+                    writer.write(charge.rp_text);
                     writer.endRecord();
                 }
             }
@@ -636,9 +636,9 @@ public class Application extends Controller {
         Collections.reverse(r.charges);
 
         for (Charge c : r.charges) {
-            if (!c.resolution_plan.toLowerCase().equals("warning") &&
-                !c.resolution_plan.equals("")) {
-                rps.add(c.resolution_plan);
+            if (!c.rp_text.toLowerCase().equals("warning") &&
+                !c.rp_text.equals("")) {
+                rps.add(c.rp_text);
             }
             if (rps.size() > 9) {
                 break;
@@ -875,6 +875,26 @@ public class Application extends Controller {
                 HashMap<String, String> values = new HashMap<String, String>();
                 values.put("label", r.getNumber() + " " + r.title);
                 values.put("id", "" + r.id);
+                result.add(values);
+            }
+        }
+
+        return Json.stringify(Json.toJson(result));
+    }
+
+    public static String jsonCases(String term) {
+        term = term.toLowerCase();
+
+        List<Case> cases = Case.find.where()
+            .eq("meeting.organization", Organization.getByHost())
+            .orderBy("case_number ASC").findList();
+
+        List<Map<String, String>> result = new ArrayList<Map<String, String>>();
+        for (Case c : cases) {
+            if (c.case_number.toLowerCase().contains(term)) {
+                HashMap<String, String> values = new HashMap<String, String>();
+                values.put("label", c.case_number);
+                values.put("id", "" + c.id);
                 result.add(values);
             }
         }

@@ -41,7 +41,7 @@ Print active @OrgConfig.get().str_res_plans</a></p>
     @if( OrgConfig.get().show_findings_in_rp_list ) {
 	   <td class="col-xs-4">@OrgConfig.get().str_findings: {{findings}}</td>
     }
-	<td class="col-xs-3">{{resolution_plan}}
+	<td class="col-xs-3">{{rp_text}}
     {{#if referred_to_sm}}
         {{#if sm_decision}}
             <b>[Sch. Mtg. decided:</b> {{sm_decision}}<b>]</b>

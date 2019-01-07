@@ -55,6 +55,7 @@ public class Charge extends Model implements Comparable<Charge> {
     public Integer rp_max_days;
     public boolean rp_start_immediately = false;
     public String rp_escape_clause = "";
+    public String rp_text = "";
 
     public static Finder<Integer, Charge> find = new Finder<Integer, Charge>(Charge.class);
 
@@ -75,10 +76,24 @@ public class Charge extends Model implements Comparable<Charge> {
     public void edit(Map<String, String[]> query_string) {
         resolution_plan = query_string.get("resolution_plan")[0];
 
-        rp_type = ResolutionPlanType.valueOf(query_string.get("rp_type")[0]);
-        rp_max_days = Integer.parseInt(query_string.get("rp_max_days")[0]);
-        rp_start_immediately = Boolean.parseBoolean(query_string.get("rp_start_immediately")[0]);
-        rp_escape_clause = query_string.get("rp_escape_clause")[0];
+        if (query_string.containsKey("rp_type")) {
+            rp_type = ResolutionPlanType.valueOf(query_string.get("rp_type")[0]);
+        }
+        if (query_string.containsKey("rp_max_days")) {
+            rp_max_days = Integer.parseInt(query_string.get("rp_max_days")[0]);
+        }
+        if (query_string.containsKey("rp_start_immediately")) {
+            rp_start_immediately = Boolean.parseBoolean(query_string.get("rp_start_immediately")[0]);
+        }
+        if (query_string.containsKey("rp_escape_clause")) {
+            rp_escape_clause = query_string.get("rp_escape_clause")[0];
+        }
+
+        if (query_string.containsKey("rp_text")) {
+            rp_text = query_string.get("rp_text")[0];
+        } else {
+            rp_text = resolution_plan;
+        }
 
         if (query_string.containsKey("plea")) {
             plea = query_string.get("plea")[0];

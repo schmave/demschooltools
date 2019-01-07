@@ -10,9 +10,11 @@ ALTER TABLE charge ADD COLUMN rp_type integer NOT NULL DEFAULT(0);
 ALTER TABLE charge ADD COLUMN rp_max_days integer DEFAULT(1);
 ALTER TABLE charge ADD COLUMN rp_start_immediately boolean NOT NULL DEFAULT(false);
 ALTER TABLE charge ADD COLUMN rp_escape_clause text NOT NULL DEFAULT('');
+ALTER TABLE charge ADD COLUMN rp_text text NOT NULL DEFAULT('');
 
 # --- !Downs
 
+ALTER TABLE charge DROP COLUMN rp_text;
 ALTER TABLE charge DROP COLUMN rp_escape_clause;
 ALTER TABLE charge DROP COLUMN rp_start_immediately;
 ALTER TABLE charge DROP COLUMN rp_max_days;

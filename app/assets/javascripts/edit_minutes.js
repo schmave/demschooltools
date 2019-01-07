@@ -32,16 +32,16 @@ function showRuleHistoryInSidebar(rule_id) {
     showSomethingInSidebar("/ruleHistory/" + rule_id);
 }
 
-function RuleChooser(el, on_change) {
+function RuleChooser(el, on_change, source) {
     this.el = el;
     var self = this;
 
-    this.search_box = el.find(".rule_search");
+    this.search_box = el.find(".search");
     this.search_box.autocomplete({
         autoFocus: true,
         delay: 0,
         minLength: 2,
-        source: app.rules,
+        source: source,
     });
 
     this.search_box.bind( "autocompleteselect", function(event, ui) {
@@ -58,7 +58,7 @@ function RuleChooser(el, on_change) {
 
         self.rule = id;
         self.rule_el =
-            self.el.prepend(app.rule_template({name: title}))
+            self.el.prepend(app.result_template({name: title}))
                 .children(":first-child");
 
         self.rule_el.find(".label").click(function() {
@@ -160,6 +160,8 @@ function Charge(charge_id, el) {
 
         el.find(".minor-referral-destination").val(json.minor_referral_destination);
         self.checkReferralLabelHighlight();
+
+        el.find(".rp-preview").html(self.generateResolutionPlanPreview());
     };
 
     this.saveIfNeeded = function() {
@@ -188,9 +190,23 @@ function Charge(charge_id, el) {
             }
         }
 
-        url += "&rp_escape_clause=" + encodeURIComponent(el.find(".rp-escape-clause").val());
-        url += "&rp_max_days=" + encodeURIComponent(el.find(".rp-max-days").val());
-        url += "&rp_start_immediately=" + el.find(".rp-start-immediately").prop("checked");
+        var rp_escape_clause = el.find(".rp-escape-clause").val();
+        var rp_max_days = el.find(".rp-max-days").val();
+        var rp_start_immediately = el.find(".rp-start-immediately").prop("checked");
+        var rp_text = el.find(".rp-preview").html();
+
+        if (rp_escape_clause !== undefined) {
+            url += "&rp_escape_clause=" + encodeURIComponent(rp_escape_clause);
+        }
+        if (rp_max_days !== undefined) {
+            url += "&rp_max_days=" + encodeURIComponent(rp_max_days);    
+        }
+        if (rp_start_immediately !== undefined) {
+            url += "&rp_start_immediately=" + rp_start_immediately;
+        }
+        if (rp_text !== undefined) {
+            url += "&rp_text=" + rp_text;
+        }
 
         var plea = el.find(".plea-guilty");
         if (plea.prop("checked")) {
@@ -263,13 +279,82 @@ function Charge(charge_id, el) {
         }
 
         self.checkReferralLabelHighlight();
+
+        el.find(".rp-preview").html(self.generateResolutionPlanPreview());
     };
 
+    this.generateResolutionPlanPreview = function() {
+        var preview = "";
+        var defaultText = "";
+        var resolutionPlan = el.find(".resolution_plan").val();
+        var maxDays = parseInt(el.find(".rp-max-days").val());
+        var startImmediately = el.find(".rp-start-immediately").prop("checked");
+        var escapeClause = el.find(".rp-escape-clause").val();
+        if (!resolutionPlan) {
+            return defaultText;
+        }
+        // change first character to uppercase
+        resolutionPlan = resolutionPlan.charAt(0).toUpperCase() + resolutionPlan.slice(1);
+        preview += resolutionPlan;
+        if (el.find(".rp-type-restriction").prop("checked")) {
+            if (maxDays > 0) {
+                if (startImmediately) {
+                    preview += " for";
+                } else {
+                    preview += " during";
+                }
+                preview += " the next " + maxDays;
+                if (maxDays > 1) {
+                    preview += " days";
+                } else {
+                    preview += " day";
+                }
+                preview += " of attendance.";
+                if (startImmediately) {
+                    preview += " The restriction also applies to the rest of today.";
+                }
+            } else if (maxDays === 0) {
+                if (startImmediately) {
+                    preview += " for the rest of today.";
+                } else {
+                    return defaultText;
+                }
+            } else {
+                return defaultText;
+            }
+            if (escapeClause) {
+                // change first character to lowercase
+                escapeClause = escapeClause.charAt(0).toLowerCase() + escapeClause.slice(1);
+                preview += " To end the restriction early, " + self.people_chooser.people[0].name + " may " + escapeClause + ".";
+            }
+        } else if (el.find(".rp-type-task").prop("checked")) {
+            if (maxDays > 0) {
+                preview += " within " + maxDays;
+                if (maxDays > 1) {
+                    preview += " days";
+                } else {
+                    preview += " day";
+                }
+                preview += " of attendance.";
+            } else if (maxDays === 0) {
+                preview += " by the end of the day today.";
+            } else {
+                preview += ".";
+            }
+        }
+        return preview;
+    }
+
     this.old_rp = null;
+    this.old_escape_clause = null;
     this.checkText = function() {
         if (el.find(".resolution_plan").val() !== self.old_rp) {
             self.markAsModified();
             self.old_rp = el.find(".resolution_plan").val();
+        }
+        if (el.find(".rp-escape-clause").val() !== self.old_escape_clause) {
+            self.markAsModified();
+            self.old_escape_clause = el.find(".rp-escape-clause").val();
         }
     };
 
@@ -292,17 +377,17 @@ function Charge(charge_id, el) {
     el.find(".refer-to-sm").change(self.markAsModified);
     el.find(".minor-referral-destination").change(self.markAsModified);
     el.find(".minor-referral-destination").on(utils.TEXT_AREA_EVENTS, self.markAsModified);
-    el.find(".rp-max-days").change(self.markAsModified);
+    el.find(".rp-max-days").on("input", self.markAsModified);
     el.find(".rp-start-immediately").change(self.markAsModified);
     el.find(".rp-escape-clause").change(self.markAsModified);
+    el.find(".rp-escape-clause").on(utils.TEXT_AREA_EVENTS, self.checkText);
 
     self.people_chooser = new people_chooser.PeopleChooser(
         el.find(".people_chooser"), self.markAsModified, self.markAsModified,
         app.people, showPersonHistoryInSidebar);
     self.people_chooser.setOnePersonMode(true);
 
-    self.rule_chooser = new RuleChooser(el.find(".rule_chooser"),
-                                        self.markAsModified);
+    self.rule_chooser = new RuleChooser(el.find(".rule_chooser"), self.markAsModified, app.rules);
 
     el.find("input[type=radio]").prop("name", "plea-" + charge_id);
 
@@ -465,6 +550,8 @@ function Case (id, el) {
     this.is_modified = false;
     this.charges = [];
 
+    self.case_chooser = new RuleChooser(el.find(".case_chooser"), self.markAsModified, app.cases);
+
     el.find(".location").change(self.markAsModified);
     el.find(".findings").change(self.markAsModified);
     el.find(".findings").on(utils.TEXT_AREA_EVENTS, self.checkText);
@@ -568,10 +655,11 @@ window.initMinutesPage = function() {
 
     Handlebars.registerPartial("people-chooser", $("#people-chooser").html());
     Handlebars.registerPartial("rule-chooser", $("#rule-chooser").html());
+    Handlebars.registerPartial("case-chooser", $("#case-chooser").html());
 
     app.case_template = Handlebars.compile($("#case-template").html());
     app.charge_template = Handlebars.compile($("#charge-template").html());
-    app.rule_template = Handlebars.compile($("#rule-template").html());
+    app.result_template = Handlebars.compile($("#result-template").html());
 
     app.committee_chooser =
         makePeopleChooser(".committee", app.ROLE_JC_MEMBER);

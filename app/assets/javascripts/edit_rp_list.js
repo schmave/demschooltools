@@ -109,6 +109,7 @@ var addCharge = function(data, parent_el) {
         "sm_day_of_week": utils.reformatDate('D', data.sm_decision_date),
         "rule_title": data.rule ? data.ruleTitle : "<No rule>",
         "resolution_plan": data.resolution_plan,
+        "rp_text": data.rp_text,
         "sm_decision": data.sm_decision,
         "findings": data.the_case.findings,
         "sm_decision_date": data.sm_decision_date,
