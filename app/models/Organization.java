@@ -43,6 +43,7 @@ public class Organization extends Model {
     public Boolean show_custodia;
     public Boolean show_attendance;
     public Boolean show_accounting;
+    public Boolean enable_structured_res_plans;
 
     @OneToMany(mappedBy="organization")
     @JsonIgnore
@@ -105,6 +106,13 @@ public class Organization extends Model {
     public void updateFromForm(Map<String, String[]> values) {
         if (values.containsKey("jc_reset_day")) {
             this.jc_reset_day = Integer.parseInt(values.get("jc_reset_day")[0]);
+        }
+        if (values.containsKey("structured_res_plans_settings")) {
+            if (values.containsKey("enable_structured_res_plans")) {
+                this.enable_structured_res_plans = Utils.getBooleanFromFormValue(values.get("enable_structured_res_plans")[0]);
+            } else {
+                this.enable_structured_res_plans = false;
+            }
         }
         if (values.containsKey("manual_settings")) {
             if (values.containsKey("show_last_modified_in_print")) {

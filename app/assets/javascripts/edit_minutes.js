@@ -96,6 +96,13 @@ function Charge(charge_id, el) {
         "severe": "Severe"
     };
 
+    var RP_TYPES = {
+        "none": "None",
+        "restriction": "Restriction",
+        "task": "Task",
+        "other": "Other"
+    };
+
     this.checkReferralLabelHighlight = function() {
         if (el.find(".minor-referral-destination").val()) {
             el.find(".minor-referral-label").addClass("highlight");
@@ -106,6 +113,9 @@ function Charge(charge_id, el) {
 
     this.loadData = function(json) {
         el.find(".resolution_plan").val(json.resolution_plan);
+        el.find(".rp-max-days").val(json.rp_max_days);
+        el.find(".rp-escape-clause").val(json.rp_escape_clause);
+
         if (json.plea == "Guilty") {
             el.find(".plea-guilty").prop("checked", true);
         } else if (json.plea == "No Contest") {
@@ -131,9 +141,20 @@ function Charge(charge_id, el) {
             el.find(".refer-to-sm").prop("checked", true);
         }
 
+        if (json.rp_start_immediately) {
+            el.find(".rp-start-immediately").prop("checked", true);
+        }
+
         for (var key in SEVERITIES) {
             if (json.severity == SEVERITIES[key]) {
                 el.find(".severity-" + key).prop("checked", true);
+            }
+        }
+
+        for (var key in RP_TYPES) {
+            if (json.rp_type == RP_TYPES[key]) {
+                el.find(".rp-type-" + key).prop("checked", true);
+                el.find('.structured-options-for-' + key).show();
             }
         }
 
@@ -160,6 +181,16 @@ function Charge(charge_id, el) {
                 url += "&severity=" + SEVERITIES[key];
             }
         }
+
+        for (var key in RP_TYPES) {
+            if (el.find(".rp-type-" + key).prop("checked")) {
+                url += "&rp_type=" + RP_TYPES[key];
+            }
+        }
+
+        url += "&rp_escape_clause=" + encodeURIComponent(el.find(".rp-escape-clause").val());
+        url += "&rp_max_days=" + encodeURIComponent(el.find(".rp-max-days").val());
+        url += "&rp_start_immediately=" + el.find(".rp-start-immediately").prop("checked");
 
         var plea = el.find(".plea-guilty");
         if (plea.prop("checked")) {
@@ -261,6 +292,9 @@ function Charge(charge_id, el) {
     el.find(".refer-to-sm").change(self.markAsModified);
     el.find(".minor-referral-destination").change(self.markAsModified);
     el.find(".minor-referral-destination").on(utils.TEXT_AREA_EVENTS, self.markAsModified);
+    el.find(".rp-max-days").change(self.markAsModified);
+    el.find(".rp-start-immediately").change(self.markAsModified);
+    el.find(".rp-escape-clause").change(self.markAsModified);
 
     self.people_chooser = new people_chooser.PeopleChooser(
         el.find(".people_chooser"), self.markAsModified, self.markAsModified,
@@ -278,6 +312,14 @@ function Charge(charge_id, el) {
         el.find(".severity-" + key).change(self.markAsModified);
     }
     el.find(".severity[type=radio]").prop("name", "severity-" + charge_id);
+
+    el.find(".rp-type")
+        .prop("name", "rp-type-" + charge_id)
+        .change(self.markAsModified)
+        .click(function() {
+            $('.structured-options').hide();
+            $('.structured-options-for-' + String($(this).val()).toLowerCase()).show();
+        });
 }
 
 function Case (id, el) {

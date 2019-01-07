@@ -30,6 +30,10 @@ public class Charge extends Model implements Comparable<Charge> {
     @JoinColumn(name="case_id")
     public Case the_case;
 
+    @ManyToOne()
+    @JoinColumn(name="referenced_charge_id")
+    public Charge referenced_charge;
+
     static final String EMPTY_PLEA = "<no plea>";
     public String plea = EMPTY_PLEA;
     public String resolution_plan = "";
@@ -44,6 +48,13 @@ public class Charge extends Model implements Comparable<Charge> {
     public String severity = "";
 
     public String minor_referral_destination = "";
+
+    public ResolutionPlanType rp_type = ResolutionPlanType.None;
+
+    public Integer rp_progress = 0;
+    public Integer rp_max_days;
+    public boolean rp_start_immediately = false;
+    public String rp_escape_clause = "";
 
     public static Finder<Integer, Charge> find = new Finder<Integer, Charge>(Charge.class);
 
@@ -63,6 +74,11 @@ public class Charge extends Model implements Comparable<Charge> {
 
     public void edit(Map<String, String[]> query_string) {
         resolution_plan = query_string.get("resolution_plan")[0];
+
+        rp_type = ResolutionPlanType.valueOf(query_string.get("rp_type")[0]);
+        rp_max_days = Integer.parseInt(query_string.get("rp_max_days")[0]);
+        rp_start_immediately = Boolean.parseBoolean(query_string.get("rp_start_immediately")[0]);
+        rp_escape_clause = query_string.get("rp_escape_clause")[0];
 
         if (query_string.containsKey("plea")) {
             plea = query_string.get("plea")[0];

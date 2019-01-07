@@ -114,6 +114,19 @@ the "Current Student" and "Staff" tags). Accounts can be created manually for gr
     </select> morning. <input type="submit" value="Save"/></p>
 }
 
+<h4>Structured @OrgConfig.get().str_res_plans</h4>
+<p class="instructions"></p>
+@helper.form(routes.Settings.editSettings()) {
+    <p>
+        <label>
+            <input type="checkbox" name="enable_structured_res_plans" @if(org.enable_structured_res_plans){ checked }>
+            Enable structured @OrgConfig.get().str_res_plans
+        </label>
+        &nbsp; <input type="submit" value="Save"/>
+        <input type="hidden" name="structured_res_plans_settings" value="true"/>
+    </p>
+}
+
 <h4>Other @OrgConfig.get().str_jc_name_short options</h4>
 <p class="instructions">The following behaviors of the @OrgConfig.get().str_jc_name_short system can be changed easily by Evan, but not
     yet directly by you. Please <a class="feedback_open">contact me</a> if you would like to change any of them.

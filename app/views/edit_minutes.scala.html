@@ -145,7 +145,47 @@ $(function () {
 	  <label><input type="radio" class="severity severity-severe" value="Severe"><span>Severe</span></label>
 	</div>
 }
-	<tr><td class="esm-form-label">@OrgConfig.get().str_res_plan_cap: <td><textarea class="resolution_plan"></textarea>
+@if( OrgConfig.get().org.enable_structured_res_plans ) {
+    <tr><td class="esm-form-label">@OrgConfig.get().str_res_plan_cap type:<td>
+    <div class="radio-inline">
+      <label><input type="radio" class="rp-type rp-type-restriction" value="Restriction"><span>Restriction</span></label>
+    </div>
+    <div class="radio-inline">
+      <label><input type="radio" class="rp-type rp-type-task" value="Task"><span>Task</span></label>
+    </div>
+    <div class="radio-inline">
+      <label><input type="radio" class="rp-type rp-type-other" value="Other"><span>Other</span></label>
+    </div>
+    <tr class="structured-options structured-options-for-restriction structured-options-for-task structured-options-for-other" hidden>
+        <td class="esm-form-label structured-options structured-options-for-restriction" hidden>Restriction:</td>
+        <td class="esm-form-label structured-options structured-options-for-task" hidden>Task:</td>
+        <td class="esm-form-label structured-options structured-options-for-other" hidden>@OrgConfig.get().str_res_plan_cap:</td>
+        <td><textarea class="resolution_plan"></textarea></td>
+    </tr>
+    <tr class="structured-options structured-options-for-restriction structured-options-for-task" hidden>
+        <td class="esm-form-label structured-options structured-options-for-restriction" hidden>Number of days:</td>
+        <td class="esm-form-label structured-options structured-options-for-task" hidden>Days to complete:</td>
+        <td>
+            <input type="number" class="rp-max-days" value="1" min="0" max="99">
+            <span class="structured-options structured-options-for-restriction" hidden>
+                (0 means the restriction ends at the end of today. 1 means the end of the next day of attendance, and so on.)
+            </span>
+            <span class="structured-options structured-options-for-task" hidden>
+                (0 means the task is due at the end of today. 1 means the end of the next day of attendance, and so on.)
+            </span>
+        </td>
+    </tr>
+    <tr class="structured-options structured-options-for-restriction" hidden>
+        <td class="esm-form-label">Start now:</td>
+        <td><input type="checkbox" class="rp-start-immediately"></td>
+    </tr>
+    <tr class="structured-options structured-options-for-restriction" hidden>
+        <td class="esm-form-label">Escape clause:</td>
+        <td><textarea class="rp-escape-clause"></textarea></td>
+    </tr>
+} else {
+    <tr><td class="esm-form-label">@OrgConfig.get().str_res_plan_cap: <td><textarea class="resolution_plan"></textarea>
+}
     <td class="last-rp"></td>
    </table>
    <button style="margin-left: 200px" class="btn btn-danger btn-xs">Remove Charge</button>
