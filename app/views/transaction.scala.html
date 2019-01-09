@@ -37,4 +37,11 @@
 			</tr>
 		</table>
 	</div>
+
+	<form action="@routes.Accounting.deleteTransaction(transaction.id)" method="post">
+		<button type="submit" class="delete-transaction-button js-delete-transaction-button btn-link"
+			onclick="return confirm('Are you sure you want to delete this transaction? This cannot be undone.');">
+			Delete Transaction
+		</button>
+	</form>
 }
