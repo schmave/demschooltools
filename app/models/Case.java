@@ -7,6 +7,7 @@ import java.io.StringWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.*;
 
 import javax.persistence.*;
 
@@ -56,6 +57,16 @@ public class Case extends Model implements Comparable<Case> {
     static Set<String> names;
 
     public Date date_closed;
+
+    @ManyToMany
+    @JoinTable(name="case_reference",
+        joinColumns=@JoinColumn(name="referencing_case", referencedColumnName="id"),
+        inverseJoinColumns=@JoinColumn(name="referenced_case", referencedColumnName="id"))
+    public List<Case> referenced_cases;
+
+    @ManyToMany(mappedBy="referenced_cases")
+    @JsonIgnore
+    public List<Case> referencing_cases;
 
     public static Finder<Integer, Case> find = new Finder<Integer, Case>(
         Case.class
@@ -192,5 +203,30 @@ public class Case extends Model implements Comparable<Case> {
 
     public int compareTo(Case other) {
         return meeting.date.compareTo(other.meeting.date);
+    }
+
+    public List<String> getReferencedCasesText() {
+        return referenced_cases.stream().map(c -> c.getReferencedCaseText()).collect(Collectors.toList());
+    }
+
+    private String getReferencedCaseText() {
+        String result = case_number + ". " + findings;
+        if (!findings.endsWith(".")) {
+            result += ".";
+        }
+        for (Charge charge : charges) {
+            if (charge.rule != null && charge.person != null) {
+                result += " " + charge.person.getDisplayName() + " was charged with " + charge.rule.getNumber() + " " + charge.rule.title;
+                if (!charge.rp_text.isEmpty()) {
+                    result += ", " + OrgConfig.get().str_res_plan_short + ": " + charge.rp_text;
+                    if (!charge.rp_text.endsWith(".")) {
+                        result += ".";
+                    }
+                } else {
+                    result += ".";
+                }
+            }
+        }
+        return result;
     }
 }

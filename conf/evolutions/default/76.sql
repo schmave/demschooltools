@@ -12,7 +12,16 @@ ALTER TABLE charge ADD COLUMN rp_start_immediately boolean NOT NULL DEFAULT(fals
 ALTER TABLE charge ADD COLUMN rp_escape_clause text NOT NULL DEFAULT('');
 ALTER TABLE charge ADD COLUMN rp_text text NOT NULL DEFAULT('');
 
+CREATE TABLE case_reference (
+	referencing_case integer NOT NULL,
+	referenced_case integer NOT NULL,
+	CONSTRAINT fk_referencing_case FOREIGN KEY (referencing_case) references "case"(id),
+	CONSTRAINT fk_referenced_case FOREIGN KEY (referenced_case) references "case"(id)
+);
+
 # --- !Downs
+
+DROP TABLE case_reference;
 
 ALTER TABLE charge DROP COLUMN rp_text;
 ALTER TABLE charge DROP COLUMN rp_escape_clause;

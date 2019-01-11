@@ -32,9 +32,11 @@ function showRuleHistoryInSidebar(rule_id) {
     showSomethingInSidebar("/ruleHistory/" + rule_id);
 }
 
-function RuleChooser(el, on_change, source) {
+function Chooser(el, allowMultiple, source, getLabel, onClick, onChange, onAdd, onRemove) {
     this.el = el;
     var self = this;
+
+    this.results = [];
 
     this.search_box = el.find(".search");
     this.search_box.autocomplete({
@@ -45,44 +47,79 @@ function RuleChooser(el, on_change, source) {
     });
 
     this.search_box.bind( "autocompleteselect", function(event, ui) {
-        self.setRule(ui.item.id, ui.item.label);
+        self.addResult(ui.item.id, ui.item.label);
 
-        if (on_change) { on_change(); }
+        if (onAdd) {
+            onAdd(ui.item.id);
+        }
+        if (onChange) { 
+            onChange();
+        }
 
         self.search_box.val('');
         event.preventDefault(); // keep jquery from inserting name into textbox
     });
 
-    this.setRule = function(id, title) {
-        self.search_box.hide();
+    this.addResult = function(id, title) {
+        // Don't add results that have already been added.
+        for (var i in self.results) {
+            if (id == self.results[i].id) {
+                return;
+            }
+        }
 
-        self.rule = id;
-        self.rule_el =
-            self.el.prepend(app.result_template({name: title}))
-                .children(":first-child");
+        if (!allowMultiple) {
+            self.search_box.hide();
+            utils.selectNextInput(self.search_box);
+        }
 
-        self.rule_el.find(".label").click(function() {
-            showRuleHistoryInSidebar(self.rule);
-        });
+        self.results.push(id);
 
-        self.rule_el.find("img").click(function() { self.unsetRule(); });
+        var result_el = $(app.result_template({name: title, id: id}));
+        self.el.find(".results").append(result_el);
 
-        utils.selectNextInput(self.search_box);
+        if (onClick) {
+            result_el.find(".label").click(function() {
+                onClick(id);
+            });
+        }
+
+        result_el.find("img").click(function() { self.removeResult(result_el); });
     };
 
-    this.unsetRule = function() {
-        $(self.rule_el).remove();
+    this.removeResult = function(result_el) {
+        $(result_el).remove();
 
-        self.rule = null;
-        self.rule_el = null;
+        for (var i in self.results) {
+            if (self.results[i] == result_el.data('id')) {
+                self.results.splice(i, 1);
+            }
+        }
 
-        self.search_box.show();
+        if (!allowMultiple) {
+            self.search_box.show();
+        }
 
-        if (on_change) { on_change(); }
+        if (onRemove) {
+            onRemove(result_el.data('id'));
+        }
+        if (onChange) { 
+            onChange();
+        }
     };
+
+    this.clear = function() {
+        self.results = [];
+    }
 
     this.loadData = function(json) {
-        self.setRule(json.id, json.title);
+        if (allowMultiple) {
+            for (var i in json) {
+                self.addResult(json[i].id, getLabel(json[i]));
+            }
+        } else {
+            self.addResult(json.id, getLabel(json));
+        }
     };
 }
 
@@ -236,9 +273,9 @@ function Charge(charge_id, el) {
             url += "&minor_referral_destination=" +
                 encodeURIComponent(minor_referral_destination.val());
         }
-
-        if (self.rule_chooser.rule) {
-            url += "&rule_id=" + self.rule_chooser.rule;
+        
+        if (self.rule_chooser.results[0]) {
+            url += "&rule_id=" + self.rule_chooser.results[0];
         }
 
         $.post(url, function(data) {
@@ -259,21 +296,21 @@ function Charge(charge_id, el) {
     this.markAsModified = function() {
         self.is_modified = true;
         if ((self.people_chooser.people.length === 0) ||
-            !self.rule_chooser.rule) {
+            !self.rule_chooser.results[0]) {
             el.find(".last-rp").html("");
         }
 
-        if (self.people_chooser.people.length == 1 && self.rule_chooser.rule) {
+        if (self.people_chooser.people.length == 1 && self.rule_chooser.results[0]) {
             var url = "/getLastRp";
             url += "/" + self.people_chooser.people[0].id;
-            url += "/" + self.rule_chooser.rule;
+            url += "/" + self.rule_chooser.results[0];
             $.get(url, function (data) {
                 el.find(".last-rp").html(data);
                 el.find(".last-rp .more-info").click(function() {
                     showSomethingInSidebar(
                         '/personRuleHistory' +
                         '/' + self.people_chooser.people[0].id +
-                        '/' + self.rule_chooser.rule);
+                        '/' + self.rule_chooser.results[0]);
                 });
             });
         }
@@ -387,7 +424,11 @@ function Charge(charge_id, el) {
         app.people, showPersonHistoryInSidebar);
     self.people_chooser.setOnePersonMode(true);
 
-    self.rule_chooser = new RuleChooser(el.find(".rule_chooser"), self.markAsModified, app.rules);
+    function getLabel(json) {
+        return json.title;
+    }
+
+    self.rule_chooser = new Chooser(el.find(".rule_chooser"), false, app.rules, getLabel, showRuleHistoryInSidebar, self.markAsModified);
 
     el.find("input[type=radio]").prop("name", "plea-" + charge_id);
 
@@ -451,6 +492,9 @@ function Case (id, el) {
             }
         }
 
+        self.case_chooser.loadData(data.referenced_cases);
+        $.get("/getReferencedCasesText?case_id=" + self.id, setReferencedCasesText);
+
         for (i in data.charges) {
             var ch = data.charges[i];
             var new_charge = self.addChargeNoServer(ch.id);
@@ -507,6 +551,7 @@ function Case (id, el) {
 
         self.testifier_chooser.clear();
         self.writer_chooser.clear();
+        self.case_chooser.clear();
 
         for (var i = 0; i < self.charges.length; i++) {
             self.charges[i].removeCharge();
@@ -550,7 +595,28 @@ function Case (id, el) {
     this.is_modified = false;
     this.charges = [];
 
-    self.case_chooser = new RuleChooser(el.find(".case_chooser"), self.markAsModified, app.cases);
+    function getLabel(json) {
+        return json.case_number;
+    }
+
+    function setReferencedCasesText(data) {
+        var json = $.parseJSON(data);
+        var el = $("#referenced-cases-text");
+        el.html("");
+        for (var i in json) {
+            el.append($("<div class=\"referenced_case_text\">" + json[i] + "</div>"));
+        }
+    }
+
+    self.case_chooser = new Chooser(el.find(".case_chooser"), true, app.cases, getLabel, null, null,
+        function(id) {
+            var url = "/addReferencedCase?case_id=" + self.id + "&referenced_case_id=" + id;
+            $.post(url, setReferencedCasesText);
+        },
+        function(id) {
+            var url = "/removeReferencedCase?case_id=" + self.id + "&referenced_case_id=" + id;
+            $.post(url, setReferencedCasesText);
+        });
 
     el.find(".location").change(self.markAsModified);
     el.find(".findings").change(self.markAsModified);

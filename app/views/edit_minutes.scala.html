@@ -95,18 +95,21 @@ $(function () {
 </script>
 
 <script id="result-template" type="text/x-handlebars-template">
-    <div class="result"><span class="label label-success">{{name}}</span><img
-        src="@routes.Assets.versioned("images/x.png")"></div>
+    <div class="result" data-id="{{id}}">
+        <span class="label label-success">{{name}}</span><img src="@routes.Assets.versioned("images/x.png")">
+    </div>
 </script>
 
 <script id="rule-chooser" type="text/x-handlebars-template">
 	<div class="rule_chooser">
+        <div class="results"></div>
         <input class="form-control search" type="text">
 	</div>
 </script>
 
 <script id="case-chooser" type="text/x-handlebars-template">
     <div class="case_chooser">
+        <div class="results"></div>
         <input class="form-control search" type="text">
     </div>
 </script>
@@ -227,8 +230,12 @@ $(function () {
 
 @if( OrgConfig.get().org.enable_structured_res_plans ) {
     <tr>
-        <td class="esm-form-label">Referenced cases:
+        <td class="esm-form-label">Referenced cases:</td>
         <td>{{render "case-chooser"}}</td>
+    </tr>
+    <tr>
+        <td></td>
+        <td id="referenced-cases-text"></td>
     </tr>
 }
 

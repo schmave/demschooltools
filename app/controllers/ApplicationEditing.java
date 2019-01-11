@@ -169,6 +169,33 @@ public class ApplicationEditing extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
+    public Result addReferencedCase(Integer case_id, Integer referenced_case_id)
+    {
+        Case referencing_case = Case.findById(case_id);
+        Case referenced_case = Case.findById(referenced_case_id);
+        referencing_case.referenced_cases.add(referenced_case);
+        referencing_case.save();
+        return ok(Utils.toJson(referencing_case.getReferencedCasesText()));
+    }
+
+    @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
+    public Result removeReferencedCase(Integer case_id, Integer referenced_case_id)
+    {
+        Case referencing_case = Case.findById(case_id);
+        Case referenced_case = Case.findById(referenced_case_id);
+        referencing_case.referenced_cases.remove(referenced_case);
+        referencing_case.save();
+        return ok(Utils.toJson(referencing_case.getReferencedCasesText()));
+    }
+
+    @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
+    public Result getReferencedCasesText(Integer case_id)
+    {
+        Case referencing_case = Case.findById(case_id);
+        return ok(Utils.toJson(referencing_case.getReferencedCasesText()));
+    }
+
+    @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
     public Result addCharge(Integer case_id)
     {
         Charge c = Charge.create(Case.find.ref(case_id));
