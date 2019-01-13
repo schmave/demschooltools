@@ -173,9 +173,8 @@ public class ApplicationEditing extends Controller {
     {
         Case referencing_case = Case.findById(case_id);
         Case referenced_case = Case.findById(referenced_case_id);
-        referencing_case.referenced_cases.add(referenced_case);
-        referencing_case.save();
-        return ok(Utils.toJson(referencing_case.getReferencedCasesText()));
+        referencing_case.addReferencedCase(referenced_case);
+        return ok(Utils.toJson(CaseReference.create(referencing_case)));
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
@@ -183,16 +182,37 @@ public class ApplicationEditing extends Controller {
     {
         Case referencing_case = Case.findById(case_id);
         Case referenced_case = Case.findById(referenced_case_id);
-        referencing_case.referenced_cases.remove(referenced_case);
-        referencing_case.save();
-        return ok(Utils.toJson(referencing_case.getReferencedCasesText()));
+        referencing_case.removeReferencedCase(referenced_case);
+        return ok(Utils.toJson(CaseReference.create(referencing_case)));
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
-    public Result getReferencedCasesText(Integer case_id)
+    public Result getCaseReferencesJson(Integer case_id)
     {
         Case referencing_case = Case.findById(case_id);
-        return ok(Utils.toJson(referencing_case.getReferencedCasesText()));
+        return ok(Utils.toJson(CaseReference.create(referencing_case)));
+    }
+
+    @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
+    public Result addChargeReferenceToCase(Integer case_id, Integer charge_id)
+    {
+        Case referencing_case = Case.findById(case_id);
+        Charge charge = Charge.findById(charge_id);
+        if (!referencing_case.referenced_charges.contains(charge)) {
+            referencing_case.referenced_charges.add(charge);
+            referencing_case.save();
+        }
+        return ok();
+    }
+
+    @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
+    public Result removeChargeReferenceFromCase(Integer case_id, Integer charge_id)
+    {
+        Case referencing_case = Case.findById(case_id);
+        Charge charge = Charge.findById(charge_id);
+        referencing_case.referenced_charges.remove(charge);
+        referencing_case.save();
+        return ok();
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
@@ -200,6 +220,13 @@ public class ApplicationEditing extends Controller {
     {
         Charge c = Charge.create(Case.find.ref(case_id));
         return ok("" + c.id);
+    }
+
+    @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
+    public Result generateChargeFromReference(Integer case_id, Integer referenced_charge_id)
+    {
+        Charge charge = Charge.generateFromReference(Case.find.ref(case_id), Charge.find.ref(referenced_charge_id));
+        return ok(Utils.toJson(charge));
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)

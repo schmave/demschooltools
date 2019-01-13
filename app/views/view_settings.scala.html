@@ -53,6 +53,18 @@ email <input type="text" name="email"/>
 
 <script type="text/javascript">
 enableNoPersonTagBox("#tag-entry", "#tags-entered", true);
+$(function () {
+    initChooser(
+        $('#breaking-res-plan-entry-chooser'),
+        false,
+        @Html(Application.jsonRules("")),
+        function(json) { return json.title; },
+        null,
+        null,
+        function(id) { $('#breaking-res-plan-entry').val(id); },
+        function() { $('#breaking-res-plan-entry').val(null); },
+        @Html(Application.jsonBreakingResPlanEntry()));
+});
 </script>
 
 }
@@ -122,7 +134,23 @@ the "Current Student" and "Staff" tags). Accounts can be created manually for gr
             <input type="checkbox" name="enable_structured_res_plans" @if(org.enable_structured_res_plans){ checked }>
             Enable structured @OrgConfig.get().str_res_plans
         </label>
-        &nbsp; <input type="submit" value="Save"/>
+        <br>
+        <label>
+            <input type="checkbox" name="enable_case_references" @if(org.enable_case_references){ checked }>
+            Enable case references
+        </label>
+    </p>
+    <p>
+        "Breaking @OrgConfig.get().str_res_plan" entry:
+        <span id="breaking-res-plan-entry-chooser">
+            <span class="results"></span>
+            <input class="search" type="text">
+        </span>
+    </p>
+    </p>
+    <p>
+        <input type="hidden" id="breaking-res-plan-entry" name="breaking_res_plan_entry_id" value="@Entry.findBreakingResPlanEntryId()">
+        <input type="submit" value="Save structured @OrgConfig.get().str_res_plans settings"/>
         <input type="hidden" name="structured_res_plans_settings" value="true"/>
     </p>
 }

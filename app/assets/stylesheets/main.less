@@ -187,6 +187,14 @@
     border-top: 1px solid #3a87ad;
 }
 
+#breaking-res-plan-entry-chooser .label {
+  font-size: 100%;
+}
+
+#breaking-res-plan-entry-chooser .result {
+  display: inline;
+}
+
 .rule_chooser {
     display: inline;
 }
@@ -284,6 +292,32 @@ img.x {
 .case_chooser .result
 {
     display:inline-block;
+}
+
+.case-reference {
+  margin-bottom: 5px;
+}
+
+.case-charge-reference-generate {
+  visibility: hidden;
+  color: #428bca;
+  cursor: pointer;
+}
+
+.case-charge-reference-generate:hover {
+  text-decoration: underline;
+}
+
+.case-charge-reference.referenced .case-charge-reference-generate {
+  visibility: visible;
+}
+
+.case-charge-reference, .case-charge-reference-already-generated {
+  color: #aaa;
+}
+
+.case-charge-reference.referenced {
+  color: #000;
 }
 
 #sidebar

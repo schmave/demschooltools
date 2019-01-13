@@ -902,6 +902,10 @@ public class Application extends Controller {
         return Json.stringify(Json.toJson(result));
     }
 
+    public static String jsonBreakingResPlanEntry() {
+        return Json.stringify(Json.toJson(Entry.findBreakingResPlanEntry()));
+    }
+
     public Result getLastRp(Integer personId, Integer ruleId) {
         Date now = new Date();
 

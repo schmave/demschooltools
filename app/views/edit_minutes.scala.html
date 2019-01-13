@@ -94,12 +94,6 @@ $(function () {
     </div>
 </script>
 
-<script id="result-template" type="text/x-handlebars-template">
-    <div class="result" data-id="{{id}}">
-        <span class="label label-success">{{name}}</span><img src="@routes.Assets.versioned("images/x.png")">
-    </div>
-</script>
-
 <script id="rule-chooser" type="text/x-handlebars-template">
 	<div class="rule_chooser">
         <div class="results"></div>
@@ -111,6 +105,23 @@ $(function () {
     <div class="case_chooser">
         <div class="results"></div>
         <input class="form-control search" type="text">
+    </div>
+</script>
+
+<script id="case-reference-template" type="text/x-handlebars-template">
+    <div class="case-reference">
+        <strong>{{case_number}}</strong>: {{findings}}
+        {{#each charges}}{{#with this}}
+            <div class="case-charge-reference {{#if is_referenced}}referenced{{/if}}">
+                <input type="checkbox" value="{{is_referenced}}" data-id="{{charge_id}}" {{#if is_referenced}}checked{{/if}}>
+                {{person}} was charged with {{rule}}.
+                @OrgConfig.get().str_res_plan_cap: {{resolution_plan}}
+                <span class="case-charge-reference-generate" data-id="{{charge_id}}"
+                {{#if has_generated}}hidden{{/if}}>Generate charge</span>
+                <span class="case-charge-reference-already-generated"
+                {{#unless has_generated}}hidden{{/unless}}>Charge generated</span>
+            </div>
+        {{/with}}{{/each}}
     </div>
 </script>
 
@@ -228,14 +239,14 @@ $(function () {
     {{render "people-chooser" clazz="testifier"}}
 </tr>
 
-@if( OrgConfig.get().org.enable_structured_res_plans ) {
+@if( OrgConfig.get().org.enable_case_references ) {
     <tr>
         <td class="esm-form-label">Referenced cases:</td>
         <td>{{render "case-chooser"}}</td>
     </tr>
     <tr>
         <td></td>
-        <td id="referenced-cases-text"></td>
+        <td id="case-references"></td>
     </tr>
 }
 

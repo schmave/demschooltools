@@ -43,7 +43,9 @@ public class Organization extends Model {
     public Boolean show_custodia;
     public Boolean show_attendance;
     public Boolean show_accounting;
+
     public Boolean enable_structured_res_plans;
+    public Boolean enable_case_references;
 
     @OneToMany(mappedBy="organization")
     @JsonIgnore
@@ -112,6 +114,20 @@ public class Organization extends Model {
                 this.enable_structured_res_plans = Utils.getBooleanFromFormValue(values.get("enable_structured_res_plans")[0]);
             } else {
                 this.enable_structured_res_plans = false;
+            }
+            if (values.containsKey("enable_case_references")) {
+                this.enable_case_references = Utils.getBooleanFromFormValue(values.get("enable_case_references")[0]);
+            } else {
+                this.enable_case_references = false;
+            }
+            if (values.containsKey("breaking_res_plan_entry_id")) {
+                Entry.unassignBreakingResPlanEntry();
+                String idString = values.get("breaking_res_plan_entry_id")[0];
+                if (!idString.isEmpty()) {
+                    Entry entry = Entry.findById(Integer.parseInt(idString));
+                    entry.is_breaking_res_plan = true;
+                    entry.save();
+                }
             }
         }
         if (values.containsKey("manual_settings")) {

@@ -68,6 +68,12 @@ public class Case extends Model implements Comparable<Case> {
     @JsonIgnore
     public List<Case> referencing_cases;
 
+    @ManyToMany
+    @JoinTable(name="charge_reference",
+        joinColumns=@JoinColumn(name="referencing_case", referencedColumnName="id"),
+        inverseJoinColumns=@JoinColumn(name="referenced_charge", referencedColumnName="id"))
+    public List<Charge> referenced_charges;
+
     public static Finder<Integer, Case> find = new Finder<Integer, Case>(
         Case.class
     );
@@ -205,28 +211,23 @@ public class Case extends Model implements Comparable<Case> {
         return meeting.date.compareTo(other.meeting.date);
     }
 
-    public List<String> getReferencedCasesText() {
-        return referenced_cases.stream().map(c -> c.getReferencedCaseText()).collect(Collectors.toList());
+    public void addReferencedCase(Case referenced_case) {
+        referenced_cases.add(referenced_case);
+        // automatically reference all charges by default
+        referenced_charges.addAll(referenced_case.charges);
+        save();
     }
 
-    private String getReferencedCaseText() {
-        String result = case_number + ". " + findings;
-        if (!findings.endsWith(".")) {
-            result += ".";
+    public void removeReferencedCase(Case referenced_case) {
+        referenced_cases.remove(referenced_case);
+        for (Charge charge : referenced_case.charges) {
+            referenced_charges.remove(charge);
         }
         for (Charge charge : charges) {
-            if (charge.rule != null && charge.person != null) {
-                result += " " + charge.person.getDisplayName() + " was charged with " + charge.rule.getNumber() + " " + charge.rule.title;
-                if (!charge.rp_text.isEmpty()) {
-                    result += ", " + OrgConfig.get().str_res_plan_short + ": " + charge.rp_text;
-                    if (!charge.rp_text.endsWith(".")) {
-                        result += ".";
-                    }
-                } else {
-                    result += ".";
-                }
+            if (charge.referenced_charge != null && charge.referenced_charge.the_case == referenced_case) {
+                charge.referenced_charge = null;
             }
         }
-        return result;
+        save();
     }
 }

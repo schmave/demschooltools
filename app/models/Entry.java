@@ -47,6 +47,8 @@ public class Entry extends Model implements Comparable<Entry> {
     @OrderBy("date_entered ASC")
     public List<ManualChange> changes;
 
+    public boolean is_breaking_res_plan;
+
     public static Finder<Integer,Entry> find = new Finder<Integer,Entry>(
         Entry.class
     );
@@ -68,6 +70,26 @@ public class Entry extends Model implements Comparable<Entry> {
             .fetch("charges.the_case.charges.rule.section.chapter", new FetchConfig().query())
             .where().eq("section.chapter.organization", Organization.getByHost())
             .eq("id", id).findUnique();
+    }
+
+    public static Entry findBreakingResPlanEntry() {
+        return find.where()
+            .eq("section.chapter.organization", Organization.getByHost())
+            .eq("is_breaking_res_plan", true)
+            .findUnique();
+    }
+
+    public static Integer findBreakingResPlanEntryId() {
+        Entry entry = findBreakingResPlanEntry();
+        return entry != null ? entry.id : null;
+    }
+
+    public static void unassignBreakingResPlanEntry() {
+        Entry entry = findBreakingResPlanEntry();
+        if (entry != null) {
+            entry.is_breaking_res_plan = false;
+            entry.save();
+        }
     }
 
     @JsonIgnore

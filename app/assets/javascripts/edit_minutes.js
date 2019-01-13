@@ -1,6 +1,7 @@
 var Handlebars = require('handlebars');
 
 var utils = require('./utils');
+var chooser = require('./chooser');
 var people_chooser = require('./people_chooser');
 
 const SAVE_TIMEOUT = 2000;
@@ -30,97 +31,6 @@ function showPersonHistoryInSidebar(person) {
 
 function showRuleHistoryInSidebar(rule_id) {
     showSomethingInSidebar("/ruleHistory/" + rule_id);
-}
-
-function Chooser(el, allowMultiple, source, getLabel, onClick, onChange, onAdd, onRemove) {
-    this.el = el;
-    var self = this;
-
-    this.results = [];
-
-    this.search_box = el.find(".search");
-    this.search_box.autocomplete({
-        autoFocus: true,
-        delay: 0,
-        minLength: 2,
-        source: source,
-    });
-
-    this.search_box.bind( "autocompleteselect", function(event, ui) {
-        self.addResult(ui.item.id, ui.item.label);
-
-        if (onAdd) {
-            onAdd(ui.item.id);
-        }
-        if (onChange) { 
-            onChange();
-        }
-
-        self.search_box.val('');
-        event.preventDefault(); // keep jquery from inserting name into textbox
-    });
-
-    this.addResult = function(id, title) {
-        // Don't add results that have already been added.
-        for (var i in self.results) {
-            if (id == self.results[i].id) {
-                return;
-            }
-        }
-
-        if (!allowMultiple) {
-            self.search_box.hide();
-            utils.selectNextInput(self.search_box);
-        }
-
-        self.results.push(id);
-
-        var result_el = $(app.result_template({name: title, id: id}));
-        self.el.find(".results").append(result_el);
-
-        if (onClick) {
-            result_el.find(".label").click(function() {
-                onClick(id);
-            });
-        }
-
-        result_el.find("img").click(function() { self.removeResult(result_el); });
-    };
-
-    this.removeResult = function(result_el) {
-        $(result_el).remove();
-
-        for (var i in self.results) {
-            if (self.results[i] == result_el.data('id')) {
-                self.results.splice(i, 1);
-            }
-        }
-
-        if (!allowMultiple) {
-            self.search_box.show();
-        }
-
-        if (onRemove) {
-            onRemove(result_el.data('id'));
-        }
-        if (onChange) { 
-            onChange();
-        }
-    };
-
-    this.clear = function() {
-        self.results = [];
-    }
-
-    this.loadData = function(json) {
-        if (allowMultiple) {
-            for (var i in json) {
-                self.addResult(json[i].id, getLabel(json[i]));
-            }
-        } else {
-            self.addResult(json.id, getLabel(json));
-        }
-    };
 }
 
 function Charge(charge_id, el) {
@@ -428,7 +338,13 @@ function Charge(charge_id, el) {
         return json.title;
     }
 
-    self.rule_chooser = new Chooser(el.find(".rule_chooser"), false, app.rules, getLabel, showRuleHistoryInSidebar, self.markAsModified);
+    self.rule_chooser = new chooser.Chooser(
+        el.find(".rule_chooser"),
+        false,
+        app.rules,
+        getLabel,
+        showRuleHistoryInSidebar,
+        self.markAsModified);
 
     el.find("input[type=radio]").prop("name", "plea-" + charge_id);
 
@@ -493,7 +409,7 @@ function Case (id, el) {
         }
 
         self.case_chooser.loadData(data.referenced_cases);
-        $.get("/getReferencedCasesText?case_id=" + self.id, setReferencedCasesText);
+        $.get("/getCaseReferencesJson?case_id=" + self.id, setCaseReferences);
 
         for (i in data.charges) {
             var ch = data.charges[i];
@@ -599,23 +515,42 @@ function Case (id, el) {
         return json.case_number;
     }
 
-    function setReferencedCasesText(data) {
+    function setCaseReferences(data) {
         var json = $.parseJSON(data);
-        var el = $("#referenced-cases-text");
-        el.html("");
+        var el = self.el.find('#case-references');
+        el.html('');
         for (var i in json) {
-            el.append($("<div class=\"referenced_case_text\">" + json[i] + "</div>"));
+            el.append(app.case_reference_template(json[i]));
         }
+        el.find('input').click(function() {
+            var parent = $(this).parents('.case-charge-reference');
+            if (this.checked) {
+                $.post("/addChargeReferenceToCase?case_id=" + self.id + "&charge_id=" + $(this).data('id'));
+                parent.addClass('referenced');
+            } else {
+                $.post("/removeChargeReferenceFromCase?case_id=" + self.id + "&charge_id=" + $(this).data('id'));
+                parent.removeClass('referenced');
+            }
+        });
+        el.find('.case-charge-reference-generate').click(function() {
+            $(this).hide().parent().find('.case-charge-reference-already-generated').show();
+            var url = "/generateChargeFromReference?case_id=" + id + "&referenced_charge_id=" + $(this).data('id');
+            $.post(url, function(data) {
+                var new_charge_el = self.el.find(".charges").append(app.charge_template()).children(":last-child");
+                var new_charge = new Charge(data.id, new_charge_el);
+                self.charges.push(new_charge);
+            });
+        });
     }
 
-    self.case_chooser = new Chooser(el.find(".case_chooser"), true, app.cases, getLabel, null, null,
+    self.case_chooser = new chooser.Chooser(el.find(".case_chooser"), true, app.cases, getLabel, null, null,
         function(id) {
             var url = "/addReferencedCase?case_id=" + self.id + "&referenced_case_id=" + id;
-            $.post(url, setReferencedCasesText);
+            $.post(url, setCaseReferences);
         },
         function(id) {
             var url = "/removeReferencedCase?case_id=" + self.id + "&referenced_case_id=" + id;
-            $.post(url, setReferencedCasesText);
+            $.post(url, setCaseReferences);
         });
 
     el.find(".location").change(self.markAsModified);
@@ -725,7 +660,7 @@ window.initMinutesPage = function() {
 
     app.case_template = Handlebars.compile($("#case-template").html());
     app.charge_template = Handlebars.compile($("#charge-template").html());
-    app.result_template = Handlebars.compile($("#result-template").html());
+    app.case_reference_template = Handlebars.compile($("#case-reference-template").html());
 
     app.committee_chooser =
         makePeopleChooser(".committee", app.ROLE_JC_MEMBER);

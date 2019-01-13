@@ -73,6 +73,18 @@ public class Charge extends Model implements Comparable<Charge> {
         return result;
     }
 
+    public static Charge generateFromReference(Case c, Charge referenced_charge)
+    {
+        Charge result = new Charge();
+        result.the_case = c;
+        result.person = referenced_charge.person;
+        result.rule = Entry.findBreakingResPlanEntry();
+        result.referenced_charge = referenced_charge;
+        result.save();
+
+        return result;
+    }
+
     public void edit(Map<String, String[]> query_string) {
         resolution_plan = query_string.get("resolution_plan")[0];
 

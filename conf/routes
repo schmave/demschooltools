@@ -49,13 +49,17 @@ POST /removePersonAtMeeting    controllers.ApplicationEditing.removePersonAtMeet
 POST /addPersonAtCase controllers.ApplicationEditing.addPersonAtCase(case_id : Integer, person_id : Integer, role : Integer)
 POST /removePersonAtCase controllers.ApplicationEditing.removePersonAtCase(case_id : Integer, person_id : Integer, role : Integer)
 
-GET /getReferencedCasesText controllers.ApplicationEditing.getReferencedCasesText(case_id : Integer)
+GET /getCaseReferencesJson controllers.ApplicationEditing.getCaseReferencesJson(case_id : Integer)
 POST /addReferencedCase controllers.ApplicationEditing.addReferencedCase(case_id : Integer, referenced_case_id : Integer)
 POST /removeReferencedCase controllers.ApplicationEditing.removeReferencedCase(case_id : Integer, referenced_case_id : Integer)
+POST /addChargeReferenceToCase controllers.ApplicationEditing.addChargeReferenceToCase(case_id : Integer, charge_id : Integer)
+POST /removeChargeReferenceFromCase controllers.ApplicationEditing.removeChargeReferenceFromCase(case_id : Integer, charge_id : Integer)
 
 POST /addCharge   controllers.ApplicationEditing.addCharge(case_id : Integer)
 POST /saveCharge controllers.ApplicationEditing.saveCharge(id : Integer)
 POST /removeCharge   controllers.ApplicationEditing.removeCharge(id : Integer)
+
+POST /generateChargeFromReference   controllers.ApplicationEditing.generateChargeFromReference(case_id : Integer, referenced_charge_id: Integer)
 
 GET /getLastRp/:personId/:ruleId	controllers.Application.getLastRp(personId : Integer, ruleId : Integer)
 
