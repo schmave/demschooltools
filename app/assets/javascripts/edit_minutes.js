@@ -117,7 +117,9 @@ function Charge(charge_id, el) {
 
         if (referenced_charge) {
             self.referenced_charge_id = referenced_charge.id;
-            el.addClass("breaking-res-plan");
+            if (referenced_charge.has_default_rule) {
+                el.addClass("breaking-res-plan");
+            }
             var text = referenced_charge.rp_text;
             if (referenced_charge.rp_type === "Restriction") {
                 if (!text.endsWith(".")) {
@@ -459,7 +461,8 @@ function Case (id, el) {
                         return {
                             id: ch.charge_id,
                             rp_text: ch.rp_text,
-                            rp_type: ch.rp_type
+                            rp_type: ch.rp_type,
+                            has_default_rule: ch.has_default_rule
                         };
                     }
                 }
@@ -583,8 +586,9 @@ function Case (id, el) {
             $(this).hide().parent().find('.case-charge-reference-already-generated').show();
             var referenced_charge = {
                 id: $(this).data('id'),
-                rp_text: $(this).data('rp'),
-                rp_type: $(this).data('rp-type')
+                rp_text: $(this).data('rp-text'),
+                rp_type: $(this).data('rp-type'),
+                has_default_rule: $(this).data('has-default-rule')
             };
             var url = "/generateChargeFromReference?case_id=" + id + "&referenced_charge_id=" + $(this).data('id');
             $.post(url, function(response) {

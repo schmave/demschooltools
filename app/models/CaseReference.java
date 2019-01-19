@@ -26,18 +26,19 @@ public class CaseReference {
 				if (charge.person == null) continue;
 
 				ChargeReference cr = new ChargeReference();
+				
 				cr.charge_id = charge.id;
 				cr.person = charge.person.display_name;
 				cr.rule = charge.getRuleTitle();
 				cr.rp_text = charge.getRpText();
 				cr.rp_type = charge.rp_type;
-
 				cr.is_referenced = referencing_case.referenced_charges.contains(charge);
 
 				for (Charge new_charge : referencing_case.charges) {
 					if (new_charge.referenced_charge == charge) {
 						cr.has_generated = true;
 						cr.generated_charge_id = new_charge.id;
+						cr.has_default_rule = new_charge != null && new_charge.rule.id == Entry.findBreakingResPlanEntryId();
 					}
 				}
 

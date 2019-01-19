@@ -116,7 +116,8 @@ $(function () {
                 <input type="checkbox" value="{{is_referenced}}" data-id="{{charge_id}}" {{#if is_referenced}}checked{{/if}}>
                 {{person}} was charged with {{rule}}.
                 @OrgConfig.get().str_res_plan_cap: {{rp_text}}
-                <span class="case-charge-reference-generate" data-id="{{charge_id}}" data-rp="{{rp_text}}" data-rp-type="{{rp_type}}"
+                <span class="case-charge-reference-generate" data-id="{{charge_id}}" data-rp-text="{{rp_text}}"
+                    data-rp-type="{{rp_type}}" data-has-default-rule="{{has_default_rule}}"
                 {{#if has_generated}}hidden{{/if}}>Generate charge</span>
                 <span class="case-charge-reference-already-generated"
                 {{#unless has_generated}}hidden{{/unless}}>Charge generated</span>

@@ -10,4 +10,5 @@ public class ChargeReference {
 	public boolean is_referenced;
 	public boolean has_generated;
 	public Integer generated_charge_id;
+	public boolean has_default_rule;
 }
