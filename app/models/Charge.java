@@ -2,6 +2,7 @@ package models;
 
 import controllers.*;
 
+import java.util.*;
 import java.util.Date;
 import java.util.Map;
 
@@ -32,7 +33,12 @@ public class Charge extends Model implements Comparable<Charge> {
 
     @ManyToOne()
     @JoinColumn(name="referenced_charge_id")
+    @JsonIgnore
     public Charge referenced_charge;
+
+    @OneToMany(mappedBy="referenced_charge")
+    @JsonIgnore
+    public List<Charge> referencing_charges;
 
     static final String EMPTY_PLEA = "<no plea>";
     public String plea = EMPTY_PLEA;
@@ -64,6 +70,7 @@ public class Charge extends Model implements Comparable<Charge> {
             .eq("id", id).findUnique();
     }
 
+
     public static Charge create(Case c)
     {
         Charge result = new Charge();
@@ -80,31 +87,34 @@ public class Charge extends Model implements Comparable<Charge> {
         result.person = referenced_charge.person;
         result.rule = Entry.findBreakingResPlanEntry();
         result.referenced_charge = referenced_charge;
+        result.rp_max_days = 1;
         result.save();
+
+        if (referenced_charge.rp_type == ResolutionPlanType.Restriction) {
+            referenced_charge.setRPComplete(true);
+        }
 
         return result;
     }
 
     public void edit(Map<String, String[]> query_string) {
+
         resolution_plan = query_string.get("resolution_plan")[0];
+        rp_escape_clause = query_string.get("rp_escape_clause")[0];
+        rp_text = query_string.get("rp_text")[0];
 
         if (query_string.containsKey("rp_type")) {
             rp_type = ResolutionPlanType.valueOf(query_string.get("rp_type")[0]);
-        }
-        if (query_string.containsKey("rp_max_days")) {
-            rp_max_days = Integer.parseInt(query_string.get("rp_max_days")[0]);
-        }
-        if (query_string.containsKey("rp_start_immediately")) {
-            rp_start_immediately = Boolean.parseBoolean(query_string.get("rp_start_immediately")[0]);
-        }
-        if (query_string.containsKey("rp_escape_clause")) {
-            rp_escape_clause = query_string.get("rp_escape_clause")[0];
+        } else {
+            rp_type = ResolutionPlanType.None;
         }
 
-        if (query_string.containsKey("rp_text")) {
-            rp_text = query_string.get("rp_text")[0];
-        } else {
-            rp_text = resolution_plan;
+        if (query_string.containsKey("rp_max_days")) {
+            rp_max_days = Utils.tryParseInt(query_string.get("rp_max_days")[0], 1);
+        }
+
+        if (query_string.containsKey("rp_start_immediately")) {
+            rp_start_immediately = Boolean.parseBoolean(query_string.get("rp_start_immediately")[0]);
         }
 
         if (query_string.containsKey("plea")) {
@@ -198,5 +208,9 @@ public class Charge extends Model implements Comparable<Charge> {
         } else {
             return Application.formatDayOfWeek(the_case.meeting.date);
         }
+    }
+
+    public String getRpText() {
+        return rp_text.isEmpty() ? resolution_plan : rp_text;
     }
 }

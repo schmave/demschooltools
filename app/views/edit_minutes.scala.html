@@ -115,8 +115,8 @@ $(function () {
             <div class="case-charge-reference {{#if is_referenced}}referenced{{/if}}">
                 <input type="checkbox" value="{{is_referenced}}" data-id="{{charge_id}}" {{#if is_referenced}}checked{{/if}}>
                 {{person}} was charged with {{rule}}.
-                @OrgConfig.get().str_res_plan_cap: {{resolution_plan}}
-                <span class="case-charge-reference-generate" data-id="{{charge_id}}"
+                @OrgConfig.get().str_res_plan_cap: {{rp_text}}
+                <span class="case-charge-reference-generate" data-id="{{charge_id}}" data-rp="{{rp_text}}" data-rp-type="{{rp_type}}"
                 {{#if has_generated}}hidden{{/if}}>Generate charge</span>
                 <span class="case-charge-reference-already-generated"
                 {{#unless has_generated}}hidden{{/unless}}>Charge generated</span>
@@ -130,6 +130,7 @@ $(function () {
 <table>
 	<tr><td class="esm-form-label">Charge against:<td colspan=2>{{render "people-chooser" clazz=""}}
 	<b>Entry:</b> {{> rule-chooser}}
+    <tr class="original-res-plan" hidden><td class="esm-form-label">Originally:<td colspan="2" class="original-res-plan-text">
 	<tr><td class="esm-form-label">Plea:<td colspan=2>
 <div class="radio-inline">
   <label><input type="radio" class="plea-guilty" value="Guilty"><span>Guilty</span></label>
@@ -198,10 +199,15 @@ $(function () {
             <input type="checkbox" class="rp-start-immediately">
             The restriction also applies to the rest of today
         </label>
+        <br>
+        <label>
+            <input type="checkbox" class="rp-include-escape-clause">
+            Include an escape clause
+        </label>
     </tr>
-    <tr class="structured-options structured-options-for-restriction" hidden>
-        <td class="esm-form-label">Escape clause:</td>
-        <td><textarea class="rp-escape-clause"></textarea></td>
+    <tr class="structured-options structured-options-for-restriction " hidden>
+        <td class="rp-escape-clause-group esm-form-label" hidden>Escape clause:</td>
+        <td class="rp-escape-clause-group" hidden><textarea class="rp-escape-clause"></textarea></td>
     </tr>
     <tr class="structured-options structured-options-for-restriction structured-options-for-task" hidden>
         <td class="esm-form-label">Preview:</td>
@@ -246,7 +252,7 @@ $(function () {
     </tr>
     <tr>
         <td></td>
-        <td id="case-references"></td>
+        <td class="case-references"></td>
     </tr>
 }
 

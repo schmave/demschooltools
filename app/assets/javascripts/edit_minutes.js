@@ -58,10 +58,15 @@ function Charge(charge_id, el) {
         }
     };
 
-    this.loadData = function(json) {
+    this.loadData = function(json, referenced_charge) {
         el.find(".resolution_plan").val(json.resolution_plan);
         el.find(".rp-max-days").val(json.rp_max_days);
-        el.find(".rp-escape-clause").val(json.rp_escape_clause);
+
+        if (json.rp_escape_clause) {
+            el.find(".rp-include-escape-clause").prop("checked", true);
+            el.find(".rp-escape-clause-group").show();
+            el.find(".rp-escape-clause").val(json.rp_escape_clause);
+        }
 
         if (json.plea == "Guilty") {
             el.find(".plea-guilty").prop("checked", true);
@@ -109,6 +114,19 @@ function Charge(charge_id, el) {
         self.checkReferralLabelHighlight();
 
         el.find(".rp-preview").html(self.generateResolutionPlanPreview());
+
+        if (referenced_charge) {
+            self.referenced_charge_id = referenced_charge.id;
+            el.addClass("breaking-res-plan");
+            var text = referenced_charge.rp_text;
+            if (referenced_charge.rp_type === "Restriction") {
+                if (!text.endsWith(".")) {
+                    text += ".";
+                }
+                text = " This original restriction has been nullified. Please replace it.";
+            }
+            el.find(".original-res-plan").show().find(".original-res-plan-text").html(text);
+        }
     };
 
     this.saveIfNeeded = function() {
@@ -194,6 +212,10 @@ function Charge(charge_id, el) {
     };
 
     this.removeCharge = function() {
+        if (self.referenced_charge_id) {
+            self.el.parents('.case').find('.case-charge-reference-generate[data-id=' + self.referenced_charge_id + ']')
+                .show().parent().find('.case-charge-reference-already-generated').hide();
+        }
         $.post("/removeCharge?id=" + charge_id, function() {
             self.el.remove();
             // Don't try to save any remaining modifications if
@@ -326,8 +348,18 @@ function Charge(charge_id, el) {
     el.find(".minor-referral-destination").on(utils.TEXT_AREA_EVENTS, self.markAsModified);
     el.find(".rp-max-days").on("input", self.markAsModified);
     el.find(".rp-start-immediately").change(self.markAsModified);
-    el.find(".rp-escape-clause").change(self.markAsModified);
-    el.find(".rp-escape-clause").on(utils.TEXT_AREA_EVENTS, self.checkText);
+    el.find(".rp-escape-clause").change(self.markAsModified).on(utils.TEXT_AREA_EVENTS, self.checkText);
+
+    el.find(".rp-include-escape-clause").change(function() {
+        var group = el.find(".rp-escape-clause-group");
+        if (this.checked) {
+            group.show();
+        } else {
+            group.hide();
+            el.find(".rp-escape-clause").val("");
+            self.markAsModified();
+        }
+    });
 
     self.people_chooser = new people_chooser.PeopleChooser(
         el.find(".people_chooser"), self.markAsModified, self.markAsModified,
@@ -408,13 +440,31 @@ function Case (id, el) {
             }
         }
 
-        self.case_chooser.loadData(data.referenced_cases);
-        $.get("/getCaseReferencesJson?case_id=" + self.id, setCaseReferences);
+        $.get("/getCaseReferencesJson?case_id=" + self.id, function(case_references) {
+            setCaseReferences(case_references);
+            var case_references_json = $.parseJSON(case_references);
+            for (i in data.charges) {
+                var ch = data.charges[i];
+                var new_charge = self.addChargeNoServer(ch.id);
+                new_charge.loadData(ch, findReferencedCharge(ch.id, case_references_json));
+            }
+        });
 
-        for (i in data.charges) {
-            var ch = data.charges[i];
-            var new_charge = self.addChargeNoServer(ch.id);
-            new_charge.loadData(ch);
+        function findReferencedCharge(charge_id, case_references) {
+            for (i in case_references) {
+                var c = case_references[i];
+                for (j in c.charges) {
+                    var ch = c.charges[j];
+                    if (ch.generated_charge_id == charge_id) {
+                        return {
+                            id: ch.charge_id,
+                            rp_text: ch.rp_text,
+                            rp_type: ch.rp_type
+                        };
+                    }
+                }
+            }
+            return null;
         }
     };
 
@@ -511,13 +561,10 @@ function Case (id, el) {
     this.is_modified = false;
     this.charges = [];
 
-    function getLabel(json) {
-        return json.case_number;
-    }
-
     function setCaseReferences(data) {
         var json = $.parseJSON(data);
-        var el = self.el.find('#case-references');
+        self.case_chooser.loadData(json);
+        var el = self.el.find('.case-references');
         el.html('');
         for (var i in json) {
             el.append(app.case_reference_template(json[i]));
@@ -534,13 +581,22 @@ function Case (id, el) {
         });
         el.find('.case-charge-reference-generate').click(function() {
             $(this).hide().parent().find('.case-charge-reference-already-generated').show();
+            var referenced_charge = {
+                id: $(this).data('id'),
+                rp_text: $(this).data('rp'),
+                rp_type: $(this).data('rp-type')
+            };
             var url = "/generateChargeFromReference?case_id=" + id + "&referenced_charge_id=" + $(this).data('id');
-            $.post(url, function(data) {
-                var new_charge_el = self.el.find(".charges").append(app.charge_template()).children(":last-child");
-                var new_charge = new Charge(data.id, new_charge_el);
-                self.charges.push(new_charge);
+            $.post(url, function(response) {
+                var new_charge_json = $.parseJSON(response);
+                var new_charge = self.addChargeNoServer(new_charge_json.id);
+                new_charge.loadData(new_charge_json, referenced_charge);
             });
         });
+    }
+
+    function getLabel(json) {
+        return json.case_number;
     }
 
     self.case_chooser = new chooser.Chooser(el.find(".case_chooser"), true, app.cases, getLabel, null, null,

@@ -62,6 +62,7 @@ public class Case extends Model implements Comparable<Case> {
     @JoinTable(name="case_reference",
         joinColumns=@JoinColumn(name="referencing_case", referencedColumnName="id"),
         inverseJoinColumns=@JoinColumn(name="referenced_case", referencedColumnName="id"))
+    @JsonIgnore
     public List<Case> referenced_cases;
 
     @ManyToMany(mappedBy="referenced_cases")
@@ -72,6 +73,7 @@ public class Case extends Model implements Comparable<Case> {
     @JoinTable(name="charge_reference",
         joinColumns=@JoinColumn(name="referencing_case", referencedColumnName="id"),
         inverseJoinColumns=@JoinColumn(name="referenced_charge", referencedColumnName="id"))
+    @JsonIgnore
     public List<Charge> referenced_charges;
 
     public static Finder<Integer, Case> find = new Finder<Integer, Case>(

@@ -92,6 +92,8 @@ var Chooser = function(el, allowMultiple, source, getLabel, onClick, onChange, o
     }
 
     this.loadData = function(json) {
+        self.clear();
+        self.el.find(".results").html("");
         if (allowMultiple) {
             for (var i in json) {
                 self.addResult(json[i].id, getLabel(json[i]));
