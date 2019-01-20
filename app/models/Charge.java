@@ -216,6 +216,17 @@ public class Charge extends Model implements Comparable<Charge> {
     }
 
     public String getRpText() {
-        return rp_text.isEmpty() ? resolution_plan : rp_text;
+        String result = rp_text.isEmpty() ? resolution_plan : rp_text;
+        if (!result.isEmpty() && !result.endsWith(".")) {
+            result += ".";
+        }
+        return result;
+    }
+
+    public void buildChargeReferenceChain(ArrayList<Charge> chain) {
+        if (referenced_charge != null) {
+            referenced_charge.buildChargeReferenceChain(chain);
+        }
+        chain.add(this);
     }
 }

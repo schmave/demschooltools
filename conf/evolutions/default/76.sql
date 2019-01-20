@@ -15,6 +15,8 @@ ALTER TABLE charge ADD COLUMN rp_start_immediately boolean NOT NULL DEFAULT(fals
 ALTER TABLE charge ADD COLUMN rp_escape_clause text NOT NULL DEFAULT('');
 ALTER TABLE charge ADD COLUMN rp_text text NOT NULL DEFAULT('');
 
+ALTER TABLE "case" ADD COLUMN composite_findings text NOT NULL DEFAULT('');
+
 CREATE TABLE case_reference (
 	referencing_case integer NOT NULL,
 	referenced_case integer NOT NULL,
@@ -33,6 +35,8 @@ CREATE TABLE charge_reference (
 
 DROP TABLE charge_reference;
 DROP TABLE case_reference;
+
+ALTER TABLE "case" DROP COLUMN composite_findings;
 
 ALTER TABLE charge DROP COLUMN rp_text;
 ALTER TABLE charge DROP COLUMN rp_escape_clause;

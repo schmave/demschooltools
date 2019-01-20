@@ -110,7 +110,7 @@ var addCharge = function(data, parent_el) {
         "rule_title": data.rule ? data.ruleTitle : "<No rule>",
         "rp_text": data.rp_text ? data.rp_text : data.resolution_plan,
         "sm_decision": data.sm_decision,
-        "findings": data.the_case.findings,
+        "findings": data.the_case.composite_findings,
         "sm_decision_date": data.sm_decision_date,
         "referred_to_sm": data.referred_to_sm
         };

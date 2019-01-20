@@ -18,7 +18,7 @@ public class CaseReference {
 			CaseReference result = new CaseReference();
 			result.id = referenced_case.id;
 			result.case_number = referenced_case.case_number;
-			result.findings = referenced_case.findings;
+			result.findings = referenced_case.generateCompositeFindingsFromCaseReferences();
 			result.charges = new ArrayList<ChargeReference>();
 
 			for (Charge charge : referenced_case.charges) {
@@ -38,7 +38,7 @@ public class CaseReference {
 					if (new_charge.referenced_charge == charge) {
 						cr.has_generated = true;
 						cr.generated_charge_id = new_charge.id;
-						cr.has_default_rule = new_charge != null && new_charge.rule.id == Entry.findBreakingResPlanEntryId();
+						cr.has_default_rule = new_charge.rule != null && new_charge.rule.id == Entry.findBreakingResPlanEntryId();
 					}
 				}
 

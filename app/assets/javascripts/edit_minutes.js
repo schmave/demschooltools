@@ -587,12 +587,14 @@ function Case (id, el) {
             var referenced_charge = {
                 id: $(this).data('id'),
                 rp_text: $(this).data('rp-text'),
-                rp_type: $(this).data('rp-type'),
-                has_default_rule: $(this).data('has-default-rule')
+                rp_type: $(this).data('rp-type')
             };
             var url = "/generateChargeFromReference?case_id=" + id + "&referenced_charge_id=" + $(this).data('id');
             $.post(url, function(response) {
                 var new_charge_json = $.parseJSON(response);
+                if (new_charge_json.rule) {
+                    referenced_charge.has_default_rule = true;
+                }
                 var new_charge = self.addChargeNoServer(new_charge_json.id);
                 new_charge.loadData(new_charge_json, referenced_charge);
             });

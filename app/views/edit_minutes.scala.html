@@ -114,10 +114,8 @@ $(function () {
         {{#each charges}}{{#with this}}
             <div class="case-charge-reference {{#if is_referenced}}referenced{{/if}}">
                 <input type="checkbox" value="{{is_referenced}}" data-id="{{charge_id}}" {{#if is_referenced}}checked{{/if}}>
-                {{person}} was charged with {{rule}}.
-                @OrgConfig.get().str_res_plan_cap: {{rp_text}}
-                <span class="case-charge-reference-generate" data-id="{{charge_id}}" data-rp-text="{{rp_text}}"
-                    data-rp-type="{{rp_type}}" data-has-default-rule="{{has_default_rule}}"
+                {{person}} was charged with {{rule}} and was assigned the @OrgConfig.get().str_res_plan "{{rp_text}}"
+                <span class="case-charge-reference-generate" data-id="{{charge_id}}" data-rp-text="{{rp_text}}" data-rp-type="{{rp_type}}"
                 {{#if has_generated}}hidden{{/if}}>Generate charge</span>
                 <span class="case-charge-reference-already-generated"
                 {{#unless has_generated}}hidden{{/unless}}>Charge generated</span>
@@ -131,7 +129,7 @@ $(function () {
 <table>
 	<tr><td class="esm-form-label">Charge against:<td colspan=2>{{render "people-chooser" clazz=""}}
 	<b>Entry:</b> {{> rule-chooser}}
-    <tr class="original-res-plan" hidden><td class="esm-form-label">Originally:<td colspan="2" class="original-res-plan-text">
+    <tr class="original-res-plan" hidden><td class="esm-form-label">Original:<td colspan="2" class="original-res-plan-text">
 	<tr><td class="esm-form-label">Plea:<td colspan=2>
 <div class="radio-inline">
   <label><input type="radio" class="plea-guilty" value="Guilty"><span>Guilty</span></label>

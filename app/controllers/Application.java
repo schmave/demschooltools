@@ -220,7 +220,7 @@ public class Application extends Controller {
             // Adding a space to the front of the case number prevents MS Excel
             // from misinterpreting it as a date.
             writer.write(" " + c.the_case.case_number, true);
-            writer.write(c.the_case.findings);
+            writer.write(c.the_case.generateCompositeFindingsFromChargeReferences());
 
             if (c.rule != null) {
                 writer.write(c.rule.getNumber() + " " + c.rule.title);
@@ -303,6 +303,15 @@ public class Application extends Controller {
                 .eq("rp_complete", true)
                 .orderBy("rp_complete_date DESC")
                 .setMaxRows(25).findList();
+
+        List<Charge> all = new ArrayList<Charge>(active_rps);
+        all.addAll(completed_rps);
+        for (Charge charge : all) {
+            Case c = charge.the_case;
+            if (c.composite_findings == null) {
+                c.composite_findings = c.generateCompositeFindingsFromChargeReferences();
+            }
+        }
 
         return ok(views.html.edit_rp_list.render(active_rps, completed_rps));
     }
