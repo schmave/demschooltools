@@ -126,35 +126,6 @@ the "Current Student" and "Staff" tags). Accounts can be created manually for gr
     </select> morning. <input type="submit" value="Save"/></p>
 }
 
-<h4>Structured @OrgConfig.get().str_res_plans</h4>
-<p class="instructions"></p>
-@helper.form(routes.Settings.editSettings()) {
-    <p>
-        <label>
-            <input type="checkbox" name="enable_structured_res_plans" @if(org.enable_structured_res_plans){ checked }>
-            Enable structured @OrgConfig.get().str_res_plans
-        </label>
-        <br>
-        <label>
-            <input type="checkbox" name="enable_case_references" @if(org.enable_case_references){ checked }>
-            Enable case references
-        </label>
-    </p>
-    <p>
-        "Breaking @OrgConfig.get().str_res_plan" entry:
-        <span id="breaking-res-plan-entry-chooser">
-            <span class="results"></span>
-            <input class="search" type="text">
-        </span>
-    </p>
-    </p>
-    <p>
-        <input type="hidden" id="breaking-res-plan-entry" name="breaking_res_plan_entry_id" value="@Entry.findBreakingResPlanEntryId()">
-        <input type="submit" value="Save structured @OrgConfig.get().str_res_plans settings"/>
-        <input type="hidden" name="structured_res_plans_settings" value="true"/>
-    </p>
-}
-
 <h4>Other @OrgConfig.get().str_jc_name_short options</h4>
 <p class="instructions">The following behaviors of the @OrgConfig.get().str_jc_name_short system can be changed easily by Evan, but not
     yet directly by you. Please <a class="feedback_open">contact me</a> if you would like to change any of them.
@@ -170,6 +141,52 @@ the "Current Student" and "Staff" tags). Accounts can be created manually for gr
     <li>The words that your school uses, e.g. "@OrgConfig.get().str_jc_name", "@OrgConfig.get().str_manual_title",
         "@OrgConfig.get().str_findings", etc.</li>
 </ul>
+
+<hr/>
+<h2>Advanced @OrgConfig.get().str_jc_name_short Settings</h4>
+@helper.form(routes.Settings.editSettings()) {
+    <h4>Case References</h4>
+    <p class="instructions">
+        This feature allows you to reference a previous @OrgConfig.get().str_jc_name_short case when creating a
+        new case, for example if a @OrgConfig.get().str_res_plan was broken.
+        This makes it easier to retrieve information about previous cases and @OrgConfig.get().str_res_plans
+        when you need it. This feature really shines when you have a chain of broken @OrgConfig.get().str_res_plans,
+        as it enables you to see the full history of the issue without having to look anything up.
+        Additionally, it allows you to decide what happens to the original @OrgConfig.get().str_res_plan when
+        a new @OrgConfig.get().str_res_plan is created.
+    </p>
+    <p>
+        <label>
+            <input type="checkbox" name="enable_case_references" @if(org.enable_case_references){ checked }>
+            Enable case references
+        </label>
+    </p>
+    <p>
+        "Breaking @OrgConfig.get().str_res_plan" entry:
+        <span id="breaking-res-plan-entry-chooser">
+            <span class="results"></span>
+            <input class="search" type="text">
+        </span>
+    </p>
+    <h4>Structured @OrgConfig.get().str_res_plans_cap</h4>
+    <p class="instructions">
+        This feature helps notetakers write @OrgConfig.get().str_res_plans by breaking up @OrgConfig.get().str_res_plans
+        into parts. You choose what kind of @OrgConfig.get().str_res_plan &mdash; is it a restriction, a task, or other?
+        &mdash; as well as which days the @OrgConfig.get().str_res_plan applies to. This helps notetakers avoid the pitfall
+        of failing to be specific when writing @OrgConfig.get().str_res_plans.
+    </p>
+    <p>
+        <label>
+            <input type="checkbox" name="enable_structured_res_plans" @if(org.enable_structured_res_plans){ checked }>
+            Enable structured @OrgConfig.get().str_res_plans
+        </label>
+    </p>
+    <p>
+        <input type="hidden" id="breaking-res-plan-entry" name="breaking_res_plan_entry_id" value="@Entry.findBreakingResPlanEntryId()">
+        <input type="submit" value="Save advanced @OrgConfig.get().str_jc_name_short settings"/>
+        <input type="hidden" name="advanced_jc_settings" value="true"/>
+    </p>
+}
 
 <hr/>
 <h2>@OrgConfig.get().str_manual_title</h2>

@@ -109,7 +109,7 @@ public class Organization extends Model {
         if (values.containsKey("jc_reset_day")) {
             this.jc_reset_day = Integer.parseInt(values.get("jc_reset_day")[0]);
         }
-        if (values.containsKey("structured_res_plans_settings")) {
+        if (values.containsKey("advanced_jc_settings")) {
             if (values.containsKey("enable_structured_res_plans")) {
                 this.enable_structured_res_plans = Utils.getBooleanFromFormValue(values.get("enable_structured_res_plans")[0]);
             } else {
