@@ -47,7 +47,8 @@ function Charge(charge_id, el) {
         "none": "None",
         "restriction": "Restriction",
         "task": "Task",
-        "other": "Other"
+        "other": "Other",
+        "no-res-plan": "NoResolutionPlan"
     };
 
     this.checkReferralLabelHighlight = function() {
@@ -61,6 +62,7 @@ function Charge(charge_id, el) {
     this.loadData = function(json, referenced_charge) {
         el.find(".resolution_plan").val(json.resolution_plan);
         el.find(".rp-max-days").val(json.rp_max_days);
+        el.find(".rp-extension").val(json.rp_extension);
 
         if (json.rp_escape_clause) {
             el.find(".rp-include-escape-clause").prop("checked", true);
@@ -113,22 +115,37 @@ function Charge(charge_id, el) {
         el.find(".minor-referral-destination").val(json.minor_referral_destination);
         self.checkReferralLabelHighlight();
 
-        el.find(".rp-preview").html(self.generateResolutionPlanPreview());
-
         if (referenced_charge) {
-            self.referenced_charge_id = referenced_charge.id;
+            self.referenced_charge = referenced_charge;
             if (referenced_charge.has_default_rule) {
                 el.addClass("breaking-res-plan");
             }
-            var text = referenced_charge.rp_text;
+            el.find(".rp-warning").remove();
+            el.find(".rp-followups").show();
+            el.find(".original-res-plan").show();
+            el.find(".original-res-plan-text").html(referenced_charge.rp_text);
             if (referenced_charge.rp_type === "Restriction") {
-                if (!text.endsWith(".")) {
-                    text += ".";
-                }
-                text = " This original restriction has been nullified. Please replace it.";
+                el.find(".rp-followup-extension-container").show();
+                el.find(".rp-restriction-extension-label").show();
             }
-            el.find(".original-res-plan").show().find(".original-res-plan-text").html(text);
+            else if (referenced_charge.rp_type === "Task") {
+                el.find(".rp-followup-extension-container").show();
+                el.find(".rp-task-extension-label").show();
+            }
+            if (json.resolution_plan || (json.rp_type && json.rp_type !== "None" && json.rp_type !== "NoResolutionPlan")) {
+                el.find(".rp-followup-new-rp").prop("checked", true);
+            } else {
+                el.find(".rp-row").hide();
+                if (json.rp_extension) {
+                    el.find(".rp-followup-extension").prop("checked", true);
+                    el.find(".structured-options-for-extension").show();
+                } else if (json.rp_type === "NoResolutionPlan") {
+                    el.find(".rp-followup-time-served").prop("checked", true);
+                }
+            }
         }
+
+        el.find(".rp-preview").html(self.generateResolutionPlanPreview());
     };
 
     this.saveIfNeeded = function() {
@@ -151,16 +168,28 @@ function Charge(charge_id, el) {
             }
         }
 
+        var rp_text = el.find(".rp-preview").html();
+
         for (var key in RP_TYPES) {
             if (el.find(".rp-type-" + key).prop("checked")) {
                 url += "&rp_type=" + RP_TYPES[key];
+                if (key === "no-res-plan") {
+                    rp_text = "Warning";
+                }
             }
+        }
+
+        if (el.find(".rp-followups").is(":visible") && el.find(".rp-followup-time-served").prop("checked")) {
+            rp_text = "Time served";
+        }
+
+        if (rp_text !== undefined) {
+            url += "&rp_text=" + rp_text;
         }
 
         var rp_escape_clause = el.find(".rp-escape-clause").val();
         var rp_max_days = el.find(".rp-max-days").val();
         var rp_start_immediately = el.find(".rp-start-immediately").prop("checked");
-        var rp_text = el.find(".rp-preview").html();
 
         if (rp_escape_clause !== undefined) {
             url += "&rp_escape_clause=" + encodeURIComponent(rp_escape_clause);
@@ -171,9 +200,8 @@ function Charge(charge_id, el) {
         if (rp_start_immediately !== undefined) {
             url += "&rp_start_immediately=" + rp_start_immediately;
         }
-        if (rp_text !== undefined) {
-            url += "&rp_text=" + rp_text;
-        }
+
+        url += "&rp_extension=" + encodeURIComponent(el.find(".rp-extension").val() || "");  
 
         var plea = el.find(".plea-guilty");
         if (plea.prop("checked")) {
@@ -214,8 +242,8 @@ function Charge(charge_id, el) {
     };
 
     this.removeCharge = function() {
-        if (self.referenced_charge_id) {
-            self.el.parents('.case').find('.case-charge-reference-generate[data-id=' + self.referenced_charge_id + ']')
+        if (self.referenced_charge) {
+            self.el.parents('.case').find('.case-charge-reference-generate[data-id=' + self.referenced_charge.id + ']')
                 .show().parent().find('.case-charge-reference-already-generated').hide();
         }
         $.post("/removeCharge?id=" + charge_id, function() {
@@ -256,64 +284,90 @@ function Charge(charge_id, el) {
 
     this.generateResolutionPlanPreview = function() {
         var preview = "";
-        var defaultText = "";
-        var resolutionPlan = el.find(".resolution_plan").val();
-        var maxDays = parseInt(el.find(".rp-max-days").val());
-        var startImmediately = el.find(".rp-start-immediately").prop("checked");
-        var escapeClause = el.find(".rp-escape-clause").val();
-        if (!resolutionPlan) {
-            return defaultText;
+        var resolution_plan = el.find(".resolution_plan").val();
+        var max_days = parseInt(el.find(".rp-max-days").val());
+        var start_immediately = el.find(".rp-start-immediately").prop("checked");
+        var escape_clause = el.find(".rp-escape-clause").val();
+        var extension = el.find(".rp-extension").val();
+
+        if (self.referenced_charge && extension) {
+            preview = upperCaseFirstChar(self.referenced_charge.resolution_plan);
+            var extensionDays = parseInt(extension);
+            if (self.referenced_charge.rp_type === "Restriction") {
+                preview += renderRestrictionText(extensionDays, true, self.referenced_charge.rp_escape_clause);
+            }
+            else if (self.referenced_charge.rp_type === "Task") {
+                preview += renderTaskText(extensionDays);
+            }
         }
-        // change first character to uppercase
-        resolutionPlan = resolutionPlan.charAt(0).toUpperCase() + resolutionPlan.slice(1);
-        preview += resolutionPlan;
-        if (el.find(".rp-type-restriction").prop("checked")) {
-            if (maxDays > 0) {
-                if (startImmediately) {
-                    preview += " for";
-                } else {
-                    preview += " during";
-                }
-                preview += " the next " + maxDays;
-                if (maxDays > 1) {
-                    preview += " days";
-                } else {
-                    preview += " day";
-                }
-                preview += " of attendance.";
-                if (startImmediately) {
-                    preview += " The restriction also applies to the rest of today.";
-                }
-            } else if (maxDays === 0) {
-                if (startImmediately) {
-                    preview += " for the rest of today.";
-                } else {
-                    return defaultText;
-                }
-            } else {
-                return defaultText;
+        else {
+            if (!resolution_plan) return "";
+            preview = upperCaseFirstChar(resolution_plan);
+            if (el.find(".rp-type-restriction").prop("checked")) {
+                preview += renderRestrictionText(max_days, start_immediately, escape_clause);
             }
-            if (escapeClause) {
-                // change first character to lowercase
-                escapeClause = escapeClause.charAt(0).toLowerCase() + escapeClause.slice(1);
-                preview += " To end the restriction early, " + self.people_chooser.people[0].name + " may " + escapeClause + ".";
-            }
-        } else if (el.find(".rp-type-task").prop("checked")) {
-            if (maxDays > 0) {
-                preview += " within " + maxDays;
-                if (maxDays > 1) {
-                    preview += " days";
-                } else {
-                    preview += " day";
-                }
-                preview += " of attendance.";
-            } else if (maxDays === 0) {
-                preview += " by the end of the day today.";
-            } else {
-                preview += ".";
+            else if (el.find(".rp-type-task").prop("checked")) {
+                preview += renderTaskText(max_days);
             }
         }
         return preview;
+
+        function upperCaseFirstChar(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        function renderRestrictionText(max_days, start_immediately, escape_clause) {
+            var result = "";
+            if (max_days > 0) {
+                if (start_immediately) {
+                    result += " for";
+                } else {
+                    result += " during";
+                }
+                result += " the next " + max_days;
+                if (max_days > 1) {
+                    result += " days";
+                } else {
+                    result += " day";
+                }
+                result += " of attendance.";
+                if (start_immediately) {
+                    result += " The restriction also applies to the rest of today.";
+                }
+            } else if (max_days === 0) {
+                if (start_immediately) {
+                    result += " for the rest of today.";
+                } else {
+                    return "";
+                }
+            } else {
+                return "";
+            }
+            if (escape_clause) {
+                // change first character to lowercase
+                escape_clause = escape_clause.charAt(0).toLowerCase() + escape_clause.slice(1);
+                result += " To end the restriction early, " + self.people_chooser.people[0].name + " may " + escape_clause + ".";
+            }
+            return result;
+        }
+
+        function renderTaskText(deadlineDays) {
+            var result = "";
+            if (deadlineDays > 0) {
+                result += " within " + deadlineDays;
+                if (deadlineDays > 1) {
+                    result += " days";
+                } else {
+                    result += " day";
+                }
+                result += " of attendance.";
+            } else if (deadlineDays === 0) {
+                result += " by the end of the day today.";
+            } else {
+                result += ".";
+            }
+            return result;
+        }
     }
 
     this.old_rp = null;
@@ -349,6 +403,7 @@ function Charge(charge_id, el) {
     el.find(".minor-referral-destination").change(self.markAsModified);
     el.find(".minor-referral-destination").on(utils.TEXT_AREA_EVENTS, self.markAsModified);
     el.find(".rp-max-days").on("input", self.markAsModified);
+    el.find(".rp-extension").on("input", self.markAsModified);
     el.find(".rp-start-immediately").change(self.markAsModified);
     el.find(".rp-escape-clause").change(self.markAsModified).on(utils.TEXT_AREA_EVENTS, self.checkText);
 
@@ -361,6 +416,26 @@ function Charge(charge_id, el) {
             el.find(".rp-escape-clause").val("");
             self.markAsModified();
         }
+    });
+
+    el.find(".rp-followup").change(function() {
+        if ($(this).hasClass("rp-followup-new-rp")) {
+            el.find(".rp-row").show();
+            el.find(".structured-options-for-extension").hide();
+            el.find(".rp-extension").val("");
+        } else {
+            el.find(".rp-row").hide();
+            el.find(".resolution_plan").val("");
+            el.find(".rp-escape-clause").val("");
+            el.find(".rp-type").prop("checked", false);
+            el.find(".structured-options").hide();
+            if ($(this).hasClass("rp-followup-extension")) {
+                el.find(".structured-options-for-extension").show();
+            } else {
+                el.find(".rp-extension").val("");
+            }
+        }
+        self.markAsModified();
     });
 
     self.people_chooser = new people_chooser.PeopleChooser(
@@ -380,7 +455,7 @@ function Charge(charge_id, el) {
         showRuleHistoryInSidebar,
         self.markAsModified);
 
-    el.find("input[type=radio]").prop("name", "plea-" + charge_id);
+    el.find(".plea[type=radio]").prop("name", "plea-" + charge_id);
 
     // el.mouseleave(function() { self.remove_button.hide(); } );
     // el.mouseenter(function() { self.remove_button.show(); } );
@@ -396,6 +471,10 @@ function Charge(charge_id, el) {
             $('.structured-options').hide();
             $('.structured-options-for-' + String($(this).val()).toLowerCase()).show();
         });
+
+    el.find(".rp-followup")
+        .prop("name", "rp-followup-" + charge_id)
+        .change(self.markAsModified);
 }
 
 function Case (id, el) {
@@ -460,6 +539,8 @@ function Case (id, el) {
                     if (ch.generated_charge_id == charge_id) {
                         return {
                             id: ch.charge_id,
+                            resolution_plan: ch.resolution_plan,
+                            rp_escape_clause: ch.rp_escape_clause,
                             rp_text: ch.rp_text,
                             rp_type: ch.rp_type,
                             has_default_rule: ch.has_default_rule
@@ -587,6 +668,8 @@ function Case (id, el) {
             var referenced_charge = {
                 id: $(this).data('id'),
                 rp_text: $(this).data('rp-text'),
+                resolution_plan: $(this).data('resolution-plan'),
+                rp_escape_clause: $(this).data('rp-escape-clause'),
                 rp_type: $(this).data('rp-type')
             };
             var url = "/generateChargeFromReference?case_id=" + id + "&referenced_charge_id=" + $(this).data('id');

@@ -58,7 +58,8 @@ public class Charge extends Model implements Comparable<Charge> {
     public ResolutionPlanType rp_type = ResolutionPlanType.None;
 
     public Integer rp_progress = 0;
-    public Integer rp_max_days;
+    public Integer rp_max_days = 1;
+    public Integer rp_extension;
     public boolean rp_start_immediately = false;
     public String rp_escape_clause = "";
     public String rp_text = "";
@@ -69,7 +70,6 @@ public class Charge extends Model implements Comparable<Charge> {
         return find.where().eq("the_case.meeting.organization", Organization.getByHost())
             .eq("id", id).findUnique();
     }
-
 
     public static Charge create(Case c)
     {
@@ -90,9 +90,7 @@ public class Charge extends Model implements Comparable<Charge> {
         result.rp_max_days = 1;
         result.save();
 
-        if (referenced_charge.rp_type == ResolutionPlanType.Restriction) {
-            referenced_charge.setRPComplete(true);
-        }
+        referenced_charge.setRPComplete(true);
 
         return result;
     }
@@ -108,6 +106,10 @@ public class Charge extends Model implements Comparable<Charge> {
 
         if (query_string.containsKey("rp_max_days")) {
             rp_max_days = Utils.tryParseInt(query_string.get("rp_max_days")[0], 1);
+        }
+
+        if (query_string.containsKey("rp_extension")) {
+            rp_extension = Utils.tryParseInt(query_string.get("rp_extension")[0], null);
         }
 
         if (query_string.containsKey("rp_start_immediately")) {

@@ -5,5 +5,6 @@ public enum ResolutionPlanType
     None,
 	Restriction,
     Task,
-    Other;
+    Other,
+    NoResolutionPlan;
 }

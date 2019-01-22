@@ -257,6 +257,7 @@ public class Case extends Model implements Comparable<Case> {
 
     private String generateCompositeFindings(List<Charge> relevant_charges) {
         String result = "";
+        Collections.sort(referenced_cases, (a, b) -> a.case_number.compareTo(b.case_number));
         for (Case c : referenced_cases) {
             if (c.referenced_cases.size() == 0) {
                 if (result.isEmpty()) {
