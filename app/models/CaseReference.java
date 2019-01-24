@@ -31,9 +31,6 @@ public class CaseReference {
 				cr.person = charge.person.display_name;
 				cr.rule = charge.getRuleTitle();
 				cr.resolution_plan = charge.resolution_plan;
-				cr.rp_escape_clause = charge.rp_escape_clause;
-				cr.rp_text = charge.getRpText();
-				cr.rp_type = charge.rp_type;
 				cr.is_referenced = referencing_case.referenced_charges.contains(charge);
 
 				for (Charge new_charge : referencing_case.charges) {

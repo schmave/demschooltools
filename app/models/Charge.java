@@ -55,15 +55,6 @@ public class Charge extends Model implements Comparable<Charge> {
 
     public String minor_referral_destination = "";
 
-    public ResolutionPlanType rp_type = ResolutionPlanType.None;
-
-    public Integer rp_progress = 0;
-    public Integer rp_max_days = 1;
-    public Integer rp_extension;
-    public boolean rp_start_immediately = false;
-    public String rp_escape_clause = "";
-    public String rp_text = "";
-
     public static Finder<Integer, Charge> find = new Finder<Integer, Charge>(Charge.class);
 
     public static Charge findById(int id) {
@@ -87,7 +78,6 @@ public class Charge extends Model implements Comparable<Charge> {
         result.person = referenced_charge.person;
         result.rule = Entry.findBreakingResPlanEntry();
         result.referenced_charge = referenced_charge;
-        result.rp_max_days = 1;
         result.save();
 
         referenced_charge.setRPComplete(true);
@@ -97,32 +87,6 @@ public class Charge extends Model implements Comparable<Charge> {
 
     public void edit(Map<String, String[]> query_string) {
         resolution_plan = query_string.get("resolution_plan")[0];
-
-        if (query_string.containsKey("rp_type")) {
-            rp_type = ResolutionPlanType.valueOf(query_string.get("rp_type")[0]);
-        } else {
-            rp_type = ResolutionPlanType.None;
-        }
-
-        if (query_string.containsKey("rp_max_days")) {
-            rp_max_days = Utils.tryParseInt(query_string.get("rp_max_days")[0], 1);
-        }
-
-        if (query_string.containsKey("rp_extension")) {
-            rp_extension = Utils.tryParseInt(query_string.get("rp_extension")[0], null);
-        }
-
-        if (query_string.containsKey("rp_start_immediately")) {
-            rp_start_immediately = Boolean.parseBoolean(query_string.get("rp_start_immediately")[0]);
-        }
-
-        if (query_string.containsKey("rp_escape_clause")) {
-            rp_escape_clause = query_string.get("rp_escape_clause")[0];
-        }
-
-        if (query_string.containsKey("rp_text")) {
-            rp_text = query_string.get("rp_text")[0];
-        }
 
         if (query_string.containsKey("plea")) {
             plea = query_string.get("plea")[0];
@@ -215,14 +179,6 @@ public class Charge extends Model implements Comparable<Charge> {
         } else {
             return Application.formatDayOfWeek(the_case.meeting.date);
         }
-    }
-
-    public String getRpText() {
-        String result = rp_text.isEmpty() ? resolution_plan : rp_text;
-        if (!result.isEmpty() && !result.endsWith(".")) {
-            result += ".";
-        }
-        return result;
     }
 
     public void buildChargeReferenceChain(ArrayList<Charge> chain) {

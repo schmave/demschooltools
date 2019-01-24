@@ -290,8 +290,8 @@ public class Case extends Model implements Comparable<Case> {
                     result += " and " + group.get(group.size() - 1).person.getDisplayName() + " were "; 
                 }
                 result += "charged with " + group.get(0).getRuleTitle();
-                String rp_text = group.get(0).getRpText();
-                if (rp_text.isEmpty()) {
+                String resolution_plan = group.get(0).resolution_plan;
+                if (resolution_plan.isEmpty()) {
                     result += ".";
                 } else {
                     if (group.size() == 1) {
@@ -299,7 +299,7 @@ public class Case extends Model implements Comparable<Case> {
                     } else {
                         result += " and were each ";
                     }
-                    result += "assigned the " + OrgConfig.get().str_res_plan + " \"" + rp_text + "\"";
+                    result += "assigned the " + OrgConfig.get().str_res_plan + " \"" + resolution_plan + "\"";
                 }
             }  
         }
@@ -325,6 +325,6 @@ public class Case extends Model implements Comparable<Case> {
 
         return charges.stream()
             .filter(ch -> relevant_charges == null || relevant_charges.contains(ch))
-            .collect(Collectors.groupingBy(ch -> ch.getRuleTitle() + ch.getRpText()));
+            .collect(Collectors.groupingBy(ch -> ch.getRuleTitle() + ch.resolution_plan));
     }
 }

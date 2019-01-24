@@ -168,19 +168,6 @@ the "Current Student" and "Staff" tags). Accounts can be created manually for gr
             <input class="search" type="text">
         </span>
     </p>
-    <h4>Structured @OrgConfig.get().str_res_plans_cap</h4>
-    <p class="instructions">
-        This feature helps notetakers write @OrgConfig.get().str_res_plans by breaking up @OrgConfig.get().str_res_plans
-        into parts. You choose what kind of @OrgConfig.get().str_res_plan &mdash; is it a restriction, a task, or other?
-        &mdash; as well as which days the @OrgConfig.get().str_res_plan applies to. This helps notetakers avoid the pitfall
-        of failing to be specific when writing @OrgConfig.get().str_res_plans.
-    </p>
-    <p>
-        <label>
-            <input type="checkbox" name="enable_structured_res_plans" @if(org.enable_structured_res_plans){ checked }>
-            Enable structured @OrgConfig.get().str_res_plans
-        </label>
-    </p>
     <p>
         <input type="hidden" id="breaking-res-plan-entry" name="breaking_res_plan_entry_id" value="@Entry.findBreakingResPlanEntryId()">
         <input type="submit" value="Save advanced @OrgConfig.get().str_jc_name_short settings"/>

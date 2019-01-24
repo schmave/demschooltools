@@ -44,7 +44,6 @@ public class Organization extends Model {
     public Boolean show_attendance;
     public Boolean show_accounting;
 
-    public Boolean enable_structured_res_plans;
     public Boolean enable_case_references;
 
     @OneToMany(mappedBy="organization")
@@ -110,11 +109,6 @@ public class Organization extends Model {
             this.jc_reset_day = Integer.parseInt(values.get("jc_reset_day")[0]);
         }
         if (values.containsKey("advanced_jc_settings")) {
-            if (values.containsKey("enable_structured_res_plans")) {
-                this.enable_structured_res_plans = Utils.getBooleanFromFormValue(values.get("enable_structured_res_plans")[0]);
-            } else {
-                this.enable_structured_res_plans = false;
-            }
             if (values.containsKey("enable_case_references")) {
                 this.enable_case_references = Utils.getBooleanFromFormValue(values.get("enable_case_references")[0]);
             } else {

@@ -46,7 +46,7 @@
 					@if( !charge.severity.equals("")){(@charge.severity)}
 					@if( !charge.plea.equals("Guilty") ) { <b>@charge.plea.</b> }
 				}
-				<u>@OrgConfig.get().str_res_plan_short: @charge.getRpText()</u>
+				<u>@OrgConfig.get().str_res_plan_short: @charge.resolution_plan</u>
 				</li>
 			}
 			</ol>

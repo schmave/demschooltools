@@ -114,9 +114,8 @@ $(function () {
         {{#each charges}}{{#with this}}
             <div class="case-charge-reference {{#if is_referenced}}referenced{{/if}}">
                 <input type="checkbox" value="{{is_referenced}}" data-id="{{charge_id}}" {{#if is_referenced}}checked{{/if}}>
-                {{person}} was charged with {{rule}} and was assigned the @OrgConfig.get().str_res_plan "{{rp_text}}"
-                <span class="case-charge-reference-generate" data-id="{{charge_id}}" data-rp-type="{{rp_type}}"
-                      data-rp-text="{{rp_text}}" data-resolution-plan="{{resolution_plan}}" data-rp-escape-clause="{{rp_escape_clause}}"
+                {{person}} was charged with {{rule}} and was assigned the @OrgConfig.get().str_res_plan "{{resolution_plan}}"
+                <span class="case-charge-reference-generate" data-id="{{charge_id}}" data-resolution-plan="{{resolution_plan}}"
                 {{#if has_generated}}hidden{{/if}}>Generate charge</span>
                 <span class="case-charge-reference-already-generated"
                 {{#unless has_generated}}hidden{{/unless}}>Charge generated</span>
@@ -174,90 +173,17 @@ $(function () {
           <label><input type="radio" class="rp-followup rp-followup-time-served rp-type-no-res-plan"
             value="TimeServed"><span>Time served</span></label>
         </div>
-        @if( OrgConfig.get().org.enable_structured_res_plans ) {
-            <div class="radio-inline rp-followup-extension-container" hidden>
-                <label><input type="radio" class="rp-followup rp-followup-extension" value="Extend">
-                    <span class="rp-restriction-extension-label" hidden>Reassign days</span>
-                    <span class="rp-task-extension-label" hidden>Extend deadline</span>
-                </label>
-            </div>
-        }
         <div class="radio-inline">
           <label><input type="radio" class="rp-followup rp-followup-new-rp"
             value="Replace"><span>Replace @OrgConfig.get().str_res_plan</span></label>
         </div>
     </td>
 </tr>
-@if( OrgConfig.get().org.enable_structured_res_plans ) {
-    <tr class="rp-row">
-        <td class="esm-form-label">@OrgConfig.get().str_res_plan_cap type:</td>
-        <td>
-            <div class="radio-inline rp-warning">
-              <label><input type="radio" class="rp-type rp-type-no-res-plan" value="NoResolutionPlan"><span>Warning</span></label>
-            </div>
-            <div class="radio-inline">
-              <label><input type="radio" class="rp-type rp-type-restriction" value="Restriction"><span>Restriction</span></label>
-            </div>
-            <div class="radio-inline">
-              <label><input type="radio" class="rp-type rp-type-task" value="Task"><span>Task</span></label>
-            </div>
-            <div class="radio-inline">
-              <label><input type="radio" class="rp-type rp-type-other" value="Other"><span>Other</span></label>
-            </div>
-        </td>
-    </tr>
-    <tr class="structured-options structured-options-for-restriction structured-options-for-task structured-options-for-other" hidden>
-        <td class="esm-form-label structured-options structured-options-for-restriction" hidden>Restriction:</td>
-        <td class="esm-form-label structured-options structured-options-for-task" hidden>Task:</td>
-        <td class="esm-form-label structured-options structured-options-for-other" hidden>@OrgConfig.get().str_res_plan_cap:</td>
-        <td><textarea class="resolution_plan"></textarea></td>
-        <td class="last-rp" rowspan="10"></td>
-    </tr>
-    <tr class="structured-options structured-options-for-restriction structured-options-for-task" hidden>
-        <td></td>
-        <td>
-            <span class="structured-options structured-options-for-restriction" hidden>during the next</span>
-            <span class="structured-options structured-options-for-task" hidden>due in</span>
-            <input type="number" class="rp-max-days" value="1" min="0" max="99"> day(s) of attendance
-        </td>
-    </tr>
-    <tr class="structured-options structured-options-for-extension" hidden>
-        <td></td>
-        <td>
-            <span class="rp-restriction-extension-label" hidden>The restriction now applies to the next</span>
-            <span class="rp-task-extension-label" hidden>New deadline:</span>
-            <input type="number" class="rp-extension" min="0" max="99"> day(s) of attendance
-            <span class="rp-task-extension-label" hidden>from now</span>
-        </td>
-    </tr>
-    <tr class="structured-options structured-options-for-restriction" hidden>
-        <td><td>
-        <label>
-            <input type="checkbox" class="rp-start-immediately">
-            The restriction also applies to the rest of today
-        </label>
-        <br>
-        <label>
-            <input type="checkbox" class="rp-include-escape-clause">
-            Include an escape clause
-        </label>
-    </tr>
-    <tr class="structured-options structured-options-for-restriction " hidden>
-        <td class="rp-escape-clause-group esm-form-label" hidden>Escape clause:</td>
-        <td class="rp-escape-clause-group" hidden><textarea class="rp-escape-clause"></textarea></td>
-    </tr>
-    <tr class="structured-options structured-options-for-restriction
-               structured-options-for-task structured-options-for-extension" hidden>
-        <td class="esm-form-label">Preview:</td>
-        <td><span class="rp-preview"></span></td>
-    </tr>
-} else {
-    <tr class="rp-row">
-        <td class="esm-form-label">@OrgConfig.get().str_res_plan_cap:</td>
-        <td><textarea class="resolution_plan"></textarea></td>
-        <td class="last-rp"></td>
-    </tr>
-}
+<tr class="rp-row">
+    <td class="esm-form-label">@OrgConfig.get().str_res_plan_cap:</td>
+    <td><textarea class="resolution_plan"></textarea></td>
+    <td class="last-rp"></td>
+</tr>
 </table>
 <button style="margin-left: 200px" class="btn btn-danger btn-xs">Remove Charge</button>
 </div>

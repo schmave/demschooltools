@@ -43,14 +43,6 @@ function Charge(charge_id, el) {
         "severe": "Severe"
     };
 
-    var RP_TYPES = {
-        "none": "None",
-        "restriction": "Restriction",
-        "task": "Task",
-        "other": "Other",
-        "no-res-plan": "NoResolutionPlan"
-    };
-
     this.checkReferralLabelHighlight = function() {
         if (el.find(".minor-referral-destination").val()) {
             el.find(".minor-referral-label").addClass("highlight");
@@ -61,14 +53,6 @@ function Charge(charge_id, el) {
 
     this.loadData = function(json, referenced_charge) {
         el.find(".resolution_plan").val(json.resolution_plan);
-        el.find(".rp-max-days").val(json.rp_max_days);
-        el.find(".rp-extension").val(json.rp_extension);
-
-        if (json.rp_escape_clause) {
-            el.find(".rp-include-escape-clause").prop("checked", true);
-            el.find(".rp-escape-clause-group").show();
-            el.find(".rp-escape-clause").val(json.rp_escape_clause);
-        }
 
         if (json.plea == "Guilty") {
             el.find(".plea-guilty").prop("checked", true);
@@ -95,20 +79,9 @@ function Charge(charge_id, el) {
             el.find(".refer-to-sm").prop("checked", true);
         }
 
-        if (json.rp_start_immediately) {
-            el.find(".rp-start-immediately").prop("checked", true);
-        }
-
         for (var key in SEVERITIES) {
             if (json.severity == SEVERITIES[key]) {
                 el.find(".severity-" + key).prop("checked", true);
-            }
-        }
-
-        for (var key in RP_TYPES) {
-            if (json.rp_type == RP_TYPES[key]) {
-                el.find(".rp-type-" + key).prop("checked", true);
-                el.find('.structured-options-for-' + key).show();
             }
         }
 
@@ -120,32 +93,16 @@ function Charge(charge_id, el) {
             if (referenced_charge.has_default_rule) {
                 el.addClass("breaking-res-plan");
             }
-            el.find(".rp-warning").remove();
             el.find(".rp-followups").show();
             el.find(".original-res-plan").show();
-            el.find(".original-res-plan-text").html(referenced_charge.rp_text);
-            if (referenced_charge.rp_type === "Restriction") {
-                el.find(".rp-followup-extension-container").show();
-                el.find(".rp-restriction-extension-label").show();
-            }
-            else if (referenced_charge.rp_type === "Task") {
-                el.find(".rp-followup-extension-container").show();
-                el.find(".rp-task-extension-label").show();
-            }
-            if (json.resolution_plan || (json.rp_type && json.rp_type !== "None" && json.rp_type !== "NoResolutionPlan")) {
+            el.find(".original-res-plan-text").html(referenced_charge.resolution_plan);
+           
+            if (json.resolution_plan) {
                 el.find(".rp-followup-new-rp").prop("checked", true);
             } else {
                 el.find(".rp-row").hide();
-                if (json.rp_extension) {
-                    el.find(".rp-followup-extension").prop("checked", true);
-                    el.find(".structured-options-for-extension").show();
-                } else if (json.rp_type === "NoResolutionPlan") {
-                    el.find(".rp-followup-time-served").prop("checked", true);
-                }
             }
         }
-
-        el.find(".rp-preview").html(self.generateResolutionPlanPreview());
     };
 
     this.saveIfNeeded = function() {
@@ -160,48 +117,17 @@ function Charge(charge_id, el) {
             url += "&person_id=" + self.people_chooser.people[0].id;
         }
 
-        url += "&resolution_plan=" + encodeURIComponent(el.find(".resolution_plan").val());
+        var resolution_plan = el.find(".resolution_plan").val();
+        if (el.find(".rp-followups").is(":visible") && el.find(".rp-followup-time-served").prop("checked")) {
+            resolution_plan = "Time served";
+        }
+        url += "&resolution_plan=" + encodeURIComponent(resolution_plan);
 
         for (var key in SEVERITIES) {
             if (el.find(".severity-" + key).prop("checked")) {
                 url += "&severity=" + SEVERITIES[key];
             }
         }
-
-        var rp_text = el.find(".rp-preview").html();
-
-        for (var key in RP_TYPES) {
-            if (el.find(".rp-type-" + key).prop("checked")) {
-                url += "&rp_type=" + RP_TYPES[key];
-                if (key === "no-res-plan") {
-                    rp_text = "Warning";
-                }
-            }
-        }
-
-        if (el.find(".rp-followups").is(":visible") && el.find(".rp-followup-time-served").prop("checked")) {
-            rp_text = "Time served";
-        }
-
-        if (rp_text !== undefined) {
-            url += "&rp_text=" + rp_text;
-        }
-
-        var rp_escape_clause = el.find(".rp-escape-clause").val();
-        var rp_max_days = el.find(".rp-max-days").val();
-        var rp_start_immediately = el.find(".rp-start-immediately").prop("checked");
-
-        if (rp_escape_clause !== undefined) {
-            url += "&rp_escape_clause=" + encodeURIComponent(rp_escape_clause);
-        }
-        if (rp_max_days !== undefined) {
-            url += "&rp_max_days=" + encodeURIComponent(rp_max_days);    
-        }
-        if (rp_start_immediately !== undefined) {
-            url += "&rp_start_immediately=" + rp_start_immediately;
-        }
-
-        url += "&rp_extension=" + encodeURIComponent(el.find(".rp-extension").val() || "");  
 
         var plea = el.find(".plea-guilty");
         if (plea.prop("checked")) {
@@ -278,108 +204,13 @@ function Charge(charge_id, el) {
         }
 
         self.checkReferralLabelHighlight();
-
-        el.find(".rp-preview").html(self.generateResolutionPlanPreview());
     };
 
-    this.generateResolutionPlanPreview = function() {
-        var preview = "";
-        var resolution_plan = el.find(".resolution_plan").val();
-        var max_days = parseInt(el.find(".rp-max-days").val());
-        var start_immediately = el.find(".rp-start-immediately").prop("checked");
-        var escape_clause = el.find(".rp-escape-clause").val();
-        var extension = el.find(".rp-extension").val();
-
-        if (self.referenced_charge && extension) {
-            preview = upperCaseFirstChar(self.referenced_charge.resolution_plan);
-            var extensionDays = parseInt(extension);
-            if (self.referenced_charge.rp_type === "Restriction") {
-                preview += renderRestrictionText(extensionDays, true, self.referenced_charge.rp_escape_clause);
-            }
-            else if (self.referenced_charge.rp_type === "Task") {
-                preview += renderTaskText(extensionDays);
-            }
-        }
-        else {
-            if (!resolution_plan) return "";
-            preview = upperCaseFirstChar(resolution_plan);
-            if (el.find(".rp-type-restriction").prop("checked")) {
-                preview += renderRestrictionText(max_days, start_immediately, escape_clause);
-            }
-            else if (el.find(".rp-type-task").prop("checked")) {
-                preview += renderTaskText(max_days);
-            }
-        }
-        return preview;
-
-        function upperCaseFirstChar(str) {
-            return str.charAt(0).toUpperCase() + str.slice(1);
-        }
-
-        function renderRestrictionText(max_days, start_immediately, escape_clause) {
-            var result = "";
-            if (max_days > 0) {
-                if (start_immediately) {
-                    result += " for";
-                } else {
-                    result += " during";
-                }
-                result += " the next " + max_days;
-                if (max_days > 1) {
-                    result += " days";
-                } else {
-                    result += " day";
-                }
-                result += " of attendance.";
-                if (start_immediately) {
-                    result += " The restriction also applies to the rest of today.";
-                }
-            } else if (max_days === 0) {
-                if (start_immediately) {
-                    result += " for the rest of today.";
-                } else {
-                    return "";
-                }
-            } else {
-                return "";
-            }
-            if (escape_clause) {
-                // change first character to lowercase
-                escape_clause = escape_clause.charAt(0).toLowerCase() + escape_clause.slice(1);
-                result += " To end the restriction early, " + self.people_chooser.people[0].name + " may " + escape_clause + ".";
-            }
-            return result;
-        }
-
-        function renderTaskText(deadlineDays) {
-            var result = "";
-            if (deadlineDays > 0) {
-                result += " within " + deadlineDays;
-                if (deadlineDays > 1) {
-                    result += " days";
-                } else {
-                    result += " day";
-                }
-                result += " of attendance.";
-            } else if (deadlineDays === 0) {
-                result += " by the end of the day today.";
-            } else {
-                result += ".";
-            }
-            return result;
-        }
-    }
-
     this.old_rp = null;
-    this.old_escape_clause = null;
     this.checkText = function() {
         if (el.find(".resolution_plan").val() !== self.old_rp) {
             self.markAsModified();
             self.old_rp = el.find(".resolution_plan").val();
-        }
-        if (el.find(".rp-escape-clause").val() !== self.old_escape_clause) {
-            self.markAsModified();
-            self.old_escape_clause = el.find(".rp-escape-clause").val();
         }
     };
 
@@ -402,38 +233,13 @@ function Charge(charge_id, el) {
     el.find(".refer-to-sm").change(self.markAsModified);
     el.find(".minor-referral-destination").change(self.markAsModified);
     el.find(".minor-referral-destination").on(utils.TEXT_AREA_EVENTS, self.markAsModified);
-    el.find(".rp-max-days").on("input", self.markAsModified);
-    el.find(".rp-extension").on("input", self.markAsModified);
-    el.find(".rp-start-immediately").change(self.markAsModified);
-    el.find(".rp-escape-clause").change(self.markAsModified).on(utils.TEXT_AREA_EVENTS, self.checkText);
-
-    el.find(".rp-include-escape-clause").change(function() {
-        var group = el.find(".rp-escape-clause-group");
-        if (this.checked) {
-            group.show();
-        } else {
-            group.hide();
-            el.find(".rp-escape-clause").val("");
-            self.markAsModified();
-        }
-    });
 
     el.find(".rp-followup").change(function() {
         if ($(this).hasClass("rp-followup-new-rp")) {
             el.find(".rp-row").show();
-            el.find(".structured-options-for-extension").hide();
-            el.find(".rp-extension").val("");
         } else {
             el.find(".rp-row").hide();
             el.find(".resolution_plan").val("");
-            el.find(".rp-escape-clause").val("");
-            el.find(".rp-type").prop("checked", false);
-            el.find(".structured-options").hide();
-            if ($(this).hasClass("rp-followup-extension")) {
-                el.find(".structured-options-for-extension").show();
-            } else {
-                el.find(".rp-extension").val("");
-            }
         }
         self.markAsModified();
     });
@@ -463,14 +269,6 @@ function Charge(charge_id, el) {
         el.find(".severity-" + key).change(self.markAsModified);
     }
     el.find(".severity[type=radio]").prop("name", "severity-" + charge_id);
-
-    el.find(".rp-type")
-        .prop("name", "rp-type-" + charge_id)
-        .change(self.markAsModified)
-        .click(function() {
-            $('.structured-options').hide();
-            $('.structured-options-for-' + String($(this).val()).toLowerCase()).show();
-        });
 
     el.find(".rp-followup")
         .prop("name", "rp-followup-" + charge_id)
@@ -540,9 +338,6 @@ function Case (id, el) {
                         return {
                             id: ch.charge_id,
                             resolution_plan: ch.resolution_plan,
-                            rp_escape_clause: ch.rp_escape_clause,
-                            rp_text: ch.rp_text,
-                            rp_type: ch.rp_type,
                             has_default_rule: ch.has_default_rule
                         };
                     }
@@ -667,10 +462,7 @@ function Case (id, el) {
             $(this).hide().parent().find('.case-charge-reference-already-generated').show();
             var referenced_charge = {
                 id: $(this).data('id'),
-                rp_text: $(this).data('rp-text'),
-                resolution_plan: $(this).data('resolution-plan'),
-                rp_escape_clause: $(this).data('rp-escape-clause'),
-                rp_type: $(this).data('rp-type')
+                resolution_plan: $(this).data('resolution-plan')
             };
             var url = "/generateChargeFromReference?case_id=" + id + "&referenced_charge_id=" + $(this).data('id');
             $.post(url, function(response) {

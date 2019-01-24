@@ -228,7 +228,7 @@ public class Application extends Controller {
                 writer.write("");
             }
             writer.write(c.plea);
-            writer.write(c.getRpText());
+            writer.write(c.resolution_plan);
             writer.write("" + c.rp_complete);
             if (OrgConfig.get().show_severity) {
                 writer.write(c.severity);
@@ -353,7 +353,7 @@ public class Application extends Controller {
                             : Application.formatDayOfWeek(charge.the_case.meeting.date))
                         + ")");
                     writer.write(charge.rule.title);
-                    writer.write(charge.getRpText());
+                    writer.write(charge.resolution_plan);
                     writer.endRecord();
                 }
             }
@@ -645,10 +645,9 @@ public class Application extends Controller {
         Collections.reverse(r.charges);
 
         for (Charge c : r.charges) {
-            String rp_text = c.getRpText();
-            if (!rp_text.toLowerCase().equals("warning") &&
-                !rp_text.equals("")) {
-                rps.add(rp_text);
+            if (!c.resolution_plan.toLowerCase().equals("warning") &&
+                !c.resolution_plan.equals("")) {
+                rps.add(c.resolution_plan);
             }
             if (rps.size() > 9) {
                 break;
