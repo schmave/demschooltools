@@ -290,16 +290,20 @@ public class Case extends Model implements Comparable<Case> {
                     result += " and " + group.get(group.size() - 1).person.getDisplayName() + " were "; 
                 }
                 result += "charged with " + group.get(0).getRuleTitle();
-                String resolution_plan = group.get(0).resolution_plan;
+                String resolution_plan = getResolutionPlanForCompositeFindings(group.get(0));
                 if (resolution_plan.isEmpty()) {
                     result += ".";
                 } else {
-                    if (group.size() == 1) {
-                        result += " and was ";
-                    } else {
-                        result += " and were each ";
+                    if (group.get(0).sm_decision != null && !group.get(0).sm_decision.isEmpty()) {
+                        result += " and School Meeting decided on";
                     }
-                    result += "assigned the " + OrgConfig.get().str_res_plan + " \"" + resolution_plan + "\"";
+                    else if (group.size() == 1) {
+                        result += " and was assigned";
+                    }
+                    else {
+                        result += " and were each assigned";
+                    }
+                    result += " the " + OrgConfig.get().str_res_plan + " \"" + resolution_plan + "\"";
                 }
             }  
         }
@@ -325,6 +329,13 @@ public class Case extends Model implements Comparable<Case> {
 
         return charges.stream()
             .filter(ch -> relevant_charges == null || relevant_charges.contains(ch))
-            .collect(Collectors.groupingBy(ch -> ch.getRuleTitle() + ch.resolution_plan));
+            .collect(Collectors.groupingBy(ch -> ch.getRuleTitle() + getResolutionPlanForCompositeFindings(ch)));
+    }
+
+    private static String getResolutionPlanForCompositeFindings(Charge charge) {
+        if (charge.sm_decision != null && !charge.sm_decision.isEmpty()) {
+            return charge.sm_decision;
+        }
+        return charge.resolution_plan;
     }
 }

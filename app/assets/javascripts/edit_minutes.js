@@ -4,6 +4,8 @@ var utils = require('./utils');
 var chooser = require('./chooser');
 var people_chooser = require('./people_chooser');
 
+const time_served_string = "Time served";
+
 const SAVE_TIMEOUT = 2000;
 
 function showSomethingInSidebar(url) {
@@ -97,9 +99,14 @@ function Charge(charge_id, el) {
             el.find(".original-res-plan").show();
             el.find(".original-res-plan-text").html(referenced_charge.resolution_plan);
            
-            if (json.resolution_plan) {
+            if (json.resolution_plan === time_served_string) {
+                el.find(".rp-followup-time-served").prop("checked", true);
+                el.find(".rp-row").hide();
+            }
+            else if (json.resolution_plan) {
                 el.find(".rp-followup-new-rp").prop("checked", true);
-            } else {
+            }
+            else {
                 el.find(".rp-row").hide();
             }
         }
@@ -119,7 +126,7 @@ function Charge(charge_id, el) {
 
         var resolution_plan = el.find(".resolution_plan").val();
         if (el.find(".rp-followups").is(":visible") && el.find(".rp-followup-time-served").prop("checked")) {
-            resolution_plan = "Time served";
+            resolution_plan = time_served_string;
         }
         url += "&resolution_plan=" + encodeURIComponent(resolution_plan);
 

@@ -33,6 +33,11 @@ public class CaseReference {
 				cr.resolution_plan = charge.resolution_plan;
 				cr.is_referenced = referencing_case.referenced_charges.contains(charge);
 
+				if (charge.sm_decision != null && !charge.sm_decision.isEmpty()) {
+					cr.is_sm_decision = true;
+					cr.resolution_plan = charge.sm_decision;
+				}
+
 				for (Charge new_charge : referencing_case.charges) {
 					if (new_charge.referenced_charge == charge) {
 						cr.has_generated = true;
