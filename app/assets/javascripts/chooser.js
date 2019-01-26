@@ -26,13 +26,15 @@ var Chooser = function(el, allowMultiple, source, getLabel, onClick, onChange, o
     });
 
     this.search_box.bind( "autocompleteselect", function(event, ui) {
-        self.addResult(ui.item.id, ui.item.label);
+        var success = self.addResult(ui.item.id, ui.item.label);
 
-        if (onAdd) {
-            onAdd(ui.item.id);
-        }
-        if (onChange) { 
-            onChange();
+        if (success) {
+            if (onAdd) {
+                onAdd(ui.item.id);
+            }
+            if (onChange) { 
+                onChange();
+            }
         }
 
         self.search_box.val('');
@@ -42,8 +44,8 @@ var Chooser = function(el, allowMultiple, source, getLabel, onClick, onChange, o
     this.addResult = function(id, title) {
         // Don't add results that have already been added.
         for (var i in self.results) {
-            if (id == self.results[i].id) {
-                return;
+            if (id == self.results[i]) {
+                return false;
             }
         }
 
@@ -64,6 +66,8 @@ var Chooser = function(el, allowMultiple, source, getLabel, onClick, onChange, o
         }
 
         result_el.find("img").click(function() { self.removeResult(result_el); });
+
+        return true;
     };
 
     this.removeResult = function(result_el) {

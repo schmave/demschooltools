@@ -115,13 +115,16 @@ $(function () {
             <div class="case-charge-reference {{#if is_referenced}}referenced{{/if}}">
                 <input type="checkbox" value="{{is_referenced}}" data-id="{{charge_id}}" {{#if is_referenced}}checked{{/if}}>
                 {{person}} was charged with {{rule}}
-                {{#if is_sm_decision}}and School Meeting decided on{{/if}}
-                {{#else}}and was assigned{{/else}}
+                {{#if is_sm_decision}}and School Meeting decided on{{else}}and was assigned{{/if}}
                 the @OrgConfig.get().str_res_plan "{{resolution_plan}}"
-                <span class="case-charge-reference-generate" data-id="{{charge_id}}" data-resolution-plan="{{resolution_plan}}"
-                {{#if has_generated}}hidden{{/if}}>Generate charge</span>
-                <span class="case-charge-reference-already-generated"
-                {{#unless has_generated}}hidden{{/unless}}>Charge generated</span>
+                {{#if previously_referenced_in_case}}
+                    (Previously referenced in case {{previously_referenced_in_case}})
+                {{else}}
+                    <span class="case-charge-reference-generate" data-id="{{charge_id}}" data-resolution-plan="{{resolution_plan}}"
+                    {{#if has_generated}}hidden{{/if}}>Generate charge</span>
+                    <span class="case-charge-reference-already-generated"
+                    {{#unless has_generated}}hidden{{/unless}}>Charge generated</span>
+                {{/if}}
             </div>
         {{/with}}{{/each}}
     </div>

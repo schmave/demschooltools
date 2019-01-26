@@ -242,7 +242,7 @@ public class Case extends Model implements Comparable<Case> {
     // on picking charge references, so we don't know which charges will be needed. As a result, we will include
     // information on all charges from the referenced cases.
     public String generateCompositeFindingsFromCaseReferences() {
-        return generateCompositeFindings(null);
+        return generateCompositeFindings(null, null);
     }
 
     // We use this method everywhere besides the edit minutes page. At this point the minutes have been finalized and the
@@ -252,12 +252,22 @@ public class Case extends Model implements Comparable<Case> {
         for (Charge charge : charges) {
             charge.buildChargeReferenceChain(relevant_charges);
         }
-        return generateCompositeFindings(relevant_charges);
+        return generateCompositeFindings(relevant_charges, null);
     }
 
-    private String generateCompositeFindings(List<Charge> relevant_charges) {
+    private String generateCompositeFindings(List<Charge> relevant_charges, List<Case> used_cases) {
         String result = "";
+
+        if (used_cases == null) {
+            used_cases = new ArrayList<Case>();
+        }
+        if (used_cases.contains(this)) {
+            return "[Error: circular reference (case " + this.case_number + ")]";
+        }
+        used_cases.add(this);
+
         Collections.sort(referenced_cases, (a, b) -> a.case_number.compareTo(b.case_number));
+
         for (Case c : referenced_cases) {
             if (c.referenced_cases.size() == 0) {
                 if (result.isEmpty()) {
@@ -270,7 +280,7 @@ public class Case extends Model implements Comparable<Case> {
             if (!result.isEmpty()) {
                 result += " ";
             }
-            result += c.generateCompositeFindings(relevant_charges);
+            result += c.generateCompositeFindings(relevant_charges, used_cases);
             if (!result.endsWith(".")) {
                 result += ".";
             }

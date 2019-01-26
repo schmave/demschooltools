@@ -11,4 +11,5 @@ public class ChargeReference {
 	public boolean has_generated;
 	public Integer generated_charge_id;
 	public boolean has_default_rule;
+	public String previously_referenced_in_case;
 }

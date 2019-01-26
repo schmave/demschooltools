@@ -46,6 +46,10 @@ public class CaseReference {
 					}
 				}
 
+				if (!cr.has_generated && charge.referencing_charges.size() > 0) {
+					cr.previously_referenced_in_case = charge.referencing_charges.get(0).the_case.case_number;
+				}
+
 				result.charges.add(cr);
 			}
 
