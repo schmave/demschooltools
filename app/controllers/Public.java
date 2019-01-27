@@ -342,7 +342,6 @@ public class Public extends Controller {
 
     public Result oAuthDenied(String provider)
     {
-        session().remove("timeout");
         return redirect(routes.Public.index());
     }
 
@@ -355,7 +354,6 @@ public class Public extends Controller {
     }
 
     public Result authenticate(String provider) {
-        session("timeout", "" + System.currentTimeMillis());
         return mAuth.authenticate(provider);
     }
 

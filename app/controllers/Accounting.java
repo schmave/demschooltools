@@ -41,6 +41,12 @@ public class Accounting extends Controller {
         }
     }
 
+    @Secured.Auth(UserRole.ROLE_ACCOUNTING)
+    public Result deleteTransaction(Integer id) {
+        Transaction.delete(id);
+        return redirect(routes.Accounting.balances());
+    }
+
     public Result balances() {
         applyMonthlyCredits();
         List<Account> personalAccounts = Account.allPersonalChecking();
@@ -57,9 +63,21 @@ public class Accounting extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result allTransactions() {
+    public Result transactionsReport() {
         applyMonthlyCredits();
-        return ok(views.html.all_transactions.render(TransactionList.all()));
+        return ok(views.html.transactions_report.render(TransactionList.blank()));
+    }
+
+    @Secured.Auth(UserRole.ROLE_ACCOUNTING)
+    public Result runTransactionsReport() {
+        Form<TransactionList> form = Form.form(TransactionList.class);
+        Form<TransactionList> filledForm = form.bindFromRequest();
+        if (filledForm.hasErrors()) {
+            System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
+            return badRequest(views.html.transactions_report.render(TransactionList.blank()));
+        }
+        TransactionList report = TransactionList.createFromForm(filledForm);
+        return ok(views.html.transactions_report.render(report));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
@@ -165,6 +183,10 @@ public class Accounting extends Controller {
         c.set(Calendar.SECOND, 0);
         c.set(Calendar.MILLISECOND, 0);
         Date monthStartDate = c.getTime();
+        int month = c.get(Calendar.MONTH) + 1;
+
+        // no credits in the months of July and August
+        if (month == 7 || month == 8) return;
 
         List<Account> accounts = Account.allWithMonthlyCredits().stream()
             .filter(a -> a.date_last_monthly_credit == null || a.date_last_monthly_credit.before(monthStartDate))

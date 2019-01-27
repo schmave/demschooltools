@@ -24,3 +24,5 @@ makarios_learning_community/*
 
 # Sublime Text files
 *.sublime-workspace
+
+conf/generated.keystore

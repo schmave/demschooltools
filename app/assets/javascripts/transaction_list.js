@@ -1,15 +1,6 @@
 export function init() {
     var login_message_shown = false;
 
-    $('#hide-archived').click(function() {
-        var archivedRows = $('.js-archived');
-        if ($(this).is(':checked')) {
-            archivedRows.hide(400);
-        } else {
-            archivedRows.show(400);
-        }
-    });
-
     $('.js-archive').click(function() {
         var checkbox = $(this);
         var id = Number(checkbox.data('id'));

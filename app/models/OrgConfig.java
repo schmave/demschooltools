@@ -233,6 +233,9 @@ class TheOpenSchool extends OrgConfig {
         str_jc_name = "Civics Board";
         str_jc_name_short = "CB";
 
+        show_findings_in_rp_list = false;
+        use_minor_referrals = false;
+
         OrgConfig.register(name, this);
     }
 
@@ -258,7 +261,7 @@ class Houston extends OrgConfig {
         str_res_plans_cap = "Sentences";
         str_findings = "Findings";
 
-        track_writer = false;
+        track_writer = true;
         use_year_in_case_number = true;
 
         OrgConfig.register(name, this);

@@ -20,12 +20,13 @@ window.enableTagBox = function(input_box, destination_div, person_id) {
             source: "/jsonTags/" + person_id,
     });
 
-    $(input_box).bind( "autocompleteselect", function(event, ui) {
+    $(input_box).bind("autocompleteselect", function(event, ui) {
         var args = "";
         if (ui.item.id > 0) {
             args = "?tagId=" + ui.item.id;
         } else {
-            args = "?title=" + $(input_box).val();
+            var title = $(input_box).val().replace('Create new tag: ', '');
+            args = "?title=" + title;
         }
         $.post("/addTag/" + person_id + args, "", function(data, textStatus, jqXHR) {
             $(destination_div).append(jqXHR.responseText);

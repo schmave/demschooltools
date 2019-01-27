@@ -564,10 +564,15 @@ public class CRM extends Controller {
             if (p.family == null || !p.address.isEmpty()) {
                 address_people.add(p);
             } else {
+                boolean found_address = false;
                 for (Person p2 : p.family.family_members) {
                     if (!p2.address.isEmpty()) {
                         address_people.add(p2);
+                        found_address = true;
                     }
+                }
+                if (!found_address) {
+                    address_people.add(p);
                 }
             }
             for (Person address_person : address_people) {

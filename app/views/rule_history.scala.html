@@ -7,7 +7,7 @@
 
 <div class="should-limit"><b>Rule text:</b> @Html(Application.markdown(r.content))</div>
 
-<h4>Recent interesting @OrgConfig.get().str_res_plans</h4>
+<h4>Recent @OrgConfig.get().str_res_plans</h4>
 
 @if( recent_rps.size() == 0 ) {
 <p>None.

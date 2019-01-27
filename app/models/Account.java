@@ -127,7 +127,7 @@ public class Account extends Model {
             t.amount = BigDecimal.ZERO.subtract(t.amount);
             result.add(t);
         }
-        Collections.sort(result, (a, b) -> b.id.compareTo(a.id));
+        TransactionList.sortTransactions(result);
         return result;
     }
 
