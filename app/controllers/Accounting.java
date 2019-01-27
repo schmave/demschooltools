@@ -41,6 +41,12 @@ public class Accounting extends Controller {
         }
     }
 
+    @Secured.Auth(UserRole.ROLE_ACCOUNTING)
+    public Result deleteTransaction(Integer id) {
+        Transaction.delete(id);
+        return redirect(routes.Accounting.balances());
+    }
+
     public Result balances() {
         applyMonthlyCredits();
         List<Account> personalAccounts = Account.allPersonalChecking();
@@ -57,9 +63,21 @@ public class Accounting extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result allTransactions() {
+    public Result transactionsReport() {
         applyMonthlyCredits();
-        return ok(views.html.all_transactions.render(TransactionList.all()));
+        return ok(views.html.transactions_report.render(TransactionList.blank()));
+    }
+
+    @Secured.Auth(UserRole.ROLE_ACCOUNTING)
+    public Result runTransactionsReport() {
+        Form<TransactionList> form = Form.form(TransactionList.class);
+        Form<TransactionList> filledForm = form.bindFromRequest();
+        if (filledForm.hasErrors()) {
+            System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
+            return badRequest(views.html.transactions_report.render(TransactionList.blank()));
+        }
+        TransactionList report = TransactionList.createFromForm(filledForm);
+        return ok(views.html.transactions_report.render(report));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
