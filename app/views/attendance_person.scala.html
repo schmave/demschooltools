@@ -42,6 +42,7 @@
     </th>
     <th width=100>Total hours</th>
     <th width=100>Avg. hours per day</th>
+    <th width=100>Attendance Rate</th>
 </thead>
 
 @for( code <- codes ) {
@@ -58,7 +59,8 @@
 }
 <td align="center">@stats.days_present</td>
 <td align="center">@Attendance.format(stats.total_hours)</td>
-<td align="center">@Attendance.format(stats.total_hours / stats.days_present)</td>
+<td align="center">@Attendance.format(stats.averageHoursPerDay())</td>
+<td align="center">@Attendance.formatAsPercent(stats.attendanceRate())</td>
 </table>
 
 <h3>Details</h3>

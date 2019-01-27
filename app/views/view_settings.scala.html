@@ -2,6 +2,12 @@
 
 @main("Settings", "settings", "settings") {
 
+<script>
+$(function () {
+    initSettingsPage();
+});
+</script>
+
 <h2>Notifications about people and tags</h2>
 
 <h4>Existing notification rules</h4>
@@ -66,13 +72,40 @@ It is totally fine to have both enabled at once. Data in Custodia can be importe
 the other way around.</p>
 
 @helper.form(routes.Settings.editSettings()) {
-<p><label><input type="checkbox" name="show_attendance"
-                 @if(org.show_attendance){ checked }>
-    Enable the "Attendance" tab</label>
-    <br/>
-    <label><input type="checkbox" name="show_custodia"
-                  @if(org.show_custodia){ checked }>
-    Enable the "Custodia" tab</label></p>
+<p>
+    <label>
+        <input type="checkbox" name="show_attendance" id="show-attendance" @if(org.show_attendance){ checked }>
+        Enable the "Attendance" tab
+    </label>
+</p>
+<div class="depends-on-attendance">
+    <label>
+        <input type="checkbox" name="attendance_enable_partial_days" id="attendance-enable-partial-days"
+            @if(org.attendance_enable_partial_days){ checked }>
+        Make partial days worth less than full days
+    </label>
+</div>
+<table class="depends-on-attendance-partial-days"><tbody>
+    <tr>
+        <td>Latest arrival time allowed for a full day (e.g. 11:00)</td>
+        <td><input type="text" size="7" name="attendance_day_min_start_time" value="@org.formatAttendanceMinStartTime()"></td>
+    </tr>
+    <tr>
+        <td>Minimum hours for a full day (e.g. 5)</td>
+        <td><input type="number" min="0" max="9" name="attendance_day_min_hours" value="@org.attendance_day_min_hours"></td>
+    </tr>
+    <tr>
+        <td>Value of a partial day (e.g. 0.5)</td>
+        <td><input type="number" min="0" max="1" step="0.1" name="attendance_partial_day_value" value="@org.attendance_partial_day_value"></td>
+    </tr>
+</tbody></table>
+<h4>Custodia</h4>
+<p>
+    <label>
+        <input type="checkbox" name="show_custodia" @if(org.show_custodia){ checked }>
+        Enable the "Custodia" tab
+    </label>
+</p>
 <p>The Custodia <a target="_blank" href="@play_config.getString("custodia_url")">electronic sign-in sheet</a> username is
     "@OrgConfig.get().org.short_name" (case-sensitive). To reset the password, enter a new one here:
     <br>

@@ -1,6 +1,9 @@
 package models;
 
 import java.util.*;
+import java.math.*;
+import java.text.*;
+import java.sql.Time;
 
 import javax.persistence.*;
 
@@ -43,6 +46,11 @@ public class Organization extends Model {
     public Boolean show_custodia;
     public Boolean show_attendance;
     public Boolean show_accounting;
+
+    public Boolean attendance_enable_partial_days;
+    public Time attendance_day_min_start_time;
+    public Integer attendance_day_min_hours;
+    public BigDecimal attendance_partial_day_value;
 
     @OneToMany(mappedBy="organization")
     @JsonIgnore
@@ -102,6 +110,14 @@ public class Organization extends Model {
         this.save();
     }
 
+    public String formatAttendanceMinStartTime() {
+        if (attendance_day_min_start_time == null) {
+            return "";
+        }
+        DateFormat format = new SimpleDateFormat("HH:mm a");
+        return format.format(attendance_day_min_start_time.getTime());
+    }
+
     public void updateFromForm(Map<String, String[]> values) {
         if (values.containsKey("jc_reset_day")) {
             this.jc_reset_day = Integer.parseInt(values.get("jc_reset_day")[0]);
@@ -124,11 +140,27 @@ public class Organization extends Model {
             } else {
                 this.show_attendance = false;
             }
+            if (values.containsKey("attendance_enable_partial_days")) {
+                this.attendance_enable_partial_days = Utils.getBooleanFromFormValue(values.get("attendance_enable_partial_days")[0]);
+            } else {
+                this.attendance_enable_partial_days = false;
+            }
             if (values.containsKey("show_custodia")) {
                 this.show_custodia = Utils.getBooleanFromFormValue(values.get("show_custodia")[0]);
             } else {
                 this.show_custodia = false;
             }
+            if (values.get("attendance_day_min_hours")[0].isEmpty()) {
+                this.attendance_day_min_hours = null;
+            } else {
+                this.attendance_day_min_hours = Integer.parseInt(values.get("attendance_day_min_hours")[0]);
+            }
+            if (values.get("attendance_partial_day_value")[0].isEmpty()) {
+                this.attendance_partial_day_value = null;
+            } else {
+                this.attendance_partial_day_value = new BigDecimal(values.get("attendance_partial_day_value")[0]);
+            }
+            this.attendance_day_min_start_time = AttendanceDay.parseTime(values.get("attendance_day_min_start_time")[0]);
         }
         if (values.containsKey("accounting_settings")) {
             if (values.containsKey("show_accounting")) {

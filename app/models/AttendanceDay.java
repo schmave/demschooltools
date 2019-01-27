@@ -47,12 +47,12 @@ public class AttendanceDay extends Model {
         return result;
     }
 
-    public static Time parseTime(String time_string) throws Exception {
+    public static Time parseTime(String time_string) {
         if (time_string == null || time_string.equals("")) {
             return null;
         }
 
-		String[] formats = {"h:mm a", "h:mma"};
+		String[] formats = {"h:mm a", "h:mma", "h:mm"};
 
 		for (String format : formats) {
 			try {
