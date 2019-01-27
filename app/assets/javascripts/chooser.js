@@ -10,7 +10,7 @@ var result_template_str =
 
 var result_template = Handlebars.compile(result_template_str);
 
-var Chooser = function(el, allowMultiple, source, getLabel, onClick, onChange, onAdd, onRemove) {
+var Chooser = function(el, allowMultiple, minLength, source, getLabel, onClick, onChange, onAdd, onRemove) {
 
     this.el = el;
     var self = this;
@@ -21,7 +21,7 @@ var Chooser = function(el, allowMultiple, source, getLabel, onClick, onChange, o
     this.search_box.autocomplete({
         autoFocus: true,
         delay: 0,
-        minLength: 2,
+        minLength: minLength,
         source: source,
     });
 

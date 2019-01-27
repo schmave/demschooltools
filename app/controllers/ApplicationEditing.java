@@ -64,6 +64,7 @@ public class ApplicationEditing extends Controller {
         if (!authToEdit(meeting.date)) {
             return tooOldToEdit();
         }
+        meeting.prepareForEditing();
 
         response().setHeader("Cache-Control", "max-age=0, no-cache, no-store");
         response().setHeader("Pragma", "no-cache");

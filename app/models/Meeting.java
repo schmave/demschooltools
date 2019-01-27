@@ -69,4 +69,14 @@ public class Meeting extends Model {
         result.organization = Organization.getByHost();
         return result;
     }
+
+    public void prepareForEditing() {
+        if (OrgConfig.get().org.enable_case_references) {
+            for (Case c : cases) {
+                for (Charge charge : c.charges) {
+                    charge.is_referenced = charge.referencing_charges.size() > 0 || charge.referencing_cases.size() > 0;
+                }
+            }
+        }
+    }
 }

@@ -110,6 +110,11 @@ function Charge(charge_id, el) {
                 el.find(".rp-row").hide();
             }
         }
+
+        if (json.is_referenced) {
+            el.find(".remove-charge").addClass("disabled");
+            el.find(".remove-charge-disabled-text").show();
+        }
     };
 
     this.saveIfNeeded = function() {
@@ -263,6 +268,7 @@ function Charge(charge_id, el) {
     self.rule_chooser = new chooser.Chooser(
         el.find(".rule_chooser"),
         false,
+        2,
         app.rules,
         getLabel,
         showRuleHistoryInSidebar,
@@ -487,7 +493,7 @@ function Case (id, el) {
         return json.case_number;
     }
 
-    self.case_chooser = new chooser.Chooser(el.find(".case_chooser"), true, app.cases, getLabel, null, null,
+    self.case_chooser = new chooser.Chooser(el.find(".case_chooser"), true, 5, app.cases, getLabel, null, null,
         function(id) {
             var url = "/addReferencedCase?case_id=" + self.id + "&referenced_case_id=" + id;
             $.post(url, setCaseReferences);

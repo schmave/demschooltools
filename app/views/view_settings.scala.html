@@ -57,6 +57,7 @@ $(function () {
     initChooser(
         $('#breaking-res-plan-entry-chooser'),
         false,
+        2,
         @Html(Application.jsonRules("")),
         function(json) { return json.title; },
         null,

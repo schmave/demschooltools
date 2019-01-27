@@ -117,8 +117,8 @@ window.initPeopleChooser = function(selector, onAdd, onRemove) {
         '/jsonPeople');
 };
 
-window.initChooser = function(el, allowMultiple, source, getLabel, onClick, onChange, onAdd, onRemove, initialData) {
-    var myChooser = new chooser.Chooser(el, allowMultiple, source, getLabel, onClick, onChange, onAdd, onRemove);
+window.initChooser = function(el, allowMultiple, minLength, source, getLabel, onClick, onChange, onAdd, onRemove, initialData) {
+    var myChooser = new chooser.Chooser(el, allowMultiple, minLength, source, getLabel, onClick, onChange, onAdd, onRemove);
     myChooser.loadData(initialData);
     return myChooser;
 };

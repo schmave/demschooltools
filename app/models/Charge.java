@@ -40,6 +40,13 @@ public class Charge extends Model implements Comparable<Charge> {
     @JsonIgnore
     public List<Charge> referencing_charges;
 
+    @ManyToMany(mappedBy="referenced_charges")
+    @JsonIgnore
+    public List<Case> referencing_cases;
+
+    @Transient
+    public boolean is_referenced;
+
     static final String EMPTY_PLEA = "<no plea>";
     public String plea = EMPTY_PLEA;
     public String resolution_plan = "";

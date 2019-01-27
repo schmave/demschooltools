@@ -242,12 +242,18 @@ public class Case extends Model implements Comparable<Case> {
     // on picking charge references, so we don't know which charges will be needed. As a result, we will include
     // information on all charges from the referenced cases.
     public String generateCompositeFindingsFromCaseReferences() {
+        if (!OrgConfig.get().org.enable_case_references) {
+            return findings;
+        }
         return generateCompositeFindings(null, null);
     }
 
     // We use this method everywhere besides the edit minutes page. At this point the minutes have been finalized and the
     // charge references have been selected. We don't need to include information about charges that weren't referenced.
     public String generateCompositeFindingsFromChargeReferences() {
+        if (!OrgConfig.get().org.enable_case_references) {
+            return findings;
+        }
         ArrayList<Charge> relevant_charges = new ArrayList<Charge>();
         for (Charge charge : charges) {
             charge.buildChargeReferenceChain(relevant_charges);
@@ -256,20 +262,22 @@ public class Case extends Model implements Comparable<Case> {
     }
 
     private String generateCompositeFindings(List<Charge> relevant_charges, List<Case> used_cases) {
-        String result = "";
 
         if (used_cases == null) {
             used_cases = new ArrayList<Case>();
         }
-        if (used_cases.contains(this)) {
-            return "[Error: circular reference (case " + this.case_number + ")]";
-        }
         used_cases.add(this);
+        String result = "";
 
         Collections.sort(referenced_cases, (a, b) -> a.case_number.compareTo(b.case_number));
 
         for (Case c : referenced_cases) {
-            if (c.referenced_cases.size() == 0) {
+            if (used_cases.contains(c)) {
+                continue;
+            }
+            ArrayList<Case> case_referenced_cases = new ArrayList<Case>(c.referenced_cases);
+            case_referenced_cases.removeAll(used_cases);
+            if (case_referenced_cases.size() == 0) {
                 if (result.isEmpty()) {
                     result += "Per case ";
                 } else {
@@ -313,7 +321,11 @@ public class Case extends Model implements Comparable<Case> {
                     else {
                         result += " and were each assigned";
                     }
-                    result += " the " + OrgConfig.get().str_res_plan + " \"" + resolution_plan + "\"";
+                    result += " the " + OrgConfig.get().str_res_plan + " \"" + resolution_plan;
+                    if (!result.endsWith(".")) {
+                        result += ".";
+                    }
+                    result += "\"";
                 }
             }  
         }
