@@ -1,35 +1,43 @@
 
 export function init() {
 
-	$('#show-attendance').click(function() {
-		var dependsOnAttendance = $('.depends-on-attendance');
-		var dependsOnPartialDays = $('.depends-on-attendance-partial-days');
-		var inputsDependentOnAttendance = dependsOnAttendance.find('input');
-		var inputsDependentOnPartialDays = dependsOnPartialDays.find('input');
-		if ($(this).prop('checked')) {
-			dependsOnAttendance.removeClass('disabled');
-			inputsDependentOnAttendance.prop('disabled', false);
-			if ($('#attendance-enable-partial-days').prop('checked')) {
-				dependsOnPartialDays.removeClass('disabled');
-				inputsDependentOnPartialDays.prop('disabled', false);
-			}
-		} else {
-			dependsOnAttendance.addClass('disabled');
-			dependsOnPartialDays.addClass('disabled');
-			inputsDependentOnAttendance.prop('disabled', true);
-			inputsDependentOnPartialDays.prop('disabled', true);
-		}
+	$('.has-dependents').each(function(i, el) {
+		var checkboxWithDependents = $(el);
+		manageDependents(checkboxWithDependents);
+		checkboxWithDependents.click(function() {
+			manageDependents(checkboxWithDependents);
+		});
 	});
 
-	$('#attendance-enable-partial-days').click(function() {
-		var dependentElement = $('.depends-on-attendance-partial-days');
-		var inputs = dependentElement.find('input');
-		if ($(this).prop('checked')) {
-			dependentElement.removeClass('disabled');
-			inputs.prop('disabled', false);
+	function manageDependents(checkboxWithDependents) {
+		if (checkboxWithDependents.prop('checked')) {
+			cascadingEnable(checkboxWithDependents);
 		} else {
-			dependentElement.addClass('disabled');
-			inputs.prop('disabled', true);
+			cascadingDisable(checkboxWithDependents);
 		}
-	});
+	}
+
+	function cascadingEnable(checkboxWithDependents) {
+		var dependentElements = findDependentElements(checkboxWithDependents);
+		dependentElements.removeClass('dependents-disabled');
+		dependentElements.find('input').prop('disabled', false);
+		dependentElements.find('.has-dependents').each(function(i, el) {
+			if ($(el).prop('checked')) {
+				cascadingEnable($(el));
+			}
+		});
+	}
+
+	function cascadingDisable(checkboxWithDependents) {
+		var dependentElements = findDependentElements(checkboxWithDependents);
+		dependentElements.addClass('dependents-disabled');
+		dependentElements.find('input').prop('disabled', true);
+		dependentElements.find('.has-dependents').each(function(i, el) {
+			cascadingDisable($(el));
+		});
+	}
+
+	function findDependentElements(checkboxWithDependents) {
+		return $('.' + checkboxWithDependents.data('dependent-class'));
+	}
 }

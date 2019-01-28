@@ -60,8 +60,7 @@ public class Attendance extends Controller {
             } else if (day.code != null || day.start_time == null || day.end_time == null) {
                 stats.incrementCodeCount(codes_map.get(day.code));
             } else {
-                stats.total_hours += day.getHours();
-                stats.days_present++;
+                stats.incrementAttendance(day);
             }
         }
 
@@ -292,8 +291,7 @@ public class Attendance extends Controller {
             if (day.code != null || day.start_time == null || day.end_time == null) {
                 stats.incrementCodeCount(codes_map.get(day.code));
             } else {
-                stats.total_hours += day.getHours();
-                stats.days_present++;
+                stats.incrementAttendance(day);
             }
         }
 

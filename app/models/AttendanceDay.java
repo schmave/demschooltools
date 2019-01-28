@@ -82,4 +82,22 @@ public class AttendanceDay extends Model {
     public double getHours() {
         return (end_time.getTime() - start_time.getTime()) / (1000.0 * 60 * 60);
     }
+
+    @JsonIgnore
+    public boolean isPartial() {
+        Organization org = OrgConfig.get().org;
+
+        if (org.attendance_enable_partial_days) {
+            Integer min_hours = org.attendance_day_min_hours;
+            Time latest_start_time = org.attendance_day_latest_start_time;
+
+            if (min_hours != null && getHours() < min_hours) {
+                return true;
+            }
+            if (latest_start_time != null && start_time.getTime() > latest_start_time.getTime()) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

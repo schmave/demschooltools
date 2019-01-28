@@ -74,29 +74,41 @@ the other way around.</p>
 @helper.form(routes.Settings.editSettings()) {
 <p>
     <label>
-        <input type="checkbox" name="show_attendance" id="show-attendance" @if(org.show_attendance){ checked }>
+        <input type="checkbox" name="show_attendance" id="show-attendance" @if(org.show_attendance){ checked }
+               class="has-dependents" data-dependent-class="depends-on-attendance">
         Enable the "Attendance" tab
     </label>
 </p>
 <div class="depends-on-attendance">
     <label>
         <input type="checkbox" name="attendance_enable_partial_days" id="attendance-enable-partial-days"
-            @if(org.attendance_enable_partial_days){ checked }>
+               class="has-dependents" data-dependent-class="depends-on-partial-days"
+               @if(org.attendance_enable_partial_days){ checked }>
         Make partial days worth less than full days
     </label>
 </div>
-<table class="depends-on-attendance-partial-days"><tbody>
+<table class="depends-on-partial-days"><tbody>
     <tr>
         <td>Latest arrival time allowed for a full day (e.g. 11:00)</td>
-        <td><input type="text" size="7" name="attendance_day_min_start_time" value="@org.formatAttendanceMinStartTime()"></td>
+        <td>
+            <input type="text" size="7" name="attendance_day_latest_start_time" value="@org.formatAttendanceLatestStartTime()"
+                   @if(!org.show_attendance || !org.attendance_enable_partial_days){ disabled }>
+        </td>
     </tr>
     <tr>
         <td>Minimum hours for a full day (e.g. 5)</td>
-        <td><input type="number" min="0" max="9" name="attendance_day_min_hours" value="@org.attendance_day_min_hours"></td>
+        <td>
+            <input type="number" min="0" max="9" name="attendance_day_min_hours" value="@org.attendance_day_min_hours"
+                   @if(!org.show_attendance || !org.attendance_enable_partial_days){ disabled }>
+        </td>
     </tr>
     <tr>
         <td>Value of a partial day (e.g. 0.5)</td>
-        <td><input type="number" min="0" max="1" step="0.1" name="attendance_partial_day_value" value="@org.attendance_partial_day_value"></td>
+        <td>
+            <input type="number" min="0" max="1" step="0.05" name="attendance_partial_day_value"
+                   value="@org.attendance_partial_day_value"
+                   @if(!org.show_attendance || !org.attendance_enable_partial_days){ disabled }>
+        </td>
     </tr>
 </tbody></table>
 <h4>Custodia</h4>

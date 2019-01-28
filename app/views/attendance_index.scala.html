@@ -70,7 +70,10 @@ $(function() {
 		</th>
 	}
 	<th width=100 class="attendance-code">Unknown/missing code</th>
-	<th width=100>Days Present</th>
+	<th width=100>@if( OrgConfig.get().org.attendance_enable_partial_days ) { Full Days } else { Days Present }</th>
+	@if( OrgConfig.get().org.attendance_enable_partial_days ) {
+		<th width=100>Partial Days</th>	
+	}
 	<th width=100>Total hours</th>
 	<th width=100>Avg. hours per day</th>
 	<th width=100>Attendance Rate</th>
@@ -104,6 +107,9 @@ $(function() {
 		<td align="center" class="empty">0</td>
 	}
 	<td align="center">@person_to_stats.get(p).days_present</td>
+	@if( OrgConfig.get().org.attendance_enable_partial_days ) {
+		<td align="center">@person_to_stats.get(p).partial_days_present</td>
+	}
 	<td align="center">@Attendance.format(person_to_stats.get(p).total_hours)</td>
 	<td align="center">@Attendance.format(person_to_stats.get(p).averageHoursPerDay())</td>
 	<td align="center">@Attendance.formatAsPercent(person_to_stats.get(p).attendanceRate())</td>
