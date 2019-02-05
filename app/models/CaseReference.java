@@ -28,7 +28,7 @@ public class CaseReference {
 				ChargeReference cr = new ChargeReference();
 				
 				cr.charge_id = charge.id;
-				cr.person = charge.person.display_name;
+				cr.person = charge.person.getDisplayName();
 				cr.rule = charge.getRuleTitle();
 				cr.resolution_plan = charge.resolution_plan;
 				cr.is_referenced = referencing_case.referenced_charges.contains(charge);

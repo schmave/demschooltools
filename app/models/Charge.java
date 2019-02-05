@@ -184,7 +184,11 @@ public class Charge extends Model implements Comparable<Charge> {
         if (sm_decision_date != null) {
             return Application.formatDayOfWeek(sm_decision_date) + "&mdash;SM";
         } else {
-            return Application.formatDayOfWeek(the_case.meeting.date);
+            if (the_case != null && the_case.meeting != null) {
+                return Application.formatDayOfWeek(the_case.meeting.date);
+            } else {
+                return null;
+            }
         }
     }
 

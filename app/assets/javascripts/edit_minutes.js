@@ -411,6 +411,9 @@ function Case (id, el) {
         self.writer_chooser.clear();
         self.case_chooser.clear();
 
+        var url = "/clearAllReferencedCases?case_id=" + self.id;
+        $.post(url, setCaseReferences);
+
         for (var i = 0; i < self.charges.length; i++) {
             self.charges[i].removeCharge();
         }

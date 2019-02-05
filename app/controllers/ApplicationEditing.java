@@ -188,6 +188,16 @@ public class ApplicationEditing extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
+    public Result clearAllReferencedCases(Integer case_id)
+    {
+        Case referencing_case = Case.findById(case_id);
+        for (Case referenced_case : new ArrayList<Case>(referencing_case.referenced_cases)) {
+            referencing_case.removeReferencedCase(referenced_case);
+        }
+        return ok(Utils.toJson(CaseReference.create(referencing_case)));
+    }
+
+    @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
     public Result getCaseReferencesJson(Integer case_id)
     {
         Case referencing_case = Case.findById(case_id);

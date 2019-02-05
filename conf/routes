@@ -52,6 +52,7 @@ POST /removePersonAtCase controllers.ApplicationEditing.removePersonAtCase(case_
 GET /getCaseReferencesJson controllers.ApplicationEditing.getCaseReferencesJson(case_id : Integer)
 POST /addReferencedCase controllers.ApplicationEditing.addReferencedCase(case_id : Integer, referenced_case_id : Integer)
 POST /removeReferencedCase controllers.ApplicationEditing.removeReferencedCase(case_id : Integer, referenced_case_id : Integer)
+POST /clearAllReferencedCases controllers.ApplicationEditing.clearAllReferencedCases(case_id : Integer)
 POST /addChargeReferenceToCase controllers.ApplicationEditing.addChargeReferenceToCase(case_id : Integer, charge_id : Integer)
 POST /removeChargeReferenceFromCase controllers.ApplicationEditing.removeChargeReferenceFromCase(case_id : Integer, charge_id : Integer)
 

@@ -896,16 +896,16 @@ public class Application extends Controller {
 
         List<Case> cases = Case.find.where()
             .eq("meeting.organization", Organization.getByHost())
+            .ge("meeting.date", Application.getStartOfYear())
+            .like("case_number", term + "%")
             .orderBy("case_number ASC").findList();
 
         List<Map<String, String>> result = new ArrayList<Map<String, String>>();
         for (Case c : cases) {
-            if (c.case_number.toLowerCase().contains(term)) {
-                HashMap<String, String> values = new HashMap<String, String>();
-                values.put("label", c.case_number);
-                values.put("id", "" + c.id);
-                result.add(values);
-            }
+            HashMap<String, String> values = new HashMap<String, String>();
+            values.put("label", c.case_number);
+            values.put("id", "" + c.id);
+            result.add(values);
         }
 
         return Json.stringify(Json.toJson(result));
