@@ -47,7 +47,9 @@
 	}
     <th width=100>Total hours</th>
     <th width=100>Avg. hours per day</th>
-    <th width=100>Attendance Rate</th>
+    @if( OrgConfig.get().org.attendance_show_percent ) {
+    	<th width=100>Attendance Rate</th>
+	}
 </thead>
 
 @for( code <- codes ) {
@@ -68,7 +70,9 @@
 }
 <td align="center">@Attendance.format(stats.total_hours)</td>
 <td align="center">@Attendance.format(stats.averageHoursPerDay())</td>
-<td align="center">@Attendance.formatAsPercent(stats.attendanceRate())</td>
+@if( OrgConfig.get().org.attendance_show_percent ) {
+	<td align="center">@Attendance.formatAsPercent(stats.attendanceRate())</td>
+}
 </table>
 
 <h3>Details</h3>

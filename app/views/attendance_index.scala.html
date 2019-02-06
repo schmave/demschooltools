@@ -76,7 +76,9 @@ $(function() {
 	}
 	<th width=100>Total hours</th>
 	<th width=100>Avg. hours per day</th>
-	<th width=100>Attendance Rate</th>
+	@if( OrgConfig.get().org.attendance_show_percent ) {
+		<th width=100>Attendance Rate</th>
+	}		
 	</thead>
 
 @for( p <- people ) {
@@ -112,7 +114,9 @@ $(function() {
 	}
 	<td align="center">@Attendance.format(person_to_stats.get(p).total_hours)</td>
 	<td align="center">@Attendance.format(person_to_stats.get(p).averageHoursPerDay())</td>
-	<td align="center">@Attendance.formatAsPercent(person_to_stats.get(p).attendanceRate())</td>
+	@if( OrgConfig.get().org.attendance_show_percent ) {
+		<td align="center">@Attendance.formatAsPercent(person_to_stats.get(p).attendanceRate())</td>
+	}
 }
 
 </table>

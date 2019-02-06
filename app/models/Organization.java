@@ -47,6 +47,7 @@ public class Organization extends Model {
     public Boolean show_attendance;
     public Boolean show_accounting;
 
+    public Boolean attendance_show_percent;
     public Boolean attendance_enable_partial_days;
     public Time attendance_day_latest_start_time;
     public Integer attendance_day_min_hours;
@@ -139,6 +140,11 @@ public class Organization extends Model {
                 this.show_attendance = Utils.getBooleanFromFormValue(values.get("show_attendance")[0]);
             } else {
                 this.show_attendance = false;
+            }
+            if (values.containsKey("attendance_show_percent")) {
+                this.attendance_show_percent = Utils.getBooleanFromFormValue(values.get("attendance_show_percent")[0]);
+            } else {
+                this.attendance_show_percent = false;
             }
             if (values.containsKey("attendance_enable_partial_days")) {
                 this.attendance_enable_partial_days = Utils.getBooleanFromFormValue(values.get("attendance_enable_partial_days")[0]);
