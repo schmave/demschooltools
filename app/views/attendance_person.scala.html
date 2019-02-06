@@ -41,7 +41,7 @@
         <input type="checkbox" checked data-code="__present"/></label>
     </th>
     @if( OrgConfig.get().org.attendance_enable_partial_days ) {
-	    <th width=100><label>Partial Days<br/>
+	    <th width=100 class="partial-days"><label>Partial Days<br/>
 	        <input type="checkbox" checked data-code="__partial"/></label>
 	    </th>
 	}
@@ -66,7 +66,7 @@
 }
 <td align="center">@stats.days_present</td>
 @if( OrgConfig.get().org.attendance_enable_partial_days ) {
-	<td align="center">@stats.partial_days_present</td>
+	<td align="center" class="partial-days">@stats.partial_days_present</td>
 }
 <td align="center">@Attendance.format(stats.total_hours)</td>
 <td align="center">@Attendance.format(stats.averageHoursPerDay())</td>
