@@ -1,6 +1,8 @@
 
 export function init() {
 
+	$('[data-toggle="tooltip"]').tooltip();
+
 	$('.has-dependents').each(function(i, el) {
 		var checkboxWithDependents = $(el);
 		manageDependents(checkboxWithDependents);
