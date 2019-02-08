@@ -326,6 +326,15 @@ public class Person extends Model implements Comparable<Person> {
         return p;
     }
 
+    @JsonIgnore
+    public String nonEmptyName() {
+        String result = this.first_name + " " + this.last_name;
+        if (result.trim().equals("")) {
+            return "<Person ID " + this.person_id + ">";
+        }
+        return result;
+    }
+
     public static void delete(Integer id) {
         Person person = find.ref(id);
         for (Account account : person.accounts) {

@@ -327,3 +327,30 @@ class Clearview extends OrgConfig {
         return INSTANCE;
     }
 }
+
+class Wicklow extends OrgConfig {
+    private static final Wicklow INSTANCE = new Wicklow();
+    public TimeZone time_zone = TimeZone.getTimeZone("Europe/Dublin");
+
+    public Wicklow() {
+        name = "Wicklow Sudbury School";
+        people_url = "https://wicklow.demschooltools.com";
+
+        str_manual_title = "Lawbook";
+        str_manual_title_short = "Lawbook";
+        str_res_plan_short = "Sentence";
+        str_res_plan = "sentence";
+        str_res_plan_cap = "Sentence";
+        str_res_plans = "sentences";
+        str_res_plans_cap = "Sentences";
+        str_findings = "Findings";
+
+        track_writer = false;
+
+        OrgConfig.register(name, this);
+    }
+
+    public static Wicklow getInstance() {
+        return INSTANCE;
+    }
+}

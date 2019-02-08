@@ -378,8 +378,12 @@ function Case (id, el) {
         el.find(".findings").val('');
         el.find("input.continued").prop("checked", false);
 
-        self.testifier_chooser.clear();
-        self.writer_chooser.clear();
+        if (self.testifier_chooser) {
+          self.testifier_chooser.clear();
+        }
+        if (self.writer_chooser) {
+          self.writer_chooser.clear();
+        }
 
         for (var i = 0; i < self.charges.length; i++) {
             self.charges[i].removeCharge();
