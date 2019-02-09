@@ -2,6 +2,12 @@
 
 @main("Settings", "settings", "settings") {
 
+<script>
+$(function () {
+    initSettingsPage();
+});
+</script>
+
 <h2>Notifications about people and tags</h2>
 
 <h4>Existing notification rules</h4>
@@ -66,13 +72,67 @@ It is totally fine to have both enabled at once. Data in Custodia can be importe
 the other way around.</p>
 
 @helper.form(routes.Settings.editSettings()) {
-<p><label><input type="checkbox" name="show_attendance"
-                 @if(org.show_attendance){ checked }>
-    Enable the "Attendance" tab</label>
-    <br/>
-    <label><input type="checkbox" name="show_custodia"
-                  @if(org.show_custodia){ checked }>
-    Enable the "Custodia" tab</label></p>
+<p>
+    <label>
+        <input type="checkbox" name="show_attendance" id="show-attendance" @if(org.show_attendance){ checked }
+               class="has-dependents" data-dependent-class="depends-on-attendance">
+        Enable the "Attendance" tab
+    </label>
+</p>
+<div class="depends-on-attendance">
+    <label>
+        <input type="checkbox" name="attendance_show_percent" id="attendance-show-percent"
+               @if(org.attendance_show_percent){ checked }>
+        Show the "Attendance Rate" column
+    </label>
+    &nbsp;<span class="settings-help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip"
+        title="This allows you to see a person's attendance rate as a percentage of days present vs. total school days."></span>
+</div>
+<div class="depends-on-attendance">
+    <label>
+        <input type="checkbox" name="attendance_enable_partial_days" id="attendance-enable-partial-days"
+               class="has-dependents" data-dependent-class="depends-on-partial-days"
+               @if(org.attendance_enable_partial_days){ checked }>
+        Count partial days separately from full days
+    </label>
+</div>
+<table class="depends-on-partial-days"><tbody>
+    <tr>
+        <td>Latest arrival time allowed for a full day</td>
+        <td>
+            <input type="text" size="7" name="attendance_day_latest_start_time" value="@org.formatAttendanceLatestStartTime()"
+                   @if(!org.show_attendance || !org.attendance_enable_partial_days){ disabled }>
+            &nbsp;<span class="settings-help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip"
+                title="If a person arrives later than this time (e.g. 11:00), the day counts as a partial day regardless of how many hours the person was at school."></span>
+        </td>
+    </tr>
+    <tr>
+        <td>Minimum hours for a full day</td>
+        <td>
+            <input type="number" min="0" max="9" name="attendance_day_min_hours" value="@org.attendance_day_min_hours"
+                   @if(!org.show_attendance || !org.attendance_enable_partial_days){ disabled }>
+            &nbsp;<span class="settings-help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip"
+                title="If a person is present for fewer than this number of hours (e.g. 5) in a day, it counts as a partial day."></span>
+        </td>
+    </tr>
+    <tr>
+        <td>Value of a partial day for attendance rate</td>
+        <td>
+            <input type="number" min="0" max="1" step="0.05" name="attendance_partial_day_value"
+                   value="@org.attendance_partial_day_value"
+                   @if(!org.show_attendance || !org.attendance_enable_partial_days){ disabled }>
+            &nbsp;<span class="settings-help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip"
+                title="If the Attendance Rate column is enabled, you can decide how much value a partial day has in the percentage calculation. For example, if the value is 0.5, a partial day counts as half of a full day."></span>
+        </td>
+    </tr>
+</tbody></table>
+<h4>Custodia</h4>
+<p>
+    <label>
+        <input type="checkbox" name="show_custodia" @if(org.show_custodia){ checked }>
+        Enable the "Custodia" tab
+    </label>
+</p>
 <p>The Custodia <a target="_blank" href="@play_config.getString("custodia_url")">electronic sign-in sheet</a> username is
     "@OrgConfig.get().org.short_name" (case-sensitive). To reset the password, enter a new one here:
     <br>

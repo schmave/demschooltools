@@ -47,12 +47,12 @@ public class AttendanceDay extends Model {
         return result;
     }
 
-    public static Time parseTime(String time_string) throws Exception {
+    public static Time parseTime(String time_string) {
         if (time_string == null || time_string.equals("")) {
             return null;
         }
 
-		String[] formats = {"h:mm a", "h:mma"};
+		String[] formats = {"h:mm a", "h:mma", "h:mm"};
 
 		for (String format : formats) {
 			try {
@@ -81,5 +81,23 @@ public class AttendanceDay extends Model {
     @JsonIgnore
     public double getHours() {
         return (end_time.getTime() - start_time.getTime()) / (1000.0 * 60 * 60);
+    }
+
+    @JsonIgnore
+    public boolean isPartial() {
+        Organization org = OrgConfig.get().org;
+
+        if (org.attendance_enable_partial_days) {
+            Integer min_hours = org.attendance_day_min_hours;
+            Time latest_start_time = org.attendance_day_latest_start_time;
+
+            if (min_hours != null && getHours() < min_hours) {
+                return true;
+            }
+            if (latest_start_time != null && start_time.getTime() > latest_start_time.getTime()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -10,6 +10,7 @@ import com.avaje.ebean.Model;
 import com.avaje.ebean.Model.Finder;
 
 import controllers.Application;
+import controllers.Utils;
 
 import play.data.Form;
 import play.libs.Json;
@@ -26,6 +27,8 @@ public class AttendanceCode extends Model {
     public String code = "";
     public String description = "";
     public String color="#000000";
+
+    public boolean counts_toward_attendance = false;
 
     public static Finder<Integer, AttendanceCode> find = new Finder<Integer, AttendanceCode>(
         AttendanceCode.class
@@ -59,6 +62,7 @@ public class AttendanceCode extends Model {
         description = form.field("description").value();
         code = form.field("code").value();
         color = form.field("color").value();
+        counts_toward_attendance = Utils.getBooleanFromFormValue(form.field("counts_toward_attendance").value());
 
         this.update();
     }
