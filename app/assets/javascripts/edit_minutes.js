@@ -98,7 +98,7 @@ function Charge(charge_id, el) {
             el.find(".rp-followups").show();
             el.find(".original-res-plan").show();
             el.find(".original-res-plan-text").html(referenced_charge.resolution_plan);
-           
+
             if (json.resolution_plan === time_served_string) {
                 el.find(".rp-followup-time-served").prop("checked", true);
                 el.find(".rp-row").hide();
@@ -169,7 +169,7 @@ function Charge(charge_id, el) {
             url += "&minor_referral_destination=" +
                 encodeURIComponent(minor_referral_destination.val());
         }
-        
+
         if (self.rule_chooser.results[0]) {
             url += "&rule_id=" + self.rule_chooser.results[0];
         }
@@ -407,9 +407,15 @@ function Case (id, el) {
         el.find(".findings").val('');
         el.find("input.continued").prop("checked", false);
 
-        self.testifier_chooser.clear();
-        self.writer_chooser.clear();
-        self.case_chooser.clear();
+        if (self.testifier_chooser) {
+          self.testifier_chooser.clear();
+        }
+        if (self.writer_chooser) {
+          self.writer_chooser.clear();
+        }
+        if (self.case_chooser) {
+          self.case_chooser.clear();
+        }
 
         var url = "/clearAllReferencedCases?case_id=" + self.id;
         $.post(url, setCaseReferences);

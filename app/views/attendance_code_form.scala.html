@@ -39,6 +39,10 @@ $(function() {
 
 @inputText(code_form("color"), '_label -> "Color", 'class -> "colorpicker")
 
+@if( OrgConfig.get().org.attendance_show_percent ) {
+	@checkbox(code_form("counts_toward_attendance"), '_label -> "Counts toward attendance rate")
+}
+
 @if(is_editing) {
     <input type="submit" class="btn btn-danger" name="delete" value="Delete" />
 }

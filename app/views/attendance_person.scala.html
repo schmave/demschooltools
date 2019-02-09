@@ -37,11 +37,19 @@
         <label>Unknown/missing code<br/>
         <input type="checkbox" checked data-code="__null"/></label>
     </th>
-    <th width=100><label>Days Present<br/>
+    <th width=100><label>@if( OrgConfig.get().org.attendance_enable_partial_days ) { Full Days } else { Days Present }<br/>
         <input type="checkbox" checked data-code="__present"/></label>
     </th>
+    @if( OrgConfig.get().org.attendance_enable_partial_days ) {
+	    <th width=100 class="partial-days"><label>Partial Days<br/>
+	        <input type="checkbox" checked data-code="__partial"/></label>
+	    </th>
+	}
     <th width=100>Total hours</th>
     <th width=100>Avg. hours per day</th>
+    @if( OrgConfig.get().org.attendance_show_percent ) {
+    	<th width=100>Attendance Rate</th>
+	}
 </thead>
 
 @for( code <- codes ) {
@@ -57,8 +65,14 @@
     <td align="center" class="empty">0</td>
 }
 <td align="center">@stats.days_present</td>
+@if( OrgConfig.get().org.attendance_enable_partial_days ) {
+	<td align="center" class="partial-days">@stats.partial_days_present</td>
+}
 <td align="center">@Attendance.format(stats.total_hours)</td>
-<td align="center">@Attendance.format(stats.total_hours / stats.days_present)</td>
+<td align="center">@Attendance.format(stats.averageHoursPerDay())</td>
+@if( OrgConfig.get().org.attendance_show_percent ) {
+	<td align="center">@Attendance.formatAsPercent(stats.attendanceRate())</td>
+}
 </table>
 
 <h3>Details</h3>
@@ -72,11 +86,27 @@
 	</thead>
 
 @for( d <- days ) {
-<tr class="@if(d.code != null) { @if(
-            codes_map.contains(d.code) ){ code-@d.code } else { code-__null } } else {
-        @if( d.start_time == null || d.end_time == null ) { code-__null } else { code-__present } } @if(
-
-        d.day.getDay() == 5 ) { friday-row } ">
+<tr class="
+	@if(d.code != null) {
+		@if(codes_map.contains(d.code)) { 
+			code-@d.code
+		} else {
+			code-__null
+		}
+	} else {
+        @if(d.start_time == null || d.end_time == null) {
+        	code-__null
+        } else { 
+        	@if(d.isPartial()) {
+        		code-__partial
+        	} else {
+        		code-__present
+        	}
+        } 
+    }
+    @if( d.day.getDay() == 5 ) { 
+    	friday-row
+    }">
     <td width="25">@Application.formatDayOfWeek(d.day)
     <td width="75">@Application.formatDateMdy(d.day)</td>
 	<td>@if(d.start_time != null && d.end_time != null) {
