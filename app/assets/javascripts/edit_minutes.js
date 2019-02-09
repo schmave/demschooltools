@@ -102,11 +102,9 @@ function Charge(charge_id, el) {
             if (json.resolution_plan === time_served_string) {
                 el.find(".rp-followup-time-served").prop("checked", true);
                 el.find(".rp-row").hide();
-            }
-            else if (json.resolution_plan) {
+            } else if (json.resolution_plan) {
                 el.find(".rp-followup-new-rp").prop("checked", true);
-            }
-            else {
+            } else {
                 el.find(".rp-row").hide();
             }
         }
@@ -343,9 +341,9 @@ function Case (id, el) {
         });
 
         function findReferencedCharge(charge_id, case_references) {
-            for (i in case_references) {
+            for (var i in case_references) {
                 var c = case_references[i];
-                for (j in c.charges) {
+                for (var j in c.charges) {
                     var ch = c.charges[j];
                     if (ch.generated_charge_id == charge_id) {
                         return {

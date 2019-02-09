@@ -135,7 +135,7 @@ $(function () {
 <table>
 	<tr><td class="esm-form-label">Charge against:<td colspan=2>{{render "people-chooser" clazz=""}}
 	<b>Entry:</b> {{> rule-chooser}}
-    <tr class="original-res-plan" hidden><td class="esm-form-label">Original:<td colspan="2" class="original-res-plan-text">
+    <tr class="original-res-plan" hidden><td class="esm-form-label">Previous @OrgConfig.get().str_res_plan_short:<td colspan="2" class="original-res-plan-text">
 	<tr><td class="esm-form-label">Plea:<td colspan=2>
 <div class="radio-inline">
   <label><input type="radio" class="plea plea-guilty" value="Guilty"><span>Guilty</span></label>
@@ -176,12 +176,12 @@ $(function () {
     <td></td>
     <td>
         <div class="radio-inline">
-          <label><input type="radio" class="rp-followup rp-followup-time-served rp-type-no-res-plan"
-            value="TimeServed"><span>Time served</span></label>
+          <label><input type="radio" class="rp-followup rp-followup-time-served rp-type-no-res-plan">
+            <span>Time served</span></label>
         </div>
         <div class="radio-inline">
-          <label><input type="radio" class="rp-followup rp-followup-new-rp"
-            value="Replace"><span>Replace @OrgConfig.get().str_res_plan</span></label>
+          <label><input type="radio" class="rp-followup rp-followup-new-rp">
+            <span>Replace @OrgConfig.get().str_res_plan</span></label>
         </div>
     </td>
 </tr>

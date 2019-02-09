@@ -912,7 +912,7 @@ public class Application extends Controller {
     }
 
     public static String jsonBreakingResPlanEntry() {
-        return Json.stringify(Json.toJson(Entry.findBreakingResPlanEntry()));
+        return Utils.toJson(Entry.findBreakingResPlanEntry());
     }
 
     public Result getLastRp(Integer personId, Integer ruleId) {
