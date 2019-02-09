@@ -2,7 +2,7 @@ var Handlebars = require('handlebars');
 
 var utils = require('./utils');
 
-var result_template_str = 
+var result_template_str =
     '<div class="result" data-id="{{id}}">' +
         '<span class="label label-success">{{name}}</span>' +
         '<img src="/assets/images/x.png">' +
@@ -11,7 +11,6 @@ var result_template_str =
 var result_template = Handlebars.compile(result_template_str);
 
 var Chooser = function(el, allowMultiple, minLength, source, getLabel, onClick, onChange, onAdd, onRemove) {
-
     this.el = el;
     var self = this;
 
@@ -32,7 +31,7 @@ var Chooser = function(el, allowMultiple, minLength, source, getLabel, onClick, 
             if (onAdd) {
                 onAdd(ui.item.id);
             }
-            if (onChange) { 
+            if (onChange) {
                 onChange();
             }
         }
@@ -41,7 +40,10 @@ var Chooser = function(el, allowMultiple, minLength, source, getLabel, onClick, 
         event.preventDefault(); // keep jquery from inserting name into textbox
     });
 
-    this.addResult = function(id, title) {
+    this.addResult = function(id, title, select_next) {
+        if (select_next === undefined) {
+          select_next = true;
+        }
         // Don't add results that have already been added.
         for (var i in self.results) {
             if (id == self.results[i]) {
@@ -51,7 +53,9 @@ var Chooser = function(el, allowMultiple, minLength, source, getLabel, onClick, 
 
         if (!allowMultiple) {
             self.search_box.hide();
-            utils.selectNextInput(self.search_box);
+            if (select_next) {
+              utils.selectNextInput(self.search_box);
+            }
         }
 
         self.results.push(id);
@@ -86,7 +90,7 @@ var Chooser = function(el, allowMultiple, minLength, source, getLabel, onClick, 
         if (onRemove) {
             onRemove(result_el.data('id'));
         }
-        if (onChange) { 
+        if (onChange) {
             onChange();
         }
     };
@@ -100,10 +104,10 @@ var Chooser = function(el, allowMultiple, minLength, source, getLabel, onClick, 
         self.el.find(".results").html("");
         if (allowMultiple) {
             for (var i in json) {
-                self.addResult(json[i].id, getLabel(json[i]));
+                self.addResult(json[i].id, getLabel(json[i]), false);
             }
         } else if (json) {
-            self.addResult(json.id, getLabel(json));
+            self.addResult(json.id, getLabel(json), false);
         }
     };
 }
