@@ -19,10 +19,13 @@ public class AttendanceStats {
         if (code == null) {
             return;
         }
-        if (code.counts_toward_attendance) {
-            approved_absences++;
-        } else {
-            unapproved_absences++;
+        // "no school" days do not count as absences
+        if (!code.code.equals("_NS_")) {
+            if (code.counts_toward_attendance) {
+                approved_absences++;
+            } else {
+                unapproved_absences++;
+            }
         }
         if (!absence_counts.containsKey(code)) {
             absence_counts.put(code, 0);
