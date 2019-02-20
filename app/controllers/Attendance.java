@@ -673,6 +673,7 @@ public class Attendance extends Controller {
             AttendanceCode no_school = new AttendanceCode();
             no_school.description = "No school";
             no_school.color = "#cc9";
+            no_school.code = "_NS_";
             codes.put("_NS_", no_school);
         }
 
