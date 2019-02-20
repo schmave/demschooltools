@@ -6,6 +6,7 @@ import java.nio.file.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.*;
 import javax.inject.Singleton;
 
 import org.markdown4j.Markdown4jProcessor;
@@ -273,6 +274,16 @@ public class Application extends Controller {
         response().setHeader("Cache-Control", "max-age=0, no-cache, no-store");
         response().setHeader("Pragma", "no-cache");
 
+        List<Integer> referenced_charge_ids = Charge.find
+            .where()
+            .eq("person.organization", Organization.getByHost())
+            .isNotNull("referenced_charge_id")
+            .select("referenced_charge")
+            .findList()
+            .stream()
+            .map(c -> c.referenced_charge.id)
+            .collect(Collectors.toList());
+
         List<Charge> active_rps =
             Charge.find
                 .fetch("the_case")
@@ -287,6 +298,7 @@ public class Application extends Controller {
                     Expr.isNotNull("sm_decision"))
                 .ne("person", null)
                 .eq("rp_complete", false)
+                .not(Expr.in("id", referenced_charge_ids))
                 .orderBy("id DESC").findList();
 
         List<Charge> completed_rps =
@@ -301,11 +313,29 @@ public class Application extends Controller {
                 .eq("person.organization", Organization.getByHost())
                 .ne("person", null)
                 .eq("rp_complete", true)
+                .not(Expr.in("id", referenced_charge_ids))
                 .orderBy("rp_complete_date DESC")
                 .setMaxRows(25).findList();
 
+        List<Charge> nullified_rps = 
+            Charge.find
+                .fetch("the_case")
+                .fetch("the_case.meeting")
+                .fetch("person")
+                .fetch("rule")
+                .fetch("rule.section")
+                .fetch("rule.section.chapter")
+                .where()
+                .eq("person.organization", Organization.getByHost())
+                .ne("person", null)
+                .in("id", referenced_charge_ids)
+                .orderBy("id DESC")
+                .setMaxRows(10).findList();
+
         List<Charge> all = new ArrayList<Charge>(active_rps);
         all.addAll(completed_rps);
+        all.addAll(nullified_rps);
+
         for (Charge charge : all) {
             Case c = charge.the_case;
             if (c.composite_findings == null) {
@@ -313,7 +343,7 @@ public class Application extends Controller {
             }
         }
 
-        return ok(views.html.edit_rp_list.render(active_rps, completed_rps));
+        return ok(views.html.edit_rp_list.render(active_rps, completed_rps, nullified_rps));
     }
 
     public Result viewMeetingResolutionPlans(int meeting_id) {
