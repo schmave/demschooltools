@@ -135,7 +135,13 @@ $(function () {
 <table>
 	<tr><td class="esm-form-label">Charge against:<td colspan=2>{{render "people-chooser" clazz=""}}
 	<b>Entry:</b> {{> rule-chooser}}
-    <tr class="original-res-plan" hidden><td class="esm-form-label">Previous @OrgConfig.get().str_res_plan_short:<td colspan="2" class="original-res-plan-text">
+    <tr class="original-res-plan" hidden>
+        <td class="esm-form-label">Original:</td>
+        <td colspan="2">
+            <span class="original-res-plan-text"></span>
+            <span class="original-res-plan-note">(Note: This charge nullifies the previous @(OrgConfig.get().str_res_plan).
+            You need to replace it or choose "time served".)</span>
+        </td>
 	<tr><td class="esm-form-label">Plea:<td colspan=2>
 <div class="radio-inline">
   <label><input type="radio" class="plea plea-guilty" value="Guilty"><span>Guilty</span></label>

@@ -164,4 +164,7 @@ window.initRpList = function() {
     for (i in app.initial_data.completed_rps) {
         loadCharge(app.initial_data.completed_rps[i], app.completed_rps, $(".completed-rps"));
     }
+    for (i in app.initial_data.nullified_rps) {
+        loadCharge(app.initial_data.nullified_rps[i], app.nullified_rps, $(".nullified-rps"));
+    }
 }

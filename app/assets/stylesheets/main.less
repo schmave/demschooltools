@@ -429,8 +429,12 @@ td.attendance-error {
   overflow: hidden;
 }
 
-.completed-rps {
+.completed-rps, .nullified-rps {
     color: #999;
+}
+
+.nullified-rps input[type=checkbox] {
+  display: none;
 }
 
 .rp-moved {
@@ -740,6 +744,11 @@ input.date {
 
 .code-__partial, .partial-days {
   background: #deeff8;
+}
+
+.original-res-plan-note {
+  font-style: italic;
+  color: #999;
 }
 
 /***************************************************************************
