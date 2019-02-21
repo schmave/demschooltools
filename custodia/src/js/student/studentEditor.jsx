@@ -14,7 +14,7 @@ module.exports = class extends React.Component {
     constructor(props, context) {
         super(props, context);
         var that = this;
-        dispatcher.register(function(action){
+        this.dispatchToken = dispatcher.register(function(action){
             if (action.type == constants.studentEvents.STUDENT_LOADED
                 || action.type == constants.studentEvents.ALL_LOADED) {
                 that.savingHide();
@@ -25,6 +25,10 @@ module.exports = class extends React.Component {
         this.state = {saving: false,
                 student: {start_date: null, guardian_email: "", name : "", olderdate: null},
                 startdate_datepicker: new Date()};
+    }
+
+    componentWillUnmount = () => {
+      dispatcher.unregister(this.dispatchToken);
     }
 
     savingShow = () => {
