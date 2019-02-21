@@ -97,28 +97,6 @@
     (is (= overrides (:total_overrides att)) "Total overrides")
     (is (= short (:total_short att))) "Total short"))
 
-;; (sample-db true)
-;; (binding [db/*school-id* 1] (sample-db true))
-(defn sample-db
-  ([] (sample-db false))
-  ([have-extra?]
-   (conn/init-pg)
-   (users/reset-db)
-   (let [{class-id :_id} (queries/get-class-by-name "2014-2015")]
-     (cmd/activate-class class-id)
-     (cmd/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 9))))
-     (cmd/make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
-     (let [s (cmd/make-student "jim")
-           {sid :_id} s]
-       (cmd/add-student-to-class sid class-id)
-       (when have-extra? (cmd/swipe-in sid (t/minus (t/now) (t/days 2)))))
-     (let [s (cmd/make-student "steve")
-           {sid :_id} s]
-       (cmd/add-student-to-class sid class-id)
-       (when have-extra? (cmd/swipe-in sid (t/minus (t/now) (t/days 1) (t/hours 5)))))))
-  )
-
-
 
 ;; (huge-sample-db)
 (defn huge-sample-db []

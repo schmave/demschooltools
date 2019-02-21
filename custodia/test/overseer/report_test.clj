@@ -9,6 +9,7 @@
             [overseer.db :as db]
             [overseer.queries :as queries]
             [overseer.commands :as cmd]
+            [overseer.database.sample-db :refer [sample-db]]
             [overseer.helpers-test :refer :all]
             [overseer.attendance :as att]
             [overseer.helpers :as h]

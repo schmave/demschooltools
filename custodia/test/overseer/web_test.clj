@@ -14,6 +14,7 @@
             [overseer.dates :as dates]
             [overseer.db :as db]
             [overseer.helpers-test :refer :all]
+            [overseer.database.sample-db :refer [sample-db]]
             [schema.test :as tests]
             [clojure.tools.logging :as log]))
 
@@ -260,23 +261,27 @@
   (today-at-utc 20 1))
 
 (deftest swipe-in-and-out-at-8pm-with-rounding-test
-  (do (sample-db)
+  (do
+    (sample-db)
+    (binding [db/*school-id* 2]
       (let [s (cmd/make-student "test")
             sid (:_id s)]
+        (cmd/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 9))))
+        (cmd/make-class "2014-2015")
         (cmd/add-student-to-class sid (get-class-id-by-name "2014-2015"))
         (cmd/swipe-in sid (_801pm))
         (cmd/swipe-out sid (t/plus (_801pm) (t/minutes 5)))
         (let [att (get-att sid)
-              _10-14 (-> att :days first)
-              first-swipe (-> _10-14 :swipes first)]
+              day (-> att :days first)
+              first-swipe (-> day :swipes first)]
           (testing "swipe info"
             (is (= "08:06" (:nice_out_time first-swipe)))
             (is (= "08:01" (:nice_in_time first-swipe))))
           (testing "att stuff"
-            (is (= (:total_mins _10-14) 0M))
+            (is (= (:total_mins day) 0M))
             (is (= (:total_days att) 0))
             (is (= true (:in_today att))))
-          ))))
+          )))))
 
 (def _840am_2014_10_14 (t/minus _2014_10-14_9-14am (t/minutes 90)))
 (def _339pm_2014_10_14 (t/plus _2014_10-14_9-14am (t/minutes 330)))
@@ -309,9 +314,11 @@
 
 (deftest swipe-before-9-test
   (do (sample-db)
+    (binding [db/*school-id* 2]
       (let [s (cmd/make-student "test")
             sid (:_id s)]
-
+        (cmd/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 9))))
+        (cmd/make-class "2014-2015")
         (cmd/add-student-to-class sid (get-class-id-by-name "2014-2015"))
         ;; only count minutes from 9-4
         (cmd/swipe-in sid _840am_2014_10_14)
@@ -323,15 +330,16 @@
           (testing "Total Minute Count"
             (is (= (-> att :days first :total_mins)
                    399M)))
-
-          ))))
+          )))))
 
 
 (deftest swipe-roundings-after-4
   (do (sample-db)
+    (binding [db/*school-id* 2]
       (let [s (cmd/make-student "test")
             sid (:_id s)]
-
+        (cmd/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 9))))
+        (cmd/make-class "2014-2015")
         (cmd/add-student-to-class sid (get-class-id-by-name "2014-2015"))
 
         ;; round after 4 back to 4
@@ -363,7 +371,7 @@
           (testing "10/14 not valid" (is (= (-> _10-14 :valid) false)))
           (testing "One short" (is (= (:total_short att) 1)))
           (testing "One attendance" (is (= (:total_days att) 1)))
-          ))))
+          )))))
 
 (deftest calculates-interval-test
   (do (sample-db)
@@ -519,9 +527,8 @@
             sid (:_id s)]
 
         (cmd/add-student-to-class sid (get-class-id-by-name "2014-2015"))
-        (cmd/swipe-in sid  (t/minus (t/today-at 9 0 0) (t/days 1)))
-        (cmd/swipe-out 3  (f/unparse (f/formatters :date-time)
-                                      (t/minus (t/today-at 19 0 0) (t/days 1))))
+        (cmd/swipe-in sid (t/minus (today-at-utc 9 0) (t/days 1)))
+        (cmd/swipe-out sid (t/minus (today-at-utc 19 0) (t/days 1)))
         )))
 
 (deftest swiped-out-without-in-no-exception-test

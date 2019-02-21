@@ -2,6 +2,7 @@
   (:require [clojure.test :refer :all]
             [clojure.java.shell :as sh]
             [overseer.commands :as cmd]
+            [overseer.database.sample-db :refer [sample-db]]
             [clj-time.core :as t]
             [overseer.helpers-test :refer :all]
             [clj-webdriver.taxi :refer :all]))

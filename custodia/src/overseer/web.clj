@@ -20,7 +20,7 @@
             [overseer.commands :as cmd]
             [overseer.dst-imports :as dst]
             [overseer.queries :as queries]
-            [overseer.database.sample-db :as sampledb]
+            [overseer.database.sample-db :refer [sample-db]]
             [overseer.dates :as dates]
             [overseer.classes :refer [class-routes]]
             [overseer.student :refer [student-routes]]
@@ -170,7 +170,7 @@
     (migrations/migrate-db @conn/pgdb))
   (when (= "true" (env :newdb))
     (do (users/reset-db)
-        (sampledb/sample-db)))
+        (sample-db)))
   (users/init-users)
   (if (= "true" (env :notify))
     (do (print "Server started")

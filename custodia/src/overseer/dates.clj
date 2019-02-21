@@ -33,6 +33,9 @@
       (t/in-minutes (t/interval in-time out-time))
       0M)))
 
+(defn from-sql-time-wo-zone [inst]
+  (f/unparse time-format (c/from-sql-date inst)))
+
 (defn from-sql-time [inst]
   (f/unparse (f/with-zone time-format (local-time-zone-id)) (c/from-sql-date inst)))
 

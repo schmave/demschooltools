@@ -20,7 +20,7 @@
   ([school-id]
     (let [classes (db/q get-classes-y {:school_id school-id} )
           classes (map (fn [c] (assoc c :late_time
-                                      (dates/from-sql-time (:late_time c))))
+                                      (dates/from-sql-time-wo-zone (:late_time c))))
                        classes)
           grouped (vals (group-by :name classes))]
       (map (fn [class-group]
