@@ -122,12 +122,24 @@ class StudentReports extends React.Component {
     };
 
     createPeriod = () => {
-        actionCreator.createPeriod(this.refs.newPeriodStartDate.state.value, this.refs.newPeriodEndDate.state.value);
+        actionCreator.createPeriod(this.state.startDate, this.state.endDate);
     };
 
     deletePeriod = () => {
         actionCreator.deletePeriod(this.state.currentYear);
     };
+
+    dateToString = value => {
+      return (value.getYear() + 1900) + "-" + (value.getMonth() + 1) + "-" + value.getDate();
+    }
+
+    onStartDateChange = value => {
+      this.setState({ startDate: this.dateToString(value) });
+    }
+
+    onEndDateChange = value => {
+      this.setState({ endDate: this.dateToString(value) });
+    }
 
     render() {
         var grid = null;
@@ -177,8 +189,10 @@ class StudentReports extends React.Component {
             <Modal ref="newSchoolYear" title="Create new period">
                 <form className="form-inline">
                     <div className="form-group">
-                        <label htmlFor="startDate">Start:</label> <DateTimePicker id="startDate" ref="newPeriodStartDate" onChange={this.newPeriodDateSelected} time={false}/>
-                        <label htmlFor="endDate">End:</label> <DateTimePicker ref="newPeriodEndDate" id="endDate" time={false}/>
+                        <label htmlFor="startDate">Start:</label>
+                        <DateTimePicker id="startDate" onChange={this.onStartDateChange} time={false}/>
+                        <label htmlFor="endDate">End:</label>
+                        <DateTimePicker id="endDate" onChange={this.onEndDateChange} time={false}/>
                     </div>
                     <div className="form-group" style={{marginLeft: '2em'}}>
                         <button className="btn btn-sm btn-primary" onClick={this.createPeriod}>Create Period</button>
