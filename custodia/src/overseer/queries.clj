@@ -38,8 +38,8 @@
 ;; (get-years)
 (defn get-years
   ([] (get-all-years))
-  ([names]
-   (filter (fn [y] (= names {:name y})) (get-all-years))))
+  ([the-name]
+   (filter (fn [y] (= the-name (:name y))) (get-all-years))))
 
 (defn get-all-students
   ([] (get-all-students db/*school-id*))
@@ -98,7 +98,7 @@
   ([year-name class-id]
    (db/q student-report-y { :year_name year-name :class_id class-id :timezone (get-school-time-zone)} )))
 
-;;(defn get-swipes-in-year [year-name student-id] (db/q swipes-in-year-y {:year_name year-name :student_id student-id :school_id db/*school-id*  :timezone (get-school-time-zone)} )) 
+;;(defn get-swipes-in-year [year-name student-id] (db/q swipes-in-year-y {:year_name year-name :student_id student-id :school_id db/*school-id*  :timezone (get-school-time-zone)} ))
 
 ;; (get-students )
 (h/deflog get-students

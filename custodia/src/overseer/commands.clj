@@ -105,7 +105,7 @@
 
 (defn delete-year [year]
   (when-let [year (first (queries/get-years year))]
-    (db/delete! year)))
+    (db/delete! {:type "years" :_id (:_id year)})))
 
 (defn delete-student [id]
   (db/delete! {:type "students" :_id id}))
