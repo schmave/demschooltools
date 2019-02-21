@@ -12,7 +12,7 @@
                  [heroku-database-url-to-jdbc "0.2.2"]
                  [jdbc-ring-session "1.0"]
                  [log4j/log4j "1.2.17" :exclusions [javax.mail/mail javax.jms/jms com.sun.jmdk/jmxtools com.sun.jmx/jmxri]]
-                 [migratus "0.8.13"]
+                 [migratus "1.2.2"]
                  [org.clojure/clojure "1.9.0"]
                  [org.clojure/data.json "0.2.6"]
                  [org.clojure/java.classpath "0.2.3"]
@@ -33,7 +33,7 @@
   :min-lein-version "2.8.1"
   :plugins [
             [lein-ring "0.9.7"]
-            [migratus-lein "0.2.6"]
+            [migratus-lein "0.7.1"]
             [environ/environ.lein "0.2.1"]
             [lein-environ "1.1.0"]]
   :migratus {:store :database

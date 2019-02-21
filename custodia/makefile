@@ -57,6 +57,9 @@ debug :
 unit-test :
 	${LEIN} test
 
+test-refresh :
+	${LEIN} test-refresh
+
 webdriver-test :
 	${LEIN} test :integration
 

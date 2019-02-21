@@ -36,6 +36,11 @@ GIT. Add in the following:
                        :user "USER",
                        :password "PASSWORD",
                        :subname "//localhost:5432/DATABASE"}}
+        :dependencies [[clj-webdriver "0.7.2"]
+                       [org.apache.httpcomponents/httpclient "4.3.5"]
+                       [org.seleniumhq.selenium/selenium-java "2.48.1"]]
+        :plugins [[com.jakemccrary/lein-test-refresh "0.23.0"]
+                  [venantius/ultra "0.5.4"]]
         :env {:database-url "postgres://USER:PASSWORD@localhost:5432/DATABASE"
              :adminpass "web"
              :userpass "web"
