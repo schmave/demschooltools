@@ -12,8 +12,13 @@
             [clj-time.coerce :as c]))
 
 
+(def new-york-tz (t/time-zone-for-id "America/New_York"))
+
 (defn today-at-utc [h m]
-  (t/to-time-zone (l/to-local-date-time (t/today-at h m)) t/utc))
+  (let [now-in-et (t/to-time-zone (t/now) new-york-tz)]
+      (t/to-time-zone (t/from-time-zone
+        (t/date-time (t/year now-in-et) (t/month now-in-et) (t/day now-in-et) h m)
+        new-york-tz) t/utc)))
 
 
 (defn get-att [id]

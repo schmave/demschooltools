@@ -469,7 +469,7 @@
                    1)))
           (testing "Total Hours"
             (is (= (:total_hours att)
-                   27.25M)))
+                   27.583M)))
           (testing "Days sorted correctly"
             (is (= (-> att :days first :day)
                    "2014-10-20")))
