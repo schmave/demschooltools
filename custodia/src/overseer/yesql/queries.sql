@@ -186,7 +186,7 @@ SELECT
   stu.student_id
     , stu.student_id as _id
     , (select s.name from overseer.students s WHERE s._id = stu.student_id) as name
-    , round(sum(CASE WHEN oid IS NOT NULL THEN stu.requiredmin/60 ELSE stu.intervalmin/60 END)) as total_hours
+    , round(sum(CASE WHEN oid IS NOT NULL THEN stu.requiredmin/60.0 ELSE stu.intervalmin/60.0 END)) as total_hours
     , sum(CASE WHEN oid IS NOT NULL
                OR stu.intervalmin >= stu.requiredmin
           THEN 1 ELSE 0 END) as good

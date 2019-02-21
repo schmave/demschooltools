@@ -49,7 +49,7 @@
 
   (cmd/swipe-in sid _2014_10_17)
   (cmd/swipe-out sid (t/plus _2014_10_17 (t/hours 4)))
-  (cmd/swipe-in sid (t/plus _2014_10_17 (t/hours 4.1)))
+  (cmd/swipe-in sid (t/plus _2014_10_17 (t/hours 4) (t/minutes 10)))
   (cmd/swipe-out sid (t/plus _2014_10_17 (t/hours 6)))
 
   ;; short
@@ -92,7 +92,7 @@
     (is (= overrides (:total_overrides att)) "Total overrides")
     (is (= short (:total_short att))) "Total short"))
 
-;; (sample-db true) 
+;; (sample-db true)
 ;; (binding [db/*school-id* 1] (sample-db true))
 (defn sample-db
   ([] (sample-db false))
@@ -115,11 +115,11 @@
 
 
 
-;; (huge-sample-db) 
+;; (huge-sample-db)
 (defn huge-sample-db []
   (conn/init-pg)
   (users/reset-db)
-  (cmd/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 5))))  
+  (cmd/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 5))))
   (cmd/make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
 
   (let [{class-id :_id} (queries/get-class-by-name "2014-2015")]

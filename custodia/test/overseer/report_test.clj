@@ -44,19 +44,12 @@
               student1 (first (filter #(= sid (:_id %)) att))
               student2 (first (filter #(= sid2 (:_id %)) att))]
 
-          (student-report-is student1 3 2 0 0 0 25M)
-          (testing "Student 1 Counts"
-            (is (= 3 (:good student1)))
-            (is (= 25 (int (:total_hours student1))))
-            (is (= 2 (:short student1))))
-          (testing "Not absent on a day a different classed student attended"
-            (is (= (:unexcused student1)
-                   0)))
+          (student-report-is student1 3 2 0 0 0 26M)
           (testing "Student 2 doesn't even show up"
             (is (= student2 nil)))
           )
         (testing "an older date string shows no attendance in that time"
-          (is (= '() (queries/get-report "06-01-2013 05-01-2014")))))) 
+          (is (= '() (queries/get-report "06-01-2013 05-01-2014"))))))
   )
 
 
@@ -80,7 +73,7 @@
         (let [att (queries/get-report today-str)
               student1 (first (filter #(= sid (:_id %)) att))
               student2 (first (filter #(= sid2 (:_id %)) att))]
-          (student-report-is student1 4 1 1 1 1 26M)
+          (student-report-is student1 4 1 1 1 1 28M)
 
           (testing "Total short count student 2"
             (is (= (:short student2) 2)))
@@ -89,6 +82,6 @@
                    5)))
           )
         (testing "an older date string shows no attendance in that time"
-          (is (= '() (queries/get-report "06-01-2013 05-01-2014")))))) 
+          (is (= '() (queries/get-report "06-01-2013 05-01-2014"))))))
   )
 
