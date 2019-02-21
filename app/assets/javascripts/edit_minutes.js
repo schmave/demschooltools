@@ -1,7 +1,10 @@
 var Handlebars = require('handlebars');
 
 var utils = require('./utils');
+var chooser = require('./chooser');
 var people_chooser = require('./people_chooser');
+
+const time_served_string = "None";
 
 const SAVE_TIMEOUT = 2000;
 
@@ -32,60 +35,6 @@ function showRuleHistoryInSidebar(rule_id) {
     showSomethingInSidebar("/ruleHistory/" + rule_id);
 }
 
-function RuleChooser(el, on_change) {
-    this.el = el;
-    var self = this;
-
-    this.search_box = el.find(".rule_search");
-    this.search_box.autocomplete({
-        autoFocus: true,
-        delay: 0,
-        minLength: 2,
-        source: app.rules,
-    });
-
-    this.search_box.bind( "autocompleteselect", function(event, ui) {
-        self.setRule(ui.item.id, ui.item.label);
-
-        if (on_change) { on_change(); }
-
-        self.search_box.val('');
-        event.preventDefault(); // keep jquery from inserting name into textbox
-    });
-
-    this.setRule = function(id, title) {
-        self.search_box.hide();
-
-        self.rule = id;
-        self.rule_el =
-            self.el.prepend(app.rule_template({name: title}))
-                .children(":first-child");
-
-        self.rule_el.find(".label").click(function() {
-            showRuleHistoryInSidebar(self.rule);
-        });
-
-        self.rule_el.find("img").click(function() { self.unsetRule(); });
-
-        utils.selectNextInput(self.search_box);
-    };
-
-    this.unsetRule = function() {
-        $(self.rule_el).remove();
-
-        self.rule = null;
-        self.rule_el = null;
-
-        self.search_box.show();
-
-        if (on_change) { on_change(); }
-    };
-
-    this.loadData = function(json) {
-        self.setRule(json.id, json.title);
-    };
-}
-
 function Charge(charge_id, el) {
     var self = this;
 
@@ -104,8 +53,9 @@ function Charge(charge_id, el) {
         }
     };
 
-    this.loadData = function(json) {
+    this.loadData = function(json, referenced_charge) {
         el.find(".resolution_plan").val(json.resolution_plan);
+
         if (json.plea == "Guilty") {
             el.find(".plea-guilty").prop("checked", true);
         } else if (json.plea == "No Contest") {
@@ -139,6 +89,30 @@ function Charge(charge_id, el) {
 
         el.find(".minor-referral-destination").val(json.minor_referral_destination);
         self.checkReferralLabelHighlight();
+
+        if (referenced_charge) {
+            self.referenced_charge = referenced_charge;
+            if (referenced_charge.has_default_rule) {
+                el.addClass("breaking-res-plan");
+            }
+            el.find(".rp-followups").show();
+            el.find(".original-res-plan").show();
+            el.find(".original-res-plan-text").html(referenced_charge.resolution_plan);
+
+            if (json.resolution_plan === time_served_string) {
+                el.find(".rp-followup-time-served").prop("checked", true);
+                el.find(".rp-row").hide();
+            } else if (json.resolution_plan) {
+                el.find(".rp-followup-new-rp").prop("checked", true);
+            } else {
+                el.find(".rp-row").hide();
+            }
+        }
+
+        if (json.is_referenced) {
+            el.find(".remove-charge").addClass("disabled");
+            el.find(".remove-charge-disabled-text").show();
+        }
     };
 
     this.saveIfNeeded = function() {
@@ -153,7 +127,11 @@ function Charge(charge_id, el) {
             url += "&person_id=" + self.people_chooser.people[0].id;
         }
 
-        url += "&resolution_plan=" + encodeURIComponent(el.find(".resolution_plan").val());
+        var resolution_plan = el.find(".resolution_plan").val();
+        if (el.find(".rp-followups").is(":visible") && el.find(".rp-followup-time-served").prop("checked")) {
+            resolution_plan = time_served_string;
+        }
+        url += "&resolution_plan=" + encodeURIComponent(resolution_plan);
 
         for (var key in SEVERITIES) {
             if (el.find(".severity-" + key).prop("checked")) {
@@ -190,8 +168,8 @@ function Charge(charge_id, el) {
                 encodeURIComponent(minor_referral_destination.val());
         }
 
-        if (self.rule_chooser.rule) {
-            url += "&rule_id=" + self.rule_chooser.rule;
+        if (self.rule_chooser.results[0]) {
+            url += "&rule_id=" + self.rule_chooser.results[0];
         }
 
         $.post(url, function(data) {
@@ -200,6 +178,10 @@ function Charge(charge_id, el) {
     };
 
     this.removeCharge = function() {
+        if (self.referenced_charge) {
+            self.el.parents('.case').find('.case-charge-reference-generate[data-id=' + self.referenced_charge.id + ']')
+                .show().parent().find('.case-charge-reference-already-generated').hide();
+        }
         $.post("/removeCharge?id=" + charge_id, function() {
             self.el.remove();
             // Don't try to save any remaining modifications if
@@ -212,21 +194,21 @@ function Charge(charge_id, el) {
     this.markAsModified = function() {
         self.is_modified = true;
         if ((self.people_chooser.people.length === 0) ||
-            !self.rule_chooser.rule) {
+            !self.rule_chooser.results[0]) {
             el.find(".last-rp").html("");
         }
 
-        if (self.people_chooser.people.length == 1 && self.rule_chooser.rule) {
+        if (self.people_chooser.people.length == 1 && self.rule_chooser.results[0]) {
             var url = "/getLastRp";
             url += "/" + self.people_chooser.people[0].id;
-            url += "/" + self.rule_chooser.rule;
+            url += "/" + self.rule_chooser.results[0];
             $.get(url, function (data) {
                 el.find(".last-rp").html(data);
                 el.find(".last-rp .more-info").click(function() {
                     showSomethingInSidebar(
                         '/personRuleHistory' +
                         '/' + self.people_chooser.people[0].id +
-                        '/' + self.rule_chooser.rule);
+                        '/' + self.rule_chooser.results[0]);
                 });
             });
         }
@@ -262,15 +244,35 @@ function Charge(charge_id, el) {
     el.find(".minor-referral-destination").change(self.markAsModified);
     el.find(".minor-referral-destination").on(utils.TEXT_AREA_EVENTS, self.markAsModified);
 
+    el.find(".rp-followup").change(function() {
+        if ($(this).hasClass("rp-followup-new-rp")) {
+            el.find(".rp-row").show();
+        } else {
+            el.find(".rp-row").hide();
+            el.find(".resolution_plan").val("");
+        }
+        self.markAsModified();
+    });
+
     self.people_chooser = new people_chooser.PeopleChooser(
         el.find(".people_chooser"), self.markAsModified, self.markAsModified,
         app.people, showPersonHistoryInSidebar);
     self.people_chooser.setOnePersonMode(true);
 
-    self.rule_chooser = new RuleChooser(el.find(".rule_chooser"),
-                                        self.markAsModified);
+    function getLabel(json) {
+        return json.title;
+    }
 
-    el.find("input[type=radio]").prop("name", "plea-" + charge_id);
+    self.rule_chooser = new chooser.Chooser(
+        el.find(".rule_chooser"),
+        false,
+        2,
+        app.rules,
+        getLabel,
+        showRuleHistoryInSidebar,
+        self.markAsModified);
+
+    el.find(".plea[type=radio]").prop("name", "plea-" + charge_id);
 
     // el.mouseleave(function() { self.remove_button.hide(); } );
     // el.mouseenter(function() { self.remove_button.show(); } );
@@ -278,6 +280,10 @@ function Charge(charge_id, el) {
         el.find(".severity-" + key).change(self.markAsModified);
     }
     el.find(".severity[type=radio]").prop("name", "severity-" + charge_id);
+
+    el.find(".rp-followup")
+        .prop("name", "rp-followup-" + charge_id)
+        .change(self.markAsModified);
 }
 
 function Case (id, el) {
@@ -324,10 +330,31 @@ function Case (id, el) {
             }
         }
 
-        for (i in data.charges) {
-            var ch = data.charges[i];
-            var new_charge = self.addChargeNoServer(ch.id);
-            new_charge.loadData(ch);
+        $.get("/getCaseReferencesJson?case_id=" + self.id, function(case_references) {
+            setCaseReferences(case_references);
+            var case_references_json = $.parseJSON(case_references);
+            for (i in data.charges) {
+                var ch = data.charges[i];
+                var new_charge = self.addChargeNoServer(ch.id);
+                new_charge.loadData(ch, findReferencedCharge(ch.id, case_references_json));
+            }
+        });
+
+        function findReferencedCharge(charge_id, case_references) {
+            for (var i in case_references) {
+                var c = case_references[i];
+                for (var j in c.charges) {
+                    var ch = c.charges[j];
+                    if (ch.generated_charge_id == charge_id) {
+                        return {
+                            id: ch.charge_id,
+                            resolution_plan: ch.resolution_plan,
+                            has_default_rule: ch.has_default_rule
+                        };
+                    }
+                }
+            }
+            return null;
         }
     };
 
@@ -384,6 +411,12 @@ function Case (id, el) {
         if (self.writer_chooser) {
           self.writer_chooser.clear();
         }
+        if (self.case_chooser) {
+          self.case_chooser.clear();
+        }
+
+        var url = "/clearAllReferencedCases?case_id=" + self.id;
+        $.post(url, setCaseReferences);
 
         for (var i = 0; i < self.charges.length; i++) {
             self.charges[i].removeCharge();
@@ -426,6 +459,56 @@ function Case (id, el) {
         app.people, showPersonHistoryInSidebar);
     this.is_modified = false;
     this.charges = [];
+
+    function setCaseReferences(data) {
+        var json = $.parseJSON(data);
+        self.case_chooser.loadData(json);
+        var el = self.el.find('.case-references');
+        el.html('');
+        for (var i in json) {
+            el.append(app.case_reference_template(json[i]));
+        }
+        el.find('input').click(function() {
+            var parent = $(this).parents('.case-charge-reference');
+            if (this.checked) {
+                $.post("/addChargeReferenceToCase?case_id=" + self.id + "&charge_id=" + $(this).data('id'));
+                parent.addClass('referenced');
+            } else {
+                $.post("/removeChargeReferenceFromCase?case_id=" + self.id + "&charge_id=" + $(this).data('id'));
+                parent.removeClass('referenced');
+            }
+        });
+        el.find('.case-charge-reference-generate').click(function() {
+            $(this).hide().parent().find('.case-charge-reference-already-generated').show();
+            var referenced_charge = {
+                id: $(this).data('id'),
+                resolution_plan: $(this).data('resolution-plan')
+            };
+            var url = "/generateChargeFromReference?case_id=" + id + "&referenced_charge_id=" + $(this).data('id');
+            $.post(url, function(response) {
+                var new_charge_json = $.parseJSON(response);
+                if (new_charge_json.rule) {
+                    referenced_charge.has_default_rule = true;
+                }
+                var new_charge = self.addChargeNoServer(new_charge_json.id);
+                new_charge.loadData(new_charge_json, referenced_charge);
+            });
+        });
+    }
+
+    function getLabel(json) {
+        return json.case_number;
+    }
+
+    self.case_chooser = new chooser.Chooser(el.find(".case_chooser"), true, 5, app.cases, getLabel, null, null,
+        function(id) {
+            var url = "/addReferencedCase?case_id=" + self.id + "&referenced_case_id=" + id;
+            $.post(url, setCaseReferences);
+        },
+        function(id) {
+            var url = "/removeReferencedCase?case_id=" + self.id + "&referenced_case_id=" + id;
+            $.post(url, setCaseReferences);
+        });
 
     el.find(".location").change(self.markAsModified);
     el.find(".findings").change(self.markAsModified);
@@ -530,10 +613,11 @@ window.initMinutesPage = function() {
 
     Handlebars.registerPartial("people-chooser", $("#people-chooser").html());
     Handlebars.registerPartial("rule-chooser", $("#rule-chooser").html());
+    Handlebars.registerPartial("case-chooser", $("#case-chooser").html());
 
     app.case_template = Handlebars.compile($("#case-template").html());
     app.charge_template = Handlebars.compile($("#charge-template").html());
-    app.rule_template = Handlebars.compile($("#rule-template").html());
+    app.case_reference_template = Handlebars.compile($("#case-reference-template").html());
 
     app.committee_chooser =
         makePeopleChooser(".committee", app.ROLE_JC_MEMBER);

@@ -1,4 +1,4 @@
-@(active_rps : List[Charge], completed_rps : List[Charge])
+@(active_rps : List[Charge], completed_rps : List[Charge], nullified_rps : List[Charge])
 
 @import helper._
 
@@ -8,10 +8,12 @@
 app = {};
 app.active_rps = [];
 app.completed_rps = [];
+app.nullified_rps = [];
 
 app.initial_data = {
 	active_rps : @Html(Utils.toJson(active_rps)),
-	completed_rps : @Html(Utils.toJson(completed_rps))
+	completed_rps : @Html(Utils.toJson(completed_rps)),
+    nullified_rps : @Html(Utils.toJson(nullified_rps))
 }
 
 config = @Html(Utils.toJson(OrgConfig.get()));
@@ -30,6 +32,12 @@ Print active @OrgConfig.get().str_res_plans</a></p>
 <h2 class="no-print">Recently completed @OrgConfig.get().str_res_plans</h2>
 <table class="table completed-rps printable-res-plans no-print">
 </table>
+
+@if(nullified_rps.size > 0) {
+    <h2 class="no-print">Recently nullified @OrgConfig.get().str_res_plans</h2>
+    <table class="table nullified-rps printable-res-plans no-print">
+    </table>
+}
 
 <script id="rp-template" type="text/x-handlebars-template">
 <tr>

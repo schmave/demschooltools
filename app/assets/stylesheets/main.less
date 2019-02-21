@@ -187,6 +187,14 @@
     border-top: 1px solid #3a87ad;
 }
 
+#breaking-res-plan-entry-chooser .label {
+  font-size: 100%;
+}
+
+#breaking-res-plan-entry-chooser .result {
+  display: inline;
+}
+
 .rule_chooser {
     display: inline;
 }
@@ -261,17 +269,64 @@ img.x {
     font-size: inherit;
 }
 
-.rule .label
+.rule_chooser .results,
+.case_chooser .results {
+  display: inline;
+}
+
+.rule_chooser .result .label,
+.case_chooser .result .label
 {
     cursor: pointer;
     display:inline-block;
     font-size: inherit;
+    margin-left: 5px;
+}
+
+.rule_chooser .result .label
+{
     width: 200px;
 }
 
-.rule
+.rule_chooser .result,
+.case_chooser .result
 {
     display:inline-block;
+}
+
+.case-reference {
+  margin-bottom: 5px;
+}
+
+.case-charge-reference-generate {
+  visibility: hidden;
+  color: #428bca;
+  cursor: pointer;
+}
+
+.case-charge-reference-generate:hover {
+  text-decoration: underline;
+}
+
+.case-charge-reference.referenced .case-charge-reference-generate {
+  visibility: visible;
+}
+
+.case-charge-reference, .case-charge-reference-already-generated {
+  color: #aaa;
+}
+
+.case-charge-reference.referenced {
+  color: #000;
+}
+
+.breaking-res-plan .name img,
+.breaking-res-plan .result img {
+  visibility: hidden;
+}
+
+.original-res-plan-text {
+  padding-left: 5px;
 }
 
 #sidebar
@@ -374,8 +429,12 @@ td.attendance-error {
   overflow: hidden;
 }
 
-.completed-rps {
+.completed-rps, .nullified-rps {
     color: #999;
+}
+
+.nullified-rps input[type=checkbox] {
+  display: none;
 }
 
 .rp-moved {
@@ -408,6 +467,25 @@ a.username {
 
 .minor-referral-label {
     margin-left: 30px;
+}
+
+.rp-row {
+  display: flex;
+  flex-direction: row;
+  div {
+    margin-left: 10px;
+  }
+}
+
+.case {
+  .radio-inline {
+    input[type="radio"] {
+      float: none;
+    }
+    span {
+      margin-left: 5px;
+    }
+  }
 }
 
 .highlight {
@@ -685,6 +763,11 @@ input.date {
 
 .code-__partial, .partial-days {
   background: #deeff8;
+}
+
+.original-res-plan-note {
+  font-style: italic;
+  color: #999;
 }
 
 /***************************************************************************

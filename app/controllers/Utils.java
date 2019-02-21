@@ -202,6 +202,14 @@ public class Utils
         Date utcNow = new Date();
         return new Date(utcNow.getTime() + OrgConfig.get().time_zone.getOffset(utcNow.getTime()));
     }
+
+    public static Integer tryParseInt(String value, Integer defaultValue) {  
+        try {  
+            return Integer.parseInt(value);  
+        } catch (NumberFormatException e) {  
+            return defaultValue;
+        }
+    }
 }
 
 //class PersonKeySerializer extends JsonSerializer<Person>

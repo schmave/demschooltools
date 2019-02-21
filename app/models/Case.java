@@ -7,6 +7,7 @@ import java.io.StringWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.*;
 
 import javax.persistence.*;
 
@@ -56,6 +57,27 @@ public class Case extends Model implements Comparable<Case> {
     static Set<String> names;
 
     public Date date_closed;
+
+    @ManyToMany
+    @JoinTable(name="case_reference",
+        joinColumns=@JoinColumn(name="referencing_case", referencedColumnName="id"),
+        inverseJoinColumns=@JoinColumn(name="referenced_case", referencedColumnName="id"))
+    @JsonIgnore
+    public List<Case> referenced_cases;
+
+    @ManyToMany(mappedBy="referenced_cases")
+    @JsonIgnore
+    public List<Case> referencing_cases;
+
+    @ManyToMany
+    @JoinTable(name="charge_reference",
+        joinColumns=@JoinColumn(name="referencing_case", referencedColumnName="id"),
+        inverseJoinColumns=@JoinColumn(name="referenced_charge", referencedColumnName="id"))
+    @JsonIgnore
+    public List<Charge> referenced_charges;
+
+    @Transient
+    public String composite_findings;
 
     public static Finder<Integer, Case> find = new Finder<Integer, Case>(
         Case.class
@@ -165,10 +187,12 @@ public class Case extends Model implements Comparable<Case> {
     public String getRedactedFindings(Person keep_this_persons_name) {
         loadNames();
 
+        String composite_findings = generateCompositeFindingsFromChargeReferences();
+
         String keep_first_name = keep_this_persons_name.first_name.trim().toLowerCase();
         String keep_display_name = keep_this_persons_name.getDisplayName().trim().toLowerCase();
 
-        String[] words = findings.split("\\b");
+        String[] words = composite_findings.split("\\b");
         Map<String, String> replacement_names = new HashMap<String, String>();
         char next_replacement = 'A';
 
@@ -182,7 +206,7 @@ public class Case extends Model implements Comparable<Case> {
             }
         }
 
-        String new_findings = this.findings;
+        String new_findings = composite_findings;
         for (String name : replacement_names.keySet()) {
             new_findings = new_findings.replaceAll("(?i)" + name, replacement_names.get(name));
         }
@@ -192,5 +216,148 @@ public class Case extends Model implements Comparable<Case> {
 
     public int compareTo(Case other) {
         return meeting.date.compareTo(other.meeting.date);
+    }
+
+    public void addReferencedCase(Case referenced_case) {
+        referenced_cases.add(referenced_case);
+        // automatically reference all charges by default
+        referenced_charges.addAll(referenced_case.charges);
+        save();
+    }
+
+    public void removeReferencedCase(Case referenced_case) {
+        referenced_cases.remove(referenced_case);
+        for (Charge charge : referenced_case.charges) {
+            referenced_charges.remove(charge);
+        }
+        for (Charge charge : charges) {
+            if (charge.referenced_charge != null && charge.referenced_charge.the_case == referenced_case) {
+                charge.referenced_charge = null;
+            }
+        }
+        save();
+    }
+
+    // We use this method while editing minutes. At this time the user has picked case references, but is still working
+    // on picking charge references, so we don't know which charges will be needed. As a result, we will include
+    // information on all charges from the referenced cases.
+    public String generateCompositeFindingsFromCaseReferences() {
+        if (!OrgConfig.get().org.enable_case_references) {
+            return findings;
+        }
+        return generateCompositeFindings(null, null);
+    }
+
+    // We use this method everywhere besides the edit minutes page. At this point the minutes have been finalized and the
+    // charge references have been selected. We don't need to include information about charges that weren't referenced.
+    public String generateCompositeFindingsFromChargeReferences() {
+        if (!OrgConfig.get().org.enable_case_references) {
+            return findings;
+        }
+        ArrayList<Charge> relevant_charges = new ArrayList<Charge>();
+        for (Charge charge : charges) {
+            charge.buildChargeReferenceChain(relevant_charges);
+        }
+        return generateCompositeFindings(relevant_charges, null);
+    }
+
+    private String generateCompositeFindings(List<Charge> relevant_charges, List<Case> used_cases) {
+
+        if (used_cases == null) {
+            used_cases = new ArrayList<Case>();
+        }
+        used_cases.add(this);
+        String result = "";
+
+        Collections.sort(referenced_cases, (a, b) -> a.case_number.compareTo(b.case_number));
+
+        for (Case c : referenced_cases) {
+            if (used_cases.contains(c)) {
+                continue;
+            }
+            ArrayList<Case> case_referenced_cases = new ArrayList<Case>(c.referenced_cases);
+            case_referenced_cases.removeAll(used_cases);
+            if (case_referenced_cases.size() == 0) {
+                if (result.isEmpty()) {
+                    result += "Per case ";
+                } else {
+                    result += " Then per case ";
+                }
+                result += c.case_number + ",";
+            }
+            if (!result.isEmpty()) {
+                result += " ";
+            }
+            result += c.generateCompositeFindings(relevant_charges, used_cases);
+            if (!result.endsWith(".")) {
+                result += ".";
+            }
+            Map<String, List<Charge>> groups = groupChargesByRuleAndResolutionPlan(c, relevant_charges);
+            for (Map.Entry<String, List<Charge>> entry : groups.entrySet()) {
+                List<Charge> group = entry.getValue();
+                result += " " + group.get(0).person.getDisplayName();
+                if (group.size() == 1) {
+                    result += " was ";    
+                } else {
+                    if (group.size() > 2) {
+                        for (Charge ch : group.subList(1, group.size() - 1)) {
+                            result += ", " + ch.person.getDisplayName();
+                        }
+                        result += ",";
+                    }
+                    result += " and " + group.get(group.size() - 1).person.getDisplayName() + " were "; 
+                }
+                result += "charged with " + group.get(0).getRuleTitle();
+                String resolution_plan = getResolutionPlanForCompositeFindings(group.get(0));
+                if (resolution_plan.isEmpty()) {
+                    result += ".";
+                } else {
+                    if (group.get(0).sm_decision != null && !group.get(0).sm_decision.isEmpty()) {
+                        result += " and School Meeting decided on";
+                    }
+                    else if (group.size() == 1) {
+                        result += " and was assigned";
+                    }
+                    else {
+                        result += " and were each assigned";
+                    }
+                    result += " the " + OrgConfig.get().str_res_plan + " \"" + resolution_plan;
+                    if (!result.endsWith(".")) {
+                        result += ".";
+                    }
+                    result += "\"";
+                }
+            }  
+        }
+        if (!result.isEmpty()) {
+            result += " Then per case " + case_number + ", ";
+        }
+        result += findings;
+        return result;
+    }
+
+    private static Map<String, List<Charge>> groupChargesByRuleAndResolutionPlan(Case c, List<Charge> relevant_charges) {
+
+        List<Charge> charges =
+            Charge.find
+                .fetch("person")
+                .fetch("rule")
+                .fetch("rule.section")
+                .fetch("rule.section.chapter")
+                .where()
+                .eq("case_id", c.id)
+                .ne("person", null)
+                .findList();
+
+        return charges.stream()
+            .filter(ch -> relevant_charges == null || relevant_charges.contains(ch))
+            .collect(Collectors.groupingBy(ch -> ch.getRuleTitle() + getResolutionPlanForCompositeFindings(ch)));
+    }
+
+    private static String getResolutionPlanForCompositeFindings(Charge charge) {
+        if (charge.sm_decision != null && !charge.sm_decision.isEmpty()) {
+            return charge.sm_decision;
+        }
+        return charge.resolution_plan;
     }
 }

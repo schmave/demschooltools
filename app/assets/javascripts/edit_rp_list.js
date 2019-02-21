@@ -110,7 +110,7 @@ var addCharge = function(data, parent_el) {
         "rule_title": data.rule ? data.ruleTitle : "<No rule>",
         "resolution_plan": data.resolution_plan,
         "sm_decision": data.sm_decision,
-        "findings": data.the_case.findings,
+        "findings": data.the_case.composite_findings,
         "sm_decision_date": data.sm_decision_date,
         "referred_to_sm": data.referred_to_sm
         };
@@ -158,11 +158,13 @@ function loadCharge(charge_data, list, parent_el) {
 
 window.initRpList = function() {
     app.rp_template = Handlebars.compile($("#rp-template").html());
-
     for (var i in app.initial_data.active_rps) {
         loadCharge(app.initial_data.active_rps[i], app.active_rps, $(".active-rps"));
     }
     for (i in app.initial_data.completed_rps) {
         loadCharge(app.initial_data.completed_rps[i], app.completed_rps, $(".completed-rps"));
+    }
+    for (i in app.initial_data.nullified_rps) {
+        loadCharge(app.initial_data.nullified_rps[i], app.nullified_rps, $(".nullified-rps"));
     }
 }

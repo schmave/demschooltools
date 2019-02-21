@@ -47,6 +47,8 @@ public class Organization extends Model {
     public Boolean show_attendance;
     public Boolean show_accounting;
 
+    public Boolean enable_case_references;
+
     public Boolean attendance_show_percent;
     public Boolean attendance_enable_partial_days;
     public Time attendance_day_latest_start_time;
@@ -122,6 +124,22 @@ public class Organization extends Model {
     public void updateFromForm(Map<String, String[]> values) {
         if (values.containsKey("jc_reset_day")) {
             this.jc_reset_day = Integer.parseInt(values.get("jc_reset_day")[0]);
+        }
+        if (values.containsKey("case_reference_settings")) {
+            if (values.containsKey("enable_case_references")) {
+                this.enable_case_references = Utils.getBooleanFromFormValue(values.get("enable_case_references")[0]);
+            } else {
+                this.enable_case_references = false;
+            }
+            if (values.containsKey("breaking_res_plan_entry_id")) {
+                Entry.unassignBreakingResPlanEntry();
+                String idString = values.get("breaking_res_plan_entry_id")[0];
+                if (!idString.isEmpty()) {
+                    Entry entry = Entry.findById(Integer.parseInt(idString));
+                    entry.is_breaking_res_plan = true;
+                    entry.save();
+                }
+            }
         }
         if (values.containsKey("manual_settings")) {
             if (values.containsKey("show_last_modified_in_print")) {

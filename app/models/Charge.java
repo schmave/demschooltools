@@ -2,6 +2,7 @@ package models;
 
 import controllers.*;
 
+import java.util.*;
 import java.util.Date;
 import java.util.Map;
 
@@ -29,6 +30,22 @@ public class Charge extends Model implements Comparable<Charge> {
     @ManyToOne
     @JoinColumn(name="case_id")
     public Case the_case;
+
+    @ManyToOne()
+    @JoinColumn(name="referenced_charge_id")
+    @JsonIgnore
+    public Charge referenced_charge;
+
+    @OneToMany(mappedBy="referenced_charge")
+    @JsonIgnore
+    public List<Charge> referencing_charges;
+
+    @ManyToMany(mappedBy="referenced_charges")
+    @JsonIgnore
+    public List<Case> referencing_cases;
+
+    @Transient
+    public boolean is_referenced;
 
     static final String EMPTY_PLEA = "<no plea>";
     public String plea = EMPTY_PLEA;
@@ -58,6 +75,17 @@ public class Charge extends Model implements Comparable<Charge> {
         result.the_case = c;
         result.save();
 
+        return result;
+    }
+
+    public static Charge generateFromReference(Case c, Charge referenced_charge)
+    {
+        Charge result = new Charge();
+        result.the_case = c;
+        result.person = referenced_charge.person;
+        result.rule = Entry.findBreakingResPlanEntry();
+        result.referenced_charge = referenced_charge;
+        result.save();
         return result;
     }
 
@@ -153,7 +181,18 @@ public class Charge extends Model implements Comparable<Charge> {
         if (sm_decision_date != null) {
             return Application.formatDayOfWeek(sm_decision_date) + "&mdash;SM";
         } else {
-            return Application.formatDayOfWeek(the_case.meeting.date);
+            if (the_case != null && the_case.meeting != null) {
+                return Application.formatDayOfWeek(the_case.meeting.date);
+            } else {
+                return null;
+            }
         }
+    }
+
+    public void buildChargeReferenceChain(ArrayList<Charge> chain) {
+        if (referenced_charge != null) {
+            referenced_charge.buildChargeReferenceChain(chain);
+        }
+        chain.add(this);
     }
 }

@@ -25,6 +25,7 @@ app.ROLE_WRITER = @PersonAtCase.ROLE_WRITER
 
 app.people = @Html(Application.jcPeople(""))
 app.rules = @Html(Application.jsonRules(""))
+app.cases = @Html(Application.jsonCases(""))
 
 app.initial_data = {
 	committee : @Html(meeting.getJsonPeople(PersonAtMeeting.ROLE_JC_MEMBER)),
@@ -93,15 +94,40 @@ $(function () {
     </div>
 </script>
 
-<script id="rule-template" type="text/x-handlebars-template">
-    <div class="rule"><span class="label label-success">{{name}}</span><img
-        src="@routes.Assets.versioned("images/x.png")"></div>
-</script>
-
 <script id="rule-chooser" type="text/x-handlebars-template">
 	<div class="rule_chooser">
-        <input class="form-control rule_search" type="text">
+        <div class="results"></div>
+        <input class="form-control search" type="text">
 	</div>
+</script>
+
+<script id="case-chooser" type="text/x-handlebars-template">
+    <div class="case_chooser">
+        <div class="results"></div>
+        <input class="form-control search" type="text">
+    </div>
+</script>
+
+<script id="case-reference-template" type="text/x-handlebars-template">
+    <div class="case-reference">
+        <strong>{{case_number}}</strong>: {{findings}}
+        {{#each charges}}{{#with this}}
+            <div class="case-charge-reference {{#if is_referenced}}referenced{{/if}}">
+                <input type="checkbox" value="{{is_referenced}}" data-id="{{charge_id}}" {{#if is_referenced}}checked{{/if}}>
+                {{person}} was charged with {{rule}}
+                {{#if is_sm_decision}}and School Meeting decided on{{else}}and was assigned{{/if}}
+                the @OrgConfig.get().str_res_plan "{{resolution_plan}}"
+                {{#if previously_referenced_in_case}}
+                    (Previously referenced in case {{previously_referenced_in_case}})
+                {{else}}
+                    <span class="case-charge-reference-generate" data-id="{{charge_id}}" data-resolution-plan="{{resolution_plan}}"
+                    {{#if has_generated}}hidden{{/if}}>Generate charge</span>
+                    <span class="case-charge-reference-already-generated"
+                    {{#unless has_generated}}hidden{{/unless}}>Charge generated</span>
+                {{/if}}
+            </div>
+        {{/with}}{{/each}}
+    </div>
 </script>
 
 <script id="charge-template" type="text/x-handlebars-template">
@@ -111,19 +137,19 @@ $(function () {
 	<b>Entry:</b> {{> rule-chooser}}
 	<tr><td class="esm-form-label">Plea:<td colspan=2>
 <div class="radio-inline">
-  <label><input type="radio" class="plea-guilty" value="Guilty"><span>Guilty</span></label>
+  <label><input type="radio" class="plea plea-guilty" value="Guilty"><span>Guilty</span></label>
 </div>
 @if( OrgConfig.get().show_no_contest_plea ) {
 <div class="radio-inline">
-  <label><input type="radio" class="plea-no-contest" value="No Contest"><span>No Contest</span></label>
+  <label><input type="radio" class="plea plea-no-contest" value="No Contest"><span>No Contest</span></label>
 </div>
 }
 <div class="radio-inline">
-  <label><input type="radio" class="plea-not-guilty" value="Not Guilty"><span>Not Guilty</span></label>
+  <label><input type="radio" class="plea plea-not-guilty" value="Not Guilty"><span>Not Guilty</span></label>
 </div>
 @if( OrgConfig.get().show_na_plea ) {
 <div class="radio-inline">
-  <label><input type="radio" class="plea-na" value="N/A"><span>N/A</span></label>
+  <label><input type="radio" class="plea plea-na" value="N/A"><span>N/A</span></label>
 </div>
 }
 &nbsp;&nbsp;&nbsp;<label><input type="checkbox" class="refer-to-sm"><span> Refer to School Meeting</span></label>
@@ -145,11 +171,37 @@ $(function () {
 	  <label><input type="radio" class="severity severity-severe" value="Severe"><span>Severe</span></label>
 	</div>
 }
-	<tr><td class="esm-form-label">@OrgConfig.get().str_res_plan_cap: <td><textarea class="resolution_plan"></textarea>
-    <td class="last-rp"></td>
-   </table>
-   <button style="margin-left: 200px" class="btn btn-danger btn-xs">Remove Charge</button>
-   </div>
+
+<tr class="original-res-plan" hidden>
+    <td class="esm-form-label">Original:</td>
+    <td colspan="2">
+        <span class="original-res-plan-text"></span>
+        <span class="original-res-plan-note">(Note: This charge nullifies this original @(OrgConfig.get().str_res_plan).)</span>
+    </td>
+</tr>
+<tr>
+    <td class="esm-form-label">@OrgConfig.get().str_res_plan_cap:</td>
+    <td colspan="2">
+        <div class="rp-followups" hidden>
+            <div class="radio-inline">
+              <label><input type="radio" class="rp-followup rp-followup-time-served rp-type-no-res-plan">
+                <span>No @OrgConfig.get().str_res_plan</span></label>
+            </div>
+            <div class="radio-inline">
+              <label><input type="radio" class="rp-followup rp-followup-new-rp">
+                <span>Replace @OrgConfig.get().str_res_plan</span></label>
+            </div>
+        </div>
+        <div class="rp-row">
+            <textarea class="resolution_plan"></textarea>
+            <div class="last-rp"></div>
+        </div>
+    </td>
+</tr>
+</table>
+<button style="margin-left: 200px" class="btn btn-danger btn-xs remove-charge">Remove Charge</button>
+<span class="remove-charge-disabled-text" hidden>(This charge is referenced in a later case.)</span>
+</div>
 </script>
 
 <script id="case-template" type="text/x-handlebars-template">
@@ -174,6 +226,17 @@ $(function () {
 <tr><td class="esm-form-label">Who testified:<td>
     {{render "people-chooser" clazz="testifier"}}
 </tr>
+
+@if( OrgConfig.get().org.enable_case_references ) {
+    <tr>
+        <td class="esm-form-label">Referenced cases:</td>
+        <td>{{render "case-chooser"}}</td>
+    </tr>
+    <tr>
+        <td></td>
+        <td class="case-references"></td>
+    </tr>
+}
 
 <tr><td class="esm-form-label">@OrgConfig.get().str_findings: <td><textarea class="findings"></textarea></tr>
 

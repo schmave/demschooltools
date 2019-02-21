@@ -14,6 +14,7 @@ require('./edit_rp_list');
 var feedback_modal = require('./feedback_modal');
 require('./sorttable');
 var people_chooser = require('./people_chooser');
+var chooser = require('./chooser');
 var create_transaction = require('./create_transaction');
 var transaction_list = require('./transaction_list');
 var settings_page = require('./settings_page');
@@ -115,6 +116,12 @@ window.initPeopleChooser = function(selector, onAdd, onRemove) {
         onAdd,
         onRemove,
         '/jsonPeople');
+};
+
+window.initChooser = function(el, allowMultiple, minLength, source, getLabel, onClick, onChange, onAdd, onRemove, initialData) {
+    var myChooser = new chooser.Chooser(el, allowMultiple, minLength, source, getLabel, onClick, onChange, onAdd, onRemove);
+    myChooser.loadData(initialData);
+    return myChooser;
 };
 
 window.enableButtonForCheckboxes = function(btn_selector, checkbox_class) {
