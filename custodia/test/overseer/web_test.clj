@@ -270,8 +270,8 @@
               _10-14 (-> att :days first)
               first-swipe (-> _10-14 :swipes first)]
           (testing "swipe info"
-            (is (= "08:06:00" (:nice_out_time first-swipe)))
-            (is (= "08:01:00" (:nice_in_time first-swipe))))
+            (is (= "08:06" (:nice_out_time first-swipe)))
+            (is (= "08:01" (:nice_in_time first-swipe))))
           (testing "att stuff"
             (is (= (:total_mins _10-14) 0M))
             (is (= (:total_days att) 0))
@@ -285,7 +285,7 @@
 (def _500pm_2014_10_14 (t/date-time 2014 10 14 21 0))
 (def _330pm_2014_10_14 (t/date-time 2014 10 14 19 30))
 
-(comment 
+(comment
  (deftest making-class-with-swipe-out-of-range
    (do (sample-db)
        (let [class (cmd/make-class "name" "2015-08-12"  "2016-06-10")
@@ -347,18 +347,18 @@
               _10-14 (-> att :days second)]
           (testing "10/15 has no out rounding"
             (is (= (-> _10-15 :swipes first :nice_out_time)
-                   "03:30:00")))
+                   "03:30")))
           (testing "10/15 has in rounding"
             (is (= (-> _10-15 :swipes first :nice_in_time)
-                   "08:39:27")))
+                   "08:39")))
           (testing "10/15 minutes" (is (= (-> _10-15 :total_mins) 390M)))
           (testing "10/15 valid" (is (= (-> _10-15 :valid) true)))
           (testing "10/14 has out rounding"
             (is (= (-> _10-14 :swipes first :nice_out_time)
-                   "05:00:00")))
+                   "05:00")))
           (testing "10/14 has no in rounding"
             (is (= (-> _10-14 :swipes first :nice_in_time)
-                   "12:00:00")))
+                   "12:00")))
           (testing "10/14 minutes" (is (= (-> _10-14 :total_mins) 240M)))
           (testing "10/14 not valid" (is (= (-> _10-14 :valid) false)))
           (testing "One short" (is (= (:total_short att) 1)))
@@ -476,7 +476,7 @@
           (testing "Nice time shown correctly"
             (is (= (-> att :days (nth 2) :swipes first :nice_in_time)
                    ;; shown as hour 10 because that was DST forward +1
-                   "10:09:27")))
+                   "10:09")))
           (testing "Total short count student 2"
             (is (= (:total_short att2)
                    2)))
@@ -611,7 +611,7 @@
   (let [res (att/get-last-swipe-type
              [{:swipes [{:day "2015-04-17", :nice_out_time nil, :type "", :nice_in_time nil, :has_override nil, :out_time nil, :in_time nil}]}
               {:swipes [{:day "2015-04-16",  :nice_out_time nil, :type "", :nice_in_time nil, :has_override nil, :out_time nil, :in_time nil}]}
-              {:swipes [{:day "2015-04-15", :nice_out_time nil, :type "swipes", :nice_in_time "07:47:25", :out_time nil, :in_time "2015-04-15T11:47:25.516000000-00:00"}]}])]
+              {:swipes [{:day "2015-04-15", :nice_out_time nil, :type "swipes", :nice_in_time "07:47", :out_time nil, :in_time "2015-04-15T11:47:25.516000000-00:00"}]}])]
     (testing "Can get last swipe type"
       (is (not= nil res)))))
 

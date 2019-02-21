@@ -290,6 +290,11 @@ rect.highlight {
 .action-buttons {
     border-top: solid lightgray 1px;
     padding-top: 5px;
+    display: flex;
+    flex-direction: row;
+}
+.action-buttons button {
+    margin: 0 3px;
 }
 
 .cal-heatmap-container rect.highlight,

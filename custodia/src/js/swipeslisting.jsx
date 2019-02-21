@@ -87,14 +87,10 @@ class SwipesListing extends React.Component {
             {showOverrideExcuseButtons ?
               <AdminItem>
                 <div className="action-buttons">
-                  <div className="pull-left">
-                    <button type="button" id="override" onClick={this.override} className="btn btn-sm btn-info">
-                        Override
-                    </button>
-                  </div>
-                  <div className="pull-right">
-                    <button type="button" onClick={this.excuse} className="btn btn-sm btn-info">Excuse</button>
-                  </div>
+                  <button type="button" id="override" onClick={this.override} className="btn btn-sm btn-info">
+                      Override
+                  </button>
+                  <button type="button" onClick={this.excuse} className="btn btn-sm btn-info">Excuse</button>
                 </div>
               </AdminItem>
               : ''
