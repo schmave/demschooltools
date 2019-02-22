@@ -15,10 +15,11 @@ import com.ecwid.mailchimp.method.v2_0.lists.UnsubscribeMethod;
 import com.ecwid.mailchimp.method.v2_0.lists.UpdateMemberMethod;
 import com.feth.play.module.pa.controllers.Authenticate;
 import com.feth.play.module.pa.PlayAuthenticate;
-import com.feth.play.module.pa.user.AuthUser;
 import com.google.inject.Inject;
 
 import models.*;
+
+import org.mindrot.jbcrypt.BCrypt;
 
 
 import play.*;
@@ -351,6 +352,24 @@ public class Public extends Controller {
 			return unauthorized("Unknown organization");
 		}
         return ok(views.html.login.render(mPlayAuth, flash("notice")));
+    }
+
+    public Result doLogin() {
+        final Map<String, String[]> values = request().body().asFormUrlEncoded();
+
+        String email = values.get("email")[0];
+        User u = User.findByEmail(email);
+
+        String password = values.get("password")[0];
+
+        if (u != null && u.hashed_password.length() > 0) {
+            if (BCrypt.checkpw(password, u.hashed_password)) {
+                return mPlayAuth.handleAuthentication("evan-auth-provider", Context.current(), u);
+            }
+        }
+        flash("notice", "Failed to login: wrong email address or password");
+
+        return redirect(routes.Public.index());
     }
 
     public Result authenticate(String provider) {

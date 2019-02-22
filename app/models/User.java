@@ -29,6 +29,7 @@ public class User extends Model {
 
 	public String email;
 	public String name;
+	public String hashed_password;
 
 	public boolean active;
 	public boolean emailValidated;
@@ -82,6 +83,9 @@ public class User extends Model {
 	public static User findByAuthUserIdentity(final AuthUserIdentity identity) {
 		if (identity == null) {
 			return null;
+		}
+		if (identity.getProvider().equals("evan-auth-provider")) {
+			return User.findByEmail(identity.getId());
 		}
 		return getAuthUserFind(identity).findUnique();
 	}

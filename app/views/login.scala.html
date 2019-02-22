@@ -5,15 +5,22 @@
 
 @main("DemSchoolTools login (" + OrgConfig.get().org.short_name + ")", "none") {
 
-	<div class="container" style="padding-top:100px;">
 	@if( notice != null ) { <div class="alert alert-warning"><strong>@notice</strong></div> }
 	<a href="@routes.Application.index()" class="btn btn-large btn-primary" style="color:white;">
 	Browse in read-only mode</a>
 
 	<hr>
-	<h3>OR</h3>
+
+	<form method="POST" action="/login">
+	<h3>Login with a password</h3>
+	Email address: <input type="text" size=40 name="email" />
+	Password: <input type="password" name="password" />
+	<input type="submit" value="Login"/>
+	</form>
+
 	<hr>
 
+	<h3>Login with Google or Facebook</h3>
 	<p class="instructions"><b>Warning:</b> If you log in with your Facebook or Google account and do not log
 		out of that account (easy to do),
 	   future users of this computer will have access to your status, email, and calendars, as well as DemSchoolTools.

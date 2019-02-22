@@ -233,6 +233,8 @@
                 href="@routes.Settings.viewTaskLists()">Checklists</a>
             <a @if(selectedBtn.equals("settings_access")) { class="active" }
                 href="@routes.Settings.viewAccess()">Users & Access</a>
+            <a @if(selectedBtn.equals("settings_password")) { class="active" }
+                href="@routes.Settings.viewPassword()">Change Password</a>
             </div>
         </div>
         }
