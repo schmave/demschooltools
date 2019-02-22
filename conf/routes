@@ -176,6 +176,9 @@ GET     /settings/notifications controllers.Settings.viewSettings()
 POST    /settings               controllers.Settings.editSettings()
 POST    /settings/notifications controllers.Settings.editNotifications()
 
+GET     /settings/password      controllers.Settings.viewPassword()
+POST    /settings/password      controllers.Settings.editPassword()
+
 GET     /settings/checklists    controllers.Settings.viewTaskLists()
 POST    /settings/newChecklist  controllers.Settings.newTaskList()
 GET     /settings/checklist/:id controllers.Settings.viewTaskList(id : Integer)
@@ -204,6 +207,7 @@ GET     /assets/*file               controllers.Assets.versioned(path="/public",
 GET     /robots.txt                 controllers.Assets.at(path="/public", file="robots.txt")
 
 
+POST    /login                controllers.Public.doLogin()
 
 GET     /logout                     com.feth.play.module.pa.controllers.Authenticate.logout
 GET     /out		            controllers.Public.loggedOut

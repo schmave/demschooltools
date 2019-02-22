@@ -7,6 +7,8 @@ import com.avaje.ebean.SqlQuery;
 import com.avaje.ebean.SqlRow;
 import com.avaje.ebean.SqlUpdate;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import models.*;
 
 import play.data.*;
@@ -73,6 +75,39 @@ public class Settings extends Controller {
     public Result viewTaskLists() {
         Form<TaskList> list_form = Form.form(TaskList.class);
         return ok(views.html.view_task_lists.render(TaskList.allForOrg(), list_form));
+    }
+
+    public Result viewPassword() {
+        return ok(views.html.view_password.render(flash("notice")));
+    }
+
+    public Result editPassword() {
+        final Map<String, String[]> values = request().body().asFormUrlEncoded();
+
+        String password = values.get("password")[0];
+        String confirmPassword = values.get("confirmPassword")[0];
+
+        if (!password.equals(confirmPassword)) {
+            flash("notice", "The two passwords you entered did not match");
+        } else if (password.length() < 8) {
+            flash("notice", "Please choose a password that is at least 8 characters");
+        } else {
+            User u = Application.getCurrentUser();
+            u.hashed_password = BCrypt.hashpw(password, BCrypt.gensalt());
+            u.save();
+            play.libs.mailer.Email mail = new play.libs.mailer.Email();
+            mail.setSubject("DemSchoolTools password changed");
+            mail.addTo(u.email);
+            mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
+            mail.setBodyText("Hi " + u.name + ",\n\nYour DemSchoolTools password was changed today (" +
+                Application.formatDateTimeLong() +
+                "). \n\nIf it was not you who changed it, please investigate what is going on! " +
+                "Feel free to contact Evan (schmave@gmail.com) for help.");
+            play.libs.mailer.MailerPlugin.send(mail);
+            flash("notice", "Your password was changed");
+        }
+
+        return redirect(routes.Settings.viewPassword());
     }
 
     public Result viewTaskList(Integer id) {

@@ -28,7 +28,8 @@ libraryDependencies ++= Seq(
   "com.ecwid" % "ecwid-mailchimp" % "2.0.1.0",
   "org.xhtmlrenderer" % "flying-saucer-pdf" % "9.0.7",
   "com.github.spullara.mustache.java" % "compiler" % "0.9.2",
-  "org.apache.poi" % "poi-ooxml" % "3.17"
+  "org.apache.poi" % "poi-ooxml" % "3.17",
+  "org.mindrot" % "jbcrypt" % "0.3m"
 )
 
 // Disable javadoc

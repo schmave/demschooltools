@@ -15,6 +15,7 @@ import play.api.inject.Binding;
 import play.api.inject.Module;
 import service.MyResolver;
 import service.MyUserService;
+import providers.EvanAuthProvider;
 
 import controllers.Application;
 
@@ -34,6 +35,7 @@ public class MyModule extends AbstractModule {
         bind(GoogleAuthProvider.class).asEagerSingleton();
         bind(FacebookAuthProvider.class).asEagerSingleton();
         bind(Application.class).asEagerSingleton();
+        bind(EvanAuthProvider.class).asEagerSingleton();
         //bind(FoursquareAuthProvider.class).asEagerSingleton();
         // bind(MyUsernamePasswordAuthProvider.class).asEagerSingleton();
         // bind(OpenIdAuthProvider.class).asEagerSingleton();
