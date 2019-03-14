@@ -27,25 +27,32 @@ Make a file called profiles.clj in the base project directory. NEVER ADD IT TO
 GIT. Add in the following:
 
 ```clojure
-{:dev {:repl-options {:init-ns overseer.web}
-       :plugins []
-       :migratus {:store :database
+{
+  :dev {:repl-options {:init-ns overseer.web}
+        :migratus {:store :database
                   :migration-dir "migrations"
                   :db {:classname "org.postgresql.Driver",
                        :subprotocol "postgresql",
                        :user "USER",
                        :password "PASSWORD",
                        :subname "//localhost:5432/DATABASE"}}
-       :dependencies [[clj-webdriver "0.7.2"]
-                      [org.apache.httpcomponents/httpclient "4.3.5"]
-                      [org.seleniumhq.selenium/selenium-java "2.48.1"]]
-       :env {:database-url "postgres://USER:PASSWORD@localhost:5432/DATABASE"
+        :dependencies [[clj-webdriver "0.7.2"]
+                       [org.apache.httpcomponents/httpclient "4.3.5"]
+                       [org.seleniumhq.selenium/selenium-java "2.48.1"]]
+        :plugins [[com.jakemccrary/lein-test-refresh "0.23.0"]
+                  [venantius/ultra "0.5.4"]]
+        :env {:database-url "postgres://USER:PASSWORD@localhost:5432/DATABASE"
              :adminpass "web"
              :userpass "web"
-             :dev true
-             :newdb false
-             :migratedb false
-             :notify false}}}
+             :host "0.0.0.0"
+             :port "5000"
+             :dev "true"
+             :migratedb "true"
+             :notify "false"
+           }
+        :jvm-opts ["-Duser.timezone=GMT"]
+  }
+}
 ```
 
 Replace the following words in your profiles.clj:
@@ -75,9 +82,6 @@ The application also sets up five default users for local testing. They are
 ## NPM
 
 You will need to install [Node.js and npm](https://nodejs.org/en/download/releases/).
-This project uses a package (npm-shrinkwrap) that is incompatible with npm
-version >= 3, so install a 4.x version of Node.js 4.x. Node.js
-version 6.x will not work.
 
 ## Running Locally
 
@@ -95,7 +99,7 @@ To run the backend, run ```make start```.
 If both the frontend and backend are running, the app will be available at
 [localhost:5000](http://localhost:5000/).
 
-### Logging 
+### Logging
 
 Exception and debugging logging can be added to the system via the
 ```log4j.properties``` in the ```src/``` directory.

@@ -27,3 +27,5 @@ pom.xml
 
 *.sublime-project
 *.sublime-workspace
+
+package-lock.json

@@ -3,7 +3,7 @@ var reportStore = require('./reportstore'),
     Modal = require('./modal.jsx'),
     Router = require('react-router'),
     Link = Router.Link,
-    DatePicker = require('react-widgets').DateTimePicker,
+    DateTimePicker = require('react-widgets').DateTimePicker,
     actionCreator = require('./reportactioncreator'),
     React = require('react'),
     Griddle = require('griddle-react');
@@ -26,47 +26,49 @@ function deciHours(time) {
     return i.toString() + ":" + pad(Math.round(((time-i)*60),10), 2);
 }
 
-var StudentTotalComponent = React.createClass({
-  render: function(){
-      var t = deciHours(this.props.data);
-      return <span>{t}</span>;
-  }
-});
+class StudentTotalComponent extends React.Component {
+    render() {
+        var t = deciHours(this.props.data);
+        return <span>{t}</span>;
+    }
+}
 
-var StudentAttendendedComponent = React.createClass({
-  render: function(){
-    var good = this.props.rowData.good;
-    var short = this.props.rowData.short;
+class StudentAttendendedComponent extends React.Component {
+    render() {
+      var good = this.props.rowData.good;
+      var short = this.props.rowData.short;
 
-    var good = (good + short) + " (" + short +  ")";
-    return <span>{good}</span>;
-  }
-});
-var StudentLinkComponent = React.createClass({
-  render: function(){
-    //url ="#speakers/" + props.rowData._id + "/" + this.props.data;
-    var sid = this.props.rowData._id,
-        name = this.props.data;
-    return <Link to="student" params={{studentId: sid}} id={"student-" + sid}>{name}</Link>;
-  }
-});
+      var good = (good + short) + " (" + short +  ")";
+      return <span>{good}</span>;
+    }
+}
 
-var exports = React.createClass({
-    getInitialState: function () {
-        return getState();
-    },
-    componentDidMount: function () {
+class StudentLinkComponent extends React.Component {
+    render() {
+      //url ="#speakers/" + props.rowData._id + "/" + this.props.data;
+      var sid = this.props.rowData._id,
+          name = this.props.data;
+      return <Link to={"/students/" + sid} id={"student-" + sid}>{name}</Link>;
+    }
+}
+
+class StudentReports extends React.Component {
+    state = getState();
+
+    componentDidMount() {
         reportStore.addChangeListener(this.onReportChange);
         classStore.addChangeListener(this.onClassChange);
         classStore.getClasses(true);
         reportStore.getSchoolYears(true);
         this.fetchReport(this.state.selectedClassId, this.state.currentYear);
-    },
-    componentWillUnmount: function () {
+    }
+
+    componentWillUnmount() {
         reportStore.removeChangeListener(this.onReportChange);
         classStore.removeChangeListener(this.onClassChange);
-    },
-    onClassChange : function() {
+    }
+
+    onClassChange = () => {
         this.refs.newSchoolYear.hide();
         var classesAndThings= classStore.getClasses(),
             state = this.state,
@@ -82,8 +84,9 @@ var exports = React.createClass({
         state.classes = classes;
         this.setState(state);
         this.fetchReport(state.selectedClassId, state.currentYear);
-    },
-    onReportChange: function (x) {
+    };
+
+    onReportChange = (x) => {
         this.refs.newSchoolYear.hide();
         var state = this.state,
             years = reportStore.getSchoolYears(),
@@ -95,32 +98,50 @@ var exports = React.createClass({
 
         this.setState(state);
         this.fetchReport(this.state.selectedClassId, currentYear);
-    },
-    fetchReport: function(currentClassId, year) {
+    };
+
+    fetchReport = (currentClassId, year) => {
         var report = reportStore.getReport(year, currentClassId),
             rows = (report != "loading") ? report : [];
         this.setState({loading: (report==null||report=="loading"), rows: rows});
-    },
-    classSelected: function (event) {
+    };
+
+    classSelected = (event) => {
         var currentClassId = event.target.value,
             matching = this.state.classes.filter(cls => cls._id == currentClassId),
             selectedClass = (matching[0]) ? matching[0] : this.state.classes[0];
         this.setState({selectedClass: selectedClass,
                        selectedClassId: selectedClass._id});
         this.fetchReport(selectedClass._id, this.state.currentYear);
-    },
-    yearSelected: function (event) {
+    };
+
+    yearSelected = (event) => {
         var currentYear = event.target.value;
         this.setState({currentYear: currentYear});
         this.fetchReport(this.state.selectedClassId, currentYear);
-    },
-    createPeriod: function(){
-        actionCreator.createPeriod(this.refs.newPeriodStartDate.state.value, this.refs.newPeriodEndDate.state.value);
-    },
-    deletePeriod: function(){
+    };
+
+    createPeriod = () => {
+        actionCreator.createPeriod(this.state.startDate, this.state.endDate);
+    };
+
+    deletePeriod = () => {
         actionCreator.deletePeriod(this.state.currentYear);
-    },
-    render: function () {
+    };
+
+    dateToString = value => {
+      return (value.getYear() + 1900) + "-" + (value.getMonth() + 1) + "-" + value.getDate();
+    }
+
+    onStartDateChange = value => {
+      this.setState({ startDate: this.dateToString(value) });
+    }
+
+    onEndDateChange = value => {
+      this.setState({ endDate: this.dateToString(value) });
+    }
+
+    render() {
         var grid = null;
         if(this.state.loading) {
             grid = <div>Loading</div>;
@@ -147,13 +168,13 @@ var exports = React.createClass({
                         onChange={this.classSelected}
                         value={this.state.selectedClassId}>
                     {this.state.classes ? this.state.classes.map(function (cls) {
-                         return <option value={cls._id}>{cls.name}</option>;
+                         return <option key={cls._id} value={cls._id}>{cls.name}</option>;
                      }.bind(this)) : ""}
                 </select>
                 <select className="pull-left" onChange={this.yearSelected}
                         value={this.state.currentYear}>
                     {this.state.years ? this.state.years.years.map(function (year) {
-                         return <option value={year}> {year === this.state.years.current_year ? year + " (Current)" : year}
+                         return <option key={year} value={year}> {year === this.state.years.current_year ? year + " (Current)" : year}
                          </option>;
                      }.bind(this)) : ""}
                 </select>
@@ -168,8 +189,10 @@ var exports = React.createClass({
             <Modal ref="newSchoolYear" title="Create new period">
                 <form className="form-inline">
                     <div className="form-group">
-                        <label htmlFor="startDate">Start:</label> <DatePicker id="startDate" ref="newPeriodStartDate" onChange={this.newPeriodDateSelected} time={false}/>
-                        <label htmlFor="endDate">End:</label> <DatePicker ref="newPeriodEndDate" id="endDate" time={false}/>
+                        <label htmlFor="startDate">Start:</label>
+                        <DateTimePicker id="startDate" onChange={this.onStartDateChange} time={false}/>
+                        <label htmlFor="endDate">End:</label>
+                        <DateTimePicker id="endDate" onChange={this.onEndDateChange} time={false}/>
                     </div>
                     <div className="form-group" style={{marginLeft: '2em'}}>
                         <button className="btn btn-sm btn-primary" onClick={this.createPeriod}>Create Period</button>
@@ -178,6 +201,6 @@ var exports = React.createClass({
             </Modal>
         </div>;
     }
-});
+}
 
-module.exports = exports;
+module.exports = StudentReports;

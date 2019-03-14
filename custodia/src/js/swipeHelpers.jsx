@@ -5,88 +5,79 @@ var React = require('react'),
     actionCreator = require('./studentactioncreator'),
     Modal = require('./modal.jsx');
 
-module.exports = React.createClass({
-    getInitialState: function() {
-        return {};
-    },
-    _getMissingSwipe : function(student) {
-        var missingdirection = (student.last_swipe_type == "in") ? "out" : "in";
-        if (!student.in_today && student.direction == "out") {
-            missingdirection = "in";
-        }
-        this.setState({missingdirection: missingdirection});
-        this.refs.missingSwipeCollector.show();
-        return missingdirection;
-        // use ComponentDidUpdate to check the states then change them
-        // use the onChange for the datepicker to mutate setState
-    },
+module.exports = class extends React.Component {
+    static displayName = "SwipeHelpers";
 
-    _swipeWithMissing: function(missing) {
+    state = {
+        missing_date: undefined,
+        missing_direction: undefined,
+        student: undefined,
+    };
+
+    _swipeWithMissing = (missing) => {
         var student = this.state.student,
-            missing = this.refs.missing_datepicker.state.value;
+            missing = this.state.missing_date;
         actionCreator.swipeStudent(student, student.direction, missing);
-        this.setState({student: {}, missingdirection: false})
-        this.refs.missingSwipeCollector.hide();
-    },
+        this.setState({student: undefined, missing_direction: undefined})
+    };
 
-    validateSignDirection: function(student, direction) {
-        this.setState({student: student})
+    validateSignDirection = (student, direction) => {
+        this.setState({student: student, missing_direction: undefined})
         student.direction = direction;
-        var missing_in = ((student.last_swipe_type == "out"
-                        || (student.last_swipe_type == "in" && !student.in_today)
-                        || !student.last_swipe_type)
-                       && direction == "out"),
-            missing_out = (student.last_swipe_type == "in"
-                        && direction == "in");
-
-        if ((missing_in || missing_out) && student.last_swipe_date) {
-            var missingD = this._getMissingSwipe(student);
-            this._setCalendarTime(student, missingD);
+        if (student.last_swipe_type === direction) {
+            var missing_direction = direction === 'in' ? 'out' : 'in';
+            this.setState({missing_direction: missing_direction});
+            this._setCalendarTime(student, missing_direction);
         } else {
             actionCreator.swipeStudent(student, direction);
         }
-    },
-    _setCalendarTime: function(student, missingdirection) {
+    };
+
+    _setCalendarTime = (student, missing_direction) => {
         var d = new Date();
         if (!student) { return d;}
-        if (student.last_swipe_date) {
-            var lastDate = student.last_swipe_date.replace(/T.*/, "");
-            d = new Date(lastDate + "T10:00:00");
-        }
-        if (!student.in_today
-            && student.direction == "out") {
-            d = new Date();
-        }
-        d.setHours((missingdirection == "in") ? 9 : 15);
-        d.setMinutes(0);
 
-        if(this.refs.missing_datepicker) {
-            this.refs.missing_datepicker.state.value = d;
+        if (missing_direction === 'out') {
+            d = new Date(student.last_swipe_date + 'T00:00:00');
         }
-        return d;
-    },
-    render: function()  {
-        return <div className="row">
+        d.setHours(missing_direction === "in" ? 9 : 15);
+        console.log('suggesting', d);
+        this.setState({missing_date: d});
+    };
+
+    componentDidUpdate = () => {
+        if (this.state.missing_direction !== undefined) {
+            this.refs.missingSwipeCollector.show();
+        }
+    }
+
+    render() {
+        var self = this;
+        if (this.state.missing_direction !== undefined) {
+            console.log('render', this.state.missing_date);
+        }
+        return this.state.missing_direction === undefined ? '' : <div className="row">
           <Modal ref="missingSwipeCollector"
-                 title={"What time did you sign " + this.state.missingdirection + "?"}>
+                 title={"What time did you sign " + this.state.missing_direction + "?"}>
             <form className="form-inline">
               <div className="form-group">
-                <label htmlFor="missing">What time did you sign {this.state.missingdirection}?</label>
-                <DateTimePicker id="missing" defaultValue={new Date()}
+                <label htmlFor="missing">What time did you sign {this.state.missing_direction}?</label>
+                <DateTimePicker format="hh:mm a"
+                                date={false}
+                                id="missing"
                                 ref="missing_datepicker"
-                                calendar={false}/>
+                                step={15}
+                                defaultValue={this.state.missing_date}
+                                onChange={function(value) {
+                                    console.log(value);
+                                    self.setState({missing_date: value});
+                                }}/>
               </div>
               <div className="form-group" style={{marginLeft: '2em'}}>
                 <button id="submit-missing" className="btn btn-sm btn-primary" onClick={this._swipeWithMissing}>
-                  Sign {this.state.missingdirection} </button>
+                  Sign {this.state.missing_direction} </button>
               </div>
             </form>
           </Modal></div>;
-    },
-
-    _onChange: function() {
-        if (this.refs.missingSwipeCollector) {
-            this.refs.missingSwipeCollector.hide();
-        }
     }
-});
+};

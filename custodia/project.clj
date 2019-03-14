@@ -3,47 +3,37 @@
   :url "http://overseer.herokuapp.com"
   :license {:name "Eclipse Public License v1.0"
             :url "http://www.eclipse.erg/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.7.0"]
+  :dependencies [
+                 [clj-time "0.14.2"]
+                 [com.cemerick/friend "0.2.3" :exclusions [xerces/xercesImpl org.clojure/core.cache]]
+                 [compojure "1.6.0"]
+                 [environ "1.0.2"]
                  [goat "0.1.0-SNAPSHOT"]
-                 [compojure "1.4.0"]
-                 [ring/ring-jetty-adapter "1.2.2"]
-                 [org.slf4j/slf4j-log4j12 "1.7.9"]
-                 [org.clojure/tools.logging "0.3.1"]
-                 [ring/ring-devel "1.4.0"]
-                 [org.clojure/data.json "0.2.5"]
-                 [com.cemerick/friend "0.2.1" :exclusions [xerces/xercesImpl
-                                                           org.clojure/core.cache]]
-                 [org.slf4j/slf4j-log4j12 "1.7.1"]
-                 [log4j/log4j "1.2.17" :exclusions [javax.mail/mail
-                                                    javax.jms/jms
-                                                    com.sun.jmdk/jmxtools
-                                                    com.sun.jmx/jmxri]]
-                 [org.clojure/tools.trace "0.7.8"]
-                 [yesql "0.5.1"]
-                 [environ "1.0.0"]
-                 [ring/ring-json "0.3.1"]
-                 [jdbc-ring-session "0.8"]
-                 [sonian/carica "1.1.0" :exclusions [[cheshire]]]
-                 [clj-time "0.8.0"]
                  [heroku-database-url-to-jdbc "0.2.2"]
-                 [org.clojure/java.jdbc "0.4.1"]
-                 [prismatic/schema "0.4.2"]
-                 [migratus "0.8.13"]
+                 [jdbc-ring-session "1.0"]
+                 [log4j/log4j "1.2.17" :exclusions [javax.mail/mail javax.jms/jms com.sun.jmdk/jmxtools com.sun.jmx/jmxri]]
+                 [migratus "1.2.2"]
+                 [org.clojure/clojure "1.9.0"]
+                 [org.clojure/data.json "0.2.6"]
+                 [org.clojure/java.classpath "0.2.3"]
+                 [org.clojure/java.jdbc "0.7.5"]
+                 [org.clojure/tools.logging "0.4.0"]
+                 [org.clojure/tools.trace "0.7.9"]
+                 [org.clojure/tools.trace "0.7.9"]
                  [org.postgresql/postgresql "9.4-1201-jdbc41"]
-                 [org.clojure/tools.trace "0.7.8"]
-                 [com.ashafa/clutch "0.4.0"]
-                 [org.clojure/java.classpath "0.2.2"]
+                 [org.slf4j/slf4j-log4j12 "1.7.25"]
+                 [prismatic/schema "1.1.7"]
+                 [ring/ring-core "1.6.3"]
+                 [ring/ring-devel "1.6.3"]
+                 [ring/ring-jetty-adapter "1.6.3"]
+                 [ring/ring-json "0.4.0"]
                  [stencil "0.5.0"]
-                 ;;[refactor-nrepl "1.2.0"]
-                 ;;[alembic "0.3.2"]
-                 ;;[org.clojure/tools.nrepl "0.2.12"]
+                 [yesql "0.5.3"]
                  ]
-  :min-lein-version "2.0.0"
+  :min-lein-version "2.8.1"
   :plugins [
-           ;; [cider/cider-nrepl "0.10.0-SNAPSHOT"]
-            ;;[refactor-nrepl "2.0.0-SNAPSHOT"]
             [lein-ring "0.9.7"]
-            [migratus-lein "0.2.6"]
+            [migratus-lein "0.7.1"]
             [environ/environ.lein "0.2.1"]
             [lein-environ "1.1.0"]]
   :migratus {:store :database
@@ -64,6 +54,6 @@
                  :port 9998}}
   ;; :main overseer.web
   :uberjar-name "overseer-standalone.jar"
-  :profiles {:debug { :jvm-opts ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"]}
+  :profiles {:debug { }
              :production {:env {:production true}}
              :uberjar {:main overseer.web :aot :all}})

@@ -1,26 +1,28 @@
 var userStore = require('./userstore'),
 React = require('react');
 
-var exports = React.createClass({
-    getInitialState: function(){
-        return {permitted: userStore.isSuper()};
-    },
-    componentDidMount: function(){
+class SuperWrapper extends React.Component {
+    state = {permitted: userStore.isSuper()};
+
+    componentDidMount() {
       userStore.addChangeListener(this._onChange);
-    },
-    componentWillUnmount: function(){
+    }
+
+    componentWillUnmount() {
       userStore.removeChangeListener(this._onChange);
-    },
-    render: function () {
+    }
+
+    render() {
         if (this.state.permitted) {
             return this.props.children;
         }
 
         return null;
-    },
-    _onChange: function(){
-        this.setState({permitted: userStore.isSuper()});
     }
-});
 
-module.exports = exports;
+    _onChange = () => {
+        this.setState({permitted: userStore.isSuper()});
+    };
+}
+
+module.exports = SuperWrapper;

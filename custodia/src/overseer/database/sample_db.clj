@@ -10,6 +10,23 @@
             [overseer.attendance :as att]
             [clj-time.coerce :as c]))
 
+; This doesn't work for some bizarre reason having to do with jdbc nonsense
+; Create make-sample.sql with this command:
+; /Applications/Postgres.app/Contents/Versions/9.6/bin/pg_dump --host localhost --port 5432
+;       --username "evan" --no-password  --format plain --verbose --inserts
+;       --file make-sample.sql school_crm
+; (defn sample-db []
+;   (println 'a')
+;   (conn/init-pg)
+;   (println 'b')
+;   (users/drop-all-tables)
+;   (println 'c')
+;   (jdbc/execute! @pgdb (slurp "make-sample.sql") {:transaction? false})
+;   (println 'd')
+; )
+
+;; (sample-db true)
+;; (binding [db/*school-id* 1] (sample-db true))
 (defn sample-db
   ([] (sample-db false))
   ([have-extra?]

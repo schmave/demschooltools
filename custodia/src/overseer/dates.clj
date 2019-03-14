@@ -1,6 +1,5 @@
 (ns overseer.dates
-  (:require [com.ashafa.clutch :as couch]
-            [overseer.db :as db]
+  (:require [overseer.db :as db]
             [overseer.helpers :refer :all]
             [clj-time.format :as f]
             [clj-time.local :as l]
@@ -13,10 +12,11 @@
 (def date-format (f/formatter "yyyy-MM-dd"))
 (def time-format (f/formatter "hh:mm:ss"))
 
-(def local-time-zone-id (t/time-zone-for-id db/*school-timezone*))
+(defn local-time-zone-id []
+  (t/time-zone-for-id db/*school-timezone*))
 
 (defn format-to-local [f d]
-  (f/unparse (f/with-zone f local-time-zone-id) d))
+  (f/unparse (f/with-zone f (local-time-zone-id)) d))
 
 (defn parse-date-string [d]
   (f/parse date-format d))
@@ -33,8 +33,11 @@
       (t/in-minutes (t/interval in-time out-time))
       0M)))
 
+(defn from-sql-time-wo-zone [inst]
+  (f/unparse time-format (c/from-sql-date inst)))
+
 (defn from-sql-time [inst]
-  (f/unparse (f/with-zone time-format local-time-zone-id) (c/from-sql-date inst)))
+  (f/unparse (f/with-zone time-format (local-time-zone-id)) (c/from-sql-date inst)))
 
 (defn make-date-string-without-timezone [d]
   (when d
@@ -57,14 +60,14 @@
                       (f/parse (f %)))
           list))
 
-(defn in-local-time-at-hour [date hour]
+(defn in-local-time-at-hour [date hour minutes]
   (let [local-date (f/parse (make-date-string date))]
-    (-> (t/date-time (t/year local-date) (t/month local-date) (t/day local-date) hour 0)
-        (t/from-time-zone local-time-zone-id))))
+    (-> (t/date-time (t/year local-date) (t/month local-date) (t/day local-date) hour minutes)
+        (t/from-time-zone (local-time-zone-id)))))
 
-(defn earliest-time [date] (in-local-time-at-hour date 9))
+(defn earliest-time [date] (in-local-time-at-hour date 8 30))
 
-(defn latest-time [date] (in-local-time-at-hour date 16))
+(defn latest-time [date] (in-local-time-at-hour date 16 0))
 
 (s/defn round-swipe-time :- DateTime [time]
   (let [time (cond-parse-date-string time)

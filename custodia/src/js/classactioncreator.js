@@ -1,7 +1,7 @@
 var eventEmitter = require('events').EventEmitter,
     constants = require('./appconstants'),
     ajax = require('./ajaxhelper'),
-    router = require('./routercontainer'),
+    myhistory = require('./myhistory.js'),
     dispatcher = require('./appdispatcher');
 
 var exports = {
@@ -27,7 +27,7 @@ var exports = {
                             type: constants.classEvents.CLASS_CREATED,
                             data: data
                         });
-                        router.get().transitionTo('classes');
+                        myhistory.replace('classes');
                     };
                 };
         if(id > 0) {

@@ -1,7 +1,7 @@
 var eventEmitter = require('events').EventEmitter,
     constants = require('./appconstants'),
     ajax = require('./ajaxhelper'),
-    router = require('./routercontainer'),
+    myhistory = require('./myhistory.js'),
     dispatcher = require('./appdispatcher');
 
 var exports = {
@@ -51,7 +51,7 @@ var exports = {
                     type: constants.systemEvents.FLASH,
                     message: 'Successfully created ' + data.made.name + '.'
                 });
-                router.get().transitionTo('studentAdmin');
+                myhistory.replace('studentAdmin');
             } else {
                 dispatcher.dispatch({
                     type: constants.systemEvents.FLASH,
@@ -107,7 +107,7 @@ var exports = {
                     message: student.name + ' swiped successfully!'
                 });
                 //student = null;
-                router.get().transitionTo('students');
+                myhistory.replace('/students');
             }.bind(this));
     },
     toggleArchived: function (id) {

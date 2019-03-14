@@ -48,8 +48,8 @@ WITH student_school_days AS (
     )
 SELECT
   schooldays.student_id
-  , to_char(s.in_time at time zone :timezone, 'HH:MI:SS') as nice_in_time
-  , to_char(s.out_time at time zone :timezone, 'HH:MI:SS') as nice_out_time
+  , to_char(s.in_time at time zone :timezone, 'HH:MI') as nice_in_time
+  , to_char(s.out_time at time zone :timezone, 'HH:MI') as nice_out_time
   , s.out_time
   , s.in_time
   , s.rounded_out_time
@@ -186,7 +186,7 @@ SELECT
   stu.student_id
     , stu.student_id as _id
     , (select s.name from overseer.students s WHERE s._id = stu.student_id) as name
-    , round(sum(CASE WHEN oid IS NOT NULL THEN stu.requiredmin/60 ELSE stu.intervalmin/60 END)) as total_hours
+    , round(sum(CASE WHEN oid IS NOT NULL THEN stu.requiredmin/60.0 ELSE stu.intervalmin/60.0 END)) as total_hours
     , sum(CASE WHEN oid IS NOT NULL
                OR stu.intervalmin >= stu.requiredmin
           THEN 1 ELSE 0 END) as good
@@ -209,8 +209,8 @@ GROUP BY stu.student_id;
 SELECT s.*
        ,'swipes' AS type
        , s.intervalmin as interval
-       , to_char(s.in_time at time zone :timezone, 'HH:MI:SS') as nice_in_time
-       , to_char(s.out_time at time zone :timezone, 'HH:MI:SS') as nice_out_time
+       , to_char(s.in_time at time zone :timezone, 'HH:MI') as nice_in_time
+       , to_char(s.out_time at time zone :timezone, 'HH:MI') as nice_out_time
        FROM overseer.swipes s
        INNER JOIN overseer.students stu ON (stu._id = s.student_id)
        INNER JOIN overseer.years y

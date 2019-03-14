@@ -1,12 +1,15 @@
 var React = require('react');
 
-var component = React.createClass({
-  filterChanged: function(event) {
+class component extends React.Component {
+  static displayName = 'FilterBox';
+
+  filterChanged = (event) => {
     this
       .props
       .onFilterChange(event.target.value);
-  },
-  render: function() {
+  };
+
+  render() {
     return <div style={{padding: "5px"}} className="panel ">
       <form style={{textAlign: "center"}} className="form-inline">
         <input
@@ -19,6 +22,6 @@ var component = React.createClass({
       </form>
     </div>;
   }
-});
+}
 
 module.exports = component;

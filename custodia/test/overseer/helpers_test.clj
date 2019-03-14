@@ -12,8 +12,13 @@
             [clj-time.coerce :as c]))
 
 
+(def new-york-tz (t/time-zone-for-id "America/New_York"))
+
 (defn today-at-utc [h m]
-  (t/to-time-zone (l/to-local-date-time (t/today-at h m)) t/utc))
+  (let [now-in-et (t/to-time-zone (t/now) new-york-tz)]
+      (t/to-time-zone (t/from-time-zone
+        (t/date-time (t/year now-in-et) (t/month now-in-et) (t/day now-in-et) h m)
+        new-york-tz) t/utc)))
 
 
 (defn get-att [id]
@@ -49,7 +54,7 @@
 
   (cmd/swipe-in sid _2014_10_17)
   (cmd/swipe-out sid (t/plus _2014_10_17 (t/hours 4)))
-  (cmd/swipe-in sid (t/plus _2014_10_17 (t/hours 4.1)))
+  (cmd/swipe-in sid (t/plus _2014_10_17 (t/hours 4) (t/minutes 10)))
   (cmd/swipe-out sid (t/plus _2014_10_17 (t/hours 6)))
 
   ;; short
@@ -77,7 +82,7 @@
         result))))
 
 (defn student-report-is [att good short excuses unexcused overrides hours]
-  (testing "Student attendence"
+  (testing "Student attendance"
     (is (= good (:good att)) "good")
     (is (= short (:short att)) "short")
     (is (= excuses (:excuses att)) "excuses")
@@ -86,40 +91,18 @@
     (is (= unexcused (:unexcused att))) "unexcused"))
 
 (defn student-att-is [att total abs overrides short]
-  (testing "Student attendence"
+  (testing "Student attendance"
     (is (= total (:total_days att)) "Total days")
     (is (= abs (:total_abs att)) "Total Abs")
     (is (= overrides (:total_overrides att)) "Total overrides")
     (is (= short (:total_short att))) "Total short"))
 
-;; (sample-db true) 
-;; (binding [db/*school-id* 1] (sample-db true))
-(defn sample-db
-  ([] (sample-db false))
-  ([have-extra?]
-   (conn/init-pg)
-   (users/reset-db)
-   (let [{class-id :_id} (queries/get-class-by-name "2014-2015")]
-     (cmd/activate-class class-id)
-     (cmd/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 9))))
-     (cmd/make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
-     (let [s (cmd/make-student "jim")
-           {sid :_id} s]
-       (cmd/add-student-to-class sid class-id)
-       (when have-extra? (cmd/swipe-in sid (t/minus (t/now) (t/days 2)))))
-     (let [s (cmd/make-student "steve")
-           {sid :_id} s]
-       (cmd/add-student-to-class sid class-id)
-       (when have-extra? (cmd/swipe-in sid (t/minus (t/now) (t/days 1) (t/hours 5)))))))
-  )
 
-
-
-;; (huge-sample-db) 
+;; (huge-sample-db)
 (defn huge-sample-db []
   (conn/init-pg)
   (users/reset-db)
-  (cmd/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 5))))  
+  (cmd/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 5))))
   (cmd/make-year (str (t/date-time 2013 6)) (str (t/date-time 2014 5)))
 
   (let [{class-id :_id} (queries/get-class-by-name "2014-2015")]

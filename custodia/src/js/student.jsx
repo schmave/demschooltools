@@ -3,7 +3,6 @@ var React = require('react'),
     userStore = require('./userstore'),
     AdminItem = require('./adminwrapper.jsx'),
     Modal = require('./modal.jsx'),
-    DateTimePicker = require('react-widgets').DateTimePicker,
     actionCreator = require('./studentactioncreator'),
     studentStore = require('./StudentStore'),
     Router = require('react-router'),
@@ -17,36 +16,42 @@ var groupingFunc = function (data) {
     return data.day.split('-')[0] + '-' + data.day.split('-')[1];
 };
 
-var exports = React.createClass({
-    contextTypes: {
-        router: React.PropTypes.func
-    },
-    getInitialState: function () {
-        var studentId = this.context.router.getCurrentParams().studentId;
-        return {
+class Student extends React.Component {
+    constructor(props) {
+        super(props);
+        var studentId = props.params.studentId;
+
+        this.state = {
             studentId: studentId,
-            student: studentStore.getStudent(studentId)
+            student: studentStore.getStudent(studentId, true)
         };
-    },
-    componentDidMount: function () {
+    }
+
+    componentDidMount() {
         studentStore.addChangeListener(this._onChange);
-    },
-    componentWillUnmount: function () {
+    }
+
+    componentWillUnmount() {
         studentStore.removeChangeListener(this._onChange);
-    },
-    signIn: function () {
+    }
+
+    signIn = () => {
         this.refs.missingSwipeCollector.validateSignDirection(this.state.student, 'in');
-    },
-    signOut: function () {
+    };
+
+    signOut = () => {
         this.refs.missingSwipeCollector.validateSignDirection(this.state.student, 'out');
-    },
-    markAbsent: function () {
+    };
+
+    markAbsent = () => {
         actionCreator.markAbsent(this.state.student);
-    },
-    studentInToday: function () {
-        return this.state.student.last_swipe_date == this.state.student.today;
-    },
-    getActionButtons: function () {
+    };
+
+    studentInToday = () => {
+        return this.state.student.in_today;
+    };
+
+    getActionButtons = () => {
         var buttons = [];
 
         if (!this.studentInToday() || this.state.student.last_swipe_type === 'out') {
@@ -54,7 +59,7 @@ var exports = React.createClass({
                                  className="btn btn-sm btn-info margined">Sign In
             </button>);
         }
-        if (!this.studentInToday() || this.state.student.last_swipe_type === 'in') {
+        if (this.studentInToday() && this.state.student.last_swipe_type === 'in') {
             buttons.push(<button key="sign-out" type="button" id="sign-out" onClick={this.signOut}
                                  className="btn btn-sm btn-info margined">Sign Out
             </button>);
@@ -66,9 +71,9 @@ var exports = React.createClass({
         }
 
         return buttons;
-    },
+    };
 
-    getDayStatus: function (day) {
+    getDayStatus = (day) => {
         var r = "";
         if (day.valid) {
             r = " ✓";
@@ -80,8 +85,9 @@ var exports = React.createClass({
         } else {
             return r;
         }
-    },
-    getDayClass: function (day) {
+    };
+
+    getDayClass = (day) => {
         if (day.valid==true) {
             return "attended-day";
         }
@@ -89,83 +95,86 @@ var exports = React.createClass({
             return "absent-day";
         }
         return "";
-    },
-    toggleMonth: function(month) {
+    };
+
+    toggleMonth = (month) => {
         if (this.state.selectedMonth === month) {
             this.setState({selectedMonth: "" });
         } else {
             this.setState({selectedMonth: month });
         }
-    },
-    openMonth: function(month) {
+    };
+
+    openMonth = (month) => {
         this.setState({selectedMonth: month });
-    },
-    listMonth: function(days, show, month) {
+    };
+
+    listMonth = (days, show, month) => {
         return days.map(function (day, i) {
             var hide = (!show) ? "hidden" : "";
             var selected = day.day === this.getActiveDay(this.state.student) ? "selected" : "";
             var clsName = hide + " " + selected;
             return <tr key={month + day.day} className={clsName}>
               <td>
-                <Link to="student"
+                <Link to={"/students/" + this.state.studentId + "/" + day.day}
                       onClick={this.openMonth.bind(this, month)}
                       id={"day-"+day.day}
-                      className={this.getDayClass(day)}
-                      params={{studentId: this.state.studentId, day: day.day}}>
+                      className={this.getDayClass(day)}>
                   {day.day} {this.getDayStatus(day)}
                 </Link>
               </td>
             </tr>;
         }.bind(this));
-    },
+    };
 
-    getPreviousDays: function () {
-        var selectedDay = this.context.router.getCurrentParams().day;
+    getPreviousDays = () => {
+        var selectedDay = this.props.params.day;
         if (!selectedDay && this.state.day) {
             //routerc.get().transitionTo('swipes', {studentId :this.state.studentId, day: this.state.day});
         }
         var groupedDays = this.state.student.days.groupBy(groupingFunc);
         var months = Object.keys(groupedDays);
+        // This returns a list of lists (of lists?), which React appears to flatten.
         return months.map(function(month){
             var cls = (month===this.state.selectedMonth)
                     ? "glyphicon glyphicon-chevron-down"
                     : "glyphicon glyphicon-chevron-right";
-            return <span key={month}>
-              <tr style={{fontWeight:"bold"}}>
+            return [
+              <tr key={month} style={{fontWeight:"bold"}}>
                 <td onClick={this.toggleMonth.bind(this, month)}
                     style={{fontWeight:"bold"}}>
                   <span className={cls}
                         style={{"paddingRight":"3px"}} ></span>
                   {month}
                 </td>
-              </tr>
-              {this.listMonth(groupedDays[month], (this.state.selectedMonth == month), month)}
-            </span>;
+              </tr>,
+              this.listMonth(groupedDays[month], (this.state.selectedMonth == month), month)
+            ];
         }.bind(this));
-    },
+    };
 
-    toggleEdit: function () {
+    toggleEdit = () => {
         if(userStore.isAdmin()) {
             this.refs.studentEditor.edit(this.state.student);
         }
-    },
+    };
 
-    getActiveDay: function (student) {
-        if (this.context.router.getCurrentParams().day) {
-            return this.context.router.getCurrentParams().day;
+    getActiveDay = (student) => {
+        if (this.props.params.day) {
+            return this.props.params.day;
         } else if (student && student.days[0]) {
             return student.days[0].day;
         } else {
             return '';
         }
-    },
+    };
 
-    toggleHours: function () {
+    toggleHours = () => {
         this.state.student.olderdate = !!!this.state.student.olderdate;
         actionCreator.toggleHours(this.state.student._id);
-    },
+    };
 
-    showingStudentName: function () {
+    showingStudentName = () => {
         return <div className="col-sm-8" id="studentName" >
               <span id="edit-name" >
                 <h1 className="pull-left">{this.state.student.name}</h1>
@@ -174,9 +183,9 @@ var exports = React.createClass({
 
               <h2 className="badge badge-red">{(!this.studentInToday() && this.state.student.absent_today) ? 'Absent' : ''}</h2>
         </div>;
-    },
+    };
 
-    render: function () {
+    render() {
         if (this.state.student) {
             var activeDate = this.getActiveDay(this.state.student);
             var attended = (this.state.student.total_days + this.state.student.total_short).toString()
@@ -244,8 +253,9 @@ var exports = React.createClass({
             return <div></div>;
         }
 
-    },
-    _onChange: function () {
+    }
+
+    _onChange = () => {
         var s = studentStore.getStudent(this.state.studentId);
 
         var activeDay = this.getActiveDay(s);
@@ -254,7 +264,7 @@ var exports = React.createClass({
             selectedMonth : "2016-04",
             activeDay: activeDay
         });
-    }
-});
+    };
+}
 
-module.exports = exports;
+module.exports = Student;

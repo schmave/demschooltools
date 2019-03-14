@@ -31,8 +31,8 @@ exports.getToday = function(){
     return today;
 };
 
-exports.getStudent = function(id){
-    if(studentDetails[id]){
+exports.getStudent = function(id, force){
+    if(!force && studentDetails[id]){
         return studentDetails[id];
     }else{
         actionCreator.loadStudent(id);

@@ -1,4 +1,5 @@
 var React = require('react'),
+    ReactDOM = require('react-dom'),
     Router = require('react-router'),
     AdminItem = require('../adminwrapper.jsx'),
     dispatcher = require('../appdispatcher'),
@@ -7,81 +8,90 @@ var React = require('react'),
     actionCreator = require('../studentactioncreator'),
     Modal = require('../modal.jsx');
 
-module.exports = React.createClass({
-    getInitialState: function() {
+module.exports = class extends React.Component {
+    static displayName = 'StudentEditor';
+
+    constructor(props, context) {
+        super(props, context);
         var that = this;
-        dispatcher.register(function(action){
+        this.dispatchToken = dispatcher.register(function(action){
             if (action.type == constants.studentEvents.STUDENT_LOADED
                 || action.type == constants.studentEvents.ALL_LOADED) {
                 that.savingHide();
                 that.close();
             }
         });
-        return {saving: false,
+
+        this.state = {saving: false,
                 student: {start_date: null, guardian_email: "", name : "", olderdate: null},
                 startdate_datepicker: new Date()};
-    },
+    }
 
-    savingShow: function () {
+    componentWillUnmount = () => {
+      dispatcher.unregister(this.dispatchToken);
+    }
+
+    savingShow = () => {
         this.setState({saving:true});
-    },
-    savingHide: function () {
-        this.setState({saving:false});
-    },
+    };
 
-    saveChange: function () {
+    savingHide = () => {
+        this.setState({saving:false});
+    };
+
+    saveChange = () => {
         this.savingShow();
         var startDate = this.refs.startdate.props.value;
         if (this.state.student._id == null) {
-            actionCreator.createStudent(this.refs.name.getDOMNode().value,
+            actionCreator.createStudent(ReactDOM.findDOMNode(this.refs.name).value,
                                         startDate,
-                                        this.refs.email.getDOMNode().value,
-                                        this.refs.required_minutes.getDOMNode().value,
+                                        ReactDOM.findDOMNode(this.refs.email).value,
+                                        ReactDOM.findDOMNode(this.refs.required_minutes).value,
                                         this.state.student.is_teacher);
         } else {
             actionCreator.updateStudent(this.state.student._id,
-                                        this.refs.name.getDOMNode().value,
+                                        ReactDOM.findDOMNode(this.refs.name).value,
                                         startDate,
-                                        this.refs.email.getDOMNode().value,
-                                        this.refs.required_minutes.getDOMNode().value,
+                                        ReactDOM.findDOMNode(this.refs.email).value,
+                                        ReactDOM.findDOMNode(this.refs.required_minutes).value,
                                         this.state.student.is_teacher);
         }
-    },
+    };
 
-    edit: function(student) {
+    edit = (student) => {
         var s = jQuery.extend({}, student);
         this.setState(
             {student: s,
              creating: (!s._id),
              startdate_datepicker: (s.start_date) ? new Date(s.start_date) : null})
         this.refs.studentEditor.show();
-    },
+    };
 
-    close: function () {
+    close = () => {
         if (this.refs.studentEditor) {
             this.refs.studentEditor.hide();
         }
-    },
+    };
 
-    handleTeacherChange: function(state) {
+    handleTeacherChange = (state) => {
         this.state.student.is_teacher = !this.state.student.is_teacher;
         this.setState({student: this.state.student});
-    },
+    };
 
-    handleDateChange: function(d) {
+    handleDateChange = (d) => {
         this.setState({startdate_datepicker: d});
-    },
+    };
 
-    handleChange: function(event) {
+    handleChange = (event) => {
         const target = event.target;
         const value = target.type === 'checkbox' ? target.checked : target.value;
         const name = target.id;
         var partialState = this.state.student;
         partialState[name] = value;
         this.setState(partialState);
-    },
+    };
 
-    render: function()  {
+    render() {
         var title = ((this.state.creating) ? "Create" :  "Edit") + " Student"
         return <div className="row">
           <Modal ref="studentEditor"
@@ -117,7 +127,7 @@ module.exports = React.createClass({
                 <b>Student Start Date:</b>
                 <DateTimePicker id="missing" value={this.state.startdate_datepicker}
                                 ref="startdate" onChange={this.handleDateChange}
-                                calendar={true}
+                                date={true}
                                 time={false} />
         </div>
         <button onClick={this.saveChange} className="btn btn-success">
@@ -129,11 +139,11 @@ module.exports = React.createClass({
        </form>
             }
           </Modal></div>;
-    },
+    }
 
-    _onChange: function() {
+    _onChange = () => {
         if (this.refs.studentEditor) {
             this.refs.studentEditor.hide();
         }
-    }
-});
+    };
+};

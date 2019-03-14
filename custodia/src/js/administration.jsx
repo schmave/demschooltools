@@ -1,4 +1,5 @@
 var React = require('react'),
+  PropTypes = require('prop-types'),
   Modal = require('./modal.jsx'),
   actionCreator = require('./studentactioncreator'),
   studentStore = require('./StudentStore'),
@@ -7,33 +8,37 @@ var React = require('react'),
   userStore = require('./userstore'),
   SuperItem = require('./superwrapper.jsx');
 
-var exports = React.createClass({
-    contextTypes: {
-        router: React.PropTypes.func
-    },
-    getInitialState: function () {
-        return {schools: userStore.getSchools(),
-                users: userStore.getUsers(),
-                selectedSchool: userStore.getSelectedSchool()};
-    },
-    componentDidMount: function () {
+class Administration extends React.Component {
+    static contextTypes = {
+        router: PropTypes.func
+    };
+
+    state = {schools: userStore.getSchools(),
+            users: userStore.getUsers(),
+            selectedSchool: userStore.getSelectedSchool()};
+
+    componentDidMount() {
         userStore.addChangeListener(this._onChange);
-    },
-    componentWillUnmount: function () {
+    }
+
+    componentWillUnmount() {
         userStore.removeChangeListener(this._onChange);
-    },
-    selectSchool: function(s) {
+    }
+
+    selectSchool = (s) => {
         userStore.setSuperSchool(s);
         this.setState({selectedSchool:s});
-    },
-    makeItems: function() {
+    };
+
+    makeItems = () => {
         var that = this;
         return this.state.schools.map(function(school){
             return (<li><a onClick={that.selectSchool.bind(that,school)}>
                      {school.name}</a></li>);
         });
-    },
-    makeDropDown: function() {
+    };
+
+    makeDropDown = () => {
         return (<div className="dropdown">
             <button className="btn btn-default dropdown-toggle"
             type="button" id="dropdownMenu1"
@@ -45,18 +50,22 @@ var exports = React.createClass({
             {this.makeItems()}
         </ul>
       </div>);
-    },
-    makeUser: function() {
+    };
+
+    makeUser = () => {
         actionCreator.makeUser(this.state.username, this.state.password);
         this.setState({username: "", password:""});
-    },
-    handleUsernameChange: function(event) {
+    };
+
+    handleUsernameChange = (event) => {
         this.setState({username: event.target.value});
-    },
-    handlePasswordChange: function(event) {
+    };
+
+    handlePasswordChange = (event) => {
         this.setState({password: event.target.value});
-    },
-    drawUsers: function() {
+    };
+
+    drawUsers = () => {
         var users = this.state.users;
         users = users.groupBy(u=>u.schema_name);
         if (Object.keys(users).length !== 0) {
@@ -68,8 +77,9 @@ var exports = React.createClass({
               </div>
           });
         }
-    },
-    render: function () {
+    };
+
+    render() {
         return <SuperItem>
             <div>Administration
                 {this.state.selectedSchool?this.state.selectedSchool.name:""}
@@ -113,12 +123,13 @@ var exports = React.createClass({
                 </div>
             </div>
             </SuperItem>
-    },
-    _onChange: function () {
+    }
+
+    _onChange = () => {
         this.setState({schools: userStore.getSchools(),
                        users: userStore.getUsers(),
                        selectedSchool: userStore.getSelectedSchool()});
-    }
-});
+    };
+}
 
-module.exports = exports;
+module.exports = Administration;

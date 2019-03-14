@@ -8,40 +8,38 @@ var React = require('react'),
     studentStore = require('./StudentStore'),
     FilterBox = require('./filterbox.jsx');
 
-var exports = React.createClass({
-    getInitialState: function () {
-        return {
-            filterText: '',
-            students: studentStore.getAllStudents(true)
-        };
-    },
+class StudentAdmin extends React.Component {
+    state = {
+        filterText: '',
+        students: studentStore.getAllStudents(true)
+    };
 
-    setupState: function (students) {
+    setupState = (students) => {
         this.setState({
             students: students,
         });
-    },
+    };
 
-    componentDidMount: function () {
+    componentDidMount() {
         studentStore.addChangeListener(this._onStudentChange);
-    },
+    }
 
-    componentWillUnmount: function () {
+    componentWillUnmount() {
         studentStore.removeChangeListener(this._onStudentChange);
-    },
+    }
 
-    _onStudentChange: function () {
+    _onStudentChange = () => {
         this.setupState(studentStore.getAllStudents());
-    },
+    };
 
-    filterStudents: function(s) {
+    filterStudents = (s) => {
         return s.filter(function(s){ return s.name.toLocaleLowerCase().indexOf(this.state.filterText.toLocaleLowerCase()) > -1;}.bind(this));
-    },
+    };
 
-    getActiveStudents: function(){
+    getActiveStudents = () => {
         var t = this.filterStudents(this.state.students)
                     .map(function (stu) {
-                        var link = <Link to="student" params={{studentId: stu._id}} id={"student-" + stu._id}>{stu.name}</Link>;
+                        var link = <Link to={"/students/" + stu._id} id={"student-" + stu._id}>{stu.name}</Link>;
                         return <div key={"t-" + stu._id}  className="col-sm-4">
                           <div>
                             <div className="name"> {link} </div>
@@ -49,21 +47,21 @@ var exports = React.createClass({
                         </div>;
                     }.bind(this));
         return t;
-    },
+    };
 
-    filterChanged: function(filter){
+    filterChanged = (filter) => {
         this.setState({filterText: filter});
-    },
+    };
 
-    toggleEdit: function () {
+    toggleEdit = () => {
         var edit = !this.state.editing;
         this.setState({editing: edit});
         if (edit) {
             this.refs.studentEditor.edit();
         }
-    },
+    };
 
-    render: function () {
+    render() {
         var createStudentLink = <span onClick={this.toggleEdit}
                                      className="btn btn-primary btn" id="create-student">
                                  Add Student
@@ -94,6 +92,6 @@ var exports = React.createClass({
                           </div>
         </div>;
     }
-});
+}
 
-module.exports = exports;
+module.exports = StudentAdmin;

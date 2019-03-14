@@ -1,7 +1,6 @@
 var eventEmitter = require('events').EventEmitter,
     constants = require('./appconstants'),
     ajax = require('./ajaxhelper'),
-    router = require('./routercontainer'),
     dispatcher = require('./appdispatcher');
 
 var exports = {

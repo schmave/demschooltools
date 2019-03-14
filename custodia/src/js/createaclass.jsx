@@ -1,12 +1,13 @@
 var React = require('react'),
+    ReactDOM = require('react-dom'),
     actionCreator = require('./classactioncreator');
 
-var exports = React.createClass({
-    submit: function(){
-        actionCreator.createClass(this.refs.name.getDOMNode().value);
-    },
+class CreateAClass extends React.Component {
+    submit = () => {
+        actionCreator.createClass(ReactDOM.findDOMNode(this.refs.name).value);
+    };
 
-    render: function () {
+    render() {
         return <div className="row">
             <div className="col-sm-4"></div>
             <div className="col-sm-4">
@@ -28,6 +29,6 @@ var exports = React.createClass({
             </div>
         </div>;
     }
-});
+}
 
-module.exports = exports;
+module.exports = CreateAClass;

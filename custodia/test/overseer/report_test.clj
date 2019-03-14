@@ -9,6 +9,7 @@
             [overseer.db :as db]
             [overseer.queries :as queries]
             [overseer.commands :as cmd]
+            [overseer.database.sample-db :refer [sample-db]]
             [overseer.helpers-test :refer :all]
             [overseer.attendance :as att]
             [overseer.helpers :as h]
@@ -26,7 +27,7 @@
 ;; make report only select students from class
 ;; make reports have a class UI
 
-(deftest swipe-attendence-with-class-test
+(deftest swipe-attendance-with-class-test
   "Report is defined without a class but will use the default one"
   (do (sample-db)
       (let [class-id (get-class-id-by-name "2014-2015")
@@ -44,23 +45,16 @@
               student1 (first (filter #(= sid (:_id %)) att))
               student2 (first (filter #(= sid2 (:_id %)) att))]
 
-          (student-report-is student1 3 2 0 0 0 25M)
-          (testing "Student 1 Counts"
-            (is (= 3 (:good student1)))
-            (is (= 25 (int (:total_hours student1))))
-            (is (= 2 (:short student1))))
-          (testing "Not absent on a day a different classed student attended"
-            (is (= (:unexcused student1)
-                   0)))
+          (student-report-is student1 3 2 0 0 0 26M)
           (testing "Student 2 doesn't even show up"
             (is (= student2 nil)))
           )
         (testing "an older date string shows no attendance in that time"
-          (is (= '() (queries/get-report "06-01-2013 05-01-2014")))))) 
+          (is (= '() (queries/get-report "06-01-2013 05-01-2014"))))))
   )
 
 
-(deftest swipe-attendence-test
+(deftest swipe-attendance-test
   (do (sample-db)
       (let [today-str (dates/get-current-year-string (queries/get-years))
             class-id (get-class-id-by-name "2014-2015")
@@ -80,7 +74,7 @@
         (let [att (queries/get-report today-str)
               student1 (first (filter #(= sid (:_id %)) att))
               student2 (first (filter #(= sid2 (:_id %)) att))]
-          (student-report-is student1 4 1 1 1 1 26M)
+          (student-report-is student1 4 1 1 1 1 28M)
 
           (testing "Total short count student 2"
             (is (= (:short student2) 2)))
@@ -89,6 +83,6 @@
                    5)))
           )
         (testing "an older date string shows no attendance in that time"
-          (is (= '() (queries/get-report "06-01-2013 05-01-2014")))))) 
+          (is (= '() (queries/get-report "06-01-2013 05-01-2014"))))))
   )
 

@@ -3,12 +3,15 @@ var React = require('react'),
     Notification = require('react-notification-system'),
     constants = require('./appconstants');
 
-var exports = React.createClass({
-    componentDidMount: function(){
+class FlashNotification extends React.Component {
+    state = {showing: false};
+
+    componentDidMount() {
         store.addChangeListener(this._onChange);
         this.notifications = this.refs.notifications;
-    },
-    _onChange: function(){
+    }
+
+    _onChange = () => {
         var message = store.getLatest();
         if(message){
             this.notifications.addNotification({
@@ -16,13 +19,11 @@ var exports = React.createClass({
                 level: message.level
             });
         }
-    },
-    getInitialState: function(){
-        return {showing: false};
-    },
-    render: function(){
+    };
+
+    render() {
         return <Notification ref="notifications" />;
     }
-});
+}
 
-module.exports = exports;
+module.exports = FlashNotification;

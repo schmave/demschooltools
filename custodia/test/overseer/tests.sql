@@ -22,8 +22,8 @@ WITH student_school_days AS (
     )
 SELECT
   schooldays.student_id
-  --, to_char(s.in_time at time zone :timezone, 'HH:MI:SS') as nice_in_time
-  --, to_char(s.out_time at time zone :timezone, 'HH:MI:SS') as nice_out_time
+  --, to_char(s.in_time at time zone :timezone, 'HH:MI') as nice_in_time
+  --, to_char(s.out_time at time zone :timezone, 'HH:MI') as nice_out_time
   , s.out_time
   , s.in_time
   , s.rounded_out_time
@@ -64,7 +64,7 @@ ORDER BY schooldays.days DESC;
 -- alter table students alter column olderdate type date using olderdate::date;
 -- update students set olderdate = '2015-03-18' where _id = 10;
 
--- School Migration 
+-- School Migration
 
 --      Step 1 - olderdate to date
 -- alter table students alter column olderdate type date using olderdate::date;
@@ -74,11 +74,11 @@ ORDER BY schooldays.days DESC;
 
 -- select * from years ;
 
--- alter table years 
+-- alter table years
 -- alter column from_date type timestamp with time zone
 -- using from_date::timestamp with time zone ;
 
--- alter table years 
+-- alter table years
 -- alter column to_date type timestamp with time zone
 -- using to_date::timestamp with time zone ;
 
@@ -90,11 +90,11 @@ ORDER BY schooldays.days DESC;
 -- select column_name, data_type, character_maximum_length
 -- from INFORMATION_SCHEMA.COLUMNS where table_name = 'swipes';
 
--- alter table swipes 
+-- alter table swipes
 -- alter column out_time type timestamp with time zone
 -- using out_time::timestamp with time zone ;
 
--- alter table swipes 
+-- alter table swipes
 -- alter column in_time type timestamp with time zone
 -- using in_time::timestamp with time zone ;
 
@@ -106,9 +106,9 @@ ORDER BY schooldays.days DESC;
 -- select column_name, data_type, character_maximum_length
 -- from INFORMATION_SCHEMA.COLUMNS where table_name = 'overrides';
 
--- alter table overrides 
+-- alter table overrides
 -- alter column date type date
--- using date::date; 
+-- using date::date;
 
 -- select * from overrides;
 
@@ -117,9 +117,9 @@ ORDER BY schooldays.days DESC;
 -- select column_name, data_type, character_maximum_length
 -- from INFORMATION_SCHEMA.COLUMNS where table_name = 'excuses';
 
--- alter table excuses 
+-- alter table excuses
 -- alter column date type date
--- using date::date; 
+-- using date::date;
 
 -- select * from excuses;
 
@@ -264,13 +264,13 @@ ORDER BY schooldays.days DESC;
 -- and that means storing sessions in memory means you get
 -- logged out each time... time to store in DB!
 
--- Turns out that Postgres has a default timezone, 
+-- Turns out that Postgres has a default timezone,
 -- and of course my local machine timezone is "localtime" and
 -- the heroku database is 'UTC'...
--- show timezone;   => 'localtime' 
+-- show timezone;   => 'localtime'
 -- set timezone='UTC';     => SET  (only works for that connectiON)
--- can be reset at the postgresql.conf file found in 
--- SHOW config_file; 
+-- can be reset at the postgresql.conf file found in
+-- SHOW config_file;
 -- edit the timezone to 'UTC' then reload it with
 -- select * from pg_reload_conf();
 

@@ -1,6 +1,6 @@
 ALTER TABLE overseer.students ADD COLUMN olderdate date;
 --;;
-DROP TABLE IF EXSITS overseer.students_required_minutes;
+DROP TABLE IF EXISTS overseer.students_required_minutes;
 --;;
 DROP FUNCTION IF EXISTS overseer.student_school_days(bigint,text,bigint);
 --;;
