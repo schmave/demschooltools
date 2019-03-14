@@ -4,7 +4,7 @@ var utils = require('./utils');
 var chooser = require('./chooser');
 var people_chooser = require('./people_chooser');
 
-const time_served_string = "None";
+const time_served_string = "Time served";
 
 const SAVE_TIMEOUT = 2000;
 
