@@ -25,7 +25,8 @@
 (deftest rounder
   (testing "rounding!"
     (let [_1am_ninth (dates/round-swipe-time (t/date-time 2015 10 9 5))]
-      (is (= 9 (t/hour _1am_ninth)))
+      (is (= 30 (t/minute _1am_ninth)))
+      (is (= 8 (t/hour _1am_ninth)))
       (is (= 9 (t/day _1am_ninth)))
       )
     (let [_10pm_ninth (dates/round-swipe-time (t/date-time 2015 10 10 1))]
@@ -217,7 +218,7 @@
           (student-att-is att 0 0 0 0)
           ))))
 
-(deftest swipe-attendence-override-test
+(deftest swipe-attendance-override-test
   (do (sample-db)
       (let [{sid :_id} (cmd/make-student "test")]
         (cmd/add-student-to-class sid (get-class-id-by-name "2014-2015"))
@@ -283,7 +284,8 @@
             (is (= true (:in_today att))))
           )))))
 
-(def _840am_2014_10_14 (t/minus _2014_10-14_9-14am (t/minutes 90)))
+
+(def _800am_2014_10_14 (t/date-time 2014 10 14 12 0))
 (def _339pm_2014_10_14 (t/plus _2014_10-14_9-14am (t/minutes 330)))
 
 (def _900am_2014_10_14 (t/date-time 2014 10 14 13 0))
@@ -312,7 +314,7 @@
                     0M)))
            )))))
 
-(deftest swipe-before-9-test
+(deftest swipe-before-830-test
   (do (sample-db)
     (binding [db/*school-id* 2]
       (let [s (cmd/make-student "test")
@@ -320,8 +322,8 @@
         (cmd/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 9))))
         (cmd/make-class "2014-2015")
         (cmd/add-student-to-class sid (get-class-id-by-name "2014-2015"))
-        ;; only count minutes from 9-4
-        (cmd/swipe-in sid _840am_2014_10_14)
+        ;; only count minutes from 8:30-4
+        (cmd/swipe-in sid _800am_2014_10_14)
         (cmd/swipe-out sid _339pm_2014_10_14)
         (let [att (get-att sid)]
           (testing "Total Valid Day Count"
@@ -329,48 +331,7 @@
                    1)))
           (testing "Total Minute Count"
             (is (= (-> att :days first :total_mins)
-                   399M)))
-          )))))
-
-
-(deftest swipe-roundings-after-4
-  (do (sample-db)
-    (binding [db/*school-id* 2]
-      (let [s (cmd/make-student "test")
-            sid (:_id s)]
-        (cmd/make-year (str (t/date-time 2014 6)) (str (t/plus (t/now) (t/days 9))))
-        (cmd/make-class "2014-2015")
-        (cmd/add-student-to-class sid (get-class-id-by-name "2014-2015"))
-
-        ;; round after 4 back to 4
-        (cmd/swipe-in sid (t/plus _900am_2014_10_14 (t/hours 3)))
-        (cmd/swipe-out sid _500pm_2014_10_14)
-
-        ;; round before 9 up to 9
-        (cmd/swipe-in sid (t/plus _840am_2014_10_14 (t/days 1)))
-        (cmd/swipe-out sid (t/plus _330pm_2014_10_14 (t/days 1)))
-
-        (let [att (get-att sid)
-              _10-15 (-> att :days first)
-              _10-14 (-> att :days second)]
-          (testing "10/15 has no out rounding"
-            (is (= (-> _10-15 :swipes first :nice_out_time)
-                   "03:30")))
-          (testing "10/15 has in rounding"
-            (is (= (-> _10-15 :swipes first :nice_in_time)
-                   "08:39")))
-          (testing "10/15 minutes" (is (= (-> _10-15 :total_mins) 390M)))
-          (testing "10/15 valid" (is (= (-> _10-15 :valid) true)))
-          (testing "10/14 has out rounding"
-            (is (= (-> _10-14 :swipes first :nice_out_time)
-                   "05:00")))
-          (testing "10/14 has no in rounding"
-            (is (= (-> _10-14 :swipes first :nice_in_time)
-                   "12:00")))
-          (testing "10/14 minutes" (is (= (-> _10-14 :total_mins) 240M)))
-          (testing "10/14 not valid" (is (= (-> _10-14 :valid) false)))
-          (testing "One short" (is (= (:total_short att) 1)))
-          (testing "One attendance" (is (= (:total_days att) 1)))
+                   429M)))
           )))))
 
 (deftest calculates-interval-test
@@ -426,7 +387,7 @@
 ;; 10-18-2014 - short
 ;; 10-19-2014 - absent
 ;; 10-20-2014 - absent
-(deftest swipe-attendence-test
+(deftest swipe-attendance-test
   (do (sample-db)
       (let [s (cmd/make-student "test")
             sid (:_id s)
@@ -808,7 +769,7 @@
           )))
   )
 
-(deftest swipe-attendence-shows-only-when-in
+(deftest swipe-attendance-shows-only-when-in
   (do (sample-db)
       (let [s (cmd/make-student "test")
             sid (:_id s)]

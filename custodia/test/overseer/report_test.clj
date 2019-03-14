@@ -27,7 +27,7 @@
 ;; make report only select students from class
 ;; make reports have a class UI
 
-(deftest swipe-attendence-with-class-test
+(deftest swipe-attendance-with-class-test
   "Report is defined without a class but will use the default one"
   (do (sample-db)
       (let [class-id (get-class-id-by-name "2014-2015")
@@ -54,7 +54,7 @@
   )
 
 
-(deftest swipe-attendence-test
+(deftest swipe-attendance-test
   (do (sample-db)
       (let [today-str (dates/get-current-year-string (queries/get-years))
             class-id (get-class-id-by-name "2014-2015")
