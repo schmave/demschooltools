@@ -60,14 +60,14 @@
                       (f/parse (f %)))
           list))
 
-(defn in-local-time-at-hour [date hour]
+(defn in-local-time-at-hour [date hour minutes]
   (let [local-date (f/parse (make-date-string date))]
-    (-> (t/date-time (t/year local-date) (t/month local-date) (t/day local-date) hour 0)
+    (-> (t/date-time (t/year local-date) (t/month local-date) (t/day local-date) hour minutes)
         (t/from-time-zone (local-time-zone-id)))))
 
-(defn earliest-time [date] (in-local-time-at-hour date 9))
+(defn earliest-time [date] (in-local-time-at-hour date 8 30))
 
-(defn latest-time [date] (in-local-time-at-hour date 16))
+(defn latest-time [date] (in-local-time-at-hour date 16 0))
 
 (s/defn round-swipe-time :- DateTime [time]
   (let [time (cond-parse-date-string time)
