@@ -11,6 +11,8 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import models.*;
 
+import service.MyUserService;
+
 import play.data.*;
 import play.mvc.*;
 
@@ -189,6 +191,7 @@ public class Settings extends Controller {
         Organization org = OrgConfig.get().org;
         List<User> users =
             User.find.where().eq("organization", org)
+            .ne("name", MyUserService.DUMMY_USERNAME)
             .order("name ASC")
             .findList();
 

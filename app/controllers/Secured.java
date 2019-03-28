@@ -17,6 +17,8 @@ import models.Organization;
 import models.User;
 import models.UserRole;
 
+import service.MyUserService;
+
 import play.Logger;
 import play.mvc.Action;
 import play.mvc.Http.Context;
@@ -146,6 +148,17 @@ public class Secured {
         }
 
     	public Result onUnauthorized(final Context ctx) {
+            final AuthUser u = mAuth.getUser(ctx.session());
+            if (u != null) {
+                User the_user = User.findByAuthUserIdentity(u);
+                if (the_user != null && the_user.name.equals(MyUserService.DUMMY_USERNAME)) {
+                    return ok(
+                        "You logged in with Facebook or Google, but Evan hasn't made a" +
+                        " DemSchoolTools account for you yet. Please contact him for help:" +
+                        " schmave@gmail.com");
+                }
+            }
+
             if (getUsernameOrIP(ctx, false) == null) {
                 // Only redirect to the login screen if there
                 // is no user logged in.

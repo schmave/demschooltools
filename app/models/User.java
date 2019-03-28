@@ -16,6 +16,8 @@ import com.feth.play.module.pa.user.AuthUserIdentity;
 import com.feth.play.module.pa.user.EmailIdentity;
 import com.feth.play.module.pa.user.NameIdentity;
 
+import service.MyUserService;
+
 @Entity
 @Table(name = "users")
 public class User extends Model {
@@ -64,6 +66,9 @@ public class User extends Model {
     }
 
     public boolean hasRole(String role) {
+    	if (this.name.equals(MyUserService.DUMMY_USERNAME)) {
+    		return false;
+    	}
         for (UserRole r : roles) {
             if (r.role.equals(role) ||
                 UserRole.includes(r.role, role)) {

@@ -8,11 +8,15 @@ import com.feth.play.module.pa.user.EmailIdentity;
 import com.google.inject.Inject;
 
 import models.LinkedAccount;
+import models.Organization;
+import models.OrgConfig;
 import models.User;
 
 import play.Logger;
 
 public class MyUserService extends AbstractUserService {
+
+	public final static String DUMMY_USERNAME = "__DUMMY_USERNAME__";
 
     @Inject
     public MyUserService(final PlayAuthenticate auth) {
@@ -32,10 +36,15 @@ public class MyUserService extends AbstractUserService {
                 User u = User.find.where().eq("email", identity.getEmail()).findUnique();
                 if (u != null) {
                     Logger.debug("    found user by email");
-                    u.linkedAccounts.add(LinkedAccount.create(authUser));
-                    u.save();
-                    return u;
+                } else {
+                	Logger.debug("    creating new account");
+                	Organization org = OrgConfig.get().org;
+                	Logger.error("New login from unknown user: " + identity.getEmail() + ", org: " + org.name);
+                	u = User.create(identity.getEmail(), DUMMY_USERNAME, org);
                 }
+                u.linkedAccounts.add(LinkedAccount.create(authUser));
+                u.save();
+                return u;
             }
 		}
 
