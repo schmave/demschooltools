@@ -235,6 +235,7 @@ class TheOpenSchool extends OrgConfig {
 
         show_findings_in_rp_list = false;
         use_minor_referrals = false;
+        show_no_contest_plea = true;
 
         OrgConfig.register(name, this);
     }
