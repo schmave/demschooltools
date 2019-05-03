@@ -102,8 +102,10 @@ function Charge(charge_id, el) {
             if (json.resolution_plan === time_served_string) {
                 el.find(".rp-followup-time-served").prop("checked", true);
                 el.find(".rp-row").hide();
+                el.find(".original-res-plan-text").addClass("deleted");
             } else if (json.resolution_plan) {
                 el.find(".rp-followup-new-rp").prop("checked", true);
+                el.find(".original-res-plan-text").addClass("deleted");
             } else {
                 el.find(".rp-row").hide();
             }
@@ -251,6 +253,7 @@ function Charge(charge_id, el) {
             el.find(".rp-row").hide();
             el.find(".resolution_plan").val("");
         }
+        el.find(".original-res-plan-text").addClass("deleted");
         self.markAsModified();
     });
 
