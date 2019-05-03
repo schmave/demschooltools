@@ -373,6 +373,9 @@ public class Case extends Model implements Comparable<Case> {
         if (charge.sm_decision != null && !charge.sm_decision.isEmpty()) {
             return charge.sm_decision;
         }
+        if (charge.referred_to_sm && charge.resolution_plan.isEmpty()) {
+            return "[Referred to School Meeting]";
+        }
         return charge.resolution_plan;
     }
 }
