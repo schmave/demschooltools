@@ -24,7 +24,7 @@ app.ROLE_TESTIFIER = @PersonAtCase.ROLE_TESTIFIER
 app.ROLE_WRITER = @PersonAtCase.ROLE_WRITER
 
 app.people = @Html(Application.jcPeople(""))
-app.rules = @Html(Application.jsonRules(""))
+app.rules = @Html(Application.jsonRules(false))
 app.cases = @Html(Application.jsonCases(""))
 
 app.initial_data = {
