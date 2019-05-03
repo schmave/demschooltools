@@ -332,6 +332,9 @@ public class Case extends Model implements Comparable<Case> {
         if (!result.isEmpty()) {
             result += " Then per case " + case_number + ", ";
         }
+        if (findings.isEmpty()) {
+            findings = "the " + OrgConfig.get().str_res_plan + " was not completed.";
+        }
         result += findings;
         return result;
     }
