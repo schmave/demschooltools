@@ -14,6 +14,7 @@ import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
+import com.avaje.ebean.ExpressionList;
 import com.avaje.ebean.FetchConfig;
 import com.avaje.ebean.SqlQuery;
 import com.avaje.ebean.SqlRow;
@@ -898,11 +899,13 @@ public class Application extends Controller {
         return Json.stringify(Json.toJson(result));
     }
 
-    public static String jsonRules(String term) {
-        term = term.toLowerCase();
+    public static String jsonRules(Boolean includeBreakingResPlan) {
 
-        List<Entry> rules = Entry.find.where()
-            .eq("section.chapter.organization", Organization.getByHost())
+        ExpressionList expr = Entry.find.where().eq("section.chapter.organization", Organization.getByHost());
+        if (!includeBreakingResPlan) {
+            expr = expr.eq("is_breaking_res_plan", false);
+        }
+        List<Entry> rules = expr
             .eq("deleted", false)
             .eq("section.deleted", false)
             .eq("section.chapter.deleted", false)
@@ -910,12 +913,10 @@ public class Application extends Controller {
 
         List<Map<String, String> > result = new ArrayList<Map<String, String> > ();
         for (Entry r : rules) {
-            if (r.title.toLowerCase().contains(term)) {
-                HashMap<String, String> values = new HashMap<String, String>();
-                values.put("label", r.getNumber() + " " + r.title);
-                values.put("id", "" + r.id);
-                result.add(values);
-            }
+            HashMap<String, String> values = new HashMap<String, String>();
+            values.put("label", r.getNumber() + " " + r.title);
+            values.put("id", "" + r.id);
+            result.add(values);
         }
 
         return Json.stringify(Json.toJson(result));

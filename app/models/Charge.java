@@ -85,6 +85,7 @@ public class Charge extends Model implements Comparable<Charge> {
         result.person = referenced_charge.person;
         result.rule = Entry.findBreakingResPlanEntry();
         result.referenced_charge = referenced_charge;
+        result.referred_to_sm = referenced_charge.referred_to_sm && referenced_charge.sm_decision == null;
         result.save();
         return result;
     }

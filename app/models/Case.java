@@ -275,9 +275,13 @@ public class Case extends Model implements Comparable<Case> {
             if (used_cases.contains(c)) {
                 continue;
             }
-            ArrayList<Case> case_referenced_cases = new ArrayList<Case>(c.referenced_cases);
-            case_referenced_cases.removeAll(used_cases);
-            if (case_referenced_cases.size() == 0) {
+            if (!isCaseRelevant(c, relevant_charges)) {
+                continue;
+            }
+            ArrayList<Case> _used_cases = new ArrayList<Case>(used_cases);
+            boolean hasRelevantReferences = c.referenced_cases.stream()
+                .anyMatch(rc -> isCaseRelevant(rc, relevant_charges) && !_used_cases.contains(rc));
+            if (!hasRelevantReferences) {
                 if (result.isEmpty()) {
                     result += "Per case ";
                 } else {
@@ -292,7 +296,7 @@ public class Case extends Model implements Comparable<Case> {
             if (!result.endsWith(".")) {
                 result += ".";
             }
-            Map<String, List<Charge>> groups = groupChargesByRuleAndResolutionPlan(c, relevant_charges);
+            Map<String, List<Charge>> groups = groupChargesByRuleAndResolutionPlan(findRelevantCharges(c, relevant_charges));
             for (Map.Entry<String, List<Charge>> entry : groups.entrySet()) {
                 List<Charge> group = entry.getValue();
                 result += " " + group.get(0).person.getDisplayName();
@@ -332,11 +336,14 @@ public class Case extends Model implements Comparable<Case> {
         if (!result.isEmpty()) {
             result += " Then per case " + case_number + ", ";
         }
+        if (findings.isEmpty()) {
+            findings = "the " + OrgConfig.get().str_res_plan + " was not completed.";
+        }
         result += findings;
         return result;
     }
 
-    private static Map<String, List<Charge>> groupChargesByRuleAndResolutionPlan(Case c, List<Charge> relevant_charges) {
+    private static List<Charge> findRelevantCharges(Case c, List<Charge> relevant_charges) {
 
         List<Charge> charges =
             Charge.find
@@ -351,12 +358,23 @@ public class Case extends Model implements Comparable<Case> {
 
         return charges.stream()
             .filter(ch -> relevant_charges == null || relevant_charges.contains(ch))
-            .collect(Collectors.groupingBy(ch -> ch.getRuleTitle() + getResolutionPlanForCompositeFindings(ch)));
+            .collect(Collectors.toList());
+    }
+
+    private static Map<String, List<Charge>> groupChargesByRuleAndResolutionPlan(List<Charge> charges) {
+        return charges.stream().collect(Collectors.groupingBy(ch -> ch.getRuleTitle() + getResolutionPlanForCompositeFindings(ch)));
+    }
+
+    private static boolean isCaseRelevant(Case c, List<Charge> relevant_charges) {
+        return c.charges.stream().anyMatch(ch -> relevant_charges == null || relevant_charges.contains(ch));
     }
 
     private static String getResolutionPlanForCompositeFindings(Charge charge) {
         if (charge.sm_decision != null && !charge.sm_decision.isEmpty()) {
             return charge.sm_decision;
+        }
+        if (charge.referred_to_sm && charge.resolution_plan.isEmpty()) {
+            return "[Referred to School Meeting]";
         }
         return charge.resolution_plan;
     }

@@ -38,6 +38,10 @@ public class CaseReference {
 					cr.resolution_plan = charge.sm_decision;
 				}
 
+				if (charge.referred_to_sm && cr.resolution_plan.isEmpty()) {
+					cr.resolution_plan = "[Referred to School Meeting]";
+				}
+
 				for (Charge new_charge : referencing_case.charges) {
 					if (new_charge.referenced_charge == charge) {
 						cr.has_generated = true;
