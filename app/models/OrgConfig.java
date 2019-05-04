@@ -355,3 +355,30 @@ class Wicklow extends OrgConfig {
         return INSTANCE;
     }
 }
+
+class Tallgrass extends OrgConfig {
+    private static final Tallgrass INSTANCE = new Tallgrass();
+    public TimeZone time_zone = TimeZone.getTimeZone("US/Central");
+
+    public Tallgrass() {
+        name = "Tallgrass Sudbury School";
+        people_url = "https://tallgrass.demschooltools.com";
+
+        str_manual_title = "Lawbook";
+        str_manual_title_short = "Lawbook";
+        str_res_plan_short = "Sentence";
+        str_res_plan = "sentence";
+        str_res_plan_cap = "Sentence";
+        str_res_plans = "sentences";
+        str_res_plans_cap = "Sentences";
+        str_findings = "Findings";
+
+        track_writer = false;
+
+        OrgConfig.register(name, this);
+    }
+
+    public static Tallgrass getInstance() {
+        return INSTANCE;
+    }
+}
