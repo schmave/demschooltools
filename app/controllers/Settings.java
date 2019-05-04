@@ -270,14 +270,40 @@ public class Settings extends Controller {
     public Result newUser() {
         Map<String, String[]> form_data = request().body().asFormUrlEncoded();
 
-        User u = User.create(
-            form_data.get("email")[0].trim(),
-            form_data.get("name")[0].trim(),
-            OrgConfig.get().org);
+        Organization org = OrgConfig.get().org;
+        final String email = form_data.get("email")[0].trim();
+        final String name = form_data.get("name")[0].trim();
 
-        UserRole.create(u, UserRole.ROLE_VIEW_JC);
+        User existing_user = User.findByEmail(email);
+        User new_user = null;
+
+        if (existing_user != null) {
+            if (existing_user.organization.id.equals(org.id)) {
+                if (existing_user.name.equals(MyUserService.DUMMY_USERNAME)) {
+                    new_user = existing_user;
+                    new_user.name = name;
+                    new_user.save();
+                } else {
+                    flash("error", "That email address (" + email + ") already has an account.");
+                    return redirect(routes.Settings.viewAccess());
+                }
+            } else {
+                flash("error", "That email address (" + email + ") already has an account for another school. " +
+                    "Please contact Evan at schmave@gmail.com for help.");
+                return redirect(routes.Settings.viewAccess());
+            }
+        }
+
+        if (new_user == null) {
+            new_user = User.create(email, name, org);
+        } else {
+            for (UserRole r : new_user.roles) {
+                r.delete();
+            }
+        }
+
+        UserRole.create(new_user, UserRole.ROLE_VIEW_JC);
 
         return redirect(routes.Settings.viewAccess());
     }
 }
-

@@ -255,7 +255,7 @@
     }
 
     @if(flash.containsKey("error")) {
-        <div class="flash-error">@flash.get("error")</div>
+        <div class="flash-error"><b>Error</b><br/><br/>@flash.get("error")</div>
     }
 
         @content
