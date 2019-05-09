@@ -318,7 +318,7 @@ public class Application extends Controller {
                 .orderBy("rp_complete_date DESC")
                 .setMaxRows(25).findList();
 
-        List<Charge> nullified_rps = 
+        List<Charge> nullified_rps =
             Charge.find
                 .fetch("the_case")
                 .fetch("the_case.meeting")
@@ -430,7 +430,7 @@ public class Application extends Controller {
         Collections.sort(changes_to_display, ManualChange.SORT_NUM_DATE);
 
         return ok(views.html.view_manual_changes.render(
-            new SimpleDateFormat("yyyy-MM-dd").format(begin_date),
+            forDateInput(begin_date),
             changes_to_display));
     }
 
@@ -996,10 +996,16 @@ public class Application extends Controller {
     }
 
     public static String formatDateShort(Date d) {
+        if (OrgConfig.get().euro_dates) {
+            return new SimpleDateFormat("dd/MM").format(d);
+        }
         return new SimpleDateFormat("MM/dd").format(d);
     }
 
     public static String formatDateMdy(Date d) {
+        if (OrgConfig.get().euro_dates) {
+            return new SimpleDateFormat("dd/MM/yyyy").format(d);
+        }
         return new SimpleDateFormat("MM/dd/yyyy").format(d);
     }
 
@@ -1007,12 +1013,23 @@ public class Application extends Controller {
         return new SimpleDateFormat("EE--MMMM dd, yyyy").format(d);
     }
 
+    public static String forDateInput(Date d) {
+        return new SimpleDateFormat("yyyy-MM-dd").format(d);
+    }
+
     public static String yymmddDate(Date d) {
+        if (OrgConfig.get().euro_dates) {
+            return new SimpleDateFormat("dd-MM-yyyy").format(d);
+        }
         return new SimpleDateFormat("yyyy-MM-dd").format(d);
     }
 
     public static String yymmddDate() {
-        return new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        Date d = new Date();
+        if (OrgConfig.get().euro_dates) {
+            return new SimpleDateFormat("dd-MM-yyyy").format(d);
+        }
+        return new SimpleDateFormat("yyyy-MM-dd").format(d);
     }
 
     public static String formatDateTimeLong() {
@@ -1020,6 +1037,9 @@ public class Application extends Controller {
     }
 
     public static String yymdDate(Date d) {
+        if (OrgConfig.get().euro_dates) {
+            return new SimpleDateFormat("d-M-yyyy").format(d);
+        }
         return new SimpleDateFormat("yyyy-M-d").format(d);
     }
 

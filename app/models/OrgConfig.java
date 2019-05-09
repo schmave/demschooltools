@@ -32,6 +32,7 @@ public class OrgConfig {
     public boolean show_findings_in_rp_list = true;
     public boolean use_year_in_case_number = false;
     public boolean hide_location_for_print = false;
+    public boolean euro_dates = false;
 
     public boolean enable_file_sharing = false;
 
@@ -56,11 +57,14 @@ public class OrgConfig {
     }
 
     public String getCaseNumberPrefix(Meeting m) {
+        String format = null;
+
         if (use_year_in_case_number) {
-            return new SimpleDateFormat("YYYY-MM-dd-").format(m.date);
+            format = euro_dates ? "dd-MM-YYYY-" : "YYYY-MM-dd-";
         } else {
-            return new SimpleDateFormat("MM-dd-").format(m.date);
+            format = euro_dates ? "dd-MM-" : "MM-dd-";
         }
+        return new SimpleDateFormat(format).format(m.date);
     }
 }
 
@@ -347,6 +351,8 @@ class Wicklow extends OrgConfig {
         str_findings = "Findings";
 
         track_writer = false;
+        euro_dates = true;
+        use_year_in_case_number = true;
 
         OrgConfig.register(name, this);
     }

@@ -14,8 +14,8 @@
 }
 <form method="GET">
 	<p>Show @person.first_name's attendance from
-		<input class="date" type="text" name="start_date" value="@Application.yymmddDate(start_date)"> to
-		<input class="date" type="text" name="end_date" value="@Application.yymmddDate(end_date)">
+		<input type="date" name="start_date" value="@Application.forDateInput(start_date)"> to
+		<input type="date" name="end_date" value="@Application.forDateInput(end_date)">
 		<input class="btn btn-xs btn-primary" type="submit">
 	</p>
 </form>
@@ -88,7 +88,7 @@
 @for( d <- days ) {
 <tr class="
 	@if(d.code != null) {
-		@if(codes_map.contains(d.code)) { 
+		@if(codes_map.contains(d.code)) {
 			code-@d.code
 		} else {
 			code-__null
@@ -96,15 +96,15 @@
 	} else {
         @if(d.start_time == null || d.end_time == null) {
         	code-__null
-        } else { 
+        } else {
         	@if(d.isPartial()) {
         		code-__partial
         	} else {
         		code-__present
         	}
-        } 
+        }
     }
-    @if( d.day.getDay() == 5 ) { 
+    @if( d.day.getDay() == 5 ) {
     	friday-row
     }">
     <td width="25">@Application.formatDayOfWeek(d.day)

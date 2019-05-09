@@ -864,6 +864,9 @@ public class CRM extends Controller {
 		if (d == null) {
 			return "---";
 		}
+        if (OrgConfig.get().euro_dates) {
+            return new SimpleDateFormat("dd/MM/yy").format(d);
+        }
         return new SimpleDateFormat("MM/dd/yy").format(d);
     }
 
@@ -881,7 +884,11 @@ public class CRM extends Controller {
 		} else if (diffHours < 24 * 7) {
 			format = "EEEE, MMMM d";
 		} else {
-            format = "MM/d/yy";
+            if (OrgConfig.get().euro_dates) {
+                format = "dd/MM/yy";
+            } else {
+                format = "MM/dd/yy";
+            }
         }
         return new SimpleDateFormat(format).format(d);
     }

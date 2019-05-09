@@ -42,14 +42,14 @@ $(function() {
 
 <h3>Attendance Summary</h3>
 <h4>For one year starting @Application.yymmddDate(start_date)
-    <a href="@routes.Attendance.download(Application.yymmddDate(start_date))" class="download-link">
+    <a href="@routes.Attendance.download(Application.forDateInput(start_date))" class="download-link">
         <span class="glyphicon glyphicon-download-alt"></span>Download as spreadsheet
     </a>
 </h4>
 <p>
-    <a href="@routes.Attendance.index(Application.yymmddDate(prev_date))">⇐ Previous Year</a>
+    <a href="@routes.Attendance.index(Application.forDateInput(prev_date))">⇐ Previous Year</a>
     @if( next_date != null ) {
-        <a href="@routes.Attendance.index(Application.yymmddDate(next_date))"
+        <a href="@routes.Attendance.index(Application.forDateInput(next_date))"
            style="margin-left: 100px;">Next Year ⇒</a>
     }
 </p>
@@ -72,13 +72,13 @@ $(function() {
 	<th width=100 class="attendance-code">Unknown/missing code</th>
 	<th width=100>@if( OrgConfig.get().org.attendance_enable_partial_days ) { Full Days } else { Days Present }</th>
 	@if( OrgConfig.get().org.attendance_enable_partial_days ) {
-		<th width=100>Partial Days</th>	
+		<th width=100>Partial Days</th>
 	}
 	<th width=100>Total hours</th>
 	<th width=100>Avg. hours per day</th>
 	@if( OrgConfig.get().org.attendance_show_percent ) {
 		<th width=100>Attendance Rate</th>
-	}		
+	}
 	</thead>
 
 @for( p <- people ) {
