@@ -178,7 +178,7 @@
             <a href="@routes.ApplicationEditing.editTodaysMinutes">
                 Edit today's minutes</a>
             <a @if(selectedBtn.equals("rps")) { class="active" }
-                href="@routes.Application.editResolutionPlanList">
+                href="@routes.Application.editResolutionPlansGridView">
                 @OrgConfig.get().str_res_plans_cap</a>
             <a @if(selectedBtn.equals("weekly_report")) { class="active" }
                 href="@routes.Application.thisWeekReport">Weekly Report</a>
