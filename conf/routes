@@ -16,10 +16,10 @@ GET  /editMeeting/:id	controllers.ApplicationEditing.editMeeting(id: Integer)
 
 GET /downloadCharges    controllers.Application.downloadCharges()
 
-GET  /viewMeetingResolutionPlans/:id		controllers.Application.viewMeetingResolutionPlans(id: Integer)
+GET  /viewMeetingResolutionPlans/:id	controllers.Application.viewMeetingResolutionPlans(id: Integer)
 GET  /downloadMeetingResolutionPlans/:id	controllers.Application.downloadMeetingResolutionPlans(id: Integer)
-GET  /editResolutionPlansGridView			controllers.Application.editResolutionPlansGridView()
-GET  /editResolutionPlansListView			controllers.Application.editResolutionPlansListView()
+GET  /editResolutionPlanList	controllers.Application.editResolutionPlanList()
+GET  /viewSimpleResolutionPlans		controllers.Application.viewSimpleResolutionPlans()
 
 POST	/setResolutionPlanComplete	controllers.ApplicationEditing.setResolutionPlanComplete(id : Integer, complete : Boolean)
 

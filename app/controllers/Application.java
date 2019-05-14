@@ -270,7 +270,7 @@ public class Application extends Controller {
                 views.html.view_meeting.render(Meeting.findById(meeting_id)).toString()));
     }
 
-    public Result editResolutionPlansGridView() {
+    public Result editResolutionPlanList() {
         response().setHeader("Cache-Control", "max-age=0, no-cache, no-store");
         response().setHeader("Pragma", "no-cache");
 
@@ -319,7 +319,7 @@ public class Application extends Controller {
             }
         }
 
-        return ok(views.html.edit_rps_grid_view.render(active_rps, completed_rps, nullified_rps));
+        return ok(views.html.edit_rp_list.render(active_rps, completed_rps, nullified_rps));
     }
 
     private List<Integer> getReferencedChargeIds() {
@@ -352,7 +352,7 @@ public class Application extends Controller {
             .orderBy("id DESC").findList();
     }
 
-    public Result editResolutionPlansListView() {
+    public Result viewSimpleResolutionPlans() {
         List<Integer> referenced_charge_ids = getReferencedChargeIds();
         List<Charge> charges = getActiveResolutionPlans(referenced_charge_ids);
 
@@ -370,7 +370,7 @@ public class Application extends Controller {
                 }
             }
         }
-        return ok(views.html.edit_rps_list_view.render(groups));
+        return ok(views.html.view_simple_rps.render(groups));
     }
 
     public Result viewMeetingResolutionPlans(int meeting_id) {
