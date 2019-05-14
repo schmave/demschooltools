@@ -352,7 +352,7 @@ public class Application extends Controller {
             .orderBy("id DESC").findList();
     }
 
-    public Result viewSimpleResolutionPlans() {
+    public Result viewSimpleResolutionPlans() throws Exception {
         List<Integer> referenced_charge_ids = getReferencedChargeIds();
         List<Charge> charges = getActiveResolutionPlans(referenced_charge_ids);
 
@@ -370,7 +370,9 @@ public class Application extends Controller {
                 }
             }
         }
-        return ok(views.html.view_simple_rps.render(groups));
+        response().setHeader("Content-Type", "application/pdf");
+        return ok(renderToPDF(views.html.view_simple_rps.render(groups).toString()));
+
     }
 
     public Result viewMeetingResolutionPlans(int meeting_id) {

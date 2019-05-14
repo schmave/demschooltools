@@ -5,16 +5,7 @@
 
 @import helper._
 
-@main("View simple " + OrgConfig.get().str_res_plans, "jc", "rps") {
-
-<p>
-    <a href="#" onclick="print();return false;" class="no-print btn btn-success">
-        Print active @OrgConfig.get().str_res_plans
-    </a>
-    <a href="/editResolutionPlanList" class="no-print btn btn-primary">
-        Switch to detailed view
-    </a>
-</p>
+@main("Print simple " + OrgConfig.get().str_res_plans, "jc", "rps") {
 
 <h2>Active @OrgConfig.get().str_res_plans <span class="comment_time">as of @Application.formatDateTimeLong()</span></h2>
 
