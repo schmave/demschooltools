@@ -23,8 +23,15 @@ $(function() {
 });
 </script>
 
-<p><a href="#" onclick="print();return false;" class="no-print btn btn-success">
-Print active @OrgConfig.get().str_res_plans</a></p>
+<p>
+    <a href="#" onclick="print();return false;" class="no-print btn btn-success">
+        Print active @OrgConfig.get().str_res_plans
+    </a>
+    <a href="/viewSimpleResolutionPlans" class="no-print btn btn-primary">
+        Print simple view
+    </a>
+</p>
+
 <h2>Active @OrgConfig.get().str_res_plans <span class="comment_time">as of @Application.formatDateTimeLong()</span></h2>
 <table class="table active-rps printable-res-plans">
 </table>

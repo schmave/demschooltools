@@ -1,0 +1,26 @@
+@(groups : HashMap[String, List[Charge]])
+
+@sorted_keys = @{ new ArrayList(groups.keySet()) }
+@{ Collections.sort(sorted_keys) }
+
+@import helper._
+
+@main("Print simple " + OrgConfig.get().str_res_plans, "jc", "rps") {
+
+<h2>Active @OrgConfig.get().str_res_plans <span class="comment_time">as of @Application.formatDateTimeLong()</span></h2>
+
+@for(key <- sorted_keys) {
+    <h3>@key</h3>
+    @for(charge <- groups.get(key)) {
+        <p>
+            <strong>@(charge.the_case.case_number).</strong>
+            @if(charge.sm_decision != null && charge.sm_decision != "") {
+                @charge.sm_decision
+            } else {
+                @charge.resolution_plan
+            }
+        </p>
+    }
+}   
+
+}

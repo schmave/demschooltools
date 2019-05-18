@@ -283,32 +283,8 @@ public class Application extends Controller {
         response().setHeader("Cache-Control", "max-age=0, no-cache, no-store");
         response().setHeader("Pragma", "no-cache");
 
-        List<Integer> referenced_charge_ids = Charge.find
-            .where()
-            .eq("person.organization", Organization.getByHost())
-            .isNotNull("referenced_charge_id")
-            .select("referenced_charge")
-            .findList()
-            .stream()
-            .map(c -> c.referenced_charge.id)
-            .collect(Collectors.toList());
-
-        List<Charge> active_rps =
-            Charge.find
-                .fetch("the_case")
-                .fetch("the_case.meeting")
-                .fetch("person")
-                .fetch("rule")
-                .fetch("rule.section")
-                .fetch("rule.section.chapter")
-                .where()
-                .eq("person.organization", Organization.getByHost())
-                .or(Expr.ne("plea", "Not Guilty"),
-                    Expr.isNotNull("sm_decision"))
-                .ne("person", null)
-                .eq("rp_complete", false)
-                .not(Expr.in("id", referenced_charge_ids))
-                .orderBy("id DESC").findList();
+        List<Integer> referenced_charge_ids = getReferencedChargeIds();
+        List<Charge> active_rps = getActiveResolutionPlans(referenced_charge_ids);
 
         List<Charge> completed_rps =
             Charge.find
@@ -353,6 +329,59 @@ public class Application extends Controller {
         }
 
         return ok(views.html.edit_rp_list.render(active_rps, completed_rps, nullified_rps));
+    }
+
+    private List<Integer> getReferencedChargeIds() {
+        return Charge.find
+            .where()
+            .eq("person.organization", Organization.getByHost())
+            .isNotNull("referenced_charge_id")
+            .select("referenced_charge")
+            .findList()
+            .stream()
+            .map(c -> c.referenced_charge.id)
+            .collect(Collectors.toList());
+    }
+
+    private List<Charge> getActiveResolutionPlans(List<Integer> referenced_charge_ids) {
+        return Charge.find
+            .fetch("the_case")
+            .fetch("the_case.meeting")
+            .fetch("person")
+            .fetch("rule")
+            .fetch("rule.section")
+            .fetch("rule.section.chapter")
+            .where()
+            .eq("person.organization", Organization.getByHost())
+            .or(Expr.ne("plea", "Not Guilty"),
+                Expr.isNotNull("sm_decision"))
+            .ne("person", null)
+            .eq("rp_complete", false)
+            .not(Expr.in("id", referenced_charge_ids))
+            .orderBy("id DESC").findList();
+    }
+
+    public Result viewSimpleResolutionPlans() throws Exception {
+        List<Integer> referenced_charge_ids = getReferencedChargeIds();
+        List<Charge> charges = getActiveResolutionPlans(referenced_charge_ids);
+
+        HashMap<String, List<Charge>> groups = new HashMap<String, List<Charge>>();
+
+        for (Charge charge : charges) {
+            if (charge.person != null) {
+                String name = charge.person.getDisplayName();
+                if (!groups.containsKey(name)) {
+                    List<Charge> list = new ArrayList<Charge>();
+                    list.add(charge);
+                    groups.put(name, list);
+                } else {
+                    groups.get(name).add(charge);
+                }
+            }
+        }
+        response().setHeader("Content-Type", "application/pdf");
+        return ok(renderToPDF(views.html.view_simple_rps.render(groups).toString()));
+
     }
 
     public Result viewMeetingResolutionPlans(int meeting_id) {

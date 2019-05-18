@@ -19,6 +19,7 @@ GET /downloadCharges    controllers.Application.downloadCharges()
 GET  /viewMeetingResolutionPlans/:id	controllers.Application.viewMeetingResolutionPlans(id: Integer)
 GET  /downloadMeetingResolutionPlans/:id	controllers.Application.downloadMeetingResolutionPlans(id: Integer)
 GET  /editResolutionPlanList	controllers.Application.editResolutionPlanList()
+GET  /viewSimpleResolutionPlans		controllers.Application.viewSimpleResolutionPlans()
 
 POST	/setResolutionPlanComplete	controllers.ApplicationEditing.setResolutionPlanComplete(id : Integer, complete : Boolean)
 

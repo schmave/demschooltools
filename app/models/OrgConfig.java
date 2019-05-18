@@ -237,7 +237,7 @@ class TheOpenSchool extends OrgConfig {
         str_jc_name = "Civics Board";
         str_jc_name_short = "CB";
 
-        show_findings_in_rp_list = false;
+        show_findings_in_rp_list = true;
         use_minor_referrals = false;
         show_no_contest_plea = true;
 
