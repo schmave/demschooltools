@@ -178,7 +178,7 @@ public class Case extends Model implements Comparable<Case> {
         }
 
         // Add first and display names of all people in JC db
-        for(Person p : Application.allPeople()) {
+        for(Person p : Application.jcPeople()) {
             names.add(p.first_name.trim().toLowerCase());
             names.add(p.getDisplayName().trim().toLowerCase());
         }

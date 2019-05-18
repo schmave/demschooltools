@@ -165,7 +165,10 @@ public class Accounting extends Controller {
 
     public static String accountsJson() {
         List<Map<String, String>> result = new ArrayList<Map<String, String>>();
-        for (Account a : Account.all()) {
+        List<Account> accounts = new ArrayList<Account>();
+        accounts.addAll(Account.allPersonalChecking());
+        accounts.addAll(Account.allInstitutionalChecking());
+        for (Account a : accounts) {
             HashMap<String, String> values = new HashMap<String, String>();
             values.put("label", a.getName());
             values.put("id", "" + a.id);

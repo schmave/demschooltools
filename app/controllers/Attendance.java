@@ -95,7 +95,7 @@ public class Attendance extends Controller {
 
         return views.html.attendance_index.render(
                 all_people, person_to_stats, all_codes, codes_map,
-                Application.allPeople(), start_date, prev_date, next_date).toString();
+                Application.attendancePeople(), start_date, prev_date, next_date).toString();
     }
 
     public Result index(String start_date) {
@@ -187,7 +187,7 @@ public class Attendance extends Controller {
                 person_to_days,
                 person_to_week));
         } else {
-            List<Person> additional_people = Application.allPeople();
+            List<Person> additional_people = Application.attendancePeople();
             additional_people.removeAll(all_people);
 
             Collections.sort(additional_people, Person.SORT_DISPLAY_NAME);

@@ -88,9 +88,17 @@ public class Application extends Controller {
         return ok(views.html.view_sm_decisions.render(the_charges));
     }
 
-    public static List<Person> allPeople() {
+    public static List<Person> jcPeople() {
+        return peopleByTagType("show_in_jc");
+    }
+
+    public static List<Person> attendancePeople() {
+        return peopleByTagType("show_in_attendance");
+    }
+
+    private static List<Person> peopleByTagType(String tag_type) {
         List<Tag> tags = Tag.find.where()
-            .eq("show_in_jc", true)
+            .eq(tag_type, true)
             .eq("organization", Organization.getByHost())
             .findList();
 
@@ -855,7 +863,7 @@ public class Application extends Controller {
             }
         }
 
-        result.uncharged_people = allPeople();
+        result.uncharged_people = jcPeople();
         for (Map.Entry<Person, WeeklyStats.PersonCounts> entry : result.person_counts.entrySet()) {
             if (entry.getValue().this_period > 0) {
                 result.uncharged_people.remove(entry.getKey());
@@ -881,7 +889,7 @@ public class Application extends Controller {
     }
 
     public static String jcPeople(String term) {
-        List<Person> people = allPeople();
+        List<Person> people = jcPeople();
         Collections.sort(people, Person.SORT_DISPLAY_NAME);
 
         term = term.toLowerCase();
