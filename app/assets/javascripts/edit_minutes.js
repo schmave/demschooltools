@@ -7,6 +7,7 @@ var people_chooser = require('./people_chooser');
 const time_served_string = "Time served";
 
 const SAVE_TIMEOUT = 2000;
+const DATE_SELECTOR = 'input[type="date"]'
 
 function showSomethingInSidebar(url) {
     $("#sidebar").html("<h2>Loading...</h2>");
@@ -299,7 +300,7 @@ function Case (id, el) {
 
         $.post("/saveCase?id=" + id, {
             closed: !self.el.find("input.continued").prop("checked"),
-            date: self.el.find(".date").val(),
+            date: self.el.find(DATE_SELECTOR).val(),
             findings: self.el.find(".findings").val(),
             location: self.el.find(".location").val(),
             time: self.el.find(".time").val()
@@ -314,7 +315,7 @@ function Case (id, el) {
 
     this.loadData = function(data) {
         el.find(".location").val(data.location);
-        el.find(".date").val(data.date);
+        el.find(DATE_SELECTOR).val(data.date);
         el.find(".time").val(data.time);
         el.find(".findings").val(data.findings);
         el.find("input.continued").prop("checked", data.date_closed === null);
@@ -402,7 +403,7 @@ function Case (id, el) {
 
      this.clearCaseNoConfirm = function() {
         el.find(".location").val('');
-        el.find(".date").val('');
+        el.find(DATE_SELECTOR).val('');
         el.find(".time").val('');
         el.find(".findings").val('');
         el.find("input.continued").prop("checked", false);
@@ -515,7 +516,7 @@ function Case (id, el) {
     el.find(".location").change(self.markAsModified);
     el.find(".findings").change(self.markAsModified);
     el.find(".findings").on(utils.TEXT_AREA_EVENTS, self.checkText);
-    el.find(".date").change(self.markAsModified);
+    el.find(DATE_SELECTOR).change(self.markAsModified);
     el.find(".time").change(self.markAsModified);
     el.find("input.continued").change(self.markAsModified);
 
@@ -673,10 +674,10 @@ function addCaseNoServer(id, number) {
     app.cases.push(case_obj);
 
     $("#meeting-cases").append(case_obj.el);
-    case_obj.el.find(".date").datepicker({
+    case_obj.el.find(DATE_SELECTOR).datepicker({
         showOtherMonths: true,
         selectOtherMonths: true});
-    case_obj.el.find(".date").datepicker("option", "dateFormat", "yy-mm-dd");
+    case_obj.el.find(DATE_SELECTOR).datepicker("option", "dateFormat", "yy-mm-dd");
 
     return case_obj;
 }

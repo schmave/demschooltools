@@ -343,11 +343,11 @@ class Wicklow extends OrgConfig {
 
         str_manual_title = "Lawbook";
         str_manual_title_short = "Lawbook";
-        str_res_plan_short = "Sentence";
-        str_res_plan = "sentence";
-        str_res_plan_cap = "Sentence";
-        str_res_plans = "sentences";
-        str_res_plans_cap = "Sentences";
+        str_res_plan_short = "Sanction";
+        str_res_plan = "sanction";
+        str_res_plan_cap = "Sanction";
+        str_res_plans = "sanctions";
+        str_res_plans_cap = "Sanctions";
         str_findings = "Findings";
 
         track_writer = false;

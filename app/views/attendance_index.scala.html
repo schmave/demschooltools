@@ -91,7 +91,7 @@ $(function() {
         <a href="@routes.Attendance.viewPersonReport(p.person_id)">
     } else {
         <a href="@routes.Attendance.viewPersonReport(
-            p.person_id, Application.yymmddDate(start_date), Application.yymmddDate(next_date))">
+            p.person_id, Application.forDateInput(start_date), Application.forDateInput(next_date))">
     }
     @p.first_name</a>
 </td>
