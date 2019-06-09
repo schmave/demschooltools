@@ -4,6 +4,15 @@ import models.*;
 
 import play.cache.Cache;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
+
+
 public abstract class CachedPage {
     public static final String ATTENDANCE_INDEX = "Attendance-index-";
     public static final String JC_INDEX = "Application-index-";
@@ -32,14 +41,49 @@ public abstract class CachedPage {
     }
 
     public String getPage() {
-        String result = (String)Cache.get(cache_key);
-        if (result != null) {
-            return result;
+        byte[] cached_bytes = (byte[])Cache.get(cache_key);
+        if (cached_bytes != null) {
+            try {
+                ByteArrayInputStream bais = new ByteArrayInputStream(cached_bytes);
+                GZIPInputStream gzis = new GZIPInputStream(bais);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(gzis));
+
+                StringBuilder sb = new StringBuilder();
+                while (true) {
+                    String line = reader.readLine();
+                    if (line == null) {
+                        break;
+                    }
+                    sb.append(line);
+                }
+                return sb.toString();
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("Exception reading cached bytes");
+            }
         }
 
-        result = render();
-        // cache it for 12 hours
-        Cache.set(cache_key, result, 60 * 60 * 12);
+        String result = render();
+
+        try {
+            byte[] bytes_to_compress = result.getBytes("UTF-8");
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(result.length());
+            GZIPOutputStream gzos = new GZIPOutputStream(baos);
+            gzos.write(bytes_to_compress);
+            gzos.finish();
+
+            byte[] compressed_bytes = baos.toByteArray();
+
+            System.out.println("Cache " + cache_key + ": orig size " + bytes_to_compress.length
+                + "; compressed: " + compressed_bytes.length);
+
+            // cache it for 12 hours
+            Cache.set(cache_key, compressed_bytes, 60 * 60 * 12);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Exception writing cached bytes");
+        }
+
         return result;
     }
 
