@@ -105,6 +105,8 @@ GET     /attendance/jsonPeople               controllers.Attendance.jsonPeople(t
 GET     /attendance/viewWeek	  controllers.Attendance.viewWeek(date : String ?= "")
 GET     /attendance/editWeek      controllers.Attendance.editWeek(date : String ?= "")
 GET  	/attendance/checkin		controllers.Attendance.checkin()
+GET     /attendance/pins         controllers.Attendance.assignPINs()
+GET     /attendance/savepins       controllers.Attendance.savePINs()
 POST	/attendance/newCode        controllers.Attendance.newCode()
 GET	/attendance/editCode/:id   controllers.Attendance.editCode(id : Integer)
 POST	/attendance/saveCode      controllers.Attendance.saveCode()

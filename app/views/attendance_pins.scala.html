@@ -1,0 +1,23 @@
+@(people : List[Person])
+
+@import helper._
+
+@main("Assign PINs", "attendance", "attendance_pins") {
+
+<h3>Assign PINs</h3>
+
+@form(routes.Attendance.savePINs, 'class -> "form-horizontal", 'role -> "form") {
+
+<table class="attendance-pins-table">
+	@for( p <- people ) {
+		<tr>
+			<td><label class="control-label">@p.getDisplayName()</label></td>
+			<td><input class="form-control" type="number" max="9999999999" step="1" name="@p.person_id" value="@p.pin"></td>
+		</tr>
+	}
+</table>
+<br>
+<input type="submit" class="btn btn-primary" value="Save">
+
+}
+}

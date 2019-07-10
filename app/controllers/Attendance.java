@@ -695,6 +695,28 @@ public class Attendance extends Controller {
         return result;
     }
 
+    public Result assignPINs() {
+        List<Person> people = Application.attendancePeople();
+        Collections.sort(people, Person.SORT_DISPLAY_NAME);
+        return ok(views.html.attendance_pins.render(people));
+    }
+
+    public Result savePINs() {
+        List<Person> people = Application.attendancePeople();
+        Set<Map.Entry<String,String[]>> entries = request().queryString().entrySet();
+        for (Map.Entry<String, String[]> entry : entries) {
+            Integer person_id = Integer.parseInt(entry.getKey());
+            for (Person person : people) {
+                if (person.person_id == person_id) {
+                    person.pin = entry.getValue()[0];
+                    person.save();
+                    break;
+                }
+            }
+        }
+        return redirect(routes.Attendance.assignPINs());
+    }
+
     // TODO need to make this accessible without logging in
     public Result checkin() {
         return redirect("/assets/checkin/app.html");

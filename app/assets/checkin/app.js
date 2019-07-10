@@ -9,13 +9,17 @@ if ('serviceWorker' in navigator) {
 }
 
 const data = [
-	{ id: 1, name: 'Sam', code: '5336', records_today: 0 },
-	{ id: 2, name: 'Lucy', code: '2969', records_today: 0 },
-	{ id: 3, name: 'Robin', code: '4718', records_today: 0 }
+	{ id: 1, name: 'Sam', pin: '5336', records_today: 0 },
+	{ id: 2, name: 'Lucy', pin: '2969', records_today: 0 },
+	{ id: 3, name: 'Robin', pin: '4718', records_today: 0 }
 ];
 
+// discard people who don't have PINs assigned
+data = data.filter(p => p.pin);
+
 // all codes are constrained to be the same length
-const code_length = data[0].code.length;
+// TODO remove this and use a confirm button
+const code_length = data[0].pin.length;
 
 var code_entered;
 
@@ -48,7 +52,7 @@ function addNumberToCodeEntered(number) {
 function checkCode() {
 	for (let i = 0; i < data.length; i++) {
 		let person = data[i];
-		if (code_entered === person.code) {
+		if (code_entered === person.pin) {
 			authorized(person);
 			return;
 		}
