@@ -146,7 +146,11 @@
                 By person:
                 <input id="navbar_attendance_people_search" type="search" placeholder="Search people..."/>
             </a><a @if(selectedBtn.equals("attendance_codes")) { class="active" }
-                href="@routes.Attendance.viewCodes">Absence codes</a>
+                href="@routes.Attendance.viewCodes">Absence codes
+            </a>
+            <a @if(selectedBtn.equals("attendance_checkin")) { class="active" }
+                href="@routes.Attendance.checkin">Check-in app
+            </a>
             </div>
         </div>
         }

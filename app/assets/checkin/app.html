@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+
+<head>
+	<title>Check-in</title>
+	<link rel="shortcut icon" type="image/png" href="/assets/checkin/icon-192.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="manifest" href="/assets/checkin/manifest.json">
+    <!-- for iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-title" content="Check-in">
+	<link rel="apple-touch-icon" href="/assets/checkin/icon-512.png">
+</head>
+
+<body>
+	<script id="numpad-template" type="text/x-handlebars-template">
+		<table>
+			<tr>
+				<td><button class="checkin-app-number-button" data-number="1">1</button></td>
+				<td><button class="checkin-app-number-button" data-number="2">2</button></td>
+				<td><button class="checkin-app-number-button" data-number="3">3</button></td>
+			</tr>
+			<tr>
+				<td><button class="checkin-app-number-button" data-number="4">4</button></td>
+				<td><button class="checkin-app-number-button" data-number="5">5</button></td>
+				<td><button class="checkin-app-number-button" data-number="6">6</button></td>
+			</tr>
+			<tr>
+				<td><button class="checkin-app-number-button" data-number="7">7</button></td>
+				<td><button class="checkin-app-number-button" data-number="8">8</button></td>
+				<td><button class="checkin-app-number-button" data-number="9">9</button></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><button class="checkin-app-number-button" data-number="0">0</button></td>
+				<td></td>
+			</tr>
+		</table>
+	</script>
+
+	<script id="authorized-template" type="text/x-handlebars-template">
+		<div class="authorized-text"></div>
+	</script>
+
+	<script id="not-authorized-template" type="text/x-handlebars-template">
+		<div class="not-authorized-text">Code not recognized. Please try again.</div>
+	</script>
+
+	<div id="container"></div>
+
+	<script src="/assets/checkin/app.js"></script>
+</body>

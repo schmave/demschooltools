@@ -695,6 +695,11 @@ public class Attendance extends Controller {
         return result;
     }
 
+    // TODO need to make this accessible without logging in
+    public Result checkin() {
+        return redirect("/assets/checkin/app.html");
+    }
+
     public Result viewCodes() {
         return ok(views.html.attendance_codes.render(
             AttendanceCode.all(OrgConfig.get().org),
