@@ -6,6 +6,7 @@ import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -720,6 +721,15 @@ public class Attendance extends Controller {
     // TODO need to make this accessible without logging in
     public Result checkin() {
         return redirect("/assets/checkin/app.html");
+    }
+
+    public Result checkinData() {
+        List<CheckinPerson> people = Application.attendancePeople().stream()
+            .filter(p -> p.pin != null && !p.pin.isEmpty())
+            .map(p -> new CheckinPerson(p))
+            .collect(Collectors.toList());
+
+        return ok(Json.stringify(Json.toJson(people)));
     }
 
     public Result viewCodes() {

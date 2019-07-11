@@ -5,6 +5,7 @@
 	<link rel="shortcut icon" type="image/png" href="/assets/checkin/icon-192.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="manifest" href="/assets/checkin/manifest.json">
+    <script src="/assets/checkin/localforage.js"></script>
     <!-- for iOS -->
     <meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -16,24 +17,24 @@
 	<script id="numpad-template" type="text/x-handlebars-template">
 		<table>
 			<tr>
-				<td><button class="checkin-app-number-button" data-number="1">1</button></td>
-				<td><button class="checkin-app-number-button" data-number="2">2</button></td>
-				<td><button class="checkin-app-number-button" data-number="3">3</button></td>
+				<td><button class="number-button" data-number="1">1</button></td>
+				<td><button class="number-button" data-number="2">2</button></td>
+				<td><button class="number-button" data-number="3">3</button></td>
 			</tr>
 			<tr>
-				<td><button class="checkin-app-number-button" data-number="4">4</button></td>
-				<td><button class="checkin-app-number-button" data-number="5">5</button></td>
-				<td><button class="checkin-app-number-button" data-number="6">6</button></td>
+				<td><button class="number-button" data-number="4">4</button></td>
+				<td><button class="number-button" data-number="5">5</button></td>
+				<td><button class="number-button" data-number="6">6</button></td>
 			</tr>
 			<tr>
-				<td><button class="checkin-app-number-button" data-number="7">7</button></td>
-				<td><button class="checkin-app-number-button" data-number="8">8</button></td>
-				<td><button class="checkin-app-number-button" data-number="9">9</button></td>
+				<td><button class="number-button" data-number="7">7</button></td>
+				<td><button class="number-button" data-number="8">8</button></td>
+				<td><button class="number-button" data-number="9">9</button></td>
 			</tr>
 			<tr>
 				<td></td>
-				<td><button class="checkin-app-number-button" data-number="0">0</button></td>
-				<td></td>
+				<td><button class="number-button" data-number="0">0</button></td>
+				<td><button class="submit-button">&#10004;</button></td>
 			</tr>
 		</table>
 	</script>

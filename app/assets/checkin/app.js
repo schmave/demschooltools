@@ -1,68 +1,83 @@
 
-if ('serviceWorker' in navigator) {
-  	window.addEventListener('load', () => {
-	    navigator.serviceWorker.register('/assets/checkin/service-worker.js')
-	        .then((reg) => {
-	          	console.log('Service worker registered.', reg);
-	        });
-  	});
-}
-
-const data = [
-	{ id: 1, name: 'Sam', pin: '5336', records_today: 0 },
-	{ id: 2, name: 'Lucy', pin: '2969', records_today: 0 },
-	{ id: 3, name: 'Robin', pin: '4718', records_today: 0 }
-];
-
-// discard people who don't have PINs assigned
-data = data.filter(p => p.pin);
-
-// all codes are constrained to be the same length
-// TODO remove this and use a confirm button
-const code_length = data[0].pin.length;
-
 var code_entered;
+var ready = false;
 
 const container = document.querySelector('#container');
 const numpad_template = document.querySelector('#numpad-template');
 const authorized_template = document.querySelector('#authorized-template');
 const not_authorized_template = document.querySelector('#not-authorized-template');
 
-resetApp();
+registerServiceWorker();
+initializeApp();
 
-document.querySelectorAll(".checkin-app-number-button").forEach(function(button) {
-	button.addEventListener("click", function() {
-		addNumberToCodeEntered(this.dataset.number);
-	});
-});
+function registerServiceWorker() {
+	if ('serviceWorker' in navigator) {
+	  	window.addEventListener('load', () => {
+		    navigator.serviceWorker.register('/assets/checkin/service-worker.js')
+		        .then((reg) => {
+		          	console.log('Service worker registered.', reg);
+		        });
+	  	});
+	}
+}
 
-function resetApp() {
+async function initializeApp() {
 	code_entered = '';
 	container.innerHTML = numpad_template.innerHTML;
+	registerEvents();
+	// The user can begin using the numpad even before initial data is downloaded.
+	// If they submit their PIN before data has finished downloading, then they will have to wait.
+	let data = await downloadData();
+	// We don't use the data directly. Instead, we save it in a local db and read it from there.
+	// This way, after the data has been downloaded once, the app can work indefinitely without
+	// internet connection.
+	await saveData(data);
+	ready = true;
+}
+
+async function downloadData() {
+	let response = await fetch('/attendance/checkin/data');
+	return await response.json();
+}
+
+async function saveData(data) {
+	console.log(data);
+	for (let i = 0; i < data.length; i++) {
+		let person = data[i];
+		await localforage.setItem(person.pin, person).catch(function(err) {
+		    console.error(err);
+		});
+	}
+}
+
+async function getPerson(pin) {
+	return await localforage.getItem(pin);
+}
+
+function registerEvents() {
+	document.querySelectorAll('.number-button').forEach(function(button) {
+		button.addEventListener('click', function() {
+			addNumberToCodeEntered(this.dataset.number);
+		});
+	});
+	document.querySelector('.submit-button').addEventListener('click', submitCode);
 }
 
 function addNumberToCodeEntered(number) {
 	code_entered += String(number);
 	console.log(code_entered);
-	if (code_entered.length === code_length) {
-		checkCode();
-	}
 }
 
-function checkCode() {
-	for (let i = 0; i < data.length; i++) {
-		let person = data[i];
-		if (code_entered === person.pin) {
-			authorized(person);
-			return;
-		}
-	}
-	notAuthorized();
+function submitCode() {
+	getPerson(code_entered).then(function(person) {
+		if (person) authorized(person);
+		else notAuthorized();
+	});
 }
 
 function authorized(person) {
 	container.innerHTML = authorized_template.innerHTML;
-	var authorized_text = '';
+	let authorized_text = '';
 	// person is considered arriving if this is the first time they've done this today.
 	// otherwise they are considered departing.
 	const is_arriving = person.records_today === 0;

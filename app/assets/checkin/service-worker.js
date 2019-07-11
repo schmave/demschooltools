@@ -1,7 +1,7 @@
 // https://codelabs.developers.google.com/codelabs/your-first-pwapp/#4
 
 // update cache names any time any of the cached files change
-const CACHE_NAME = 'static-cache-v1';
+const CACHE_NAME = 'static-cache-v20';
 const DATA_CACHE_NAME = 'data-cache-v1';
 
 const FILES_TO_CACHE = [
@@ -9,7 +9,8 @@ const FILES_TO_CACHE = [
 	'/assets/checkin/app.js',
 	'/assets/checkin/icon-192.png',
 	'/assets/checkin/icon-512.png',
-	'/assets/checkin/manifest.json'
+	'/assets/checkin/manifest.json',
+	'/assets/checkin/localforage.js'
 ];
 
 self.addEventListener('install', (evt) => {
@@ -43,20 +44,21 @@ self.addEventListener('fetch', (evt) => {
 	console.log('[ServiceWorker] Fetch', evt.request.url);
 	if (evt.request.url.includes('/data')) {
 		console.log('[Service Worker] Fetch (data)', evt.request.url);
-		evt.respondWith(
-		  caches.open(DATA_CACHE_NAME).then((cache) => {
-		    return fetch(evt.request)
-		        .then((response) => {
-		          // If the response was good, clone it and store it in the cache.
-		          if (response.status === 200) {
-		            cache.put(evt.request.url, response.clone());
-		          }
-		          return response;
-		        }).catch((err) => {
-		          // Network request failed, try to get it from the cache.
-		          return cache.match(evt.request);
-		        });
-		  }));
+		// No data caching. We'll use localStorage instead.
+		// evt.respondWith(
+		//   caches.open(DATA_CACHE_NAME).then((cache) => {
+		//     return fetch(evt.request)
+		//         .then((response) => {
+		//           // If the response was good, clone it and store it in the cache.
+		//           if (response.status === 200) {
+		//             cache.put(evt.request.url, response.clone());
+		//           }
+		//           return response;
+		//         }).catch((err) => {
+		//           // Network request failed, try to get it from the cache.
+		//           return cache.match(evt.request);
+		//         });
+		//   }));
 		return;
 	}
 	evt.respondWith(
