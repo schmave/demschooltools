@@ -1,7 +1,7 @@
 // https://codelabs.developers.google.com/codelabs/your-first-pwapp/#4
 
 // update cache names any time any of the cached files change
-const CACHE_NAME = 'static-cache-v31';
+const CACHE_NAME = 'static-cache-v41';
 
 const FILES_TO_CACHE = [
 	'/assets/checkin/app.html',
@@ -41,8 +41,8 @@ self.addEventListener('activate', (evt) => {
 
 self.addEventListener('fetch', (evt) => {
 	console.log('[ServiceWorker] Fetch', evt.request.url);
-	if (evt.request.mode !== 'navigate') {
-		// Not a page navigation, bail.
+	// don't cache application data
+	if (evt.request.url.includes('/data')) {
 		return;
 	}
 	// Use cache-first strategy. Only request resources from the server if they are not found in the cache.

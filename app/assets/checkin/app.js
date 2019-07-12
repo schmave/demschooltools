@@ -30,24 +30,35 @@ function initializeApp() {
 	code_entered = '';
 	container.innerHTML = numpad_template.innerHTML;
 	registerEvents();
+	poll();
+}
+
+function poll() {
+	console.log('Running polling process');
 	setTimeout(poll, POLLING_INTERVAL_MS);
-	// Note: this is asynchronous, so it's possible that the user will submit a code before 
-	// initial data has been downloaded. In that case the app would say the code is not
-	// recognized. However we aren't going to worry about it because there is only a very
-	// small window where this could happen immediately after the app is installed.
+	trySendMessages();
 	downloadData();
 }
 
 async function downloadData() {
 	let response = await fetch('/attendance/checkin/data');
 	let data = await response.json();
+	let pins = [];
 	// We don't use the data directly. Instead, we save it in a local db and read it from there.
 	// This way, after the data has been downloaded once, the app can work indefinitely without
 	// internet connection.
 	for (let i = 0; i < data.length; i++) {
+		pins.push(data[i].pin);
 		savePerson(data[i]);
 	}
-	// TODO we also need to clean up old entries
+	// clean up old entries
+	localforage.iterate(function(person, key) {
+		if (key.startsWith(PERSON_KEY_PREFIX) && !pins.includes(person.pin)) {
+			localforage.removeItem(key).catch(function(err) {
+			    console.error(err);
+			});
+		}
+	});
 }
 
 async function getPerson(pin) {
@@ -133,7 +144,6 @@ async function trySendMessages() {
 	    	fetch('/attendance/checkin/message' + query_string, { method: 'POST' }).then(response => {
 				// If the response is good, the server received the message, so we can delete it.
 		        if (response.status === 200) {
-		        	help(response);
 		        	localforage.removeItem(key).catch(function(err) {
 					    console.error(err);
 					});
@@ -145,16 +155,4 @@ async function trySendMessages() {
 	}).catch(function(err) {
 	    console.error(err);
 	});
-}
-
-async function help(response) {
-	let json = await response.json();
-	console.log('MESSAGE SENT:');
-	console.log(JSON.stringify(json));
-}
-
-function poll() {
-	setTimeout(poll, POLLING_INTERVAL_MS);
-	trySendMessages();
-	downloadData();
 }
