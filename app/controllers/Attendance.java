@@ -733,12 +733,15 @@ public class Attendance extends Controller {
     }
 
     public Result checkinMessage(long time, int person_id, boolean is_arriving) throws ParseException {
-        CheckinMessage message = new CheckinMessage(time, person_id, is_arriving);
-        // get an AttendanceDay object
+        // find or create AttendanceWeek and AttendanceDay objects
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Date day = sdf.parse(sdf.format(new Date(time)));
-        Person p = Person.findById(person_id);
-        AttendanceDay attendance_day = AttendanceDay.findOrCreate(day, p);
+        Person person = Person.findById(person_id);
+        AttendanceWeek.findOrCreate(day, person);
+        AttendanceDay attendance_day = AttendanceDay.find.where()
+            .eq("person", person)
+            .eq("day", day)
+            .findUnique();
         // Messages from the app should never overwrite existing data.
         // Check if the value exists and set it if it doesn't.
         if (attendance_day.code == null || attendance_day.code.isEmpty()) {
@@ -751,7 +754,7 @@ public class Attendance extends Controller {
                 attendance_day.update();
             }
         }
-        return ok(Json.stringify(Json.toJson(attendance_day)));
+        return ok();
     }
 
     public Result viewCodes() {
