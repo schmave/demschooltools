@@ -1,6 +1,11 @@
 
+const PERSON_KEY_PREFIX = 'person-';
+const MESSAGE_KEY_PREFIX = 'message-';
+
+// poll every 2 minutes
+const POLLING_INTERVAL_MS = 120000
+
 var code_entered;
-var ready = false;
 
 const container = document.querySelector('#container');
 const numpad_template = document.querySelector('#numpad-template');
@@ -21,72 +26,74 @@ function registerServiceWorker() {
 	}
 }
 
-async function initializeApp() {
+function initializeApp() {
 	code_entered = '';
 	container.innerHTML = numpad_template.innerHTML;
 	registerEvents();
-	// The user can begin using the numpad even before initial data is downloaded.
-	// If they submit their PIN before data has finished downloading, then they will have to wait.
-	let data = await downloadData();
-	// We don't use the data directly. Instead, we save it in a local db and read it from there.
-	// This way, after the data has been downloaded once, the app can work indefinitely without
-	// internet connection.
-	await saveData(data);
-	ready = true;
+	setTimeout(poll, POLLING_INTERVAL_MS);
+	// Note: this is asynchronous, so it's possible that the user will submit a code before 
+	// initial data has been downloaded. In that case the app would say the code is not
+	// recognized. However we aren't going to worry about it because there is only a very
+	// small window where this could happen immediately after the app is installed.
+	downloadData();
 }
 
 async function downloadData() {
 	let response = await fetch('/attendance/checkin/data');
-	return await response.json();
-}
-
-async function saveData(data) {
-	console.log(data);
+	let data = await response.json();
+	// We don't use the data directly. Instead, we save it in a local db and read it from there.
+	// This way, after the data has been downloaded once, the app can work indefinitely without
+	// internet connection.
 	for (let i = 0; i < data.length; i++) {
-		let person = data[i];
-		await localforage.setItem(person.pin, person).catch(function(err) {
-		    console.error(err);
-		});
+		savePerson(data[i]);
 	}
+	// TODO we also need to clean up old entries
 }
 
 async function getPerson(pin) {
-	return await localforage.getItem(pin);
+	return localforage.getItem(PERSON_KEY_PREFIX + pin);
+}
+
+async function savePerson(person) {
+	return localforage.setItem(PERSON_KEY_PREFIX + person.pin, person).catch(function(err) {
+	    console.error(err);
+	});
 }
 
 function registerEvents() {
 	document.querySelectorAll('.number-button').forEach(function(button) {
 		button.addEventListener('click', function() {
-			addNumberToCodeEntered(this.dataset.number);
+			addNumberToCode(this.dataset.number);
 		});
 	});
-	document.querySelector('.submit-button').addEventListener('click', submitCode);
+	document.querySelector('.submit-button').addEventListener('click', function() {
+		// TODO separate into two buttons
+		submitCode(false);
+	});
 }
 
-function addNumberToCodeEntered(number) {
+function addNumberToCode(number) {
 	code_entered += String(number);
 	console.log(code_entered);
 }
 
-function submitCode() {
-	getPerson(code_entered).then(function(person) {
-		if (person) authorized(person);
-		else notAuthorized();
-	});
+async function submitCode(is_arriving) {
+	// TODO add some kind of visual indicator that the app is waiting (e.g. graying out buttons)
+	let person = await getPerson(code_entered);
+	if (person) authorized(person, is_arriving);
+	else notAuthorized();
 }
 
-function authorized(person) {
+function notAuthorized() {
+	container.innerHTML = not_authorized_template.innerHTML;
+	// need a way for user to return to numpad
+	// also the numpad should automatically reappear after a minute or so
+}
+
+function authorized(person, is_arriving) {
+	createMessage(person, is_arriving);
 	container.innerHTML = authorized_template.innerHTML;
 	let authorized_text = '';
-	// person is considered arriving if this is the first time they've done this today.
-	// otherwise they are considered departing.
-	const is_arriving = person.records_today === 0;
-	// need to save new person data in local DB
-	person.records_today++;
-	// need to send server the person ID and current time.
-	// this will involve creating a message object in local DB which will sync to
-	// server whenever connection is available
-	//
 	if (is_arriving) {
 		authorized_text = 'Welcome ';
 	} else {
@@ -96,8 +103,58 @@ function authorized(person) {
 	document.querySelector('.authorized-text').innerHTML = authorized_text;
 }
 
-function notAuthorized() {
-	container.innerHTML = not_authorized_template.innerHTML;
-	// need a way for user to return to numpad
-	// also the numpad should automatically reappear after a short time
+async function createMessage(person, is_arriving) {
+	let message = {
+		// this is milliseconds elapsed since epoch, which we can use as a unique key
+		time: Date.now(),
+		person_id: person.person_id,
+		is_arriving: is_arriving
+	}
+	await saveMessage(message);
+	trySendMessages();
+}
+
+async function saveMessage(message) {
+	return localforage.setItem(MESSAGE_KEY_PREFIX + message.time, message).catch(function(err) {
+	    console.error(err);
+	});
+}
+
+async function trySendMessages() {
+	// loop through all messages
+	localforage.iterate(function(message, key) {
+		// Because this function can be called both by a user event and the polling process,
+		// it's possible for a second call to begin before the first one ends, which could result
+		// in a message being sent twice. This is okay, since the server will ignore or overwrite
+		// duplicate messages.
+	    if (key.startsWith(MESSAGE_KEY_PREFIX)) {
+	    	// try sending the message
+	    	let query_string = `?time=${message.time}&person_id=${message.person_id}&is_arriving=${message.is_arriving}`;
+	    	fetch('/attendance/checkin/message' + query_string, { method: 'POST' }).then(response => {
+				// If the response is good, the server received the message, so we can delete it.
+		        if (response.status === 200) {
+		        	help(response);
+		        	localforage.removeItem(key).catch(function(err) {
+					    console.error(err);
+					});
+		        }
+            }).catch(function(err) {
+			    console.error(err);
+			});
+	    }
+	}).catch(function(err) {
+	    console.error(err);
+	});
+}
+
+async function help(response) {
+	let json = await response.json();
+	console.log('MESSAGE SENT:');
+	console.log(JSON.stringify(json));
+}
+
+function poll() {
+	setTimeout(poll, POLLING_INTERVAL_MS);
+	trySendMessages();
+	downloadData();
 }

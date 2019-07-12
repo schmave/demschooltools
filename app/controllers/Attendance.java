@@ -732,6 +732,11 @@ public class Attendance extends Controller {
         return ok(Json.stringify(Json.toJson(people)));
     }
 
+    public Result checkinMessage(long time, int person_id, boolean is_arriving) {
+        CheckinMessage message = new CheckinMessage(time, person_id, is_arriving);
+        return ok(Json.stringify(Json.toJson(message)));
+    }
+
     public Result viewCodes() {
         return ok(views.html.attendance_codes.render(
             AttendanceCode.all(OrgConfig.get().org),
