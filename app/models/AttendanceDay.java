@@ -47,6 +47,16 @@ public class AttendanceDay extends Model {
         return result;
     }
 
+    public static AttendanceDay findOrCreate(Date day, Person p) {
+        AttendanceDay attendance_day = AttendanceDay.find.where()
+            .eq("person", p)
+            .eq("day", day)
+            .findUnique();
+
+        if (attendance_day != null) return attendance_day;
+        return create(day, p); 
+    }
+
     public static Time parseTime(String time_string) {
         if (time_string == null || time_string.equals("")) {
             return null;
