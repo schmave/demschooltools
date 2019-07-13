@@ -72,20 +72,34 @@ async function savePerson(person) {
 }
 
 function registerEvents() {
+	const highlightable_buttons = [];
 	document.querySelectorAll('.number-button').forEach(function(button) {
 		button.addEventListener('click', function() {
-			addNumberToCode(this.dataset.number);
+			code_entered += String(this.dataset.number);
+			console.log(code_entered);
 		});
+		highlightable_buttons.push(button);
 	});
-	document.querySelector('.submit-button').addEventListener('click', function() {
-		// TODO separate into two buttons
+	const clear_button = document.querySelector('.clear-button');
+	highlightable_buttons.push(clear_button);
+	clear_button.addEventListener('click', function() {
+		code_entered = '';
+	});
+	document.querySelector('.arriving-button').addEventListener('click', function() {
+		submitCode(true);
+	});
+	document.querySelector('.leaving-button').addEventListener('click', function() {
 		submitCode(false);
 	});
-}
-
-function addNumberToCode(number) {
-	code_entered += String(number);
-	console.log(code_entered);
+	for (let i = 0; i < highlightable_buttons.length; i++) {
+		let button = highlightable_buttons[i];
+		button.addEventListener('touchstart', function() {
+			this.classList.add('highlight');
+		});
+		button.addEventListener('touchend', function() {
+			this.classList.remove('highlight');
+		});
+	}
 }
 
 async function submitCode(is_arriving) {

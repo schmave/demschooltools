@@ -1,0 +1,70 @@
+
+html, body, #container, table {
+	height: 100%;
+}
+
+body {
+	margin: 0;
+	background: #ddd;
+}
+
+table {
+	width: 100%;
+	margin: auto;
+	table-layout: fixed;
+	border-spacing: 0;
+}
+
+.number-button, .arriving-button, .leaving-button, .clear-button {
+	width: 100%;
+	height: 100%;
+	border: none;
+	outline: none;
+}
+
+.number-button {
+	background-color: #fff;
+	font-size: 2em;
+	color: #555;
+	transition-property: background-color;
+	transition-duration: 0.5s;
+}
+
+.number-button.highlight {
+	background-color: #c2f6ff;
+	transition-property: none;
+}
+
+.arriving-button, .leaving-button, .clear-button {
+	color: #fff;
+	font-size: 1em;
+}
+
+.arriving-button {
+	background: #08b860;
+}
+
+.leaving-button {
+	background: #1388c2;
+}
+
+.clear-button {
+	background: #888;
+	transition-property: background-color;
+	transition-duration: 0.5s;
+}
+
+.clear-button.highlight {
+	background-color: #555;
+	transition-property: none;
+}
+
+.cross {
+	font-size: 1.3em;
+	vertical-align: middle;
+}
+
+.arrow {
+	font-size: 2em;
+	vertical-align: middle;
+}

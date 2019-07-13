@@ -1,7 +1,7 @@
 // https://codelabs.developers.google.com/codelabs/your-first-pwapp/#4
 
 // update cache names any time any of the cached files change
-const CACHE_NAME = 'static-cache-v41';
+const CACHE_NAME = 'static-cache-v76';
 
 const FILES_TO_CACHE = [
 	'/assets/checkin/app.html',
@@ -9,7 +9,8 @@ const FILES_TO_CACHE = [
 	'/assets/checkin/icon-192.png',
 	'/assets/checkin/icon-512.png',
 	'/assets/checkin/manifest.json',
-	'/assets/checkin/localforage.js'
+	'/assets/checkin/localforage.js',
+	'/assets/checkin/style.css'
 ];
 
 self.addEventListener('install', (evt) => {

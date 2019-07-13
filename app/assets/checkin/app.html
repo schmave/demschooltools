@@ -5,6 +5,7 @@
 	<link rel="shortcut icon" type="image/x-icon" href="/assets/checkin/icon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="manifest" href="/assets/checkin/manifest.json">
+    <link rel="stylesheet" type="text/css" href="style.css">
     <script src="/assets/checkin/localforage.js"></script>
     <!-- for iOS -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -17,24 +18,40 @@
 	<script id="numpad-template" type="text/x-handlebars-template">
 		<table>
 			<tr>
-				<td><button class="number-button" data-number="1">1</button></td>
-				<td><button class="number-button" data-number="2">2</button></td>
-				<td><button class="number-button" data-number="3">3</button></td>
+				<td colspan="2"><button class="number-button" data-number="1">1</button></td>
+				<td colspan="2"><button class="number-button" data-number="2">2</button></td>
+				<td colspan="2"><button class="number-button" data-number="3">3</button></td>
 			</tr>
 			<tr>
-				<td><button class="number-button" data-number="4">4</button></td>
-				<td><button class="number-button" data-number="5">5</button></td>
-				<td><button class="number-button" data-number="6">6</button></td>
+				<td colspan="2"><button class="number-button" data-number="4">4</button></td>
+				<td colspan="2"><button class="number-button" data-number="5">5</button></td>
+				<td colspan="2"><button class="number-button" data-number="6">6</button></td>
 			</tr>
 			<tr>
-				<td><button class="number-button" data-number="7">7</button></td>
-				<td><button class="number-button" data-number="8">8</button></td>
-				<td><button class="number-button" data-number="9">9</button></td>
+				<td colspan="2"><button class="number-button" data-number="7">7</button></td>
+				<td colspan="2"><button class="number-button" data-number="8">8</button></td>
+				<td colspan="2"><button class="number-button" data-number="9">9</button></td>
 			</tr>
 			<tr>
-				<td></td>
-				<td><button class="number-button" data-number="0">0</button></td>
-				<td><button class="submit-button">&#10004;</button></td>
+				<td colspan="2">
+					<button class="clear-button">
+						<span class="cross">&#10006;</span>&nbsp; Clear
+					</button>
+				</td>
+				<td colspan="2"><button class="number-button" data-number="0">0</button></td>
+				<td colspan="2"></td>
+			</tr>
+			<tr>
+				<td colspan="3">
+					<button class="arriving-button">
+						<span class="arrow">&#10149;</span>&nbsp; I'm arriving
+					</button>
+				</td>
+				<td colspan="3">
+					<button class="leaving-button">
+						I'm leaving &nbsp;<span class="arrow">&#10150;</span>
+					</button>
+				</td>
 			</tr>
 		</table>
 	</script>
