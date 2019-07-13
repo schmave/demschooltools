@@ -8,6 +8,25 @@ body {
 	background: #ddd;
 }
 
+#container {
+	position: absolute;
+}
+
+#overlay {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+	transition-property: opacity;
+	transition-duration: 0.3s;
+}
+
+#overlay.disabled {
+	background: #000;
+	opacity: 0.2;
+	z-index: 1;
+}
+
 table {
 	width: 100%;
 	margin: auto;
@@ -20,19 +39,22 @@ table {
 	height: 100%;
 	border: none;
 	outline: none;
+	transition-property: background-color;
+	transition-duration: 0.5s;
+}
+
+.highlight {
+	transition-property: none;
 }
 
 .number-button {
 	background-color: #fff;
 	font-size: 2em;
 	color: #555;
-	transition-property: background-color;
-	transition-duration: 0.5s;
 }
 
 .number-button.highlight {
 	background-color: #c2f6ff;
-	transition-property: none;
 }
 
 .arriving-button, .leaving-button, .clear-button {
@@ -44,19 +66,24 @@ table {
 	background: #08b860;
 }
 
+.arriving-button.highlight {
+	background-color: #008d46;
+}
+
 .leaving-button {
 	background: #1388c2;
 }
 
+.leaving-button.highlight {
+	background-color: #015f8d;
+}
+
 .clear-button {
 	background: #888;
-	transition-property: background-color;
-	transition-duration: 0.5s;
 }
 
 .clear-button.highlight {
 	background-color: #555;
-	transition-property: none;
 }
 
 .cross {

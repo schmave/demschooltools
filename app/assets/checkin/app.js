@@ -11,6 +11,7 @@ const container = document.querySelector('#container');
 const numpad_template = document.querySelector('#numpad-template');
 const authorized_template = document.querySelector('#authorized-template');
 const not_authorized_template = document.querySelector('#not-authorized-template');
+const overlay = document.querySelector('#overlay');
 
 registerServiceWorker();
 initializeApp();
@@ -78,11 +79,8 @@ function registerEvents() {
 			code_entered += String(this.dataset.number);
 			console.log(code_entered);
 		});
-		highlightable_buttons.push(button);
 	});
-	const clear_button = document.querySelector('.clear-button');
-	highlightable_buttons.push(clear_button);
-	clear_button.addEventListener('click', function() {
+	document.querySelector('.clear-button').addEventListener('click', function() {
 		code_entered = '';
 	});
 	document.querySelector('.arriving-button').addEventListener('click', function() {
@@ -91,20 +89,22 @@ function registerEvents() {
 	document.querySelector('.leaving-button').addEventListener('click', function() {
 		submitCode(false);
 	});
-	for (let i = 0; i < highlightable_buttons.length; i++) {
-		let button = highlightable_buttons[i];
+	document.querySelectorAll('button').forEach(function(button) {
 		button.addEventListener('touchstart', function() {
 			this.classList.add('highlight');
 		});
 		button.addEventListener('touchend', function() {
 			this.classList.remove('highlight');
 		});
-	}
+	});
 }
 
 async function submitCode(is_arriving) {
-	// TODO add some kind of visual indicator that the app is waiting (e.g. graying out buttons)
+	// Setting this class on the overlay prevents any of the buttons from being pressed
+	// while we are retrieving person data.
+	overlay.classList.add('disabled');
 	let person = await getPerson(code_entered);
+	overlay.classList.remove('disabled');
 	if (person) authorized(person, is_arriving);
 	else notAuthorized();
 }
