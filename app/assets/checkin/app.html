@@ -18,6 +18,11 @@
 	<script id="numpad-template" type="text/x-handlebars-template">
 		<table>
 			<tr>
+				<td colspan="6">
+					<div id="code-entered"></div>
+				</td>
+			</tr>
+			<tr>
 				<td colspan="2"><button class="number-button" data-number="1">1</button></td>
 				<td colspan="2"><button class="number-button" data-number="2">2</button></td>
 				<td colspan="2"><button class="number-button" data-number="3">3</button></td>
@@ -57,11 +62,19 @@
 	</script>
 
 	<script id="authorized-template" type="text/x-handlebars-template">
-		<div class="authorized-text"></div>
+		<div class="not-authorized">
+			<div class="authorized-check">&#10004;</div>
+			<div class="authorized-text"></div>
+			<div><button class="ok-button">OK</button></div>
+		</div>
 	</script>
 
 	<script id="not-authorized-template" type="text/x-handlebars-template">
-		<div class="not-authorized-text">Code not recognized. Please try again.</div>
+		<div class="not-authorized">
+			<div class="not-authorized-cross">&#10006;</div>
+			Code not recognized.<br>Please try again.
+			<div><button class="ok-button">OK</button></div>
+		</div>
 	</script>
 
 	<div id="overlay"></div>

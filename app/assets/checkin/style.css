@@ -1,5 +1,6 @@
 
-html, body, #container, table {
+html, body, #container, #overlay, table, .authorized, .not-authorized {
+	width: 100%;
 	height: 100%;
 }
 
@@ -14,8 +15,6 @@ body {
 
 #overlay {
 	position: absolute;
-	width: 100%;
-	height: 100%;
 	opacity: 0;
 	transition-property: opacity;
 	transition-duration: 0.3s;
@@ -27,6 +26,13 @@ body {
 	z-index: 1;
 }
 
+#code-entered {
+	line-height: 30px;
+	height: 30px;
+	text-align: center;
+	font-size: 1.3em;
+}
+
 table {
 	width: 100%;
 	margin: auto;
@@ -34,13 +40,13 @@ table {
 	border-spacing: 0;
 }
 
-.number-button, .arriving-button, .leaving-button, .clear-button {
+button {
 	width: 100%;
 	height: 100%;
 	border: none;
 	outline: none;
 	transition-property: background-color;
-	transition-duration: 0.5s;
+	transition-duration: 0.2s;
 }
 
 .highlight {
@@ -94,4 +100,39 @@ table {
 .arrow {
 	font-size: 2em;
 	vertical-align: middle;
+}
+
+.authorized, .not-authorized {
+	background: #fff;
+	font-family: sans-serif;
+	text-align: center;
+}
+
+.authorized-check, .not-authorized-cross {
+	font-size: 4em;
+	padding-top: 50px;
+	margin-bottom: 15px;
+}
+
+.authorized-check.hello {
+	color: #08b860;
+}
+
+.authorized-check.goodbye {
+	color: #1388c2;
+}
+
+.not-authorized-cross {
+	color: #f00;
+}
+
+.ok-button {
+	width: 120px;
+	padding: 15px;
+	margin-top: 25px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	background: #f4f4f4;
+	color: #000;
+	font-size: 1em;
 }

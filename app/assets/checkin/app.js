@@ -5,6 +5,9 @@ const MESSAGE_KEY_PREFIX = 'message-';
 // poll every 2 minutes
 const POLLING_INTERVAL_MS = 120000
 
+// after someone checks in/out, automatically return to the home screen after 15 seconds
+const WAIT_BEFORE_RESETTING_MS = 15000;
+
 var code_entered;
 
 const container = document.querySelector('#container');
@@ -14,7 +17,8 @@ const not_authorized_template = document.querySelector('#not-authorized-template
 const overlay = document.querySelector('#overlay');
 
 registerServiceWorker();
-initializeApp();
+resetApp();
+poll();
 
 function registerServiceWorker() {
 	if ('serviceWorker' in navigator) {
@@ -27,11 +31,40 @@ function registerServiceWorker() {
 	}
 }
 
-function initializeApp() {
-	code_entered = '';
+function resetApp() {
 	container.innerHTML = numpad_template.innerHTML;
-	registerEvents();
-	poll();
+	updateCodeEntered('');
+	document.querySelectorAll('.number-button').forEach(function(button) {
+		button.addEventListener('click', function() {
+			updateCodeEntered(code_entered + String(this.dataset.number));
+		});
+	});
+	document.querySelector('.clear-button').addEventListener('click', function() {
+		updateCodeEntered('');
+	});
+	document.querySelector('.arriving-button').addEventListener('click', function() {
+		submitCode(true);
+	});
+	document.querySelector('.leaving-button').addEventListener('click', function() {
+		submitCode(false);
+	});
+	document.querySelectorAll('button').forEach(function(button) {
+		button.addEventListener('touchstart', function() {
+			this.classList.add('highlight');
+		});
+		button.addEventListener('touchend', function() {
+			this.classList.remove('highlight');
+		});
+	});
+}
+
+function updateCodeEntered(code) {
+	code_entered = code;
+	hidden_code = '';
+	for (let i = 0; i < code_entered.length; i++) {
+		hidden_code += '*';
+	}
+	document.querySelector('#code-entered').innerHTML = hidden_code;
 }
 
 function poll() {
@@ -72,60 +105,57 @@ async function savePerson(person) {
 	});
 }
 
-function registerEvents() {
-	const highlightable_buttons = [];
-	document.querySelectorAll('.number-button').forEach(function(button) {
-		button.addEventListener('click', function() {
-			code_entered += String(this.dataset.number);
-			console.log(code_entered);
-		});
-	});
-	document.querySelector('.clear-button').addEventListener('click', function() {
-		code_entered = '';
-	});
-	document.querySelector('.arriving-button').addEventListener('click', function() {
-		submitCode(true);
-	});
-	document.querySelector('.leaving-button').addEventListener('click', function() {
-		submitCode(false);
-	});
-	document.querySelectorAll('button').forEach(function(button) {
-		button.addEventListener('touchstart', function() {
-			this.classList.add('highlight');
-		});
-		button.addEventListener('touchend', function() {
-			this.classList.remove('highlight');
-		});
-	});
-}
-
 async function submitCode(is_arriving) {
 	// Setting this class on the overlay prevents any of the buttons from being pressed
 	// while we are retrieving person data.
 	overlay.classList.add('disabled');
 	let person = await getPerson(code_entered);
 	overlay.classList.remove('disabled');
-	if (person) authorized(person, is_arriving);
-	else notAuthorized();
+	if (person) setAuthorized(person, is_arriving);
+	else setUnauthorized();
 }
 
-function notAuthorized() {
-	container.innerHTML = not_authorized_template.innerHTML;
-	// need a way for user to return to numpad
-	// also the numpad should automatically reappear after a minute or so
-}
-
-function authorized(person, is_arriving) {
+function setAuthorized(person, is_arriving) {
 	createMessage(person, is_arriving);
 	container.innerHTML = authorized_template.innerHTML;
+	document.querySelector('.authorized-text').innerHTML = getAuthorizedText(person, is_arriving);
+	// We will automatically return to the home screen after a period of time if the OK
+	// button is not pressed.
+	var hasReset = false;
+	registerOkButtonEvent(function() {
+		hasReset = true;
+	});
+	setTimeout(function() {
+		console.log('timeout, hasReset = ' + hasReset);
+		if (!hasReset) {
+			resetApp();
+		}
+	}, WAIT_BEFORE_RESETTING_MS);
+}
+
+function getAuthorizedText(person, is_arriving) {
 	let authorized_text = '';
 	if (is_arriving) {
-		authorized_text = 'Welcome ';
+		authorized_text = 'Hello ';
+		document.querySelector('.authorized-check').classList.add('hello');
 	} else {
 		authorized_text = 'Goodbye ';
+		document.querySelector('.authorized-check').classList.add('goodbye');
 	}
 	authorized_text += person.name;
-	document.querySelector('.authorized-text').innerHTML = authorized_text;
+	return authorized_text;
+}
+
+function setUnauthorized() {
+	container.innerHTML = not_authorized_template.innerHTML;
+	registerOkButtonEvent();
+}
+
+function registerOkButtonEvent(callback) {
+	document.querySelector('.ok-button').addEventListener('click', function() {
+		if (callback) callback();
+		resetApp();
+	});
 }
 
 async function createMessage(person, is_arriving) {
