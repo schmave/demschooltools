@@ -733,9 +733,16 @@ public class Attendance extends Controller {
     }
 
     public Result checkinMessage(long time, int person_id, boolean is_arriving) throws ParseException {
-        // find or create AttendanceWeek and AttendanceDay objects
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Date day = sdf.parse(sdf.format(new Date(time)));
+        // if the day is Saturday or Sunday, ignore the message
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(day);
+        int dow = calendar.get(Calendar.DAY_OF_WEEK);
+        if (dow == Calendar.SATURDAY || dow == Calendar.SUNDAY) {
+            return ok();
+        }
+        // find or create AttendanceWeek and AttendanceDay objects
         Person person = Person.findById(person_id);
         AttendanceWeek.findOrCreate(day, person);
         AttendanceDay attendance_day = AttendanceDay.find.where()
