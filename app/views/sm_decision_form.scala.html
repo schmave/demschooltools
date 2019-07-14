@@ -23,7 +23,7 @@
 </div>
 <div class="form-group">
 	<label class="col-sm-1">On date:</label>
-		<div class="col-sm-2"><input name="date" class="date form-control" type="text" @if( c.sm_decision_date != null ){ value="@Application.yymmddDate(c.sm_decision_date)" }></div>
+		<div class="col-sm-2"><input name="date" type="date" @if( c.sm_decision_date != null ){ value="@Application.forDateInput(c.sm_decision_date)" }></div>
 </div>
 <br><input style="margin-left: 200px" type="submit" class="btn btn-primary" value="Submit and mark as closed">
 </form>

@@ -383,7 +383,7 @@ public class Attendance extends Controller {
             CachedPage.remove(CachedPage.ATTENDANCE_INDEX);
         }
 
-        return redirect(routes.Attendance.editWeek(Application.yymmddDate(start_date.getTime())));
+        return redirect(routes.Attendance.editWeek(Application.forDateInput(start_date.getTime())));
     }
 
 

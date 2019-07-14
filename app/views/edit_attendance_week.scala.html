@@ -14,7 +14,7 @@ app = {};
 app.person_rows = [];
 
 app.codes = @Html(Utils.toJson(codes));
-app.monday = "@Application.yymmddDate(monday)";
+app.monday = "@Application.forDateInput(monday)";
 
 app.initial_data = {
 	active_people: @Html(Utils.toJson(people)),
@@ -39,10 +39,10 @@ $(function() {
 
 <h3>Editing week of @Application.yymmddDate(monday)</h3>
 <form method="POST" action="@routes.Attendance.importFromCustodia()">
-<p><a class="btn btn-success" href="@routes.Attendance.viewWeek()?date=@Application.yymmddDate(monday)">Done editing; return to viewing</a>
+<p><a class="btn btn-success" href="@routes.Attendance.viewWeek()?date=@Application.forDateInput(monday)">Done editing; return to viewing</a>
 @if( OrgConfig.get().org.show_custodia ) {
-        <input type="hidden" name="monday" value="@Application.yymmddDate(monday)">
-        <button class="btn btn-primary">Import from Custodia</button>
+  <input type="hidden" name="monday" value="@Application.forDateInput(monday)">
+  <button class="btn btn-primary">Import from Custodia</button>
 }
 </p>
 </form>

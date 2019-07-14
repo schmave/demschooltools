@@ -6,18 +6,18 @@ minor_referral_destinations : List[ String ])
 @main("Weekly report starting on " + Application.formatDateShort(start_date), "jc", "weekly_report") {
 
 <h3> Weekly report </h3>
-<p><a href="@routes.Application.viewWeeklyReport(Application.yymmddDate(Application.addWeek(end_date, -1)))">&lt;&lt; Prev week</a>
+<p><a href="@routes.Application.viewWeeklyReport(Application.forDateInput(Application.addWeek(end_date, -1)))">&lt;&lt; Prev week</a>
 &nbsp;&nbsp;&nbsp;&nbsp;
 Period from
 @Application.formatDayOfWeek(start_date) @Application.formatDateShort(start_date) to
 @Application.formatDayOfWeek(end_date) @Application.formatDateShort(end_date), inclusive.
 &nbsp;&nbsp;&nbsp;&nbsp;
-<a href="@routes.Application.viewWeeklyReport(Application.yymmddDate(Application.addWeek(end_date, 1)))">Next week &gt;&gt;</a>
+<a href="@routes.Application.viewWeeklyReport(Application.forDateInput(Application.addWeek(end_date, 1)))">Next week &gt;&gt;</a>
 <p>
 <p>
 <p>@data.num_cases total cases.
 <p>@data.num_charges total charges.
-<p><a href="@routes.Application.printWeeklyMinutes(Application.yymmddDate(start_date))">Print the week's minutes</a></p>
+<p><a href="@routes.Application.printWeeklyMinutes(Application.forDateInput(start_date))">Print the week's minutes</a></p>
 
 <div class="row">
 	<div class="col-sm-4">
