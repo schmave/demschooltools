@@ -735,8 +735,7 @@ public class Attendance extends Controller {
     }
 
     public Result checkinMessage(long time, int person_id, boolean is_arriving) throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        Date day = sdf.parse(sdf.format(new Date(time)));
+        Date day = new Date(time);
         // if the day is Saturday or Sunday, ignore the message
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(day);
