@@ -249,6 +249,37 @@ class TheOpenSchool extends OrgConfig {
     }
 }
 
+class TheOpenSchool2 extends OrgConfig {
+    private static final TheOpenSchool2 INSTANCE = new TheOpenSchool2();
+
+    public TheOpenSchool2() {
+        name = "The Open School - Riverside";
+        people_url = "https://tos-2.demschooltools.com";
+        time_zone = TimeZone.getTimeZone("US/Pacific");
+
+        str_manual_title = "Law Book";
+        str_manual_title_short = "Law Book";
+        str_res_plan_short = "Sentence";
+        str_res_plan = "sentence";
+        str_res_plan_cap = "Sentence";
+        str_res_plans = "sentences";
+        str_res_plans_cap = "Sentences";
+        str_findings = "Findings";
+        str_jc_name = "Civics Board";
+        str_jc_name_short = "CB";
+
+        show_findings_in_rp_list = true;
+        use_minor_referrals = false;
+        show_no_contest_plea = true;
+
+        OrgConfig.register(name, this);
+    }
+
+    public static TheOpenSchool2 getInstance() {
+        return INSTANCE;
+    }
+}
+
 class Houston extends OrgConfig {
     private static final Houston INSTANCE = new Houston();
     public TimeZone time_zone = TimeZone.getTimeZone("US/Central");
