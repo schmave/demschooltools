@@ -3,6 +3,7 @@ var React = require('react'),
     AdminItem = require('./adminwrapper.jsx'),
     DateTimePicker = require('react-widgets').DateTimePicker,
     actionCreator = require('./studentactioncreator'),
+    userStore = require('./userstore'),
     Modal = require('./modal.jsx');
 
 module.exports = class extends React.Component {
@@ -40,8 +41,9 @@ module.exports = class extends React.Component {
         if (missing_direction === 'out') {
             d = new Date(student.last_swipe_date + 'T00:00:00');
         }
-        d.setHours(missing_direction === "in" ? 9 : 15);
-        console.log('suggesting', d);
+        const school = userStore.getSelectedSchool();
+        const defaultOutTime = school._id === 11 ? 16 : 15;
+        d.setHours(missing_direction === "in" ? 9 : defaultOutTime);
         this.setState({missing_date: d});
     };
 
