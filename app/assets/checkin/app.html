@@ -44,7 +44,11 @@
 					</button>
 				</td>
 				<td colspan="2"><button class="number-button" data-number="0">0</button></td>
-				<td colspan="2"></td>
+				<td colspan="2">
+					<button class="roster-button">
+						<span class="cross">&#10070;</span>&nbsp; Roster
+					</button>
+				</td>
 			</tr>
 			<tr>
 				<td colspan="3">
@@ -59,6 +63,32 @@
 				</td>
 			</tr>
 		</table>
+	</script>
+
+	<script id="loading-template" type="text/x-handlebars-template">
+		<div class="loading">
+			<div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+			Loading Roster
+		</div>
+	</script>
+
+	<script id="roster-template" type="text/x-handlebars-template">
+		<div class="roster-header">
+			&#10070; Roster
+			<button class="close-button roster-close-button">&#10006;</button>
+		</div>
+		<table class="roster">
+			<tbody id="roster"></tbody>
+		</table>
+	</script>
+
+	<script id="roster-failed-template" type="text/x-handlebars-template">
+		<div class="roster-failed">
+			<div class="roster-failed-symbol">&#9888;</div>
+			Failed to download the roster because the app is in offline mode.
+			Check to make sure your device is connected to the internet.
+			<div><button class="ok-button">OK</button></div>
+		</div>
 	</script>
 
 	<script id="authorized-template" type="text/x-handlebars-template">

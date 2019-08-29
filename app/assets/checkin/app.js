@@ -12,6 +12,9 @@ var code_entered;
 
 const container = document.querySelector('#container');
 const numpad_template = document.querySelector('#numpad-template');
+const loading_template = document.querySelector('#loading-template');
+const roster_template = document.querySelector('#roster-template');
+const roster_failed_template = document.querySelector('#roster-failed-template');
 const authorized_template = document.querySelector('#authorized-template');
 const not_authorized_template = document.querySelector('#not-authorized-template');
 const overlay = document.querySelector('#overlay');
@@ -42,6 +45,9 @@ function resetApp() {
 	document.querySelector('.clear-button').addEventListener('click', function() {
 		updateCodeEntered('');
 	});
+	document.querySelector('.roster-button').addEventListener('click', function() {
+		showRoster();
+	});
 	document.querySelector('.arriving-button').addEventListener('click', function() {
 		submitCode(true);
 	});
@@ -65,6 +71,45 @@ function updateCodeEntered(code) {
 		hidden_code += '*';
 	}
 	document.querySelector('#code-entered').innerHTML = hidden_code;
+}
+
+async function showRoster() {
+	container.innerHTML = loading_template.innerHTML;
+	let data = await downloadRoster();
+	if (data) {
+		container.innerHTML = roster_template.innerHTML;
+		let roster = document.getElementById('roster');
+		for (let i = 0; i < data.length; i++) {
+			let person = data[i];
+			let person_row = document.createElement('tr');
+			// add name column
+			let name_column = document.createElement('td');
+			name_column.innerHTML = person.name;
+			person_row.appendChild(name_column);
+			// if there is an attendance code, add the code in a 2-span column
+			if (person.current_day_code) {
+				let code_column = document.createElement('td');
+				code_column.setAttribute('colspan', 2);
+				code_column.className = 'absent';
+				code_column.innerHTML = 'Absent';
+				person_row.appendChild(code_column);
+			}
+			// if there is no attendance code, add in & out columns
+			else {
+				let in_column = document.createElement('td');
+				let out_column = document.createElement('td');
+				in_column.innerHTML = person.current_day_start_time;
+				out_column.innerHTML = person.current_day_end_time;
+				person_row.appendChild(in_column);
+				person_row.appendChild(out_column);
+			}
+			roster.appendChild(person_row);
+		}
+		registerCloseButtonEvent();
+	} else {
+		container.innerHTML = roster_failed_template.innerHTML;
+		registerOkButtonEvent();
+	}
 }
 
 function poll() {
@@ -93,6 +138,23 @@ async function downloadData() {
 			});
 		}
 	});
+}
+
+async function downloadRoster() {
+	// The "roster" data is the same as the application data; the difference is that when the
+	// user requests the roster, we have to give them up-to-date data from the server, or
+	// nothing. This allows the user to see data that is guaranteed to be current, or allows
+	// them to see that the app is offline.
+	try {
+		let response = await fetch('/attendance/checkin/data');
+		console.log('response: ' + response);
+	    if (response.status === 200) {
+	    	return response.json();
+	    }
+	} catch (err) {
+		console.error(err);
+	}
+    return null;
 }
 
 async function getPerson(pin) {
@@ -154,6 +216,12 @@ function setUnauthorized() {
 function registerOkButtonEvent(callback) {
 	document.querySelector('.ok-button').addEventListener('click', function() {
 		if (callback) callback();
+		resetApp();
+	});
+}
+
+function registerCloseButtonEvent() {
+	document.querySelector('.close-button').addEventListener('click', function() {
 		resetApp();
 	});
 }
