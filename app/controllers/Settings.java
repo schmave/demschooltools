@@ -31,15 +31,38 @@ public class Settings extends Controller {
 
     public Result editSettings() {
         final Map<String, String[]> values = request().body().asFormUrlEncoded();
-        OrgConfig.get().org.updateFromForm(values);
+        final Organization org = OrgConfig.get().org;
+        org.updateFromForm(values);
         CachedPage.clearAll();
 
-        String new_password = null;
-        if (values.containsKey("custodia_student_password")) {
-            new_password = values.get("custodia_student_password")[0];
+        {
+            String new_password = null;
+            if (values.containsKey("custodia_student_password")) {
+                new_password = values.get("custodia_student_password")[0];
+            }
+            if (new_password != null && !new_password.trim().isEmpty()) {
+                Utils.setCustodiaPassword(new_password);
+            }
         }
-        if (new_password != null && !new_password.trim().isEmpty()) {
-            Utils.setCustodiaPassword(new_password);
+
+        {
+            String new_password = null;
+            if (values.containsKey("electronic_signin_password")) {
+                new_password = values.get("electronic_signin_password")[0];
+            }
+            if (new_password != null && !new_password.trim().isEmpty()) {
+                String username = org.short_name;
+                User user = User.findByEmail(username);
+                if (user == null) {
+                    user = User.create(username, "Check-in app user", org);
+                }
+                user.hashed_password = BCrypt.hashpw(new_password, BCrypt.gensalt());
+                user.save();
+                for (UserRole r : user.roles) {
+                    r.delete();
+                }
+                UserRole.create(user, UserRole.ROLE_CHECKIN_APP);
+            }
         }
 
         return redirect(routes.Settings.viewSettings());
@@ -191,9 +214,17 @@ public class Settings extends Controller {
         Organization org = OrgConfig.get().org;
         List<User> users =
             User.find.where().eq("organization", org)
-            .ne("name", MyUserService.DUMMY_USERNAME)
             .order("name ASC")
             .findList();
+
+        List<User> users_to_show = new ArrayList<User>();
+        for (User user : users) {
+            // Hide dummy users and the check-in app user
+            if (!user.name.equals(MyUserService.DUMMY_USERNAME) &&
+                !user.email.equals(org.short_name)) {
+                users_to_show.add(user);
+            }
+        }
 
         String allowed_ip = "";
         String sql = "select ip from allowed_ips where organization_id=:org_id";
@@ -205,7 +236,7 @@ public class Settings extends Controller {
         }
 
         Form<User> user_form = Form.form(User.class);
-        return ok(views.html.view_access.render(users, allowed_ip, user_form));
+        return ok(views.html.view_access.render(users_to_show, allowed_ip, user_form));
     }
 
     public Result saveAccess() {

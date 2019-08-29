@@ -79,7 +79,7 @@ $(function () {
 <hr/>
 <h2>Attendance and Custodia</h2>
 <p class="instructions">DemSchoolTools has two attendance tracking systems. "Attendance" is the original one, and allows
-you to manually enter students' arrival and departure times, as well as absence reasons. "Custodia" (new as of Fall 2017)
+you to manually enter students' arrival and departure times, as well as absence reasons. "Custodia"
 lets students and staff sign in and out using a web interface, so there is no manual entry of arrival and departure times.
 It is totally fine to have both enabled at once. Data in Custodia can be imported into Attendance, but not
 the other way around.</p>
@@ -94,14 +94,27 @@ the other way around.</p>
 </p>
 <div class="depends-on-attendance">
     <label>
+        <input type="checkbox" name="show_electronic_signin"
+            @if(org.show_electronic_signin){ checked }
+            class="has-dependents" data-dependent-class="depends-on-electronic-signin">
+        Enable the experimental electronic check-in app (new in Fall 2019)
+    </label>
+
+    <p class="depends-on-electronic-signin">The <a target="_blank" href="@routes.Public.checkin">electronic check-in app</a> username is
+        "@OrgConfig.get().org.short_name" (case-sensitive). To reset the password, enter a new one here:
+        <br>
+        <input type="text" size="30" placeholder="New password" name="electronic_signin_password" />
+    </p>
+
+    <label>
         <input type="checkbox" name="attendance_show_percent" id="attendance-show-percent"
                @if(org.attendance_show_percent){ checked }>
         Show the "Attendance Rate" column
     </label>
     &nbsp;<span class="settings-help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip"
         title="This allows you to see a person's attendance rate as a percentage of days present vs. total school days."></span>
-</div>
-<div class="depends-on-attendance">
+
+    <br/>
     <label>
         <input type="checkbox" name="attendance_enable_partial_days" id="attendance-enable-partial-days"
                class="has-dependents" data-dependent-class="depends-on-partial-days"
@@ -109,7 +122,7 @@ the other way around.</p>
         Count partial days separately from full days
     </label>
 </div>
-<table class="depends-on-partial-days"><tbody>
+<div class="depends-on-partial-days"><table><tbody>
     <tr>
         <td>Latest arrival time allowed for a full day</td>
         <td>
@@ -138,19 +151,22 @@ the other way around.</p>
                 title="If the Attendance Rate column is enabled, you can decide how much value a partial day has in the percentage calculation. For example, if the value is 0.5, a partial day counts as half of a full day."></span>
         </td>
     </tr>
-</tbody></table>
+</tbody></table></div>
 <h4>Custodia</h4>
 <p>
     <label>
-        <input type="checkbox" name="show_custodia" @if(org.show_custodia){ checked }>
+        <input type="checkbox" name="show_custodia" @if(org.show_custodia){ checked }
+            class="has-dependents" data-dependent-class="depends-on-custodia">
         Enable the "Custodia" tab
     </label>
 </p>
-<p>The Custodia <a target="_blank" href="@play_config.getString("custodia_url")">electronic sign-in sheet</a> username is
-    "@OrgConfig.get().org.short_name" (case-sensitive). To reset the password, enter a new one here:
-    <br>
-    <input type="text" size="30" placeholder="New password" name="custodia_student_password" />
-</p>
+<div class="depends-on-custodia">
+    <p>The Custodia <a target="_blank" href="@play_config.getString("custodia_url")">electronic sign-in sheet</a> username is
+        "@OrgConfig.get().org.short_name" (case-sensitive). To reset the password, enter a new one here:
+        <br>
+        <input type="text" size="30" placeholder="New password" name="custodia_student_password" />
+    </p>
+</div>
 <input type="hidden" name="attendance_settings" value="true"/>
 <input type="submit" value="Save Attendance settings"/>
 }

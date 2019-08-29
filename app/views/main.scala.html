@@ -148,12 +148,14 @@
             </a><a @if(selectedBtn.equals("attendance_codes")) { class="active" }
                 href="@routes.Attendance.viewCodes">Absence codes
             </a>
-            <a @if(selectedBtn.equals("attendance_pins")) { class="active" }
-                href="@routes.Attendance.assignPINs">Assign PINs
-            </a>
-            <a @if(selectedBtn.equals("attendance_checkin")) { class="active" }
-                href="@routes.Attendance.checkin">Check-in app
-            </a>
+            @if(OrgConfig.get().org.show_electronic_signin) {
+                <a @if(selectedBtn.equals("attendance_pins")) { class="active" }
+                    href="@routes.Attendance.assignPINs">Assign PINs
+                </a>
+                <a @if(selectedBtn.equals("attendance_checkin")) { class="active" }
+                    href="@routes.Public.checkin">Check-in app
+                </a>
+            }
             </div>
         </div>
         }

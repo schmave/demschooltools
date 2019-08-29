@@ -20,8 +20,9 @@ const not_authorized_template = document.querySelector('#not-authorized-template
 const overlay = document.querySelector('#overlay');
 
 registerServiceWorker();
-resetApp();
-poll();
+resetApp().then(() => {
+	poll();
+});
 
 function registerServiceWorker() {
 	if ('serviceWorker' in navigator) {
@@ -62,11 +63,22 @@ function resetApp() {
 			this.classList.remove('highlight');
 		});
 	});
+
+	return fetch('/login', {
+		body: 'email=WSS&password=12341234',
+		headers: {
+			'Content-Type': 'application/x-www-form-urlencoded',
+		},
+		method: 'POST',
+		redirect: 'manual',
+	}).catch(function(err) {
+		console.error(err);
+	});
 }
 
 function updateCodeEntered(code) {
 	code_entered = code;
-	hidden_code = '';
+	var hidden_code = '';
 	for (let i = 0; i < code_entered.length; i++) {
 		hidden_code += '*';
 	}

@@ -42,8 +42,8 @@ self.addEventListener('activate', (evt) => {
 
 self.addEventListener('fetch', (evt) => {
 	console.log('[ServiceWorker] Fetch', evt.request.url);
-	// don't cache application data
-	if (evt.request.url.includes('/data')) {
+	// don't cache application data or logging in
+	if (evt.request.url.includes('/data') || evt.request.url.includes('/login')) {
 		return;
 	}
 	// Use cache-first strategy. Only request resources from the server if they are not found in the cache.

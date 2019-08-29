@@ -346,6 +346,10 @@ public class Public extends Controller {
         return redirect(routes.Public.index());
     }
 
+    public Result checkin() {
+        return redirect("/assets/checkin/app.html");
+    }
+
     public Result index()
     {
 		if (Organization.getByHost() == null) {
