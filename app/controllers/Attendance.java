@@ -704,15 +704,17 @@ public class Attendance extends Controller {
 
     public Result savePINs() {
         List<Person> people = Application.attendancePeople();
+        HashMap<Integer, Person> people_by_id = new HashMap<Integer, Person>();
+        for (Person p : people) {
+            people_by_id.put(p.person_id, p);
+        }
         Set<Map.Entry<String,String[]>> entries = request().queryString().entrySet();
         for (Map.Entry<String, String[]> entry : entries) {
             Integer person_id = Integer.parseInt(entry.getKey());
-            for (Person person : people) {
-                if (person.person_id == person_id) {
-                    person.pin = entry.getValue()[0];
-                    person.save();
-                    break;
-                }
+            Person person = people_by_id.get(person_id);
+            if (person != null) {
+                person.pin = entry.getValue()[0];
+                person.save();
             }
         }
         return redirect(routes.Attendance.assignPINs());
@@ -757,7 +759,7 @@ public class Attendance extends Controller {
     private AttendanceDay findCurrentDay(long time, int person_id) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         try {
-            Date day = sdf.parse(sdf.format(new Date(time)));
+            Date day = new Date(time);
             // if the day is Saturday or Sunday, there can't be an attendance day
             Calendar calendar = new GregorianCalendar();
             calendar.setTime(day);
