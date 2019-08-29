@@ -147,7 +147,6 @@ async function downloadRoster() {
 	// them to see that the app is offline.
 	try {
 		let response = await fetch('/attendance/checkin/data');
-		console.log('response: ' + response);
 	    if (response.status === 200) {
 	    	return response.json();
 	    }

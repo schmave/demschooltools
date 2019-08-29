@@ -757,27 +757,21 @@ public class Attendance extends Controller {
     }
 
     private AttendanceDay findCurrentDay(long time, int person_id) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        try {
-            Date day = new Date(time);
-            // if the day is Saturday or Sunday, there can't be an attendance day
-            Calendar calendar = new GregorianCalendar();
-            calendar.setTime(day);
-            int dow = calendar.get(Calendar.DAY_OF_WEEK);
-            if (dow == Calendar.SATURDAY || dow == Calendar.SUNDAY) {
-                return null;
-            }
-            // find or create AttendanceWeek and AttendanceDay objects
-            Person person = Person.findById(person_id);
-            AttendanceWeek.findOrCreate(day, person);
-            return AttendanceDay.find.where()
-                .eq("person", person)
-                .eq("day", day)
-                .findUnique();
-        }
-        catch (ParseException ex) {
+        Date day = new Date(time);
+        // if the day is Saturday or Sunday, there can't be an attendance day
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(day);
+        int dow = calendar.get(Calendar.DAY_OF_WEEK);
+        if (dow == Calendar.SATURDAY || dow == Calendar.SUNDAY) {
             return null;
         }
+        // find or create AttendanceWeek and AttendanceDay objects
+        Person person = Person.findById(person_id);
+        AttendanceWeek.findOrCreate(day, person);
+        return AttendanceDay.find.where()
+            .eq("person", person)
+            .eq("day", day)
+            .findUnique();
     }
 
     public Result viewCodes() {
