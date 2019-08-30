@@ -1,5 +1,5 @@
 
-html, body, #container, #overlay, table, .authorized, .not-authorized, .loading, .roster, .roster-failed {
+html, body, #container, #overlay, table, .authorized, .not-authorized, .login, .loading, .roster, .roster-failed {
 	width: 100%;
 	height: 100%;
 }
@@ -110,7 +110,7 @@ button {
 	vertical-align: middle;
 }
 
-.authorized, .not-authorized, .loading, .roster, .roster-failed {
+.authorized, .not-authorized, .login, .loading, .roster, .roster-failed {
 	background: #fff;
 	font-family: sans-serif;
 	text-align: center;
@@ -149,8 +149,35 @@ button {
 	font-size: 1em;
 }
 
+.login {
+	text-align: left;
+	padding: 25px;
+	width: calc(100% - 50px);
+}
+
+.login-info-incorrect {
+	padding: 10px 15px;
+	background: #fcc;
+	border-radius: 4px;
+	border: 1px solid #f55;
+	margin-bottom: 15px;
+}
+
+.login input {
+	display: block;
+	padding: 10px;
+	margin-top: 15px;
+	font-size: 1em;
+}
+
+.login button {
+	display: block;
+	height: auto;
+	margin-top: 15px;
+}
+
 .loading {
-	padding-top: 100px;
+	padding-top: 120px;
 }
 
 .roster-failed {

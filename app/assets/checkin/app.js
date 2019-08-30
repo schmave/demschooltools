@@ -1,4 +1,5 @@
 
+const LOGIN_INFO_KEY = 'login-info';
 const PERSON_KEY_PREFIX = 'person-';
 const MESSAGE_KEY_PREFIX = 'message-';
 
@@ -9,9 +10,11 @@ const POLLING_INTERVAL_MS = 120000
 const WAIT_BEFORE_RESETTING_MS = 15000;
 
 var code_entered;
+var polling_started;
 
 const container = document.querySelector('#container');
 const numpad_template = document.querySelector('#numpad-template');
+const login_template = document.querySelector('#login-template');
 const loading_template = document.querySelector('#loading-template');
 const roster_template = document.querySelector('#roster-template');
 const roster_failed_template = document.querySelector('#roster-failed-template');
@@ -20,9 +23,7 @@ const not_authorized_template = document.querySelector('#not-authorized-template
 const overlay = document.querySelector('#overlay');
 
 registerServiceWorker();
-resetApp().then(() => {
-	poll();
-});
+initializeApp();
 
 function registerServiceWorker() {
 	if ('serviceWorker' in navigator) {
@@ -35,7 +36,87 @@ function registerServiceWorker() {
 	}
 }
 
-function resetApp() {
+async function initializeApp() {
+	container.innerHTML = loading_template.innerHTML;
+	let login_info = await getLoginInfo();
+	// if this is the first time the app has been loaded on this device,
+	// there will be no login info saved, so the user needs to enter it
+	if (!login_info) {
+		showLoginScreen();
+	}
+	else {
+		showNumpad();
+		polling_started = true;
+		poll();
+	}
+}
+
+async function logIn(login_info) {
+	console.log('attempting to log in to server');
+	if (!login_info) {
+		login_info = await getLoginInfo();
+	}
+	let response = await fetch('/login', {
+		body: 'email=' + login_info.username + '&password=' + login_info.password,
+		headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+		method: 'POST',
+		redirect: 'manual',
+	});
+	// TODO this is incorrect. POST to /login always responds with a status code of 0
+	if (response.status === 200) {
+		// we are now logged in, so tell the caller that they can continue
+		// or retry whatever they were trying to do
+		console.log('successfully logged in');
+		return true;
+	}
+	// The login failed, presumably because the login info was incorrect.
+	// The user needs to try entering the login info again.
+	let is_login_info_incorrect = true;
+	showLoginScreen(is_login_info_incorrect);
+	return false;
+}
+
+function getLoginInfo() {
+	return localforage.getItem(LOGIN_INFO_KEY);
+}
+
+function saveLoginInfo(login_info) {
+	return localforage.setItem(LOGIN_INFO_KEY, login_info).catch(function(err) {
+	    console.error(err);
+	});
+}
+
+function showLoginScreen(is_login_info_incorrect) {
+	// stop polling while the login screen is showing
+	polling_started = false;
+	container.innerHTML = login_template.innerHTML;
+	if (is_login_info_incorrect) {
+		document.querySelector('.login-info-incorrect').hidden = false;
+	}
+	saveLoginInfo(null);
+	document.querySelector('#login-submit').addEventListener('click', function() {
+		submitLoginInfo();
+	});
+}
+
+async function submitLoginInfo() {
+	let username = document.querySelector('#username').value;
+	let password = document.querySelector('#password').value;
+	container.innerHTML = loading_template.innerHTML;
+	let login_info = { username, password };
+	await saveLoginInfo(login_info);
+	let success = await logIn(login_info);
+	if (success) {
+		await downloadData();
+		showNumpad();
+		if (!polling_started) {
+			polling_started = true;
+			setTimeout(poll, POLLING_INTERVAL_MS);
+		}
+	}
+}
+
+function showNumpad() {
 	container.innerHTML = numpad_template.innerHTML;
 	updateCodeEntered('');
 	document.querySelectorAll('.number-button').forEach(function(button) {
@@ -63,17 +144,6 @@ function resetApp() {
 			this.classList.remove('highlight');
 		});
 	});
-
-	return fetch('/login', {
-		body: 'email=WSS&password=12341234',
-		headers: {
-			'Content-Type': 'application/x-www-form-urlencoded',
-		},
-		method: 'POST',
-		redirect: 'manual',
-	}).catch(function(err) {
-		console.error(err);
-	});
 }
 
 function updateCodeEntered(code) {
@@ -88,7 +158,14 @@ function updateCodeEntered(code) {
 async function showRoster() {
 	container.innerHTML = loading_template.innerHTML;
 	let data = await downloadRoster();
-	if (data) {
+	// -1 means we are not logged in to the server
+	if (data === -1) {
+		let success = await logIn();
+		if (success) {
+			showRoster();
+		}
+	}
+	else if (data) {
 		container.innerHTML = roster_template.innerHTML;
 		let roster = document.getElementById('roster');
 		for (let i = 0; i < data.length; i++) {
@@ -118,21 +195,37 @@ async function showRoster() {
 			roster.appendChild(person_row);
 		}
 		registerCloseButtonEvent();
-	} else {
+	}
+	else {
 		container.innerHTML = roster_failed_template.innerHTML;
 		registerOkButtonEvent();
 	}
 }
 
-function poll() {
-	console.log('Running polling process');
-	setTimeout(poll, POLLING_INTERVAL_MS);
-	trySendMessages();
-	downloadData();
+async function poll() {
+	if (polling_started) {
+		console.log('running polling process');
+		setTimeout(poll, POLLING_INTERVAL_MS);
+		// wait until downloadData is complete before trying to send messages,
+		// because if we are not logged in to the server, downloadData will log
+		// us in, but trySendMessages won't
+		await downloadData();
+		trySendMessages();
+	}
 }
 
 async function downloadData() {
+	console.log('downloading application data');
 	let response = await fetch('/attendance/checkin/data');
+	// 'redirected' means we are not logged in to the server
+	if (response.redirected) {
+		let success = await logIn();
+		if (success) {
+			// we are now logged in, try again
+			await downloadData();
+		}
+		return;
+	}
 	let data = await response.json();
 	let pins = [];
 	// We don't use the data directly. Instead, we save it in a local db and read it from there.
@@ -140,7 +233,7 @@ async function downloadData() {
 	// internet connection.
 	for (let i = 0; i < data.length; i++) {
 		pins.push(data[i].pin);
-		savePerson(data[i]);
+		await savePerson(data[i]);
 	}
 	// clean up old entries
 	localforage.iterate(function(person, key) {
@@ -159,6 +252,10 @@ async function downloadRoster() {
 	// them to see that the app is offline.
 	try {
 		let response = await fetch('/attendance/checkin/data');
+		// 'redirected' means we are not logged in to the server
+		if (response.redirected) {
+			return -1;
+		}
 	    if (response.status === 200) {
 	    	return response.json();
 	    }
@@ -168,11 +265,11 @@ async function downloadRoster() {
     return null;
 }
 
-async function getPerson(pin) {
+function getPerson(pin) {
 	return localforage.getItem(PERSON_KEY_PREFIX + pin);
 }
 
-async function savePerson(person) {
+function savePerson(person) {
 	return localforage.setItem(PERSON_KEY_PREFIX + person.pin, person).catch(function(err) {
 	    console.error(err);
 	});
@@ -201,7 +298,7 @@ function setAuthorized(person, is_arriving) {
 	setTimeout(function() {
 		console.log('timeout, hasReset = ' + hasReset);
 		if (!hasReset) {
-			resetApp();
+			showNumpad();
 		}
 	}, WAIT_BEFORE_RESETTING_MS);
 }
@@ -227,19 +324,20 @@ function setUnauthorized() {
 function registerOkButtonEvent(callback) {
 	document.querySelector('.ok-button').addEventListener('click', function() {
 		if (callback) callback();
-		resetApp();
+		showNumpad()
 	});
 }
 
 function registerCloseButtonEvent() {
 	document.querySelector('.close-button').addEventListener('click', function() {
-		resetApp();
+		showNumpad();
 	});
 }
 
 async function createMessage(person, is_arriving) {
 	let message = {
-		// this is milliseconds elapsed since epoch, which we can use as a unique key
+		// this is milliseconds elapsed since epoch, which we can use as a unique key,
+		// and also tells the server what time the user checked in/out
 		time: Date.now(),
 		person_id: person.person_id,
 		is_arriving: is_arriving
@@ -254,7 +352,8 @@ async function saveMessage(message) {
 	});
 }
 
-async function trySendMessages() {
+function trySendMessages() {
+	console.log('trying to send queued messages');
 	// loop through all messages
 	localforage.iterate(function(message, key) {
 		// Because this function can be called both by a user event and the polling process,
@@ -266,7 +365,7 @@ async function trySendMessages() {
 	    	let query_string = `?time=${message.time}&person_id=${message.person_id}&is_arriving=${message.is_arriving}`;
 	    	fetch('/attendance/checkin/message' + query_string, { method: 'POST' }).then(response => {
 				// If the response is good, the server received the message, so we can delete it.
-		        if (response.status === 200) {
+		        if (!response.redirected && response.status === 200) {
 		        	localforage.removeItem(key).catch(function(err) {
 					    console.error(err);
 					});

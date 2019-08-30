@@ -65,10 +65,25 @@
 		</table>
 	</script>
 
+	<script id="login-template" type="text/x-handlebars-template">
+		<div class="login">
+			<div class="login-info-incorrect" hidden>
+				The username or password you entered is incorrect.
+			</div>
+			<div>
+				Log in to use the app. You will only have to do this once per device.
+				Visit the <a href="/settings">Settings</a>
+				page if you don't know your username or password.
+			</div>
+			<input type="text" id="username" placeholder="username">
+			<input type="text" id="password" placeholder="password">
+			<button id="login-submit" class="ok-button">Submit</button>
+		</div>
+	</script>
+
 	<script id="loading-template" type="text/x-handlebars-template">
 		<div class="loading">
 			<div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
-			Loading Roster
 		</div>
 	</script>
 
