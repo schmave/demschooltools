@@ -62,6 +62,7 @@ public class Settings extends Controller {
                     r.delete();
                 }
                 UserRole.create(user, UserRole.ROLE_CHECKIN_APP);
+                UserRole.create(user, UserRole.ROLE_VIEW_JC);
             }
         }
 

@@ -57,13 +57,14 @@ async function logIn(login_info) {
 		login_info = await getLoginInfo();
 	}
 	let response = await fetch('/login', {
-		body: 'email=' + login_info.username + '&password=' + login_info.password,
+		body: 'noredirect&email=' + login_info.username + '&password=' + login_info.password,
 		headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
 		method: 'POST',
 		redirect: 'manual',
 	});
-	// TODO this is incorrect. POST to /login always responds with a status code of 0
-	if (response.status === 200) {
+	// The server returns a redirect to the home page if the login was successful,
+	// and also sets a cookie that will be used for subsequent requests.
+	if (response.type === 'opaqueredirect') {
 		// we are now logged in, so tell the caller that they can continue
 		// or retry whatever they were trying to do
 		console.log('successfully logged in');
