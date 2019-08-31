@@ -6,6 +6,7 @@ import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -693,6 +694,30 @@ public class Attendance extends Controller {
                 "custodia_admin.html",
                 scopes));
         return result;
+    }
+
+    public Result assignPINs() {
+        List<Person> people = Application.attendancePeople();
+        Collections.sort(people, Person.SORT_DISPLAY_NAME);
+        return ok(views.html.attendance_pins.render(people));
+    }
+
+    public Result savePINs() {
+        List<Person> people = Application.attendancePeople();
+        HashMap<Integer, Person> people_by_id = new HashMap<Integer, Person>();
+        for (Person p : people) {
+            people_by_id.put(p.person_id, p);
+        }
+        Set<Map.Entry<String,String[]>> entries = request().queryString().entrySet();
+        for (Map.Entry<String, String[]> entry : entries) {
+            Integer person_id = Integer.parseInt(entry.getKey());
+            Person person = people_by_id.get(person_id);
+            if (person != null) {
+                person.pin = entry.getValue()[0];
+                person.save();
+            }
+        }
+        return redirect(routes.Attendance.assignPINs());
     }
 
     public Result viewCodes() {

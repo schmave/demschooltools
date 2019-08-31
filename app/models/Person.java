@@ -59,6 +59,8 @@ public class Person extends Model implements Comparable<Person> {
 	public String previous_school = "";
 	public String school_district = "";
 
+    public String pin = "";
+
     @JsonIgnore
     @ManyToMany(mappedBy = "people")
     public List<Tag> tags;

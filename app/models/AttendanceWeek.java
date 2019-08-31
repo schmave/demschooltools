@@ -10,6 +10,7 @@ import com.avaje.ebean.Model;
 import com.avaje.ebean.Model.Finder;
 
 import controllers.Application;
+import controllers.Utils;
 
 import play.libs.Json;
 
@@ -39,6 +40,32 @@ public class AttendanceWeek extends Model {
         result.save();
 
         return result;
+    }
+
+    public static AttendanceWeek findOrCreate(Date day, Person person) {
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(day);
+        Utils.adjustToPreviousDay(calendar, Calendar.MONDAY);
+        Date monday = calendar.getTime();
+
+        AttendanceWeek result = AttendanceWeek.find.where()
+            .eq("person", person)
+            .eq("monday", monday)
+            .findUnique();
+
+        if (result != null) return result;
+
+        AttendanceWeek attendance_week = new AttendanceWeek();
+        attendance_week.person = person;
+        attendance_week.monday = monday;
+        attendance_week.save();
+
+        for (int i = 0; i < 5; i++) {
+            AttendanceDay.create(calendar.getTime(), person);
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+        }
+
+        return attendance_week;
     }
 
     public void edit(double extra_hours) {

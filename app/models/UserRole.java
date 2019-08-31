@@ -20,6 +20,7 @@ public class UserRole extends Model {
     public static final String ROLE_EDIT_31_DAY_JC = "edit-recent-31-jc";
     public static final String ROLE_EDIT_ALL_JC = "edit-all-jc";
     public static final String ROLE_ALL_ACCESS = "all-access";
+    public static final String ROLE_CHECKIN_APP = "checkin-app";
 
     public static final String[] ALL_ROLES = {
         ROLE_ACCOUNTING,

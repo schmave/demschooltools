@@ -1,0 +1,289 @@
+
+html, body, #container, #overlay, table, .authorized, .not-authorized, .login, .loading, .roster, .roster-failed {
+	width: 100%;
+	height: 100%;
+}
+
+body {
+	margin: 0;
+	background: #ddd;
+}
+
+#container {
+	position: absolute;
+}
+
+#overlay {
+	position: absolute;
+	opacity: 0;
+	transition-property: opacity;
+	transition-duration: 0.3s;
+}
+
+#overlay.disabled {
+	background: #000;
+	opacity: 0.2;
+	z-index: 1;
+}
+
+#code-entered {
+	line-height: 30px;
+	height: 30px;
+	text-align: center;
+	font-size: 1.3em;
+}
+
+table {
+	width: 100%;
+	margin: auto;
+	table-layout: fixed;
+	border-spacing: 0;
+}
+
+button {
+	width: 100%;
+	height: 100%;
+	border: none;
+	outline: none;
+	transition-property: background-color;
+	transition-duration: 0.2s;
+}
+
+.highlight {
+	transition-property: none;
+}
+
+.number-button {
+	background-color: #fff;
+	font-size: 2em;
+	color: #555;
+}
+
+.number-button.highlight {
+	background-color: #c2f6ff;
+}
+
+.arriving-button, .leaving-button, .clear-button, .roster-button {
+	color: #fff;
+	font-size: 1em;
+}
+
+.arriving-button {
+	background: #08b860;
+}
+
+.arriving-button.highlight {
+	background-color: #008d46;
+}
+
+.leaving-button {
+	background: #1388c2;
+}
+
+.leaving-button.highlight {
+	background-color: #015f8d;
+}
+
+.clear-button {
+	background: #888;
+}
+
+.clear-button.highlight {
+	background-color: #555;
+}
+
+.roster-button {
+	background: #ff9b00;
+}
+
+.roster-button.highlight {
+	background-color: #b26c00;
+}
+
+.cross {
+	font-size: 1.3em;
+	vertical-align: middle;
+}
+
+.arrow {
+	font-size: 2em;
+	vertical-align: middle;
+}
+
+.authorized, .not-authorized, .login, .loading, .roster, .roster-failed {
+	background: #fff;
+	font-family: sans-serif;
+	text-align: center;
+}
+
+.authorized-check, .not-authorized-cross, .roster-failed-symbol {
+	font-size: 4em;
+	padding-top: 50px;
+	margin-bottom: 15px;
+}
+
+.authorized-check.hello {
+	color: #08b860;
+}
+
+.authorized-check.goodbye {
+	color: #1388c2;
+}
+
+.not-authorized-cross {
+	color: #f00;
+}
+
+.roster-failed-symbol {
+	color: #ff9b00;
+}
+
+.ok-button {
+	width: 120px;
+	padding: 15px;
+	margin-top: 25px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	background: #f4f4f4;
+	color: #000;
+	font-size: 1em;
+}
+
+.login {
+	text-align: left;
+	padding: 25px;
+	width: calc(100% - 50px);
+}
+
+.login-info-incorrect {
+	padding: 10px 15px;
+	background: #fcc;
+	border-radius: 4px;
+	border: 1px solid #f55;
+	margin-bottom: 15px;
+}
+
+.login input {
+	display: block;
+	padding: 10px;
+	margin-top: 15px;
+	font-size: 1em;
+}
+
+.login button {
+	display: block;
+	height: auto;
+	margin-top: 15px;
+}
+
+.loading {
+	padding-top: 120px;
+}
+
+.roster-failed {
+	width: auto;
+	padding: 0 30px;
+}
+
+.roster-header {
+	background: #ff9b00;
+	color: #fff;
+	position: relative;
+	font-family: sans-serif;
+	font-size: 1.2em;
+	padding: 8px;
+}
+
+.roster-close-button {
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 44px;
+	padding-bottom: 3px;
+	color: #fff;
+	font-size: 1.3em;
+	background: transparent;
+}
+
+.roster {
+	height: 1px;
+}
+
+.roster th, .roster td {
+	border-right: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
+  	padding: 8px 10px;
+  	text-align: left;
+}
+
+.roster td.absent {
+	background: #ccc;
+}
+
+.roster tr:nth-child(even) {
+	background-color: #f2f2f2;
+}
+
+.roster th {
+  background-color: #666;
+  color: #fff;
+  font-weight: normal;
+}
+
+
+/* css loader from https://loading.io/css/ */
+.lds-ellipsis {
+  margin: auto;
+  position: relative;
+  width: 64px;
+  height: 64px;
+}
+.lds-ellipsis div {
+  position: absolute;
+  top: 27px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #888;
+  animation-timing-function: cubic-bezier(0, 1, 1, 0);
+}
+.lds-ellipsis div:nth-child(1) {
+  left: 6px;
+  animation: lds-ellipsis1 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(2) {
+  left: 6px;
+  animation: lds-ellipsis2 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(3) {
+  left: 26px;
+  animation: lds-ellipsis2 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(4) {
+  left: 45px;
+  animation: lds-ellipsis3 0.6s infinite;
+}
+@keyframes lds-ellipsis1 {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes lds-ellipsis3 {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0);
+  }
+}
+@keyframes lds-ellipsis2 {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(19px, 0);
+  }
+}

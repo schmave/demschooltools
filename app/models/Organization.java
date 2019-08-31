@@ -45,6 +45,7 @@ public class Organization extends Model {
     public String custodia_password;
     public Boolean show_custodia;
     public Boolean show_attendance;
+    public Boolean show_electronic_signin;
     public Boolean show_accounting;
 
     public Boolean enable_case_references;
@@ -158,6 +159,11 @@ public class Organization extends Model {
                 this.show_attendance = Utils.getBooleanFromFormValue(values.get("show_attendance")[0]);
             } else {
                 this.show_attendance = false;
+            }
+            if (values.containsKey("show_electronic_signin")) {
+                this.show_electronic_signin = Utils.getBooleanFromFormValue(values.get("show_electronic_signin")[0]);
+            } else {
+                this.show_electronic_signin = false;
             }
             if (values.containsKey("attendance_show_percent")) {
                 this.attendance_show_percent = Utils.getBooleanFromFormValue(values.get("attendance_show_percent")[0]);

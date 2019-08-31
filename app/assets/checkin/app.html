@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+
+<head>
+	<title>Check-in</title>
+	<link rel="shortcut icon" type="image/x-icon" href="/assets/checkin/icon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="manifest" href="/assets/checkin/manifest.json">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="/assets/checkin/localforage.js"></script>
+    <!-- for iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-title" content="Check-in">
+	<link rel="apple-touch-icon" href="/assets/checkin/icon-512.png">
+</head>
+
+<body>
+	<script id="numpad-template" type="text/x-handlebars-template">
+		<table>
+			<tr>
+				<td colspan="6">
+					<div id="code-entered"></div>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2"><button class="number-button" data-number="1">1</button></td>
+				<td colspan="2"><button class="number-button" data-number="2">2</button></td>
+				<td colspan="2"><button class="number-button" data-number="3">3</button></td>
+			</tr>
+			<tr>
+				<td colspan="2"><button class="number-button" data-number="4">4</button></td>
+				<td colspan="2"><button class="number-button" data-number="5">5</button></td>
+				<td colspan="2"><button class="number-button" data-number="6">6</button></td>
+			</tr>
+			<tr>
+				<td colspan="2"><button class="number-button" data-number="7">7</button></td>
+				<td colspan="2"><button class="number-button" data-number="8">8</button></td>
+				<td colspan="2"><button class="number-button" data-number="9">9</button></td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<button class="clear-button">
+						<span class="cross">&#10006;</span>&nbsp; Clear
+					</button>
+				</td>
+				<td colspan="2"><button class="number-button" data-number="0">0</button></td>
+				<td colspan="2">
+					<button class="roster-button">
+						<span class="cross">&#10070;</span>&nbsp; Roster
+					</button>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3">
+					<button class="arriving-button">
+						<span class="arrow">&#10149;</span>&nbsp; I'm arriving
+					</button>
+				</td>
+				<td colspan="3">
+					<button class="leaving-button">
+						I'm leaving &nbsp;<span class="arrow">&#10150;</span>
+					</button>
+				</td>
+			</tr>
+		</table>
+	</script>
+
+	<script id="login-template" type="text/x-handlebars-template">
+		<div class="login">
+			<div class="login-info-incorrect" hidden>
+				The username or password you entered is incorrect.
+			</div>
+			<div>
+				Log in to use the app. You will only have to do this once per device.
+				Visit the <a href="/settings">Settings</a>
+				page if you don't know your username or password.
+			</div>
+			<input type="text" id="username" placeholder="username">
+			<input type="text" id="password" placeholder="password">
+			<button id="login-submit" class="ok-button">Submit</button>
+		</div>
+	</script>
+
+	<script id="loading-template" type="text/x-handlebars-template">
+		<div class="loading">
+			<div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+		</div>
+	</script>
+
+	<script id="roster-template" type="text/x-handlebars-template">
+		<div class="roster-header">
+			&#10070; Roster
+			<button class="close-button roster-close-button">&#10006;</button>
+		</div>
+		<table class="roster">
+			<tbody id="roster"></tbody>
+		</table>
+	</script>
+
+	<script id="roster-failed-template" type="text/x-handlebars-template">
+		<div class="roster-failed">
+			<div class="roster-failed-symbol">&#9888;</div>
+			Failed to download the roster because the app is in offline mode.
+			Check to make sure your device is connected to the internet.
+			<div><button class="ok-button">OK</button></div>
+		</div>
+	</script>
+
+	<script id="authorized-template" type="text/x-handlebars-template">
+		<div class="not-authorized">
+			<div class="authorized-check">&#10004;</div>
+			<div class="authorized-text"></div>
+			<div><button class="ok-button">OK</button></div>
+		</div>
+	</script>
+
+	<script id="not-authorized-template" type="text/x-handlebars-template">
+		<div class="not-authorized">
+			<div class="not-authorized-cross">&#10006;</div>
+			Code not recognized.<br>Please try again.
+			<div><button class="ok-button">OK</button></div>
+		</div>
+	</script>
+
+	<div id="overlay"></div>
+	<div id="container"></div>
+
+	<script src="/assets/checkin/app.js"></script>
+</body>

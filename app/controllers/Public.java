@@ -346,6 +346,10 @@ public class Public extends Controller {
         return redirect(routes.Public.index());
     }
 
+    public Result checkin() {
+        return redirect("/assets/checkin/app.html");
+    }
+
     public Result index()
     {
 		if (Organization.getByHost() == null) {
@@ -367,6 +371,11 @@ public class Public extends Controller {
                 return mPlayAuth.handleAuthentication("evan-auth-provider", Context.current(), u);
             }
         }
+
+        if (values.get("noredirect") != null) {
+            return unauthorized();
+        }
+
         flash("notice", "Failed to login: wrong email address or password");
 
         return redirect(routes.Public.index());

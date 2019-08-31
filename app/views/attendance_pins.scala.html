@@ -1,0 +1,43 @@
+@(people : List[Person])
+
+@import helper._
+
+@main("Assign PINs", "attendance", "attendance_pins") {
+
+<h3>Assign PINs</h3>
+
+@form(routes.Attendance.savePINs, 'class -> "form-horizontal", 'role -> "form") {
+
+<table class="attendance-pins-table">
+	@for( p <- people ) {
+		<tr>
+			<td><label class="control-label">@p.getDisplayName()</label></td>
+			<td><input class="form-control pin" type="number" max="9999999999" step="1" name="@p.person_id" value="@p.pin"></td>
+		</tr>
+	}
+</table>
+<br>
+<input id="save" type="submit" class="btn btn-primary" value="Save">
+
+}
+}
+
+<script>
+	document.getElementById('save').addEventListener('click', function() {
+		const pins = [];
+		document.querySelectorAll('.pin').forEach(function(el) {
+			let pin = el.value;
+			if (pins.includes(pin)) {
+				el.setCustomValidity('This PIN is used more than once.');
+			} else {
+				el.setCustomValidity('');
+				pins.push(pin);
+			}
+		});
+	});
+	document.querySelectorAll('.pin').forEach(function(el) {
+		el.addEventListener('input', function() {
+			this.setCustomValidity('');
+		});
+	});
+</script>
