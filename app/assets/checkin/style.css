@@ -118,7 +118,7 @@ button {
 
 .authorized-check, .not-authorized-cross, .roster-failed-symbol {
 	font-size: 4em;
-	padding-top: 50px;
+	padding-top: 120px;
 	margin-bottom: 15px;
 }
 
@@ -177,7 +177,7 @@ button {
 }
 
 .loading {
-	padding-top: 120px;
+	padding-top: 180px;
 }
 
 .roster-failed {
