@@ -337,9 +337,10 @@ function registerCloseButtonEvent() {
 
 async function createMessage(person, is_arriving) {
 	let message = {
-		// this is milliseconds elapsed since epoch, which we can use as a unique key,
-		// and also tells the server what time the user checked in/out
+		// this is milliseconds elapsed since epoch, which we can use as a unique key
 		time: Date.now(),
+		// we need this string to be in a specific format so the server can parse it correctly
+		time_string: new Date().toLocaleString('en-US'),
 		person_id: person.person_id,
 		is_arriving: is_arriving
 	}
@@ -363,7 +364,7 @@ function trySendMessages() {
 		// duplicate messages.
 	    if (key.startsWith(MESSAGE_KEY_PREFIX)) {
 	    	// try sending the message
-	    	let query_string = `?time=${message.time}&person_id=${message.person_id}&is_arriving=${message.is_arriving}`;
+	    	let query_string = `?time_string=${message.time_string}&person_id=${message.person_id}&is_arriving=${message.is_arriving}`;
 	    	fetch('/attendance/checkin/message' + query_string, { method: 'POST' }).then(response => {
 				// If the response is good, the server received the message, so we can delete it.
 		        if (!response.redirected && response.status === 200) {
