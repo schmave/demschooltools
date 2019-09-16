@@ -31,7 +31,9 @@
 				el.setCustomValidity('This PIN is used more than once.');
 			} else {
 				el.setCustomValidity('');
-				pins.push(pin);
+				if (pin) {
+					pins.push(pin);
+				}
 			}
 		});
 	});
