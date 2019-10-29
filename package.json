@@ -10,7 +10,7 @@
     "eslint-plugin-promise": "3.6.0",
     "eslint-plugin-react": "7.4.0",
     "eslint-plugin-standard": "3.0.1",
-    "handlebars": "4.0.10",
+    "handlebars": "4.5.1",
     "jquery": "3.2.1",
     "jquery-form": "4.2.1",
     "jquery-ui": "1.12.1",
