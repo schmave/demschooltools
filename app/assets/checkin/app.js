@@ -217,7 +217,8 @@ async function poll() {
 
 async function downloadData() {
 	console.log('downloading application data');
-	let response = await fetch('/attendance/checkin/data');
+	let time = new Date().toLocaleString('en-US');
+	let response = await fetch('/attendance/checkin/data?time=' + time);
 	// 'redirected' means we are not logged in to the server
 	if (response.redirected) {
 		let success = await logIn();
@@ -252,7 +253,8 @@ async function downloadRoster() {
 	// nothing. This allows the user to see data that is guaranteed to be current, or allows
 	// them to see that the app is offline.
 	try {
-		let response = await fetch('/attendance/checkin/data');
+		let time = new Date().toLocaleString('en-US');
+		let response = await fetch('/attendance/checkin/data?time=' + time);
 		// 'redirected' means we are not logged in to the server
 		if (response.redirected) {
 			return -1;

@@ -19,11 +19,12 @@ import play.mvc.*;
 @Secured.Auth(UserRole.ROLE_CHECKIN_APP)
 public class Checkin extends Controller {
 
-    public Result checkinData() {
+    public Result checkinData(String time) throws ParseException {
+        Date date = new SimpleDateFormat("M/d/yyyy, h:mm:ss a").parse(time);
         List<CheckinPerson> people = Application.attendancePeople().stream()
             .sorted(Comparator.comparing(Person::getDisplayName))
             .filter(p -> p.pin != null && !p.pin.isEmpty())
-            .map(p -> new CheckinPerson(p, findCurrentDay(new Date(), p.person_id)))
+            .map(p -> new CheckinPerson(p, findCurrentDay(date, p.person_id)))
             .collect(Collectors.toList());
 
         return ok(Json.stringify(Json.toJson(people)));
