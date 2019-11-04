@@ -156,7 +156,7 @@ function updateCodeEntered(code) {
 	document.querySelector('#code-entered').innerHTML = hidden_code;
 }
 
-async function showRoster() {
+async function showRoster(admin_mode) {
 	container.innerHTML = loading_template.innerHTML;
 	let data = await downloadRoster();
 	// -1 means we are not logged in to the server
@@ -172,26 +172,13 @@ async function showRoster() {
 		for (let i = 0; i < data.length; i++) {
 			let person = data[i];
 			let person_row = document.createElement('tr');
-			// add name column
 			let name_column = document.createElement('td');
 			name_column.innerHTML = person.name;
 			person_row.appendChild(name_column);
-			// if there is an attendance code, add the code in a 2-span column
-			if (person.current_day_code) {
-				let code_column = document.createElement('td');
-				code_column.setAttribute('colspan', 2);
-				code_column.className = 'absent';
-				code_column.innerHTML = 'Absent';
-				person_row.appendChild(code_column);
-			}
-			// if there is no attendance code, add in & out columns
-			else {
-				let in_column = document.createElement('td');
-				let out_column = document.createElement('td');
-				in_column.innerHTML = person.current_day_start_time;
-				out_column.innerHTML = person.current_day_end_time;
-				person_row.appendChild(in_column);
-				person_row.appendChild(out_column);
+			if (admin_mode) {
+				buildEditableRosterRow(person, person_row);
+			} else {
+				buildRosterRow(person, person_row);
 			}
 			roster.appendChild(person_row);
 		}
@@ -201,6 +188,40 @@ async function showRoster() {
 		container.innerHTML = roster_failed_template.innerHTML;
 		registerOkButtonEvent();
 	}
+}
+
+async function buildRosterRow(person, person_row) {
+	// if there is an attendance code, add the code in a 2-span column
+	if (person.current_day_code) {
+		let code_column = document.createElement('td');
+		code_column.setAttribute('colspan', 2);
+		code_column.className = 'absent';
+		code_column.innerHTML = 'Absent';
+		person_row.appendChild(code_column);
+	}
+	// if there is no attendance code, add in & out columns
+	else {
+		let in_column = document.createElement('td');
+		let out_column = document.createElement('td');
+		in_column.innerHTML = person.current_day_start_time;
+		out_column.innerHTML = person.current_day_end_time;
+		person_row.appendChild(in_column);
+		person_row.appendChild(out_column);
+	}
+}
+
+async function buildEditableRosterRow(person, person_row) {
+	let in_column = document.createElement('td');
+	let out_column = document.createElement('td');
+	let in_field = document.createElement('input');
+	let out_field = document.createElement('input');
+
+	in_column.innerHTML = person.current_day_start_time;
+	out_column.innerHTML = person.current_day_end_time;
+	person_row.appendChild(in_column);
+	person_row.appendChild(out_column);
+	in_column.appendChild(in_field);
+	out_column.appendChild(out_field);
 }
 
 async function poll() {
