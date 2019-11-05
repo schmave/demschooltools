@@ -1,7 +1,7 @@
 // https://codelabs.developers.google.com/codelabs/your-first-pwapp/#4
 
 // update cache names any time any of the cached files change
-const CACHE_NAME = 'static-cache-v193';
+const CACHE_NAME = 'static-cache-v194';
 
 const FILES_TO_CACHE = [
 	'/assets/checkin/app.html',
@@ -46,13 +46,17 @@ self.addEventListener('fetch', (evt) => {
 	if (evt.request.url.includes('/data') || evt.request.url.includes('/login')) {
 		return;
 	}
-	// Use cache-first strategy. Only request resources from the server if they are not found in the cache.
-	evt.respondWith(
-	    caches.open(CACHE_NAME).then((cache) => {
-	      return cache.match(evt.request)
-			.then((response) => {
-			  return response || fetch(evt.request);
-			});
-	    })
-	);
+	// replace the default fetch handler with our custom handler that uses the cache
+	evt.respondWith(fetchResources(evt));
 });
+
+async function fetchResources(evt) {
+	// first try to get resources from the server, falling back on the cache if the server cannot be reached
+	try {
+		const response = await fetch(evt.request);
+		if (response.ok) return response;
+	} catch (err) {
+		console.error(err);
+	}
+	return cache.match(evt.request);
+}
