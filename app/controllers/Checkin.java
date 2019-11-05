@@ -26,6 +26,13 @@ public class Checkin extends Controller {
             .map(p -> new CheckinPerson(p, findCurrentDay(new Date(), p.person_id)))
             .collect(Collectors.toList());
 
+        // add admin
+        Person admin = new Person();
+        admin.person_id = -1;
+        admin.first_name = "Admin";
+        admin.pin = OrgConfig.get().org.attendance_admin_pin;
+        people.add(0, new CheckinPerson(admin, null));
+
         return ok(Json.stringify(Json.toJson(people)));
     }
 

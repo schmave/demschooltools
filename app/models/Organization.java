@@ -55,6 +55,7 @@ public class Organization extends Model {
     public Time attendance_day_latest_start_time;
     public Integer attendance_day_min_hours;
     public BigDecimal attendance_partial_day_value;
+    public String attendance_admin_pin;
 
     @OneToMany(mappedBy="organization")
     @JsonIgnore
@@ -120,6 +121,11 @@ public class Organization extends Model {
         }
         DateFormat format = new SimpleDateFormat("HH:mm a");
         return format.format(attendance_day_latest_start_time.getTime());
+    }
+
+    public void setAttendanceAdminPIN(String pin) {
+        this.attendance_admin_pin = pin;
+        this.save();
     }
 
     public void updateFromForm(Map<String, String[]> values) {

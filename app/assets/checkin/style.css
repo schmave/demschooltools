@@ -230,6 +230,24 @@ button {
   font-weight: normal;
 }
 
+.roster td.editable {
+	padding: 0;
+}
+
+.roster td.absence-code {
+	padding: 0;
+	background: #888;
+}
+
+.roster input.editable {
+	width: calc(100% - 24px);
+	margin: 0;
+	padding: 6px 10px;
+	border: none;
+	font-size: 1em;
+	background: none;
+}
+
 
 /* css loader from https://loading.io/css/ */
 .lds-ellipsis {

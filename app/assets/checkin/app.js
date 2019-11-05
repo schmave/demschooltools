@@ -156,8 +156,13 @@ function updateCodeEntered(code) {
 	document.querySelector('#code-entered').innerHTML = hidden_code;
 }
 
-async function showRoster(admin_mode) {
+async function showRoster(editable) {
 	container.innerHTML = loading_template.innerHTML;
+	// if the admin PIN has been entered, load the roster in editable mode
+	let person = await getPerson(code_entered);
+	if (person && person.person_id === -1) {
+		editable = true;
+	}
 	let data = await downloadRoster();
 	// -1 means we are not logged in to the server
 	if (data === -1) {
@@ -171,11 +176,12 @@ async function showRoster(admin_mode) {
 		let roster = document.getElementById('roster');
 		for (let i = 0; i < data.length; i++) {
 			let person = data[i];
+			if (person.person_id === -1) continue;
 			let person_row = document.createElement('tr');
 			let name_column = document.createElement('td');
 			name_column.innerHTML = person.name;
 			person_row.appendChild(name_column);
-			if (admin_mode) {
+			if (editable) {
 				buildEditableRosterRow(person, person_row);
 			} else {
 				buildRosterRow(person, person_row);
@@ -211,17 +217,30 @@ async function buildRosterRow(person, person_row) {
 }
 
 async function buildEditableRosterRow(person, person_row) {
-	let in_column = document.createElement('td');
-	let out_column = document.createElement('td');
-	let in_field = document.createElement('input');
-	let out_field = document.createElement('input');
 
-	in_column.innerHTML = person.current_day_start_time;
-	out_column.innerHTML = person.current_day_end_time;
-	person_row.appendChild(in_column);
-	person_row.appendChild(out_column);
+	let in_column = document.createElement('td');
+	let in_field = document.createElement('input');
+	in_column.className = 'editable';
+	in_field.className = 'editable';
 	in_column.appendChild(in_field);
+	person_row.appendChild(in_column);
+
+	let out_column = document.createElement('td');
+	let out_field = document.createElement('input');
+	out_column.className = 'editable';
+	out_field.className = 'editable';
 	out_column.appendChild(out_field);
+	person_row.appendChild(out_column);
+
+	if (person.current_day_code) {
+		in_field.value = person.current_day_code;
+		out_column.className = 'absence-code';
+		out_field.setAttribute('disabled', true);
+	}
+	else {
+		in_field.value = person.current_day_start_time;
+		out_field.value = person.current_day_end_time;
+	}
 }
 
 async function poll() {
@@ -303,8 +322,16 @@ async function submitCode(is_arriving) {
 	overlay.classList.add('disabled');
 	let person = await getPerson(code_entered);
 	overlay.classList.remove('disabled');
-	if (person) setAuthorized(person, is_arriving);
-	else setUnauthorized();
+	if (person) {
+		// if this is the admin PIN, show the roster in editable mode
+		if (person.person_id === -1) {
+			showRoster(true);
+		} else {
+			setAuthorized(person, is_arriving);
+		}
+	} else {
+		setUnauthorized();
+	}
 }
 
 function setAuthorized(person, is_arriving) {
