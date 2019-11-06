@@ -63,6 +63,14 @@ public class Checkin extends Controller {
         return ok();
     }
 
+    public Result adminMessage(int person_id, String in_time, String out_time, String absence_code) throws Exception {
+        AttendanceDay attendance_day = findCurrentDay(new Date(), person_id);
+        if (attendance_day != null) {
+            attendance_day.edit(absence_code, in_time, out_time);
+        }
+        return ok();
+    }
+
     private AttendanceDay findCurrentDay(Date day, int person_id) {
         // if the day is Saturday or Sunday, there can't be an attendance day
         Calendar calendar = new GregorianCalendar();

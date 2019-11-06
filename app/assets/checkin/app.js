@@ -3,6 +3,7 @@ const LOGIN_INFO_KEY = 'login-info';
 const ABSENCE_CODES_KEY = 'absence-codes';
 const PERSON_KEY_PREFIX = 'person-';
 const MESSAGE_KEY_PREFIX = 'message-';
+const ADMIN_MESSAGE_KEY_PREFIX = 'admin-message-';
 
 // poll every 2 minutes
 const POLLING_INTERVAL_MS = 120000
@@ -224,48 +225,88 @@ async function buildRosterRow(person, person_row) {
 
 async function buildEditableRosterRow(person, person_row) {
 	person_row.innerHTML = '';
+	createNameColumn();
+	const in_field = createTimeColumn(person.current_day_start_time);
+	const out_field = createTimeColumn(person.current_day_end_time);
+	const code_field = await createAbsenceCodeColumn();
 
-	let name_column = document.createElement('td');
-	name_column.innerHTML = person.name;
-	person_row.appendChild(name_column);
-
-	createTimeColumn(person.current_day_start_time);
-	createTimeColumn(person.current_day_end_time);
-	createAbsenceCodeColumn();
+	function createNameColumn() {
+		let name_column = document.createElement('td');
+		name_column.innerHTML = person.name;
+		person_row.appendChild(name_column);
+	}
 
 	function createTimeColumn(starting_value) {
 		let column = document.createElement('td');
 		let field = document.createElement('input');
 		column.className = 'editable';
-		field.setAttribute('type', 'number');
 		field.value = starting_value;
 		column.appendChild(field);
 		person_row.appendChild(column);
-
-		field.addEventListener('change', function() {
-			
+		field.addEventListener('click', function() {
+			field.select();
 		});
+		field.addEventListener('change', function() {
+			field.value = convertTime(field.value);
+			code_field.selectedIndex = 0;
+			saveChanges();
+		});
+		return field;
 	}
 
-	function createAbsenceCodeColumn() {
-		let code_column = document.createElement('td');
-		let code_field = document.createElement('select');
+	async function createAbsenceCodeColumn() {
+		let column = document.createElement('td');
+		let field = document.createElement('select');
 		let empty_option = document.createElement('option');
-		code_column.className = 'editable';
-		code_field.appendChild(empty_option);
-		code_column.appendChild(code_field);
-		person_row.appendChild(code_column);
+		column.className = 'editable';
+		field.appendChild(empty_option);
+		column.appendChild(field);
+		person_row.appendChild(column);
 
 		let absence_codes = await getAbsenceCodes();
 		for (let i in absence_codes) {
 			let code = absence_codes[i];
 			let option = document.createElement('option');
 			option.value = option.innerHTML = code;
-			code_field.appendChild(option);
+			field.appendChild(option);
 			if (person.current_day_code === code) {
 				option.setAttribute('selected', 'selected');
 			}
 		}
+		field.addEventListener('change', function() {
+			in_field.value = '';
+			out_field.value = '';
+			saveChanges();
+		});
+		return field;
+	}
+
+	function saveChanges() {
+		let code = code_field.options[code_field.selectedIndex].value;
+		createAdminMessage(person, in_field.value, out_field.value, code);
+	}
+
+	function convertTime(s) {
+	    if (!s.match(/^[0-9]+$/)) {
+	        return s;
+	    }
+	    if (s.length < 3) {
+	        s = s + '00';
+	    }
+	    let num = parseInt(s);
+	    let hours = Math.floor(num / 100);
+	    let minutes = num % 100;
+	    if (hours < 0 || hours > 12 || minutes < 0 || minutes > 59) {
+	        return '';
+	    }
+	    if (minutes < 10) {
+	        minutes = '0' + minutes;
+	    }
+	    var ampm = 'AM';
+	    if (hours == 12 || hours <= 6) {
+	        ampm = 'PM';
+	    }
+	    return `${hours}:${minutes} ${ampm}`;
 	}
 }
 
@@ -433,8 +474,27 @@ async function createMessage(person, is_arriving) {
 	trySendMessages();
 }
 
+async function createAdminMessage(person, in_time, out_time, absence_code) {
+	let message = {
+		person_id: person.person_id,
+		in_time: in_time,
+		out_time: out_time,
+		absence_code: absence_code
+	}
+	await saveAdminMessage(message);
+	trySendMessages();
+}
+
 async function saveMessage(message) {
 	return localforage.setItem(MESSAGE_KEY_PREFIX + message.time, message).catch(function(err) {
+	    console.error(err);
+	});
+}
+
+async function saveAdminMessage(message) {
+	// Use person_id as the unique key for messages, that way if the same person's data is edited
+	// multiple times, later edits will overwrite earlier edits.
+	return localforage.setItem(ADMIN_MESSAGE_KEY_PREFIX + message.person_id, message).catch(function(err) {
 	    console.error(err);
 	});
 }
@@ -447,10 +507,17 @@ function trySendMessages() {
 		// it's possible for a second call to begin before the first one ends, which could result
 		// in a message being sent twice. This is okay, since the server will ignore or overwrite
 		// duplicate messages.
-	    if (key.startsWith(MESSAGE_KEY_PREFIX)) {
+	    if (key.startsWith(MESSAGE_KEY_PREFIX) || key.startsWith(ADMIN_MESSAGE_KEY_PREFIX)) {
 	    	// try sending the message
-	    	let query_string = `?time_string=${message.time_string}&person_id=${message.person_id}&is_arriving=${message.is_arriving}`;
-	    	fetch('/attendance/checkin/message' + query_string, { method: 'POST' }).then(response => {
+	    	let query_string, url;
+	    	if (key.startsWith(MESSAGE_KEY_PREFIX)) {
+	    		query_string = `?time_string=${message.time_string}&person_id=${message.person_id}&is_arriving=${message.is_arriving}`;
+	    		url = '/attendance/checkin/message' + query_string;
+	    	} else {
+	    		query_string = `?person_id=${message.person_id}&in_time=${message.in_time}&out_time=${message.out_time}&absence_code=${message.absence_code}`;
+	    		url = '/attendance/checkin/adminmessage' + query_string;
+	    	}
+	    	fetch(url, { method: 'POST' }).then(response => {
 				// If the response is good, the server received the message, so we can delete it.
 		        if (!response.redirected && response.status === 200) {
 		        	localforage.removeItem(key).catch(function(err) {
