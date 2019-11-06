@@ -33,7 +33,11 @@ public class Checkin extends Controller {
         admin.pin = OrgConfig.get().org.attendance_admin_pin;
         people.add(0, new CheckinPerson(admin, null));
 
-        return ok(Json.stringify(Json.toJson(people)));
+        List<String> absence_codes = AttendanceCode.all(OrgConfig.get().org).stream()
+            .map(c -> c.code)
+            .collect(Collectors.toList());
+
+        return ok(Json.stringify(Json.toJson(new CheckinData(people, absence_codes))));
     }
 
     public Result checkinMessage(String time_string, int person_id, boolean is_arriving) throws ParseException {

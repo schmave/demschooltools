@@ -234,18 +234,20 @@ button {
 	padding: 0;
 }
 
-.roster td.absence-code {
-	padding: 0;
-	background: #888;
-}
-
-.roster input.editable {
+.roster input {
 	width: calc(100% - 24px);
 	margin: 0;
-	padding: 6px 10px;
+	padding: 6px;
 	border: none;
 	font-size: 1em;
 	background: none;
+}
+
+.roster select {
+	background: none;
+	border: none;
+	font-size: 1em;
+	padding: 6px;
 }
 
 

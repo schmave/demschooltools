@@ -1,5 +1,6 @@
 
 const LOGIN_INFO_KEY = 'login-info';
+const ABSENCE_CODES_KEY = 'absence-codes';
 const PERSON_KEY_PREFIX = 'person-';
 const MESSAGE_KEY_PREFIX = 'message-';
 
@@ -172,15 +173,17 @@ async function showRoster(editable) {
 		}
 	}
 	else if (data) {
+		await saveAbsenceCodes(data.absence_codes);
+		let people = data.people;
 		container.innerHTML = roster_template.innerHTML;
+		if (editable) {
+			document.querySelector('#roster-header-title').innerHTML = 'Editable Roster';
+		}
 		let roster = document.getElementById('roster');
-		for (let i = 0; i < data.length; i++) {
-			let person = data[i];
+		for (let i = 0; i < people.length; i++) {
+			let person = people[i];
 			if (person.person_id === -1) continue;
 			let person_row = document.createElement('tr');
-			let name_column = document.createElement('td');
-			name_column.innerHTML = person.name;
-			person_row.appendChild(name_column);
 			if (editable) {
 				buildEditableRosterRow(person, person_row);
 			} else {
@@ -197,6 +200,9 @@ async function showRoster(editable) {
 }
 
 async function buildRosterRow(person, person_row) {
+	let name_column = document.createElement('td');
+	name_column.innerHTML = person.name;
+	person_row.appendChild(name_column);
 	// if there is an attendance code, add the code in a 2-span column
 	if (person.current_day_code) {
 		let code_column = document.createElement('td');
@@ -217,29 +223,49 @@ async function buildRosterRow(person, person_row) {
 }
 
 async function buildEditableRosterRow(person, person_row) {
+	person_row.innerHTML = '';
 
-	let in_column = document.createElement('td');
-	let in_field = document.createElement('input');
-	in_column.className = 'editable';
-	in_field.className = 'editable';
-	in_column.appendChild(in_field);
-	person_row.appendChild(in_column);
+	let name_column = document.createElement('td');
+	name_column.innerHTML = person.name;
+	person_row.appendChild(name_column);
 
-	let out_column = document.createElement('td');
-	let out_field = document.createElement('input');
-	out_column.className = 'editable';
-	out_field.className = 'editable';
-	out_column.appendChild(out_field);
-	person_row.appendChild(out_column);
+	createTimeColumn(person.current_day_start_time);
+	createTimeColumn(person.current_day_end_time);
+	createAbsenceCodeColumn();
 
-	if (person.current_day_code) {
-		in_field.value = person.current_day_code;
-		out_column.className = 'absence-code';
-		out_field.setAttribute('disabled', true);
+	function createTimeColumn(starting_value) {
+		let column = document.createElement('td');
+		let field = document.createElement('input');
+		column.className = 'editable';
+		field.setAttribute('type', 'number');
+		field.value = starting_value;
+		column.appendChild(field);
+		person_row.appendChild(column);
+
+		field.addEventListener('change', function() {
+			
+		});
 	}
-	else {
-		in_field.value = person.current_day_start_time;
-		out_field.value = person.current_day_end_time;
+
+	function createAbsenceCodeColumn() {
+		let code_column = document.createElement('td');
+		let code_field = document.createElement('select');
+		let empty_option = document.createElement('option');
+		code_column.className = 'editable';
+		code_field.appendChild(empty_option);
+		code_column.appendChild(code_field);
+		person_row.appendChild(code_column);
+
+		let absence_codes = await getAbsenceCodes();
+		for (let i in absence_codes) {
+			let code = absence_codes[i];
+			let option = document.createElement('option');
+			option.value = option.innerHTML = code;
+			code_field.appendChild(option);
+			if (person.current_day_code === code) {
+				option.setAttribute('selected', 'selected');
+			}
+		}
 	}
 }
 
@@ -268,15 +294,16 @@ async function downloadData() {
 		return;
 	}
 	let data = await response.json();
+	let people = data.people;
 	let pins = [];
 	// We don't use the data directly. Instead, we save it in a local db and read it from there.
 	// This way, after the data has been downloaded once, the app can work indefinitely without
 	// internet connection.
-	for (let i = 0; i < data.length; i++) {
-		pins.push(data[i].pin);
-		await savePerson(data[i]);
+	for (let i = 0; i < people.length; i++) {
+		pins.push(people[i].pin);
+		await savePerson(people[i]);
 	}
-	// clean up old entries
+	// clean up old person entries (we don't await this because it's not needed for the app to run)
 	localforage.iterate(function(person, key) {
 		if (key.startsWith(PERSON_KEY_PREFIX) && !pins.includes(person.pin)) {
 			localforage.removeItem(key).catch(function(err) {
@@ -312,6 +339,16 @@ function getPerson(pin) {
 
 function savePerson(person) {
 	return localforage.setItem(PERSON_KEY_PREFIX + person.pin, person).catch(function(err) {
+	    console.error(err);
+	});
+}
+
+function getAbsenceCodes(pin) {
+	return localforage.getItem(ABSENCE_CODES_KEY);
+}
+
+function saveAbsenceCodes(absence_codes) {
+	return localforage.setItem(ABSENCE_CODES_KEY, absence_codes).catch(function(err) {
 	    console.error(err);
 	});
 }
