@@ -27,7 +27,18 @@ public class Checkin extends Controller {
             .map(p -> new CheckinPerson(p, findCurrentDay(date, p.person_id)))
             .collect(Collectors.toList());
 
-        return ok(Json.stringify(Json.toJson(people)));
+        // add admin
+        Person admin = new Person();
+        admin.person_id = -1;
+        admin.first_name = "Admin";
+        admin.pin = OrgConfig.get().org.attendance_admin_pin;
+        people.add(0, new CheckinPerson(admin, null));
+
+        List<String> absence_codes = AttendanceCode.all(OrgConfig.get().org).stream()
+            .map(c -> c.code)
+            .collect(Collectors.toList());
+
+        return ok(Json.stringify(Json.toJson(new CheckinData(people, absence_codes))));
     }
 
     public Result checkinMessage(String time_string, int person_id, boolean is_arriving) throws ParseException {
@@ -49,6 +60,14 @@ public class Checkin extends Controller {
                 attendance_day.end_time = time;
                 attendance_day.update();
             }
+        }
+        return ok();
+    }
+
+    public Result adminMessage(int person_id, String in_time, String out_time, String absence_code) throws Exception {
+        AttendanceDay attendance_day = findCurrentDay(new Date(), person_id);
+        if (attendance_day != null) {
+            attendance_day.edit(absence_code, in_time, out_time);
         }
         return ok();
     }

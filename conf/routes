@@ -107,6 +107,7 @@ GET     /attendance/editWeek      controllers.Attendance.editWeek(date : String 
 GET  	/attendance/checkin				controllers.Public.checkin()
 GET     /attendance/checkin/data 		controllers.Checkin.checkinData(time: String)
 POST    /attendance/checkin/message 	controllers.Checkin.checkinMessage(time_string: String, person_id: Integer, is_arriving: Boolean)
+POST    /attendance/checkin/adminmessage 	controllers.Checkin.adminMessage(person_id: Integer, in_time: String, out_time: String, absence_code: String)
 GET     /attendance/pins         controllers.Attendance.assignPINs()
 GET     /attendance/savepins       controllers.Attendance.savePINs()
 POST	/attendance/newCode        controllers.Attendance.newCode()

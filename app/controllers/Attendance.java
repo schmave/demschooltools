@@ -699,6 +699,12 @@ public class Attendance extends Controller {
     public Result assignPINs() {
         List<Person> people = Application.attendancePeople();
         Collections.sort(people, Person.SORT_DISPLAY_NAME);
+        // add admin PIN
+        Person admin = new Person();
+        admin.person_id = -1;
+        admin.first_name = "Admin";
+        admin.pin = OrgConfig.get().org.attendance_admin_pin;
+        people.add(0, admin);
         return ok(views.html.attendance_pins.render(people));
     }
 
@@ -711,10 +717,15 @@ public class Attendance extends Controller {
         Set<Map.Entry<String,String[]>> entries = request().queryString().entrySet();
         for (Map.Entry<String, String[]> entry : entries) {
             Integer person_id = Integer.parseInt(entry.getKey());
-            Person person = people_by_id.get(person_id);
-            if (person != null) {
-                person.pin = entry.getValue()[0];
-                person.save();
+            if (person_id == -1) {
+                OrgConfig.get().org.setAttendanceAdminPIN(entry.getValue()[0]);
+            }
+            else {
+                Person person = people_by_id.get(person_id);
+                if (person != null) {
+                    person.pin = entry.getValue()[0];
+                    person.save();
+                }
             }
         }
         return redirect(routes.Attendance.assignPINs());
