@@ -18,6 +18,7 @@ var chooser = require('./chooser');
 var create_transaction = require('./create_transaction');
 var transaction_list = require('./transaction_list');
 var settings_page = require('./settings_page');
+var off_campus = require('./off_campus');
 
 $(function() {
     // Fix for bootstrap tabs not remembering their active tab
@@ -142,4 +143,8 @@ window.initTransactionList = function() {
 
 window.initSettingsPage = function() {
     return settings_page.init();
+};
+
+window.initOffCampus = function() {
+    return off_campus.init();
 };

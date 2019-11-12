@@ -33,6 +33,9 @@ public class AttendanceDay extends Model {
     public Time start_time;
     public Time end_time;
 
+    public Time off_campus_departure_time;
+    public Time off_campus_return_time;
+
     public static Finder<Integer, AttendanceDay> find = new Finder<Integer, AttendanceDay>(
         AttendanceDay.class
     );

@@ -1,0 +1,28 @@
+@(events : List[OffCampusEvent])
+
+@import helper._
+
+@main("Off Campus Time", "attendance", "off_campus_time") {
+
+<h3>Off Campus Time</h3>
+
+<a href="@routes.Attendance.addOffCampusTime()">Add off campus time</a>
+
+@form(routes.Attendance.saveOffCampusTime, 'class -> "form-horizontal", 'role -> "form") {
+
+<table class="table sortable">
+	<tr>
+		<th>Date</th>
+		<th>Person</th>
+		<th>Departure Time</th>
+		<th>Return Time</th>
+	</tr>
+	@for( e <- events ) {
+		<tr>
+			
+		</tr>
+	}
+</table>
+
+}
+}

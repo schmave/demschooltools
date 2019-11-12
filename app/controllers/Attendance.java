@@ -696,6 +696,25 @@ public class Attendance extends Controller {
         return result;
     }
 
+    public Result offCampusTime() {
+        List<OffCampusEvent> events = AttendanceDay.find.where()
+            .ne("off_campus_departure_time", null)
+            .findList().stream()
+            .map(d -> new OffCampusEvent(d))
+            .sorted(Comparator.comparing(OffCampusEvent::getDay))
+            .collect(Collectors.toList());
+
+        return ok(views.html.attendance_off_campus.render(events));
+    }
+
+    public Result addOffCampusTime() {
+        return ok(views.html.attendance_add_off_campus.render());
+    }
+
+    public Result saveOffCampusTime() {
+        return ok();
+    }
+
     public Result assignPINs() {
         List<Person> people = Application.attendancePeople();
         Collections.sort(people, Person.SORT_DISPLAY_NAME);

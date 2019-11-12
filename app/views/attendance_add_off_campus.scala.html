@@ -1,0 +1,32 @@
+@import helper._
+
+@main("Off Campus Time", "attendance", "off_campus_time") {
+
+<h3>Add Off Campus Time</h3>
+
+@form(routes.Attendance.saveOffCampusTime, 'class -> "form-horizontal", 'role -> "form") {
+
+<table class="table attendance-off-campus-table">
+	<tr>
+		<th>Date</th>
+		<th>Person</th>
+		<th>Departure Time</th>
+		<th>Return Time</th>
+	</tr>
+	@for( i <- 0 to 9 ) {
+		<tr>
+			<td><input type="textfield" name="day-@i" class="date"></td>
+			<td><input type="text" name="person-id-@i"></td>
+			<td><input type="text" class="attendance-off-campus-time" name="departure-time-@i"></td>
+			<td><input type="text" class="attendance-off-campus-time" name="return-time-@i"></td>
+		</tr>
+	}
+</table>
+<input id="save" type="submit" class="btn btn-primary" value="Save">
+
+}
+}
+
+<script>
+	initOffCampus();
+</script>
