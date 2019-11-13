@@ -342,8 +342,11 @@ async function downloadData() {
 	// This way, after the data has been downloaded once, the app can work indefinitely without
 	// internet connection.
 	for (let i = 0; i < people.length; i++) {
-		pins.push(people[i].pin);
-		await savePerson(people[i]);
+		let person = people[i];
+		// don't save admin if there is no admin code
+		if (person.person_id === -1 && !person.pin) continue;
+		pins.push(person.pin);
+		await savePerson(person);
 	}
 	// clean up old person entries (we don't await this because it's not needed for the app to run)
 	localforage.iterate(function(person, key) {
