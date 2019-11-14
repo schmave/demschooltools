@@ -230,6 +230,26 @@ button {
   font-weight: normal;
 }
 
+.roster td.editable {
+	padding: 0;
+}
+
+.roster input {
+	width: calc(100% - 24px);
+	margin: 0;
+	padding: 6px;
+	border: none;
+	font-size: 1em;
+	background: none;
+}
+
+.roster select {
+	background: none;
+	border: none;
+	font-size: 1em;
+	padding: 6px;
+}
+
 
 /* css loader from https://loading.io/css/ */
 .lds-ellipsis {
