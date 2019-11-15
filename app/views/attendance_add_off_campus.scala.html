@@ -1,3 +1,5 @@
+@(current_date : String, people_json : String)
+
 @import helper._
 
 @main("Off Campus Time", "attendance", "off_campus_time") {
@@ -15,18 +17,26 @@
 	</tr>
 	@for( i <- 0 to 9 ) {
 		<tr>
-			<td><input type="textfield" name="day-@i" class="date"></td>
-			<td><input type="text" name="person-id-@i"></td>
+			<td><input type="textfield" name="day-@i" class="js-date attendance-off-campus-date" value="@current_date"></td>
+			<td class="js-person-row">
+				<div class="js-person-name-selected attendance-off-campus-person-selected name">
+					<span class="js-person-name-selected-text label label-primary"></span>
+					<img src="/assets/images/x.png">
+				</div>
+				<input type="text" class="js-person-name attendance-off-campus-person">
+				<input type="hidden" class="js-person-id" name="person-id-@i"/>
+			</td>
 			<td><input type="text" class="attendance-off-campus-time" name="departure-time-@i"></td>
 			<td><input type="text" class="attendance-off-campus-time" name="return-time-@i"></td>
 		</tr>
 	}
 </table>
 <input id="save" type="submit" class="btn btn-primary" value="Save">
-
+<br><br><br><br>
 }
 }
 
 <script>
-	initOffCampus();
+	var people = @Html(people_json);
+	initOffCampus(people);
 </script>

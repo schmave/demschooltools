@@ -3,8 +3,7 @@ package controllers;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.sql.Time;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.text.*;
 import java.util.*;
 import java.util.stream.*;
 import java.util.zip.ZipEntry;
@@ -708,7 +707,11 @@ public class Attendance extends Controller {
     }
 
     public Result addOffCampusTime() {
-        return ok(views.html.attendance_add_off_campus.render());
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        Date today = Calendar.getInstance().getTime();        
+        String current_date = df.format(today);
+        String people_json = Application.attendancePeopleJson();
+        return ok(views.html.attendance_add_off_campus.render(current_date, people_json));
     }
 
     public Result saveOffCampusTime() {

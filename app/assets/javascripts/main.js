@@ -145,6 +145,6 @@ window.initSettingsPage = function() {
     return settings_page.init();
 };
 
-window.initOffCampus = function() {
-    return off_campus.init();
+window.initOffCampus = function(people) {
+    return off_campus.init(people);
 };
