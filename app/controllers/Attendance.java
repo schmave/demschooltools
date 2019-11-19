@@ -714,8 +714,38 @@ public class Attendance extends Controller {
         return ok(views.html.attendance_add_off_campus.render(current_date, people_json));
     }
 
-    public Result saveOffCampusTime() {
-        return ok();
+    public Result saveOffCampusTime() throws ParseException {
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        List<OffCampusEvent> events = new ArrayList<OffCampusEvent>();
+        for (int i = 0; i < 10; i++) {
+            events.add(new OffCampusEvent());
+        }
+        Set<Map.Entry<String,String[]>> entries = request().queryString().entrySet();
+        for (Map.Entry<String, String[]> entry : entries) {
+            String value = entry.getValue()[0];
+            if (value == null || value.isEmpty()) continue;
+            String[] key_parts = entry.getKey().split("-");
+            String name = key_parts[0];
+            Integer i = Integer.parseInt(key_parts[1]);
+            switch (name) {
+                case "personid":
+                    events.get(i).person_id = Integer.parseInt(value);
+                    break;
+                case "day":
+                    events.get(i).day = df.parse(value);
+                    break;
+                case "departuretime":
+                    events.get(i).departure_time = AttendanceDay.parseTime(value);
+                    break;
+                case "returntime":
+                    events.get(i).return_time = AttendanceDay.parseTime(value);
+                    break;
+            }
+        }
+        for (OffCampusEvent event : events) {
+            event.save();
+        }
+        return redirect(routes.Attendance.offCampusTime());
     }
 
     public Result assignPINs() {

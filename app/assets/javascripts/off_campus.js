@@ -7,6 +7,11 @@ export function init(people) {
 	$('.js-person-row').each(function() {
 		registerAutocomplete($(this), people);
 	});
+
+	$('.js-time').blur(function() {
+		var time = utils.formatTime($(this).val());
+		$(this).val(time);
+	});
 }
 
 function registerAutocomplete(row, people) {

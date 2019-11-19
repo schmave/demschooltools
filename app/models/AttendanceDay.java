@@ -103,4 +103,21 @@ public class AttendanceDay extends Model {
         }
         return false;
     }
+
+    public static AttendanceDay findCurrentDay(Date day, int person_id) {
+        // if the day is Saturday or Sunday, there can't be an attendance day
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(day);
+        int dow = calendar.get(Calendar.DAY_OF_WEEK);
+        if (dow == Calendar.SATURDAY || dow == Calendar.SUNDAY) {
+            return null;
+        }
+        // find or create AttendanceWeek and AttendanceDay objects
+        Person person = Person.findById(person_id);
+        AttendanceWeek.findOrCreate(day, person);
+        return AttendanceDay.find.where()
+            .eq("person", person)
+            .eq("day", day)
+            .findUnique();
+    }
 }

@@ -115,12 +115,42 @@ var selectNextInput = function(cur_input) {
     }
 };
 
+var formatTime = function(s) {
+    if (!s.match(/^[0-9]+$/)) {
+        return s;
+    }
+    if (s.length < 3) {
+        s = s + "00";
+    }
+    var num = parseInt(s);
+    var hours = Math.floor(num / 100);
+    var minutes = num % 100;
+    if (hours < 0 || hours > 12 || minutes < 0 || minutes > 59) {
+        return "";
+    }
+    var ampm = "AM";
+    if (hours == 12 || hours <= 6) {
+        ampm = "PM";
+    }
+    return "" + hours + ":" + zeroPad(minutes) + " " + ampm;
+}
+
+var zeroPad = function(minutes) {
+    if (minutes < 10) {
+        return "0" + minutes;
+    } else {
+        return "" + minutes;
+    }
+}
+
 module.exports = {
     displayName: displayName,
     limitHeight: limitHeight,
     parseDate: parseDate,
     reformatDate: reformatDate,
     selectNextInput: selectNextInput,
+    formatTime: formatTime,
+    zeroPad: zeroPad,
     // These events should capture all possible ways to change the text
     // in a textfield.
     TEXT_AREA_EVENTS: "change keyup paste cut",

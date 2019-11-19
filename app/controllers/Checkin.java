@@ -24,7 +24,7 @@ public class Checkin extends Controller {
         List<CheckinPerson> people = Application.attendancePeople().stream()
             .sorted(Comparator.comparing(Person::getDisplayName))
             .filter(p -> p.pin != null && !p.pin.isEmpty())
-            .map(p -> new CheckinPerson(p, findCurrentDay(date, p.person_id)))
+            .map(p -> new CheckinPerson(p, AttendanceDay.findCurrentDay(date, p.person_id)))
             .collect(Collectors.toList());
 
         // add admin
@@ -44,7 +44,7 @@ public class Checkin extends Controller {
     public Result checkinMessage(String time_string, int person_id, boolean is_arriving) throws ParseException {
         Date date = new SimpleDateFormat("M/d/yyyy, h:mm:ss a").parse(time_string);
         Time time = new Time(date.getTime());
-        AttendanceDay attendance_day = findCurrentDay(date, person_id);
+        AttendanceDay attendance_day = AttendanceDay.findCurrentDay(date, person_id);
         // if this is an invalid day, ignore the message
         if (attendance_day == null) {
             return ok();
@@ -65,27 +65,10 @@ public class Checkin extends Controller {
     }
 
     public Result adminMessage(int person_id, String in_time, String out_time, String absence_code) throws Exception {
-        AttendanceDay attendance_day = findCurrentDay(new Date(), person_id);
+        AttendanceDay attendance_day = AttendanceDay.findCurrentDay(new Date(), person_id);
         if (attendance_day != null) {
             attendance_day.edit(absence_code, in_time, out_time);
         }
         return ok();
-    }
-
-    private AttendanceDay findCurrentDay(Date day, int person_id) {
-        // if the day is Saturday or Sunday, there can't be an attendance day
-        Calendar calendar = new GregorianCalendar();
-        calendar.setTime(day);
-        int dow = calendar.get(Calendar.DAY_OF_WEEK);
-        if (dow == Calendar.SATURDAY || dow == Calendar.SUNDAY) {
-            return null;
-        }
-        // find or create AttendanceWeek and AttendanceDay objects
-        Person person = Person.findById(person_id);
-        AttendanceWeek.findOrCreate(day, person);
-        return AttendanceDay.find.where()
-            .eq("person", person)
-            .eq("day", day)
-            .findUnique();
     }
 }
