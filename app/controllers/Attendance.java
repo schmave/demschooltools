@@ -715,7 +715,7 @@ public class Attendance extends Controller {
     }
 
     public Result saveOffCampusTime() throws ParseException {
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
         List<OffCampusEvent> events = new ArrayList<OffCampusEvent>();
         for (int i = 0; i < 10; i++) {
             events.add(new OffCampusEvent());

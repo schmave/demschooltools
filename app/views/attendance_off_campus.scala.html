@@ -19,7 +19,10 @@
 	</tr>
 	@for( e <- events ) {
 		<tr>
-			
+			<td>@e.formatDate()</td>
+			<td>@e.name</td>
+			<td>@e.formatDepartureTime()</td>
+			<td>@e.formatReturnTime()</td>
 		</tr>
 	}
 </table>

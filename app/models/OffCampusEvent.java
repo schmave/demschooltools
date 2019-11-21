@@ -1,5 +1,6 @@
 package models;
 
+import java.text.*;
 import java.util.*;
 import java.sql.Time;
 
@@ -26,6 +27,21 @@ public class OffCampusEvent {
 
     public Date getDay() {
         return day;
+    }
+
+    public String formatDate() {
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+        return df.format(day);
+    }
+
+    public String formatDepartureTime() {
+        DateFormat df = new SimpleDateFormat("h:mm aa");
+        return df.format(departure_time);
+    }
+
+    public String formatReturnTime() {
+        DateFormat df = new SimpleDateFormat("h:mm aa");
+        return df.format(return_time);
     }
 
     public void save() {
