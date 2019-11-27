@@ -1,6 +1,7 @@
 @(person : Person, days : List[AttendanceDay], weeks: Map[Date, AttendanceWeek],
   codes : List[String], codes_map : Map[String, AttendanceCode], stats: AttendanceStats,
-  start_date: Date, end_date: Date, min_date: Date, max_date: Date)
+  start_date: Date, end_date: Date, min_date: Date, max_date: Date,
+  has_off_campus_time: Boolean, table_width: Integer)
 
 @import helper._
 
@@ -76,11 +77,15 @@
 </table>
 
 <h3>Details</h3>
-<table class="attendance-view table" style="max-width: 700px;">
+<table class="attendance-view table" style="max-width: @(table_width)px;">
 <thead><th colspan=2 width=100>Date</th>
 	<th width=50>Hours</th>
 	<th width=75>Arrival time</th>
 	<th width=75>Departure time</th>
+	@if( has_off_campus_time ) {
+		<th width=75>Off Campus Start Time</th>
+		<th width=75>Off Campus End Time</th>
+	}
 	<th width=100>Absence code</th>
 	<th width=100>Extra hours (weekly)</th>
 	</thead>
@@ -117,6 +122,10 @@
 	</td>
 	<td>@Attendance.formatTime(d.start_time)</td>
 	<td>@Attendance.formatTime(d.end_time)</td>
+	@if( has_off_campus_time ) {
+		<td>@Attendance.formatTime(d.off_campus_departure_time)</td>
+		<td>@Attendance.formatTime(d.off_campus_return_time)</td>
+	}
 	@if(d.code != null) {
 		@if(codes_map.contains(d.code)) {
 			<td class="attendance-code" style="background-color:@codes_map.get(d.code).color">

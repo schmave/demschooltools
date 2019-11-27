@@ -287,11 +287,16 @@ public class Attendance extends Controller {
 
         Map<String, AttendanceCode> codes_map = getCodesMap(true);
         AttendanceStats stats = new AttendanceStats();
+        boolean has_off_campus_time = false;
+
         for (AttendanceDay day : days) {
             if (day.code != null || day.start_time == null || day.end_time == null) {
                 stats.incrementCodeCount(codes_map.get(day.code));
             } else {
                 stats.incrementAttendance(day);
+            }
+            if (day.off_campus_departure_time != null || day.off_campus_return_time != null) {
+                has_off_campus_time = true;
             }
         }
 
@@ -304,6 +309,8 @@ public class Attendance extends Controller {
             day_to_week.put(w.monday, w);
         }
 
+        int table_width = has_off_campus_time ? 900 : 700;
+
         return ok(views.html.attendance_person.render(
             p,
             days,
@@ -314,7 +321,9 @@ public class Attendance extends Controller {
             start_date,
             end_date,
             row == null ? null : row.getDate("min_date"),
-            row == null ? null : row.getDate("max_date")
+            row == null ? null : row.getDate("max_date"),
+            has_off_campus_time,
+            table_width
         ));
     }
 

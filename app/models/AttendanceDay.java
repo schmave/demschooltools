@@ -90,7 +90,11 @@ public class AttendanceDay extends Model {
 
     @JsonIgnore
     public double getHours() {
-        return (end_time.getTime() - start_time.getTime()) / (1000.0 * 60 * 60);
+        long off_campus_time = 0;
+        if (off_campus_return_time != null && off_campus_departure_time != null) {
+            off_campus_time = off_campus_return_time.getTime() - off_campus_departure_time.getTime();
+        }
+        return (end_time.getTime() - start_time.getTime() - off_campus_time) / (1000.0 * 60 * 60);
     }
 
     @JsonIgnore
