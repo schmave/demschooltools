@@ -40,6 +40,13 @@ public class AttendanceDay extends Model {
         AttendanceDay.class
     );
 
+    public static AttendanceDay findById(int id) {
+        return find.where()
+            .eq("person.organization", Organization.getByHost())
+            .eq("id", id)
+            .findUnique();
+    }
+
     public static AttendanceDay create(Date day, Person p)
     {
         AttendanceDay result = new AttendanceDay();

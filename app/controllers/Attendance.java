@@ -706,6 +706,20 @@ public class Attendance extends Controller {
         return ok(views.html.attendance_off_campus.render(events));
     }
 
+    public Result deleteOffCampusTime() {
+        DynamicForm form = Form.form().bindFromRequest();
+        Map<String, String> data = form.data();
+        for (Map.Entry<String, String> entry : data.entrySet()) {
+            if (entry.getKey().isEmpty()) continue;
+            Integer attendance_day_id = Integer.parseInt(entry.getKey());
+            AttendanceDay attendance_day = AttendanceDay.findById(attendance_day_id);
+            attendance_day.off_campus_departure_time = null;
+            attendance_day.off_campus_return_time = null;
+            attendance_day.update();
+        }
+        return redirect(routes.Attendance.offCampusTime());
+    }
+
     public Result addOffCampusTime() {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         Date today = Calendar.getInstance().getTime();        
@@ -720,9 +734,10 @@ public class Attendance extends Controller {
         for (int i = 0; i < 10; i++) {
             events.add(new OffCampusEvent());
         }
-        Set<Map.Entry<String,String[]>> entries = request().queryString().entrySet();
-        for (Map.Entry<String, String[]> entry : entries) {
-            String value = entry.getValue()[0];
+        DynamicForm form = Form.form().bindFromRequest();
+        Map<String, String> data = form.data();
+        for (Map.Entry<String, String> entry : data.entrySet()) {
+            String value = entry.getValue();
             if (value == null || value.isEmpty()) continue;
             String[] key_parts = entry.getKey().split("-");
             String name = key_parts[0];
