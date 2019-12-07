@@ -21,6 +21,8 @@ public class OrgConfig {
     public String str_corporation = "Corporation";
     public String str_committee = "Committee";
     public String str_clerk = "Clerk";
+    public String str_guilty = "Guilty";
+    public String str_not_guilty = "Not Guilty";
 
     public boolean show_no_contest_plea = false;
     public boolean show_na_plea = false;
@@ -65,6 +67,14 @@ public class OrgConfig {
             format = euro_dates ? "dd-MM-" : "MM-dd-";
         }
         return new SimpleDateFormat(format).format(m.date);
+    }
+
+    public String translatePlea(String plea) {
+        if (plea.equals("Guilty")) {
+            return this.str_guilty;
+        } else {
+            return this.str_not_guilty;
+        }
     }
 }
 
@@ -265,8 +275,10 @@ class TheOpenSchool2 extends OrgConfig {
         str_res_plans = "sentences";
         str_res_plans_cap = "Sentences";
         str_findings = "Findings";
-        str_jc_name = "Civics Board";
-        str_jc_name_short = "CB";
+        str_jc_name = "Justice Committee";
+        str_jc_name_short = "JC";
+        str_guilty = "Confirm";
+        str_not_guilty = "Deny";
 
         show_findings_in_rp_list = true;
         use_minor_referrals = false;

@@ -16,7 +16,7 @@
 		<tr><td>@c.the_case.case_number
 			<td>@if(c.person != null) { @c.person.getDisplayName() } else { <i>No one</i> }
 			<td>@c.getRuleTitle()
-			<td>@c.plea
+			<td>@OrgConfig.get().translatePlea(c.plea)
 			<td>@c.resolution_plan
 			<td>@Utils.newlineToBr(c.the_case.generateCompositeFindingsFromChargeReferences())
 	}
