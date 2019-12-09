@@ -44,7 +44,7 @@
 				@if( charge.rule != null) {
 					@charge.rule.getNumber() @charge.rule.title.
 					@if( !charge.severity.equals("")){(@charge.severity)}
-					@if( !charge.plea.equals("Guilty") ) { <b>@charge.plea.</b> }
+					@if( !charge.plea.equals("Guilty") ) { <b>@OrgConfig.get().translatePlea(charge.plea).</b> }
 				}
 				<u>@OrgConfig.get().str_res_plan_short: @charge.resolution_plan</u>
 				</li>

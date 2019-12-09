@@ -211,6 +211,8 @@ public class Application extends Controller {
         writer.write("SM decision date");
         writer.endRecord();
 
+        OrgConfig config = OrgConfig.get();
+
         List<Charge> charges = Charge.find
             .fetch("the_case")
             .fetch("person")
@@ -249,14 +251,14 @@ public class Application extends Controller {
             } else {
                 writer.write("");
             }
-            writer.write(c.plea);
+            writer.write(config.translatePlea(c.plea));
             writer.write(c.resolution_plan);
             writer.write("" + c.rp_complete);
-            if (OrgConfig.get().show_severity) {
+            if (config.show_severity) {
                 writer.write(c.severity);
             }
 
-            if (OrgConfig.get().use_minor_referrals) {
+            if (config.use_minor_referrals) {
                 writer.write(c.minor_referral_destination);
             }
             writer.write("" + c.referred_to_sm);

@@ -137,7 +137,7 @@ $(function () {
 	<b>Entry:</b> {{> rule-chooser}}
 	<tr><td class="esm-form-label">Plea:<td colspan=2>
 <div class="radio-inline">
-  <label><input type="radio" class="plea plea-guilty" value="Guilty"><span>Guilty</span></label>
+  <label><input type="radio" class="plea plea-guilty" value="Guilty"><span>@OrgConfig.get().str_guilty</span></label>
 </div>
 @if( OrgConfig.get().show_no_contest_plea ) {
 <div class="radio-inline">
@@ -145,7 +145,7 @@ $(function () {
 </div>
 }
 <div class="radio-inline">
-  <label><input type="radio" class="plea plea-not-guilty" value="Not Guilty"><span>Not Guilty</span></label>
+  <label><input type="radio" class="plea plea-not-guilty" value="Not Guilty"><span>@OrgConfig.get().str_not_guilty</span></label>
 </div>
 @if( OrgConfig.get().show_na_plea ) {
 <div class="radio-inline">

@@ -16,7 +16,7 @@
 @if( redact_findings ) { @c.the_case.getRedactedFindings(c.person) } else { @c.the_case.generateCompositeFindingsFromChargeReferences() }
 
 @if( !c.plea.equals("Guilty") ) {
-	Plead <b>@c.plea</b>.
+	Plead <b>@OrgConfig.get().translatePlea(c.plea)</b>.
 }
 
 <u>@OrgConfig.get().str_res_plan_short: @c.resolution_plan</u>
