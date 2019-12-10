@@ -826,17 +826,13 @@ public class Application extends Controller {
         end_date.add(GregorianCalendar.DATE, 6);
 
         response().setHeader("Content-Type", "application/pdf");
-        ArrayList<String> documents = new ArrayList<String>();
 
         List<Meeting> meetings = Meeting.find.where()
             .eq("organization", Organization.getByHost())
             .le("date", end_date.getTime())
             .ge("date", start_date.getTime()).findList();
-        for (Meeting m : meetings) {
-            documents.add(views.html.view_meeting.render(m).toString());
-        }
 
-        return ok(renderToPDF(documents));
+        return ok(renderToPDF(views.html.multi_meetings.render(meetings).toString()));
     }
 
     public Result viewWeeklyReport(String date_string) {

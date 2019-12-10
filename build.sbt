@@ -26,7 +26,7 @@ libraryDependencies ++= Seq(
   "com.feth"      %% "play-authenticate" % "0.8.3",
   "com.typesafe.play" %% "play-mailer" % "5.0.0",
   "com.ecwid" % "ecwid-mailchimp" % "2.0.1.0",
-  "org.xhtmlrenderer" % "flying-saucer-pdf" % "9.0.7",
+  "org.xhtmlrenderer" % "flying-saucer-pdf-itext5" % "9.1.19",
   "com.github.spullara.mustache.java" % "compiler" % "0.9.2",
   "org.apache.poi" % "poi-ooxml" % "3.17",
   "org.mindrot" % "jbcrypt" % "0.3m"

@@ -1,0 +1,22 @@
+@(meetings : List[Meeting])
+
+@import helper._
+
+<html>
+    <head>
+        <link rel="stylesheet" media="all" href="@routes.Assets.versioned("stylesheets/main.css")" />
+        <style>
+            @@page {
+              @@bottom-right {
+                content: "Page " counter(page) " of " counter(pages);
+              }
+            }
+        </style>
+    </head>
+    <body>
+        @for(m <- meetings) {
+            @meetingHelper(m)
+            <div style="page-break-after: always" />
+        }
+    </body>
+</html>
