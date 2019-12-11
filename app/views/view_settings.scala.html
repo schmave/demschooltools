@@ -107,6 +107,12 @@ the other way around.</p>
     </p>
 
     <label>
+        <input type="checkbox" name="attendance_enable_off_campus" @if(org.attendance_enable_off_campus){ checked }>
+        Enable logging Off Campus Time
+    </label>
+
+    <br/>
+    <label>
         <input type="checkbox" name="attendance_show_percent" id="attendance-show-percent"
                @if(org.attendance_show_percent){ checked }>
         Show the "Attendance Rate" column

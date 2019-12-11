@@ -148,9 +148,11 @@
             </a><a @if(selectedBtn.equals("attendance_codes")) { class="active" }
                 href="@routes.Attendance.viewCodes">Absence codes
             </a>
-            <a @if(selectedBtn.equals("off_campus_time")) { class="active" }
-                href="@routes.Attendance.offCampusTime">Off campus time
-            </a>
+            @if(OrgConfig.get().org.attendance_enable_off_campus) {
+                <a @if(selectedBtn.equals("off_campus_time")) { class="active" }
+                    href="@routes.Attendance.offCampusTime">Off campus time
+                </a>
+            }
             @if(OrgConfig.get().org.show_electronic_signin) {
                 <a @if(selectedBtn.equals("attendance_pins")) { class="active" }
                     href="@routes.Attendance.assignPINs">Assign PINs
