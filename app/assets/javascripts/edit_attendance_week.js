@@ -2,13 +2,6 @@ var Handlebars = require('handlebars');
 
 var utils = require('./utils');
 
-function zeroPad(minutes) {
-    if (minutes < 10) {
-        return "0" + minutes;
-    } else {
-        return "" + minutes;
-    }
-}
 
 function dbTimeToUserTime(str) {
     if (str === null || str.length == 0) {
@@ -29,32 +22,7 @@ function dbTimeToUserTime(str) {
         hours -= 12;
     }
 
-    return "" + hours + ":" + zeroPad(minutes) + " " + ampm;
-}
-
-function typedToUserTime(s) {
-    if (!s.match(/^[0-9]+$/)) {
-        return s;
-    }
-
-    if (s.length < 3) {
-        s = s + "00";
-    }
-
-    var num = parseInt(s);
-    var hours = Math.floor(num / 100);
-    var minutes = num % 100;
-
-    if (hours < 0 || hours > 12 || minutes < 0 || minutes > 59) {
-        return "";
-    }
-
-    var ampm = "AM";
-    if (hours == 12 || hours <= 6) {
-        ampm = "PM";
-    }
-
-    return "" + hours + ":" + zeroPad(minutes) + " " + ampm;
+    return "" + hours + ":" + utils.zeroPad(minutes) + " " + ampm;
 }
 
 function Day(data, start_input, end_input) {
@@ -96,8 +64,8 @@ function Day(data, start_input, end_input) {
     };
 
     self.onBlur = function() {
-        self.start_input.val(typedToUserTime(self.start_input.val()));
-        self.end_input.val(typedToUserTime(self.end_input.val()));
+        self.start_input.val(utils.formatTime(self.start_input.val()));
+        self.end_input.val(utils.formatTime(self.end_input.val()));
     };
 
     this.save = function() {

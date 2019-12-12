@@ -1,0 +1,34 @@
+@(events : List[OffCampusEvent])
+
+@import helper._
+
+@main("Off Campus Time", "attendance", "off_campus_time") {
+
+<h3>Off Campus Time</h3>
+
+<a href="@routes.Attendance.addOffCampusTime()">Add off campus time</a>
+
+@form(routes.Attendance.deleteOffCampusTime, 'class -> "form-horizontal", 'role -> "form") {
+
+<table class="table sortable">
+	<tr>
+		<th></th>
+		<th>Date</th>
+		<th>Person</th>
+		<th>Departure Time</th>
+		<th>Return Time</th>
+	</tr>
+	@for( e <- events ) {
+		<tr>
+			<td><input type="checkbox" name="@e.attendance_day_id"></td>
+			<td>@e.formatDate()</td>
+			<td>@e.name</td>
+			<td>@e.formatDepartureTime()</td>
+			<td>@e.formatReturnTime()</td>
+		</tr>
+	}
+</table>
+<input id="save" type="submit" class="btn btn-danger" value="Delete Selected">
+<br><br><br><br>
+}
+}

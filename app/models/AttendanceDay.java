@@ -33,9 +33,19 @@ public class AttendanceDay extends Model {
     public Time start_time;
     public Time end_time;
 
+    public Time off_campus_departure_time;
+    public Time off_campus_return_time;
+
     public static Finder<Integer, AttendanceDay> find = new Finder<Integer, AttendanceDay>(
         AttendanceDay.class
     );
+
+    public static AttendanceDay findById(int id) {
+        return find.where()
+            .eq("person.organization", Organization.getByHost())
+            .eq("id", id)
+            .findUnique();
+    }
 
     public static AttendanceDay create(Date day, Person p)
     {
@@ -80,7 +90,11 @@ public class AttendanceDay extends Model {
 
     @JsonIgnore
     public double getHours() {
-        return (end_time.getTime() - start_time.getTime()) / (1000.0 * 60 * 60);
+        long off_campus_time = 0;
+        if (off_campus_return_time != null && off_campus_departure_time != null) {
+            off_campus_time = off_campus_return_time.getTime() - off_campus_departure_time.getTime();
+        }
+        return (end_time.getTime() - start_time.getTime() - off_campus_time) / (1000.0 * 60 * 60);
     }
 
     @JsonIgnore
@@ -99,5 +113,22 @@ public class AttendanceDay extends Model {
             }
         }
         return false;
+    }
+
+    public static AttendanceDay findCurrentDay(Date day, int person_id) {
+        // if the day is Saturday or Sunday, there can't be an attendance day
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(day);
+        int dow = calendar.get(Calendar.DAY_OF_WEEK);
+        if (dow == Calendar.SATURDAY || dow == Calendar.SUNDAY) {
+            return null;
+        }
+        // find or create AttendanceWeek and AttendanceDay objects
+        Person person = Person.findById(person_id);
+        AttendanceWeek.findOrCreate(day, person);
+        return AttendanceDay.find.where()
+            .eq("person", person)
+            .eq("day", day)
+            .findUnique();
     }
 }

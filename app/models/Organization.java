@@ -50,6 +50,7 @@ public class Organization extends Model {
 
     public Boolean enable_case_references;
 
+    public Boolean attendance_enable_off_campus;
     public Boolean attendance_show_percent;
     public Boolean attendance_enable_partial_days;
     public Time attendance_day_latest_start_time;
@@ -170,6 +171,11 @@ public class Organization extends Model {
                 this.show_electronic_signin = Utils.getBooleanFromFormValue(values.get("show_electronic_signin")[0]);
             } else {
                 this.show_electronic_signin = false;
+            }
+            if (values.containsKey("attendance_enable_off_campus")) {
+                this.attendance_enable_off_campus = Utils.getBooleanFromFormValue(values.get("attendance_enable_off_campus")[0]);
+            } else {
+                this.attendance_enable_off_campus = false;
             }
             if (values.containsKey("attendance_show_percent")) {
                 this.attendance_show_percent = Utils.getBooleanFromFormValue(values.get("attendance_show_percent")[0]);

@@ -96,6 +96,18 @@ public class Application extends Controller {
         return peopleByTagType("show_in_attendance");
     }
 
+    public static String attendancePeopleJson() {
+        List<Map<String, String>> result = new ArrayList<Map<String, String>>();
+        List<Person> people = attendancePeople();
+        for (Person p : people) {
+            HashMap<String, String> values = new HashMap<String, String>();
+            values.put("label", p.getDisplayName());
+            values.put("id", "" + p.person_id);
+            result.add(values);
+        }
+        return Json.stringify(Json.toJson(result));
+    }
+
     private static List<Person> peopleByTagType(String tag_type) {
         List<Tag> tags = Tag.find.where()
             .eq(tag_type, true)

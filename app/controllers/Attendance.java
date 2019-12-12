@@ -3,8 +3,7 @@ package controllers;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.sql.Time;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.text.*;
 import java.util.*;
 import java.util.stream.*;
 import java.util.zip.ZipEntry;
@@ -288,11 +287,16 @@ public class Attendance extends Controller {
 
         Map<String, AttendanceCode> codes_map = getCodesMap(true);
         AttendanceStats stats = new AttendanceStats();
+        boolean has_off_campus_time = false;
+
         for (AttendanceDay day : days) {
             if (day.code != null || day.start_time == null || day.end_time == null) {
                 stats.incrementCodeCount(codes_map.get(day.code));
             } else {
                 stats.incrementAttendance(day);
+            }
+            if (day.off_campus_departure_time != null || day.off_campus_return_time != null) {
+                has_off_campus_time = true;
             }
         }
 
@@ -305,6 +309,8 @@ public class Attendance extends Controller {
             day_to_week.put(w.monday, w);
         }
 
+        int table_width = has_off_campus_time ? 900 : 700;
+
         return ok(views.html.attendance_person.render(
             p,
             days,
@@ -315,7 +321,9 @@ public class Attendance extends Controller {
             start_date,
             end_date,
             row == null ? null : row.getDate("min_date"),
-            row == null ? null : row.getDate("max_date")
+            row == null ? null : row.getDate("max_date"),
+            has_off_campus_time,
+            table_width
         ));
     }
 
@@ -694,6 +702,74 @@ public class Attendance extends Controller {
                 "custodia_admin.html",
                 scopes));
         return result;
+    }
+
+    public Result offCampusTime() {
+        List<OffCampusEvent> events = AttendanceDay.find.where()
+            .ne("off_campus_departure_time", null)
+            .findList().stream()
+            .map(d -> new OffCampusEvent(d))
+            .sorted(Comparator.comparing(OffCampusEvent::getDay))
+            .collect(Collectors.toList());
+
+        return ok(views.html.attendance_off_campus.render(events));
+    }
+
+    public Result deleteOffCampusTime() {
+        DynamicForm form = Form.form().bindFromRequest();
+        Map<String, String> data = form.data();
+        for (Map.Entry<String, String> entry : data.entrySet()) {
+            if (entry.getKey().isEmpty()) continue;
+            Integer attendance_day_id = Integer.parseInt(entry.getKey());
+            AttendanceDay attendance_day = AttendanceDay.findById(attendance_day_id);
+            attendance_day.off_campus_departure_time = null;
+            attendance_day.off_campus_return_time = null;
+            attendance_day.update();
+        }
+        return redirect(routes.Attendance.offCampusTime());
+    }
+
+    public Result addOffCampusTime() {
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        Date today = Calendar.getInstance().getTime();        
+        String current_date = df.format(today);
+        String people_json = Application.attendancePeopleJson();
+        return ok(views.html.attendance_add_off_campus.render(current_date, people_json));
+    }
+
+    public Result saveOffCampusTime() throws ParseException {
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
+        List<OffCampusEvent> events = new ArrayList<OffCampusEvent>();
+        for (int i = 0; i < 10; i++) {
+            events.add(new OffCampusEvent());
+        }
+        DynamicForm form = Form.form().bindFromRequest();
+        Map<String, String> data = form.data();
+        for (Map.Entry<String, String> entry : data.entrySet()) {
+            String value = entry.getValue();
+            if (value == null || value.isEmpty()) continue;
+            String[] key_parts = entry.getKey().split("-");
+            String name = key_parts[0];
+            Integer i = Integer.parseInt(key_parts[1]);
+            switch (name) {
+                case "personid":
+                    events.get(i).person_id = Integer.parseInt(value);
+                    break;
+                case "day":
+                    events.get(i).day = df.parse(value);
+                    break;
+                case "departuretime":
+                    events.get(i).departure_time = AttendanceDay.parseTime(value);
+                    break;
+                case "returntime":
+                    events.get(i).return_time = AttendanceDay.parseTime(value);
+                    break;
+            }
+        }
+        for (OffCampusEvent event : events) {
+            event.save();
+        }
+        return redirect(routes.Attendance.offCampusTime());
     }
 
     public Result assignPINs() {
