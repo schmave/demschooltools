@@ -1,4 +1,4 @@
-@(events : List[OffCampusEvent])
+@(days : List[AttendanceDay])
 
 @import helper._
 
@@ -18,13 +18,13 @@
 		<th>Departure Time</th>
 		<th>Return Time</th>
 	</tr>
-	@for( e <- events ) {
+	@for( d <- days ) {
 		<tr>
-			<td><input type="checkbox" name="@e.attendance_day_id"></td>
-			<td>@e.formatDate()</td>
-			<td>@e.name</td>
-			<td>@e.formatDepartureTime()</td>
-			<td>@e.formatReturnTime()</td>
+			<td><input type="checkbox" name="@d.id"></td>
+			<td>@Application.formatDateMdy(d.day)</td>
+			<td>@d.person.getDisplayName()</td>
+			<td>@Attendance.formatTime(d.off_campus_departure_time)</td>
+			<td>@Attendance.formatTime(d.off_campus_return_time)</td>
 		</tr>
 	}
 </table>

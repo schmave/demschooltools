@@ -23,6 +23,7 @@ import play.mvc.*;
 
 import static controllers.Application.getConfiguration;
 
+
 @With(DumpOnError.class)
 @Secured.Auth(UserRole.ROLE_ALL_ACCESS)
 public class Attendance extends Controller {
@@ -705,12 +706,10 @@ public class Attendance extends Controller {
     }
 
     public Result offCampusTime() {
-        List<OffCampusEvent> events = AttendanceDay.find.where()
+        List<AttendanceDay> events = AttendanceDay.find.where()
             .ne("off_campus_departure_time", null)
-            .findList().stream()
-            .map(d -> new OffCampusEvent(d))
-            .sorted(Comparator.comparing(OffCampusEvent::getDay))
-            .collect(Collectors.toList());
+            .order("day ASC")
+            .findList();
 
         return ok(views.html.attendance_off_campus.render(events));
     }
@@ -731,7 +730,7 @@ public class Attendance extends Controller {
 
     public Result addOffCampusTime() {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-        Date today = Calendar.getInstance().getTime();        
+        Date today = Calendar.getInstance().getTime();
         String current_date = df.format(today);
         String people_json = Application.attendancePeopleJson();
         return ok(views.html.attendance_add_off_campus.render(current_date, people_json));
@@ -739,35 +738,24 @@ public class Attendance extends Controller {
 
     public Result saveOffCampusTime() throws ParseException {
         DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
-        List<OffCampusEvent> events = new ArrayList<OffCampusEvent>();
-        for (int i = 0; i < 10; i++) {
-            events.add(new OffCampusEvent());
-        }
         DynamicForm form = Form.form().bindFromRequest();
         Map<String, String> data = form.data();
-        for (Map.Entry<String, String> entry : data.entrySet()) {
-            String value = entry.getValue();
-            if (value == null || value.isEmpty()) continue;
-            String[] key_parts = entry.getKey().split("-");
-            String name = key_parts[0];
-            Integer i = Integer.parseInt(key_parts[1]);
-            switch (name) {
-                case "personid":
-                    events.get(i).person_id = Integer.parseInt(value);
-                    break;
-                case "day":
-                    events.get(i).day = df.parse(value);
-                    break;
-                case "departuretime":
-                    events.get(i).departure_time = AttendanceDay.parseTime(value);
-                    break;
-                case "returntime":
-                    events.get(i).return_time = AttendanceDay.parseTime(value);
-                    break;
+
+        for (int i = 0; i < 10; i++) {
+            try {
+                Integer person_id = Integer.parseInt(data.get("personid-" + i));
+                Date day = df.parse(data.get("day-" + i));
+                Time departure_time = AttendanceDay.parseTime(data.get("departuretime-" + i));
+                Time return_time = AttendanceDay.parseTime(data.get("returntime-" + i));
+
+                if (person_id != null && day != null && departure_time != null && return_time != null) {
+                    AttendanceDay attendance_day = AttendanceDay.findCurrentDay(day, person_id);
+                    attendance_day.off_campus_departure_time = departure_time;
+                    attendance_day.off_campus_return_time = return_time;
+                    attendance_day.update();
+                }
+            } catch (NumberFormatException e) {
             }
-        }
-        for (OffCampusEvent event : events) {
-            event.save();
         }
         return redirect(routes.Attendance.offCampusTime());
     }
