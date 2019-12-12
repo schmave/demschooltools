@@ -1,26 +1,25 @@
 var utils = require('./utils');
 
 export function init(people) {
+  $('.js-date').val($.datepicker.formatDate('mm/dd/yy', new Date())).datepicker();
 
-	$('.js-date').val($.datepicker.formatDate('mm/dd/yy', new Date())).datepicker();
+  $('.js-person-row').each(function() {
+    registerAutocomplete($(this), people);
+  });
 
-	$('.js-person-row').each(function() {
-		registerAutocomplete($(this), people);
-	});
-
-	$('.js-time').blur(function() {
-		var time = utils.formatTime($(this).val());
-		$(this).val(time);
-	});
+  $('.js-time').blur(function() {
+    var time = utils.formatTime($(this).val());
+    $(this).val(time);
+  });
 }
 
 function registerAutocomplete(row, people) {
-	var selected = row.find('.js-person-name-selected');
+  var selected = row.find('.js-person-name-selected');
     var selectedText = row.find('.js-person-name-selected-text');
-	var textInput = row.find('.js-person-name');
+  var textInput = row.find('.js-person-name');
     var idInput = row.find('.js-person-id');
 
-	textInput.autocomplete({
+  textInput.autocomplete({
         source: people,
         delay: 0,
         autoFocus: true,

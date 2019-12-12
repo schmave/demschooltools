@@ -2,7 +2,6 @@ var Handlebars = require('handlebars');
 
 var utils = require('./utils');
 
-
 function dbTimeToUserTime(str) {
     if (str === null || str.length == 0) {
         return;
