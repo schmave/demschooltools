@@ -72,8 +72,10 @@ public class OrgConfig {
     public String translatePlea(String plea) {
         if (plea.equals("Guilty")) {
             return this.str_guilty;
-        } else {
+        } else if (plea.equals("Not Guilty")) {
             return this.str_not_guilty;
+        } else {
+            return "No Contest";
         }
     }
 }
