@@ -154,7 +154,7 @@ public class Account extends Model {
             .findList();
     }
 
-    public static List<Account> allInstitutionalChecking() {
+    public static List<Account> allNonPersonalChecking() {
         return baseQuery().where()
             .eq("organization", Organization.getByHost())
             .ne("type", AccountType.Cash)
