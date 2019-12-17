@@ -74,9 +74,9 @@ public class OrgConfig {
             return this.str_guilty;
         } else if (plea.equals("Not Guilty")) {
             return this.str_not_guilty;
-        } else {
-            return "No Contest";
         }
+
+        return plea;
     }
 }
 
