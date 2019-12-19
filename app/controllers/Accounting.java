@@ -152,7 +152,7 @@ public class Accounting extends Controller {
     public Result editAccount(Integer id) {
         Account account = Account.findById(id);
         Form<Account> form = Form.form(Account.class).fill(account);
-        return ok(views.html.edit_account.render(form));
+        return ok(views.html.edit_account.render(form, account.is_active));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)

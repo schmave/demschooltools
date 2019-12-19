@@ -1,10 +1,10 @@
-@(accountForm: Form[Account])
+@(accountForm: Form[Account], is_active: Boolean)
 
 @import helper._
 
 @main("Edit Account", "accounting") {
+	<h2>Edit Account</h2>
 	@form(routes.Accounting.saveAccount()) {
-		<h2>Edit Account</h2>
 		<input type="hidden" name="id" value="@accountForm("id").value"/>
 		<div class="col-sm-6">
 			@inputText(accountForm("name"), '_label -> "Name", 'class -> "form-control")
@@ -16,6 +16,8 @@
 				'class -> "form-control"
 			)
 			@inputText(accountForm("monthly_credit"), 'type -> "number", '_label -> "Monthly Credit", 'class -> "form-control")
+			<input type="checkbox" id="is_active" name="is_active" @if(is_active) { value="true" checked="checked" }> Is Active
+			<br><br>
 			<input type="submit" value="Save"/>
 		</div>
 	}

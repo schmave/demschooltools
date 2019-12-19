@@ -11,6 +11,8 @@ import com.fasterxml.jackson.annotation.*;
 import com.avaje.ebean.*;
 import play.data.*;
 
+import controllers.Utils;
+
 @Entity
 public class Account extends Model {
 
@@ -39,6 +41,8 @@ public class Account extends Model {
     public BigDecimal initial_balance = new BigDecimal(0);
 
     public BigDecimal monthly_credit = new BigDecimal(0);
+
+    public boolean is_active;
 
     @play.data.format.Formats.DateTime(pattern="MM/dd/yyyy")
     public Date date_last_monthly_credit;
@@ -146,7 +150,6 @@ public class Account extends Model {
                 .findList();
     }
 
-
     public static List<Account> allPersonalChecking() {
         return baseQuery().where()
             .in("person", allPeople())
@@ -157,6 +160,7 @@ public class Account extends Model {
     public static List<Account> allNonPersonalChecking() {
         return baseQuery().where()
             .eq("organization", Organization.getByHost())
+            .eq("is_active", true)
             .ne("type", AccountType.Cash)
             .ne("type", AccountType.PersonalChecking)
             .findList();
@@ -165,6 +169,7 @@ public class Account extends Model {
     public static List<Account> allWithMonthlyCredits() {
         return baseQuery().where()
                 .eq("organization", Organization.getByHost())
+                .eq("is_active", true)
                 .ne("monthly_credit", BigDecimal.ZERO)
                 .findList();
     }
@@ -201,12 +206,14 @@ public class Account extends Model {
         account.person = person;
         account.name = name;
         account.type = type;
+        account.is_active = true;
         account.organization = Organization.getByHost();
         account.save();
         return account;
     }
 
     public void updateFromForm(Form<Account> form) {
+        is_active = Utils.getBooleanFromFormValue(form.field("is_active").value());
         name = form.field("name").value();
         type = AccountType.valueOf(form.field("type").value());
         monthly_credit = new BigDecimal(form.field("monthly_credit").value());
