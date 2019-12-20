@@ -64,8 +64,14 @@ public class Checkin extends Controller {
         return ok();
     }
 
-    public Result adminMessage(int person_id, String in_time, String out_time, String absence_code) throws Exception {
-        AttendanceDay attendance_day = AttendanceDay.findCurrentDay(new Date(), person_id);
+    public Result adminMessage(int person_id, String in_time, String out_time, String absence_code, String time_string) throws Exception {
+        Date date = new Date();
+        // We use time_string to determine which day it is according to the client. This could be different
+        // from the current day according to the server, depending on the client's time zone.
+        if (!time_string.isEmpty()) {
+            date = new SimpleDateFormat("M/d/yyyy, h:mm:ss a").parse(time_string);
+        }
+        AttendanceDay attendance_day = AttendanceDay.findCurrentDay(date, person_id);
         if (attendance_day != null) {
             attendance_day.edit(absence_code, in_time, out_time);
         }

@@ -484,7 +484,8 @@ async function createAdminMessage(person, in_time, out_time, absence_code) {
 		person_id: person.person_id,
 		in_time: in_time,
 		out_time: out_time,
-		absence_code: absence_code
+		absence_code: absence_code,
+		time_string: new Date().toLocaleString('en-US')
 	}
 	await saveAdminMessage(message);
 	trySendMessages();
@@ -519,7 +520,7 @@ function trySendMessages() {
 	    		query_string = `?time_string=${message.time_string}&person_id=${message.person_id}&is_arriving=${message.is_arriving}`;
 	    		url = '/attendance/checkin/message' + query_string;
 	    	} else {
-	    		query_string = `?person_id=${message.person_id}&in_time=${message.in_time}&out_time=${message.out_time}&absence_code=${message.absence_code}`;
+	    		query_string = `?person_id=${message.person_id}&in_time=${message.in_time}&out_time=${message.out_time}&absence_code=${message.absence_code}&time_string=${message.time_string}`;
 	    		url = '/attendance/checkin/adminmessage' + query_string;
 	    	}
 	    	fetch(url, { method: 'POST' }).then(response => {
