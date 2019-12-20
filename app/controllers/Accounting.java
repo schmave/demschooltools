@@ -50,10 +50,10 @@ public class Accounting extends Controller {
     public Result balances() {
         applyMonthlyCredits();
         List<Account> personalAccounts = Account.allPersonalChecking();
-        List<Account> institutionalAccounts = Account.allInstitutionalChecking();
+        List<Account> nonPersonalAccounts = Account.allNonPersonalChecking();
         Collections.sort(personalAccounts, (a, b) -> a.getName().compareTo(b.getName()));
-        Collections.sort(institutionalAccounts, (a, b) -> a.getName().compareTo(b.getName()));
-        return ok(views.html.balances.render(personalAccounts, institutionalAccounts));
+        Collections.sort(nonPersonalAccounts, (a, b) -> a.getName().compareTo(b.getName()));
+        return ok(views.html.balances.render(personalAccounts, nonPersonalAccounts));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
@@ -152,7 +152,7 @@ public class Accounting extends Controller {
     public Result editAccount(Integer id) {
         Account account = Account.findById(id);
         Form<Account> form = Form.form(Account.class).fill(account);
-        return ok(views.html.edit_account.render(form));
+        return ok(views.html.edit_account.render(form, account.is_active));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
@@ -167,7 +167,7 @@ public class Accounting extends Controller {
         List<Map<String, String>> result = new ArrayList<Map<String, String>>();
         List<Account> accounts = new ArrayList<Account>();
         accounts.addAll(Account.allPersonalChecking());
-        accounts.addAll(Account.allInstitutionalChecking());
+        accounts.addAll(Account.allNonPersonalChecking());
         for (Account a : accounts) {
             HashMap<String, String> values = new HashMap<String, String>();
             values.put("label", a.getName());

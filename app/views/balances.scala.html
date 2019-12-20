@@ -1,4 +1,4 @@
-@(personalAccounts: List[Account], institutionalAccounts: List[Account])
+@(personalAccounts: List[Account], nonPersonalAccounts: List[Account])
 
 @main("Account Balances", "accounting", "accounting_balances") {
 
@@ -33,7 +33,7 @@
 				<th>Name</th>
 				<th class="balance">Current Balance</th>
 			</tr>
-			@for(account <- institutionalAccounts) {
+			@for(account <- nonPersonalAccounts) {
 				<tr>
 					<td><a href="@routes.Accounting.account(account.id)">@account.getName()</a></td>
 					<td class="balance">@account.getFormattedBalance()</td>
