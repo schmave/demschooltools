@@ -63,7 +63,11 @@ public abstract class CachedPage {
             }
         }
 
-        String result = render();
+        String result = null;
+        // Only render one cached page at a time (per server process)
+        synchronized(JC_INDEX) {
+            result = render();
+        }
 
         try {
             byte[] bytes_to_compress = result.getBytes("UTF-8");
