@@ -25,7 +25,7 @@ import static controllers.Application.getConfiguration;
 
 
 @With(DumpOnError.class)
-@Secured.Auth(UserRole.ROLE_ALL_ACCESS)
+@Secured.Auth(UserRole.ROLE_ATTENDANCE)
 public class Attendance extends Controller {
 
     static Form<AttendanceCode> code_form;

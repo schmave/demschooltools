@@ -13,6 +13,7 @@ public class UserRole extends Model {
     public User user;
 
     public static final String ROLE_ACCOUNTING = "accounting";
+    public static final String ROLE_ATTENDANCE = "attendance";
     public static final String ROLE_VIEW_JC = "view-jc";
     public static final String ROLE_EDIT_MANUAL = "edit-manual";
     public static final String ROLE_EDIT_RESOLUTION_PLANS = "edit-rps";
@@ -30,6 +31,7 @@ public class UserRole extends Model {
         ROLE_EDIT_31_DAY_JC,
         ROLE_EDIT_ALL_JC,
         ROLE_EDIT_MANUAL,
+        ROLE_ATTENDANCE,
         ROLE_ALL_ACCESS,
     };
 
@@ -87,6 +89,8 @@ public class UserRole extends Model {
             return "View and Edit everything";
         } else if (role.equals(ROLE_ACCOUNTING)) {
             return "Manage accounts and create transactions";
+        } else if (role.equals(ROLE_ATTENDANCE)) {
+            return "Manage attendance records";
         }
 
         throw new RuntimeException("unknown role: " + role);
