@@ -4,6 +4,10 @@
 
 @main("History of " + r.getNumber() + " " + r.title, "jc") {
 
+@if(flash.containsKey("notice")) {
+    <div class="flash-error">@flash.get("notice")</div>
+}
+
 <script type="text/javascript">
 $(function() {
     $("table.sortable").each(function (i) {

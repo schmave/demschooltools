@@ -765,6 +765,19 @@ public class Application extends Controller {
             false));
     }
 
+
+    private static Date restrictStartDate(Date d) {
+        Date soy = getStartOfYear();
+        long soy_millis = soy.getTime();
+        long d_millis = d.getTime();
+        if ((soy_millis - d_millis > 1000 * 60) && getCurrentUser() == null) {
+            flash("notice", "You must be logged in to view info prior to " +
+                Application.yymmddDate(soy) + ".");
+            return soy;
+        }
+        return d;
+    }
+
     public Result viewPersonHistory(Integer id, Boolean redact_names, String start_date_str, String end_date_str) {
         Date start_date = getStartOfYear();
         Date end_date = null;
@@ -774,6 +787,8 @@ public class Application extends Controller {
             end_date = new SimpleDateFormat("yyyy-M-d").parse(end_date_str);
         } catch (ParseException e) {
         }
+
+        start_date = this.restrictStartDate(start_date);
 
         Person p = Person.findByIdWithJCData(id);
         return ok(views.html.view_person_history.render(
@@ -800,6 +815,8 @@ public class Application extends Controller {
             end_date = new SimpleDateFormat("yyyy-M-d").parse(end_date_str);
         } catch (ParseException e) {
         }
+
+        start_date = this.restrictStartDate(start_date);
 
         Entry r = Entry.findByIdWithJCData(id);
         return ok(views.html.view_rule_history.render(
@@ -1034,6 +1051,10 @@ public class Application extends Controller {
         }
         result.setMonth(7);
         result.setDate(1);
+
+        result.setHours(0);
+        result.setMinutes(0);
+        result.setSeconds(0);
 
         return result;
     }
