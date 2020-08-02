@@ -444,12 +444,15 @@ class MiamiSudburySchool extends OrgConfig {
 
         str_manual_title = "Lawbook";
         str_manual_title_short = "Lawbook";
-        str_res_plan_short = "Sentence";
-        str_res_plan = "sentence";
-        str_res_plan_cap = "Sentence";
-        str_res_plans = "sentences";
-        str_res_plans_cap = "Sentences";
-        str_findings = "Findings";
+        str_res_plan_short = "Ruling";
+        str_res_plan = "ruling";
+        str_res_plan_cap = "Ruling";
+        str_res_plans = "rulings";
+        str_res_plans_cap = "Rulings";
+        str_findings = "Complaint & Further Information";
+
+        str_guilty = "Accepts responsibility";
+        str_not_guilty = "Does not accept responsibility";
 
         track_writer = false;
 
