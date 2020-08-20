@@ -1,11 +1,11 @@
 // https://codelabs.developers.google.com/codelabs/your-first-pwapp/#4
 
 // update cache names any time any of the cached files change
-const CACHE_NAME = 'static-cache-v236';
+const CACHE_NAME = 'static-cache-v237';
 
 const FILES_TO_CACHE = [
 	'/assets/checkin/app.html',
-	'/assets/checkin/app.js',
+	'/assets/checkin/app-compiled.js',
 	'/assets/checkin/icon-192.png',
 	'/assets/checkin/icon-512.png',
 	'/assets/checkin/manifest.json',
