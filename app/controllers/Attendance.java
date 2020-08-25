@@ -707,6 +707,8 @@ public class Attendance extends Controller {
 
     public Result offCampusTime() {
         List<AttendanceDay> events = AttendanceDay.find.where()
+            .eq("person.organization", OrgConfig.get().org)
+            .gt("day", Application.getStartOfYear())
             .ne("off_campus_departure_time", null)
             .order("day ASC")
             .findList();
