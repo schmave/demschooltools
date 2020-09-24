@@ -83,7 +83,11 @@
 		@inputText(personForm("school_district"), '_label -> "School District", 'class -> "form-control")
 		<hr/>
 		@inputText(personForm("grade"), '_label -> "Current Grade", 'class -> "form-control")
-		@inputDate(personForm("dob"), '_label -> "Date of Birth")
+		@inputDate(personForm("dob"), '_label -> "Date of Birth", 'class -> "form-control")
+
+		@if(OrgConfig.get().org.show_electronic_signin) {
+			@inputText(personForm("pin"), '_label -> "Attendance PIN", 'class -> "form-control")
+		}
 
 
 </div>
