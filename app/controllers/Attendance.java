@@ -379,13 +379,22 @@ public class Attendance extends Controller {
             }
 
             for (AttendanceDay day : days) {
-                if (day.code == null && day.start_time == null && day.end_time == null
+                if (day.code == null
                         && person_day_custodia.containsKey(day.person.person_id)
                         && person_day_custodia.get(day.person.person_id).containsKey(day.day)) {
                     SqlRow row = person_day_custodia.get(day.person.person_id).get(day.day);
-                    day.start_time = new Time(row.getDate("in_time").getTime());
-                    day.end_time = new Time(row.getDate("out_time").getTime());
-                    day.save();
+                    boolean updated = false;
+                    if (day.start_time == null) {
+                        day.start_time = new Time(row.getDate("in_time").getTime());
+                        updated = true;
+                    }
+                    if (day.end_time == null) {
+                        day.end_time = new Time(row.getDate("out_time").getTime());
+                        updated = true;
+                    }
+                    if (updated) {
+                        day.save();
+                    }
                 }
             }
 
