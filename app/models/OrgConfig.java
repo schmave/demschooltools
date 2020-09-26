@@ -454,7 +454,7 @@ class MiamiSudburySchool extends OrgConfig {
         str_guilty = "Accepts responsibility";
         str_not_guilty = "Does not accept responsibility";
 
-        track_writer = false;
+        track_writer = true;
 
         OrgConfig.register(name, this);
     }
