@@ -383,7 +383,7 @@ class Wicklow extends OrgConfig {
     public TimeZone time_zone = TimeZone.getTimeZone("Europe/Dublin");
 
     public Wicklow() {
-        name = "Wicklow Sudbury School";
+        name = "Wicklow Democratic School";
         people_url = "https://wicklow.demschooltools.com";
 
         str_manual_title = "Lawbook";
