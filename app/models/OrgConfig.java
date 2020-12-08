@@ -248,6 +248,8 @@ class TheOpenSchool extends OrgConfig {
         str_findings = "Findings";
         str_jc_name = "Civics Board";
         str_jc_name_short = "CB";
+        str_guilty = "Agree";
+        str_not_guilty = "Disagree";
 
         show_findings_in_rp_list = true;
         use_minor_referrals = false;
@@ -417,12 +419,17 @@ class Tallgrass extends OrgConfig {
 
         str_manual_title = "Lawbook";
         str_manual_title_short = "Lawbook";
-        str_res_plan_short = "Sentence";
-        str_res_plan = "sentence";
-        str_res_plan_cap = "Sentence";
-        str_res_plans = "sentences";
-        str_res_plans_cap = "Sentences";
+        str_res_plan_short = "Result";
+        str_res_plan = "result";
+        str_res_plan_cap = "Result";
+        str_res_plans = "results";
+        str_res_plans_cap = "Results";
         str_findings = "Findings";
+        str_jc_name = "Restoration Committee";
+        str_jc_name_short = "RC";
+
+        str_guilty = "Agree";
+        str_not_guilty = "Disagree";
 
         track_writer = false;
 
