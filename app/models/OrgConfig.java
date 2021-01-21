@@ -470,3 +470,31 @@ class MiamiSudburySchool extends OrgConfig {
         return INSTANCE;
     }
 }
+
+class SligoSudburySchool extends OrgConfig {
+    private static final SligoSudburySchool INSTANCE = new SligoSudburySchool();
+    public TimeZone time_zone = TimeZone.getTimeZone("Europe/Dublin");
+
+    public SligoSudburySchool() {
+        name = "Sligo Sudbury School";
+        people_url = "https://sligo.demschooltools.com";
+
+        str_manual_title = "Lawbook";
+        str_manual_title_short = "Lawbook";
+        str_res_plan_short = "Sanction";
+        str_res_plan = "sanction";
+        str_res_plan_cap = "Sanction";
+        str_res_plans = "sanctions";
+        str_res_plans_cap = "Sanctions";
+
+        track_writer = true;
+        euro_dates = true;
+        use_year_in_case_number = true;
+
+        OrgConfig.register(name, this);
+    }
+
+    public static SligoSudburySchool getInstance() {
+        return INSTANCE;
+    }
+}
