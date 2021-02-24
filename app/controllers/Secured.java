@@ -106,7 +106,7 @@ public class Secured {
                 if (role.equals(UserRole.ROLE_VIEW_JC)) {
                     return username;
                 }
-            } else if (u.hasRole(role) &&
+            } else if (u.active && u.hasRole(role) &&
                        (u.organization == null || u.organization.equals(OrgConfig.get().org))) {
                 // Allow access if this user belongs to this organization or is a
                 // multi-domain admin (null organization). Also, the user must
@@ -151,11 +151,17 @@ public class Secured {
             final AuthUser u = mAuth.getUser(ctx.session());
             if (u != null) {
                 User the_user = User.findByAuthUserIdentity(u);
-                if (the_user != null && the_user.name.equals(MyUserService.DUMMY_USERNAME)) {
-                    return ok(
-                        "You logged in with Facebook or Google, but Evan hasn't made a" +
-                        " DemSchoolTools account for you yet. Please contact him for help:" +
-                        " schmave@gmail.com");
+                if (the_user != null) {
+                    if (the_user.name.equals(MyUserService.DUMMY_USERNAME)) {
+                        return ok(
+                            "You logged in with Facebook or Google, but Evan hasn't made a" +
+                            " DemSchoolTools account for you yet. Please contact him for help:" +
+                            " schmave@gmail.com");
+                    }
+                    if (!the_user.active) {
+                        return unauthorized("Your account with email address " +
+                            the_user.email + " is inactive.");
+                    }
                 }
             }
 

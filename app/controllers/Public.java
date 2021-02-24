@@ -372,11 +372,15 @@ public class Public extends Controller {
             }
         }
 
+        if (u != null && u.hashed_password.length() == 0) {
+            flash("notice", "Failed to login: password login is not enabled for your account");
+        } else {
+            flash("notice", "Failed to login: wrong email address or password");
+        }
+
         if (values.get("noredirect") != null) {
             return unauthorized();
         }
-
-        flash("notice", "Failed to login: wrong email address or password");
 
         return redirect(routes.Public.index());
     }

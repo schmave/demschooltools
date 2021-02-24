@@ -160,14 +160,12 @@ public class User extends Model {
 
     private static ExpressionList<User> getAuthUserFind(
             final AuthUserIdentity identity) {
-        return find.where().eq("active", true)
+        return find.where()
                 .eq("linkedAccounts.providerUserId", identity.getId())
                 .eq("linkedAccounts.providerKey", identity.getProvider());
     }
 
 	private static ExpressionList<User> getEmailUserFind(final String email) {
-		return find.where()
-                .eq("active", true)
-                .eq("email", email);
+		return find.where().eq("email", email);
 	}
 }
