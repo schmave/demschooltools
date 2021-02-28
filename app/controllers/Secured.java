@@ -103,7 +103,9 @@ public class Secured {
             if (u == null) {
                 // Allow access by IP address to ROLE_VIEW_JC things. username
                 // may be null if not from a valid IP, which will deny access.
-                if (role.equals(UserRole.ROLE_VIEW_JC)) {
+                if (role.equals(UserRole.ROLE_VIEW_JC) &&
+                    // Don't let IP address users change their password
+                    !ctx.request().path().equals(routes.Application.viewPassword().path())) {
                     return username;
                 }
             } else if (u.active && u.hasRole(role) &&

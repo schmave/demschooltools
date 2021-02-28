@@ -166,6 +166,6 @@ public class User extends Model {
     }
 
 	private static ExpressionList<User> getEmailUserFind(final String email) {
-		return find.where().eq("email", email);
+		return find.where().ieq("email", email);
 	}
 }

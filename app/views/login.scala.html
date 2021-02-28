@@ -5,7 +5,7 @@
 
 @main("DemSchoolTools login (" + OrgConfig.get().org.short_name + ")", "none") {
 
-	@if( notice != null ) { <div class="alert alert-warning"><strong>@notice</strong></div> }
+	@if( notice != null ) { <div class="alert alert-warning">@notice</div> }
 	<a href="@routes.Application.index()" class="btn btn-large btn-primary" style="color:white;">
 	Browse in read-only mode</a>
 

@@ -10,6 +10,7 @@ import java.util.stream.*;
 import javax.inject.Singleton;
 
 import org.markdown4j.Markdown4jProcessor;
+import org.mindrot.jbcrypt.BCrypt;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import com.avaje.ebean.Ebean;
@@ -43,6 +44,39 @@ public class Application extends Controller {
     public Application(final PlayAuthenticate auth) {
         mAuth = auth;
         sInstance = this;
+    }
+
+    public Result viewPassword() {
+        return ok(views.html.view_password.render(flash("notice")));
+    }
+
+    public Result editPassword() {
+        final Map<String, String[]> values = request().body().asFormUrlEncoded();
+
+        String password = values.get("password")[0];
+        String confirmPassword = values.get("confirmPassword")[0];
+
+        if (!password.equals(confirmPassword)) {
+            flash("notice", "The two passwords you entered did not match");
+        } else if (password.length() < 8) {
+            flash("notice", "Please choose a password that is at least 8 characters");
+        } else {
+            User u = Application.getCurrentUser();
+            u.hashed_password = BCrypt.hashpw(password, BCrypt.gensalt());
+            u.save();
+            play.libs.mailer.Email mail = new play.libs.mailer.Email();
+            mail.setSubject("DemSchoolTools password changed");
+            mail.addTo(u.email);
+            mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
+            mail.setBodyText("Hi " + u.name + ",\n\nYour DemSchoolTools password was changed today (" +
+                Application.formatDateTimeLong() +
+                "). \n\nIf it was not you who changed it, please investigate what is going on! " +
+                "Feel free to contact Evan (schmave@gmail.com) for help.");
+            play.libs.mailer.MailerPlugin.send(mail);
+            flash("notice", "Your password was changed");
+        }
+
+        return redirect(routes.Application.viewPassword());
     }
 
     public static Date getDateFromString(String date_string) {
@@ -1119,7 +1153,7 @@ public class Application extends Controller {
         return username != null && username.contains("@");
     }
 
-    public static boolean isCurrentUserEditor() {
+    public static boolean isCurrentUserLoggedIn() {
         return isUserEditor(currentUsername());
     }
 

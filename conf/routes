@@ -187,8 +187,8 @@ GET     /settings/notifications controllers.Settings.viewSettings()
 POST    /settings               controllers.Settings.editSettings()
 POST    /settings/notifications controllers.Settings.editNotifications()
 
-GET     /settings/password      controllers.Settings.viewPassword()
-POST    /settings/password      controllers.Settings.editPassword()
+GET     /settings/password      controllers.Application.viewPassword()
+POST    /settings/password      controllers.Application.editPassword()
 
 GET     /settings/checklists    controllers.Settings.viewTaskLists()
 POST    /settings/newChecklist  controllers.Settings.newTaskList()
