@@ -43,6 +43,12 @@ public class Public extends Controller {
         mAuth = auth;
     }
 
+    public Result facebookDeleteInfo() {
+        return ok("Hello Facebook user!\n\n" +
+            "If you would like to delete your user info that is stored with DemSchoolTools,\n" +
+            "please send an email with your request to schmave@gmail.com.");
+    }
+
 	public Result postEmail() {
 		final java.util.Map<String, String[]> values = request().body().asFormUrlEncoded();
 

@@ -104,6 +104,7 @@ GET     /attendance		  controllers.Attendance.index(start_of_year ?= "")
 GET     /attendance/jsonPeople               controllers.Attendance.jsonPeople(term ?= "")
 GET     /attendance/viewWeek	  controllers.Attendance.viewWeek(date : String ?= "")
 GET     /attendance/editWeek      controllers.Attendance.editWeek(date : String ?= "")
+
 GET  	/attendance/checkin				controllers.Public.checkin()
 GET     /attendance/checkin/data 		controllers.Checkin.checkinData(time: String)
 POST    /attendance/checkin/message 	controllers.Checkin.checkinMessage(time_string: String, person_id: Integer, is_arriving: Boolean)
@@ -218,6 +219,7 @@ GET     /assets/*file               controllers.Assets.versioned(path="/public",
 GET     /robots.txt                 controllers.Assets.at(path="/public", file="robots.txt")
 
 
+GET     /fb-delete-info                         controllers.Public.facebookDeleteInfo()
 POST    /login                controllers.Public.doLogin()
 
 GET     /logout                     com.feth.play.module.pa.controllers.Authenticate.logout
