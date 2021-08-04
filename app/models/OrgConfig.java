@@ -498,3 +498,29 @@ class SligoSudburySchool extends OrgConfig {
         return INSTANCE;
     }
 }
+
+class Courtiol extends OrgConfig {
+    private static final Courtiol INSTANCE = new Courtiol();
+
+    public Courtiol() {
+        name = "Courtiol";
+        people_url = "https://tlp.demschooltools.com";
+
+        str_manual_title = "Lawbook";
+        str_manual_title_short = "Lawbook";
+        str_res_plan_short = "Sentence";
+        str_res_plan = "sentence";
+        str_res_plan_cap = "Sentence";
+        str_res_plans = "sentences";
+        str_res_plans_cap = "Sentences";
+
+        track_writer = true;
+        use_year_in_case_number = true;
+
+        OrgConfig.register(name, this);
+    }
+
+    public static Courtiol getInstance() {
+        return INSTANCE;
+    }
+}

@@ -1,0 +1,31 @@
+How to add a new school
+======
+
+* Add subdomain CNAME record
+* Update Facebook SSO settings ("App Domains" and "Valid OAuth Redirect URIs")
+* Update Google SSO settings ("Authorized redirect URIs")
+* Create new subclass of OrgConfig
+* Create new entry in organization table (ID, name, short_name)
+* Create new entry in organization_hosts table
+* Run:
+
+    . set_keys_blank.sh
+    sbt clean
+    sbt dist
+    ./copy_release_to_server.sh
+    ./connect_to_server.sh
+    ./run_servers.sh
+
+    sudo vim /etc/nginx/sites-enabled/demschooltools  # add new host to http and https configs
+    sudo service nginx reload
+    vim certbot.sh  # Add new domain to the list
+    sudo ./certbot.sh  # Choose Expand at the prompt
+
+* Use DST to add a new user to the new school
+
+
+What to test
+=====
+
+* Can login with FB
+* Can login with Google
