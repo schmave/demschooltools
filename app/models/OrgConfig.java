@@ -499,11 +499,12 @@ class SligoSudburySchool extends OrgConfig {
     }
 }
 
-class Courtiol extends OrgConfig {
-    private static final Courtiol INSTANCE = new Courtiol();
+class LearningProjectIbiza extends OrgConfig {
+    private static final LearningProjectIbiza INSTANCE = new LearningProjectIbiza();
+    public TimeZone time_zone = TimeZone.getTimeZone("Europe/Madrid");
 
-    public Courtiol() {
-        name = "Courtiol";
+    public LearningProjectIbiza() {
+        name = "Learning Project Ibiza";
         people_url = "https://tlp.demschooltools.com";
 
         str_manual_title = "Lawbook";
@@ -520,7 +521,33 @@ class Courtiol extends OrgConfig {
         OrgConfig.register(name, this);
     }
 
-    public static Courtiol getInstance() {
+    public static LearningProjectIbiza getInstance() {
+        return INSTANCE;
+    }
+}
+
+class Wilmington extends OrgConfig {
+    private static final Wilmington INSTANCE = new Wilmington();
+
+    public Wilmington() {
+        name = "Wilmington Sudbury School";
+        people_url = "https://wilmington.demschooltools.com";
+
+        str_manual_title = "Lawbook";
+        str_manual_title_short = "Lawbook";
+        str_res_plan_short = "Sentence";
+        str_res_plan = "sentence";
+        str_res_plan_cap = "Sentence";
+        str_res_plans = "sentences";
+        str_res_plans_cap = "Sentences";
+
+        track_writer = true;
+        use_year_in_case_number = true;
+
+        OrgConfig.register(name, this);
+    }
+
+    public static Wilmington getInstance() {
         return INSTANCE;
     }
 }
