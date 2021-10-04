@@ -20,7 +20,7 @@ public class AttendanceStats {
             return;
         }
         // "no school" days do not count as absences
-        if (!code.code.equals("_NS_")) {
+        if (!code.code.equals("_NS_") && !code.not_counted) {
             if (code.counts_toward_attendance) {
                 approved_absences++;
             } else {

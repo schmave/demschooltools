@@ -29,6 +29,7 @@ public class AttendanceCode extends Model {
     public String color="#000000";
 
     public boolean counts_toward_attendance = false;
+    public boolean not_counted = false;
 
     public static Finder<Integer, AttendanceCode> find = new Finder<Integer, AttendanceCode>(
         AttendanceCode.class
@@ -63,6 +64,7 @@ public class AttendanceCode extends Model {
         code = form.field("code").value();
         color = form.field("color").value();
         counts_toward_attendance = Utils.getBooleanFromFormValue(form.field("counts_toward_attendance").value());
+        not_counted = Utils.getBooleanFromFormValue(form.field("not_counted").value());
 
         this.update();
     }
