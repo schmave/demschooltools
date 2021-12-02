@@ -49,14 +49,15 @@ public class Checkin extends Controller {
         if (attendance_day == null) {
             return ok();
         }
-        // Messages from the app should never overwrite existing data.
-        // Check if the value exists and set it if it doesn't.
+        // Messages from the app should never overwrite absence codes.
         if (attendance_day.code == null || attendance_day.code.isEmpty()) {
+            // Don't overwrite the start time. This way the earliest start time is the one we use.
             if (is_arriving && attendance_day.start_time == null) {
                 attendance_day.start_time = time;
                 attendance_day.update();
             }
-            else if (!is_arriving && attendance_day.end_time == null) {
+            // DO overwrite the end time. This way the latest end time is the one we use.
+            else if (!is_arriving) {
                 attendance_day.end_time = time;
                 attendance_day.update();
             }
