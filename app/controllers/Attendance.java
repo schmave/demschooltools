@@ -771,6 +771,21 @@ public class Attendance extends Controller {
         return redirect(routes.Attendance.offCampusTime());
     }
 
+    public Result reports() {
+        return ok(views.html.attendance_reports.render(new AttendanceReport()));
+    }
+
+    public Result runReport() {
+        Form<AttendanceReport> form = Form.form(AttendanceReport.class);
+        Form<AttendanceReport> filledForm = form.bindFromRequest();
+        if (filledForm.hasErrors()) {
+            System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
+            return badRequest(views.html.attendance_reports.render(new AttendanceReport()));
+        }
+        AttendanceReport report = AttendanceReport.createFromForm(filledForm);
+        return ok(views.html.attendance_reports.render(report));
+    }
+
     public Result assignPINs() {
         List<Person> people = Application.attendancePeople();
         Collections.sort(people, Person.SORT_DISPLAY_NAME);

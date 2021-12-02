@@ -115,6 +115,12 @@ public class AttendanceDay extends Model {
         return false;
     }
 
+    @JsonIgnore
+    public String getFormattedDate() {
+        SimpleDateFormat sdf = new SimpleDateFormat("M/d/yy");
+        return sdf.format(day);
+    }
+
     public static AttendanceDay findCurrentDay(Date day, int person_id) {
         // if the day is Saturday or Sunday, there can't be an attendance day
         Calendar calendar = new GregorianCalendar();
