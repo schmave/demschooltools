@@ -181,6 +181,7 @@ class TheCircleSchool extends OrgConfig {
         track_writer = false;
         filter_no_charge_cases = true;
         hide_location_for_print = true;
+        show_no_contest_plea = true;
 
         OrgConfig.register(name, this);
     }
