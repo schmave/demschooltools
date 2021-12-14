@@ -54,7 +54,7 @@ public class User extends Model {
     public static User create(String email, String name, Organization org) {
         User result = new User();
 
-        result.email = email;
+        result.email = email.toLowerCase();
         result.name = name;
         result.organization = org;
         result.active = true;
