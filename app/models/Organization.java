@@ -51,6 +51,8 @@ public class Organization extends Model {
     public Boolean enable_case_references;
 
     public Boolean attendance_enable_off_campus;
+    public Boolean attendance_show_reports;
+    public Time attendance_report_latest_departure_time;
     public Boolean attendance_show_percent;
     public Boolean attendance_enable_partial_days;
     public Time attendance_day_latest_start_time;
@@ -120,8 +122,16 @@ public class Organization extends Model {
         if (attendance_day_latest_start_time == null) {
             return "";
         }
-        DateFormat format = new SimpleDateFormat("HH:mm a");
+        DateFormat format = new SimpleDateFormat("h:mm a");
         return format.format(attendance_day_latest_start_time.getTime());
+    }
+
+    public String formatAttendanceReportLatestDepartureTime() {
+        if (attendance_report_latest_departure_time == null) {
+            return "";
+        }
+        DateFormat format = new SimpleDateFormat("h:mm a");
+        return format.format(attendance_report_latest_departure_time.getTime());
     }
 
     public void setAttendanceAdminPIN(String pin) {
@@ -177,6 +187,11 @@ public class Organization extends Model {
             } else {
                 this.attendance_enable_off_campus = false;
             }
+            if (values.containsKey("attendance_show_reports")) {
+                this.attendance_show_reports = Utils.getBooleanFromFormValue(values.get("attendance_show_reports")[0]);
+            } else {
+                this.attendance_show_reports = false;
+            }
             if (values.containsKey("attendance_show_percent")) {
                 this.attendance_show_percent = Utils.getBooleanFromFormValue(values.get("attendance_show_percent")[0]);
             } else {
@@ -206,6 +221,11 @@ public class Organization extends Model {
                 this.attendance_day_latest_start_time = AttendanceDay.parseTime(values.get("attendance_day_latest_start_time")[0]);
             } else {
                 this.attendance_day_latest_start_time = null;
+            }
+            if (values.containsKey("attendance_report_latest_departure_time")) {
+                this.attendance_report_latest_departure_time = AttendanceDay.parseTime(values.get("attendance_report_latest_departure_time")[0]);
+            } else {
+                this.attendance_report_latest_departure_time = null;
             }
         }
         if (values.containsKey("accounting_settings")) {

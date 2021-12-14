@@ -113,6 +113,24 @@ the other way around.</p>
 
     <br/>
     <label>
+        <input type="checkbox" name="attendance_show_reports"
+            class="has-dependents" data-dependent-class="depends-on-attendance-reports"
+            @if(org.attendance_show_reports){ checked }>
+        Show the "Reports" tab
+    </label>
+
+    <div class="depends-on-attendance-reports"><table><tbody>
+        <tr>
+            <td>Latest allowed departure time &nbsp;</td>
+            <td>
+                <input type="text" size="7" name="attendance_report_latest_departure_time"
+                    value="@org.formatAttendanceReportLatestDepartureTime()"
+                    @if(!org.show_attendance || !org.attendance_show_reports){ disabled }>
+            </td>
+        </tr>
+    </tbody></table></div>
+
+    <label>
         <input type="checkbox" name="attendance_show_percent" id="attendance-show-percent"
                @if(org.attendance_show_percent){ checked }>
         Show the "Attendance Rate" column

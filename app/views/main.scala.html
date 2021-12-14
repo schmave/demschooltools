@@ -155,6 +155,11 @@
                     href="@routes.Attendance.offCampusTime">Off campus time
                 </a>
             }
+            @if(OrgConfig.get().org.attendance_show_reports) {
+                <a @if(selectedBtn.equals("reports")) { class="active" }
+                    href="@routes.Attendance.reports">Reports
+                </a>
+            }
             @if(OrgConfig.get().org.show_electronic_signin) {
                 <a @if(selectedBtn.equals("attendance_pins")) { class="active" }
                     href="@routes.Attendance.assignPINs">Assign PINs
