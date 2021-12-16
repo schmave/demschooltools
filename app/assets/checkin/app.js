@@ -467,11 +467,20 @@ function registerCloseButtonEvent() {
 }
 
 async function createMessage(person, is_arriving) {
+	let timestamp = new Date();
+	// round down to the minute so the actual stored time is consistent with what the user sees
+	let roundedTimestamp = new Date(
+		timestamp.getFullYear(),
+		timestamp.getMonth(),
+		timestamp.getDate(),
+		timestamp.getHours(),
+		timestamp.getMinutes()
+	);
 	let message = {
 		// this is milliseconds elapsed since epoch, which we can use as a unique key
 		time: Date.now(),
 		// we need this string to be in a specific format so the server can parse it correctly
-		time_string: new Date().toLocaleString('en-US'),
+		time_string: roundedTimestamp.toLocaleString('en-US'),
 		person_id: person.person_id,
 		is_arriving: is_arriving
 	}
