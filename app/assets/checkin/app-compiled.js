@@ -1167,13 +1167,13 @@ function _buildRosterRow() {
               person_row.appendChild(code_column);
             } // if there is no attendance code, add in & out columns
             else {
-                in_column = document.createElement('td');
-                out_column = document.createElement('td');
-                in_column.innerHTML = person.current_day_start_time;
-                out_column.innerHTML = person.current_day_end_time;
-                person_row.appendChild(in_column);
-                person_row.appendChild(out_column);
-              }
+              in_column = document.createElement('td');
+              out_column = document.createElement('td');
+              in_column.innerHTML = person.current_day_start_time;
+              out_column.innerHTML = person.current_day_end_time;
+              person_row.appendChild(in_column);
+              person_row.appendChild(out_column);
+            }
 
           case 4:
           case "end":
@@ -1639,26 +1639,29 @@ function createMessage(_x8, _x9) {
 
 function _createMessage() {
   _createMessage = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee12(person, is_arriving) {
-    var message;
+    var timestamp, roundedTimestamp, message;
     return regeneratorRuntime.wrap(function _callee12$(_context12) {
       while (1) {
         switch (_context12.prev = _context12.next) {
           case 0:
+            timestamp = new Date(); // round down to the minute so the actual stored time is consistent with what the user sees
+
+            roundedTimestamp = new Date(timestamp.getFullYear(), timestamp.getMonth(), timestamp.getDate(), timestamp.getHours(), timestamp.getMinutes());
             message = {
               // this is milliseconds elapsed since epoch, which we can use as a unique key
               time: Date.now(),
               // we need this string to be in a specific format so the server can parse it correctly
-              time_string: new Date().toLocaleString('en-US'),
+              time_string: roundedTimestamp.toLocaleString('en-US'),
               person_id: person.person_id,
               is_arriving: is_arriving
             };
-            _context12.next = 3;
+            _context12.next = 5;
             return saveMessage(message);
 
-          case 3:
+          case 5:
             trySendMessages();
 
-          case 4:
+          case 6:
           case "end":
             return _context12.stop();
         }
