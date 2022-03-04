@@ -758,11 +758,13 @@ public class Attendance extends Controller {
                 Date day = df.parse(data.get("day-" + i));
                 Time departure_time = AttendanceDay.parseTime(data.get("departuretime-" + i));
                 Time return_time = AttendanceDay.parseTime(data.get("returntime-" + i));
+                Integer minutes_exempted = AttendanceDay.parseInt(data.get("minutesexempted-" + i));
 
                 if (person_id != null && day != null && departure_time != null && return_time != null) {
                     AttendanceDay attendance_day = AttendanceDay.findCurrentDay(day, person_id);
                     attendance_day.off_campus_departure_time = departure_time;
                     attendance_day.off_campus_return_time = return_time;
+                    attendance_day.off_campus_minutes_exempted = minutes_exempted;
                     attendance_day.update();
                 }
             } catch (NumberFormatException e) {

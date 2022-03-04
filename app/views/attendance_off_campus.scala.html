@@ -17,6 +17,7 @@
 		<th>Person</th>
 		<th>Departure Time</th>
 		<th>Return Time</th>
+		<th>Minutes Exempted</th>
 	</tr>
 	@for( d <- days ) {
 		<tr>
@@ -25,6 +26,7 @@
 			<td>@d.person.getDisplayName()</td>
 			<td>@Attendance.formatTime(d.off_campus_departure_time)</td>
 			<td>@Attendance.formatTime(d.off_campus_return_time)</td>
+			<td>@d.off_campus_minutes_exempted</td>
 		</tr>
 	}
 </table>

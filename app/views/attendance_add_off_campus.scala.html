@@ -14,6 +14,7 @@
 		<th>Person</th>
 		<th>Departure Time</th>
 		<th>Return Time</th>
+		<th>Minutes Exempted</th>
 	</tr>
 	@for( i <- 0 to 9 ) {
 		<tr>
@@ -28,6 +29,7 @@
 			</td>
 			<td><input type="text" class="js-time attendance-off-campus-time" name="departuretime-@i"></td>
 			<td><input type="text" class="js-time attendance-off-campus-time" name="returntime-@i"></td>
+			<td><input type="number" min="0" max="9999" class="attendance-off-campus-time" name="minutesexempted-@i"></td>
 		</tr>
 	}
 </table>

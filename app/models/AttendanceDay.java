@@ -35,6 +35,7 @@ public class AttendanceDay extends Model {
 
     public Time off_campus_departure_time;
     public Time off_campus_return_time;
+    public Integer off_campus_minutes_exempted;
 
     public static Finder<Integer, AttendanceDay> find = new Finder<Integer, AttendanceDay>(
         AttendanceDay.class
@@ -75,6 +76,13 @@ public class AttendanceDay extends Model {
 		return null;
     }
 
+    public static Integer parseInt(String str) {
+        if (str == null || str.equals("")) {
+            return null;
+        }
+        return Integer.parseInt(str);
+    }
+
     public void edit(String code, String start_time, String end_time) throws Exception {
         if (code.equals("")) {
             this.code = null;
@@ -93,6 +101,12 @@ public class AttendanceDay extends Model {
         long off_campus_time = 0;
         if (off_campus_return_time != null && off_campus_departure_time != null) {
             off_campus_time = off_campus_return_time.getTime() - off_campus_departure_time.getTime();
+            if (off_campus_minutes_exempted != null) {
+                off_campus_time -= off_campus_minutes_exempted * 60 * 1000;
+                if (off_campus_time < 0) {
+                    off_campus_time = 0;
+                }
+            }
         }
         return (end_time.getTime() - start_time.getTime() - off_campus_time) / (1000.0 * 60 * 60);
     }
