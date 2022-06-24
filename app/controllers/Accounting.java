@@ -1,11 +1,14 @@
 package controllers;
 
+import java.io.*;
 import java.util.*;
 import java.util.stream.*;
 import models.*;
 import play.mvc.*;
 import play.data.*;
 import play.libs.*;
+import com.csvreader.CsvWriter;
+import java.nio.charset.Charset;
 
 @With(DumpOnError.class)
 @Secured.Auth(UserRole.ROLE_VIEW_JC)
@@ -83,7 +86,7 @@ public class Accounting extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result runTransactionsReport() {
+    public Result runTransactionsReport() throws IOException {
         Form<TransactionList> form = Form.form(TransactionList.class);
         Form<TransactionList> filledForm = form.bindFromRequest();
         if (filledForm.hasErrors()) {
@@ -91,7 +94,46 @@ public class Accounting extends Controller {
             return badRequest(views.html.transactions_report.render(TransactionList.blank()));
         }
         TransactionList report = TransactionList.createFromForm(filledForm);
-        return ok(views.html.transactions_report.render(report));
+        String action = request().body().asFormUrlEncoded().get("action")[0];
+        if (action.equals("download")) {
+            return ok(downloadTransactionReport(report));  
+        }
+        else {
+            return ok(views.html.transactions_report.render(report));
+        }
+    }
+
+    private byte[] downloadTransactionReport(TransactionList report) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Charset charset = Charset.forName("UTF-8");
+        CsvWriter writer = new CsvWriter(baos, ',', charset);
+
+        writer.write("Archived");
+        writer.write("Transaction ID");
+        writer.write("Date");
+        writer.write("Created By User");
+        writer.write("Type");
+        writer.write("Description");
+        writer.write("Amount");
+        writer.endRecord();
+
+        for (Transaction t : report.transactions) {
+            writer.write(t.archived ? "yes" : "no");
+            writer.write(t.id.toString());
+            writer.write(t.getFormattedDate());
+            writer.write(t.getCreatedByUserName());
+            writer.write(t.getTypeName());
+            writer.write(t.description);
+            writer.write(t.getFormattedAmount(false));
+            writer.endRecord();
+        }
+
+        writer.close();
+
+        response().setHeader("Content-Type", "application/csv");
+        response().setHeader("Content-Disposition", "attachment; filename=transactions.csv");
+
+        return baos.toByteArray();
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
