@@ -100,7 +100,7 @@ GET     /people/:id               controllers.CRM.person(id: Integer)
 POST    /people                   controllers.CRM.makeNewPerson()
 POST    /people/:id/delete        controllers.CRM.deletePerson(id: Integer)
 
-GET     /attendance		  controllers.Attendance.index(start_of_year ?= "")
+GET     /attendance		  controllers.Attendance.index(start_date ?= "", end_date: String ?= "", is_custom_date: Boolean ?= false)
 GET     /attendance/jsonPeople               controllers.Attendance.jsonPeople(term ?= "")
 GET     /attendance/viewWeek	  controllers.Attendance.viewWeek(date : String ?= "")
 GET     /attendance/editWeek      controllers.Attendance.editWeek(date : String ?= "")
