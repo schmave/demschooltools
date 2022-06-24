@@ -13,7 +13,8 @@ public class Accounting extends Controller {
 
     public Result transaction(Integer id) {
         Transaction transaction = Transaction.findById(id);
-        return ok(views.html.transaction.render(transaction));
+        Form<Transaction> form = Form.form(Transaction.class).fill(transaction);
+        return ok(views.html.transaction.render(transaction, form));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
@@ -40,6 +41,19 @@ public class Accounting extends Controller {
             }
         }
     }
+
+    @Secured.Auth(UserRole.ROLE_ACCOUNTING)
+    public Result saveTransaction() {
+        try {
+            Form<Transaction> form = Form.form(Transaction.class).bindFromRequest();
+            Transaction transaction = Transaction.findById(Integer.parseInt(form.field("id").value()));
+            transaction.updateFromForm(form);
+            return redirect(routes.Accounting.transaction(transaction.id));
+        }
+        catch (Exception ex) {
+            return badRequest(ex.toString());
+        }
+    }    
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result deleteTransaction(Integer id) {

@@ -60,6 +60,11 @@ public class Transaction extends Model {
         return sdf.format(date_created);
     }
 
+    public String getFormattedDate2() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        return sdf.format(date_created);
+    }
+
     public String getFormattedAmount(boolean includePlusSign) {
         if (amount == BigDecimal.ZERO) return "0";
         String formatted = new DecimalFormat("0.00").format(amount);
@@ -165,5 +170,13 @@ public class Transaction extends Model {
     public static void delete(Integer id) {
         Transaction transaction = find.ref(id);
         transaction.delete();
+    }
+
+    public void updateFromForm(Form<Transaction> form) throws Exception {
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+        description = form.field("description").value();
+        amount = new BigDecimal(form.field("amount").value());
+        date_created = format.parse(form.field("date_created").value());
+        save();
     }
 }

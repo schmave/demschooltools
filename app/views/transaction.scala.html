@@ -1,42 +1,56 @@
-@(transaction : Transaction)
+@(transaction : Transaction, transactionForm: Form[Transaction])
+
+@import helper._
 
 @main("Transaction #" + transaction.id, "accounting") {
 
 	<h2>Transaction #@transaction.id</h2>
-	<div class="create-transaction">
-		<table class="create-transaction-table">
-			<tr>
-				<th>Type</th>
-				<td>@transaction.getTypeName()</td>
-			</tr>
-			<tr>
-				<th>From</th>
-				@if(transaction.from_account != null) {
-					<td><a href="@routes.Accounting.account(transaction.from_account.id)">@transaction.from_name</a></td>
-				} else {
-					<td>@transaction.from_name</td>
-				}
-			</tr>
-			@if(transaction.getTypeName() != "Cash Withdrawal") {
+	@helper.form(routes.Accounting.saveTransaction()) {
+		<input type="hidden" name="id" value="@transactionForm("id").value"/>
+		<div class="create-transaction">
+			<table class="create-transaction-table">
 				<tr>
-					<th>To</th>
-					@if(transaction.to_account != null) {
-						<td><a href="@routes.Accounting.account(transaction.to_account.id)">@transaction.to_name</a></td>
+					<th>Created By</th>
+					<td>@transaction.getCreatedByUserName()</td>
+				</tr>
+				<tr>
+					<th>Type</th>
+					<td>@transaction.getTypeName()</td>
+				</tr>
+				<tr>
+					<th>From</th>
+					@if(transaction.from_account != null) {
+						<td><a href="@routes.Accounting.account(transaction.from_account.id)">@transaction.from_name</a></td>
 					} else {
-						<td>@transaction.to_name</td>
+						<td>@transaction.from_name</td>
 					}
 				</tr>
-			}
-			<tr>
-				<th>Reason</th>
-				<td>@transaction.description</td>
-			</tr>
-			<tr>
-				<th>Amount</th>
-				<td>$@transaction.amount</td>
-			</tr>
-		</table>
-	</div>
+				@if(transaction.getTypeName() != "Cash Withdrawal") {
+					<tr>
+						<th>To</th>
+						@if(transaction.to_account != null) {
+							<td><a href="@routes.Accounting.account(transaction.to_account.id)">@transaction.to_name</a></td>
+						} else {
+							<td>@transaction.to_name</td>
+						}
+					</tr>
+				}
+				<tr>
+					<th>Reason</th>
+					<td><input type="text" id="description" name="description" value="@transaction.description"></td>
+				</tr>
+				<tr>
+					<th>Amount</th>
+					<td>$ <input id="amount" type="number" name="amount" value="@transaction.amount" min="0" step="0.01" required autocomplete="off" /></td>
+				</tr>
+				<tr>
+					<th>Date</th>
+					<td><input type="date" name="date_created" value="@transaction.getFormattedDate2()" autocomplete="off"></input></td>
+				</tr>
+			</table>
+			<input type="submit" value="Update" class="create-transaction-submit js-update-transaction-submit btn btn-primary">
+		</div>
+	}
 
 	<form action="@routes.Accounting.deleteTransaction(transaction.id)" method="post">
 		<button type="submit" class="delete-transaction-button js-delete-transaction-button btn-link"
