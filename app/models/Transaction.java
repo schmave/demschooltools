@@ -100,7 +100,8 @@ public class Transaction extends Model {
     public static List<Transaction> allWithConditions(
             Boolean include_personal,
             Boolean include_non_personal,
-            Boolean include_cash,
+            Boolean include_cash_deposits,
+            Boolean include_cash_withdrawals,
             Boolean include_digital,
             Boolean include_archived) {
         
@@ -114,7 +115,8 @@ public class Transaction extends Model {
             .filter(t -> 
                 (include_personal || !t.isPersonal()) &&
                 (include_non_personal || t.isPersonal()) &&
-                (include_cash || t.type == TransactionType.DigitalTransaction) &&
+                (include_cash_deposits || t.type != TransactionType.CashDeposit) &&
+                (include_cash_withdrawals || t.type != TransactionType.CashWithdrawal) &&
                 (include_digital || t.type != TransactionType.DigitalTransaction) &&
                 (include_archived || !t.archived))
             .collect(Collectors.toList());

@@ -14,8 +14,12 @@
 			Include non-personal
 		</label>
 		<label class="transactions-report-condition">
-			<input type="checkbox" name="include_cash" @if(model.include_cash){checked="checked"}>
-			Include cash
+			<input type="checkbox" name="include_cash_deposits" @if(model.include_cash_deposits){checked="checked"}>
+			Include cash deposits
+		</label>
+		<label class="transactions-report-condition">
+			<input type="checkbox" name="include_cash_withdrawals" @if(model.include_cash_withdrawals){checked="checked"}>
+			Include cash withdrawals
 		</label>
 		<label class="transactions-report-condition">
 			<input type="checkbox" name="include_digital" @if(model.include_digital){checked="checked"}>
