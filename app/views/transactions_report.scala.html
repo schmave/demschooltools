@@ -14,8 +14,12 @@
 			Include non-personal
 		</label>
 		<label class="transactions-report-condition">
-			<input type="checkbox" name="include_cash" @if(model.include_cash){checked="checked"}>
-			Include cash
+			<input type="checkbox" name="include_cash_deposits" @if(model.include_cash_deposits){checked="checked"}>
+			Include cash deposits
+		</label>
+		<label class="transactions-report-condition">
+			<input type="checkbox" name="include_cash_withdrawals" @if(model.include_cash_withdrawals){checked="checked"}>
+			Include cash withdrawals
 		</label>
 		<label class="transactions-report-condition">
 			<input type="checkbox" name="include_digital" @if(model.include_digital){checked="checked"}>
@@ -26,8 +30,9 @@
 			Include archived
 		</label>
 		<br>
-		<button type="submit">Fetch Transactions</button>
-		<br><br>
+		<button type="submit" name="action" value="fetch" class="transactions-fetch">Fetch transactions</button>
+		<button type="submit" name="action" value="download"class="transactions-fetch">Fetch and download as csv</button>
+		<br>
 	}
 
 	@if(model.transactions != null) {

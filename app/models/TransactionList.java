@@ -14,7 +14,8 @@ public class TransactionList {
 
     public Boolean include_personal = false;
     public Boolean include_non_personal = false;
-    public Boolean include_cash = false;
+    public Boolean include_cash_deposits = false;
+    public Boolean include_cash_withdrawals = false;
     public Boolean include_digital = false;
     public Boolean include_archived = false;
 
@@ -82,7 +83,8 @@ public class TransactionList {
         TransactionList model = new TransactionList();
         model.include_personal = true;
         model.include_non_personal = true;
-        model.include_cash = true;
+        model.include_cash_deposits = true;
+        model.include_cash_withdrawals = true;
         model.include_digital = true;
         model.include_archived = true;
         return model;
@@ -94,7 +96,8 @@ public class TransactionList {
         model.transactions = Transaction.allWithConditions(
             model.include_personal,
             model.include_non_personal,
-            model.include_cash,
+            model.include_cash_deposits,
+            model.include_cash_withdrawals,
             model.include_digital,
             model.include_archived);
 
