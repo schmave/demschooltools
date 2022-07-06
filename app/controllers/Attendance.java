@@ -37,9 +37,11 @@ public class Attendance extends Controller {
         return code_form;
     }
 
-    String renderIndexContent(Date start_date) {
-        Date end_date = new Date(start_date.getTime());
-        end_date.setYear(end_date.getYear() + 1);
+    String renderIndexContent(Date start_date, Date end_date, Boolean is_custom_date) {
+        if (end_date == null) {
+            end_date = new Date(start_date.getTime());
+            end_date.setYear(end_date.getYear() + 1);
+        }
         Map<Person, AttendanceStats> person_to_stats = new HashMap<>();
         Map<String, AttendanceCode> codes_map = getCodesMap(false);
 
@@ -96,11 +98,11 @@ public class Attendance extends Controller {
 
         return views.html.attendance_index.render(
                 all_people, person_to_stats, all_codes, codes_map,
-                Application.attendancePeople(), start_date, prev_date, next_date).toString();
+                Application.attendancePeople(), start_date, end_date, is_custom_date, prev_date, next_date).toString();
     }
 
-    public Result index(String start_date) {
-        if (start_date.equals("")) {
+    public Result index(String start_date_str, String end_date_str, Boolean is_custom_date) {
+        if (start_date_str.equals("")) {
             return ok(views.html.cached_page.render(
                     new CachedPage(CachedPage.ATTENDANCE_INDEX,
                             "Attendance",
@@ -108,7 +110,7 @@ public class Attendance extends Controller {
                             "attendance_home") {
                         @Override
                         String render() {
-                            return renderIndexContent(Application.getStartOfYear());
+                            return renderIndexContent(Application.getStartOfYear(), null, false);
                         }
                     }));
         } else {
@@ -119,7 +121,12 @@ public class Attendance extends Controller {
                             "attendance_home") {
                         @Override
                         public String getPage() {
-                            return renderIndexContent(Utils.parseDateOrNow(start_date).getTime());
+                            Date start_date = Utils.parseDateOrNow(start_date_str).getTime();
+                            Date end_date = null;
+                            if (!end_date_str.equals("")) {
+                                end_date = Utils.parseDateOrNow(end_date_str).getTime();
+                            }
+                            return renderIndexContent(start_date, end_date, is_custom_date);
                         }
 
                         @Override
