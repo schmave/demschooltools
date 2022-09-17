@@ -215,8 +215,11 @@ public class Attendance extends Controller {
     public Result jsonPeople(String term) {
         List<Person> name_matches =
                 Person.find.where()
-                    .add(Expr.or(Expr.ilike("last_name", "%" + term + "%"),
-                                 Expr.ilike("first_name", "%" + term + "%")))
+                    .add(Expr.or(
+                        Expr.ilike("last_name", "%" + term + "%"),
+                        Expr.or(
+                            Expr.ilike("first_name", "%" + term + "%"),
+                            Expr.ilike("display_name", "%" + term + "%"))))
                     .eq("organization", Organization.getByHost())
                     .eq("is_family", false)
                     .findList();
@@ -234,7 +237,10 @@ public class Attendance extends Controller {
             HashMap<String, String> values = new HashMap<>();
             String label = p.first_name;
             if (p.last_name != null) {
-                label = label + " " + p.last_name;
+                label += " " + p.last_name;
+            }
+            if (p.display_name != null && !p.display_name.equals("")) {
+                label += " (\"" + p.display_name + "\")";
             }
             values.put("label", label);
             values.put("id", "" + p.person_id);

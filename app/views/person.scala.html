@@ -16,7 +16,7 @@
 	<div class="student"></div>
 }
 <h4><a href="@routes.CRM.person(person.person_id)">
-@person.first_name @person.last_name</a></h4>
+@person.first_name @person.last_name @if(person.display_name) { ("@person.display_name") } </a></h4>
 @if( person.notes ) {
 	<p>@person.notes</p>
 }

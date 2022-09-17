@@ -110,6 +110,8 @@ public class CRM extends Controller {
 				Expr.ilike("address", "%" + term + "%"));
 			this_expr = Expr.or(this_expr,
 				Expr.ilike("email", "%" + term + "%"));
+            this_expr = Expr.or(this_expr,
+                Expr.ilike("display_name", "%" + term + "%"));
 
 			people_matched_this_round =
 				Person.find.where().add(this_expr)
@@ -147,6 +149,9 @@ public class CRM extends Controller {
             String label = p.first_name;
             if (p.last_name != null) {
                 label = label + " " + p.last_name;
+            }
+            if (p.display_name != null && !p.display_name.equals("")) {
+                label += " (\"" + p.display_name + "\")";
             }
             values.put("label", label);
             values.put("id", "" + p.person_id);
