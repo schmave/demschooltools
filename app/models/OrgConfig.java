@@ -122,6 +122,8 @@ class PhillyFreeSchool extends OrgConfig {
         str_res_plan_cap = "Sentence";
         str_res_plans = "sentences";
         str_res_plans_cap = "Sentences";
+        str_guilty = "Accept Responsibility";
+        str_not_guilty = "Reject Responsibility";
 
         show_no_contest_plea = true;
         show_na_plea = true;
