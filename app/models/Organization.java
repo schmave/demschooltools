@@ -58,6 +58,7 @@ public class Organization extends Model {
     public Time attendance_day_latest_start_time;
     public Integer attendance_day_min_hours;
     public BigDecimal attendance_partial_day_value;
+    public Integer attendance_rate_standard_time_frame;
     public String attendance_admin_pin;
 
     @OneToMany(mappedBy="organization")
@@ -216,6 +217,11 @@ public class Organization extends Model {
                 this.attendance_partial_day_value = null;
             } else {
                 this.attendance_partial_day_value = new BigDecimal(values.get("attendance_partial_day_value")[0]);
+            }
+            if (!values.containsKey("attendance_rate_standard_time_frame") || values.get("attendance_rate_standard_time_frame")[0].isEmpty()) {
+                this.attendance_rate_standard_time_frame = null;
+            } else {
+                this.attendance_rate_standard_time_frame = Integer.parseInt(values.get("attendance_rate_standard_time_frame")[0]);
             }
             if (values.containsKey("attendance_day_latest_start_time")) {
                 this.attendance_day_latest_start_time = AttendanceDay.parseTime(values.get("attendance_day_latest_start_time")[0]);

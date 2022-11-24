@@ -134,6 +134,11 @@ button {
 	color: #f00;
 }
 
+.authorized-data {
+	margin-top: 70px;
+	color:  #666;
+}
+
 .roster-failed-symbol {
 	color: #ff9b00;
 }

@@ -21,10 +21,15 @@ public class Checkin extends Controller {
 
     public Result checkinData(String time) throws ParseException {
         Date date = new SimpleDateFormat("M/d/yyyy, h:mm:ss a").parse(time);
+
+        Date start_date = Attendance.getAttendanceRateStandardTimeFrameStart();
+        Date end_date = new Date();
+        Map<Person, AttendanceStats> person_to_stats = Attendance.mapPeopleToStats(start_date, end_date);
+
         List<CheckinPerson> people = Application.attendancePeople().stream()
             .sorted(Comparator.comparing(Person::getDisplayName))
             .filter(p -> p.pin != null && !p.pin.isEmpty())
-            .map(p -> new CheckinPerson(p, AttendanceDay.findCurrentDay(date, p.person_id)))
+            .map(p -> new CheckinPerson(p, AttendanceDay.findCurrentDay(date, p.person_id), person_to_stats.get(p)))
             .collect(Collectors.toList());
 
         // add admin
@@ -32,7 +37,7 @@ public class Checkin extends Controller {
         admin.person_id = -1;
         admin.first_name = "Admin";
         admin.pin = OrgConfig.get().org.attendance_admin_pin;
-        people.add(0, new CheckinPerson(admin, null));
+        people.add(0, new CheckinPerson(admin, null, null));
 
         List<String> absence_codes = AttendanceCode.all(OrgConfig.get().org).stream()
             .map(c -> c.code)

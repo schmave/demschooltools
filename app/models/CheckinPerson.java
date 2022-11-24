@@ -1,6 +1,7 @@
 package models;
 
 import java.text.SimpleDateFormat;
+import controllers.Attendance;
 
 public class CheckinPerson {
     
@@ -10,11 +11,19 @@ public class CheckinPerson {
     public String current_day_code;
     public String current_day_start_time;
     public String current_day_end_time;
+    public String attendance_rate;
 
-    public CheckinPerson(Person person, AttendanceDay current_day) {
+    public CheckinPerson(Person person, AttendanceDay current_day, AttendanceStats stats) {
         person_id = person.person_id;
         pin = person.pin;
         name = person.getDisplayName();
+
+        if (stats != null && OrgConfig.get().org.attendance_show_percent) {
+            double rate = stats.attendanceRate();
+            if (!Double.isNaN(rate)) {
+                attendance_rate = Attendance.formatAsPercent(rate);
+            }
+        }
 
         if (current_day != null) {
             SimpleDateFormat format = new SimpleDateFormat("h:mm aa");
