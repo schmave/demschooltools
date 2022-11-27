@@ -117,11 +117,11 @@ class PhillyFreeSchool extends OrgConfig {
 
         str_manual_title = "Lawbook";
         str_manual_title_short = "Lawbook";
-        str_res_plan_short = "Sentence";
-        str_res_plan = "sentence";
-        str_res_plan_cap = "Sentence";
-        str_res_plans = "sentences";
-        str_res_plans_cap = "Sentences";
+        str_res_plan_short = "Consequence";
+        str_res_plan = "consequence";
+        str_res_plan_cap = "Consequence";
+        str_res_plans = "consequences";
+        str_res_plans_cap = "Consequences";
         str_guilty = "Accept Responsibility";
         str_not_guilty = "Reject Responsibility";
 
