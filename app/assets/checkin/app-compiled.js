@@ -1584,7 +1584,11 @@ function _submitCode() {
 function setAuthorized(person, is_arriving) {
   createMessage(person, is_arriving);
   container.innerHTML = authorized_template.innerHTML;
-  document.querySelector('.authorized-text').innerHTML = getAuthorizedText(person, is_arriving); // We will automatically return to the home screen after a period of time if the OK
+  document.querySelector('.authorized-text').innerHTML = getAuthorizedText(person, is_arriving);
+  if (is_arriving && person.attendance_rate) {
+    document.querySelector('.authorized-data').innerHTML = getAuthorizedData(person);
+  }
+  // We will automatically return to the home screen after a period of time if the OK
   // button is not pressed.
 
   var hasReset = false;
@@ -1613,6 +1617,10 @@ function getAuthorizedText(person, is_arriving) {
 
   authorized_text += person.name;
   return authorized_text;
+}
+
+function getAuthorizedData(person) {
+  return `Your current attendance<br>rate is <strong>${person.attendance_rate}</strong>`;
 }
 
 function setUnauthorized() {

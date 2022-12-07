@@ -138,44 +138,50 @@ the other way around.</p>
     &nbsp;<span class="settings-help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip"
         title="This allows you to see a person's attendance rate as a percentage of days present vs. total school days."></span>
 
-    <br/>
+    <div>
+        Use the last
+        <input type="number" min="0" max="999" name="attendance_rate_standard_time_frame" value="@org.attendance_rate_standard_time_frame">
+        school days as the standard for calculating attendance rate
+        &nbsp;<span class="settings-help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip"
+                    title="If a value is given here, the Check-in app will use this time frame to calculate attendance rate instead of using the whole school year. (The Check-in app shows a student's attendance rate when they check in.) A button will also be added to the Attendance By Year page to be able to easily view this time frame for all students."></span>
+    </div>
     <label>
         <input type="checkbox" name="attendance_enable_partial_days" id="attendance-enable-partial-days"
                class="has-dependents" data-dependent-class="depends-on-partial-days"
                @if(org.attendance_enable_partial_days){ checked }>
         Count partial days separately from full days
     </label>
+    <div class="depends-on-partial-days"><table><tbody>
+        <tr>
+            <td>Latest arrival time allowed for a full day</td>
+            <td>
+                <input type="text" size="7" name="attendance_day_latest_start_time" value="@org.formatAttendanceLatestStartTime()"
+                       @if(!org.show_attendance || !org.attendance_enable_partial_days){ disabled }>
+                &nbsp;<span class="settings-help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip"
+                    title="If a person arrives later than this time (e.g. 11:00), the day counts as a partial day regardless of how many hours the person was at school."></span>
+            </td>
+        </tr>
+        <tr>
+            <td>Minimum hours for a full day</td>
+            <td>
+                <input type="number" min="0" max="9" name="attendance_day_min_hours" value="@org.attendance_day_min_hours"
+                       @if(!org.show_attendance || !org.attendance_enable_partial_days){ disabled }>
+                &nbsp;<span class="settings-help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip"
+                    title="If a person is present for fewer than this number of hours (e.g. 5) in a day, it counts as a partial day."></span>
+            </td>
+        </tr>
+        <tr>
+            <td>Value of a partial day for attendance rate</td>
+            <td>
+                <input type="number" min="0" max="1" step="0.05" name="attendance_partial_day_value"
+                       value="@org.attendance_partial_day_value"
+                       @if(!org.show_attendance || !org.attendance_enable_partial_days){ disabled }>
+                &nbsp;<span class="settings-help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip"
+                    title="If the Attendance Rate column is enabled, you can decide how much value a partial day has in the percentage calculation. For example, if the value is 0.5, a partial day counts as half of a full day."></span>
+            </td>
+        </tr>
+    </tbody></table></div>
 </div>
-<div class="depends-on-partial-days"><table><tbody>
-    <tr>
-        <td>Latest arrival time allowed for a full day</td>
-        <td>
-            <input type="text" size="7" name="attendance_day_latest_start_time" value="@org.formatAttendanceLatestStartTime()"
-                   @if(!org.show_attendance || !org.attendance_enable_partial_days){ disabled }>
-            &nbsp;<span class="settings-help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip"
-                title="If a person arrives later than this time (e.g. 11:00), the day counts as a partial day regardless of how many hours the person was at school."></span>
-        </td>
-    </tr>
-    <tr>
-        <td>Minimum hours for a full day</td>
-        <td>
-            <input type="number" min="0" max="9" name="attendance_day_min_hours" value="@org.attendance_day_min_hours"
-                   @if(!org.show_attendance || !org.attendance_enable_partial_days){ disabled }>
-            &nbsp;<span class="settings-help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip"
-                title="If a person is present for fewer than this number of hours (e.g. 5) in a day, it counts as a partial day."></span>
-        </td>
-    </tr>
-    <tr>
-        <td>Value of a partial day for attendance rate</td>
-        <td>
-            <input type="number" min="0" max="1" step="0.05" name="attendance_partial_day_value"
-                   value="@org.attendance_partial_day_value"
-                   @if(!org.show_attendance || !org.attendance_enable_partial_days){ disabled }>
-            &nbsp;<span class="settings-help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip"
-                title="If the Attendance Rate column is enabled, you can decide how much value a partial day has in the percentage calculation. For example, if the value is 0.5, a partial day counts as half of a full day."></span>
-        </td>
-    </tr>
-</tbody></table></div>
 <h4>Custodia</h4>
 <p>
     <label>

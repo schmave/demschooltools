@@ -1,6 +1,7 @@
 @(people : List[Person], person_to_stats : Map[Person, AttendanceStats],
   codes : List[String], codes_map : Map[String, AttendanceCode], current_people: List[Person],
-  start_date: Date, end_date: Date, is_custom_date: Boolean, prev_date: Date, next_date: Date)
+  start_date: Date, end_date: Date, is_custom_date: Boolean, prev_date: Date, next_date: Date,
+  standard_time_frame_start: Date, today: Date, standard_time_frame_days: Integer, is_standard_time_frame: Boolean)
 
 @import helper._
 
@@ -54,6 +55,11 @@ $(function() {
 	           style="margin-left: 100px;">Next Year ⇒</a>
 	    }
 	</p>
+}
+@if(standard_time_frame_days != null && !is_standard_time_frame) {
+	<p><a href="@routes.Attendance.index(Application.forDateInput(standard_time_frame_start), Application.forDateInput(today), true)">
+	 	Show last @standard_time_frame_days school days
+	</a></p>
 }
 <form method="GET">
 	<p>Showing
