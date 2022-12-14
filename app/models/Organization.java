@@ -56,7 +56,7 @@ public class Organization extends Model {
     public Boolean attendance_show_percent;
     public Boolean attendance_enable_partial_days;
     public Time attendance_day_latest_start_time;
-    public Integer attendance_day_min_hours;
+    public Double attendance_day_min_hours;
     public BigDecimal attendance_partial_day_value;
     public Integer attendance_rate_standard_time_frame;
     public String attendance_admin_pin;
@@ -211,7 +211,7 @@ public class Organization extends Model {
             if (!values.containsKey("attendance_day_min_hours") || values.get("attendance_day_min_hours")[0].isEmpty()) {
                 this.attendance_day_min_hours = null;
             } else {
-                this.attendance_day_min_hours = Integer.parseInt(values.get("attendance_day_min_hours")[0]);
+                this.attendance_day_min_hours = Double.parseDouble(values.get("attendance_day_min_hours")[0]);
             }
             if (!values.containsKey("attendance_partial_day_value") || values.get("attendance_partial_day_value")[0].isEmpty()) {
                 this.attendance_partial_day_value = null;

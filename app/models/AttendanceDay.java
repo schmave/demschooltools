@@ -116,7 +116,7 @@ public class AttendanceDay extends Model {
         Organization org = OrgConfig.get().org;
 
         if (org.attendance_enable_partial_days) {
-            Integer min_hours = org.attendance_day_min_hours;
+            Double min_hours = org.attendance_day_min_hours;
             Time latest_start_time = org.attendance_day_latest_start_time;
 
             if (min_hours != null && getHours() < min_hours) {
