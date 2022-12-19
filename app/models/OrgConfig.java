@@ -23,6 +23,7 @@ public class OrgConfig {
     public String str_clerk = "Clerk";
     public String str_guilty = "Guilty";
     public String str_not_guilty = "Not Guilty";
+    public String str_na = "N/A";
 
     public boolean show_no_contest_plea = false;
     public boolean show_na_plea = false;
@@ -74,6 +75,8 @@ public class OrgConfig {
             return this.str_guilty;
         } else if (plea.equals("Not Guilty")) {
             return this.str_not_guilty;
+        } else if (plea.equals("N/A")) {
+            return this.str_na;
         }
 
         return plea;
@@ -253,10 +256,12 @@ class TheOpenSchool extends OrgConfig {
         str_jc_name_short = "CB";
         str_guilty = "Agree";
         str_not_guilty = "Disagree";
+        str_na = "Mediated";
 
         show_findings_in_rp_list = true;
         use_minor_referrals = false;
         show_no_contest_plea = true;
+        show_na_plea = true;
 
         OrgConfig.register(name, this);
     }
