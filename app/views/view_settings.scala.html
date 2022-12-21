@@ -164,7 +164,7 @@ the other way around.</p>
         <tr>
             <td>Minimum hours for a full day</td>
             <td>
-                <input type="number" min="0" max="9" name="attendance_day_min_hours" value="@org.attendance_day_min_hours"
+                <input type="number" min="0" max="9" step="0.01" name="attendance_day_min_hours" value="@org.attendance_day_min_hours"
                        @if(!org.show_attendance || !org.attendance_enable_partial_days){ disabled }>
                 &nbsp;<span class="settings-help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip"
                     title="If a person is present for fewer than this number of hours (e.g. 5) in a day, it counts as a partial day."></span>
