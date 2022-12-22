@@ -500,23 +500,13 @@ public class Application extends Controller {
             ManualChange.find.where()
                 .gt("date_entered", begin_date)
                 .eq("entry.section.chapter.organization", Organization.getByHost())
-                .orderBy("entry.id, date_entered ASC")
                 .findList();
 
-        List<ManualChange> changes_to_display = new ArrayList<ManualChange>();
-        int last_id = -1;
-        for (ManualChange c : changes) {
-            if (c.entry.id != last_id) {
-                changes_to_display.add(c);
-            }
-            last_id = c.entry.id;
-        }
-
-        Collections.sort(changes_to_display, ManualChange.SORT_NUM_DATE);
+        Collections.sort(changes, ManualChange.SORT_NUM_DATE);
 
         return ok(views.html.view_manual_changes.render(
             forDateInput(begin_date),
-            changes_to_display));
+            changes));
     }
 
     public Result printManual() {
