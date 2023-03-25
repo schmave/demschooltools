@@ -11,7 +11,7 @@ import java.sql.Time;
 
 public class AttendanceReport {
 
-    public List<AttendanceDay> events;
+    public List<LateDepartureGroup> late_departures;
 
     @play.data.format.Formats.DateTime(pattern="MM/dd/yyyy")
     public Date start_date;
@@ -22,6 +22,8 @@ public class AttendanceReport {
     public Time latest_departure_time;
 
     public AttendanceReport() {
+        late_departures = new ArrayList<LateDepartureGroup>();
+
         Organization org = OrgConfig.get().org;
         latest_departure_time = org.attendance_report_latest_departure_time;
     }
@@ -29,13 +31,26 @@ public class AttendanceReport {
     public static AttendanceReport createFromForm(Form<AttendanceReport> form) {
         AttendanceReport model = form.get();
 
-        model.events = AttendanceDay.find.where()
+        List<AttendanceDay> events = AttendanceDay.find.where()
             .eq("person.organization", OrgConfig.get().org)
             .ge("day", model.start_date)
             .le("day", model.end_date)
             .gt("end_time", model.latest_departure_time)
             .order("person.first_name ASC, day ASC")
             .findList();
+
+        for (AttendanceDay event : events) {
+            String name = event.person.getDisplayName();
+            LateDepartureGroup group = model.late_departures.stream()
+                .filter(g -> name.equals(g.name))
+                .findAny().orElse(null);
+
+            if (group == null) {
+                group = new LateDepartureGroup(name);
+                model.late_departures.add(group);
+            }
+            group.events.add(event);
+        }
 
         return model;
     }
