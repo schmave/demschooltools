@@ -97,6 +97,9 @@ $(function() {
 	<th width=100>Avg. hours per day</th>
 	@if( OrgConfig.get().org.attendance_show_percent ) {
 		<th width=100>Attendance Rate</th>
+		@if( !is_custom_date ) {
+			<th width=100>Weighted AR</th>
+		}
 	}
 	</thead>
 
@@ -135,6 +138,9 @@ $(function() {
 	<td align="center">@Attendance.format(person_to_stats.get(p).averageHoursPerDay())</td>
 	@if( OrgConfig.get().org.attendance_show_percent ) {
 		<td align="center">@Attendance.formatAsPercent(person_to_stats.get(p).attendanceRate())</td>
+		@if( !is_custom_date ) {
+			<td align="center">@Attendance.formatAsPercent(person_to_stats.get(p).weightedAttendanceRate())</td>
+		}
 	}
 }
 

@@ -268,16 +268,18 @@ public class Attendance extends Controller {
                 .le("monday", end_date)
                 .findList();
 
+        List<List<AttendanceDay>> school_days = listSchoolDays(start_date, end_date);
+
         Map<String, AttendanceCode> codes_map = getCodesMap(true);
         AttendanceStats stats = new AttendanceStats();
         boolean has_off_campus_time = false;
 
-        for (AttendanceDay day : days) {
-            if (day.code != null || day.start_time == null || day.end_time == null) {
-                stats.incrementCodeCount(codes_map.get(day.code));
-            } else {
-                stats.incrementAttendance(day);
-            }
+        for (int i = 0; i < school_days.size(); i++) {
+            List<AttendanceDay> school_day = school_days.get(i);
+            AttendanceDay day = school_day.stream().filter(d -> d.person.person_id == person_id).findAny().orElse(null);
+
+            stats.processDay(day, i, codes_map);
+
             if (day.off_campus_departure_time != null || day.off_campus_return_time != null) {
                 has_off_campus_time = true;
             }
@@ -292,13 +294,17 @@ public class Attendance extends Controller {
             day_to_week.put(w.monday, w);
         }
 
+        List<String> codes = new ArrayList<String>(codes_map.keySet()).stream()
+            .filter(c -> c != "_NS_")
+            .collect(Collectors.toList());
+
         int table_width = has_off_campus_time ? 900 : 700;
 
         return ok(views.html.attendance_person.render(
             p,
             days,
             day_to_week,
-            new ArrayList<String>(codes_map.keySet()),
+            codes,
             codes_map,
             stats,
             start_date,
@@ -685,25 +691,16 @@ public class Attendance extends Controller {
         Map<Person, AttendanceStats> person_to_stats = new HashMap<>();
         Map<String, AttendanceCode> codes_map = getCodesMap(false);
 
-        List<AttendanceDay> days =
-                AttendanceDay.find.where()
-                        .eq("person.organization", OrgConfig.get().org)
-                        .ge("day", start_date)
-                        .le("day", end_date)
-                        .findList();
+        List<List<AttendanceDay>> school_days = listSchoolDays(start_date, end_date);
 
-        for (AttendanceDay day : days) {
-            if (!person_to_stats.containsKey(day.person)) {
-                person_to_stats.put(day.person, new AttendanceStats());
-            }
-
-            AttendanceStats stats = person_to_stats.get(day.person);
-            if (day.code != null && day.code.equals("_NS_")) {
-                // special no school day code, do nothing.
-            } else if (day.code != null || day.start_time == null || day.end_time == null) {
-                stats.incrementCodeCount(codes_map.get(day.code));
-            } else {
-                stats.incrementAttendance(day);
+        for (int i = 0; i < school_days.size(); i++) {
+            List<AttendanceDay> school_day = school_days.get(i);
+            for (AttendanceDay day : school_day) {
+                if (!person_to_stats.containsKey(day.person)) {
+                    person_to_stats.put(day.person, new AttendanceStats());
+                }
+                AttendanceStats stats = person_to_stats.get(day.person);
+                stats.processDay(day, i, codes_map);
             }
         }
 
@@ -731,10 +728,17 @@ public class Attendance extends Controller {
         int count = 0;
         Date start_date = Application.getStartOfYear();
         Date end_date = new Date();
+        List<List<AttendanceDay>> school_days = listSchoolDays(start_date, end_date);
 
-        if (time_frame_days == null) {
+        // if we run out of days before reaching time_frame_days, just return the start of the school year
+        if (time_frame_days == null || school_days.size() < time_frame_days) {
             return start_date;
         }
+        return school_days.get(time_frame_days - 1).get(0).day;
+    }
+
+    public static List<List<AttendanceDay>> listSchoolDays(Date start_date, Date end_date) {
+        List<List<AttendanceDay>> school_days = new ArrayList<>();
 
         List<AttendanceDay> days = AttendanceDay.find.where()
             .eq("person.organization", OrgConfig.get().org)
@@ -742,7 +746,7 @@ public class Attendance extends Controller {
             .le("day", end_date)
             .findList();
 
-        // group AttendanceDays by date
+        // group AttendanceDays by date, sorted into reverse chronological order
         SortedMap<Date, List<AttendanceDay>> groups = new TreeMap<Date, List<AttendanceDay>>(Collections.reverseOrder());
         for (AttendanceDay day : days) {
             if (!groups.containsKey(day.day)) {
@@ -754,22 +758,17 @@ public class Attendance extends Controller {
 
         for (List<AttendanceDay> group : groups.values()) {
             // Iterate through all AttendanceDays in the group until we find one that has some attendance
-            // data that's not _NS_. If we don't find any, the group (i.e. the date) is not counted.
+            // data that's not _NS_. If we don't find any, the date is not a school day.
             for (AttendanceDay day : group) {
                 boolean is_absence = day.code != null && !day.code.equals("_NS_");
                 boolean is_attendance = day.start_time != null && day.end_time != null;
                 if (is_absence || is_attendance) {
-                    count++;
+                    school_days.add(group);
                     break;
                 }
             }
-            // once we reach time_frame_days school days ago, return the date
-            if (count == time_frame_days) {
-                return group.get(0).day;
-            }
         }
-        // if we ran out of days before reaching time_frame_days, just return the start of the school year
-        return start_date;
+        return school_days;
     }
 
     public Result viewCustodiaAdmin() {
