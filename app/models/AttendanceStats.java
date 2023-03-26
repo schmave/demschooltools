@@ -73,7 +73,7 @@ public class AttendanceStats {
     }
 
     public double attendanceRate() {
-        double total = 0;
+        double total = 0d;
         for (Map.Entry<Integer, Double> v : values.entrySet()) {
             total += v.getValue();
         }
@@ -81,25 +81,31 @@ public class AttendanceStats {
     }
 
     public double weightedAttendanceRate() {
-        double total = 0;
+        double total = 0d;
+        double reference_total = 0d;
         for (Map.Entry<Integer, Double> v : values.entrySet()) {
             Integer index = v.getKey();
             Double value = v.getValue();
-            // The way the weighted attendance rate works is that the present day is worth 100%,
-            // and a long time in the past (i.e. several months ago) is worth close to 0%,
-            // with a smooth transition in between.
-            // reference_days is the number of school days in the past when the weight reaches 20%,
-            // so you can adjust this to stretch or compress the curve. I've chosen 60 because
-            // this is equivalent to 3 months. You could change it to e.g. 45 to make recent
-            // days weighted more as compared to older days.
-            double reference_days = 60d;
-            double curve_constant = Math.pow(5d/(4d * reference_days), 2);
-            // The curve is a Gaussian function, i.e. a bell curve, so near present day (index = 0)
-            // the weight decreases slowly at first, then faster, then reaches an inflection point
-            // and starts slowing down again, and finally has a long tail that goes out to infinity.
-            // Try graphing this function with a graphing app so you can visualize it.
-            total += value * Math.exp(-curve_constant * Math.pow(index, 2));
+            total += weightFunction(index, value);
+            reference_total += weightFunction(index, 1d);
         }
-        return total / values.size();
+        return total / reference_total;
+    }
+
+    private double weightFunction(Integer index, Double value) {
+        // The way the weighted attendance rate works is that the present day is worth 100%,
+        // and a long time in the past (i.e. several months ago) is worth close to 0%,
+        // with a smooth transition in between.
+        // reference_days is the number of school days in the past when the weight reaches 20%,
+        // so you can adjust this to stretch or compress the curve. I've chosen 60 because
+        // this is equivalent to 3 months. You could change it to e.g. 45 to make recent
+        // days weighted more as compared to older days.
+        double reference_days = 60d;
+        double curve_constant = Math.pow(5d/(4d * reference_days), 2);
+        // The curve is a Gaussian function, i.e. a bell curve, so near present day (index = 0)
+        // the weight decreases slowly at first, then faster, then reaches an inflection point
+        // and starts slowing down again, and finally has a long tail that goes out to infinity.
+        // Try graphing this function with a graphing app so you can visualize it.
+        return value * Math.exp(-curve_constant * Math.pow(index, 2));
     }
 }

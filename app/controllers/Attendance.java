@@ -58,15 +58,9 @@ public class Attendance extends Controller {
             next_date = null;
         }
 
-        Integer standard_time_frame_days = OrgConfig.get().org.attendance_rate_standard_time_frame;
-        Date standard_time_frame_start = Application.getDateFromString(Application.forDateInput(getAttendanceRateStandardTimeFrameStart()));
-        Date today = Application.getDateFromString(Application.forDateInput(new Date()));
-        boolean is_standard_time_frame = start_date.getTime() == standard_time_frame_start.getTime() && end_date.getTime() == today.getTime();
-
         return views.html.attendance_index.render(
             all_people, person_to_stats, all_codes, codes_map,
-            Application.attendancePeople(), start_date, end_date, is_custom_date, prev_date, next_date,
-            standard_time_frame_start, today, standard_time_frame_days, is_standard_time_frame
+            Application.attendancePeople(), start_date, end_date, is_custom_date, prev_date, next_date
         ).toString();
     }
 
@@ -721,20 +715,6 @@ public class Attendance extends Controller {
         }
 
         return person_to_stats;
-    }
-
-    public static Date getAttendanceRateStandardTimeFrameStart() {
-        Integer time_frame_days = OrgConfig.get().org.attendance_rate_standard_time_frame;
-        int count = 0;
-        Date start_date = Application.getStartOfYear();
-        Date end_date = new Date();
-        List<List<AttendanceDay>> school_days = listSchoolDays(start_date, end_date);
-
-        // if we run out of days before reaching time_frame_days, just return the start of the school year
-        if (time_frame_days == null || school_days.size() < time_frame_days) {
-            return start_date;
-        }
-        return school_days.get(time_frame_days - 1).get(0).day;
     }
 
     public static List<List<AttendanceDay>> listSchoolDays(Date start_date, Date end_date) {

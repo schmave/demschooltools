@@ -29,6 +29,8 @@ $(function() {
         $("a[href='#" + location.hash.substr(2) + "']").tab("show");
     }
 
+    $('[data-toggle="tooltip"]').tooltip();
+
     $("a[data-toggle='tab']").on("shown.bs.tab", function (e) {
         var hash = $(e.target).attr("href");
         if (hash.substr(0,1) == "#") {
