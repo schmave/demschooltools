@@ -53,6 +53,8 @@ public class Organization extends Model {
     public Boolean attendance_enable_off_campus;
     public Boolean attendance_show_reports;
     public Time attendance_report_latest_departure_time;
+    public Integer attendance_report_late_fee;
+    public Integer attendance_report_late_fee_interval;
     public Boolean attendance_show_percent;
     public Boolean attendance_show_weighted_percent;
     public Boolean attendance_enable_partial_days;
@@ -232,6 +234,16 @@ public class Organization extends Model {
                 this.attendance_report_latest_departure_time = AttendanceDay.parseTime(values.get("attendance_report_latest_departure_time")[0]);
             } else {
                 this.attendance_report_latest_departure_time = null;
+            }
+            if (!values.containsKey("attendance_report_late_fee") || values.get("attendance_report_late_fee")[0].isEmpty()) {
+                this.attendance_report_late_fee = null;
+            } else {
+                this.attendance_report_late_fee = Integer.parseInt(values.get("attendance_report_late_fee")[0]);
+            }
+            if (!values.containsKey("attendance_report_late_fee_interval") || values.get("attendance_report_late_fee_interval")[0].isEmpty()) {
+                this.attendance_report_late_fee_interval = null;
+            } else {
+                this.attendance_report_late_fee_interval = Integer.parseInt(values.get("attendance_report_late_fee_interval")[0]);
             }
         }
         if (values.containsKey("accounting_settings")) {

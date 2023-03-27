@@ -119,16 +119,20 @@ the other way around.</p>
         Show the "Reports" tab
     </label>
 
-    <div class="depends-on-attendance-reports"><table><tbody>
-        <tr>
-            <td>Latest allowed departure time &nbsp;</td>
-            <td>
-                <input type="text" size="7" name="attendance_report_latest_departure_time"
-                    value="@org.formatAttendanceReportLatestDepartureTime()"
-                    @if(!org.show_attendance || !org.attendance_show_reports){ disabled }>
-            </td>
-        </tr>
-    </tbody></table></div>
+    <div class="depends-on-attendance-reports">
+        Charge a late fee of&nbsp;
+        $ <input type="number" min="0" max="999" name="attendance_report_late_fee"
+            value="@org.attendance_report_late_fee"
+            @if(!org.show_attendance || !org.attendance_show_reports){ disabled }>
+         &nbsp;per&nbsp;
+        <input type="number" min="0" max="999" name="attendance_report_late_fee_interval"
+            value="@org.attendance_report_late_fee_interval"
+            @if(!org.show_attendance || !org.attendance_show_reports){ disabled }>
+         &nbsp;minutes after&nbsp;
+        <input type="text" size="7" name="attendance_report_latest_departure_time"
+            value="@org.formatAttendanceReportLatestDepartureTime()"
+            @if(!org.show_attendance || !org.attendance_show_reports){ disabled }>
+    </div>
 
     <label>
         <input type="checkbox" name="attendance_show_percent" id="attendance-show-percent"
