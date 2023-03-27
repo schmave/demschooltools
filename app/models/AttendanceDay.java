@@ -37,6 +37,9 @@ public class AttendanceDay extends Model {
     public Time off_campus_return_time;
     public Integer off_campus_minutes_exempted;
 
+    @Transient
+    public Integer late_fee;
+
     public static Finder<Integer, AttendanceDay> find = new Finder<Integer, AttendanceDay>(
         AttendanceDay.class
     );
