@@ -1,5 +1,4 @@
 export function init() {
-
   $('.has-dependents').each(function(i, el) {
     var checkboxWithDependents = $(el);
     manageDependents(checkboxWithDependents);
