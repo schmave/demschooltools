@@ -18,8 +18,8 @@ public class CheckinPerson {
         pin = person.pin;
         name = person.getDisplayName();
 
-        if (stats != null && OrgConfig.get().org.attendance_show_percent) {
-            double rate = stats.attendanceRate();
+        if (stats != null && OrgConfig.get().org.attendance_show_weighted_percent) {
+            double rate = stats.weightedAttendanceRate();
             if (!Double.isNaN(rate)) {
                 attendance_rate = Attendance.formatAsPercent(rate);
             }

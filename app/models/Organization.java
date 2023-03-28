@@ -56,11 +56,11 @@ public class Organization extends Model {
     public Integer attendance_report_late_fee;
     public Integer attendance_report_late_fee_interval;
     public Boolean attendance_show_percent;
+    public Boolean attendance_show_weighted_percent;
     public Boolean attendance_enable_partial_days;
     public Time attendance_day_latest_start_time;
     public Double attendance_day_min_hours;
     public BigDecimal attendance_partial_day_value;
-    public Integer attendance_rate_standard_time_frame;
     public String attendance_admin_pin;
 
     @OneToMany(mappedBy="organization")
@@ -200,6 +200,11 @@ public class Organization extends Model {
             } else {
                 this.attendance_show_percent = false;
             }
+            if (values.containsKey("attendance_show_weighted_percent")) {
+                this.attendance_show_weighted_percent = Utils.getBooleanFromFormValue(values.get("attendance_show_weighted_percent")[0]);
+            } else {
+                this.attendance_show_weighted_percent = false;
+            }
             if (values.containsKey("attendance_enable_partial_days")) {
                 this.attendance_enable_partial_days = Utils.getBooleanFromFormValue(values.get("attendance_enable_partial_days")[0]);
             } else {
@@ -219,11 +224,6 @@ public class Organization extends Model {
                 this.attendance_partial_day_value = null;
             } else {
                 this.attendance_partial_day_value = new BigDecimal(values.get("attendance_partial_day_value")[0]);
-            }
-            if (!values.containsKey("attendance_rate_standard_time_frame") || values.get("attendance_rate_standard_time_frame")[0].isEmpty()) {
-                this.attendance_rate_standard_time_frame = null;
-            } else {
-                this.attendance_rate_standard_time_frame = Integer.parseInt(values.get("attendance_rate_standard_time_frame")[0]);
             }
             if (values.containsKey("attendance_day_latest_start_time")) {
                 this.attendance_day_latest_start_time = AttendanceDay.parseTime(values.get("attendance_day_latest_start_time")[0]);

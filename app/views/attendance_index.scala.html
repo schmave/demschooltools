@@ -1,7 +1,6 @@
 @(people : List[Person], person_to_stats : Map[Person, AttendanceStats],
   codes : List[String], codes_map : Map[String, AttendanceCode], current_people: List[Person],
-  start_date: Date, end_date: Date, is_custom_date: Boolean, prev_date: Date, next_date: Date,
-  standard_time_frame_start: Date, today: Date, standard_time_frame_days: Integer, is_standard_time_frame: Boolean)
+  start_date: Date, end_date: Date, is_custom_date: Boolean, prev_date: Date, next_date: Date)
 
 @import helper._
 
@@ -56,11 +55,6 @@ $(function() {
 	    }
 	</p>
 }
-@if(standard_time_frame_days != null && !is_standard_time_frame) {
-	<p><a href="@routes.Attendance.index(Application.forDateInput(standard_time_frame_start), Application.forDateInput(today), true)">
-	 	Show last @standard_time_frame_days school days
-	</a></p>
-}
 <form method="GET">
 	<p>Showing
 		<input type="date" name="start_date" value="@Application.forDateInput(start_date)"> to
@@ -97,6 +91,18 @@ $(function() {
 	<th width=100>Avg. hours per day</th>
 	@if( OrgConfig.get().org.attendance_show_percent ) {
 		<th width=100>Attendance Rate</th>
+	}
+	@if( OrgConfig.get().org.attendance_show_weighted_percent ) {
+		@if( !is_custom_date ) {
+			<th width=100>
+				Weighted Att. Rate
+				<span class="help-icon-wrapper">
+					<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip"
+						title="Weighted attendance rate counts recent days as worth more, and distant past days as worth less, with a smooth transition in between. This is only computed for the full school year.">
+					</span>
+				</span>
+			</th>
+		}
 	}
 	</thead>
 
@@ -135,6 +141,13 @@ $(function() {
 	<td align="center">@Attendance.format(person_to_stats.get(p).averageHoursPerDay())</td>
 	@if( OrgConfig.get().org.attendance_show_percent ) {
 		<td align="center">@Attendance.formatAsPercent(person_to_stats.get(p).attendanceRate())</td>
+	}
+	@if( OrgConfig.get().org.attendance_show_weighted_percent ) {
+		@if( !is_custom_date ) {
+			<td align="center" class="attendance-weighted-value">
+				@Attendance.formatAsPercent(person_to_stats.get(p).weightedAttendanceRate())
+			</td>
+		}
 	}
 }
 

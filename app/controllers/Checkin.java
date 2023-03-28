@@ -22,7 +22,7 @@ public class Checkin extends Controller {
     public Result checkinData(String time) throws ParseException {
         Date date = new SimpleDateFormat("M/d/yyyy, h:mm:ss a").parse(time);
 
-        Date start_date = Attendance.getAttendanceRateStandardTimeFrameStart();
+        Date start_date = Application.getStartOfYear();
         Date end_date = new Date();
         Map<Person, AttendanceStats> person_to_stats = Attendance.mapPeopleToStats(start_date, end_date);
 
