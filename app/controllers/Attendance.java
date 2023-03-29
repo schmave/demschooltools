@@ -271,11 +271,12 @@ public class Attendance extends Controller {
         for (int i = 0; i < school_days.size(); i++) {
             List<AttendanceDay> school_day = school_days.get(i);
             AttendanceDay day = school_day.stream().filter(d -> d.person.person_id == person_id).findAny().orElse(null);
-
-            stats.processDay(day, i, codes_map);
-
-            if (day.off_campus_departure_time != null || day.off_campus_return_time != null) {
-                has_off_campus_time = true;
+            
+            if (day != null) {
+                stats.processDay(day, i, codes_map);
+                if (day.off_campus_departure_time != null || day.off_campus_return_time != null) {
+                    has_off_campus_time = true;
+                }
             }
         }
 
