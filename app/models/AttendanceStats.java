@@ -28,6 +28,9 @@ public class AttendanceStats {
     }
 
     public void processDay(AttendanceDay day, int index, Map<String, AttendanceCode> codes_map) {
+        if (day == null) {
+            return;
+        }
         if (day.code != null || day.start_time == null || day.end_time == null) {
             incrementCodeCount(codes_map.get(day.code), index);
         }
