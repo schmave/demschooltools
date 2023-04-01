@@ -132,6 +132,18 @@ the other way around.</p>
         <input type="text" size="7" name="attendance_report_latest_departure_time"
             value="@org.formatAttendanceReportLatestDepartureTime()"
             @if(!org.show_attendance || !org.attendance_show_reports){ disabled }>
+        <br>Then charge&nbsp;
+        $ <input type="number" min="0" max="999" name="attendance_report_late_fee_2"
+            value="@org.attendance_report_late_fee_2"
+            @if(!org.show_attendance || !org.attendance_show_reports){ disabled }>
+         &nbsp;per&nbsp;
+        <input type="number" min="0" max="999" name="attendance_report_late_fee_interval_2"
+            value="@org.attendance_report_late_fee_interval_2"
+            @if(!org.show_attendance || !org.attendance_show_reports){ disabled }>
+         &nbsp;minutes after&nbsp;
+        <input type="text" size="7" name="attendance_report_latest_departure_time_2"
+            value="@org.formatAttendanceReportLatestDepartureTime2()"
+            @if(!org.show_attendance || !org.attendance_show_reports){ disabled }>
     </div>
 
     <label>
