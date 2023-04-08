@@ -270,7 +270,7 @@ public class Attendance extends Controller {
 
         for (int i = 0; i < school_days.size(); i++) {
             List<AttendanceDay> school_day = school_days.get(i);
-            AttendanceDay day = school_day.stream().filter(d -> d.person.person_id == person_id).findAny().orElse(null);
+            AttendanceDay day = school_day.stream().filter(d -> d.person.person_id.equals(person_id)).findAny().orElse(null);
             
             if (day != null) {
                 stats.processDay(day, i, codes_map);
