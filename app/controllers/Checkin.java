@@ -20,6 +20,10 @@ import play.mvc.*;
 public class Checkin extends Controller {
 
     public Result checkinData(String time) throws ParseException {
+        // As of April 2023, some browsers are including non-breaking spaces in
+        // their localized time strings, so we need to replace them with regular
+        // spaces before trying to parse.
+        time = time.replace('\u00A0',' ').replace('\u2007',' ').replace('\u202F',' ');
         Date date = new SimpleDateFormat("M/d/yyyy, h:mm:ss a").parse(time);
 
         Date start_date = Application.getStartOfYear();
