@@ -7,21 +7,21 @@
 @if( is_new ) {
     <h2>New entry</h2>
 } else {
-    <h2>Edit entry "@form("title").value()"</h2>
+    <h2>Edit entry "@form("title").getValue().get()"</h2>
 }
 
 @helper.form(routes.ApplicationEditing.saveEntry(), 'class -> "form-horizontal", 'role -> "form") {
 
 
-@if(form("id").value()) {
-	<input type="hidden" name="id" value="@form("id").value()"/>
+@if(form("id").getValue().isPresent()) {
+	<input type="hidden" name="id" value="@form("id").getValue().get()"/>
 }
 	@helper.select(form("section.id"), options = chapters.flatMap (c => c.sections.map(s => ("" + s.id, s.chapter.num + "" + s.num + " " + s.title))),
 		'_label -> "Section", 'class -> "form-control")
 <div class="form-group" id="num_field">
     <label for="num" class="col-sm-3 control-label">Number</label>
     <div class="col-sm-6">
-    @{section.getNumber()}.<input type="text" id="num" name="num" value="@form("num").value()" size="10">
+    @{section.getNumber()}.<input type="text" id="num" name="num" value="@form("num").getValue().get()" size="10">
 	</div>
 </div>
 	@helper.inputText(form("title"), '_label -> "Title", 'class -> "form-control")

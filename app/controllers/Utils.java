@@ -4,6 +4,8 @@ import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.persistence.*;
 
 import com.fasterxml.jackson.databind.*;
@@ -30,6 +32,7 @@ import play.data.Form;
 import play.twirl.api.Html;
 import play.twirl.api.HtmlFormat;
 
+@Singleton
 public class Utils
 {
     static MustacheFactory sMustache = new DefaultMustacheFactory();

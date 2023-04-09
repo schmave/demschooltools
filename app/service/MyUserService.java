@@ -5,7 +5,7 @@ import com.feth.play.module.pa.service.AbstractUserService;
 import com.feth.play.module.pa.user.AuthUser;
 import com.feth.play.module.pa.user.AuthUserIdentity;
 import com.feth.play.module.pa.user.EmailIdentity;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 
 import models.LinkedAccount;
 import models.Organization;

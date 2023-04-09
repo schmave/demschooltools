@@ -14,10 +14,10 @@ import com.avaje.ebean.SqlRow;
 import com.fasterxml.jackson.annotation.*;
 
 import controllers.Utils;
-import play.cache.Cache;
 import play.Logger;
 import com.avaje.ebean.Model;
 import play.mvc.Http.Context;
+import controllers.Public;
 
 @Entity
 public class Organization extends Model {
@@ -76,7 +76,7 @@ public class Organization extends Model {
 
         String cache_key = "Organization::getByHost::" + host;
 
-        Object cached_val = Cache.get(cache_key);
+        Object cached_val = Public.sCache.get(cache_key);
         if (cached_val!= null) {
             return (Organization)cached_val;
         }
@@ -90,7 +90,7 @@ public class Organization extends Model {
 
         if (result != null) {
             Organization org_result = find.byId(result.getInteger("organization_id"));
-            Cache.set(cache_key, org_result, 60); // cache for 1 minute
+            Public.sCache.set(cache_key, org_result, 60); // cache for 1 minute
             return org_result;
         } else {
 			if (host.matches("[a-z]")) {

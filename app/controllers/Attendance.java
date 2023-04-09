@@ -21,6 +21,8 @@ import play.data.*;
 import play.libs.Json;
 import play.mvc.*;
 
+import javax.inject.Inject;
+
 import static controllers.Application.getConfiguration;
 
 
@@ -28,13 +30,11 @@ import static controllers.Application.getConfiguration;
 @Secured.Auth(UserRole.ROLE_ATTENDANCE)
 public class Attendance extends Controller {
 
-    static Form<AttendanceCode> code_form;
-
-    static Form<AttendanceCode> getCodeForm() {
-        if (code_form == null) {
-            code_form = Form.form(AttendanceCode.class);
-        }
-        return code_form;
+    FormFactory mFormFactory;
+    
+    @Inject
+    public Attendance(FormFactory ff) {
+        this.mFormFactory = ff;
     }
 
     String renderIndexContent(Date start_date, Date end_date, Boolean is_custom_date) {
@@ -779,7 +779,7 @@ public class Attendance extends Controller {
     }
 
     public Result deleteOffCampusTime() {
-        DynamicForm form = Form.form().bindFromRequest();
+        DynamicForm form = mFormFactory.form().bindFromRequest();
         Map<String, String> data = form.data();
         for (Map.Entry<String, String> entry : data.entrySet()) {
             if (entry.getKey().isEmpty()) continue;
@@ -802,7 +802,7 @@ public class Attendance extends Controller {
 
     public Result saveOffCampusTime() throws ParseException {
         DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
-        DynamicForm form = Form.form().bindFromRequest();
+        DynamicForm form = mFormFactory.form().bindFromRequest();
         Map<String, String> data = form.data();
 
         for (int i = 0; i < 10; i++) {
@@ -831,7 +831,7 @@ public class Attendance extends Controller {
     }
 
     public Result runReport() {
-        Form<AttendanceReport> form = Form.form(AttendanceReport.class);
+        Form<AttendanceReport> form = mFormFactory.form(AttendanceReport.class);
         Form<AttendanceReport> filledForm = form.bindFromRequest();
         if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
@@ -874,6 +874,10 @@ public class Attendance extends Controller {
             }
         }
         return redirect(routes.Attendance.assignPINs());
+    }
+
+    Form<AttendanceCode> getCodeForm() {
+        return mFormFactory.form(AttendanceCode.class);
     }
 
     public Result viewCodes() {

@@ -52,7 +52,7 @@
 
 @form(routes.Settings.saveTaskList(), 'class -> "form-horizontal", 'role -> "form") {
 
-	<input type="hidden" name="id" value="@listForm("id").value()"/>
+	<input type="hidden" name="id" value="@listForm("id").getValue().get()"/>
 	@inputText(listForm("title"), '_label -> "Title", 'class -> "form-control")
 
 	<div class="form-group"><label class="col-sm-3 control-label">Tag</label>

@@ -4,13 +4,13 @@ import java.lang.annotation.*;
 
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.CompletableFuture;
+import javax.inject.Inject;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.SqlQuery;
 import com.avaje.ebean.SqlRow;
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.user.AuthUser;
-import com.google.inject.Inject;
 
 import models.OrgConfig;
 import models.Organization;
@@ -66,17 +66,8 @@ public class Secured {
                     Result unauthorized = authenticator.onUnauthorized(ctx);
                     return CompletableFuture.completedFuture(unauthorized);
                 } else {
-                    try {
-                        ctx.request().setUsername(username);
-                        return delegate.call(ctx).whenComplete(
-                            (result, throwable) -> {
-                                ctx.request().setUsername(null);
-                            }
-                        );
-                    } catch(Exception e) {
-                        ctx.request().setUsername(null);
-                        throw e;
-                    }
+                    Context childCtx = ctx.withRequest(ctx.request().withUsername(username));
+                    return delegate.call(childCtx);
                 }
             } catch(RuntimeException e) {
                 throw e;

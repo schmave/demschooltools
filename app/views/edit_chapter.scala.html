@@ -7,14 +7,14 @@
 @if( is_new ) {
     <h2>New chapter</h2>
 } else {
-    <h2>Edit chapter "@form("title").value()"</h2>
+    <h2>Edit chapter "@form("title").getValue().get()"</h2>
 }
 
 @helper.form(routes.ApplicationEditing.saveChapter(), 'class -> "form-horizontal") {
 
 
-@if(form("id").value()) {
-	<input type="hidden" name="id" value="@form("id").value()"/>
+@if(form("id").getValue().isPresent()) {
+	<input type="hidden" name="id" value="@form("id").getValue().get()"/>
 }
         @helper.inputText(form("num"), '_label -> "Number")
         @helper.inputText(form("title"), '_label -> "Title", 'class-> "form-control")

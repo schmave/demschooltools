@@ -15,7 +15,7 @@ import com.ecwid.mailchimp.method.v2_0.lists.UnsubscribeMethod;
 import com.ecwid.mailchimp.method.v2_0.lists.UpdateMemberMethod;
 import com.feth.play.module.pa.controllers.Authenticate;
 import com.feth.play.module.pa.PlayAuthenticate;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 
 import models.*;
 
@@ -23,6 +23,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 
 import play.*;
+import play.cache.SyncCacheApi;
 import play.data.*;
 import play.libs.Json;
 import play.mvc.*;
@@ -37,10 +38,13 @@ public class Public extends Controller {
     PlayAuthenticate mPlayAuth;
     Authenticate mAuth;
 
+    public static SyncCacheApi sCache;
+
     @Inject
-    public Public(final PlayAuthenticate playAuth, final Authenticate auth) {
+    public Public(final PlayAuthenticate playAuth, final Authenticate auth, final SyncCacheApi cache) {
         mPlayAuth = playAuth;
         mAuth = auth;
+        sCache = cache;
     }
 
     public Result facebookDeleteInfo() {

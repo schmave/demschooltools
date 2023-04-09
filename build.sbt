@@ -12,7 +12,7 @@ lazy val root = (project in file("."))
 
 scalaVersion := "2.11.7"
 
-// javacOptions in Compile ++= Seq("-Xlint:unchecked", "-Xlint:deprecation")
+javacOptions in Compile ++= Seq("-Xlint:unchecked", "-Xlint:deprecation")
 
 pipelineStages := Seq(digest, gzip)
 
@@ -21,7 +21,8 @@ pipelineStages := Seq(digest, gzip)
 libraryDependencies ++= Seq(
   javaJdbc,
   evolutions,
-  cache,
+  ehcache,
+  guice,
   "org.postgresql" % "postgresql" % "9.4-1201-jdbc41",
   "com.feth"      %% "play-authenticate" % "0.8.3",
   "com.typesafe.play" %% "play-mailer" % "5.0.0",
@@ -53,8 +54,8 @@ webpack := {
   if(runWebpack(baseDirectory.value) != 0) throw new Exception("Something went wrong when running webpack.")
 }
 
-dist <<= dist dependsOn webpack
+dist := (dist dependsOn webpack).value
 
-stage <<= stage dependsOn webpack
+stage := (stage dependsOn webpack).value
 
-PlayKeys.playRunHooks <+= baseDirectory.map(Webpack.apply)
+PlayKeys.playRunHooks += baseDirectory.map(Webpack.apply).value

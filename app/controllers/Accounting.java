@@ -9,27 +9,35 @@ import play.data.*;
 import play.libs.*;
 import com.csvreader.CsvWriter;
 import java.nio.charset.Charset;
+import javax.inject.Inject;
 
 @With(DumpOnError.class)
 @Secured.Auth(UserRole.ROLE_VIEW_JC)
 public class Accounting extends Controller {
 
+    FormFactory mFormFactory;
+
+    @Inject
+    public Accounting(FormFactory formFactory) {
+        mFormFactory = formFactory;
+    }
+
     public Result transaction(Integer id) {
         Transaction transaction = Transaction.findById(id);
-        Form<Transaction> form = Form.form(Transaction.class).fill(transaction);
+        Form<Transaction> form = mFormFactory.form(Transaction.class).fill(transaction);
         return ok(views.html.transaction.render(transaction, form));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result newTransaction() {
         applyMonthlyCredits();
-        Form<Transaction> form = Form.form(Transaction.class);
+        Form<Transaction> form = mFormFactory.form(Transaction.class);
         return ok(views.html.create_transaction.render(form));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result makeNewTransaction() {
-        Form<Transaction> form = Form.form(Transaction.class);
+        Form<Transaction> form = mFormFactory.form(Transaction.class);
         Form<Transaction> filledForm = form.bindFromRequest();
         if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
@@ -48,7 +56,7 @@ public class Accounting extends Controller {
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result saveTransaction() {
         try {
-            Form<Transaction> form = Form.form(Transaction.class).bindFromRequest();
+            Form<Transaction> form = mFormFactory.form(Transaction.class).bindFromRequest();
             Transaction transaction = Transaction.findById(Integer.parseInt(form.field("id").value()));
             transaction.updateFromForm(form);
             return redirect(routes.Accounting.transaction(transaction.id));
@@ -87,7 +95,7 @@ public class Accounting extends Controller {
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result runTransactionsReport() throws IOException {
-        Form<TransactionList> form = Form.form(TransactionList.class);
+        Form<TransactionList> form = mFormFactory.form(TransactionList.class);
         Form<TransactionList> filledForm = form.bindFromRequest();
         if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
@@ -152,7 +160,7 @@ public class Accounting extends Controller {
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result runReport() {
-        Form<AccountingReport> form = Form.form(AccountingReport.class);
+        Form<AccountingReport> form = mFormFactory.form(AccountingReport.class);
         Form<AccountingReport> filledForm = form.bindFromRequest();
         if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
@@ -184,13 +192,13 @@ public class Accounting extends Controller {
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result newAccount() {
-        Form<Account> form = Form.form(Account.class);
+        Form<Account> form = mFormFactory.form(Account.class);
         return ok(views.html.new_account.render(form));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result makeNewAccount() {
-        Form<Account> form = Form.form(Account.class);
+        Form<Account> form = mFormFactory.form(Account.class);
         Form<Account> filledForm = form.bindFromRequest();
         if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
@@ -207,13 +215,13 @@ public class Accounting extends Controller {
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result editAccount(Integer id) {
         Account account = Account.findById(id);
-        Form<Account> form = Form.form(Account.class).fill(account);
+        Form<Account> form = mFormFactory.form(Account.class).fill(account);
         return ok(views.html.edit_account.render(form, account.is_active));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result saveAccount() {
-        Form<Account> form = Form.form(Account.class).bindFromRequest();
+        Form<Account> form = mFormFactory.form(Account.class).bindFromRequest();
         Account account = Account.findById(Integer.parseInt(form.field("id").value()));
         account.updateFromForm(form);
         return redirect(routes.Accounting.account(account.id));

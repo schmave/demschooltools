@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.*;
 import javax.inject.Singleton;
+import javax.inject.Inject;
 
 import org.markdown4j.Markdown4jProcessor;
 import org.mindrot.jbcrypt.BCrypt;
@@ -21,7 +22,6 @@ import com.avaje.ebean.SqlQuery;
 import com.avaje.ebean.SqlRow;
 import com.csvreader.CsvWriter;
 import com.feth.play.module.pa.PlayAuthenticate;
-import com.google.inject.Inject;
 
 import models.*;
 

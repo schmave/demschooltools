@@ -9,9 +9,9 @@
 
 <div class="col-sm-6">
 
-@if(personForm("person_id").value()) {
-	<input type="hidden" name="person_id" value="@personForm("person_id").value()"/>
-    <input type="hidden" name="is_family" value="@personForm("is_family").value()"/>
+@if(personForm("person_id").getValue().isPresent()) {
+	<input type="hidden" name="person_id" value="@personForm("person_id").getValue().get()"/>
+    <input type="hidden" name="is_family" value="@personForm("is_family").getValue().get()"/>
 } else {
     <input type="hidden" name="is_family" value="false"/>
 }
@@ -27,10 +27,10 @@
 		@textarea(personForm("notes"), '_label -> "Notes", 'rows->6, 'class -> "form-control")
 		<hr/>
 
-		@defining(personForm("address").value() ||
-			personForm("city").value() ||
-			personForm("state").value() ||
-			personForm("zip").value()) { has_address =>
+		@defining(personForm("address").getValue().isPresent() ||
+			personForm("city").getValue().isPresent() ||
+			personForm("state").getValue().isPresent() ||
+			personForm("zip").getValue().isPresent()) { has_address =>
 			@if( !has_address ) {
 				<a id="address_controller" href="#" onclick="$('#address_stuff').show();$('#address_controller').hide();return false;">
 					  Add address
@@ -49,8 +49,8 @@
 		@inputText(personForm("neighborhood"), '_label -> "Neighborhood", 'class -> "form-control")
 		<hr/>
 
-		@defining(personForm("number_2").value() ||
-			personForm("number_3").value()) { has_phones =>
+		@defining(personForm("number_2").getValue().isPresent() ||
+			personForm("number_3").getValue().isPresent()) { has_phones =>
 		@for( i <- 1 to 3 ) {
 			@if( i == 2 && !has_phones ) {
 				<a id="phone_controller" href="#" onclick="$('#phone_stuff').show();$('#phone_controller').hide();return false;">

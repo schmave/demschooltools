@@ -12,7 +12,7 @@ import javax.mail.internet.*;
 import com.avaje.ebean.*;
 import com.ecwid.mailchimp.*;
 import com.ecwid.mailchimp.method.v2_0.lists.ListMethodResult;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 
 import models.*;
 
@@ -30,10 +30,13 @@ import play.mvc.*;
 public class CRM extends Controller {
 
     Application mApplication;
+    FormFactory mFormFactory;
 
     @Inject
-    public CRM(final Application app) {
+    public CRM(final Application app,
+               final FormFactory ff) {
         mApplication = app;
+        mFormFactory = ff;
     }
 
     public Result recentComments() {
@@ -354,12 +357,12 @@ public class CRM extends Controller {
     }
 
     public Result editTag(Integer id) {
-        Form<Tag> filled_form = Form.form(Tag.class).fill(Tag.findById(id));
+        Form<Tag> filled_form = mFormFactory.form(Tag.class).fill(Tag.findById(id));
         return ok(views.html.edit_tag.render(filled_form));
     }
 
     public Result saveTag() {
-        Form<Tag> form = Form.form(Tag.class).bindFromRequest();
+        Form<Tag> form = mFormFactory.form(Tag.class).bindFromRequest();
 
         if (form.field("id").value() != null) {
             Tag t = Tag.findById(Integer.parseInt(form.field("id").value()));
@@ -646,12 +649,12 @@ public class CRM extends Controller {
     }
 
     public Result newPerson() {
-        Form<Person> personForm = Form.form(Person.class);
+        Form<Person> personForm = mFormFactory.form(Person.class);
         return ok(views.html.new_person.render(personForm));
     }
 
     public Result makeNewPerson() {
-        Form<Person> personForm = Form.form(Person.class);
+        Form<Person> personForm = mFormFactory.form(Person.class);
         Form<Person> filledForm = personForm.bindFromRequest();
         if(filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
@@ -792,15 +795,12 @@ public class CRM extends Controller {
     public Result savePersonEdits() {
         CachedPage.onPeopleChanged();
 
-        Form<Person> personForm = Form.form(Person.class);
+        Form<Person> personForm = mFormFactory.form(Person.class);
         Form<Person> filledForm = personForm.bindFromRequest();
         if(filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
-            for (Map.Entry<String, List<ValidationError>> error : filledForm.errors().entrySet()) {
-                System.out.println(error.getKey());
-                for (ValidationError error2 : error.getValue()) {
-                    System.out.println(error2.key() + ", " + error2.message());
-                }
+            for (ValidationError error : filledForm.allErrors()) {
+                System.out.println(error.key() + ", " + error.message());
             }
             return badRequest(
                 views.html.edit_person.render(filledForm)
@@ -814,7 +814,7 @@ public class CRM extends Controller {
 
     public Result addComment() {
         CachedPage.remove(CachedPage.RECENT_COMMENTS);
-        Form<Comment> filledForm = Form.form(Comment.class).bindFromRequest();
+        Form<Comment> filledForm = mFormFactory.form(Comment.class).bindFromRequest();
         Comment new_comment = new Comment();
 
         new_comment.person = Person.findById(Integer.parseInt(filledForm.field("person").value()));
@@ -913,7 +913,7 @@ public class CRM extends Controller {
             Public.getMailChimpLists(mailChimpClient, org.mailchimp_api_key);
 
         return ok(views.html.view_mailchimp_settings.render(
-            Form.form(Organization.class), org,
+            mFormFactory.form(Organization.class), org,
             MailchimpSync.find.where().eq("tag.organization", OrgConfig.get().org).findList(),
             mc_list_map));
     }

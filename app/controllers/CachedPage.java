@@ -2,8 +2,6 @@ package controllers;
 
 import models.*;
 
-import play.cache.Cache;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -29,7 +27,7 @@ public abstract class CachedPage {
     }
 
     public static void remove(String key_base) {
-        Cache.remove(getKey(key_base));
+        Public.sCache.remove(getKey(key_base));
     }
 
     public CachedPage(String key_base, String title, String menu,
@@ -41,7 +39,7 @@ public abstract class CachedPage {
     }
 
     public String getPage() {
-        byte[] cached_bytes = (byte[])Cache.get(cache_key);
+        byte[] cached_bytes = (byte[])Public.sCache.get(cache_key);
         if (cached_bytes != null) {
             try {
                 ByteArrayInputStream bais = new ByteArrayInputStream(cached_bytes);
@@ -82,7 +80,7 @@ public abstract class CachedPage {
                 + "; compressed: " + compressed_bytes.length);
 
             // cache it for 12 hours
-            Cache.set(cache_key, compressed_bytes, 60 * 60 * 12);
+            Public.sCache.set(cache_key, compressed_bytes, 60 * 60 * 12);
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Exception writing cached bytes");

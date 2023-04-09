@@ -7,7 +7,7 @@ import java.util.concurrent.Executors;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.SqlUpdate;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 
 import models.*;
 
@@ -22,10 +22,13 @@ public class ApplicationEditing extends Controller {
 
     static ExecutorService sExecutor = Executors.newFixedThreadPool(2);
     static Set<Integer> sAlreadyEmailedCharges = new HashSet<>();
+    FormFactory mFormFactory;
 
     @Inject
-    public ApplicationEditing(Database db) {
+    public ApplicationEditing(Database db,
+                              FormFactory formFactory) {
         this.mDatabase = db;
+        this.mFormFactory = formFactory;
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
@@ -357,19 +360,19 @@ public class ApplicationEditing extends Controller {
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
 	public Result addChapter() {
-		Form<Chapter> form = Form.form(Chapter.class);
+		Form<Chapter> form = mFormFactory.form(Chapter.class);
 		return ok(views.html.edit_chapter.render(form, true));
 	}
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
 	public Result editChapter(Integer id) {
-		Form<Chapter> filled_form = Form.form(Chapter.class).fill(Chapter.findById(id));
+		Form<Chapter> filled_form = mFormFactory.form(Chapter.class).fill(Chapter.findById(id));
 		return ok(views.html.edit_chapter.render(filled_form, false));
 	}
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
 	public Result saveChapter() {
-		Form<Chapter> form = Form.form(Chapter.class).bindFromRequest();
+		Form<Chapter> form = mFormFactory.form(Chapter.class).bindFromRequest();
 
 		Chapter c = null;
 		if (form.field("id").value() != null) {
@@ -385,7 +388,7 @@ public class ApplicationEditing extends Controller {
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
 	public Result addSection(Integer chapterId) {
-		Form<Section> form = Form.form(Section.class);
+		Form<Section> form = mFormFactory.form(Section.class);
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("chapter.id", "" + chapterId);
 		form = form.bind(map, "chapter.id");
@@ -395,13 +398,13 @@ public class ApplicationEditing extends Controller {
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
 	public Result editSection(Integer id) {
 		Section existing_section = Section.findById(id);
-		Form<Section> filled_form = Form.form(Section.class).fill(existing_section);
+		Form<Section> filled_form = mFormFactory.form(Section.class).fill(existing_section);
 		return ok(views.html.edit_section.render(filled_form, existing_section.chapter, false, Chapter.all()));
 	}
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
 	public Result saveSection() {
-        Form<Section> form = Form.form(Section.class).bindFromRequest();
+        Form<Section> form = mFormFactory.form(Section.class).bindFromRequest();
 
 		Section s = null;
 		if (form.field("id").value() != null) {
@@ -417,7 +420,7 @@ public class ApplicationEditing extends Controller {
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
 	public Result addEntry(Integer sectionId) {
-		Form<Entry> form = Form.form(Entry.class);
+		Form<Entry> form = mFormFactory.form(Entry.class);
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("section.id", "" + sectionId);
 		form = form.bind(map, "section.id");
@@ -427,13 +430,13 @@ public class ApplicationEditing extends Controller {
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
 	public Result editEntry(Integer id) {
         Entry e = Entry.findById(id);
-		Form<Entry> filled_form = Form.form(Entry.class).fill(e);
+		Form<Entry> filled_form = mFormFactory.form(Entry.class).fill(e);
 		return ok(views.html.edit_entry.render(filled_form, e.section, false, Chapter.all()));
 	}
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
 	public Result saveEntry() {
-		Form<Entry> form = Form.form(Entry.class).bindFromRequest();
+		Form<Entry> form = mFormFactory.form(Entry.class).bindFromRequest();
 
 		Entry e = null;
 		if (form.field("id").value() != null) {
