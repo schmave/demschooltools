@@ -11,6 +11,7 @@ import javax.inject.Inject;
 
 import models.*;
 
+import play.api.libs.mailer.MailerClient;
 import play.db.Database;
 import play.data.*;
 import play.mvc.*;
@@ -18,7 +19,9 @@ import play.mvc.*;
 @With(DumpOnError.class)
 public class ApplicationEditing extends Controller {
 
-    private Database mDatabase;
+    private final Database mDatabase;
+    MailerClient mMailer;
+
 
     static ExecutorService sExecutor = Executors.newFixedThreadPool(2);
     static Set<Integer> sAlreadyEmailedCharges = new HashSet<>();
@@ -26,9 +29,11 @@ public class ApplicationEditing extends Controller {
 
     @Inject
     public ApplicationEditing(Database db,
-                              FormFactory formFactory) {
+                              FormFactory formFactory,
+                              MailerClient mailer) {
         this.mDatabase = db;
         this.mFormFactory = formFactory;
+        mMailer = mailer;
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
@@ -194,7 +199,7 @@ public class ApplicationEditing extends Controller {
     public Result clearAllReferencedCases(Integer case_id)
     {
         Case referencing_case = Case.findById(case_id);
-        for (Case referenced_case : new ArrayList<Case>(referencing_case.referenced_cases)) {
+        for (Case referenced_case : new ArrayList<>(referencing_case.referenced_cases)) {
             referencing_case.removeReferencedCase(referenced_case);
         }
         return ok(Utils.toJson(CaseReference.create(referencing_case)));
@@ -258,36 +263,33 @@ public class ApplicationEditing extends Controller {
                 !sAlreadyEmailedCharges.contains(c.id) &&
                 !NotificationRule.findByType(NotificationRule.TYPE_SCHOOL_MEETING).isEmpty()) {
             final OrgConfig org_config = OrgConfig.get();
-            sExecutor.submit(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(1000 * 60 * 5);
-                        Charge c = Charge.find.byId(id);
-                        if (c.referred_to_sm && !sAlreadyEmailedCharges.contains(c.id)) {
-                            sAlreadyEmailedCharges.add(c.id);
-                            List<NotificationRule> rules = NotificationRule.findByType(
-                                    NotificationRule.TYPE_SCHOOL_MEETING, org_config);
-                            for (NotificationRule rule : rules) {
-                                play.libs.mailer.Email mail = new play.libs.mailer.Email();
-                                mail.addTo(rule.email);
-                                mail.setSubject(c.person.getInitials() + "'s charge"
-                                        + " referred to School Meeting in case #" + c.the_case.case_number);
-                                mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
-                                mail.setBodyText(
-                                    "" + c.person.getDisplayName()
-                                    + " was charged with " + c.getRuleTitle()
-                                    + " and the charge was referred to School Meeting in case #" + c.the_case.case_number + ".\n\n"
-                                    + "For more information, view today's minutes:\n\n"
-                                    + org_config.people_url + routes.Application.viewMeeting(c.the_case.meeting.id).toString()
-                                    + "\n\n"
-                                );
-                                play.libs.mailer.MailerPlugin.send(mail);
-                            }
+            sExecutor.submit(() -> {
+                try {
+                    Thread.sleep(1000 * 60 * 5);
+                    Charge c1 = Charge.find.byId(id);
+                    if (c1.referred_to_sm && !sAlreadyEmailedCharges.contains(c1.id)) {
+                        sAlreadyEmailedCharges.add(c1.id);
+                        List<NotificationRule> rules = NotificationRule.findByType(
+                                NotificationRule.TYPE_SCHOOL_MEETING, org_config);
+                        for (NotificationRule rule : rules) {
+                            play.libs.mailer.Email mail = new play.libs.mailer.Email();
+                            mail.addTo(rule.email);
+                            mail.setSubject(c1.person.getInitials() + "'s charge"
+                                    + " referred to School Meeting in case #" + c1.the_case.case_number);
+                            mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
+                            mail.setBodyText(
+                                "" + c1.person.getDisplayName()
+                                + " was charged with " + c1.getRuleTitle()
+                                + " and the charge was referred to School Meeting in case #" + c1.the_case.case_number + ".\n\n"
+                                + "For more information, view today's minutes:\n\n"
+                                + org_config.people_url + routes.Application.viewMeeting(c1.the_case.meeting.id).toString()
+                                + "\n\n"
+                            );
+                            mMailer.send(mail);
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             });
         }
@@ -374,7 +376,7 @@ public class ApplicationEditing extends Controller {
 	public Result saveChapter() {
 		Form<Chapter> form = mFormFactory.form(Chapter.class).bindFromRequest();
 
-		Chapter c = null;
+		Chapter c;
 		if (form.field("id").getValue().isPresent()) {
 			c = Chapter.findById(Integer.parseInt(form.field("id").getValue().get()));
 			c.updateFromForm(form);
@@ -389,7 +391,7 @@ public class ApplicationEditing extends Controller {
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
 	public Result addSection(Integer chapterId) {
 		Form<Section> form = mFormFactory.form(Section.class);
-		Map<String, String> map = new HashMap<String, String>();
+		Map<String, String> map = new HashMap<>();
 		map.put("chapter.id", "" + chapterId);
 		form = form.bind(map, "chapter.id");
 		return ok(views.html.edit_section.render(form, Chapter.findById(chapterId), true, Chapter.all()));
@@ -406,7 +408,7 @@ public class ApplicationEditing extends Controller {
 	public Result saveSection() {
         Form<Section> form = mFormFactory.form(Section.class).bindFromRequest();
 
-		Section s = null;
+		Section s;
 		if (form.field("id").getValue().isPresent()) {
 			s = Section.findById(Integer.parseInt(form.field("id").getValue().get()));
 			s.updateFromForm(form);
@@ -421,7 +423,7 @@ public class ApplicationEditing extends Controller {
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
 	public Result addEntry(Integer sectionId) {
 		Form<Entry> form = mFormFactory.form(Entry.class);
-		Map<String, String> map = new HashMap<String, String>();
+		Map<String, String> map = new HashMap<>();
 		map.put("section.id", "" + sectionId);
 		form = form.bind(map, "section.id");
 		return ok(views.html.edit_entry.render(form, Section.findById(sectionId), true, Chapter.all()));
@@ -438,7 +440,7 @@ public class ApplicationEditing extends Controller {
 	public Result saveEntry() {
 		Form<Entry> form = mFormFactory.form(Entry.class).bindFromRequest();
 
-		Entry e = null;
+		Entry e;
 		if (form.field("id").getValue().isPresent()) {
 			e = Entry.findById(Integer.parseInt(form.field("id").getValue().get()));
 			e.updateFromForm(form);

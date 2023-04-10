@@ -19,6 +19,7 @@ import models.*;
 import models.Comment;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import play.api.libs.mailer.MailerClient;
 import play.data.*;
 import play.data.validation.ValidationError;
 import play.libs.Json;
@@ -31,12 +32,15 @@ public class CRM extends Controller {
 
     Application mApplication;
     FormFactory mFormFactory;
+    static MailerClient sMailer;
 
     @Inject
     public CRM(final Application app,
-               final FormFactory ff) {
+               final FormFactory ff,
+               final MailerClient mailer) {
         mApplication = app;
         mFormFactory = ff;
+        sMailer = mailer;
     }
 
     public Result recentComments() {
@@ -139,8 +143,7 @@ public class CRM extends Controller {
 			first_time = false;
 		}
 
-		List<Person> sorted_people = new ArrayList<>();
-		sorted_people.addAll(selected_people);
+        List<Person> sorted_people = new ArrayList<>(selected_people);
 		sorted_people.sort(Person.SORT_FIRST_NAME);
 		if (sorted_people.size() > 30) {
             sorted_people = sorted_people.subList(0, 29);
@@ -213,9 +216,7 @@ public class CRM extends Controller {
 	public Collection<Person> getTagMembers(Integer tagId, String familyMode) {
         List<Person> people = Tag.findById(tagId).people;
 
-        Set<Person> selected_people = new HashSet<>();
-
-		selected_people.addAll(people);
+        Set<Person> selected_people = new HashSet<>(people);
 
 		if (!familyMode.equals("just_tags")) {
 			for (Person p : people) {
@@ -321,7 +322,7 @@ public class CRM extends Controller {
             mail.addTo(rule.email);
             mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
             mail.setBodyHtml(views.html.tag_email.render(t, p, was_add).toString());
-            play.libs.mailer.MailerPlugin.send(mail);
+            sMailer.send(mail);
         }
     }
 
@@ -825,7 +826,7 @@ public class CRM extends Controller {
                     mail.addTo(rule.email);
                     mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
                     mail.setBodyHtml(views.html.comment_email.render(Comment.find.byId(new_comment.id)).toString());
-                    play.libs.mailer.MailerPlugin.send(mail);
+                    sMailer.send(mail);
                 }
             }
 

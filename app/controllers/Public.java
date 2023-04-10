@@ -22,6 +22,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 
 import play.*;
+import play.api.libs.mailer.MailerClient;
 import play.cache.SyncCacheApi;
 import play.mvc.*;
 import play.mvc.Http.Context;
@@ -36,15 +37,17 @@ public class Public extends Controller {
     public static SyncCacheApi sCache;
     public static Environment sEnvironment;
     public static Config sConfig;
+    MailerClient mMailer;
 
     @Inject
     public Public(final PlayAuthenticate playAuth, final Authenticate auth, final SyncCacheApi cache,
-                  final Environment environment, final Config config) {
+                  final Environment environment, final Config config, final MailerClient mailer) {
         mPlayAuth = playAuth;
         mAuth = auth;
         sCache = cache;
         sEnvironment = environment;
         sConfig = config;
+        mMailer = mailer;
     }
 
     public Result facebookDeleteInfo() {
@@ -328,7 +331,7 @@ public class Public extends Controller {
                 mail.addTo(org.mailchimp_updates_email);
                 mail.setFrom("Papal DB <noreply@threeriversvillageschool.org>");
                 mail.setBodyHtml(views.html.sync_email.render(mc_lists, info).toString());
-                play.libs.mailer.MailerPlugin.send(mail);
+                mMailer.send(mail);
             }
         }
         return ok("");

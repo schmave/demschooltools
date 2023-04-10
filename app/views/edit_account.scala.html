@@ -5,7 +5,7 @@
 @main("Edit Account", "accounting") {
 	<h2>Edit Account</h2>
 	@form(routes.Accounting.saveAccount()) {
-		<input type="hidden" name="id" value="@accountForm("id").value"/>
+		<input type="hidden" name="id" value="@accountForm("id").getValue.get"/>
 		<div class="col-sm-6">
 			@inputText(accountForm("name"), '_label -> "Name", 'class -> "form-control")
 			@select(

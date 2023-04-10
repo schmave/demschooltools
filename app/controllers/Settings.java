@@ -35,7 +35,7 @@ public class Settings extends Controller {
             .order("the_type DESC, tag.id")
             .findList();
 
-        return ok(views.html.view_settings.render(rules, OrgConfig.get().org, Application.getConfiguration()));
+        return ok(views.html.view_settings.render(rules, OrgConfig.get().org, Public.sConfig.getConfig("school_crm")));
     }
 
     public Result editSettings() {

@@ -1,31 +1,32 @@
 package controllers;
 
-import java.io.*;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.sql.Time;
-import java.text.*;
-import java.util.*;
-import java.util.stream.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
 import com.avaje.ebean.SqlRow;
 import com.csvreader.CsvWriter;
-
 import com.typesafe.config.Config;
 import models.*;
-
-import play.*;
-import play.data.*;
+import play.data.DynamicForm;
+import play.data.Form;
+import play.data.FormFactory;
 import play.libs.Json;
-import play.mvc.*;
+import play.mvc.Controller;
+import play.mvc.Result;
+import play.mvc.With;
 
 import javax.inject.Inject;
-
-import static controllers.Application.getConfiguration;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.sql.Time;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 
 @With(DumpOnError.class)

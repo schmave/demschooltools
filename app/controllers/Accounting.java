@@ -1,6 +1,7 @@
 package controllers;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.*;
 import models.*;
@@ -76,8 +77,8 @@ public class Accounting extends Controller {
         applyMonthlyCredits();
         List<Account> personalAccounts = Account.allPersonalChecking();
         List<Account> nonPersonalAccounts = Account.allNonPersonalChecking();
-        Collections.sort(personalAccounts, (a, b) -> a.getName().compareTo(b.getName()));
-        Collections.sort(nonPersonalAccounts, (a, b) -> a.getName().compareTo(b.getName()));
+        personalAccounts.sort(Comparator.comparing(Account::getName));
+        nonPersonalAccounts.sort(Comparator.comparing(Account::getName));
         return ok(views.html.balances.render(personalAccounts, nonPersonalAccounts));
     }
 
@@ -113,7 +114,7 @@ public class Accounting extends Controller {
 
     private byte[] downloadTransactionReport(TransactionList report) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Charset charset = Charset.forName("UTF-8");
+        Charset charset = StandardCharsets.UTF_8;
         CsvWriter writer = new CsvWriter(baos, ',', charset);
 
         writer.write("Archived");
@@ -186,7 +187,7 @@ public class Accounting extends Controller {
     public Result accounts() {
         applyMonthlyCredits();
         List<Account> accounts = Account.all();
-        Collections.sort(accounts, (a, b) -> a.getName().compareTo(b.getName()));
+        accounts.sort(Comparator.comparing(Account::getName));
         return ok(views.html.accounts.render(accounts));
     }
 
@@ -228,12 +229,12 @@ public class Accounting extends Controller {
     }
 
     public static String accountsJson() {
-        List<Map<String, String>> result = new ArrayList<Map<String, String>>();
-        List<Account> accounts = new ArrayList<Account>();
+        List<Map<String, String>> result = new ArrayList<>();
+        List<Account> accounts = new ArrayList<>();
         accounts.addAll(Account.allPersonalChecking());
         accounts.addAll(Account.allNonPersonalChecking());
         for (Account a : accounts) {
-            HashMap<String, String> values = new HashMap<String, String>();
+            HashMap<String, String> values = new HashMap<>();
             values.put("label", a.getName());
             values.put("id", "" + a.id);
             values.put("balance", a.getFormattedBalance());
