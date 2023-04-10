@@ -1,12 +1,11 @@
 package models;
 
-import java.text.*;
-import java.util.*;
-import java.math.*;
-import javax.persistence.*;
-import com.fasterxml.jackson.annotation.*;
-import play.data.*;
-import com.avaje.ebean.*;
+import play.data.Form;
+
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TransactionList {
 
@@ -63,7 +62,7 @@ public class TransactionList {
 
     public static TransactionList allCash() {
         TransactionList model = new TransactionList();
-        model.transactions = new ArrayList<Transaction>();
+        model.transactions = new ArrayList<>();
         List<Transaction> deposit_transactions = Transaction.allCashDeposits();
         List<Transaction> withdrawal_transactions = Transaction.allCashWithdrawals();
         for (Transaction t : deposit_transactions) {
@@ -109,7 +108,7 @@ public class TransactionList {
     }
 
     public static void sortTransactions(List<Transaction> transactions) {
-        Collections.sort(transactions, (a, b) -> (getTransactionSortValue(b)).compareTo(getTransactionSortValue(a)));
+        transactions.sort((a, b) -> (getTransactionSortValue(b)).compareTo(getTransactionSortValue(a)));
     }
 
     private static Integer getTransactionSortValue(Transaction transaction) {

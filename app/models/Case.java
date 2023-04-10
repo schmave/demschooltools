@@ -1,26 +1,19 @@
 package models;
 
+import com.avaje.ebean.Model;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import controllers.Application;
+import controllers.Public;
+import controllers.Utils;
+
+import javax.persistence.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.StringWriter;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.*;
-
-import javax.persistence.*;
-
-import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.core.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import controllers.Application;
-import controllers.Utils;
-
-import com.avaje.ebean.Model;
-import com.avaje.ebean.Model.Finder;
-import play.libs.Json;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name="`case`")
@@ -79,8 +72,8 @@ public class Case extends Model implements Comparable<Case> {
     @Transient
     public String composite_findings;
 
-    public static Finder<Integer, Case> find = new Finder<Integer, Case>(
-        Case.class
+    public static Finder<Integer, Case> find = new Finder<>(
+            Case.class
     );
 
     public static Case findById(Integer id) {
@@ -141,25 +134,25 @@ public class Case extends Model implements Comparable<Case> {
         this.update();
     }
 
-	public boolean empty() {
-		return findings.equals("") &&
-			location.equals("") &&
-			date == null &&
+    public boolean empty() {
+        return findings.equals("") &&
+                location.equals("") &&
+                date == null &&
             time.equals("") &&
-			people_at_case.size() == 0 &&
-			charges.size() == 0;
-	}
+                people_at_case.size() == 0 &&
+                charges.size() == 0;
+    }
 
     public void loadNames() {
         if (names != null) {
             return;
         }
 
-        names = new HashSet<String>();
+        names = new HashSet<>();
 
         try {
             BufferedReader r = new BufferedReader(new InputStreamReader(
-                play.Play.application().classloader().getResourceAsStream("names.txt")));
+                    Public.sEnvironment.resourceAsStream("names.txt")));
             while (true) {
                 String line = r.readLine();
                 if (line == null) {
@@ -193,7 +186,7 @@ public class Case extends Model implements Comparable<Case> {
         String keep_display_name = keep_this_persons_name.getDisplayName().trim().toLowerCase();
 
         String[] words = composite_findings.split("\\b");
-        Map<String, String> replacement_names = new HashMap<String, String>();
+        Map<String, String> replacement_names = new HashMap<>();
         char next_replacement = 'A';
 
         for (String w : words) {
@@ -254,7 +247,7 @@ public class Case extends Model implements Comparable<Case> {
         if (!OrgConfig.get().org.enable_case_references) {
             return findings;
         }
-        ArrayList<Charge> relevant_charges = new ArrayList<Charge>();
+        ArrayList<Charge> relevant_charges = new ArrayList<>();
         for (Charge charge : charges) {
             charge.buildChargeReferenceChain(relevant_charges);
         }
@@ -264,12 +257,12 @@ public class Case extends Model implements Comparable<Case> {
     private String generateCompositeFindings(List<Charge> relevant_charges, List<Case> used_cases) {
 
         if (used_cases == null) {
-            used_cases = new ArrayList<Case>();
+            used_cases = new ArrayList<>();
         }
         used_cases.add(this);
         String result = "";
 
-        Collections.sort(referenced_cases, (a, b) -> a.case_number.compareTo(b.case_number));
+        referenced_cases.sort(Comparator.comparing(a -> a.case_number));
 
         for (Case c : referenced_cases) {
             if (used_cases.contains(c)) {
@@ -278,7 +271,7 @@ public class Case extends Model implements Comparable<Case> {
             if (!isCaseRelevant(c, relevant_charges)) {
                 continue;
             }
-            ArrayList<Case> _used_cases = new ArrayList<Case>(used_cases);
+            ArrayList<Case> _used_cases = new ArrayList<>(used_cases);
             boolean hasRelevantReferences = c.referenced_cases.stream()
                 .anyMatch(rc -> isCaseRelevant(rc, relevant_charges) && !_used_cases.contains(rc));
             if (!hasRelevantReferences) {

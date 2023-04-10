@@ -2,8 +2,6 @@ package models;
 
 import java.util.*;
 
-import controllers.Application;
-
 public class RuleHistory {
 
     public class Record {
@@ -18,8 +16,8 @@ public class RuleHistory {
 	public List<Charge> charges;
 
     public RuleHistory(Entry rule, boolean include_today, Date start_date, Date end_date) {
-		charges = new ArrayList<Charge>();
-        HashMap<Person, Record> records = new HashMap<Person, Record>();
+		charges = new ArrayList<>();
+        HashMap<Person, Record> records = new HashMap<>();
 
         Date today = new Date();
 		if (end_date == null) {
@@ -53,7 +51,7 @@ public class RuleHistory {
             }
         }
 
-        rule_records = new ArrayList<Record>(records.values());
+        rule_records = new ArrayList<>(records.values());
     }
 
 

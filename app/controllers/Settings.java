@@ -164,7 +164,7 @@ public class Settings extends Controller {
         Form<Task> task_form = mFormFactory.form(Task.class);
         Form<Task> filled_form = task_form.bindFromRequest();
         Task t = filled_form.get();
-        if (filled_form.apply("enabled").value().equals("false")) {
+        if (filled_form.apply("enabled").getValue().get().equals("false")) {
             t.enabled = false;
         }
         t.update();
@@ -194,7 +194,7 @@ public class Settings extends Controller {
             .order("name ASC")
             .findList();
 
-        List<User> users_to_show = new ArrayList<User>();
+        List<User> users_to_show = new ArrayList<>();
         for (User user : users) {
             // Hide dummy users and the check-in app user
             if (!user.name.equals(MyUserService.DUMMY_USERNAME) &&
@@ -261,7 +261,7 @@ public class Settings extends Controller {
             }
         }
 
-        if (filled_form.apply("active").value().equals("false")) {
+        if (filled_form.apply("active").getValue().get().equals("false")) {
             u.active = false;
             Ebean.deleteAll(orig_user.linkedAccounts);
         }

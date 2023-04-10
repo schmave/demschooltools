@@ -3,7 +3,6 @@ package models;
 import java.text.*;
 import java.util.*;
 import java.math.*;
-import java.time.*;
 import javax.persistence.*;
 
 import com.avaje.ebean.Query;
@@ -61,10 +60,6 @@ public class Account extends Model {
 
     public AccountType getType() {
         return type;
-    }
-
-    public BigDecimal getMonthly_credit() {
-        return monthly_credit;
     }
 
     public String getName() {
@@ -213,10 +208,10 @@ public class Account extends Model {
     }
 
     public void updateFromForm(Form<Account> form) {
-        is_active = Utils.getBooleanFromFormValue(form.field("is_active").value());
-        name = form.field("name").value();
-        type = AccountType.valueOf(form.field("type").value());
-        monthly_credit = new BigDecimal(form.field("monthly_credit").value());
+        is_active = Utils.getBooleanFromFormValue(form.field("is_active"));
+        name = form.field("name").getValue().get();
+        type = AccountType.valueOf(form.field("type").getValue().get());
+        monthly_credit = new BigDecimal(form.field("monthly_credit").getValue().get());
         // if we are changing the monthly credit, set the date last applied to today
         if (monthly_credit.compareTo(BigDecimal.ZERO) != 0) {
             date_last_monthly_credit = new Date();

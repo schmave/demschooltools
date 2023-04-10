@@ -3,14 +3,12 @@ package providers;
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.providers.AuthProvider;
 import com.feth.play.module.pa.user.AuthUser;
+import models.User;
 import play.inject.ApplicationLifecycle;
 import play.mvc.Http.Context;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-
-import models.LinkedAccount;
-import models.User;
 
 @Singleton
 public class EvanAuthProvider extends AuthProvider {
@@ -24,7 +22,7 @@ public class EvanAuthProvider extends AuthProvider {
     @Override
     public Object authenticate(final Context context, final Object payload) {
         final User user = (User) payload;
-        AuthUser result = new AuthUser() {
+        return new AuthUser() {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -37,7 +35,6 @@ public class EvanAuthProvider extends AuthProvider {
                 return "evan-auth-provider";
             }
         };
-        return result;
     }
 
     @Override

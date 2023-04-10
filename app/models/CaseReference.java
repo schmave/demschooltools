@@ -1,7 +1,7 @@
 package models;
 
-import models.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CaseReference {
 
@@ -11,7 +11,7 @@ public class CaseReference {
 	public List<ChargeReference> charges;
 
 	public static List<CaseReference> create(Case referencing_case) {
-		List<CaseReference> results = new ArrayList<CaseReference>();
+		List<CaseReference> results = new ArrayList<>();
 		
 		for (Case referenced_case : referencing_case.referenced_cases) {
 			
@@ -19,7 +19,7 @@ public class CaseReference {
 			result.id = referenced_case.id;
 			result.case_number = referenced_case.case_number;
 			result.findings = referenced_case.generateCompositeFindingsFromCaseReferences();
-			result.charges = new ArrayList<ChargeReference>();
+			result.charges = new ArrayList<>();
 
 			for (Charge charge : referenced_case.charges) {
 
@@ -46,7 +46,7 @@ public class CaseReference {
 					if (new_charge.referenced_charge == charge) {
 						cr.has_generated = true;
 						cr.generated_charge_id = new_charge.id;
-						cr.has_default_rule = new_charge.rule != null && new_charge.rule.id == Entry.findBreakingResPlanEntryId();
+						cr.has_default_rule = new_charge.rule != null && new_charge.rule.id.equals(Entry.findBreakingResPlanEntryId());
 					}
 				}
 

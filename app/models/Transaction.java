@@ -1,14 +1,20 @@
 package models;
 
+import com.avaje.ebean.FetchConfig;
+import com.avaje.ebean.Model;
 import controllers.Application;
-import java.text.*;
-import java.util.*;
-import java.util.stream.*;
-import java.math.*;
+import play.data.Form;
+
 import javax.persistence.*;
-import com.fasterxml.jackson.annotation.*;
-import play.data.*;
-import com.avaje.ebean.*;
+import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name="transactions")
@@ -66,7 +72,7 @@ public class Transaction extends Model {
     }
 
     public String getFormattedAmount(boolean includePlusSign) {
-        if (amount == BigDecimal.ZERO) return "0";
+        if (Objects.equals(amount, BigDecimal.ZERO)) return "0";
         String formatted = new DecimalFormat("0.00").format(amount);
         if (includePlusSign) {
             String prefix = amount.compareTo(BigDecimal.ZERO) > 0 ? "+" : "";
@@ -88,8 +94,8 @@ public class Transaction extends Model {
         return cssClass;
     }
 
-    public static Finder<Integer, Transaction> find = new Finder<Integer, Transaction>(
-        Transaction.class
+    public static Finder<Integer, Transaction> find = new Finder<>(
+            Transaction.class
     );
 
     public static Transaction findById(Integer id) {
@@ -139,11 +145,11 @@ public class Transaction extends Model {
     public static Transaction create(Form<Transaction> form) throws Exception {
         Transaction transaction = form.get();
 
-        transaction.from_account = findAccountById(form.field("from_account_id").value());
-        transaction.to_account = findAccountById(form.field("to_account_id").value());
+        transaction.from_account = findAccountById(form.field("from_account_id").getValue().get());
+        transaction.to_account = findAccountById(form.field("to_account_id").getValue().get());
 
         DateFormat format = new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
-        transaction.date_created = format.parse(form.field("date_created").value());
+        transaction.date_created = format.parse(form.field("date_created").getValue().get());
 
         transaction.organization = Organization.getByHost();
         transaction.created_by_user = Application.getCurrentUser();
@@ -176,9 +182,9 @@ public class Transaction extends Model {
 
     public void updateFromForm(Form<Transaction> form) throws Exception {
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
-        description = form.field("description").value();
-        amount = new BigDecimal(form.field("amount").value());
-        date_created = format.parse(form.field("date_created").value());
+        description = form.field("description").getValue().get();
+        amount = new BigDecimal(form.field("amount").getValue().get());
+        date_created = format.parse(form.field("date_created").getValue().get());
         save();
     }
 }

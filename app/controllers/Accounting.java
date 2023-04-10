@@ -57,7 +57,7 @@ public class Accounting extends Controller {
     public Result saveTransaction() {
         try {
             Form<Transaction> form = mFormFactory.form(Transaction.class).bindFromRequest();
-            Transaction transaction = Transaction.findById(Integer.parseInt(form.field("id").value()));
+            Transaction transaction = Transaction.findById(Integer.parseInt(form.field("id").getValue().get()));
             transaction.updateFromForm(form);
             return redirect(routes.Accounting.transaction(transaction.id));
         }
@@ -205,8 +205,8 @@ public class Accounting extends Controller {
             return badRequest(views.html.new_account.render(filledForm));
         }
         else {
-            String name = filledForm.field("name").value();
-            AccountType type = AccountType.valueOf(filledForm.field("type").value());
+            String name = filledForm.field("name").getValue().get();
+            AccountType type = AccountType.valueOf(filledForm.field("type").getValue().get());
             Account account = Account.create(type, name, null);
             return redirect(routes.Accounting.account(account.id));
         }
@@ -222,7 +222,7 @@ public class Accounting extends Controller {
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result saveAccount() {
         Form<Account> form = mFormFactory.form(Account.class).bindFromRequest();
-        Account account = Account.findById(Integer.parseInt(form.field("id").value()));
+        Account account = Account.findById(Integer.parseInt(form.field("id").getValue().get()));
         account.updateFromForm(form);
         return redirect(routes.Accounting.account(account.id));
     }

@@ -30,8 +30,8 @@ public class NotificationRule extends Model {
     @JoinColumn(name="organization_id")
     public Organization organization;
 
-    public static Finder<Integer, NotificationRule> find = new Finder<Integer, NotificationRule>(
-        NotificationRule.class
+    public static Finder<Integer, NotificationRule> find = new Finder<>(
+            NotificationRule.class
     );
 
     public static NotificationRule findById(int id) {

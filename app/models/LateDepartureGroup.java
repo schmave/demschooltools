@@ -1,13 +1,8 @@
 package models;
 
-import java.text.*;
-import java.util.*;
-import java.math.*;
-import javax.persistence.*;
-import com.fasterxml.jackson.annotation.*;
-import play.data.*;
-import com.avaje.ebean.*;
 import java.sql.Time;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LateDepartureGroup {
     
@@ -20,7 +15,7 @@ public class LateDepartureGroup {
 
     public LateDepartureGroup(String person_name) {
         name = person_name;
-        events = new ArrayList<AttendanceDay>();
+        events = new ArrayList<>();
 
         Organization org = OrgConfig.get().org;
         late_fee = org.attendance_report_late_fee;

@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -39,7 +40,7 @@ public abstract class CachedPage {
     }
 
     public String getPage() {
-        byte[] cached_bytes = (byte[])Public.sCache.get(cache_key);
+        byte[] cached_bytes = Public.sCache.get(cache_key);
         if (cached_bytes != null) {
             try {
                 ByteArrayInputStream bais = new ByteArrayInputStream(cached_bytes);
@@ -61,14 +62,14 @@ public abstract class CachedPage {
             }
         }
 
-        String result = null;
+        String result;
         // Only render one cached page at a time (per server process)
         synchronized(JC_INDEX) {
             result = render();
         }
 
         try {
-            byte[] bytes_to_compress = result.getBytes("UTF-8");
+            byte[] bytes_to_compress = result.getBytes(StandardCharsets.UTF_8);
             ByteArrayOutputStream baos = new ByteArrayOutputStream(result.length());
             GZIPOutputStream gzos = new GZIPOutputStream(baos);
             gzos.write(bytes_to_compress);

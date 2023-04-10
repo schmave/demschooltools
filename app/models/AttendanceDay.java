@@ -1,20 +1,15 @@
 package models;
 
-import java.io.*;
+import com.avaje.ebean.Model;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import javax.persistence.*;
 import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
-
-import javax.persistence.*;
-
-import com.avaje.ebean.Model;
-import com.avaje.ebean.Model.Finder;
-import com.fasterxml.jackson.annotation.*;
-
-import controllers.Application;
-
-import play.libs.Json;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 @Entity
 public class AttendanceDay extends Model {
@@ -40,8 +35,8 @@ public class AttendanceDay extends Model {
     @Transient
     public Integer late_fee;
 
-    public static Finder<Integer, AttendanceDay> find = new Finder<Integer, AttendanceDay>(
-        AttendanceDay.class
+    public static Finder<Integer, AttendanceDay> find = new Finder<>(
+            AttendanceDay.class
     );
 
     public static AttendanceDay findById(int id) {

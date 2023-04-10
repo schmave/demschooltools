@@ -1,11 +1,9 @@
 package models;
 
-import java.util.List;
+import com.avaje.ebean.Model;
 
 import javax.persistence.*;
-
-import com.avaje.ebean.Model;
-import com.avaje.ebean.Model.Finder;
+import java.util.List;
 
 @Entity
 public class Task extends Model {
@@ -25,8 +23,8 @@ public class Task extends Model {
     @OneToMany(mappedBy="task")
     public List<CompletedTask> completed_tasks;
 
-    public static Finder<Integer, Task> find = new Finder<Integer, Task>(
-        Task.class
+    public static Finder<Integer, Task> find = new Finder<>(
+            Task.class
     );
 
     public static Task findById(int id) {

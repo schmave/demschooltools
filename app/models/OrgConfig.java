@@ -1,6 +1,5 @@
 package models;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.TimeZone;
@@ -54,13 +53,13 @@ public class OrgConfig {
         return "School Meeting";
     }
 
-    static HashMap<String, OrgConfig> configs = new HashMap<String, OrgConfig>();
+    static HashMap<String, OrgConfig> configs = new HashMap<>();
     static void register(String name, OrgConfig config) {
         configs.put(name, config);
     }
 
     public String getCaseNumberPrefix(Meeting m) {
-        String format = null;
+        String format;
 
         if (use_year_in_case_number) {
             format = euro_dates ? "dd-MM-YYYY-" : "YYYY-MM-dd-";

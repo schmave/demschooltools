@@ -1,11 +1,9 @@
 package models;
 
-import java.util.List;
+import com.avaje.ebean.Model;
 
 import javax.persistence.*;
-
-import com.avaje.ebean.Model;
-import com.avaje.ebean.Model.Finder;
+import java.util.List;
 
 @Entity
 public class TaskList extends Model {
@@ -25,8 +23,8 @@ public class TaskList extends Model {
     @JoinColumn(name="tag_id")
     public Tag tag;
 
-    public static Finder<Integer, TaskList> find = new Finder<Integer, TaskList>(
-        TaskList.class
+    public static Model.Finder<Integer, TaskList> find = new Model.Finder<>(
+            TaskList.class
     );
 
     public static TaskList findById(int id) {

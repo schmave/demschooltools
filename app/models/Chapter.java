@@ -1,33 +1,22 @@
 package models;
 
-import java.util.*;
+import com.avaje.ebean.Model;
+import com.avaje.ebean.annotation.Where;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import controllers.Utils;
+import play.data.Form;
 
 import javax.persistence.*;
-
-import com.fasterxml.jackson.annotation.*;
-
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.Expr;
-import com.avaje.ebean.RawSql;
-import com.avaje.ebean.RawSqlBuilder;
-import com.avaje.ebean.annotation.Where;
-
-import controllers.*;
-
-import play.data.*;
-import play.data.validation.Constraints.*;
-import play.data.validation.ValidationError;
-import com.avaje.ebean.Model;
-import static play.libs.F.*;
+import java.util.List;
 
 @Entity
 public class Chapter extends Model {
     @Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "chapter_id_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "chapter_id_seq")
     public Integer id;
 
     public String title = "";
-	public String num = "";
+    public String num = "";
 
     @OneToMany(mappedBy="chapter")
     @OrderBy("num ASC")
@@ -38,10 +27,10 @@ public class Chapter extends Model {
     @ManyToOne()
     public Organization organization;
 
-	public Boolean deleted;
+    public Boolean deleted;
 
-    public static Finder<Integer,Chapter> find = new Finder<Integer,Chapter>(
-        Chapter.class
+    public static Finder<Integer,Chapter> find = new Finder<>(
+            Chapter.class
     );
 
     public static Chapter findById(int id) {
@@ -56,19 +45,18 @@ public class Chapter extends Model {
             .orderBy("num ASC").findList();
     }
 
-	public void updateFromForm(Form<Chapter> form) {
-		title = form.field("title").value();
-		num = form.field("num").value();
-		String deleted_val = form.field("deleted").value();
-		deleted = deleted_val != null && deleted_val.equals("true");
-		save();
-	}
+    public void updateFromForm(Form<Chapter> form) {
+        title = form.field("title").getValue().get();
+        num = form.field("num").getValue().get();
+        deleted = Utils.getBooleanFromFormValue(form.field("deleted"));
+        save();
+    }
 
-	public static Chapter create(Form<Chapter> form) {
-		Chapter result = form.get();
+    public static Chapter create(Form<Chapter> form) {
+        Chapter result = form.get();
         result.organization = Organization.getByHost();
-		result.updateFromForm(form);
-		result.save();
-		return result;
-	}
+        result.updateFromForm(form);
+        result.save();
+        return result;
+    }
 }

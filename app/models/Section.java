@@ -1,24 +1,13 @@
 package models;
 
-import java.util.*;
+import com.avaje.ebean.Model;
+import com.avaje.ebean.annotation.Where;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import controllers.Utils;
+import play.data.Form;
 
 import javax.persistence.*;
-
-import com.avaje.ebean.annotation.Where;
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.Expr;
-import com.avaje.ebean.RawSql;
-import com.avaje.ebean.RawSqlBuilder;
-
-import controllers.*;
-
-import com.fasterxml.jackson.annotation.*;
-
-import play.data.*;
-import play.data.validation.Constraints.*;
-import play.data.validation.ValidationError;
-import com.avaje.ebean.Model;
-import static play.libs.F.*;
+import java.util.List;
 
 @Entity
 public class Section extends Model {
@@ -40,9 +29,9 @@ public class Section extends Model {
 
 	public Boolean deleted;
 
-    public static Finder<Integer,Section> find = new Finder<Integer,Section>(
-        Section.class
-    );
+    public static Finder<Integer,Section> find = new Finder<>(
+			Section.class
+	);
 
     public static Section findById(int id) {
         return find.where().eq("chapter.organization", Organization.getByHost())
@@ -54,11 +43,10 @@ public class Section extends Model {
     }
 
 	public void updateFromForm(Form<Section> form) {
-		title = form.field("title").value();
-		num = form.field("num").value();
-		chapter = Chapter.find.byId(Integer.parseInt(form.field("chapter.id").value()));
-		String deleted_val = form.field("deleted").value();
-		deleted = deleted_val != null && deleted_val.equals("true");
+		title = form.field("title").getValue().get();
+		num = form.field("num").getValue().get();
+		chapter = Chapter.find.byId(Integer.parseInt(form.field("chapter.id").getValue().get()));
+		deleted = Utils.getBooleanFromFormValue(form.field("deleted"));
 		save();
 	}
 

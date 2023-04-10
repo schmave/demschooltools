@@ -1,34 +1,30 @@
 package controllers;
 
-import java.io.*;
-import java.nio.charset.Charset;
-import java.nio.file.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.stream.*;
-import javax.inject.Singleton;
-import javax.inject.Inject;
-
+import com.avaje.ebean.*;
+import com.csvreader.CsvWriter;
+import com.feth.play.module.pa.PlayAuthenticate;
+import com.typesafe.config.Config;
+import models.*;
 import org.markdown4j.Markdown4jProcessor;
 import org.mindrot.jbcrypt.BCrypt;
 import org.xhtmlrenderer.pdf.ITextRenderer;
-
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.Expr;
-import com.avaje.ebean.ExpressionList;
-import com.avaje.ebean.FetchConfig;
-import com.avaje.ebean.SqlQuery;
-import com.avaje.ebean.SqlRow;
-import com.csvreader.CsvWriter;
-import com.feth.play.module.pa.PlayAuthenticate;
-
-import models.*;
-
-import play.*;
+import play.api.libs.mailer.MailerClient;
 import play.libs.Json;
 import play.mvc.*;
 import play.mvc.Http.Context;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Singleton
 @With(DumpOnError.class)
@@ -36,14 +32,17 @@ import play.mvc.Http.Context;
 public class Application extends Controller {
 
     PlayAuthenticate mAuth;
+    MailerClient mMailer;
 
     // TODO: Remove this once we change the main template to not use it
     static Application sInstance = null;
 
     @Inject
-    public Application(final PlayAuthenticate auth) {
+    public Application(final PlayAuthenticate auth,
+                       final MailerClient mailerClient) {
         mAuth = auth;
         sInstance = this;
+        mMailer = mailerClient;
     }
 
     public Result viewPassword() {
@@ -72,7 +71,7 @@ public class Application extends Controller {
                 Application.formatDateTimeLong() +
                 "). \n\nIf it was not you who changed it, please investigate what is going on! " +
                 "Feel free to contact Evan (schmave@gmail.com) for help.");
-            play.libs.mailer.MailerPlugin.send(mail);
+            mMailer.send(mail);
             flash("notice", "Your password was changed");
         }
 
@@ -131,10 +130,10 @@ public class Application extends Controller {
     }
 
     public static String attendancePeopleJson() {
-        List<Map<String, String>> result = new ArrayList<Map<String, String>>();
+        List<Map<String, String>> result = new ArrayList<>();
         List<Person> people = attendancePeople();
         for (Person p : people) {
-            HashMap<String, String> values = new HashMap<String, String>();
+            HashMap<String, String> values = new HashMap<>();
             values.put("label", p.getDisplayName());
             values.put("id", "" + p.person_id);
             result.add(values);
@@ -185,7 +184,7 @@ public class Application extends Controller {
             .findSet();
 
         List<Person> people = new ArrayList<>(peopleSet);
-        Collections.sort(people, Person.SORT_DISPLAY_NAME);
+        people.sort(Person.SORT_DISPLAY_NAME);
 
         List<Entry> entries = Entry.find
             .fetch("charges")
@@ -198,14 +197,14 @@ public class Application extends Controller {
             .eq("section.deleted", false)
             .eq("deleted", false)
             .findList();
-        List<Entry> entries_with_charges = new ArrayList<Entry>();
+        List<Entry> entries_with_charges = new ArrayList<>();
         for (Entry e : entries) {
             if (e.getThisYearCharges().size() > 0) {
                 entries_with_charges.add(e);
             }
         }
 
-        Collections.sort(entries_with_charges, Entry.SORT_NUMBER);
+        entries_with_charges.sort(Entry.SORT_NUMBER);
 
         return views.html.jc_index.render(meetings, people,
             entries_with_charges).toString();
@@ -218,7 +217,7 @@ public class Application extends Controller {
             "attachment; filename=All charges.csv");
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Charset charset = Charset.forName("UTF-8");
+        Charset charset = StandardCharsets.UTF_8;
         CsvWriter writer = new CsvWriter(baos, ',', charset);
 
         writer.write("Name");
@@ -365,7 +364,7 @@ public class Application extends Controller {
                 .orderBy("id DESC")
                 .setMaxRows(10).findList();
 
-        List<Charge> all = new ArrayList<Charge>(active_rps);
+        List<Charge> all = new ArrayList<>(active_rps);
         all.addAll(completed_rps);
         all.addAll(nullified_rps);
 
@@ -413,13 +412,13 @@ public class Application extends Controller {
         List<Integer> referenced_charge_ids = getReferencedChargeIds();
         List<Charge> charges = getActiveResolutionPlans(referenced_charge_ids);
 
-        HashMap<String, List<Charge>> groups = new HashMap<String, List<Charge>>();
+        HashMap<String, List<Charge>> groups = new HashMap<>();
 
         for (Charge charge : charges) {
             if (charge.person != null) {
                 String name = charge.person.getDisplayName();
                 if (!groups.containsKey(name)) {
-                    List<Charge> list = new ArrayList<Charge>();
+                    List<Charge> list = new ArrayList<>();
                     list.add(charge);
                     groups.put(name, list);
                 } else {
@@ -441,7 +440,7 @@ public class Application extends Controller {
         response().setHeader("Content-Disposition", "attachment; filename=" + OrgConfig.get().str_res_plans + ".csv");
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Charset charset = Charset.forName("UTF-8");
+        Charset charset = StandardCharsets.UTF_8;
         CsvWriter writer = new CsvWriter(baos, ',', charset);
 
         writer.write("Person");
@@ -486,7 +485,7 @@ public class Application extends Controller {
     }
 
     public Result viewManualChanges(String begin_date_string) {
-        Date begin_date = null;
+        Date begin_date;
 
         try {
             begin_date = new SimpleDateFormat("yyyy-M-d").parse(begin_date_string);
@@ -502,7 +501,7 @@ public class Application extends Controller {
                 .eq("entry.section.chapter.organization", Organization.getByHost())
                 .findList();
 
-        Collections.sort(changes, ManualChange.SORT_NUM_DATE);
+        changes.sort(ManualChange.SORT_NUM_DATE);
 
         return ok(views.html.view_manual_changes.render(
             forDateInput(begin_date),
@@ -529,7 +528,7 @@ public class Application extends Controller {
         };
 
         for (String name : names) {
-            Files.copy(Play.application().resourceAsStream("public/stylesheets/" + name),
+            Files.copy(Public.sEnvironment.resourceAsStream("public/stylesheets/" + name),
                 print_temp_dir.resolve("stylesheets").resolve(name),
                 StandardCopyOption.REPLACE_EXISTING);
         }
@@ -543,7 +542,7 @@ public class Application extends Controller {
 
         OutputStreamWriter writer = new OutputStreamWriter(
             new FileOutputStream(html_file),
-            Charset.forName("UTF-8"));
+                StandardCharsets.UTF_8);
 
         // XML 1.0 only allows the following characters
         // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
@@ -751,7 +750,7 @@ public class Application extends Controller {
         Collections.reverse(r.charges);
 
         for (Charge c : r.charges) {
-            if (!c.resolution_plan.toLowerCase().equals("warning") &&
+            if (!c.resolution_plan.equalsIgnoreCase("warning") &&
                 !c.resolution_plan.equals("")) {
                 rps.add(c.resolution_plan);
             }
@@ -970,7 +969,7 @@ public class Application extends Controller {
 
     public static String jcPeople(String term) {
         List<Person> people = jcPeople();
-        Collections.sort(people, Person.SORT_DISPLAY_NAME);
+        people.sort(Person.SORT_DISPLAY_NAME);
 
         term = term.toLowerCase();
 
@@ -1073,7 +1072,7 @@ public class Application extends Controller {
         if (result.getMonth() < 7) { // july or earlier
             result.setYear(result.getYear() - 1);
         }
-        result.setMonth(7);
+        result.setMonth(Calendar.AUGUST);
         result.setDate(1);
 
         result.setHours(0);
@@ -1136,7 +1135,7 @@ public class Application extends Controller {
     }
 
     public static String currentUsername() {
-        return Context.current().request().username();
+        return Context.current().request().attrs().getOptional(Security.USERNAME).orElse(null);
     }
 
     public static boolean isUserEditor(String username) {
@@ -1149,14 +1148,14 @@ public class Application extends Controller {
 
     public static String getRemoteIp() {
         Context ctx = Context.current();
-        Configuration conf = getConfiguration();
+        Config conf = Public.sConfig;
 
         if (conf.getBoolean("heroku_ips")) {
-            String header = ctx.request().getHeader("X-Forwarded-For");
-            if (header == null) {
+            Optional<String> header = ctx.request().header("X-Forwarded-For");
+            if (!header.isPresent()) {
                 return "unknown-ip";
             }
-            String splits[] = header.split("[, ]");
+            String[] splits = header.get().split("[, ]");
             return splits[splits.length - 1];
         } else {
             return ctx.request().remoteAddress();
@@ -1166,10 +1165,6 @@ public class Application extends Controller {
     public static User getCurrentUser() {
         return User.findByAuthUserIdentity(
             sInstance.mAuth.getUser(Context.current().session()));
-    }
-
-    public static Configuration getConfiguration() {
-        return Play.application().configuration().getConfig("school_crm");
     }
 
     public static String markdown(String input) {
@@ -1199,7 +1194,7 @@ public class Application extends Controller {
         Map<String, Object> scopes = new HashMap<String, Object>();
 
         ArrayList<String> existingFiles = new ArrayList<>();
-        File files[] = getSharedFileDirectory().listFiles();
+        File[] files = getSharedFileDirectory().listFiles();
         for (File f : files) {
             existingFiles.add(f.getName());
         }
@@ -1293,7 +1288,7 @@ public class Application extends Controller {
                 mail.addTo(OrgConfig.get().org.printer_email);
                 mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
                 mail.addAttachment(the_file.getName(), the_file);
-                play.libs.mailer.MailerPlugin.send(mail);
+                mMailer.send(mail);
             }
         }
 
@@ -1318,45 +1313,34 @@ public class Application extends Controller {
 
         StringBuilder body = new StringBuilder();
         if (values.containsKey("message")) {
-            body.append(values.get("message")[0] + "\n---\n");
+            body.append(values.get("message")[0]).append("\n---\n");
         }
         if (values.containsKey("name")) {
-            body.append(values.get("name")[0] + "\n");
+            body.append(values.get("name")[0]).append("\n");
         }
         if (values.containsKey("email")) {
-            body.append(values.get("email")[0] + "\n");
+            body.append(values.get("email")[0]).append("\n");
         }
 
         try {
             body.append("\n\n=========================\n");
-            body.append(Utils.toJson(request().headers()));
+            body.append(Utils.toJson(request().getHeaders()));
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         mail.setBodyText(body.toString());
-        play.libs.mailer.MailerPlugin.send(mail);
+        mMailer.send(mail);
 
         return ok();
     }
 
     public static void copyFileUsingStream(File source, File dest) throws IOException {
-        InputStream is = null;
-        OutputStream os = null;
-        try {
-            is = new FileInputStream(source);
-            os = new FileOutputStream(dest);
+        try (InputStream is = new FileInputStream(source); OutputStream os = new FileOutputStream(dest)) {
             byte[] buffer = new byte[1024];
             int length;
             while ((length = is.read(buffer)) > 0) {
                 os.write(buffer, 0, length);
-            }
-        } finally {
-            if (is != null) {
-                is.close();
-            }
-            if (os != null) {
-                os.close();
             }
         }
     }

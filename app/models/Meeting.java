@@ -1,17 +1,10 @@
 package models;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import com.avaje.ebean.Model;
+import play.libs.Json;
 
 import javax.persistence.*;
-
-import com.avaje.ebean.Model;
-import com.avaje.ebean.Model.Finder;
-import play.libs.Json;
+import java.util.*;
 
 
 @Entity
@@ -38,8 +31,8 @@ public class Meeting extends Model {
         joinColumns = @JoinColumn(name="meeting_id", referencedColumnName="id"))
     public List<Case> additional_cases;
 
-    public static Finder<Integer, Meeting> find = new Finder<Integer, Meeting>(
-        Meeting.class
+    public static Finder<Integer, Meeting> find = new Finder<>(
+            Meeting.class
     );
 
     public static Meeting findById(int id) {
@@ -48,11 +41,11 @@ public class Meeting extends Model {
     }
 
     public String getJsonPeople(int role) {
-        List<Map<String, String> > result = new ArrayList<Map<String, String> >();
+        List<Map<String, String> > result = new ArrayList<>();
 
         for (PersonAtMeeting p : people_at_meeting) {
             if (p.role == role) {
-                HashMap<String, String> map = new HashMap<String, String>();
+                HashMap<String, String> map = new HashMap<>();
 				map.put("name", p.person.getDisplayName());
                 map.put("id", "" + p.person.person_id);
                 result.add(map);

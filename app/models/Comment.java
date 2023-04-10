@@ -1,12 +1,10 @@
 package models;
 
-import java.util.*;
+import com.avaje.ebean.Model;
 
 import javax.persistence.*;
-
-import play.data.*;
-import play.data.validation.Constraints.*;
-import com.avaje.ebean.Model;
+import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "comments")
@@ -31,7 +29,7 @@ public class Comment extends Model {
     @OneToMany(mappedBy="comment")
     public List<CompletedTask> completed_tasks;
 
-    public static Finder<Integer, Comment> find = new Finder<Integer, Comment>(
-        Comment.class
+    public static Finder<Integer, Comment> find = new Finder<>(
+            Comment.class
     );
 }

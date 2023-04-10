@@ -1,19 +1,11 @@
 package models;
 
-import java.io.*;
-import java.sql.Time;
-import java.util.*;
+import com.avaje.ebean.Model;
+import controllers.Utils;
+import play.data.Form;
 
 import javax.persistence.*;
-
-import com.avaje.ebean.Model;
-import com.avaje.ebean.Model.Finder;
-
-import controllers.Application;
-import controllers.Utils;
-
-import play.data.Form;
-import play.libs.Json;
+import java.util.List;
 
 @Entity
 public class AttendanceCode extends Model {
@@ -31,8 +23,8 @@ public class AttendanceCode extends Model {
     public boolean counts_toward_attendance = false;
     public boolean not_counted = false;
 
-    public static Finder<Integer, AttendanceCode> find = new Finder<Integer, AttendanceCode>(
-        AttendanceCode.class
+    public static Finder<Integer, AttendanceCode> find = new Finder<>(
+            AttendanceCode.class
     );
 
     public static List<AttendanceCode> all(Organization org) {
@@ -56,15 +48,15 @@ public class AttendanceCode extends Model {
     }
 
     public void edit(Form<AttendanceCode> form) {
-        if (form.field("delete").value() != null) {
+        if (form.field("delete").getValue().isPresent()) {
             this.delete();
             return;
         }
-        description = form.field("description").value();
-        code = form.field("code").value();
-        color = form.field("color").value();
-        counts_toward_attendance = Utils.getBooleanFromFormValue(form.field("counts_toward_attendance").value());
-        not_counted = Utils.getBooleanFromFormValue(form.field("not_counted").value());
+        description = form.field("description").getValue().get();
+        code = form.field("code").getValue().get();
+        color = form.field("color").getValue().get();
+        counts_toward_attendance = Utils.getBooleanFromFormValue(form.field("counts_toward_attendance"));
+        not_counted = Utils.getBooleanFromFormValue(form.field("not_counted"));
 
         this.update();
     }

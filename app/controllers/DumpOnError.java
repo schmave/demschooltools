@@ -14,20 +14,20 @@ public class DumpOnError extends Action.Simple {
                 e.printStackTrace();
                 StringBuilder sb = new StringBuilder();
 
-                sb.append("Error for request at " + ctx.request().host() + " " + ctx.request().uri() + "\n");
+                sb.append("Error for request at ").append(ctx.request().host()).append(" ").append(ctx.request().uri()).append("\n");
                 sb.append("Headers: \n");
-                Map<String, String[]> headers = ctx.request().headers();
+                Map<String, List<String>> headers = ctx.request().getHeaders().toMap();
                 for (String key : headers.keySet()) {
-                    sb.append("  " + key + " --> ");
+                    sb.append("  ").append(key).append(" --> ");
                     for (String val : headers.get(key)) {
-                        sb.append(val + "|||");
+                        sb.append(val).append("|||");
                     }
                     sb.append("\n");
                 }
 
                 sb.append("Cookies: \n");
                 for (Http.Cookie cookie : ctx.request().cookies()) {
-                    sb.append("  " + cookie.name() + " --> " + cookie.value() + "\n");
+                    sb.append("  ").append(cookie.name()).append(" --> ").append(cookie.value()).append("\n");
                 }
 
                 Http.RequestBody body = ctx.request().body();
@@ -35,9 +35,9 @@ public class DumpOnError extends Action.Simple {
                 if (body_vals != null) {
                     sb.append("Body (as form URL encoded): \n");
                     for (String key : body_vals.keySet()) {
-                        sb.append("  " + key + " --> ");
+                        sb.append("  ").append(key).append(" --> ");
                         for (String val : body_vals.get(key)) {
-                            sb.append(val + "|||");
+                            sb.append(val).append("|||");
                         }
                         sb.append("\n");
                     }

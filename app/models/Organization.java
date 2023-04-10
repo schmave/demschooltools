@@ -67,8 +67,8 @@ public class Organization extends Model {
     @JsonIgnore
     public List<NotificationRule> notification_rules;
 
-    public static Finder<Integer, Organization> find = new Finder<Integer, Organization>(
-        Organization.class
+    public static Finder<Integer, Organization> find = new Finder<>(
+            Organization.class
     );
 
     public static Organization getByHost() {

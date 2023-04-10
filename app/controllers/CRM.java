@@ -66,7 +66,7 @@ public class CRM extends Controller {
             Person.find.where().isNotNull("family").eq("family", the_person.family).
                 ne("person_id", the_person.person_id).findList();
 
-        Set<Integer> family_ids = new HashSet<Integer>();
+        Set<Integer> family_ids = new HashSet<>();
         family_ids.add(the_person.person_id);
         for (Person family : family_members) {
             family_ids.add(family.person_id);
@@ -168,7 +168,6 @@ public class CRM extends Controller {
     // person, but just wants a list of available tags. In that case,
     // the "create new tag" functionality is also disabled.
     public Result jsonTags(String term, Integer personId) {
-        String like_arg = "%" + term + "%";
         List<Tag> selected_tags =
             Tag.find.where()
                 .eq("organization", Organization.getByHost())
@@ -183,10 +182,10 @@ public class CRM extends Controller {
             }
         }
 
-        List<Map<String, String> > result = new ArrayList<Map<String, String> > ();
+        List<Map<String, String> > result = new ArrayList<>();
         for (Tag t : selected_tags) {
             if (existing_tags == null || !existing_tags.contains(t)) {
-                HashMap<String, String> values = new HashMap<String, String>();
+                HashMap<String, String> values = new HashMap<>();
                 values.put("label", t.title);
                 values.put("id", "" + t.id);
                 result.add(values);
@@ -195,13 +194,14 @@ public class CRM extends Controller {
 
         boolean tag_already_exists = false;
         for (Tag t : selected_tags) {
-            if (t.title.toLowerCase().equals(term.toLowerCase())) {
+            if (t.title.equalsIgnoreCase(term)) {
                 tag_already_exists = true;
+                break;
             }
         }
 
         if (personId >= 0 && !tag_already_exists) {
-            HashMap<String, String> values = new HashMap<String, String>();
+            HashMap<String, String> values = new HashMap<>();
             values.put("label", "Create new tag: " + term);
             values.put("id", "-1");
             result.add(values);
@@ -213,7 +213,7 @@ public class CRM extends Controller {
 	public Collection<Person> getTagMembers(Integer tagId, String familyMode) {
         List<Person> people = Tag.findById(tagId).people;
 
-        Set<Person> selected_people = new HashSet<Person>();
+        Set<Person> selected_people = new HashSet<>();
 
 		selected_people.addAll(people);
 
@@ -226,7 +226,7 @@ public class CRM extends Controller {
 		}
 
 		if (familyMode.equals("family_no_kids")) {
-			Set<Person> no_kids = new HashSet<Person>();
+			Set<Person> no_kids = new HashSet<>();
 			for (Person p2 : selected_people) {
 				if (p2.dob == null ||
 					CRM.calcAge(p2) > 18) {
@@ -268,21 +268,18 @@ public class CRM extends Controller {
             return;
         }
 
-        Ebean.execute(new TxRunnable() {
-            @Override
-            public void run() {
-                tag.people.add(person);
-                tag.save();
+        Ebean.execute(() -> {
+            tag.people.add(person);
+            tag.save();
 
-                PersonTagChange ptc = PersonTagChange.create(
-                        tag,
-                        person,
-                        mApplication.getCurrentUser(),
-                        true);
+            PersonTagChange.create(
+                    tag,
+                    person,
+                    Application.getCurrentUser(),
+                    true);
 
-                person.tags.add(tag);
-                notifyAboutTag(tag, person, true);
-            }
+            person.tags.add(tag);
+            notifyAboutTag(tag, person, true);
         });
     }
 
@@ -300,19 +297,16 @@ public class CRM extends Controller {
         if (!tag.people.contains(person)) {
             return;
         }
-        Ebean.execute(new TxRunnable() {
-            @Override
-            public void run() {
-                if (Ebean.createSqlUpdate("DELETE from person_tag where person_id=" + person.person_id +
-                        " AND tag_id=" + tag.id).execute() == 1) {
-                    PersonTagChange ptc = PersonTagChange.create(
-                            tag,
-                            person,
-                            mApplication.getCurrentUser(),
-                            false);
-                }
-                notifyAboutTag(tag, person, false);
+        Ebean.execute(() -> {
+            if (Ebean.createSqlUpdate("DELETE from person_tag where person_id=" + person.person_id +
+                    " AND tag_id=" + tag.id).execute() == 1) {
+                PersonTagChange.create(
+                        tag,
+                        person,
+                        Application.getCurrentUser(),
+                        false);
             }
+            notifyAboutTag(tag, person, false);
         });
     }
 
@@ -364,8 +358,8 @@ public class CRM extends Controller {
     public Result saveTag() {
         Form<Tag> form = mFormFactory.form(Tag.class).bindFromRequest();
 
-        if (form.field("id").value() != null) {
-            Tag t = Tag.findById(Integer.parseInt(form.field("id").value()));
+        if (form.field("id").getValue().isPresent()) {
+            Tag t = Tag.findById(Integer.parseInt(form.field("id").getValue().get()));
             t.updateFromForm(form);
 
             CachedPage.onPeopleChanged();
@@ -426,20 +420,17 @@ public class CRM extends Controller {
             if (key_name.startsWith(prefix) && values.get(key_name)[0].equals("on")) {
                 PersonTagChange change =
                     PersonTagChange.find.byId(Integer.parseInt(key_name.substring(prefix.length())));
-                Ebean.execute(new TxRunnable() {
-                    @Override
-                    public void run() {
-                        if (change.was_add) {
-                            tag.people.remove(change.person);
-                        } else {
-                            if (!tag.people.contains(change.person)) {
-                                tag.people.add(change.person);
-                            }
+                Ebean.execute(() -> {
+                    if (change.was_add) {
+                        tag.people.remove(change.person);
+                    } else {
+                        if (!tag.people.contains(change.person)) {
+                            tag.people.add(change.person);
                         }
-                        tag.save();
-                        change.delete();
-                        notifyAboutTag(tag, change.person, !change.was_add);
                     }
+                    tag.save();
+                    change.delete();
+                    notifyAboutTag(tag, change.person, !change.was_add);
                 });
             }
         }
@@ -459,7 +450,7 @@ public class CRM extends Controller {
 
         List<Person> people = the_tag.people;
 
-        Set<Person> people_with_family = new HashSet<Person>();
+        Set<Person> people_with_family = new HashSet<>();
         for (Person p : people) {
             if (p.family != null) {
                 people_with_family.addAll(p.family.family_members);
@@ -555,14 +546,11 @@ public class CRM extends Controller {
         topBorderStyle.setBorderTop(BorderStyle.THICK);
 
         // Sort people who have multiple addresses at the end
-        people.sort(new Comparator<Person>() {
-            @Override
-            public int compare(Person p1, Person p2) {
-                if (p1.hasMultipleAddresses() != p2.hasMultipleAddresses()) {
-                    return p1.hasMultipleAddresses() ? 1 : -1;
-                }
-                return p1.compareTo(p2);
+        people.sort((p1, p2) -> {
+            if (p1.hasMultipleAddresses() != p2.hasMultipleAddresses()) {
+                return p1.hasMultipleAddresses() ? 1 : -1;
             }
+            return p1.compareTo(p2);
         });
 
         int i = 1;
@@ -673,10 +661,6 @@ public class CRM extends Controller {
             .eq("deleted", false).eq("sent", false).orderBy("id ASC").setMaxRows(1).findUnique();
 	}
 
-	public static boolean hasPendingEmail() {
-		return getPendingEmail() != null;
-	}
-
 	public Result viewPendingEmail() {
 		Email e = getPendingEmail();
 		if (e == null) {
@@ -688,13 +672,13 @@ public class CRM extends Controller {
             .eq("title", "Staff").findUnique();
         List<Person> people = staff_tag.people;
 
-        ArrayList<String> test_addresses = new ArrayList<String>();
+        ArrayList<String> test_addresses = new ArrayList<>();
         for (Person p : people) {
             test_addresses.add(p.email);
         }
 		test_addresses.add("staff@threeriversvillageschool.org");
 
-        ArrayList<String> from_addresses = new ArrayList<String>();
+        ArrayList<String> from_addresses = new ArrayList<>();
         from_addresses.add("office@threeriversvillageschool.org");
         from_addresses.add("evan@threeriversvillageschool.org");
         from_addresses.add("jmp@threeriversvillageschool.org");
@@ -744,14 +728,11 @@ public class CRM extends Controller {
 								new InternetAddress(p.email, p.first_name + " " + p.last_name));
 					to_send.setFrom(new InternetAddress(values.get("from")[0]));
 					Transport.send(to_send);
-				} catch (MessagingException ex) {
+				} catch (MessagingException | UnsupportedEncodingException ex) {
 					ex.printStackTrace();
 					hadErrors = true;
-                } catch (UnsupportedEncodingException ex) {
-                    ex.printStackTrace();
-                    hadErrors = true;
-				}
-			}
+                }
+            }
 		}
 
 		// Send confirmation email
@@ -817,11 +798,11 @@ public class CRM extends Controller {
         Form<Comment> filledForm = mFormFactory.form(Comment.class).bindFromRequest();
         Comment new_comment = new Comment();
 
-        new_comment.person = Person.findById(Integer.parseInt(filledForm.field("person").value()));
-        new_comment.user = mApplication.getCurrentUser();
-        new_comment.message = filledForm.field("message").value();
+        new_comment.person = Person.findById(Integer.parseInt(filledForm.field("person").getValue().get()));
+        new_comment.user = Application.getCurrentUser();
+        new_comment.message = filledForm.field("message").getValue().get();
 
-        String task_id_string = filledForm.field("comment_task_ids").value();
+        String task_id_string = filledForm.field("comment_task_ids").getValue().get();
 
         if (task_id_string.length() > 0 || new_comment.message.length() > 0) {
             new_comment.save();
@@ -836,7 +817,7 @@ public class CRM extends Controller {
                 }
             }
 
-            if (filledForm.field("send_email").value() != null) {
+            if (filledForm.field("send_email").getValue().isPresent()) {
                 for (NotificationRule rule :
                         NotificationRule.findByType(NotificationRule.TYPE_COMMENT)) {
                     play.libs.mailer.Email mail = new play.libs.mailer.Email();
@@ -932,7 +913,7 @@ public class CRM extends Controller {
         if (values.containsKey("sync_type")) {
             for (String tag_id : values.get("tag_id")) {
                 Tag t = Tag.findById(Integer.parseInt(tag_id));
-                MailchimpSync sync = MailchimpSync.create(t,
+                MailchimpSync.create(t,
                     values.get("mailchimp_list_id")[0],
                     values.get("sync_type")[0].equals("local_add"),
                     values.get("sync_type")[0].equals("local_remove"));

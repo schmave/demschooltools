@@ -1,9 +1,8 @@
 package models;
 
-import javax.persistence.*;
-
 import com.avaje.ebean.Model;
-import com.avaje.ebean.Model.Finder;
+
+import javax.persistence.*;
 
 @Entity
 public class CompletedTask extends Model {
@@ -23,8 +22,8 @@ public class CompletedTask extends Model {
     @JoinColumn(name="comment_id")
     public Comment comment;
 
-    public static Finder<Integer, CompletedTask> find = new Finder<Integer, CompletedTask>(
-        CompletedTask.class
+    public static Finder<Integer, CompletedTask> find = new Finder<>(
+            CompletedTask.class
     );
 
     public static CompletedTask create(Task t, Comment c)

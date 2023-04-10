@@ -1,22 +1,17 @@
 package models;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.persistence.*;
-
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.ExpressionList;
 import com.avaje.ebean.Model;
 import com.feth.play.module.pa.user.AuthUser;
 import com.feth.play.module.pa.user.AuthUserIdentity;
-import com.feth.play.module.pa.user.EmailIdentity;
-import com.feth.play.module.pa.user.NameIdentity;
-
 import service.MyUserService;
+
+import javax.persistence.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -42,7 +37,7 @@ public class User extends Model {
 	@OneToMany(cascade = CascadeType.ALL)
 	public List<LinkedAccount> linkedAccounts;
 
-	public static final Finder<Integer, User> find = new Finder<Integer, User>(
+	public static final Finder<Integer, User> find = new Finder<>(
 			User.class);
 
     public static User findById(Integer id) {
@@ -82,7 +77,7 @@ public class User extends Model {
 	public static boolean existsByAuthUserIdentity(
 			final AuthUserIdentity identity) {
 		final ExpressionList<User> exp = getAuthUserFind(identity);
-		return exp.findRowCount() > 0;
+		return exp.findCount() > 0;
 	}
 
 	public static User findByAuthUserIdentity(final AuthUserIdentity identity) {
@@ -103,7 +98,7 @@ public class User extends Model {
 
 		// deactivate the merged user that got added to this one
 		otherUser.active = false;
-		Ebean.save(Arrays.asList(new User[] { otherUser, this }));
+		Ebean.save(Arrays.asList(otherUser, this));
 	}
 
 	//public static User create(final AuthUser authUser) {
@@ -139,7 +134,7 @@ public class User extends Model {
 	}
 
 	public Set<String> getProviders() {
-		final Set<String> providerKeys = new HashSet<String>(
+		final Set<String> providerKeys = new HashSet<>(
 				linkedAccounts.size());
 		for (final LinkedAccount acc : linkedAccounts) {
 			providerKeys.add(acc.providerKey);

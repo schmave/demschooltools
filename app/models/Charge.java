@@ -11,6 +11,7 @@ import javax.persistence.*;
 import com.fasterxml.jackson.annotation.*;
 
 import com.avaje.ebean.Model;
+import org.jetbrains.annotations.NotNull;
 
 @Entity
 @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
@@ -62,7 +63,7 @@ public class Charge extends Model implements Comparable<Charge> {
 
     public String minor_referral_destination = "";
 
-    public static Finder<Integer, Charge> find = new Finder<Integer, Charge>(Charge.class);
+    public static Finder<Integer, Charge> find = new Finder<>(Charge.class);
 
     public static Charge findById(int id) {
         return find.where().eq("the_case.meeting.organization", Organization.getByHost())
@@ -171,7 +172,7 @@ public class Charge extends Model implements Comparable<Charge> {
     }
 
     @Override
-    public int compareTo(Charge c2) {
+    public int compareTo(@NotNull Charge c2) {
 		if (the_case.meeting.date != null) {
 			return the_case.meeting.date.compareTo(c2.the_case.meeting.date);
 		}

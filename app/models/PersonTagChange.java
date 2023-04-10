@@ -1,12 +1,9 @@
 package models;
 
-import java.util.*;
+import com.avaje.ebean.Model;
 
 import javax.persistence.*;
-
-import play.data.*;
-import play.data.validation.Constraints.*;
-import com.avaje.ebean.Model;
+import java.util.Date;
 
 
 @Entity
@@ -32,8 +29,8 @@ public class PersonTagChange extends Model {
 
     public boolean was_add;
 
-    public static Finder<Integer, PersonTagChange> find = new Finder<Integer, PersonTagChange>(
-        PersonTagChange.class
+    public static Finder<Integer, PersonTagChange> find = new Finder<>(
+            PersonTagChange.class
     );
 
     public static PersonTagChange create(Tag t, Person p, User u, boolean was_add) {

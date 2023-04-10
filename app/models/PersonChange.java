@@ -1,12 +1,12 @@
 package models;
 
-import java.util.*;
-
-import javax.persistence.*;
-
-import play.data.*;
-import play.data.validation.Constraints.*;
 import com.avaje.ebean.Model;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import java.util.Date;
 
 
 @Entity
@@ -22,8 +22,8 @@ public class PersonChange extends Model {
     @Column(insertable = false, updatable = false)
     public Date time;
 
-    public static Finder<Integer, PersonChange> find = new Finder<Integer, PersonChange>(
-        PersonChange.class
+    public static Finder<Integer, PersonChange> find = new Finder<>(
+            PersonChange.class
     );
 
     public static PersonChange create(Person p, String new_email) {

@@ -1,8 +1,7 @@
 package models;
 
-import java.util.*;
-import java.math.*;
-import java.sql.Time;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AttendanceStats {
 
@@ -13,7 +12,7 @@ public class AttendanceStats {
     public double total_hours;
 
     public Map<AttendanceCode, Integer> absence_counts =
-        new HashMap<AttendanceCode, Integer>();
+            new HashMap<>();
 
     private Map<Integer, Double> values;
 

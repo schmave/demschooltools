@@ -1,16 +1,9 @@
 package models;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import com.avaje.ebean.Model;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
-
-import com.fasterxml.jackson.annotation.*;
-
-import com.avaje.ebean.Model;
-import com.avaje.ebean.Model.Finder;
 
 @Entity
 public class PersonAtCase extends Model {

@@ -1,13 +1,12 @@
 package models;
 
-import java.text.*;
-import java.util.*;
-import java.math.*;
-import javax.persistence.*;
-import com.fasterxml.jackson.annotation.*;
-import play.data.*;
-import com.avaje.ebean.*;
+import play.data.Form;
+
 import java.sql.Time;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class AttendanceReport {
 
@@ -22,7 +21,7 @@ public class AttendanceReport {
     public Time latest_departure_time;
 
     public AttendanceReport() {
-        late_departures = new ArrayList<LateDepartureGroup>();
+        late_departures = new ArrayList<>();
 
         Organization org = OrgConfig.get().org;
         latest_departure_time = org.attendance_report_latest_departure_time;

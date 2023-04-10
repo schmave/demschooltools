@@ -11,7 +11,7 @@ public enum AccountType
     Clerk;
 
     public static Map<String, String> options(){
-        LinkedHashMap<String, String> vals = new LinkedHashMap<String, String>();
+        LinkedHashMap<String, String> vals = new LinkedHashMap<>();
         for (AccountType type: AccountType.values()) {
             // don't include PersonalChecking -- that kind of account is generated and may not be created by users manually
             if (type != AccountType.PersonalChecking && type != AccountType.Cash) {

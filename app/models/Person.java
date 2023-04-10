@@ -1,25 +1,14 @@
 package models;
 
-import java.util.*;
+import com.avaje.ebean.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import controllers.Application;
+import controllers.CRM;
+import play.data.Form;
 
+import javax.persistence.OrderBy;
 import javax.persistence.*;
-
-import com.fasterxml.jackson.annotation.*;
-
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.Expr;
-import com.avaje.ebean.FetchConfig;
-import com.avaje.ebean.RawSql;
-import com.avaje.ebean.RawSqlBuilder;
-
-import controllers.*;
-
-import play.Logger;
-import play.data.*;
-import play.data.validation.Constraints.*;
-import play.data.validation.ValidationError;
-import com.avaje.ebean.Model;
-import static play.libs.F.*;
+import java.util.*;
 
 @Entity
 public class Person extends Model implements Comparable<Person> {
@@ -108,15 +97,15 @@ public class Person extends Model implements Comparable<Person> {
 
 	public String grade = "";
 
-    static Set<String> fieldsToUpdateExplicitly = new HashSet<String>();
+    static Set<String> fieldsToUpdateExplicitly = new HashSet<>();
 
     {
         fieldsToUpdateExplicitly.add("dob");
         fieldsToUpdateExplicitly.add("approximate_dob");
     }
 
-    public static Finder<Integer,Person> find = new Finder<Integer,Person>(
-        Person.class
+    public static Finder<Integer,Person> find = new Finder<>(
+            Person.class
     );
 
     public static Person findById(int id) {
@@ -199,7 +188,7 @@ public class Person extends Model implements Comparable<Person> {
     public List<Charge> getThisYearCharges() {
         Date beginning_of_year = Application.getStartOfYear();
 
-        List<Charge> result = new ArrayList<Charge>();
+        List<Charge> result = new ArrayList<>();
         for (Charge c : charges) {
             if (c.the_case.meeting.date.after(beginning_of_year)) {
                 result.add(c);
@@ -213,7 +202,7 @@ public class Person extends Model implements Comparable<Person> {
     public List<Case> getThisYearCasesWrittenUp() {
         Date beginning_of_year = Application.getStartOfYear();
 
-        List<Case> result = new ArrayList<Case>();
+        List<Case> result = new ArrayList<>();
         for (PersonAtCase pac : cases_involved_in) {
             if (pac.role == PersonAtCase.ROLE_WRITER &&
                 pac.the_case.meeting.date.after(beginning_of_year)) {
@@ -226,7 +215,7 @@ public class Person extends Model implements Comparable<Person> {
 
     @JsonIgnore
     public List<Case> getCasesWrittenUp() {
-        List<Case> result = new ArrayList<Case>();
+        List<Case> result = new ArrayList<>();
         for (PersonAtCase pac : cases_involved_in) {
             if (pac.role == PersonAtCase.ROLE_WRITER) {
                 result.add(pac.the_case);
@@ -259,13 +248,13 @@ public class Person extends Model implements Comparable<Person> {
     }
 
     public void addPhoneNumbers(Form<Person> form) {
-        phone_numbers = new ArrayList<PhoneNumber>();
+        phone_numbers = new ArrayList<>();
 
         for (int i = 1; i <= 3; i++) {
-            if (!form.field("number_" + i).value().equals("")) {
+            if (!form.field("number_" + i).getValue().get().equals("")) {
                 phone_numbers.add(PhoneNumber.create(
-                    form.field("number_" + i).value(),
-                    form.field("number_" + i + "_comment").value(),
+                    form.field("number_" + i).getValue().get(),
+                    form.field("number_" + i + "_comment").getValue().get(),
                     this));
             }
         }
@@ -286,10 +275,9 @@ public class Person extends Model implements Comparable<Person> {
 	}
 
     public static Person create(Form<Person> form) {
-        java.util.Map<java.lang.String,java.lang.String> data = form.data();
         Person person = form.get();
         person.is_family = false;
-        person.attachToPersonAsFamily(form.field("same_family_id").value());
+        person.attachToPersonAsFamily(form.field("same_family_id").getValue().get());
         person.organization = Organization.getByHost();
 		person.trimSpaces();
         person.save();
@@ -304,7 +292,7 @@ public class Person extends Model implements Comparable<Person> {
 
     public static Person updateFromForm(Form<Person> form) {
         Person p = form.get();
-        p.attachToPersonAsFamily(form.field("same_family_id").value());
+        p.attachToPersonAsFamily(form.field("same_family_id").getValue().get());
 
         if (!p.is_family) {
             // Remove all existing phone numbers -- they are not loaded
@@ -356,7 +344,7 @@ public class Person extends Model implements Comparable<Person> {
     }
 
     public Form<Person> fillForm() {
-        HashMap<String, String> data = new HashMap<String, String>();
+        HashMap<String, String> data = new HashMap<>();
         int i = 1;
         for (PhoneNumber number : phone_numbers) {
             data.put("number_" + i, number.number);
@@ -372,9 +360,9 @@ public class Person extends Model implements Comparable<Person> {
 
         // This is how you create a hybrid form based
         // on both a map of values and an object. Crazy.
-        return new Form<Person>(null, Person.class, data,
-            new HashMap<String,List<ValidationError>>(),
-            Optional.of(this), null, null, null);
+        return new Form<>(null, Person.class, data,
+                new ArrayList<>(),
+                Optional.of(this), null, null, null);
     }
 
     // called by PersonController
@@ -386,7 +374,7 @@ public class Person extends Model implements Comparable<Person> {
         tags = Ebean.find(Tag.class).setRawSql(rawSql).
             where().eq("person.person_id", person_id).findList();
         if (tags == null) {
-            tags = new ArrayList<Tag>();
+            tags = new ArrayList<>();
         }
     }
 
@@ -409,7 +397,7 @@ public class Person extends Model implements Comparable<Person> {
 
     public CompletedTask completedTask(Task t) {
         for (CompletedTask ct : completed_tasks) {
-            if (ct.task.id == t.id) {
+            if (ct.task.id.equals(t.id)) {
                 return ct;
             }
         }
@@ -440,14 +428,14 @@ public class Person extends Model implements Comparable<Person> {
 
     public List<String> familyAddresses()
     {
-        Set<Person> candidates = new HashSet<Person>();
+        Set<Person> candidates = new HashSet<>();
         candidates.add(this);
         if (family != null)
         {
             candidates.addAll(family.family_members);
         }
 
-        ArrayList<String> addresses = new ArrayList<String>();
+        ArrayList<String> addresses = new ArrayList<>();
         for (Person p : candidates)
         {
             if (p.address.length() > 0)
@@ -462,14 +450,14 @@ public class Person extends Model implements Comparable<Person> {
 
     public List<String> familyPhoneNumbers()
     {
-        Set<Person> candidates = new HashSet<Person>();
+        Set<Person> candidates = new HashSet<>();
         candidates.add(this);
         if (family != null)
         {
             candidates.addAll(family.family_members);
         }
 
-        ArrayList<String> numbers = new ArrayList<String>();
+        ArrayList<String> numbers = new ArrayList<>();
         for (Person p : candidates)
         {
             for (PhoneNumber num : p.phone_numbers)
@@ -502,21 +490,13 @@ public class Person extends Model implements Comparable<Person> {
         return last_name_compare;
     }
 
-    public static Comparator<Person> SORT_DISPLAY_NAME = new Comparator<Person>() {
-            @Override
-            public int compare(Person o1, Person o2) {
-                return o1.getDisplayName().compareTo(o2.getDisplayName());
-            }
-        };
+    public static Comparator<Person> SORT_DISPLAY_NAME = Comparator.comparing(Person::getDisplayName);
 
-    public static Comparator<Person> SORT_FIRST_NAME = new Comparator<Person>() {
-            @Override
-            public int compare(Person o1, Person o2) {
-                int first_name_compare = o1.first_name.compareTo(o2.first_name);
-                if (first_name_compare == 0) {
-                    return o1.last_name.compareTo(o2.first_name);
-                }
-                return first_name_compare;
-            }
-        };
+    public static Comparator<Person> SORT_FIRST_NAME = (o1, o2) -> {
+        int first_name_compare = o1.first_name.compareTo(o2.first_name);
+        if (first_name_compare == 0) {
+            return o1.last_name.compareTo(o2.first_name);
+        }
+        return first_name_compare;
+    };
 }

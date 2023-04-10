@@ -37,8 +37,8 @@ public class UserRole extends Model {
 
     public String role;
 
-	public static final Finder<Integer, UserRole> find = new Finder<Integer, UserRole>(
-			UserRole.class);
+	public static final Finder<Integer, UserRole> find = new Finder<>(
+            UserRole.class);
 
     public static UserRole create(User u, String r) {
         UserRole result = new UserRole();
@@ -73,24 +73,25 @@ public class UserRole extends Model {
 
     public static String getDescription(String role) {
         String jc_name = OrgConfig.get().str_jc_name_short;
-        if (role.equals(ROLE_VIEW_JC)) {
-            return "View " + jc_name + " records & rules";
-        } else if (role.equals(ROLE_EDIT_MANUAL)) {
-            return "Edit " + OrgConfig.get().str_manual_title_short;
-        } else if (role.equals(ROLE_EDIT_RESOLUTION_PLANS)) {
-            return "Check off " + jc_name + " " + OrgConfig.get().str_res_plans;
-        } else if (role.equals(ROLE_EDIT_7_DAY_JC)) {
-            return "Edit " + jc_name + " records up to 7 days old";
-        } else if (role.equals(ROLE_EDIT_31_DAY_JC)) {
-            return "Edit " + jc_name + " records up to 31 days old";
-        } else if (role.equals(ROLE_EDIT_ALL_JC)) {
-            return "Edit all " + jc_name + " records";
-        } else if (role.equals(ROLE_ALL_ACCESS)) {
-            return "View and Edit everything";
-        } else if (role.equals(ROLE_ACCOUNTING)) {
-            return "Manage accounts and create transactions";
-        } else if (role.equals(ROLE_ATTENDANCE)) {
-            return "Manage attendance records";
+        switch (role) {
+            case ROLE_VIEW_JC:
+                return "View " + jc_name + " records & rules";
+            case ROLE_EDIT_MANUAL:
+                return "Edit " + OrgConfig.get().str_manual_title_short;
+            case ROLE_EDIT_RESOLUTION_PLANS:
+                return "Check off " + jc_name + " " + OrgConfig.get().str_res_plans;
+            case ROLE_EDIT_7_DAY_JC:
+                return "Edit " + jc_name + " records up to 7 days old";
+            case ROLE_EDIT_31_DAY_JC:
+                return "Edit " + jc_name + " records up to 31 days old";
+            case ROLE_EDIT_ALL_JC:
+                return "Edit all " + jc_name + " records";
+            case ROLE_ALL_ACCESS:
+                return "View and Edit everything";
+            case ROLE_ACCOUNTING:
+                return "Manage accounts and create transactions";
+            case ROLE_ATTENDANCE:
+                return "Manage attendance records";
         }
 
         throw new RuntimeException("unknown role: " + role);

@@ -1,14 +1,11 @@
 package models;
 
-import java.util.*;
+import com.avaje.ebean.Model;
+import controllers.Utils;
+import play.data.Form;
 
 import javax.persistence.*;
-
-import com.avaje.ebean.Model;
-import com.avaje.ebean.Model.Finder;
-
-import controllers.Utils;
-import play.data.*;
+import java.util.*;
 
 @Entity
 public class Tag extends Model {
@@ -45,8 +42,8 @@ public class Tag extends Model {
     @OneToMany(mappedBy="tag")
     public List<NotificationRule> notification_rules;
 
-    public static Finder<Integer, Tag> find = new Finder<Integer, Tag>(
-        Tag.class
+    public static Finder<Integer, Tag> find = new Finder<>(
+            Tag.class
     );
 
     public static Tag findById(int id) {
@@ -75,32 +72,27 @@ public class Tag extends Model {
     }
 
     public void updateFromForm(Form<Tag> form) {
-        title = form.field("title").value();
-        use_student_display = Utils.getBooleanFromFormValue(form.field("use_student_display").value());
-        show_in_jc = Utils.getBooleanFromFormValue(form.field("show_in_jc").value());
-        show_in_attendance = Utils.getBooleanFromFormValue(form.field("show_in_attendance").value());
-        show_in_menu = Utils.getBooleanFromFormValue(form.field("show_in_menu").value());
-        show_in_account_balances = Utils.getBooleanFromFormValue(form.field("show_in_account_balances").value());
+        title = form.field("title").getValue().get();
+        use_student_display = Utils.getBooleanFromFormValue(form.field("use_student_display"));
+        show_in_jc = Utils.getBooleanFromFormValue(form.field("show_in_jc"));
+        show_in_attendance = Utils.getBooleanFromFormValue(form.field("show_in_attendance"));
+        show_in_menu = Utils.getBooleanFromFormValue(form.field("show_in_menu"));
+        show_in_account_balances = Utils.getBooleanFromFormValue(form.field("show_in_account_balances"));
         save();
     }
 
     public static Map<String, List<Tag>> getWithPrefixes() {
-        Map<String, List<Tag>> result = new TreeMap<String, List<Tag>>(String.CASE_INSENSITIVE_ORDER);
+        Map<String, List<Tag>> result = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
         for (Tag t : find.where()
                 .eq("organization", Organization.getByHost())
                 .eq("show_in_menu", true)
                 .order("title ASC").findList()) {
             String[] splits = t.title.split(":");
-            String prefix = t.title;
-
-            if (splits.length > 1) {
-                prefix = splits[0];
-            }
 
             List<Tag> cur_list = result.get(splits[0]);
             if (cur_list == null) {
-                cur_list = new ArrayList<Tag>();
+                cur_list = new ArrayList<>();
             }
             cur_list.add(t);
             result.put(splits[0], cur_list);

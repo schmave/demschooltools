@@ -25,7 +25,7 @@ public class LinkedAccount extends Model {
 	public String providerUserId;
 	public String providerKey;
 
-	public static final Finder<Long, LinkedAccount> find = new Finder<Long, LinkedAccount>(
+	public static final Finder<Long, LinkedAccount> find = new Finder<>(
 			LinkedAccount.class);
 
 	public static LinkedAccount create(final AuthUser authUser) {

@@ -1,26 +1,17 @@
 package models;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.TreeMap;
-
-import javax.persistence.*;
-
-import javax.mail.*;
-import javax.mail.internet.*;
-import com.fasterxml.jackson.annotation.*;
-
 import com.avaje.ebean.Model;
-import com.avaje.ebean.Model.Finder;
+import controllers.Public;
 
-import play.Play;
+import javax.mail.Header;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
+import javax.persistence.*;
+import java.io.ByteArrayInputStream;
+import java.util.Enumeration;
+import java.util.Properties;
 
 @javax.persistence.Entity
 public class Email extends Model {
@@ -35,9 +26,9 @@ public class Email extends Model {
 	public boolean sent;
 	public boolean deleted;
 
-    public static Finder<Integer, Email> find = new Finder<Integer, Email>(
-        Email.class
-    );
+    public static Finder<Integer, Email> find = new Finder<>(
+			Email.class
+	);
 
     public static Email findById(int id) {
         return find.where().eq("organization", Organization.getByHost())
@@ -72,9 +63,9 @@ public class Email extends Model {
 
 			// Setup mail server
 			properties.setProperty("mail.smtp.host",
-                Play.application().configuration().getString("smtp.host"));
+					Public.sConfig.getString("smtp.host"));
 			properties.setProperty("mail.smtp.port",
-                Play.application().configuration().getString("smtp.port"));
+					Public.sConfig.getString("smtp.port"));
 
 			properties.setProperty("mail.smtp.auth", "true");
 			Authenticator authenticator = new Authenticator();
@@ -82,28 +73,27 @@ public class Email extends Model {
 
 			// Get the default Session object.
 			Session session = Session.getInstance(properties, new Authenticator());
-            session.setDebug(Play.application().configuration().getBoolean("smtp.debug", false));
+            session.setDebug(Public.sConfig.getBoolean("smtp.debug"));
 			parsedMessage = new MimeMessage(session, new ByteArrayInputStream(message.getBytes()));
 
 			for (Enumeration e = parsedMessage.getAllHeaders(); e.hasMoreElements() ;) {
 				Header h = (Header)e.nextElement();
-				if (!h.getName().toLowerCase().equals("content-type") &&
-					!h.getName().toLowerCase().equals("subject")) {
+				if (!h.getName().equalsIgnoreCase("content-type") &&
+						!h.getName().equalsIgnoreCase("subject")) {
 					parsedMessage.removeHeader(h.getName());
 				}
 			}
 			parsedMessage.saveChanges();
-        }
-		catch (MessagingException e) {
+        } catch (MessagingException e) {
 			e.printStackTrace();
 		}
     }
 }
 
  class Authenticator extends javax.mail.Authenticator {
-	protected PasswordAuthentication getPasswordAuthentication() {
-		return new PasswordAuthentication(
-            Play.application().configuration().getString("smtp.user"),
-            Play.application().configuration().getString("smtp.password"));
-	}
+	 protected PasswordAuthentication getPasswordAuthentication() {
+		 return new PasswordAuthentication(
+            Public.sConfig.getString("smtp.user"),
+            Public.sConfig.getString("smtp.password"));
+	 }
 }

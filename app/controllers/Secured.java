@@ -17,15 +17,11 @@ import models.Organization;
 import models.User;
 import models.UserRole;
 
+import play.mvc.*;
 import service.MyUserService;
 
 import play.Logger;
-import play.mvc.Action;
 import play.mvc.Http.Context;
-import play.mvc.Http.Session;
-import play.mvc.Result;
-import play.mvc.Results;
-import play.mvc.With;
 
 
 // Lifted from play.mvc.Security
@@ -45,7 +41,7 @@ public class Secured {
     /**
      * Wraps another action, allowing only authenticated HTTP requests.
      * <p>
-     * The user name is retrieved from the session cookie, and added to the HTTP request's
+     * The username is retrieved from the session cookie, and added to the HTTP request's
      * <code>username</code> attribute.
      */
     public static class AuthenticatedAction extends Action<Auth> {
@@ -66,7 +62,8 @@ public class Secured {
                     Result unauthorized = authenticator.onUnauthorized(ctx);
                     return CompletableFuture.completedFuture(unauthorized);
                 } else {
-                    Context childCtx = ctx.withRequest(ctx.request().withUsername(username));
+                    Context childCtx = ctx.withRequest(ctx.request().withAttrs(
+                            ctx.request().attrs().put(Security.USERNAME, username)));
                     return delegate.call(childCtx);
                 }
             } catch(RuntimeException e) {
@@ -87,7 +84,7 @@ public class Secured {
             mAuth = auth;
         }
 
-    	public String getUsername(final Context ctx, String role) {
+        public String getUsername(final Context ctx, String role) {
             String username = getUsernameOrIP(ctx, true);
             User u = User.findByEmail(username);
 
@@ -108,7 +105,7 @@ public class Secured {
             }
 
             return null;
-    	}
+        }
 
         public String getUsernameOrIP(final Context ctx, boolean allow_ip) {
             Logger.debug("Authenticator::getUsername " + ctx + ", " + allow_ip);
@@ -117,8 +114,8 @@ public class Secured {
             if (u != null) {
                 User the_user = User.findByAuthUserIdentity(u);
                 if (the_user != null) {
-					return the_user.email;
-				}
+                    return the_user.email;
+                }
             }
 
             // If we don't have a logged-in user, try going by IP address.
@@ -140,7 +137,7 @@ public class Secured {
             return null;
         }
 
-    	public Result onUnauthorized(final Context ctx) {
+        public Result onUnauthorized(final Context ctx) {
             final AuthUser u = mAuth.getUser(ctx.session());
             if (u != null) {
                 User the_user = User.findByAuthUserIdentity(u);
@@ -162,7 +159,7 @@ public class Secured {
                 // Only redirect to the login screen if there
                 // is no user logged in.
                 //
-                // If a user is logged in but they don't have the proper role
+                // If a user is logged in, but they don't have the proper role
                 // for the page they are trying to access, logging in again
                 // isn't going to help them.
                 mAuth.storeOriginalUrl(ctx);
@@ -170,7 +167,7 @@ public class Secured {
             } else {
                 return unauthorized("You can't access this page.");
             }
-    	}
+        }
 
     }
 }

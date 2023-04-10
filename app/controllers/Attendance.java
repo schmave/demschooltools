@@ -2,6 +2,7 @@ package controllers;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.Time;
 import java.text.*;
 import java.util.*;
@@ -14,6 +15,7 @@ import com.avaje.ebean.Expr;
 import com.avaje.ebean.SqlRow;
 import com.csvreader.CsvWriter;
 
+import com.typesafe.config.Config;
 import models.*;
 
 import play.*;
@@ -46,7 +48,7 @@ public class Attendance extends Controller {
         Map<String, AttendanceCode> codes_map = getCodesMap(false);
 
         List<Person> all_people = new ArrayList<>(person_to_stats.keySet());
-        Collections.sort(all_people, Person.SORT_FIRST_NAME);
+        all_people.sort(Person.SORT_FIRST_NAME);
 
         List<String> all_codes = new ArrayList<>(codes_map.keySet());
 
@@ -116,12 +118,12 @@ public class Attendance extends Controller {
                 .findList();
 
         Map<Person, List<AttendanceDay>> person_to_days =
-            new HashMap<Person, List<AttendanceDay>>();
+                new HashMap<>();
 
         for (AttendanceDay day : days) {
             List<AttendanceDay> list = person_to_days.containsKey(day.person)
                 ? person_to_days.get(day.person)
-                : new ArrayList<AttendanceDay>();
+                : new ArrayList<>();
 
             list.add(day);
             person_to_days.put(day.person, list);
@@ -134,19 +136,19 @@ public class Attendance extends Controller {
                 .findList();
 
         Map<Person, AttendanceWeek> person_to_week =
-            new HashMap<Person, AttendanceWeek>();
+                new HashMap<>();
 
         for (AttendanceWeek week : weeks) {
             person_to_week.put(week.person, week);
         }
 
-        List<Person> all_people = new ArrayList<Person>(person_to_days.keySet());
+        List<Person> all_people = new ArrayList<>(person_to_days.keySet());
         for (Person p : person_to_week.keySet()) {
             if (!all_people.contains(p)) {
                 all_people.add(p);
             }
         }
-        Collections.sort(all_people, Person.SORT_FIRST_NAME);
+        all_people.sort(Person.SORT_FIRST_NAME);
 
         Map<String, AttendanceCode> codes = getCodesMap(do_view);
 
@@ -161,7 +163,7 @@ public class Attendance extends Controller {
             List<Person> additional_people = Application.attendancePeople();
             additional_people.removeAll(all_people);
 
-            Collections.sort(additional_people, Person.SORT_DISPLAY_NAME);
+            additional_people.sort(Person.SORT_DISPLAY_NAME);
 
             response().setHeader("Cache-Control", "max-age=0, no-cache, no-store");
             response().setHeader("Pragma", "no-cache");
@@ -284,13 +286,13 @@ public class Attendance extends Controller {
             stats.total_hours += week.extra_hours;
         }
 
-        Map<Date, AttendanceWeek> day_to_week = new HashMap<Date, AttendanceWeek>();
+        Map<Date, AttendanceWeek> day_to_week = new HashMap<>();
         for (AttendanceWeek w : weeks) {
             day_to_week.put(w.monday, w);
         }
 
-        List<String> codes = new ArrayList<String>(codes_map.keySet()).stream()
-            .filter(c -> c != "_NS_")
+        List<String> codes = new ArrayList<>(codes_map.keySet()).stream()
+            .filter(c -> !Objects.equals(c, "_NS_"))
             .collect(Collectors.toList());
 
         int table_width = has_off_campus_time ? 900 : 700;
@@ -394,7 +396,7 @@ public class Attendance extends Controller {
         Map<String,String[]> data = request().body().asFormUrlEncoded();
         Calendar start_date = Utils.parseDateOrNow(data.get("monday")[0]);
 
-        ArrayList<Object> result = new ArrayList<Object>();
+        ArrayList<Object> result = new ArrayList<>();
         String[] person_ids = data.get("person_id[]");
 
         if (person_ids == null) {
@@ -411,7 +413,7 @@ public class Attendance extends Controller {
                 Utils.eatIfUniqueViolation(pe);
                 alreadyExists = true;
             }
-            Map<String, Object> one_result = new HashMap<String, Object>();
+            Map<String, Object> one_result = new HashMap<>();
 
             // look up our newly-created object so that we get the ID
             one_result.put("week", AttendanceWeek.find.where()
@@ -486,7 +488,7 @@ public class Attendance extends Controller {
         end_date.setYear(end_date.getYear() + 1);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Charset charset = Charset.forName("UTF-8");
+        Charset charset = StandardCharsets.UTF_8;
         CsvWriter writer = new CsvWriter(baos, ',', charset);
 
         writer.write("Name");
@@ -665,7 +667,7 @@ public class Attendance extends Controller {
     }
 
     public static Map<String, AttendanceCode> getCodesMap(boolean include_no_school) {
-        Map<String, AttendanceCode> codes = new HashMap<String, AttendanceCode>();
+        Map<String, AttendanceCode> codes = new HashMap<>();
 
         for (AttendanceCode code : AttendanceCode.all(OrgConfig.get().org)) {
             codes.put(code.code, code);
@@ -728,10 +730,10 @@ public class Attendance extends Controller {
             .findList();
 
         // group AttendanceDays by date, sorted into reverse chronological order
-        SortedMap<Date, List<AttendanceDay>> groups = new TreeMap<Date, List<AttendanceDay>>(Collections.reverseOrder());
+        SortedMap<Date, List<AttendanceDay>> groups = new TreeMap<>(Collections.reverseOrder());
         for (AttendanceDay day : days) {
             if (!groups.containsKey(day.day)) {
-                groups.put(day.day, new ArrayList<AttendanceDay>());
+                groups.put(day.day, new ArrayList<>());
             }
             List<AttendanceDay> group = groups.get(day.day);
             group.add(day);
@@ -754,17 +756,16 @@ public class Attendance extends Controller {
 
     public Result viewCustodiaAdmin() {
         Map<String, Object> scopes = new HashMap<>();
-        Configuration conf = getConfiguration();
+        Config conf = Public.sConfig;
         scopes.put("custodiaUrl", conf.getString("custodia_url"));
         scopes.put("custodiaUsername", OrgConfig.get().org.short_name + "-admin");
         scopes.put("custodiaPassword", conf.getString("custodia_password"));
-        Result result = ok(views.html.main_with_mustache.render(
+        return ok(views.html.main_with_mustache.render(
                 "Sign in system",
                 "custodia",
                 "",
                 "custodia_admin.html",
                 scopes));
-        return result;
     }
 
     public Result offCampusTime() {
@@ -780,7 +781,7 @@ public class Attendance extends Controller {
 
     public Result deleteOffCampusTime() {
         DynamicForm form = mFormFactory.form().bindFromRequest();
-        Map<String, String> data = form.data();
+        Map<String, String> data = form.rawData();
         for (Map.Entry<String, String> entry : data.entrySet()) {
             if (entry.getKey().isEmpty()) continue;
             Integer attendance_day_id = Integer.parseInt(entry.getKey());
@@ -803,7 +804,7 @@ public class Attendance extends Controller {
     public Result saveOffCampusTime() throws ParseException {
         DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
         DynamicForm form = mFormFactory.form().bindFromRequest();
-        Map<String, String> data = form.data();
+        Map<String, String> data = form.rawData();
 
         for (int i = 0; i < 10; i++) {
             try {
@@ -813,7 +814,7 @@ public class Attendance extends Controller {
                 Time return_time = AttendanceDay.parseTime(data.get("returntime-" + i));
                 Integer minutes_exempted = AttendanceDay.parseInt(data.get("minutesexempted-" + i));
 
-                if (person_id != null && day != null && departure_time != null && return_time != null) {
+                if (day != null && departure_time != null && return_time != null) {
                     AttendanceDay attendance_day = AttendanceDay.findCurrentDay(day, person_id);
                     attendance_day.off_campus_departure_time = departure_time;
                     attendance_day.off_campus_return_time = return_time;
@@ -843,7 +844,7 @@ public class Attendance extends Controller {
 
     public Result assignPINs() {
         List<Person> people = Application.attendancePeople();
-        Collections.sort(people, Person.SORT_DISPLAY_NAME);
+        people.sort(Person.SORT_DISPLAY_NAME);
         // add admin PIN
         Person admin = new Person();
         admin.person_id = -1;
@@ -855,7 +856,7 @@ public class Attendance extends Controller {
 
     public Result savePINs() {
         List<Person> people = Application.attendancePeople();
-        HashMap<Integer, Person> people_by_id = new HashMap<Integer, Person>();
+        HashMap<Integer, Person> people_by_id = new HashMap<>();
         for (Person p : people) {
             people_by_id.put(p.person_id, p);
         }
@@ -905,7 +906,7 @@ public class Attendance extends Controller {
     public Result saveCode() {
         Form<AttendanceCode> filled_form = getCodeForm().bindFromRequest();
         AttendanceCode ac = AttendanceCode.findById(
-            Integer.parseInt(filled_form.field("id").value()));
+            Integer.parseInt(filled_form.field("id").getValue().get()));
         ac.edit(filled_form);
 
         CachedPage.remove(CachedPage.ATTENDANCE_INDEX);

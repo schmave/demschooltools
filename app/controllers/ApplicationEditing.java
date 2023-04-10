@@ -375,8 +375,8 @@ public class ApplicationEditing extends Controller {
 		Form<Chapter> form = mFormFactory.form(Chapter.class).bindFromRequest();
 
 		Chapter c = null;
-		if (form.field("id").value() != null) {
-			c = Chapter.findById(Integer.parseInt(form.field("id").value()));
+		if (form.field("id").getValue().isPresent()) {
+			c = Chapter.findById(Integer.parseInt(form.field("id").getValue().get()));
 			c.updateFromForm(form);
 		} else {
 			c = Chapter.create(form);
@@ -407,8 +407,8 @@ public class ApplicationEditing extends Controller {
         Form<Section> form = mFormFactory.form(Section.class).bindFromRequest();
 
 		Section s = null;
-		if (form.field("id").value() != null) {
-			s = Section.findById(Integer.parseInt(form.field("id").value()));
+		if (form.field("id").getValue().isPresent()) {
+			s = Section.findById(Integer.parseInt(form.field("id").getValue().get()));
 			s.updateFromForm(form);
 		} else {
 			s = Section.create(form);
@@ -439,8 +439,8 @@ public class ApplicationEditing extends Controller {
 		Form<Entry> form = mFormFactory.form(Entry.class).bindFromRequest();
 
 		Entry e = null;
-		if (form.field("id").value() != null) {
-			e = Entry.findById(Integer.parseInt(form.field("id").value()));
+		if (form.field("id").getValue().isPresent()) {
+			e = Entry.findById(Integer.parseInt(form.field("id").getValue().get()));
 			e.updateFromForm(form);
 		} else {
 			e = Entry.create(form);

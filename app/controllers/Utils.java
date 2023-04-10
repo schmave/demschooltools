@@ -4,7 +4,6 @@ import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.persistence.*;
 
@@ -16,6 +15,7 @@ import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.typesafe.config.Config;
 import models.OrgConfig;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -26,8 +26,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import play.Configuration;
-import play.Play;
 import play.data.Form;
 import play.twirl.api.Html;
 import play.twirl.api.HtmlFormat;
@@ -114,7 +112,7 @@ public class Utils
         StringWriter writer = new StringWriter();
         sMustache.compile(
             new InputStreamReader(
-                Play.application().resourceAsStream("public/mustache/" + templateName)),
+                Public.sEnvironment.resourceAsStream("public/mustache/" + templateName)),
             templateName)
             .execute(writer, scopes);
         return writer.toString();
@@ -124,12 +122,12 @@ public class Utils
         return HtmlFormat.raw(HtmlFormat.escape(input.trim()).body().replace("\n", "<br/>"));
     }
 
-    public static boolean getBooleanFromFormValue(String form_value) {
-        return form_value != null && (form_value.equals("true") || form_value.equals("on"));
+    public static boolean getBooleanFromFormValue(String value) {
+        return value.equals("true") || value.equals("on");
     }
 
     public static boolean getBooleanFromFormValue(Form.Field field) {
-        return getBooleanFromFormValue(field.value());
+        return field.getValue().filter(Utils::getBooleanFromFormValue).isPresent();
     }
 
     public static boolean lessThanDaysOld(Date date, int num_days) {
@@ -158,46 +156,43 @@ public class Utils
         }
     }
 
-    private static void loginToCustodia(CloseableHttpClient client, Configuration play_config) {
-        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+    private static void loginToCustodia(CloseableHttpClient client, Config play_config) {
+        Config school_crm_config = play_config.getConfig("school_crm");
+        List<NameValuePair> nvps = new ArrayList<>();
         nvps.add(new BasicNameValuePair("username", "admin"));
-        nvps.add(new BasicNameValuePair("password", play_config.getString("custodia_password")));
-        makeCustodiaPost(client, play_config.getString("custodia_url") + "/users/login", nvps);
+        nvps.add(new BasicNameValuePair("password",
+                school_crm_config.getString(
+                        "custodia_password")));
+        makeCustodiaPost(client, school_crm_config.getString("custodia_url") + "/users/login", nvps);
     }
 
     public static void setCustodiaPassword(String new_password) {
         final OrgConfig config = OrgConfig.get();
-        final Configuration play_config = Application.getConfiguration();
-        sCustodiaService.submit(new Runnable() {
-            public void run() {
-                try {
-                    CloseableHttpClient httpclient = HttpClients.createDefault();
-                    loginToCustodia(httpclient, play_config);
+        sCustodiaService.submit(() -> {
+            try {
+                CloseableHttpClient httpclient = HttpClients.createDefault();
+                loginToCustodia(httpclient, Public.sConfig);
 
-                    List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-                    nvps.add(new BasicNameValuePair("username", config.org.short_name));
-                    nvps.add(new BasicNameValuePair("password", new_password));
-                    makeCustodiaPost(httpclient,
-                            play_config.getString("custodia_url") + "/users/password",
-                            nvps);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                List<NameValuePair> nvps = new ArrayList<>();
+                nvps.add(new BasicNameValuePair("username", config.org.short_name));
+                nvps.add(new BasicNameValuePair("password", new_password));
+                makeCustodiaPost(httpclient,
+                        Public.sConfig.getString("custodia_url") + "/users/password",
+                        nvps);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
     }
 
     public static void updateCustodia() {
-        final Configuration play_config = Application.getConfiguration();
-        sCustodiaService.submit(new Runnable() {
-            public void run() {
-                CloseableHttpClient httpclient = HttpClients.createDefault();
-                loginToCustodia(httpclient, play_config);
+        sCustodiaService.submit(() -> {
+            CloseableHttpClient httpclient = HttpClients.createDefault();
+            loginToCustodia(httpclient, Public.sConfig);
 
-                makeCustodiaPost(httpclient,
-                        play_config.getString("custodia_url") + "/updatefromdst",
-                        new ArrayList<NameValuePair>());
-            }
+            makeCustodiaPost(httpclient,
+                    Public.sConfig.getString("custodia_url") + "/updatefromdst",
+                    new ArrayList<>());
         });
     }
 
@@ -205,22 +200,4 @@ public class Utils
         Date utcNow = new Date();
         return new Date(utcNow.getTime() + OrgConfig.get().time_zone.getOffset(utcNow.getTime()));
     }
-
-    public static Integer tryParseInt(String value, Integer defaultValue) {  
-        try {  
-            return Integer.parseInt(value);  
-        } catch (NumberFormatException e) {  
-            return defaultValue;
-        }
-    }
 }
-
-//class PersonKeySerializer extends JsonSerializer<Person>
-//{
-//    @Override
-//    public void serialize(Person p, JsonGenerator jgen, SerializerProvider provider)
-//        throws IOException, JsonProcessingException
-//    {
-//        jgen.writeFieldName(String.valueOf(p.person_id));
-//    }
-//}

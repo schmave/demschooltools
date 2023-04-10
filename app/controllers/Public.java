@@ -3,8 +3,6 @@ package controllers;
 import java.io.IOException;
 import java.util.*;
 
-import javax.mail.*;
-import javax.mail.internet.*;
 import javax.inject.Singleton;
 
 import com.ecwid.mailchimp.*;
@@ -17,6 +15,7 @@ import com.feth.play.module.pa.controllers.Authenticate;
 import com.feth.play.module.pa.PlayAuthenticate;
 import javax.inject.Inject;
 
+import com.typesafe.config.Config;
 import models.*;
 
 import org.mindrot.jbcrypt.BCrypt;
@@ -24,12 +23,8 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import play.*;
 import play.cache.SyncCacheApi;
-import play.data.*;
-import play.libs.Json;
 import play.mvc.*;
 import play.mvc.Http.Context;
-
-import views.html.*;
 
 @Singleton
 @With(DumpOnError.class)
@@ -39,12 +34,17 @@ public class Public extends Controller {
     Authenticate mAuth;
 
     public static SyncCacheApi sCache;
+    public static Environment sEnvironment;
+    public static Config sConfig;
 
     @Inject
-    public Public(final PlayAuthenticate playAuth, final Authenticate auth, final SyncCacheApi cache) {
+    public Public(final PlayAuthenticate playAuth, final Authenticate auth, final SyncCacheApi cache,
+                  final Environment environment, final Config config) {
         mPlayAuth = playAuth;
         mAuth = auth;
         sCache = cache;
+        sEnvironment = environment;
+        sConfig = config;
     }
 
     public Result facebookDeleteInfo() {
@@ -54,10 +54,10 @@ public class Public extends Controller {
     }
 
 	public Result postEmail() {
-		final java.util.Map<String, String[]> values = request().body().asFormUrlEncoded();
+		/*final java.util.Map<String, String[]> values = request().body().asFormUrlEncoded();
 
 		Email new_email = Email.create(values.get("email")[0]);
-		/* new_email.parseMessage();
+		 new_email.parseMessage();
 
 		boolean autoSend = false;
 		Address[] rcpts = new_email.parsedMessage.getRecipients(Message.ReceipientType.TO);
@@ -124,7 +124,7 @@ public class Public extends Controller {
         }
     }
 
-    // Return true iff person was previously subscribed to this list and
+    // Return true iff person was previously subscribed to this list, and
     // we removed them from the list.
     static boolean removePersonFromList(MailChimpClient client, String api_key, String list_id, String email) throws MailChimpException, IOException {
         if (email.equals("")) {
@@ -159,7 +159,7 @@ public class Public extends Controller {
         ListMethod method = new ListMethod();
         method.apikey = api_key;
 
-        Map<String, ListMethodResult.Data> result = new HashMap<String, ListMethodResult.Data>();
+        Map<String, ListMethodResult.Data> result = new HashMap<>();
 
         if (api_key.equals("")) {
             // client.execute() returns an IllegalArgumentException when api_key is empty.
@@ -172,10 +172,7 @@ public class Public extends Controller {
                 result.put(data.id, data);
             }
         }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-        catch (MailChimpException e) {
+        catch (IOException | MailChimpException e) {
             e.printStackTrace();
         }
 
@@ -213,7 +210,7 @@ public class Public extends Controller {
                 // should contain the email address that mailchimp knows about.
                 // The person object itself contains the latest data.
                 if (last_changed_person != null &&
-                    change.person.person_id == last_changed_person.person_id) {
+                    change.person.person_id.equals(last_changed_person.person_id)) {
                     continue;
                 }
                 last_changed_person = change.person;
@@ -231,10 +228,7 @@ public class Public extends Controller {
                                     info.update(list_id, change.person);
                                 }
                             }
-                        } catch (IOException e) {
-                            info.error(list_id, "Updating " + change.person + ": " + e);
-                            e.printStackTrace();
-                        } catch (MailChimpException e) {
+                        } catch (IOException | MailChimpException e) {
                             info.error(list_id, "Updating " + change.person + ": " + e);
                             e.printStackTrace();
                         }
@@ -251,10 +245,7 @@ public class Public extends Controller {
                             try {
                                 addPersonToList(client, org.mailchimp_api_key, sync.mailchimp_list_id, change.person);
                                 info.add(sync.mailchimp_list_id, change.person);
-                            } catch (IOException e) {
-                                info.error(sync.mailchimp_list_id, "Changed email, adding " + change.person + ": " + e);
-                                e.printStackTrace();
-                            } catch (MailChimpException e) {
+                            } catch (IOException | MailChimpException e) {
                                 info.error(sync.mailchimp_list_id, "Changed email, adding " + change.person + ": " + e);
                                 e.printStackTrace();
                             }
@@ -268,7 +259,7 @@ public class Public extends Controller {
             for (Tag t : Tag.find.where().eq("organization", org).findList()) {
                 for (MailchimpSync sync : t.syncs) {
                     if (sync.last_sync == null) {
-                        sync.last_sync = new Date(0, 1, 1);
+                        sync.last_sync = new Date(0, Calendar.JANUARY, 1);
                     }
                     List<PersonTagChange> tag_changes = PersonTagChange.find.where()
                         .eq("tag", t)
@@ -279,13 +270,13 @@ public class Public extends Controller {
 
                     // Go through the list of all changes and save
                     // only the most recent one for each person
-                    Map<Person, Boolean> person_to_add_value = new HashMap<Person, Boolean>();
+                    Map<Person, Boolean> person_to_add_value = new HashMap<>();
                     for (PersonTagChange change : tag_changes) {
                         person_to_add_value.put(change.person, change.was_add);
                     }
 
-                    List<Person> adds = new ArrayList<Person>();
-                    List<Person> removes = new ArrayList<Person>();
+                    List<Person> adds = new ArrayList<>();
+                    List<Person> removes = new ArrayList<>();
 
                     for (Person p : person_to_add_value.keySet()) {
                         if (sync.sync_local_adds && person_to_add_value.get(p)) {
@@ -305,11 +296,7 @@ public class Public extends Controller {
                                 addPersonToList(client, org.mailchimp_api_key, sync.mailchimp_list_id, p);
                                 info.add(sync.mailchimp_list_id, p);
                             }
-                            catch (IOException e) {
-                                info.error(sync.mailchimp_list_id, "Adding " + p.first_name + ": " + e);
-                                e.printStackTrace();
-                            }
-                            catch (MailChimpException e) {
+                            catch (IOException | MailChimpException e) {
                                 info.error(sync.mailchimp_list_id, "Adding " + p.first_name + ": " + e);
                                 e.printStackTrace();
                             }
@@ -323,11 +310,7 @@ public class Public extends Controller {
                                     info.remove(sync.mailchimp_list_id, p);
                                 }
                             }
-                            catch (IOException e) {
-                                info.error(sync.mailchimp_list_id, "Removing " + p.first_name + ": " + e);
-                                e.printStackTrace();
-                            }
-                            catch (MailChimpException e) {
+                            catch (IOException | MailChimpException e) {
                                 info.error(sync.mailchimp_list_id, "Removing " + p.first_name + ": " + e);
                                 e.printStackTrace();
                             }
@@ -351,7 +334,7 @@ public class Public extends Controller {
         return ok("");
     }
 
-    public Result oAuthDenied(String provider)
+    public Result oAuthDenied(String ignoredProvider)
     {
         return redirect(routes.Public.index());
     }
