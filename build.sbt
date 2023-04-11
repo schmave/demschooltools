@@ -1,3 +1,5 @@
+import scala.sys.process._
+
 name := "DemSchoolTools"
 
 version := "1.1"
