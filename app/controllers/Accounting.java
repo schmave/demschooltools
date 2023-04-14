@@ -1,16 +1,22 @@
 package controllers;
 
-import java.io.*;
+import com.csvreader.CsvWriter;
+import models.*;
+import play.data.Form;
+import play.data.FormFactory;
+import play.libs.Json;
+import play.mvc.Controller;
+import play.mvc.Http;
+import play.mvc.Result;
+import play.mvc.With;
+
+import javax.inject.Inject;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.*;
-import models.*;
-import play.mvc.*;
-import play.data.*;
-import play.libs.*;
-import com.csvreader.CsvWriter;
-import java.nio.charset.Charset;
-import javax.inject.Inject;
+import java.util.stream.Collectors;
 
 @With(DumpOnError.class)
 @Secured.Auth(UserRole.ROLE_VIEW_JC)
@@ -37,9 +43,9 @@ public class Accounting extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result makeNewTransaction() {
+    public Result makeNewTransaction(Http.Request request) {
         Form<Transaction> form = mFormFactory.form(Transaction.class);
-        Form<Transaction> filledForm = form.bindFromRequest();
+        Form<Transaction> filledForm = form.bindFromRequest(request);
         if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
             return badRequest(views.html.create_transaction.render(filledForm));
@@ -55,9 +61,9 @@ public class Accounting extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result saveTransaction() {
+    public Result saveTransaction(Http.Request request) {
         try {
-            Form<Transaction> form = mFormFactory.form(Transaction.class).bindFromRequest();
+            Form<Transaction> form = mFormFactory.form(Transaction.class).bindFromRequest(request);
             Transaction transaction = Transaction.findById(Integer.parseInt(form.field("id").value().get()));
             transaction.updateFromForm(form);
             return redirect(routes.Accounting.transaction(transaction.id));
@@ -95,24 +101,24 @@ public class Accounting extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result runTransactionsReport() throws IOException {
+    public Result runTransactionsReport(Http.Request request) throws IOException {
         Form<TransactionList> form = mFormFactory.form(TransactionList.class);
-        Form<TransactionList> filledForm = form.bindFromRequest();
+        Form<TransactionList> filledForm = form.bindFromRequest(request);
         if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
             return badRequest(views.html.transactions_report.render(TransactionList.blank()));
         }
         TransactionList report = TransactionList.createFromForm(filledForm);
-        String action = request().body().asFormUrlEncoded().get("action")[0];
+        String action = request.body().asFormUrlEncoded().get("action")[0];
         if (action.equals("download")) {
-            return ok(downloadTransactionReport(report));  
+            return downloadTransactionReport(report);
         }
         else {
             return ok(views.html.transactions_report.render(report));
         }
     }
 
-    private byte[] downloadTransactionReport(TransactionList report) throws IOException {
+    private Result downloadTransactionReport(TransactionList report) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Charset charset = StandardCharsets.UTF_8;
         CsvWriter writer = new CsvWriter(baos, ',', charset);
@@ -139,10 +145,8 @@ public class Accounting extends Controller {
 
         writer.close();
 
-        response().setHeader("Content-Type", "application/csv");
-        response().setHeader("Content-Disposition", "attachment; filename=transactions.csv");
-
-        return baos.toByteArray();
+        return ok(baos.toByteArray()).withHeader("Content-Type", "application/csv")
+                .withHeader("Content-Disposition", "attachment; filename=transactions.csv");
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
@@ -160,9 +164,9 @@ public class Accounting extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result runReport() {
+    public Result runReport(Http.Request request) {
         Form<AccountingReport> form = mFormFactory.form(AccountingReport.class);
-        Form<AccountingReport> filledForm = form.bindFromRequest();
+        Form<AccountingReport> filledForm = form.bindFromRequest(request);
         if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
             return badRequest(views.html.accounting_report.render(new AccountingReport()));
@@ -198,9 +202,9 @@ public class Accounting extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result makeNewAccount() {
+    public Result makeNewAccount(Http.Request request) {
         Form<Account> form = mFormFactory.form(Account.class);
-        Form<Account> filledForm = form.bindFromRequest();
+        Form<Account> filledForm = form.bindFromRequest(request);
         if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
             return badRequest(views.html.new_account.render(filledForm));
@@ -221,8 +225,8 @@ public class Accounting extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result saveAccount() {
-        Form<Account> form = mFormFactory.form(Account.class).bindFromRequest();
+    public Result saveAccount(Http.Request request) {
+        Form<Account> form = mFormFactory.form(Account.class).bindFromRequest(request);
         Account account = Account.findById(Integer.parseInt(form.field("id").value().get()));
         account.updateFromForm(form);
         return redirect(routes.Accounting.account(account.id));
