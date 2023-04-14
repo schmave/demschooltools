@@ -31,8 +31,8 @@ $(function() {
 @form(destination, 'class -> "form-horizontal", 'role -> "form") {
 
 <div class="col-sm-6">
-@if(code_form("id").getValue().isPresent()) {
-	<input type="hidden" name="id" value="@code_form("id").getValue().get()"/>
+@if(code_form("id").value().isPresent()) {
+	<input type="hidden" name="id" value="@code_form("id").value().get()"/>
 }
 @inputText(code_form("code"), '_label -> "Code", 'class -> "form-control")
 @inputText(code_form("description"), '_label -> "Description", 'class -> "form-control")

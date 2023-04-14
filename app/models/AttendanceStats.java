@@ -14,7 +14,7 @@ public class AttendanceStats {
     public Map<AttendanceCode, Integer> absence_counts =
             new HashMap<>();
 
-    private Map<Integer, Double> values;
+    private final Map<Integer, Double> values;
 
     private double partial_day_value;
 

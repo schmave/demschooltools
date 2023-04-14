@@ -12,13 +12,18 @@ lazy val root = (project in file("."))
 	    )
 	.enablePlugins(PlayJava, PlayEbean)
 
-scalaVersion := "2.11.7"
+scalaVersion := "2.12.17"
 
 javacOptions in Compile ++= Seq("-Xlint:unchecked", "-Xlint:deprecation")
 
 pipelineStages := Seq(digest, gzip)
 
 // resolvers += Resolver.sonatypeRepo("snapshots")
+
+// These settings from
+//  https://github.com/playframework/play-ebean/blob/main/docs/manual/working/javaGuide/main/sql/code/ebean.sbt
+Compile / playEbeanModels := Seq("models.*")
+playEbeanDebugLevel := 4
 
 libraryDependencies ++= Seq(
   javaJdbc,

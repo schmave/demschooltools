@@ -6,9 +6,9 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.CompletableFuture;
 import javax.inject.Inject;
 
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.SqlQuery;
-import com.avaje.ebean.SqlRow;
+import io.ebean.Ebean;
+import io.ebean.SqlQuery;
+import io.ebean.SqlRow;
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.user.AuthUser;
 
@@ -127,7 +127,7 @@ public class Secured {
                 sqlQuery.setParameter("org_id", Organization.getByHost().id);
 
                 // execute the query returning a List of MapBean objects
-                SqlRow result = sqlQuery.findUnique();
+                SqlRow result = sqlQuery.findOne();
 
                 if (result != null) {
                     return address;

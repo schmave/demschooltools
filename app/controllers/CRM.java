@@ -9,7 +9,7 @@ import java.util.*;
 import javax.mail.*;
 import javax.mail.internet.*;
 
-import com.avaje.ebean.*;
+import io.ebean.*;
 import com.ecwid.mailchimp.*;
 import com.ecwid.mailchimp.method.v2_0.lists.ListMethodResult;
 import javax.inject.Inject;
@@ -51,7 +51,7 @@ public class CRM extends Controller {
                 "recent_comments") {
                 @Override
                 String render() {
-                    List<Comment> recent_comments = Comment.find
+                    List<Comment> recent_comments = Comment.find.query()
                         .fetch("person")
                         .fetch("completed_tasks", new FetchConfig().query())
                         .fetch("completed_tasks.task", new FetchConfig().query())
@@ -67,7 +67,7 @@ public class CRM extends Controller {
         Person the_person = Person.findById(id);
 
         List<Person> family_members =
-            Person.find.where().isNotNull("family").eq("family", the_person.family).
+            Person.find.query().where().isNotNull("family").eq("family", the_person.family).
                 ne("person_id", the_person.person_id).findList();
 
         Set<Integer> family_ids = new HashSet<>();
@@ -76,7 +76,7 @@ public class CRM extends Controller {
             family_ids.add(family.person_id);
         }
 
-        List<Comment> all_comments = Comment.find.where().in("person_id", family_ids).
+        List<Comment> all_comments = Comment.find.query().where().in("person_id", family_ids).
             order("created DESC").findList();
 
         String comment_destination = "<No email set>";
@@ -121,13 +121,13 @@ public class CRM extends Controller {
                 Expr.ilike("display_name", "%" + term + "%"));
 
 			people_matched_this_round =
-				Person.find.where().add(this_expr)
+				Person.find.query().where().add(this_expr)
 					.eq("organization", Organization.getByHost())
 					.eq("is_family", false)
                     .findList();
 
 			List<PhoneNumber> phone_numbers =
-				PhoneNumber.find.where().ilike("number", "%" + term + "%")
+				PhoneNumber.find.query().where().ilike("number", "%" + term + "%")
                     .eq("owner.organization", Organization.getByHost())
                     .findList();
 			for (PhoneNumber pn : phone_numbers) {
@@ -172,7 +172,7 @@ public class CRM extends Controller {
     // the "create new tag" functionality is also disabled.
     public Result jsonTags(String term, Integer personId) {
         List<Tag> selected_tags =
-            Tag.find.where()
+            Tag.find.query().where()
                 .eq("organization", Organization.getByHost())
                 .eq("show_in_menu", true)
                 .ilike("title", "%" + term + "%").findList();
@@ -331,7 +331,7 @@ public class CRM extends Controller {
     }
 
     public Result viewAllTags() {
-        List<Tag> tags = Tag.find
+        List<Tag> tags = Tag.find.query()
             .where().eq("organization", Organization.getByHost())
             .orderBy("lower(title)")
             .findList();
@@ -359,8 +359,8 @@ public class CRM extends Controller {
     public Result saveTag() {
         Form<Tag> form = mFormFactory.form(Tag.class).bindFromRequest();
 
-        if (form.field("id").getValue().isPresent()) {
-            Tag t = Tag.findById(Integer.parseInt(form.field("id").getValue().get()));
+        if (form.field("id").value().isPresent()) {
+            Tag t = Tag.findById(Integer.parseInt(form.field("id").value().get()));
             t.updateFromForm(form);
 
             CachedPage.onPeopleChanged();
@@ -441,13 +441,13 @@ public class CRM extends Controller {
     }
 
     public Result viewTag(Integer id) {
-        Tag the_tag = Tag.find
+        Tag the_tag = Tag.find.query()
             .fetch("people")
             .fetch("people.phone_numbers", new FetchConfig().query())
             .fetch("people.family", new FetchConfig().query())
             .fetch("people.family.family_members", new FetchConfig().query())
             .where().eq("organization", Organization.getByHost())
-            .eq("id", id).findUnique();
+            .eq("id", id).findOne();
 
         List<Person> people = the_tag.people;
 
@@ -483,13 +483,13 @@ public class CRM extends Controller {
     }
 
     public Result downloadTag(Integer id) throws IOException {
-        Tag the_tag = Tag.find
+        Tag the_tag = Tag.find.query()
             .fetch("people")
             .fetch("people.phone_numbers", new FetchConfig().query())
             .fetch("people.family", new FetchConfig().query())
             .fetch("people.family.family_members", new FetchConfig().query())
             .where().eq("organization", Organization.getByHost())
-            .eq("id", id).findUnique();
+            .eq("id", id).findOne();
 
         response().setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response().setHeader("Content-Disposition", "attachment; filename=" +
@@ -657,9 +657,9 @@ public class CRM extends Controller {
     }
 
 	static Email getPendingEmail() {
-		return Email.find.where()
+		return Email.find.query().where()
             .eq("organization", Organization.getByHost())
-            .eq("deleted", false).eq("sent", false).orderBy("id ASC").setMaxRows(1).findUnique();
+            .eq("deleted", false).eq("sent", false).orderBy("id ASC").setMaxRows(1).findOne();
 	}
 
 	public Result viewPendingEmail() {
@@ -668,9 +668,9 @@ public class CRM extends Controller {
 			return redirect(routes.CRM.recentComments());
 		}
 
-        Tag staff_tag = Tag.find.where()
+        Tag staff_tag = Tag.find.query().where()
             .eq("organization", Organization.getByHost())
-            .eq("title", "Staff").findUnique();
+            .eq("title", "Staff").findOne();
         List<Person> people = staff_tag.people;
 
         ArrayList<String> test_addresses = new ArrayList<>();
@@ -799,11 +799,11 @@ public class CRM extends Controller {
         Form<Comment> filledForm = mFormFactory.form(Comment.class).bindFromRequest();
         Comment new_comment = new Comment();
 
-        new_comment.person = Person.findById(Integer.parseInt(filledForm.field("person").getValue().get()));
+        new_comment.person = Person.findById(Integer.parseInt(filledForm.field("person").value().get()));
         new_comment.user = Application.getCurrentUser();
-        new_comment.message = filledForm.field("message").getValue().get();
+        new_comment.message = filledForm.field("message").value().get();
 
-        String task_id_string = filledForm.field("comment_task_ids").getValue().get();
+        String task_id_string = filledForm.field("comment_task_ids").value().get();
 
         if (task_id_string.length() > 0 || new_comment.message.length() > 0) {
             new_comment.save();
@@ -818,7 +818,7 @@ public class CRM extends Controller {
                 }
             }
 
-            if (filledForm.field("send_email").getValue().isPresent()) {
+            if (filledForm.field("send_email").value().isPresent()) {
                 for (NotificationRule rule :
                         NotificationRule.findByType(NotificationRule.TYPE_COMMENT)) {
                     play.libs.mailer.Email mail = new play.libs.mailer.Email();
@@ -896,7 +896,7 @@ public class CRM extends Controller {
 
         return ok(views.html.view_mailchimp_settings.render(
             mFormFactory.form(Organization.class), org,
-            MailchimpSync.find.where().eq("tag.organization", OrgConfig.get().org).findList(),
+            MailchimpSync.find.query().where().eq("tag.organization", OrgConfig.get().org).findList(),
             mc_list_map));
     }
 

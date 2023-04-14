@@ -127,7 +127,7 @@ public class Utils
     }
 
     public static boolean getBooleanFromFormValue(Form.Field field) {
-        return field.getValue().filter(Utils::getBooleanFromFormValue).isPresent();
+        return field.value().filter(Utils::getBooleanFromFormValue).isPresent();
     }
 
     public static boolean lessThanDaysOld(Date date, int num_days) {

@@ -10,8 +10,7 @@ import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.*;
 
-import com.avaje.ebean.Model;
-import org.jetbrains.annotations.NotNull;
+import io.ebean.*;
 
 @Entity
 @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
@@ -66,8 +65,8 @@ public class Charge extends Model implements Comparable<Charge> {
     public static Finder<Integer, Charge> find = new Finder<>(Charge.class);
 
     public static Charge findById(int id) {
-        return find.where().eq("the_case.meeting.organization", Organization.getByHost())
-            .eq("id", id).findUnique();
+        return find.query().where().eq("the_case.meeting.organization", Organization.getByHost())
+            .eq("id", id).findOne();
     }
 
     public static Charge create(Case c)
@@ -172,7 +171,7 @@ public class Charge extends Model implements Comparable<Charge> {
     }
 
     @Override
-    public int compareTo(@NotNull Charge c2) {
+    public int compareTo(@javax.annotation.Nonnull Charge c2) {
 		if (the_case.meeting.date != null) {
 			return the_case.meeting.date.compareTo(c2.the_case.meeting.date);
 		}

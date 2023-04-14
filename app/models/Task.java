@@ -1,6 +1,6 @@
 package models;
 
-import com.avaje.ebean.Model;
+import io.ebean.*;
 
 import javax.persistence.*;
 import java.util.List;
@@ -28,7 +28,7 @@ public class Task extends Model {
     );
 
     public static Task findById(int id) {
-        return find.where().eq("task_list.organization", Organization.getByHost())
-            .eq("id", id).findUnique();
+        return find.query().where().eq("task_list.organization", Organization.getByHost())
+            .eq("id", id).findOne();
     }
 }

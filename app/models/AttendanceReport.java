@@ -30,7 +30,7 @@ public class AttendanceReport {
     public static AttendanceReport createFromForm(Form<AttendanceReport> form) {
         AttendanceReport model = form.get();
 
-        List<AttendanceDay> events = AttendanceDay.find.where()
+        List<AttendanceDay> events = AttendanceDay.find.query().where()
             .eq("person.organization", OrgConfig.get().org)
             .ge("day", model.start_date)
             .le("day", model.end_date)

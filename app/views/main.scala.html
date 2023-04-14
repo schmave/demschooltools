@@ -123,7 +123,7 @@
             </span>
             <span class="dropdown">
                 <ul class="dropdown-menu">
-                    @for( l <- TaskList.find.where().eq("organization", Organization.getByHost()).findList() ) {
+                    @for( l <- TaskList.find.query().where().eq("organization", Organization.getByHost()).findList() ) {
                         <li><a href="@routes.CRM.viewTaskList(l.id)">@l.title</a></li>
                         }
                 </ul>

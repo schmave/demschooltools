@@ -12,6 +12,7 @@
 	<hr>
 
 	<form method="POST" action="/login">
+		@CSRF.formField
 	<h3>Login with a password</h3>
 	Email address: <input type="text" size=40 name="email" />
 	Password: <input type="password" name="password" />

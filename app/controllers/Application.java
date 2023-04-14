@@ -1,6 +1,6 @@
 package controllers;
 
-import com.avaje.ebean.*;
+import io.ebean.*;
 import com.csvreader.CsvWriter;
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.typesafe.config.Config;
@@ -25,6 +25,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import controllers.routes;
 
 @Singleton
 @With(DumpOnError.class)
@@ -92,7 +94,7 @@ public class Application extends Controller {
     }
 
     public static List<Charge> getActiveSchoolMeetingReferrals() {
-        return Charge.find.where()
+        return Charge.find.query().where()
             .eq("referred_to_sm", true)
             .eq("sm_decision", null)
             .eq("person.organization", Organization.getByHost())
@@ -106,7 +108,7 @@ public class Application extends Controller {
 
     public Result viewSchoolMeetingDecisions() {
         List<Charge> the_charges =
-            Charge.find
+            Charge.find.query()
                 .fetch("rule")
                 .fetch("rule.section")
                 .fetch("rule.section.chapter")
@@ -142,7 +144,7 @@ public class Application extends Controller {
     }
 
     private static List<Person> peopleByTagType(String tag_type) {
-        List<Tag> tags = Tag.find.where()
+        List<Tag> tags = Tag.find.query().where()
             .eq(tag_type, true)
             .eq("organization", Organization.getByHost())
             .findList();
@@ -162,17 +164,17 @@ public class Application extends Controller {
                 "jc_home") {
                 @Override
                 String render() {
-        List<Meeting> meetings = Meeting.find
+        List<Meeting> meetings = Meeting.find.query()
             .fetch("cases")
             .where().eq("organization", Organization.getByHost())
             .orderBy("date DESC").findList();
 
-        List<Tag> tags = Tag.find.where()
+        List<Tag> tags = Tag.find.query().where()
             .eq("show_in_jc", true)
             .eq("organization", Organization.getByHost())
             .findList();
 
-        Set<Person> peopleSet = Person.find
+        Set<Person> peopleSet = Person.find.query()
             .fetch("charges")
             .fetch("charges.the_case")
             .fetch("charges.the_case.meeting")
@@ -186,7 +188,7 @@ public class Application extends Controller {
         List<Person> people = new ArrayList<>(peopleSet);
         people.sort(Person.SORT_DISPLAY_NAME);
 
-        List<Entry> entries = Entry.find
+        List<Entry> entries = Entry.find.query()
             .fetch("charges")
             .fetch("charges.the_case")
             .fetch("charges.the_case.meeting")
@@ -246,7 +248,7 @@ public class Application extends Controller {
 
         OrgConfig config = OrgConfig.get();
 
-        List<Charge> charges = Charge.find
+        List<Charge> charges = Charge.find.query()
             .fetch("the_case")
             .fetch("person")
             .fetch("rule")
@@ -334,7 +336,7 @@ public class Application extends Controller {
         List<Charge> active_rps = getActiveResolutionPlans(referenced_charge_ids);
 
         List<Charge> completed_rps =
-            Charge.find
+            Charge.find.query()
                 .fetch("the_case")
                 .fetch("the_case.meeting")
                 .fetch("person")
@@ -350,7 +352,7 @@ public class Application extends Controller {
                 .setMaxRows(25).findList();
 
         List<Charge> nullified_rps =
-            Charge.find
+            Charge.find.query()
                 .fetch("the_case")
                 .fetch("the_case.meeting")
                 .fetch("person")
@@ -379,7 +381,7 @@ public class Application extends Controller {
     }
 
     private List<Integer> getReferencedChargeIds() {
-        return Charge.find
+        return Charge.find.query()
             .where()
             .eq("person.organization", Organization.getByHost())
             .isNotNull("referenced_charge_id")
@@ -391,7 +393,7 @@ public class Application extends Controller {
     }
 
     private List<Charge> getActiveResolutionPlans(List<Integer> referenced_charge_ids) {
-        return Charge.find
+        return Charge.find.query()
             .fetch("the_case")
             .fetch("the_case.meeting")
             .fetch("person")
@@ -496,7 +498,7 @@ public class Application extends Controller {
         }
 
         List<ManualChange> changes =
-            ManualChange.find.where()
+            ManualChange.find.query().where()
                 .gt("date_entered", begin_date)
                 .eq("entry.section.chapter.organization", Organization.getByHost())
                 .findList();
@@ -657,11 +659,11 @@ public class Application extends Controller {
     }
 
     public Result viewChapter(Integer id) {
-        Chapter c = Chapter.find
+        Chapter c = Chapter.find.query()
             .fetch("sections", new FetchConfig().query())
             .fetch("sections.entries", new FetchConfig().query())
             .where().eq("organization", Organization.getByHost())
-            .eq("id", id).findUnique();
+            .eq("id", id).findOne();
 
         return ok(views.html.view_chapter.render(c));
     }
@@ -702,7 +704,7 @@ public class Application extends Controller {
             }
         }
 
-        Map<Integer, Entry> entries = Entry.find
+        Map<Integer, Entry> entries = Entry.find.query()
             .fetch("section", new FetchConfig().query())
             .fetch("section.chapter", new FetchConfig().query())
             .where().in("id", entryIds).findMap();
@@ -879,7 +881,7 @@ public class Application extends Controller {
 
         response().setHeader("Content-Type", "application/pdf");
 
-        List<Meeting> meetings = Meeting.find.where()
+        List<Meeting> meetings = Meeting.find.query().where()
             .eq("organization", Organization.getByHost())
             .le("date", end_date.getTime())
             .ge("date", start_date.getTime()).findList();
@@ -894,7 +896,7 @@ public class Application extends Controller {
         Calendar end_date = (Calendar)start_date.clone();
         end_date.add(GregorianCalendar.DATE, 6);
 
-        List<Charge> all_charges = Charge.find
+        List<Charge> all_charges = Charge.find.query()
             .fetch("the_case")
             .fetch("person")
             .fetch("rule")
@@ -929,7 +931,7 @@ public class Application extends Controller {
 
         List<Case> all_cases = new ArrayList<Case>();
 
-        List<Meeting> meetings = Meeting.find.where()
+        List<Meeting> meetings = Meeting.find.query().where()
             .eq("organization", Organization.getByHost())
             .le("date", end_date.getTime())
             .ge("date", start_date.getTime()).findList();
@@ -988,7 +990,7 @@ public class Application extends Controller {
 
     public static String jsonRules(Boolean includeBreakingResPlan) {
 
-        ExpressionList expr = Entry.find.where().eq("section.chapter.organization", Organization.getByHost());
+        ExpressionList expr = Entry.find.query().where().eq("section.chapter.organization", Organization.getByHost());
         if (!includeBreakingResPlan) {
             expr = expr.eq("is_breaking_res_plan", false);
         }
@@ -1012,7 +1014,7 @@ public class Application extends Controller {
     public static String jsonCases(String term) {
         term = term.toLowerCase();
 
-        List<Case> cases = Case.find.where()
+        List<Case> cases = Case.find.query().where()
             .eq("meeting.organization", Organization.getByHost())
             .ge("meeting.date", Application.getStartOfYear())
             .like("case_number", term + "%")
@@ -1039,7 +1041,7 @@ public class Application extends Controller {
         // Look up person using findById to guarantee that the current user
         // has access to that organization.
         Person p = Person.findById(personId);
-        List<Charge> charges = Charge.find.where().eq("person", p)
+        List<Charge> charges = Charge.find.query().where().eq("person", p)
                 .eq("rule_id", ruleId)
                 .lt("the_case.meeting.date", now)
                 .ge("the_case.meeting.date", Application.getStartOfYear())
@@ -1148,7 +1150,7 @@ public class Application extends Controller {
 
     public static String getRemoteIp() {
         Context ctx = Context.current();
-        Config conf = Public.sConfig;
+        Config conf = Public.sConfig.getConfig("school_crm");
 
         if (conf.getBoolean("heroku_ips")) {
             Optional<String> header = ctx.request().header("X-Forwarded-For");
@@ -1191,7 +1193,7 @@ public class Application extends Controller {
 
     @Secured.Auth(UserRole.ROLE_ALL_ACCESS)
     public Result fileSharing() {
-        Map<String, Object> scopes = new HashMap<String, Object>();
+        Map<String, Object> scopes = new HashMap<>();
 
         ArrayList<String> existingFiles = new ArrayList<>();
         File[] files = getSharedFileDirectory().listFiles();

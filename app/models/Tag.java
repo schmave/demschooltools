@@ -1,10 +1,11 @@
 package models;
 
-import com.avaje.ebean.Model;
+import io.ebean.*;
 import controllers.Utils;
 import play.data.Form;
 
 import javax.persistence.*;
+import javax.persistence.OrderBy;
 import java.util.*;
 
 @Entity
@@ -47,8 +48,8 @@ public class Tag extends Model {
     );
 
     public static Tag findById(int id) {
-        return find.where().eq("organization", Organization.getByHost())
-            .eq("id", id).findUnique();
+        return find.query().where().eq("organization", Organization.getByHost())
+            .eq("id", id).findOne();
     }
 
     public static Tag create(String title) {
@@ -72,7 +73,7 @@ public class Tag extends Model {
     }
 
     public void updateFromForm(Form<Tag> form) {
-        title = form.field("title").getValue().get();
+        title = form.field("title").value().get();
         use_student_display = Utils.getBooleanFromFormValue(form.field("use_student_display"));
         show_in_jc = Utils.getBooleanFromFormValue(form.field("show_in_jc"));
         show_in_attendance = Utils.getBooleanFromFormValue(form.field("show_in_attendance"));
@@ -84,7 +85,7 @@ public class Tag extends Model {
     public static Map<String, List<Tag>> getWithPrefixes() {
         Map<String, List<Tag>> result = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
-        for (Tag t : find.where()
+        for (Tag t : find.query().where()
                 .eq("organization", Organization.getByHost())
                 .eq("show_in_menu", true)
                 .order("title ASC").findList()) {

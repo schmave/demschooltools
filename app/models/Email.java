@@ -1,6 +1,6 @@
 package models;
 
-import com.avaje.ebean.Model;
+import io.ebean.*;
 import controllers.Public;
 
 import javax.mail.Header;
@@ -31,8 +31,8 @@ public class Email extends Model {
 	);
 
     public static Email findById(int id) {
-        return find.where().eq("organization", Organization.getByHost())
-            .eq("id", id).findUnique();
+        return find.query().where().eq("organization", Organization.getByHost())
+            .eq("id", id).findOne();
     }
 
 	public static Email create(String message) {

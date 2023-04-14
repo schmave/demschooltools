@@ -5,10 +5,10 @@ import java.util.*;
 import java.math.*;
 import javax.persistence.*;
 
-import com.avaje.ebean.Query;
 import com.fasterxml.jackson.annotation.*;
-import com.avaje.ebean.*;
+import io.ebean.Query;
 import play.data.*;
+import io.ebean.*;
 
 import controllers.Utils;
 
@@ -116,7 +116,7 @@ public class Account extends Model {
     }
 
     public List<Transaction> getTransactionsViewModel() {
-        List<Transaction> result = new ArrayList<Transaction>();
+        List<Transaction> result = new ArrayList<>();
         for (Transaction t : credit_transactions) {
             t.description = getFormattedDescription("from", t.from_name, t.description);
             result.add(t);
@@ -137,7 +137,7 @@ public class Account extends Model {
         return toFrom + " – " + description;
     }
 
-    private static Finder<Integer, Account> find = new Finder<Integer, Account>(Account.class);
+    private static final Finder<Integer, Account> find = new Finder<>(Account.class);
 
     public static List<Account> all() {
         return baseQuery().where()
@@ -170,14 +170,14 @@ public class Account extends Model {
     }
 
     private static Query<Account> baseQuery() {
-        return find
+        return find.query()
             .fetch("person", new FetchConfig().query())
             .fetch("payment_transactions", new FetchConfig().query())
             .fetch("credit_transactions", new FetchConfig().query());
     }
 
     private static List<Person> allPeople() {
-        List<Tag> tags = Tag.find.where()
+        List<Tag> tags = Tag.find.query().where()
             .eq("show_in_account_balances", true)
             .eq("organization", Organization.getByHost())
             .findList();
@@ -190,10 +190,10 @@ public class Account extends Model {
     }
 
     public static Account findById(Integer id) {
-        return find.where()
+        return find.query().where()
             .eq("organization", Organization.getByHost())
             .eq("id", id)
-            .findUnique();
+            .findOne();
     }
 
     public static Account create(AccountType type, String name, Person person) {
@@ -209,9 +209,9 @@ public class Account extends Model {
 
     public void updateFromForm(Form<Account> form) {
         is_active = Utils.getBooleanFromFormValue(form.field("is_active"));
-        name = form.field("name").getValue().get();
-        type = AccountType.valueOf(form.field("type").getValue().get());
-        monthly_credit = new BigDecimal(form.field("monthly_credit").getValue().get());
+        name = form.field("name").value().get();
+        type = AccountType.valueOf(form.field("type").value().get());
+        monthly_credit = new BigDecimal(form.field("monthly_credit").value().get());
         // if we are changing the monthly credit, set the date last applied to today
         if (monthly_credit.compareTo(BigDecimal.ZERO) != 0) {
             date_last_monthly_credit = new Date();

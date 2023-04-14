@@ -1,9 +1,10 @@
 package models;
 
-import com.avaje.ebean.Model;
+import io.ebean.*;
 import play.libs.Json;
 
 import javax.persistence.*;
+import javax.persistence.OrderBy;
 import java.util.*;
 
 
@@ -36,8 +37,8 @@ public class Meeting extends Model {
     );
 
     public static Meeting findById(int id) {
-        return find.where().eq("organization", Organization.getByHost())
-            .eq("id", id).findUnique();
+        return find.query().where().eq("organization", Organization.getByHost())
+            .eq("id", id).findOne();
     }
 
     public String getJsonPeople(int role) {

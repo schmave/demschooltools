@@ -2,13 +2,13 @@
 
 @implicitField = @{ helper.FieldConstructor(myConstructor.f) }
 
-@main("Edit tag " + form("title").getValue().get(), "crm") {
-    <h3 class="big-margin-top">Edit tag "@form("title").getValue().get()"</h3>
+@main("Edit tag " + form("title").value().get(), "crm") {
+    <h3 class="big-margin-top">Edit tag "@form("title").value().get()"</h3>
 
     @helper.form(routes.CRM.saveTag(), 'class -> "form-horizontal") {
 
-        @if(form("id").getValue().isPresent()) {
-        	<input type="hidden" name="id" value="@form("id").getValue().get()"/>
+        @if(form("id").value().isPresent()) {
+        	<input type="hidden" name="id" value="@form("id").value().get()"/>
         }
         @helper.inputText(form("title"), '_label -> "Title", 'class-> "form-control")
     	@helper.checkbox(form("use_student_display"), '_label -> "This is a list of students")

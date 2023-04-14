@@ -9,7 +9,7 @@
 
 	@form(routes.Settings.saveTask(), 'class -> "form-horizontal", 'role -> "form") {
 
-		<input type="hidden" name="id" value="@taskForm("id").getValue().get()"/>
+		<input type="hidden" name="id" value="@taskForm("id").value().get()"/>
 
 		@helper.select(taskForm("task_list.id"), options =
 			list_options.map (l => ("" + l.id, l.title)), '_label -> "Checklist",

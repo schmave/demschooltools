@@ -1,6 +1,6 @@
 package models;
 
-import com.avaje.ebean.Model;
+import io.ebean.*;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

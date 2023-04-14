@@ -3,21 +3,22 @@ package models;
 import java.util.*;
 
 import javax.persistence.*;
+import javax.persistence.OrderBy;
 
 import com.fasterxml.jackson.annotation.*;
 
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.Expr;
-import com.avaje.ebean.FetchConfig;
-import com.avaje.ebean.RawSql;
-import com.avaje.ebean.RawSqlBuilder;
+import io.ebean.Ebean;
+import io.ebean.Expr;
+import io.ebean.FetchConfig;
+import io.ebean.RawSql;
+import io.ebean.RawSqlBuilder;
 
 import controllers.*;
 
 import play.data.*;
 import play.data.validation.Constraints.*;
 import play.data.validation.ValidationError;
-import com.avaje.ebean.Model;
+import io.ebean.*;
 import static play.libs.F.*;
 
 @Entity
@@ -54,12 +55,12 @@ public class Entry extends Model implements Comparable<Entry> {
     );
 
     public static Entry findById(int id) {
-        return find.where().eq("section.chapter.organization", Organization.getByHost())
-            .eq("id", id).findUnique();
+        return find.query().where().eq("section.chapter.organization", Organization.getByHost())
+            .eq("id", id).findOne();
     }
 
     public static Entry findByIdWithJCData(int id) {
-        return find
+        return find.query()
             .fetch("charges", new FetchConfig().query())
             .fetch("charges.the_case", new FetchConfig().query())
             .fetch("charges.the_case.meeting", new FetchConfig().query())
@@ -69,14 +70,14 @@ public class Entry extends Model implements Comparable<Entry> {
             .fetch("charges.the_case.charges.rule.section", new FetchConfig().query())
             .fetch("charges.the_case.charges.rule.section.chapter", new FetchConfig().query())
             .where().eq("section.chapter.organization", Organization.getByHost())
-            .eq("id", id).findUnique();
+            .eq("id", id).findOne();
     }
 
     public static Entry findBreakingResPlanEntry() {
-        return find.where()
+        return find.query().where()
             .eq("section.chapter.organization", Organization.getByHost())
             .eq("is_breaking_res_plan", true)
-            .findUnique();
+            .findOne();
     }
 
     public static Integer findBreakingResPlanEntryId() {
@@ -115,15 +116,15 @@ public class Entry extends Model implements Comparable<Entry> {
         String old_title = title;
         String old_content = content;
 
-        title = form.field("title").getValue().get();
-        content = form.field("content").getValue().get();
-        num = form.field("num").getValue().get();
-        String deleted_val = form.field("deleted").getValue().get();
+        title = form.field("title").value().get();
+        content = form.field("content").value().get();
+        num = form.field("num").value().get();
+        String deleted_val = form.field("deleted").value().get();
 
         boolean previous_deleted = deleted;
         deleted = deleted_val != null && deleted_val.equals("true");
 
-        section = Section.find.byId(Integer.parseInt(form.field("section.id").getValue().get()));
+        section = Section.find.byId(Integer.parseInt(form.field("section.id").value().get()));
 
         if (make_change_record) {
             if (!previous_deleted && deleted) {

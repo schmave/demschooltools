@@ -1,7 +1,6 @@
 package models;
 
-import com.avaje.ebean.FetchConfig;
-import com.avaje.ebean.Model;
+import io.ebean.*;
 import controllers.Application;
 import play.data.Form;
 
@@ -99,8 +98,8 @@ public class Transaction extends Model {
     );
 
     public static Transaction findById(Integer id) {
-        return find.where().eq("organization", Organization.getByHost())
-            .eq("id", id).findUnique();
+        return find.query().where().eq("organization", Organization.getByHost())
+            .eq("id", id).findOne();
     }
 
     public static List<Transaction> allWithConditions(
@@ -111,7 +110,7 @@ public class Transaction extends Model {
             Boolean include_digital,
             Boolean include_archived) {
         
-        return find
+        return find.query()
             .fetch("to_account", new FetchConfig().query())
             .fetch("from_account", new FetchConfig().query())
             .where()
@@ -129,14 +128,14 @@ public class Transaction extends Model {
     }
 
     public static List<Transaction> allCashDeposits() {
-        return find.where()
+        return find.query().where()
             .eq("organization", Organization.getByHost())
             .eq("type", TransactionType.CashDeposit)
             .findList();
     }
 
     public static List<Transaction> allCashWithdrawals() {
-        return find.where()
+        return find.query().where()
             .eq("organization", Organization.getByHost())
             .eq("type", TransactionType.CashWithdrawal)
             .findList();
@@ -145,11 +144,11 @@ public class Transaction extends Model {
     public static Transaction create(Form<Transaction> form) throws Exception {
         Transaction transaction = form.get();
 
-        transaction.from_account = findAccountById(form.field("from_account_id").getValue().get());
-        transaction.to_account = findAccountById(form.field("to_account_id").getValue().get());
+        transaction.from_account = findAccountById(form.field("from_account_id").value().get());
+        transaction.to_account = findAccountById(form.field("to_account_id").value().get());
 
         DateFormat format = new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
-        transaction.date_created = format.parse(form.field("date_created").getValue().get());
+        transaction.date_created = format.parse(form.field("date_created").value().get());
 
         transaction.organization = Organization.getByHost();
         transaction.created_by_user = Application.getCurrentUser();
@@ -182,9 +181,9 @@ public class Transaction extends Model {
 
     public void updateFromForm(Form<Transaction> form) throws Exception {
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
-        description = form.field("description").getValue().get();
-        amount = new BigDecimal(form.field("amount").getValue().get());
-        date_created = format.parse(form.field("date_created").getValue().get());
+        description = form.field("description").value().get();
+        amount = new BigDecimal(form.field("amount").value().get());
+        date_created = format.parse(form.field("date_created").value().get());
         save();
     }
 }

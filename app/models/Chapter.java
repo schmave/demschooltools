@@ -1,12 +1,13 @@
 package models;
 
-import com.avaje.ebean.Model;
-import com.avaje.ebean.annotation.Where;
+import io.ebean.*;
+import io.ebean.annotation.Where;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import controllers.Utils;
 import play.data.Form;
 
 import javax.persistence.*;
+import javax.persistence.OrderBy;
 import java.util.List;
 
 @Entity
@@ -34,20 +35,20 @@ public class Chapter extends Model {
     );
 
     public static Chapter findById(int id) {
-        return find.where().eq("organization", Organization.getByHost())
-            .eq("id", id).findUnique();
+        return find.query().where().eq("organization", Organization.getByHost())
+            .eq("id", id).findOne();
     }
 
     public static List<Chapter> all() {
-        return find.where()
+        return find.query().where()
             .eq("deleted", Boolean.FALSE)
             .eq("organization", Organization.getByHost())
             .orderBy("num ASC").findList();
     }
 
     public void updateFromForm(Form<Chapter> form) {
-        title = form.field("title").getValue().get();
-        num = form.field("num").getValue().get();
+        title = form.field("title").value().get();
+        num = form.field("num").value().get();
         deleted = Utils.getBooleanFromFormValue(form.field("deleted"));
         save();
     }

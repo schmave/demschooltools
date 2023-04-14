@@ -6,7 +6,7 @@
 
 	<h2>Transaction #@transaction.id</h2>
 	@helper.form(routes.Accounting.saveTransaction()) {
-		<input type="hidden" name="id" value="@transactionForm("id").getValue.get"/>
+		<input type="hidden" name="id" value="@transactionForm("id").value.get"/>
 		<div class="create-transaction">
 			<table class="create-transaction-table">
 				<tr>

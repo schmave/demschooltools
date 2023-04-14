@@ -4,7 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
-import com.avaje.ebean.Model;
+import io.ebean.*;
 
 import com.feth.play.module.pa.user.AuthUser;
 

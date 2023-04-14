@@ -1,8 +1,8 @@
 package controllers;
 
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.Expr;
-import com.avaje.ebean.SqlRow;
+import io.ebean.Ebean;
+import io.ebean.Expr;
+import io.ebean.SqlRow;
 import com.csvreader.CsvWriter;
 import com.typesafe.config.Config;
 import models.*;
@@ -111,7 +111,7 @@ public class Attendance extends Controller {
         end_date.add(Calendar.DAY_OF_MONTH, 5);
 
         List<AttendanceDay> days =
-            AttendanceDay.find.where()
+            AttendanceDay.find.query().where()
                 .eq("person.organization", OrgConfig.get().org)
                 .ge("day", start_date.getTime())
                 .lt("day", end_date.getTime())
@@ -131,7 +131,7 @@ public class Attendance extends Controller {
         }
 
         List<AttendanceWeek> weeks =
-            AttendanceWeek.find.where()
+            AttendanceWeek.find.query().where()
                 .eq("person.organization", OrgConfig.get().org)
                 .eq("monday", start_date.getTime())
                 .findList();
@@ -180,7 +180,7 @@ public class Attendance extends Controller {
 
     public Result jsonPeople(String term) {
         List<Person> name_matches =
-                Person.find.where()
+                Person.find.query().where()
                     .add(Expr.or(
                         Expr.ilike("last_name", "%" + term + "%"),
                         Expr.or(
@@ -230,11 +230,11 @@ public class Attendance extends Controller {
             }
         } else {
             AttendanceDay last_day =
-                    AttendanceDay.find.where()
+                    AttendanceDay.find.query().where()
                             .eq("person", p)
                             .order("day DESC")
                             .setMaxRows(1)
-                            .findUnique();
+                            .findOne();
             if (last_day != null) {
                 end_date = last_day.day;
                 start_date = Application.getStartOfYear(end_date);
@@ -248,10 +248,10 @@ public class Attendance extends Controller {
                 "group by person_id";
         SqlRow row = Ebean.createSqlQuery(sql)
                 .setParameter("person_id", p.person_id)
-                .findUnique();
+                .findOne();
 
         List<AttendanceDay> days =
-            AttendanceDay.find.where()
+            AttendanceDay.find.query().where()
                 .eq("person", p)
                 .ge("day", start_date)
                 .le("day", end_date)
@@ -259,7 +259,7 @@ public class Attendance extends Controller {
                 .findList();
 
         List<AttendanceWeek> weeks =
-            AttendanceWeek.find.where()
+            AttendanceWeek.find.query().where()
                 .eq("person", p)
                 .ge("monday", start_date)
                 .le("monday", end_date)
@@ -321,7 +321,7 @@ public class Attendance extends Controller {
         end_date.add(Calendar.DAY_OF_MONTH, 4);
 
         List<AttendanceDay> days =
-                AttendanceDay.find.where()
+                AttendanceDay.find.query().where()
                         .eq("person.organization", OrgConfig.get().org)
                         .ge("day", start_date.getTime())
                         .le("day", end_date.getTime())
@@ -417,10 +417,10 @@ public class Attendance extends Controller {
             Map<String, Object> one_result = new HashMap<>();
 
             // look up our newly-created object so that we get the ID
-            one_result.put("week", AttendanceWeek.find.where()
+            one_result.put("week", AttendanceWeek.find.query().where()
                 .eq("person", p)
                 .eq("monday", start_date.getTime())
-                .findUnique());
+                .findOne());
 
             for (int i = 0; i < 5; i++) {
                 try {
@@ -433,7 +433,7 @@ public class Attendance extends Controller {
             }
 
             one_result.put("days",
-                AttendanceDay.find.where()
+                AttendanceDay.find.query().where()
                 .eq("person", p)
                 .ge("day", start_date.getTime())
                 .le("day", end_date.getTime())
@@ -458,7 +458,7 @@ public class Attendance extends Controller {
 
         Person p = Person.findById(person_id);
 
-        List<AttendanceDay> days = AttendanceDay.find.where()
+        List<AttendanceDay> days = AttendanceDay.find.query().where()
             .eq("person", p)
             .ge("day", start_date.getTime())
             .le("day", end_date.getTime())
@@ -468,7 +468,7 @@ public class Attendance extends Controller {
             day.delete();
         }
 
-        List<AttendanceWeek> weeks = AttendanceWeek.find.where()
+        List<AttendanceWeek> weeks = AttendanceWeek.find.query().where()
             .eq("person", p)
             .eq("monday", start_date.getTime())
             .findList();
@@ -501,7 +501,7 @@ public class Attendance extends Controller {
         writer.endRecord();
 
         List<AttendanceDay> days =
-            AttendanceDay.find.where()
+            AttendanceDay.find.query().where()
                 .eq("person.organization", OrgConfig.get().org)
                 .ge("day", start_date)
                 .le("day", end_date)
@@ -524,7 +524,7 @@ public class Attendance extends Controller {
         }
 
         List<AttendanceWeek> weeks =
-            AttendanceWeek.find.where()
+            AttendanceWeek.find.query().where()
                 .eq("person.organization", OrgConfig.get().org)
                 .ge("monday", start_date)
                 .le("monday", end_date)
@@ -703,7 +703,7 @@ public class Attendance extends Controller {
         }
 
         List<AttendanceWeek> weeks =
-                AttendanceWeek.find.where()
+                AttendanceWeek.find.query().where()
                         .eq("person.organization", OrgConfig.get().org)
                         .ge("monday", start_date)
                         .le("monday", end_date)
@@ -724,7 +724,7 @@ public class Attendance extends Controller {
     public static List<List<AttendanceDay>> listSchoolDays(Date start_date, Date end_date) {
         List<List<AttendanceDay>> school_days = new ArrayList<>();
 
-        List<AttendanceDay> days = AttendanceDay.find.where()
+        List<AttendanceDay> days = AttendanceDay.find.query().where()
             .eq("person.organization", OrgConfig.get().org)
             .ge("day", start_date)
             .le("day", end_date)
@@ -770,7 +770,7 @@ public class Attendance extends Controller {
     }
 
     public Result offCampusTime() {
-        List<AttendanceDay> events = AttendanceDay.find.where()
+        List<AttendanceDay> events = AttendanceDay.find.query().where()
             .eq("person.organization", OrgConfig.get().org)
             .gt("day", Application.getStartOfYear())
             .ne("off_campus_departure_time", null)
@@ -907,7 +907,7 @@ public class Attendance extends Controller {
     public Result saveCode() {
         Form<AttendanceCode> filled_form = getCodeForm().bindFromRequest();
         AttendanceCode ac = AttendanceCode.findById(
-            Integer.parseInt(filled_form.field("id").getValue().get()));
+            Integer.parseInt(filled_form.field("id").value().get()));
         ac.edit(filled_form);
 
         CachedPage.remove(CachedPage.ATTENDANCE_INDEX);

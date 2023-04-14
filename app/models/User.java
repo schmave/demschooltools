@@ -1,8 +1,8 @@
 package models;
 
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.ExpressionList;
-import com.avaje.ebean.Model;
+import io.ebean.Ebean;
+import io.ebean.ExpressionList;
+import io.ebean.*;
 import com.feth.play.module.pa.user.AuthUser;
 import com.feth.play.module.pa.user.AuthUserIdentity;
 import service.MyUserService;
@@ -41,9 +41,9 @@ public class User extends Model {
 			User.class);
 
     public static User findById(Integer id) {
-        return find.where().eq("organization", OrgConfig.get().org)
+        return find.query().where().eq("organization", OrgConfig.get().org)
             .eq("id", id)
-            .findUnique();
+            .findOne();
     }
 
     public static User create(String email, String name, Organization org) {
@@ -87,7 +87,7 @@ public class User extends Model {
 		if (identity.getProvider().equals("evan-auth-provider")) {
 			return User.findByEmail(identity.getId());
 		}
-		return getAuthUserFind(identity).findUnique();
+		return getAuthUserFind(identity).findOne();
 	}
 
 	public void merge(final User otherUser) {
@@ -150,17 +150,17 @@ public class User extends Model {
 	}
 
 	public static User findByEmail(final String email) {
-		return getEmailUserFind(email).findUnique();
+		return getEmailUserFind(email).findOne();
 	}
 
     private static ExpressionList<User> getAuthUserFind(
             final AuthUserIdentity identity) {
-        return find.where()
+        return find.query().where()
                 .eq("linkedAccounts.providerUserId", identity.getId())
                 .eq("linkedAccounts.providerKey", identity.getProvider());
     }
 
 	private static ExpressionList<User> getEmailUserFind(final String email) {
-		return find.where().ieq("email", email);
+		return find.query().where().ieq("email", email);
 	}
 }

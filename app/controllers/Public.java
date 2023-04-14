@@ -201,7 +201,7 @@ public class Public extends Controller {
             // excluding where old_email="" If new email is "", unsubscribe them
             // from all lists.
             List<PersonChange> changes =
-                PersonChange.find.where().eq("person.organization", org)
+                PersonChange.find.query().where().eq("person.organization", org)
                     .gt("time", org.mailchimp_last_sync_person_changes)
                     .order("person, time ASC").findList();
             Map<String, ListMethodResult.Data> mc_lists = getMailChimpLists(client, org.mailchimp_api_key);
@@ -242,7 +242,7 @@ public class Public extends Controller {
                     // that the person is tagged with.
                     change.person.loadTags();
                     for (Tag t : change.person.tags) {
-                        List<MailchimpSync> syncs = MailchimpSync.find.where()
+                        List<MailchimpSync> syncs = MailchimpSync.find.query().where()
                             .eq("tag", t).eq("sync_local_adds", true).findList();
                         for (MailchimpSync sync : syncs) {
                             try {
@@ -259,12 +259,12 @@ public class Public extends Controller {
 
             org.setLastMailChimpSyncTime(new Date());
 
-            for (Tag t : Tag.find.where().eq("organization", org).findList()) {
+            for (Tag t : Tag.find.query().where().eq("organization", org).findList()) {
                 for (MailchimpSync sync : t.syncs) {
                     if (sync.last_sync == null) {
                         sync.last_sync = new Date(0, Calendar.JANUARY, 1);
                     }
-                    List<PersonTagChange> tag_changes = PersonTagChange.find.where()
+                    List<PersonTagChange> tag_changes = PersonTagChange.find.query().where()
                         .eq("tag", t)
                         .gt("time", sync.last_sync).findList();
 

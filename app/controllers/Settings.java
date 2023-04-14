@@ -2,10 +2,10 @@ package controllers;
 
 import java.util.*;
 
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.SqlQuery;
-import com.avaje.ebean.SqlRow;
-import com.avaje.ebean.SqlUpdate;
+import io.ebean.Ebean;
+import io.ebean.SqlQuery;
+import io.ebean.SqlRow;
+import io.ebean.SqlUpdate;
 
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -30,7 +30,7 @@ public class Settings extends Controller {
     }
 
     public Result viewSettings() {
-        List<NotificationRule> rules = NotificationRule.find.where()
+        List<NotificationRule> rules = NotificationRule.find.query().where()
             .eq("organization", OrgConfig.get().org)
             .order("the_type DESC, tag.id")
             .findList();
@@ -164,7 +164,7 @@ public class Settings extends Controller {
         Form<Task> task_form = mFormFactory.form(Task.class);
         Form<Task> filled_form = task_form.bindFromRequest();
         Task t = filled_form.get();
-        if (filled_form.apply("enabled").getValue().get().equals("false")) {
+        if (filled_form.apply("enabled").value().get().equals("false")) {
             t.enabled = false;
         }
         t.update();
@@ -190,7 +190,7 @@ public class Settings extends Controller {
     public Result viewAccess() {
         Organization org = OrgConfig.get().org;
         List<User> users =
-            User.find.where().eq("organization", org)
+            User.find.query().where().eq("organization", org)
             .order("name ASC")
             .findList();
 
@@ -261,7 +261,7 @@ public class Settings extends Controller {
             }
         }
 
-        if (filled_form.apply("active").getValue().get().equals("false")) {
+        if (filled_form.apply("active").value().get().equals("false")) {
             u.active = false;
             Ebean.deleteAll(orig_user.linkedAccounts);
         }

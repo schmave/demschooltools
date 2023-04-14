@@ -1,6 +1,6 @@
 package models;
 
-import com.avaje.ebean.Model;
+import io.ebean.*;
 import controllers.Utils;
 
 import javax.persistence.*;
@@ -42,10 +42,10 @@ public class AttendanceWeek extends Model {
         Utils.adjustToPreviousDay(calendar, Calendar.MONDAY);
         Date monday = calendar.getTime();
 
-        AttendanceWeek result = AttendanceWeek.find.where()
+        AttendanceWeek result = AttendanceWeek.find.query().where()
             .eq("person", person)
             .eq("monday", monday)
-            .findUnique();
+            .findOne();
 
         if (result != null) return result;
 

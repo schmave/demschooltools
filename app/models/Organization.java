@@ -7,15 +7,15 @@ import java.sql.Time;
 
 import javax.persistence.*;
 
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.SqlQuery;
-import com.avaje.ebean.SqlRow;
+import io.ebean.Ebean;
+import io.ebean.SqlQuery;
+import io.ebean.SqlRow;
 
 import com.fasterxml.jackson.annotation.*;
 
 import controllers.Utils;
 import play.Logger;
-import com.avaje.ebean.Model;
+import io.ebean.*;
 import play.mvc.Http.Context;
 import controllers.Public;
 
@@ -86,7 +86,7 @@ public class Organization extends Model {
         sqlQuery.setParameter("host", host);
 
         // execute the query returning a List of MapBean objects
-        SqlRow result = sqlQuery.findUnique();
+        SqlRow result = sqlQuery.findOne();
 
         if (result != null) {
             Organization org_result = find.byId(result.getInteger("organization_id"));

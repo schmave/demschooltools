@@ -1,6 +1,6 @@
 package models;
 
-import com.avaje.ebean.*;
+import io.ebean.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import controllers.Application;
 import controllers.CRM;
@@ -109,12 +109,12 @@ public class Person extends Model implements Comparable<Person> {
     );
 
     public static Person findById(int id) {
-        return find.where().eq("organization", Organization.getByHost())
-            .eq("person_id", id).findUnique();
+        return find.query().where().eq("organization", Organization.getByHost())
+            .eq("person_id", id).findOne();
     }
 
     public static Person findByIdWithJCData(int id) {
-        return find
+        return find.query()
             .fetch("charges", new FetchConfig().query())
             .fetch("charges.the_case", new FetchConfig().query())
             .fetch("charges.the_case.meeting", new FetchConfig().query())
@@ -133,7 +133,7 @@ public class Person extends Model implements Comparable<Person> {
             .fetch("cases_involved_in.the_case.charges.rule.section", new FetchConfig().query())
             .fetch("cases_involved_in.the_case.charges.rule.section.chapter", new FetchConfig().query())
             .where().eq("organization", Organization.getByHost())
-            .eq("person_id", id).findUnique();
+            .eq("person_id", id).findOne();
     }
 
     @JsonIgnore
@@ -176,7 +176,7 @@ public class Person extends Model implements Comparable<Person> {
     }
 
     public static List<Person> all() {
-        return find.where()
+        return find.query().where()
             .eq("organization", Organization.getByHost())
             .eq("is_family", Boolean.FALSE)
             .orderBy("last_name, first_name ASC")
@@ -251,10 +251,10 @@ public class Person extends Model implements Comparable<Person> {
         phone_numbers = new ArrayList<>();
 
         for (int i = 1; i <= 3; i++) {
-            if (!form.field("number_" + i).getValue().get().equals("")) {
+            if (!form.field("number_" + i).value().get().equals("")) {
                 phone_numbers.add(PhoneNumber.create(
-                    form.field("number_" + i).getValue().get(),
-                    form.field("number_" + i + "_comment").getValue().get(),
+                    form.field("number_" + i).value().get(),
+                    form.field("number_" + i + "_comment").value().get(),
                     this));
             }
         }
@@ -277,7 +277,7 @@ public class Person extends Model implements Comparable<Person> {
     public static Person create(Form<Person> form) {
         Person person = form.get();
         person.is_family = false;
-        person.attachToPersonAsFamily(form.field("same_family_id").getValue().get());
+        person.attachToPersonAsFamily(form.field("same_family_id").value().get());
         person.organization = Organization.getByHost();
 		person.trimSpaces();
         person.save();
@@ -292,12 +292,12 @@ public class Person extends Model implements Comparable<Person> {
 
     public static Person updateFromForm(Form<Person> form) {
         Person p = form.get();
-        p.attachToPersonAsFamily(form.field("same_family_id").getValue().get());
+        p.attachToPersonAsFamily(form.field("same_family_id").value().get());
 
         if (!p.is_family) {
             // Remove all existing phone numbers -- they are not loaded
             // into the object, so we have to go direct to the DB to get them.
-            List<PhoneNumber> numbers = PhoneNumber.find.where().eq("person_id", p.person_id).findList();
+            List<PhoneNumber> numbers = PhoneNumber.find.query().where().eq("person_id", p.person_id).findList();
             for (PhoneNumber number : numbers) {
                 number.delete();
             }
@@ -362,7 +362,7 @@ public class Person extends Model implements Comparable<Person> {
         // on both a map of values and an object. Crazy.
         return new Form<>(null, Person.class, data,
                 new ArrayList<>(),
-                Optional.of(this), null, null, null);
+                Optional.of(this), null, null, null, null);
     }
 
     // called by PersonController

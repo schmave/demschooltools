@@ -2,7 +2,7 @@ package models;
 
 import javax.persistence.*;
 
-import com.avaje.ebean.Model;
+import io.ebean.*;
 
 @Entity
 public class PersonAtMeeting extends Model {

@@ -1,6 +1,6 @@
 package models;
 
-import com.avaje.ebean.Model;
+import io.ebean.*;
 import controllers.Utils;
 import play.data.Form;
 
@@ -28,14 +28,14 @@ public class AttendanceCode extends Model {
     );
 
     public static List<AttendanceCode> all(Organization org) {
-        return find.where().eq("organization", org).findList();
+        return find.query().where().eq("organization", org).findList();
     }
 
     public static AttendanceCode findById(Integer id) {
-        return find.where()
+        return find.query().where()
             .eq("organization", OrgConfig.get().org)
             .eq("id", id)
-            .findUnique();
+            .findOne();
     }
 
     public static AttendanceCode create(Organization org)
@@ -48,13 +48,13 @@ public class AttendanceCode extends Model {
     }
 
     public void edit(Form<AttendanceCode> form) {
-        if (form.field("delete").getValue().isPresent()) {
+        if (form.field("delete").value().isPresent()) {
             this.delete();
             return;
         }
-        description = form.field("description").getValue().get();
-        code = form.field("code").getValue().get();
-        color = form.field("color").getValue().get();
+        description = form.field("description").value().get();
+        code = form.field("code").value().get();
+        color = form.field("color").value().get();
         counts_toward_attendance = Utils.getBooleanFromFormValue(form.field("counts_toward_attendance"));
         not_counted = Utils.getBooleanFromFormValue(form.field("not_counted"));
 

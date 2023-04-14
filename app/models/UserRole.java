@@ -2,7 +2,7 @@ package models;
 
 import javax.persistence.*;
 
-import com.avaje.ebean.*;
+import io.ebean.*;
 
 @Entity
 public class UserRole extends Model {

@@ -33,7 +33,7 @@ public class MyUserService extends AbstractUserService {
             if (authUser instanceof EmailIdentity) {
                 final EmailIdentity identity = (EmailIdentity) authUser;
                 Logger.debug("    is email identity, email='" + identity.getEmail() + "'");
-                User u = User.find.where().ieq("email", identity.getEmail()).findUnique();
+                User u = User.find.query().where().ieq("email", identity.getEmail()).findOne();
                 if (u != null) {
                     Logger.debug("    found user by email");
                 } else {

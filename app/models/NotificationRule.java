@@ -4,7 +4,7 @@ import java.util.*;
 
 import javax.persistence.*;
 
-import com.avaje.ebean.Model;
+import io.ebean.*;
 
 
 @Entity
@@ -35,17 +35,17 @@ public class NotificationRule extends Model {
     );
 
     public static NotificationRule findById(int id) {
-        return find.where().eq("organization", OrgConfig.get().org)
-            .eq("id", id).findUnique();
+        return find.query().where().eq("organization", OrgConfig.get().org)
+            .eq("id", id).findOne();
     }
 
     public static List<NotificationRule> findByType(int type) {
-        return find.where().eq("organization", OrgConfig.get().org)
+        return find.query().where().eq("organization", OrgConfig.get().org)
             .eq("the_type", type).findList();
     }
 
     public static List<NotificationRule> findByType(int type, OrgConfig org_config) {
-        return find.where().eq("organization", org_config.org)
+        return find.query().where().eq("organization", org_config.org)
                 .eq("the_type", type).findList();
     }
 

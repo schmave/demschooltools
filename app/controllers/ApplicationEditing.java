@@ -5,8 +5,8 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.SqlUpdate;
+import io.ebean.Ebean;
+import io.ebean.SqlUpdate;
 import javax.inject.Inject;
 
 import models.*;
@@ -38,9 +38,9 @@ public class ApplicationEditing extends Controller {
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
     public Result editTodaysMinutes() {
-        Meeting the_meeting = Meeting.find.where()
+        Meeting the_meeting = Meeting.find.query().where()
             .eq("organization", Organization.getByHost())
-            .eq("date", new Date()).findUnique();
+            .eq("date", new Date()).findOne();
         if (the_meeting == null) {
             CachedPage.remove(CachedPage.JC_INDEX);
             the_meeting = Meeting.create(new Date());
@@ -377,8 +377,8 @@ public class ApplicationEditing extends Controller {
 		Form<Chapter> form = mFormFactory.form(Chapter.class).bindFromRequest();
 
 		Chapter c;
-		if (form.field("id").getValue().isPresent()) {
-			c = Chapter.findById(Integer.parseInt(form.field("id").getValue().get()));
+		if (form.field("id").value().isPresent()) {
+			c = Chapter.findById(Integer.parseInt(form.field("id").value().get()));
 			c.updateFromForm(form);
 		} else {
 			c = Chapter.create(form);
@@ -409,8 +409,8 @@ public class ApplicationEditing extends Controller {
         Form<Section> form = mFormFactory.form(Section.class).bindFromRequest();
 
 		Section s;
-		if (form.field("id").getValue().isPresent()) {
-			s = Section.findById(Integer.parseInt(form.field("id").getValue().get()));
+		if (form.field("id").value().isPresent()) {
+			s = Section.findById(Integer.parseInt(form.field("id").value().get()));
 			s.updateFromForm(form);
 		} else {
 			s = Section.create(form);
@@ -441,8 +441,8 @@ public class ApplicationEditing extends Controller {
 		Form<Entry> form = mFormFactory.form(Entry.class).bindFromRequest();
 
 		Entry e;
-		if (form.field("id").getValue().isPresent()) {
-			e = Entry.findById(Integer.parseInt(form.field("id").getValue().get()));
+		if (form.field("id").value().isPresent()) {
+			e = Entry.findById(Integer.parseInt(form.field("id").value().get()));
 			e.updateFromForm(form);
 		} else {
 			e = Entry.create(form);

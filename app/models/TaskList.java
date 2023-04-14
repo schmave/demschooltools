@@ -1,8 +1,9 @@
 package models;
 
-import com.avaje.ebean.Model;
+import io.ebean.*;
 
 import javax.persistence.*;
+import javax.persistence.OrderBy;
 import java.util.List;
 
 @Entity
@@ -23,17 +24,17 @@ public class TaskList extends Model {
     @JoinColumn(name="tag_id")
     public Tag tag;
 
-    public static Model.Finder<Integer, TaskList> find = new Model.Finder<>(
+    public static Finder<Integer, TaskList> find = new Finder<>(
             TaskList.class
     );
 
     public static TaskList findById(int id) {
-        return find.where().eq("organization", Organization.getByHost())
-            .eq("id", id).findUnique();
+        return find.query().where().eq("organization", Organization.getByHost())
+            .eq("id", id).findOne();
     }
 
     public static List<TaskList> allForOrg() {
-        return TaskList.find
+        return TaskList.find.query()
             .where().eq("organization", OrgConfig.get().org)
             .order("title ASC")
             .findList();

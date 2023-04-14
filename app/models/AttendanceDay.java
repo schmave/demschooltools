@@ -1,6 +1,6 @@
 package models;
 
-import com.avaje.ebean.Model;
+import io.ebean.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
@@ -40,10 +40,10 @@ public class AttendanceDay extends Model {
     );
 
     public static AttendanceDay findById(int id) {
-        return find.where()
+        return find.query().where()
             .eq("person.organization", Organization.getByHost())
             .eq("id", id)
-            .findUnique();
+            .findOne();
     }
 
     public static AttendanceDay create(Date day, Person p)
@@ -144,9 +144,9 @@ public class AttendanceDay extends Model {
         // find or create AttendanceWeek and AttendanceDay objects
         Person person = Person.findById(person_id);
         AttendanceWeek.findOrCreate(day, person);
-        return AttendanceDay.find.where()
+        return AttendanceDay.find.query().where()
             .eq("person", person)
             .eq("day", day)
-            .findUnique();
+            .findOne();
     }
 }

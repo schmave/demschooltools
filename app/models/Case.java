@@ -1,6 +1,6 @@
 package models;
 
-import com.avaje.ebean.Model;
+import io.ebean.*;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -9,6 +9,7 @@ import controllers.Public;
 import controllers.Utils;
 
 import javax.persistence.*;
+import javax.persistence.OrderBy;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -77,12 +78,12 @@ public class Case extends Model implements Comparable<Case> {
     );
 
     public static Case findById(Integer id) {
-        return find.where().eq("meeting.organization", Organization.getByHost())
-            .eq("id", id).findUnique();
+        return find.query().where().eq("meeting.organization", Organization.getByHost())
+            .eq("id", id).findOne();
     }
 
     public static List<Case> getOpenCases() {
-        return find.where()
+        return find.query().where()
             .eq("meeting.organization", Organization.getByHost())
             .eq("date_closed", null)
             .order("case_number ASC")
@@ -339,7 +340,7 @@ public class Case extends Model implements Comparable<Case> {
     private static List<Charge> findRelevantCharges(Case c, List<Charge> relevant_charges) {
 
         List<Charge> charges =
-            Charge.find
+            Charge.find.query()
                 .fetch("person")
                 .fetch("rule")
                 .fetch("rule.section")

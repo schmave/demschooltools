@@ -1,12 +1,13 @@
 package models;
 
-import com.avaje.ebean.Model;
-import com.avaje.ebean.annotation.Where;
+import io.ebean.*;
+import io.ebean.annotation.Where;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import controllers.Utils;
 import play.data.Form;
 
 import javax.persistence.*;
+import javax.persistence.OrderBy;
 import java.util.List;
 
 @Entity
@@ -34,8 +35,8 @@ public class Section extends Model {
 	);
 
     public static Section findById(int id) {
-        return find.where().eq("chapter.organization", Organization.getByHost())
-            .eq("id", id).findUnique();
+        return find.query().where().eq("chapter.organization", Organization.getByHost())
+            .eq("id", id).findOne();
     }
 
     public String getNumber() {
@@ -43,9 +44,9 @@ public class Section extends Model {
     }
 
 	public void updateFromForm(Form<Section> form) {
-		title = form.field("title").getValue().get();
-		num = form.field("num").getValue().get();
-		chapter = Chapter.find.byId(Integer.parseInt(form.field("chapter.id").getValue().get()));
+		title = form.field("title").value().get();
+		num = form.field("num").value().get();
+		chapter = Chapter.find.byId(Integer.parseInt(form.field("chapter.id").value().get()));
 		deleted = Utils.getBooleanFromFormValue(form.field("deleted"));
 		save();
 	}
