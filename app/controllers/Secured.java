@@ -122,7 +122,7 @@ public class Secured {
             if (allow_ip && Organization.getByHost() != null) {
                 String sql = "select ip from allowed_ips where ip like :ip and organization_id=:org_id";
                 SqlQuery sqlQuery = Ebean.createSqlQuery(sql);
-                String address = Application.getRemoteIp();
+                String address = Application.getRemoteIp(ctx.request());
                 sqlQuery.setParameter("ip", address);
                 sqlQuery.setParameter("org_id", Organization.getByHost().id);
 

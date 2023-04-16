@@ -1,7 +1,6 @@
 package models;
 
 import io.ebean.*;
-import controllers.Application;
 import play.data.Form;
 
 import javax.persistence.*;
@@ -97,8 +96,8 @@ public class Transaction extends Model {
             Transaction.class
     );
 
-    public static Transaction findById(Integer id) {
-        return find.query().where().eq("organization", Organization.getByHost())
+    public static Transaction findById(Integer id, Organization org) {
+        return find.query().where().eq("organization", org)
             .eq("id", id).findOne();
     }
 
@@ -108,13 +107,13 @@ public class Transaction extends Model {
             Boolean include_cash_deposits,
             Boolean include_cash_withdrawals,
             Boolean include_digital,
-            Boolean include_archived) {
+            Boolean include_archived, Organization org) {
         
         return find.query()
             .fetch("to_account", new FetchConfig().query())
             .fetch("from_account", new FetchConfig().query())
             .where()
-            .eq("organization", Organization.getByHost())
+            .eq("organization", org)
             .findList()
             .stream()
             .filter(t -> 
@@ -127,21 +126,22 @@ public class Transaction extends Model {
             .collect(Collectors.toList());
     }
 
-    public static List<Transaction> allCashDeposits() {
+    public static List<Transaction> allCashDeposits(Organization org) {
         return find.query().where()
-            .eq("organization", Organization.getByHost())
+            .eq("organization", org)
             .eq("type", TransactionType.CashDeposit)
             .findList();
     }
 
-    public static List<Transaction> allCashWithdrawals() {
+    public static List<Transaction> allCashWithdrawals(Organization org) {
         return find.query().where()
-            .eq("organization", Organization.getByHost())
+            .eq("organization", org)
             .eq("type", TransactionType.CashWithdrawal)
             .findList();
     }
 
-    public static Transaction create(Form<Transaction> form) throws Exception {
+    public static Transaction create(Form<Transaction> form,
+                                     Organization org, User current_user) throws Exception {
         Transaction transaction = form.get();
 
         transaction.from_account = findAccountById(form.field("from_account_id").value().get());
@@ -150,21 +150,21 @@ public class Transaction extends Model {
         DateFormat format = new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
         transaction.date_created = format.parse(form.field("date_created").value().get());
 
-        transaction.organization = Organization.getByHost();
-        transaction.created_by_user = Application.getCurrentUser();
+        transaction.organization = org;
+        transaction.created_by_user = current_user;
 
         transaction.save();
         return transaction;
     }
 
-    public static Transaction createMonthlyCreditTransaction(Account account, Date date) {
+    public static Transaction createMonthlyCreditTransaction(Account account, Date date, Organization org) {
         Transaction transaction = new Transaction();
         transaction.to_account = account;
         transaction.amount = account.monthly_credit;
         transaction.type = TransactionType.DigitalTransaction;
         transaction.description = new SimpleDateFormat("MMMM").format(date) + " monthly credit";
         transaction.date_created = date;
-        transaction.organization = Organization.getByHost();
+        transaction.organization = org;
         transaction.save();
         return transaction;
     }

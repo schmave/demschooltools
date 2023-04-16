@@ -1,9 +1,9 @@
 package controllers;
 
-import io.ebean.*;
 import com.csvreader.CsvWriter;
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.typesafe.config.Config;
+import io.ebean.*;
 import models.*;
 import org.markdown4j.Markdown4jProcessor;
 import org.mindrot.jbcrypt.BCrypt;
@@ -26,8 +26,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import controllers.routes;
-
 @Singleton
 @With(DumpOnError.class)
 @Secured.Auth(UserRole.ROLE_VIEW_JC)
@@ -47,22 +45,25 @@ public class Application extends Controller {
         mMailer = mailerClient;
     }
 
-    public Result viewPassword() {
-        return ok(views.html.view_password.render(flash("notice")));
+    public Result viewPassword(Http.Request request) {
+        return ok(views.html.view_password.render(
+                request.flash().getOptional("notice").orElse("")));
     }
 
-    public Result editPassword() {
-        final Map<String, String[]> values = request().body().asFormUrlEncoded();
+    public Result editPassword(Http.Request request) {
+        final Map<String, String[]> values = request.body().asFormUrlEncoded();
 
         String password = values.get("password")[0];
         String confirmPassword = values.get("confirmPassword")[0];
 
+        Result result = redirect(routes.Application.viewPassword());
+
         if (!password.equals(confirmPassword)) {
-            flash("notice", "The two passwords you entered did not match");
+            result.flashing("notice", "The two passwords you entered did not match");
         } else if (password.length() < 8) {
-            flash("notice", "Please choose a password that is at least 8 characters");
+            result.flashing("notice", "Please choose a password that is at least 8 characters");
         } else {
-            User u = Application.getCurrentUser();
+            User u = Application.getCurrentUser(request);
             u.hashed_password = BCrypt.hashpw(password, BCrypt.gensalt());
             u.save();
             play.libs.mailer.Email mail = new play.libs.mailer.Email();
@@ -74,10 +75,10 @@ public class Application extends Controller {
                 "). \n\nIf it was not you who changed it, please investigate what is going on! " +
                 "Feel free to contact Evan (schmave@gmail.com) for help.");
             mMailer.send(mail);
-            flash("notice", "Your password was changed");
+            result.flashing("notice", "Your password was changed");
         }
 
-        return redirect(routes.Application.viewPassword());
+        return result;
     }
 
     public static Date getDateFromString(String date_string) {
@@ -214,10 +215,6 @@ public class Application extends Controller {
     }
 
     public Result downloadCharges() throws IOException {
-        response().setHeader("Content-Type", "text/csv; charset=utf-8");
-        response().setHeader("Content-Disposition",
-            "attachment; filename=All charges.csv");
-
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Charset charset = StandardCharsets.UTF_8;
         CsvWriter writer = new CsvWriter(baos, ',', charset);
@@ -314,7 +311,12 @@ public class Application extends Controller {
 
         // Adding the BOM here causes Excel 2010 on Windows to realize
         // that the file is Unicode-encoded.
-        return ok("\ufeff" + new String(baos.toByteArray(), charset));
+        return ok("\ufeff" + new String(baos.toByteArray(), charset))
+                .withHeader("Content-Type", "text/csv; charset=utf-8")
+        .withHeader("Content-Disposition",
+                "attachment; filename=All charges.csv");
+
+
     }
 
     public Result viewMeeting(int meeting_id) {
@@ -322,16 +324,11 @@ public class Application extends Controller {
     }
 
     public Result printMeeting(int meeting_id) throws Exception {
-        response().setHeader("Content-Type", "application/pdf");
-        return ok(
-            renderToPDF(
-                views.html.view_meeting.render(Meeting.findById(meeting_id)).toString()));
+        return renderToPDF(
+                views.html.view_meeting.render(Meeting.findById(meeting_id)).toString());
     }
 
     public Result editResolutionPlanList() {
-        response().setHeader("Cache-Control", "max-age=0, no-cache, no-store");
-        response().setHeader("Pragma", "no-cache");
-
         List<Integer> referenced_charge_ids = getReferencedChargeIds();
         List<Charge> active_rps = getActiveResolutionPlans(referenced_charge_ids);
 
@@ -377,7 +374,10 @@ public class Application extends Controller {
             }
         }
 
-        return ok(views.html.edit_rp_list.render(active_rps, completed_rps, nullified_rps));
+        return ok(views.html.edit_rp_list.render(active_rps, completed_rps, nullified_rps))
+        .withHeader("Cache-Control", "max-age=0, no-cache, no-store")
+        .withHeader("Pragma", "no-cache");
+
     }
 
     private List<Integer> getReferencedChargeIds() {
@@ -428,8 +428,8 @@ public class Application extends Controller {
                 }
             }
         }
-        response().setHeader("Content-Type", "application/pdf");
-        return ok(renderToPDF(views.html.view_simple_rps.render(groups).toString()));
+        return renderToPDF(views.html.view_simple_rps.render(groups).toString())
+                ;
 
     }
 
@@ -438,9 +438,6 @@ public class Application extends Controller {
     }
 
     public Result downloadMeetingResolutionPlans(int meeting_id) throws IOException {
-        response().setHeader("Content-Type", "text/csv; charset=utf-8");
-        response().setHeader("Content-Disposition", "attachment; filename=" + OrgConfig.get().str_res_plans + ".csv");
-
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Charset charset = StandardCharsets.UTF_8;
         CsvWriter writer = new CsvWriter(baos, ',', charset);
@@ -479,7 +476,10 @@ public class Application extends Controller {
 
         // Adding the BOM here causes Excel 2010 on Windows to realize
         // that the file is Unicode-encoded.
-        return ok("\ufeff" + new String(baos.toByteArray(), charset));
+        return ok("\ufeff" + new String(baos.toByteArray(), charset))
+                .withHeader("Content-Type", "text/csv; charset=utf-8")
+                .withHeader("Content-Disposition", "attachment; filename=" + OrgConfig.get().str_res_plans + ".csv");
+
     }
 
     public Result viewManual() {
@@ -525,7 +525,7 @@ public class Application extends Controller {
             Files.createDirectory(print_temp_dir.resolve("stylesheets"));
         }
 
-        String names[] = new String[] {
+        String[] names = new String[] {
             "main.css",
         };
 
@@ -543,7 +543,7 @@ public class Application extends Controller {
             Files.createTempFile(print_temp_dir, "chapter", ".xhtml").toFile();
 
         OutputStreamWriter writer = new OutputStreamWriter(
-            new FileOutputStream(html_file),
+                Files.newOutputStream(html_file.toPath()),
                 StandardCharsets.UTF_8);
 
         // XML 1.0 only allows the following characters
@@ -572,7 +572,7 @@ public class Application extends Controller {
         return html_file;
     }
 
-    public static byte[] renderToPDF(String orig_html) throws Exception {
+    public static Result renderToPDF(String orig_html) throws Exception {
         File html_file = null;
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -583,7 +583,7 @@ public class Application extends Controller {
             renderer.layout();
             renderer.createPDF(baos);
 
-            return baos.toByteArray();
+            return ok(baos.toByteArray()).withHeader("Content-Type", "application/pdf");
         } finally {
             if (html_file != null) {
                 html_file.delete();
@@ -591,7 +591,7 @@ public class Application extends Controller {
         }
     }
 
-    public static byte[] renderToPDF(List<String> orig_htmls) throws Exception {
+    public static Result renderToPDF(List<String> orig_htmls) throws Exception {
         File html_file = null;
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -614,7 +614,7 @@ public class Application extends Controller {
             }
 
             renderer.finishPDF();
-            return baos.toByteArray();
+            return ok(baos.toByteArray()).withHeader("Content-Type", "application/pdf");
         } finally {
             if (html_file != null) {
                 html_file.delete();
@@ -636,24 +636,25 @@ public class Application extends Controller {
     }
 
     public Result printManualChapter(Integer id) throws Exception {
-        response().setHeader("Content-Type", "application/pdf");
 
         if (id == -1) {
-            ArrayList<String> documents = new ArrayList<String>();
+            ArrayList<String> documents = new ArrayList<>();
             // render TOC
             documents.add(renderManualTOC().toString());
             // then render all chapters
             for (Chapter chapter : Chapter.all()) {
                 documents.add(views.html.view_chapter.render(chapter).toString());
             }
-            return ok(renderToPDF(documents));
+            return renderToPDF(documents);
         } else {
             if (id == -2) {
-                return ok(renderToPDF(renderManualTOC().toString()));
+                return renderToPDF(renderManualTOC().toString());
+
             } else {
                 Chapter chapter = Chapter.findById(id);
-                return ok(renderToPDF(
-                    views.html.view_chapter.render(chapter).toString()));
+                return renderToPDF(
+                    views.html.view_chapter.render(chapter).toString());
+
             }
         }
     }
@@ -669,7 +670,7 @@ public class Application extends Controller {
     }
 
     public Result searchManual(String searchString) {
-        Map<String, Object> scopes = new HashMap<String, Object>();
+        Map<String, Object> scopes = new HashMap<>();
         scopes.put("searchString", searchString);
 
         String sql =
@@ -685,12 +686,12 @@ public class Application extends Controller {
         sqlQuery.setParameter("searchString", searchString);
 
         List<SqlRow> result = sqlQuery.findList();
-        List<Integer> entryIds = new ArrayList<Integer>();
-        for (int i = 0; i < result.size(); i++) {
-            entryIds.add(result.get(i).getInteger("id"));
+        List<Integer> entryIds = new ArrayList<>();
+        for (SqlRow sqlRow : result) {
+            entryIds.add(sqlRow.getInteger("id"));
         }
 
-        Map<Integer, String> entryToHeadline = new HashMap<Integer, String>();
+        Map<Integer, String> entryToHeadline = new HashMap<>();
         if (entryIds.size() > 0) {
             sql = "SELECT e.id, ts_headline(e.content, plainto_tsquery(:searchString), 'MaxFragments=5') as headline " +
                 "FROM entry e WHERE e.id IN (:entryIds)";
@@ -698,9 +699,9 @@ public class Application extends Controller {
             sqlQuery.setParameter("searchString", searchString);
             sqlQuery.setParameter("entryIds", entryIds);
             List<SqlRow> headlines = sqlQuery.findList();
-            for (int i = 0; i < headlines.size(); i++) {
-                entryToHeadline.put(headlines.get(i).getInteger("id"),
-                    headlines.get(i).getString("headline"));
+            for (SqlRow headline : headlines) {
+                entryToHeadline.put(headline.getInteger("id"),
+                        headline.getString("headline"));
             }
         }
 
@@ -709,10 +710,10 @@ public class Application extends Controller {
             .fetch("section.chapter", new FetchConfig().query())
             .where().in("id", entryIds).findMap();
 
-        ArrayList<Map<String, Object>> entriesList = new ArrayList<Map<String, Object>>();
-        for (int i = 0; i < result.size(); i++) {
-            Map<String, Object> entryInfo = new HashMap<String, Object>();
-            int entryId = result.get(i).getInteger("id");
+        ArrayList<Map<String, Object>> entriesList = new ArrayList<>();
+        for (SqlRow sqlRow : result) {
+            Map<String, Object> entryInfo = new HashMap<>();
+            int entryId = sqlRow.getInteger("id");
             entryInfo.put("entry", entries.get(entryId));
             entryInfo.put("headline", entryToHeadline.get(entryId));
             entriesList.add(entryInfo);
@@ -728,7 +729,7 @@ public class Application extends Controller {
     }
 
     static List<Charge> getLastWeekCharges(Person p) {
-        List<Charge> last_week_charges = new ArrayList<Charge>();
+        List<Charge> last_week_charges = new ArrayList<>();
 
         Date now = new Date();
 
@@ -746,7 +747,7 @@ public class Application extends Controller {
     }
 
     static Collection<String> getRecentResolutionPlans(Entry r) {
-        Set<String> rps = new HashSet<String>();
+        Set<String> rps = new HashSet<>();
 
         Collections.sort(r.charges);
         Collections.reverse(r.charges);
@@ -791,19 +792,24 @@ public class Application extends Controller {
     }
 
 
-    private static Date restrictStartDate(Date d) {
+    private static Date restrictStartDate(Date d, User current_user) {
         Date soy = getStartOfYear();
         long soy_millis = soy.getTime();
         long d_millis = d.getTime();
-        if ((soy_millis - d_millis > 1000 * 60) && getCurrentUser() == null) {
-            flash("notice", "You must be logged in to view info prior to " +
-                Application.yymmddDate(soy) + ".");
+        if ((soy_millis - d_millis > 1000 * 60) && current_user == null) {
             return soy;
         }
         return d;
     }
 
-    public Result viewPersonHistory(Integer id, Boolean redact_names, String start_date_str, String end_date_str) {
+    Result addRestrictStartDateMessage(Result result) {
+        return result.flashing("notice", "You must be logged in to view info prior to " +
+                Application.yymmddDate(Application.getStartOfYear()) + ".");
+    }
+
+    public Result viewPersonHistory(Integer id, Boolean redact_names,
+                                    String start_date_str, String end_date_str,
+                                    Http.Request request) {
         Date start_date = getStartOfYear();
         Date end_date = null;
 
@@ -813,14 +819,19 @@ public class Application extends Controller {
         } catch (ParseException e) {
         }
 
-        start_date = this.restrictStartDate(start_date);
-
+        Date restricted_start_date = restrictStartDate(start_date, getCurrentUser(request));
         Person p = Person.findByIdWithJCData(id);
-        return ok(views.html.view_person_history.render(
+        Result result = ok(views.html.view_person_history.render(
             p,
             new PersonHistory(p, true, start_date, end_date),
             getLastWeekCharges(p),
             redact_names));
+
+        if (restricted_start_date != start_date) {
+            result = addRestrictStartDateMessage(result);
+
+        }
+        return result;
     }
 
     public Result getRuleHistory(Integer id) {
@@ -831,7 +842,8 @@ public class Application extends Controller {
             getRecentResolutionPlans(r)));
     }
 
-    public Result viewRuleHistory(Integer id, String start_date_str, String end_date_str) {
+    public Result viewRuleHistory(Integer id, String start_date_str, String end_date_str,
+                                  Http.Request request) {
         Date start_date = getStartOfYear();
         Date end_date = null;
 
@@ -841,19 +853,25 @@ public class Application extends Controller {
         } catch (ParseException e) {
         }
 
-        start_date = this.restrictStartDate(start_date);
+        Date restricted_start_date = restrictStartDate(start_date, getCurrentUser(request));
 
         Entry r = Entry.findByIdWithJCData(id);
-        return ok(views.html.view_rule_history.render(
+        Result result = ok(views.html.view_rule_history.render(
             r,
             new RuleHistory(r, true, start_date, end_date),
             getRecentResolutionPlans(r)));
+
+        if (restricted_start_date != start_date) {
+            result = addRestrictStartDateMessage(result);
+
+        }
+        return result;
     }
 
     public Result viewPersonsWriteups(Integer id) {
         Person p = Person.findByIdWithJCData(id);
 
-        List<Case> cases_written_up = new ArrayList<Case>(p.getThisYearCasesWrittenUp());
+        List<Case> cases_written_up = new ArrayList<>(p.getThisYearCasesWrittenUp());
 
         Collections.sort(cases_written_up);
         Collections.reverse(cases_written_up);
@@ -879,14 +897,12 @@ public class Application extends Controller {
         Calendar end_date = (Calendar)start_date.clone();
         end_date.add(GregorianCalendar.DATE, 6);
 
-        response().setHeader("Content-Type", "application/pdf");
-
         List<Meeting> meetings = Meeting.find.query().where()
             .eq("organization", Organization.getByHost())
             .le("date", end_date.getTime())
             .ge("date", start_date.getTime()).findList();
 
-        return ok(renderToPDF(views.html.multi_meetings.render(meetings).toString()));
+        return renderToPDF(views.html.multi_meetings.render(meetings).toString());
     }
 
     public Result viewWeeklyReport(String date_string) {
@@ -905,8 +921,8 @@ public class Application extends Controller {
                 .ge("the_case.meeting.date", getStartOfYear(start_date.getTime()))
             .findList();
         WeeklyStats result = new WeeklyStats();
-        result.rule_counts = new TreeMap<Entry, Integer>();
-        result.person_counts = new TreeMap<Person, WeeklyStats.PersonCounts>();
+        result.rule_counts = new TreeMap<>();
+        result.person_counts = new TreeMap<>();
 
         for (Charge c : all_charges) {
             long case_millis = c.the_case.meeting.date.getTime();
@@ -915,21 +931,21 @@ public class Application extends Controller {
             if (c.rule != null && c.person != null) {
                 if (diff >= 0 &&
                     diff < 6.5 * 24 * 60 * 60 * 1000) {
-                    result.rule_counts.put(c.rule, 1 + getOrDefault(result.rule_counts, c.rule, 0));
-                    result.person_counts.put(c.person, getOrDefault(result.person_counts, c.person, new WeeklyStats.PersonCounts()).addThisPeriod());
+                    result.rule_counts.put(c.rule, 1 + result.rule_counts.getOrDefault(c.rule, 0));
+                    result.person_counts.put(c.person, result.person_counts.getOrDefault(c.person, new WeeklyStats.PersonCounts()).addThisPeriod());
                     result.num_charges++;
                 }
                 if (diff >= 0 &&
                     diff < 27.5 * 24 * 60 * 60 * 1000) {
-                    result.person_counts.put(c.person, getOrDefault(result.person_counts, c.person, new WeeklyStats.PersonCounts()).addLast28Days());
+                    result.person_counts.put(c.person, result.person_counts.getOrDefault(c.person, new WeeklyStats.PersonCounts()).addLast28Days());
                 }
                 if (diff >= 0) {
-                    result.person_counts.put(c.person, getOrDefault(result.person_counts, c.person, new WeeklyStats.PersonCounts()).addAllTime());
+                    result.person_counts.put(c.person, result.person_counts.getOrDefault(c.person, new WeeklyStats.PersonCounts()).addAllTime());
                 }
             }
         }
 
-        List<Case> all_cases = new ArrayList<Case>();
+        List<Case> all_cases = new ArrayList<>();
 
         List<Meeting> meetings = Meeting.find.query().where()
             .eq("organization", Organization.getByHost())
@@ -951,7 +967,7 @@ public class Application extends Controller {
             }
         }
 
-        ArrayList<String> referral_destinations = new ArrayList<String>();
+        ArrayList<String> referral_destinations = new ArrayList<>();
         for (Case c : all_cases) {
             for (Charge ch : c.charges) {
                 if (!ch.minor_referral_destination.equals("") &&
@@ -975,10 +991,10 @@ public class Application extends Controller {
 
         term = term.toLowerCase();
 
-        List<Map<String, String> > result = new ArrayList<Map<String, String> > ();
+        List<Map<String, String> > result = new ArrayList<>();
         for (Person p : people) {
             if (p.searchStringMatches(term)) {
-                HashMap<String, String> values = new HashMap<String, String>();
+                HashMap<String, String> values = new HashMap<>();
                 values.put("label", p.getDisplayName());
                 values.put("id", "" + p.person_id);
                 result.add(values);
@@ -990,7 +1006,7 @@ public class Application extends Controller {
 
     public static String jsonRules(Boolean includeBreakingResPlan) {
 
-        ExpressionList expr = Entry.find.query().where().eq("section.chapter.organization", Organization.getByHost());
+        ExpressionList<Entry> expr = Entry.find.query().where().eq("section.chapter.organization", Organization.getByHost());
         if (!includeBreakingResPlan) {
             expr = expr.eq("is_breaking_res_plan", false);
         }
@@ -1000,9 +1016,9 @@ public class Application extends Controller {
             .eq("section.chapter.deleted", false)
             .orderBy("title ASC").findList();
 
-        List<Map<String, String> > result = new ArrayList<Map<String, String> > ();
+        List<Map<String, String> > result = new ArrayList<>();
         for (Entry r : rules) {
-            HashMap<String, String> values = new HashMap<String, String>();
+            HashMap<String, String> values = new HashMap<>();
             values.put("label", r.getNumber() + " " + r.title);
             values.put("id", "" + r.id);
             result.add(values);
@@ -1020,9 +1036,9 @@ public class Application extends Controller {
             .like("case_number", term + "%")
             .orderBy("case_number ASC").findList();
 
-        List<Map<String, String>> result = new ArrayList<Map<String, String>>();
+        List<Map<String, String>> result = new ArrayList<>();
         for (Case c : cases) {
-            HashMap<String, String> values = new HashMap<String, String>();
+            HashMap<String, String> values = new HashMap<>();
             values.put("label", c.case_number);
             values.put("id", "" + c.id);
             result.add(values);
@@ -1058,10 +1074,6 @@ public class Application extends Controller {
 
     public static Date addWeek(Date d, int numWeeks) {
         return new Date(d.getTime() + numWeeks * 7 * 24 * 60 * 60 * 1000);
-    }
-
-    private static <K, V> V getOrDefault(Map<K,V> map, K key, V defaultValue) {
-        return map.containsKey(key) ? map.get(key) : defaultValue;
     }
 
     public static Date getStartOfYear() {
@@ -1148,25 +1160,24 @@ public class Application extends Controller {
         return isUserEditor(currentUsername());
     }
 
-    public static String getRemoteIp() {
-        Context ctx = Context.current();
+    public static String getRemoteIp(Http.Request request) {
         Config conf = Public.sConfig.getConfig("school_crm");
 
         if (conf.getBoolean("heroku_ips")) {
-            Optional<String> header = ctx.request().header("X-Forwarded-For");
+            Optional<String> header = request.header("X-Forwarded-For");
             if (!header.isPresent()) {
                 return "unknown-ip";
             }
             String[] splits = header.get().split("[, ]");
             return splits[splits.length - 1];
         } else {
-            return ctx.request().remoteAddress();
+            return request.remoteAddress();
         }
     }
 
-    public static User getCurrentUser() {
+    public static User getCurrentUser(Http.Request request) {
         return User.findByAuthUserIdentity(
-            sInstance.mAuth.getUser(Context.current().session()));
+            sInstance.mAuth.getUser(request.session()));
     }
 
     public static String markdown(String input) {
@@ -1176,12 +1187,12 @@ public class Application extends Controller {
         try {
             return new Markdown4jProcessor().process(input);
         } catch (IOException e) {
-            return e.toString() + "<br><br>" + input;
+            return e + "<br><br>" + input;
         }
     }
 
-    public Result renderMarkdown() {
-        Map<String, String[]> form_data = request().body().asFormUrlEncoded();
+    public Result renderMarkdown(Http.Request request) {
+        Map<String, String[]> form_data = request.body().asFormUrlEncoded();
 
         if (form_data == null || form_data.get("markdown") == null) {
             return ok("");
@@ -1213,8 +1224,8 @@ public class Application extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_ALL_ACCESS)
-    public Result saveFileSharingSettings() {
-        final Map<String, String[]> values = request().body().asFormUrlEncoded();
+    public Result saveFileSharingSettings(Http.Request request) {
+        final Map<String, String[]> values = request.body().asFormUrlEncoded();
 
         if (values.containsKey("printer_email")) {
             OrgConfig.get().org.setPrinterEmail(values.get("printer_email")[0]);
@@ -1224,14 +1235,14 @@ public class Application extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_ALL_ACCESS)
-    public Result uploadFileShare() throws IOException {
-        Http.MultipartFormData<File> body = request().body().asMultipartFormData();
+    public Result uploadFileShare(Http.Request request) throws IOException {
+        Http.MultipartFormData<File> body = request.body().asMultipartFormData();
         Http.MultipartFormData.FilePart<File> pdf = body.getFile("pdf_upload");
         if (pdf != null) {
             String fileName = pdf.getFilename();
             if (!fileName.equals("")) {
                 File outputFile = new File(getSharedFileDirectory(), fileName);
-                copyFileUsingStream(pdf.getFile(), outputFile);
+                copyFileUsingStream(pdf.getRef().getAbsoluteFile(), outputFile);
             }
         }
         return redirect(routes.Application.fileSharing());
@@ -1246,8 +1257,8 @@ public class Application extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_ALL_ACCESS)
-    public Result deleteFile() {
-        final Map<String, String[]> values = request().body().asFormUrlEncoded();
+    public Result deleteFile(Http.Request request) {
+        final Map<String, String[]> values = request.body().asFormUrlEncoded();
 
         if (values.containsKey("filename")) {
             File the_file = new File(getSharedFileDirectory(), values.get("filename")[0]);
@@ -1260,10 +1271,10 @@ public class Application extends Controller {
     }
 
     public Result viewFiles() {
-        Map<String, Object> scopes = new HashMap<String, Object>();
+        Map<String, Object> scopes = new HashMap<>();
 
         ArrayList<String> existingFiles = new ArrayList<>();
-        File files[] = getSharedFileDirectory().listFiles();
+        File[] files = getSharedFileDirectory().listFiles();
         for (File f : files) {
             existingFiles.add(f.getName());
         }
@@ -1279,8 +1290,8 @@ public class Application extends Controller {
             scopes));
     }
 
-    public Result emailFile() {
-        final Map<String, String[]> values = request().body().asFormUrlEncoded();
+    public Result emailFile(Http.Request request) {
+        final Map<String, String[]> values = request.body().asFormUrlEncoded();
 
         if (values.containsKey("filename")) {
             File the_file = new File(getSharedFileDirectory(), values.get("filename")[0]);
@@ -1297,8 +1308,8 @@ public class Application extends Controller {
         return redirect(routes.Application.viewFiles());
     }
 
-    public Result sendFeedbackEmail() {
-        final Map<String, String[]> values = request().body().asFormUrlEncoded();
+    public Result sendFeedbackEmail(Http.Request request) {
+        final Map<String, String[]> values = request.body().asFormUrlEncoded();
 
         play.libs.mailer.Email mail = new play.libs.mailer.Email();
 
@@ -1326,7 +1337,7 @@ public class Application extends Controller {
 
         try {
             body.append("\n\n=========================\n");
-            body.append(Utils.toJson(request().getHeaders()));
+            body.append(Utils.toJson(request.getHeaders()));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1338,7 +1349,7 @@ public class Application extends Controller {
     }
 
     public static void copyFileUsingStream(File source, File dest) throws IOException {
-        try (InputStream is = new FileInputStream(source); OutputStream os = new FileOutputStream(dest)) {
+        try (InputStream is = Files.newInputStream(source.toPath()); OutputStream os = Files.newOutputStream(dest.toPath())) {
             byte[] buffer = new byte[1024];
             int length;
             while ((length = is.read(buffer)) > 0) {

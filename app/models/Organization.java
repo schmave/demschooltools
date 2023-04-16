@@ -1,23 +1,21 @@
 package models;
 
-import java.util.*;
-import java.math.*;
-import java.text.*;
-import java.sql.Time;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import controllers.Public;
+import controllers.Utils;
+import io.ebean.*;
+import play.Logger;
+import play.mvc.Http;
 
 import javax.persistence.*;
-
-import io.ebean.Ebean;
-import io.ebean.SqlQuery;
-import io.ebean.SqlRow;
-
-import com.fasterxml.jackson.annotation.*;
-
-import controllers.Utils;
-import play.Logger;
-import io.ebean.*;
-import play.mvc.Http.Context;
-import controllers.Public;
+import java.math.BigDecimal;
+import java.sql.Time;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Entity
 public class Organization extends Model {
@@ -67,18 +65,20 @@ public class Organization extends Model {
     @JsonIgnore
     public List<NotificationRule> notification_rules;
 
+    static Logger.ALogger sLogger = Logger.of("application");
+
     public static Finder<Integer, Organization> find = new Finder<>(
             Organization.class
     );
 
-    public static Organization getByHost() {
-        String host = Context.current().request().host();
+    public static Organization getByHost(Http.Request request) {
+        String host = request.host();
 
         String cache_key = "Organization::getByHost::" + host;
 
-        Object cached_val = Public.sCache.get(cache_key);
-        if (cached_val!= null) {
-            return (Organization)cached_val;
+        Optional<Organization> cached_val = Public.sCache.getOptional(cache_key);
+        if (cached_val.isPresent()) {
+            return cached_val.get();
         }
 
         String sql = "select organization_id from organization_hosts where host like :host";
@@ -94,7 +94,7 @@ public class Organization extends Model {
             return org_result;
         } else {
 			if (host.matches("[a-z]")) {
-				Logger.error("Unknown organization for host: " + host);
+                sLogger.error("Unknown organization for host: " + host);
 			}
         }
 

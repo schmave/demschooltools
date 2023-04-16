@@ -37,7 +37,7 @@ public class ApplicationEditing extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
-    public Result editTodaysMinutes() {
+    public Result editTodaysMinutes(Http.Request request) {
         Meeting the_meeting = Meeting.find.query().where()
             .eq("organization", Organization.getByHost())
             .eq("date", new Date()).findOne();
@@ -46,15 +46,15 @@ public class ApplicationEditing extends Controller {
             the_meeting = Meeting.create(new Date());
             the_meeting.save();
         }
-        return editMinutes(the_meeting);
+        return editMinutes(the_meeting, request);
     }
 
     Result tooOldToEdit() {
         return unauthorized("This JC data is too old for you to edit.");
     }
 
-    static boolean authToEdit(Date date) {
-        User u = Application.getCurrentUser();
+    static boolean authToEdit(Date date, Http.Request request) {
+        User u = Application.getCurrentUser(request);
 
         if (u.hasRole(UserRole.ROLE_EDIT_ALL_JC)) {
             return true;
@@ -68,21 +68,21 @@ public class ApplicationEditing extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
-    public Result editMinutes(Meeting meeting) {
-        if (!authToEdit(meeting.date)) {
+    public Result editMinutes(Meeting meeting, Http.Request request) {
+        if (!authToEdit(meeting.date, request)) {
             return tooOldToEdit();
         }
         meeting.prepareForEditing();
 
-        response().setHeader("Cache-Control", "max-age=0, no-cache, no-store");
-        response().setHeader("Pragma", "no-cache");
-        return ok(views.html.edit_minutes.render(meeting, Case.getOpenCases()));
+        return ok(views.html.edit_minutes.render(meeting, Case.getOpenCases()))
+                .withHeader("Cache-Control", "max-age=0, no-cache, no-store")
+                .withHeader("Pragma", "no-cache");
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
-    public Result editMeeting(int meeting_id) {
+    public Result editMeeting(int meeting_id, Http.Request request) {
         Meeting the_meeting = Meeting.findById(meeting_id);
-        return editMinutes(the_meeting);
+        return editMinutes(the_meeting, request);
     }
 
     // This method is synchronized so that there is no race condition

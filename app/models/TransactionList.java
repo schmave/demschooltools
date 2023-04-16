@@ -1,6 +1,7 @@
 package models;
 
 import play.data.Form;
+import play.mvc.Http;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -60,11 +61,11 @@ public class TransactionList {
         return result;
     }
 
-    public static TransactionList allCash() {
+    public static TransactionList allCash(Organization org) {
         TransactionList model = new TransactionList();
         model.transactions = new ArrayList<>();
-        List<Transaction> deposit_transactions = Transaction.allCashDeposits();
-        List<Transaction> withdrawal_transactions = Transaction.allCashWithdrawals();
+        List<Transaction> deposit_transactions = Transaction.allCashDeposits(org);
+        List<Transaction> withdrawal_transactions = Transaction.allCashWithdrawals(org);
         for (Transaction t : deposit_transactions) {
             t.description = getFormattedDescription(t.type, t.from_name, t.to_name, t.description);
             model.transactions.add(t);
@@ -89,7 +90,7 @@ public class TransactionList {
         return model;
     }
 
-    public static TransactionList createFromForm(Form<TransactionList> form) {
+    public static TransactionList createFromForm(Form<TransactionList> form, Organization org) {
         TransactionList model = form.get();
 
         model.transactions = Transaction.allWithConditions(
@@ -98,7 +99,7 @@ public class TransactionList {
             model.include_cash_deposits,
             model.include_cash_withdrawals,
             model.include_digital,
-            model.include_archived);
+            model.include_archived, org);
 
         for (Transaction t : model.transactions) {
             t.description = getFormattedDescription(t.type, t.from_name, t.to_name, t.description);

@@ -100,52 +100,52 @@ public class CRM extends Controller {
     }
 
     public Result jsonPeople(String query) {
-		HashSet<Person> selected_people = new HashSet<>();
-		boolean first_time = true;
+        HashSet<Person> selected_people = new HashSet<>();
+        boolean first_time = true;
 
-		for (String term : query.split(" ")) {
-		    term = term.trim();
-		    if (term.length() < 2) {
-		        continue;
+        for (String term : query.split(" ")) {
+            term = term.trim();
+            if (term.length() < 2) {
+                continue;
             }
-			List<Person> people_matched_this_round;
+            List<Person> people_matched_this_round;
 
-			Expression this_expr =
-				Expr.or(Expr.ilike("last_name", "%" + term + "%"),
-				Expr.ilike("first_name", "%" + term + "%"));
-			this_expr = Expr.or(this_expr,
-				Expr.ilike("address", "%" + term + "%"));
-			this_expr = Expr.or(this_expr,
-				Expr.ilike("email", "%" + term + "%"));
+            Expression this_expr =
+                    Expr.or(Expr.ilike("last_name", "%" + term + "%"),
+                            Expr.ilike("first_name", "%" + term + "%"));
+            this_expr = Expr.or(this_expr,
+                    Expr.ilike("address", "%" + term + "%"));
+            this_expr = Expr.or(this_expr,
+                    Expr.ilike("email", "%" + term + "%"));
             this_expr = Expr.or(this_expr,
                 Expr.ilike("display_name", "%" + term + "%"));
 
-			people_matched_this_round =
-				Person.find.query().where().add(this_expr)
-					.eq("organization", Organization.getByHost())
-					.eq("is_family", false)
+            people_matched_this_round =
+                    Person.find.query().where().add(this_expr)
+                            .eq("organization", Organization.getByHost())
+                            .eq("is_family", false)
                     .findList();
 
-			List<PhoneNumber> phone_numbers =
-				PhoneNumber.find.query().where().ilike("number", "%" + term + "%")
+            List<PhoneNumber> phone_numbers =
+                    PhoneNumber.find.query().where().ilike("number", "%" + term + "%")
                     .eq("owner.organization", Organization.getByHost())
                     .findList();
-			for (PhoneNumber pn : phone_numbers) {
-				people_matched_this_round.add(pn.owner);
-			}
+            for (PhoneNumber pn : phone_numbers) {
+                people_matched_this_round.add(pn.owner);
+            }
 
-			if (first_time) {
-				selected_people.addAll(people_matched_this_round);
-			} else {
-				selected_people.retainAll(people_matched_this_round);
-			}
+            if (first_time) {
+                selected_people.addAll(people_matched_this_round);
+            } else {
+                selected_people.retainAll(people_matched_this_round);
+            }
 
-			first_time = false;
-		}
+            first_time = false;
+        }
 
         List<Person> sorted_people = new ArrayList<>(selected_people);
-		sorted_people.sort(Person.SORT_FIRST_NAME);
-		if (sorted_people.size() > 30) {
+        sorted_people.sort(Person.SORT_FIRST_NAME);
+        if (sorted_people.size() > 30) {
             sorted_people = sorted_people.subList(0, 29);
         }
 
@@ -177,7 +177,7 @@ public class CRM extends Controller {
                 .eq("show_in_menu", true)
                 .ilike("title", "%" + term + "%").findList();
 
-		List<Tag> existing_tags = null;
+        List<Tag> existing_tags = null;
         if (personId >= 0) {
             Person p = Person.findById(personId);
             if (p != null) {
@@ -213,40 +213,40 @@ public class CRM extends Controller {
         return ok(Json.stringify(Json.toJson(result)));
     }
 
-	public Collection<Person> getTagMembers(Integer tagId, String familyMode) {
+    public Collection<Person> getTagMembers(Integer tagId, String familyMode) {
         List<Person> people = Tag.findById(tagId).people;
 
         Set<Person> selected_people = new HashSet<>(people);
 
-		if (!familyMode.equals("just_tags")) {
-			for (Person p : people) {
-				if (p.family != null) {
-					selected_people.addAll(p.family.family_members);
-				}
-			}
-		}
+        if (!familyMode.equals("just_tags")) {
+            for (Person p : people) {
+                if (p.family != null) {
+                    selected_people.addAll(p.family.family_members);
+                }
+            }
+        }
 
-		if (familyMode.equals("family_no_kids")) {
-			Set<Person> no_kids = new HashSet<>();
-			for (Person p2 : selected_people) {
-				if (p2.dob == null ||
-					CRM.calcAge(p2) > 18) {
-					no_kids.add(p2);
-				}
-			}
-			selected_people = no_kids;
-		}
+        if (familyMode.equals("family_no_kids")) {
+            Set<Person> no_kids = new HashSet<>();
+            for (Person p2 : selected_people) {
+                if (p2.dob == null ||
+                        CRM.calcAge(p2) > 18) {
+                    no_kids.add(p2);
+                }
+            }
+            selected_people = no_kids;
+        }
 
-		return selected_people;
-	}
+        return selected_people;
+    }
 
-	public Result renderTagMembers(Integer tagId, String familyMode) {
+    public Result renderTagMembers(Integer tagId, String familyMode) {
         Tag the_tag = Tag.findById(tagId);
-		return ok(views.html.to_address_fragment.render(the_tag.title,
-			getTagMembers(tagId, familyMode)));
-	}
+        return ok(views.html.to_address_fragment.render(the_tag.title,
+                getTagMembers(tagId, familyMode)));
+    }
 
-    public Result addTag(Integer tagId, String title, Integer personId) {
+    public Result addTag(Integer tagId, String title, Integer personId, Http.Request request) {
         Person p = Person.findById(personId);
         if (p == null) {
             return badRequest();
@@ -259,12 +259,12 @@ public class CRM extends Controller {
             the_tag = Tag.find.ref(tagId);
         }
 
-        addTag(the_tag, p);
+        addTag(the_tag, p, Application.getCurrentUser(request));
         CachedPage.onPeopleChanged();
         return ok(views.html.tag_fragment.render(the_tag, p));
     }
 
-    public void addTag(Tag tag, Person person) {
+    public void addTag(Tag tag, Person person, User current_user) {
         if (tag.people.contains(person)) {
             return;
         }
@@ -276,7 +276,7 @@ public class CRM extends Controller {
             PersonTagChange.create(
                     tag,
                     person,
-                    Application.getCurrentUser(),
+                    current_user,
                     true);
 
             person.tags.add(tag);
@@ -284,17 +284,17 @@ public class CRM extends Controller {
         });
     }
 
-    public Result removeTag(Integer person_id, Integer tag_id) {
+    public Result removeTag(Integer person_id, Integer tag_id, Http.Request request) {
         Tag t = Tag.findById(tag_id);
         Person p = Person.findById(person_id);
 
-        removeTag(t, p);
+        removeTag(t, p, Application.getCurrentUser(request));
         CachedPage.onPeopleChanged();
 
         return ok();
     }
 
-    public void removeTag(Tag tag, Person person) {
+    public void removeTag(Tag tag, Person person, User current_user) {
         if (!tag.people.contains(person)) {
             return;
         }
@@ -304,7 +304,7 @@ public class CRM extends Controller {
                 PersonTagChange.create(
                         tag,
                         person,
-                        Application.getCurrentUser(),
+                        current_user,
                         false);
             }
             notifyAboutTag(tag, person, false);
@@ -370,33 +370,33 @@ public class CRM extends Controller {
         return redirect(routes.CRM.recentComments());
     }
 
-    public Result addPeopleFromTag() {
+    public Result addPeopleFromTag(User current_user) {
         final Map<String, String[]> values = request().body().asFormUrlEncoded();
         Tag dest_tag = Tag.findById(Integer.parseInt(values.get("dest_id")[0]));
         Tag src_tag = Tag.findById(Integer.parseInt(values.get("tag_id")[0]));
 
         for (Person p : src_tag.people) {
-            addTag(dest_tag, p);
+            addTag(dest_tag, p, current_user);
         }
 
         CachedPage.onPeopleChanged();
         return redirect(routes.CRM.viewTag(dest_tag.id));
     }
 
-    public Result addPeopleToTag() {
+    public Result addPeopleToTag(Http.Request request) {
         final Map<String, String[]> values = request().body().asFormUrlEncoded();
         Tag dest_tag = Tag.findById(Integer.parseInt(values.get("dest_id")[0]));
 
         for (String person_id_str : values.get("person_id")) {
             Person p = Person.findById(Integer.parseInt(person_id_str));
-            addTag(dest_tag, p);
+            addTag(dest_tag, p, Application.getCurrentUser(request));
         }
 
         CachedPage.onPeopleChanged();
         return redirect(routes.CRM.viewTag(dest_tag.id));
     }
 
-    public Result removePeopleFromTag() {
+    public Result removePeopleFromTag(Http.Request request) {
         final Map<String, String[]> values = request().body().asFormUrlEncoded();
         Tag tag = Tag.findById(Integer.parseInt(values.get("tag_id")[0]));
 
@@ -404,7 +404,7 @@ public class CRM extends Controller {
         for (String key_name : values.keySet()) {
             if (key_name.startsWith(prefix) && values.get(key_name)[0].equals("on")) {
                 Person p = Person.findById(Integer.parseInt(key_name.substring(prefix.length())));
-                removeTag(tag, p);
+                removeTag(tag, p, Application.getCurrentUser(request));
             }
         }
 
@@ -656,17 +656,17 @@ public class CRM extends Controller {
         }
     }
 
-	static Email getPendingEmail() {
-		return Email.find.query().where()
+    static Email getPendingEmail() {
+        return Email.find.query().where()
             .eq("organization", Organization.getByHost())
             .eq("deleted", false).eq("sent", false).orderBy("id ASC").setMaxRows(1).findOne();
-	}
+    }
 
-	public Result viewPendingEmail() {
-		Email e = getPendingEmail();
-		if (e == null) {
-			return redirect(routes.CRM.recentComments());
-		}
+    public Result viewPendingEmail() {
+        Email e = getPendingEmail();
+        if (e == null) {
+            return redirect(routes.CRM.recentComments());
+        }
 
         Tag staff_tag = Tag.find.query().where()
             .eq("organization", Organization.getByHost())
@@ -677,7 +677,7 @@ public class CRM extends Controller {
         for (Person p : people) {
             test_addresses.add(p.email);
         }
-		test_addresses.add("staff@threeriversvillageschool.org");
+        test_addresses.add("staff@threeriversvillageschool.org");
 
         ArrayList<String> from_addresses = new ArrayList<>();
         from_addresses.add("office@threeriversvillageschool.org");
@@ -688,23 +688,23 @@ public class CRM extends Controller {
         from_addresses.add("staff@threeriversvillageschool.org");
 
         e.parseMessage();
-		return ok(views.html.view_pending_email.render(e, test_addresses, from_addresses));
-	}
+        return ok(views.html.view_pending_email.render(e, test_addresses, from_addresses));
+    }
 
     public Result sendTestEmail() {
         final Map<String, String[]> values = request().body().asFormUrlEncoded();
         Email e = Email.findById(Integer.parseInt(values.get("id")[0]));
         e.parseMessage();
 
-		try {
-			MimeMessage to_send = new MimeMessage(e.parsedMessage);
-			to_send.addRecipient(Message.RecipientType.TO,
-						new InternetAddress(values.get("dest_email")[0]));
-			to_send.setFrom(new InternetAddress("Papal DB <noreply@threeriversvillageschool.org>"));
-			Transport.send(to_send);
-		} catch (MessagingException ex) {
-			ex.printStackTrace();
-		}
+        try {
+            MimeMessage to_send = new MimeMessage(e.parsedMessage);
+            to_send.addRecipient(Message.RecipientType.TO,
+                    new InternetAddress(values.get("dest_email")[0]));
+            to_send.setFrom(new InternetAddress("Papal DB <noreply@threeriversvillageschool.org>"));
+            Transport.send(to_send);
+        } catch (MessagingException ex) {
+            ex.printStackTrace();
+        }
 
         return ok();
     }
@@ -714,45 +714,45 @@ public class CRM extends Controller {
         Email e = Email.findById(Integer.parseInt(values.get("id")[0]));
         e.parseMessage();
 
-		int tagId = Integer.parseInt(values.get("tagId")[0]);
+        int tagId = Integer.parseInt(values.get("tagId")[0]);
         Tag theTag = Tag.findById(tagId);
-		String familyMode = values.get("familyMode")[0];
-		Collection<Person> recipients = getTagMembers(tagId, familyMode);
+        String familyMode = values.get("familyMode")[0];
+        Collection<Person> recipients = getTagMembers(tagId, familyMode);
 
-		boolean hadErrors = false;
+        boolean hadErrors = false;
 
-		for (Person p : recipients) {
-			if (p.email != null && !p.email.equals("")) {
-				try {
-					MimeMessage to_send = new MimeMessage(e.parsedMessage);
-					to_send.addRecipient(Message.RecipientType.TO,
-								new InternetAddress(p.email, p.first_name + " " + p.last_name));
-					to_send.setFrom(new InternetAddress(values.get("from")[0]));
-					Transport.send(to_send);
-				} catch (MessagingException | UnsupportedEncodingException ex) {
-					ex.printStackTrace();
-					hadErrors = true;
+        for (Person p : recipients) {
+            if (p.email != null && !p.email.equals("")) {
+                try {
+                    MimeMessage to_send = new MimeMessage(e.parsedMessage);
+                    to_send.addRecipient(Message.RecipientType.TO,
+                            new InternetAddress(p.email, p.first_name + " " + p.last_name));
+                    to_send.setFrom(new InternetAddress(values.get("from")[0]));
+                    Transport.send(to_send);
+                } catch (MessagingException | UnsupportedEncodingException ex) {
+                    ex.printStackTrace();
+                    hadErrors = true;
                 }
             }
-		}
+        }
 
-		// Send confirmation email
-		try {
-			MimeMessage to_send = new MimeMessage(e.parsedMessage);
-			to_send.addRecipient(Message.RecipientType.TO,
-						new InternetAddress("Staff <staff@threeriversvillageschool.org>"));
-			String subject = "(Sent to " + theTag.title + " " + familyMode + ") " + to_send.getSubject();
-			if (hadErrors) {
-				subject = "***ERRORS*** " + subject;
-			}
-			to_send.setSubject(subject);
-			to_send.setFrom(new InternetAddress(values.get("from")[0]));
+        // Send confirmation email
+        try {
+            MimeMessage to_send = new MimeMessage(e.parsedMessage);
+            to_send.addRecipient(Message.RecipientType.TO,
+                    new InternetAddress("Staff <staff@threeriversvillageschool.org>"));
+            String subject = "(Sent to " + theTag.title + " " + familyMode + ") " + to_send.getSubject();
+            if (hadErrors) {
+                subject = "***ERRORS*** " + subject;
+            }
+            to_send.setSubject(subject);
+            to_send.setFrom(new InternetAddress(values.get("from")[0]));
             Transport.send(to_send);
-		} catch (MessagingException ex) {
-			ex.printStackTrace();
-		}
+        } catch (MessagingException ex) {
+            ex.printStackTrace();
+        }
 
-		e.delete();
+        e.delete();
         return ok();
     }
 
@@ -794,13 +794,13 @@ public class CRM extends Controller {
                 (updatedPerson.is_family ? updatedPerson.family_members.get(0) : updatedPerson).person_id));
     }
 
-    public Result addComment() {
+    public Result addComment(User current_user) {
         CachedPage.remove(CachedPage.RECENT_COMMENTS);
         Form<Comment> filledForm = mFormFactory.form(Comment.class).bindFromRequest();
         Comment new_comment = new Comment();
 
         new_comment.person = Person.findById(Integer.parseInt(filledForm.field("person").value().get()));
-        new_comment.user = Application.getCurrentUser();
+        new_comment.user = current_user;
         new_comment.message = filledForm.field("message").value().get();
 
         String task_id_string = filledForm.field("comment_task_ids").value().get();
@@ -841,16 +841,16 @@ public class CRM extends Controller {
     }
 
     public static int calcAgeAtBeginningOfSchool(Person p) {
-		if (p.dob == null) {
-			return -1;
-		}
+        if (p.dob == null) {
+            return -1;
+        }
         return (int)((Application.getStartOfYear().getTime() - p.dob.getTime()) / 1000 / 60 / 60 / 24 / 365.25);
     }
 
     public static String formatDob(Date d) {
-		if (d == null) {
-			return "---";
-		}
+        if (d == null) {
+            return "---";
+        }
         if (OrgConfig.get().euro_dates) {
             return new SimpleDateFormat("dd/MM/yy").format(d);
         }
@@ -861,16 +861,16 @@ public class CRM extends Controller {
         d = new Date(d.getTime() + OrgConfig.get().time_zone.getOffset(d.getTime()));
         Date now = Utils.localNow();
 
-		long diffHours = (now.getTime() - d.getTime()) / 1000 / 60 / 60;
+        long diffHours = (now.getTime() - d.getTime()) / 1000 / 60 / 60;
 
         // String format = "EEE MMMM d, h:mm a";
-		String format;
+        String format;
 
-		if (diffHours < 24) {
-			format = "h:mm a";
-		} else if (diffHours < 24 * 7) {
-			format = "EEEE, MMMM d";
-		} else {
+        if (diffHours < 24) {
+            format = "h:mm a";
+        } else if (diffHours < 24 * 7) {
+            format = "EEEE, MMMM d";
+        } else {
             if (OrgConfig.get().euro_dates) {
                 format = "dd/MM/yy";
             } else {

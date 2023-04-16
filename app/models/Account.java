@@ -220,7 +220,7 @@ public class Account extends Model {
     }
 
     public void createMonthlyCreditTransaction(Date date) {
-        Transaction.createMonthlyCreditTransaction(this, date);
+        Transaction.createMonthlyCreditTransaction(this, date, Organization.getByHost(request));
         date_last_monthly_credit = date;
         save();
     }

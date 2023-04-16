@@ -1,4 +1,4 @@
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, notice : String)
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, notice : String, remote_ip: String)
 
 @import helper._
 @import com.feth.play.module.pa.views.html._
@@ -50,6 +50,6 @@
 
 	</div>
 
-	<p style="padding-top: 100px; font-size:0.8em">Your IP address is: @Application.getRemoteIp()</p>
+	<p style="padding-top: 100px; font-size:0.8em">Your IP address is: @remote_ip</p>
 	<hr/><p align=right>@Organization.getByHost().name</p>
 }

@@ -2,17 +2,17 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-GET /login	controllers.Public.index()
+GET /login	controllers.Public.index(request: Request)
 
 GET     /                         controllers.Application.index()
 
-GET     /editToday                controllers.ApplicationEditing.editTodaysMinutes
+GET     /editToday                controllers.ApplicationEditing.editTodaysMinutes(request: Request)
 
 
 GET  /viewMeeting/:id	controllers.Application.viewMeeting(id: Integer)
 GET  /printMeeting/:id	controllers.Application.printMeeting(id: Integer)
 GET  /printWeeklyMinutes/:start_date	controllers.Application.printWeeklyMinutes(start_date : String)
-GET  /editMeeting/:id	controllers.ApplicationEditing.editMeeting(id: Integer)
+GET  /editMeeting/:id	controllers.ApplicationEditing.editMeeting(id: Integer, request: Request)
 
 GET /downloadCharges    controllers.Application.downloadCharges()
 
@@ -28,8 +28,10 @@ GET   /personHistory/:id    controllers.Application.getPersonHistory(id: Integer
 GET   /ruleHistory/:id    controllers.Application.getRuleHistory(id: Integer)
 
 GET   /viewPersonsWriteups/:id    controllers.Application.viewPersonsWriteups(id: Integer)
-GET   /viewPersonHistory/:id    controllers.Application.viewPersonHistory(id: Integer, redact_names: Boolean ?= false, start_date : String ?= "", end_date : String ?= "")
-GET   /viewRuleHistory/:id    controllers.Application.viewRuleHistory(id: Integer, start_date : String ?= "", end_date : String ?= "")
+GET   /viewPersonHistory/:id    controllers.Application.viewPersonHistory(id: Integer, redact_names: Boolean ?= false,
+                    start_date : String ?= "", end_date : String ?= "", request: Request)
+GET   /viewRuleHistory/:id    controllers.Application.viewRuleHistory(id: Integer, start_date : String ?= "",
+                end_date : String ?= "", request: Request)
 
 
 GET   /viewSchoolMeetingReferrals    controllers.Application.viewSchoolMeetingReferrals()
@@ -88,7 +90,7 @@ POST /saveSection	controllers.ApplicationEditing.saveSection()
 GET /addEntry/:sectionId		controllers.ApplicationEditing.addEntry(sectionId : Integer)
 GET /editEntry/:id		controllers.ApplicationEditing.editEntry(id : Integer)
 POST /saveEntry		controllers.ApplicationEditing.saveEntry()
-POST /renderMarkdown	controllers.Application.renderMarkdown()
+POST /renderMarkdown	controllers.Application.renderMarkdown(request: Request)
 
 GET     /custodia                   controllers.Attendance.viewCustodiaAdmin()
 
@@ -131,7 +133,7 @@ POST    /attendance/saveDay           controllers.Attendance.saveDay(day_id : In
 
 POST    /attendance/importFromCustodia     controllers.Attendance.importFromCustodia()
 
-GET 	/accounting/transaction/:id		  			controllers.Accounting.transaction(id: Integer)
+GET 	/accounting/transaction/:id		  			controllers.Accounting.transaction(id: Integer, request: Request)
 GET 	/accounting/createTransaction				controllers.Accounting.newTransaction()
 POST 	/accounting/createTransaction				controllers.Accounting.makeNewTransaction(request: Request)
 POST 	/accounting/saveTransaction					controllers.Accounting.saveTransaction(request: Request)
@@ -140,7 +142,7 @@ GET 	/accounting/balances			  			controllers.Accounting.balances()
 GET 	/accounting/bankCashBalance		  			controllers.Accounting.bankCashBalance()
 GET 	/accounting/transactions		  			controllers.Accounting.transactionsReport()
 POST 	/accounting/transactions		  			controllers.Accounting.runTransactionsReport(request: Request)
-POST 	/accounting/toggleTransactionArchived/:id	controllers.Accounting.toggleTransactionArchived(id: Integer)
+POST 	/accounting/toggleTransactionArchived/:id	controllers.Accounting.toggleTransactionArchived(id: Integer, request: Request)
 GET 	/accounting/accounts			  			controllers.Accounting.accounts()
 GET 	/accounting/account/:id		  				controllers.Accounting.account(id: Integer)
 GET 	/accounting/newAccount			  			controllers.Accounting.newAccount()
@@ -155,8 +157,9 @@ GET     /people/edit/:id          controllers.CRM.editPerson(id: Integer)
 POST    /people/edit              controllers.CRM.savePersonEdits()
 
 GET     /jsonTags/:personId       controllers.CRM.jsonTags(term ?= "", personId: Integer)
-POST    /addTag/:personId         controllers.CRM.addTag(tagId : Integer ?= null, title ?= "", personId : Integer)
-POST    /removeTag/:personId/:tagId controllers.CRM.removeTag(personId: Integer, tagId: Integer)
+POST    /addTag/:personId         controllers.CRM.addTag(tagId : Integer ?= null, title ?= "", personId : Integer,
+                                    request: Request)
+POST    /removeTag/:personId/:tagId controllers.CRM.removeTag(personId: Integer, tagId: Integer, request: Request)
 GET     /getTagMembers			  controllers.CRM.renderTagMembers(tagId : Integer, familyMode : String)
 GET     /viewAllTags              controllers.CRM.viewAllTags()
 
@@ -167,8 +170,8 @@ GET     /editTag/:id            controllers.CRM.editTag(id: Integer)
 POST    /saveTag                controllers.CRM.saveTag()
 GET     /downloadTag/:id	  controllers.CRM.downloadTag(id: Integer)
 POST    /addPeopleFromTag        controllers.CRM.addPeopleFromTag()
-POST    /addPeopleToTag          controllers.CRM.addPeopleToTag()
-POST    /removePeopleFromTag     controllers.CRM.removePeopleFromTag()
+POST    /addPeopleToTag          controllers.CRM.addPeopleToTag(request: Request)
+POST    /removePeopleFromTag     controllers.CRM.removePeopleFromTag(request: Request)
 POST    /undoTagChanges          controllers.CRM.undoTagChanges()
 
 GET     /viewTaskList/:id         controllers.CRM.viewTaskList(id: Integer)
@@ -179,7 +182,7 @@ POST	/sendTestEmail				  controllers.CRM.sendTestEmail()
 POST	/deleteEmail				  controllers.CRM.deleteEmail()
 POST	/sendEmail				  controllers.CRM.sendEmail()
 
-POST      /sendFeedbackEmail          controllers.Application.sendFeedbackEmail()
+POST      /sendFeedbackEmail          controllers.Application.sendFeedbackEmail(request: Request)
 
 GET     /mailchimpSettings	controllers.CRM.viewMailchimpSettings()
 POST	/mailchimpSettings	controllers.CRM.saveMailchimpSettings()
@@ -191,8 +194,8 @@ GET     /settings/notifications controllers.Settings.viewSettings()
 POST    /settings               controllers.Settings.editSettings()
 POST    /settings/notifications controllers.Settings.editNotifications()
 
-GET     /settings/password      controllers.Application.viewPassword()
-POST    /settings/password      controllers.Application.editPassword()
+GET     /settings/password      controllers.Application.viewPassword(request: Request)
+POST    /settings/password      controllers.Application.editPassword(request: Request)
 
 GET     /settings/checklists    controllers.Settings.viewTaskLists()
 POST    /settings/newChecklist  controllers.Settings.newTaskList()
@@ -211,10 +214,10 @@ POST     /settings/access/saveUser controllers.Settings.saveUser()
 
 GET    /misc/fileSharing           controllers.Application.fileSharing()
 GET    /misc/viewFiles              controllers.Application.viewFiles()
-POST   /misc/saveFileSharingSettings   controllers.Application.saveFileSharingSettings()
-POST   /misc/uploadFileShare          controllers.Application.uploadFileShare()
-POST   /misc/emailFile              controllers.Application.emailFile()
-POST   /misc/deleteFile              controllers.Application.deleteFile()
+POST   /misc/saveFileSharingSettings   controllers.Application.saveFileSharingSettings(request: Request)
+POST   /misc/uploadFileShare          controllers.Application.uploadFileShare(request: Request)
+POST   /misc/emailFile              controllers.Application.emailFile(request: Request)
+POST   /misc/deleteFile              controllers.Application.deleteFile(request: Request)
 
 
 # Map static resources from the /public folder to the /assets URL path

@@ -29,8 +29,8 @@ public class Accounting extends Controller {
         mFormFactory = formFactory;
     }
 
-    public Result transaction(Integer id) {
-        Transaction transaction = Transaction.findById(id);
+    public Result transaction(Integer id, Http.Request request) {
+        Transaction transaction = Transaction.findById(id, Organization.getByHost(request));
         Form<Transaction> form = mFormFactory.form(Transaction.class).fill(transaction);
         return ok(views.html.transaction.render(transaction, form));
     }
@@ -51,7 +51,8 @@ public class Accounting extends Controller {
             return badRequest(views.html.create_transaction.render(filledForm));
         } else {
             try {
-                Transaction transaction = Transaction.create(filledForm);
+                Transaction transaction = Transaction.create(filledForm,
+                        Organization.getByHost(request), Application.getCurrentUser(request));
                 return redirect(routes.Accounting.transaction(transaction.id));
             }
             catch (Exception ex) {
@@ -64,7 +65,7 @@ public class Accounting extends Controller {
     public Result saveTransaction(Http.Request request) {
         try {
             Form<Transaction> form = mFormFactory.form(Transaction.class).bindFromRequest(request);
-            Transaction transaction = Transaction.findById(Integer.parseInt(form.field("id").value().get()));
+            Transaction transaction = Transaction.findById(Integer.parseInt(form.field("id").value().get()), Organization.getByHost(request));
             transaction.updateFromForm(form);
             return redirect(routes.Accounting.transaction(transaction.id));
         }
@@ -89,9 +90,9 @@ public class Accounting extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result bankCashBalance() {
+    public Result bankCashBalance(Http.Request request) {
         applyMonthlyCredits();
-        return ok(views.html.bank_cash_balance.render(TransactionList.allCash()));
+        return ok(views.html.bank_cash_balance.render(TransactionList.allCash(Organization.getByHost(request))));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
@@ -108,7 +109,7 @@ public class Accounting extends Controller {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
             return badRequest(views.html.transactions_report.render(TransactionList.blank()));
         }
-        TransactionList report = TransactionList.createFromForm(filledForm);
+        TransactionList report = TransactionList.createFromForm(filledForm, Organization.getByHost(request));
         String action = request.body().asFormUrlEncoded().get("action")[0];
         if (action.equals("download")) {
             return downloadTransactionReport(report);
@@ -150,8 +151,8 @@ public class Accounting extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result toggleTransactionArchived(int id) {
-        Transaction transaction = Transaction.findById(id);
+    public Result toggleTransactionArchived(int id, Http.Request request) {
+        Transaction transaction = Transaction.findById(id, Organization.getByHost(request));
         transaction.archived = !transaction.archived;
         transaction.save();
         return ok();

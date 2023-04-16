@@ -346,12 +346,15 @@ public class Public extends Controller {
         return redirect("/assets/checkin/app.html");
     }
 
-    public Result index()
+    public Result index(Http.Request request)
     {
 		if (Organization.getByHost() == null) {
 			return unauthorized("Unknown organization");
 		}
-        return ok(views.html.login.render(mPlayAuth, flash("notice")));
+        return ok(views.html.login.render(
+                mPlayAuth,
+                request.flash().getOptional("notice").orElse("")),
+                Application.getRemoteIp(request));
     }
 
     public Result doLogin() {
