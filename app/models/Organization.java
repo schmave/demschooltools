@@ -7,6 +7,7 @@ import io.ebean.*;
 import play.Logger;
 import play.mvc.Http;
 
+import javax.annotation.Nonnull;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.sql.Time;
@@ -71,7 +72,7 @@ public class Organization extends Model {
             Organization.class
     );
 
-    public static Organization getByHost(Http.Request request) {
+    public static @Nonnull Organization getByHost(Http.Request request) {
         String host = request.host();
 
         String cache_key = "Organization::getByHost::" + host;
@@ -142,7 +143,7 @@ public class Organization extends Model {
         this.save();
     }
 
-    public void updateFromForm(Map<String, String[]> values) {
+    public void updateFromForm(Map<String, String[]> values, Organization org) {
         if (values.containsKey("jc_reset_day")) {
             this.jc_reset_day = Integer.parseInt(values.get("jc_reset_day")[0]);
         }
@@ -153,10 +154,10 @@ public class Organization extends Model {
                 this.enable_case_references = false;
             }
             if (values.containsKey("breaking_res_plan_entry_id")) {
-                Entry.unassignBreakingResPlanEntry();
+                Entry.unassignBreakingResPlanEntry(this);
                 String idString = values.get("breaking_res_plan_entry_id")[0];
                 if (!idString.isEmpty()) {
-                    Entry entry = Entry.findById(Integer.parseInt(idString));
+                    Entry entry = Entry.findById(Integer.parseInt(idString), this);
                     entry.is_breaking_res_plan = true;
                     entry.save();
                 }
@@ -250,7 +251,7 @@ public class Organization extends Model {
             if (values.containsKey("show_accounting")) {
                 this.show_accounting = Utils.getBooleanFromFormValue(values.get("show_accounting")[0]);
                 if (this.show_accounting) {
-                    Account.createPersonalAccounts();
+                    Account.createPersonalAccounts(org);
                 }
             } else {
                 this.show_accounting = false;

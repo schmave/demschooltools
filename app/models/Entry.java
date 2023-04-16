@@ -7,19 +7,12 @@ import javax.persistence.OrderBy;
 
 import com.fasterxml.jackson.annotation.*;
 
-import io.ebean.Ebean;
-import io.ebean.Expr;
 import io.ebean.FetchConfig;
-import io.ebean.RawSql;
-import io.ebean.RawSqlBuilder;
 
 import controllers.*;
 
 import play.data.*;
-import play.data.validation.Constraints.*;
-import play.data.validation.ValidationError;
 import io.ebean.*;
-import static play.libs.F.*;
 
 @Entity
 public class Entry extends Model implements Comparable<Entry> {
@@ -50,16 +43,16 @@ public class Entry extends Model implements Comparable<Entry> {
 
     public boolean is_breaking_res_plan;
 
-    public static Finder<Integer,Entry> find = new Finder<Integer,Entry>(
-        Entry.class
+    public static Finder<Integer,Entry> find = new Finder<>(
+            Entry.class
     );
 
-    public static Entry findById(int id) {
-        return find.query().where().eq("section.chapter.organization", Organization.getByHost())
+    public static Entry findById(int id, Organization org) {
+        return find.query().where().eq("section.chapter.organization", org)
             .eq("id", id).findOne();
     }
 
-    public static Entry findByIdWithJCData(int id) {
+    public static Entry findByIdWithJCData(int id, Organization org) {
         return find.query()
             .fetch("charges", new FetchConfig().query())
             .fetch("charges.the_case", new FetchConfig().query())
@@ -69,24 +62,24 @@ public class Entry extends Model implements Comparable<Entry> {
             .fetch("charges.the_case.charges.rule", new FetchConfig().query())
             .fetch("charges.the_case.charges.rule.section", new FetchConfig().query())
             .fetch("charges.the_case.charges.rule.section.chapter", new FetchConfig().query())
-            .where().eq("section.chapter.organization", Organization.getByHost())
+            .where().eq("section.chapter.organization", org)
             .eq("id", id).findOne();
     }
 
-    public static Entry findBreakingResPlanEntry() {
+    public static Entry findBreakingResPlanEntry(Organization org) {
         return find.query().where()
-            .eq("section.chapter.organization", Organization.getByHost())
+            .eq("section.chapter.organization", org)
             .eq("is_breaking_res_plan", true)
             .findOne();
     }
 
-    public static Integer findBreakingResPlanEntryId() {
-        Entry entry = findBreakingResPlanEntry();
+    public static Integer findBreakingResPlanEntryId(Organization org) {
+        Entry entry = findBreakingResPlanEntry(org);
         return entry != null ? entry.id : null;
     }
 
-    public static void unassignBreakingResPlanEntry() {
-        Entry entry = findBreakingResPlanEntry();
+    public static void unassignBreakingResPlanEntry(Organization org) {
+        Entry entry = findBreakingResPlanEntry(org);
         if (entry != null) {
             entry.is_breaking_res_plan = false;
             entry.save();
@@ -97,7 +90,7 @@ public class Entry extends Model implements Comparable<Entry> {
     public List<Charge> getThisYearCharges() {
         Date beginning_of_year = Application.getStartOfYear();
 
-        List<Charge> result = new ArrayList<Charge>();
+        List<Charge> result = new ArrayList<>();
         for (Charge c : charges) {
             if (c.the_case.meeting.date.after(beginning_of_year)) {
                 result.add(c);
@@ -155,10 +148,5 @@ public class Entry extends Model implements Comparable<Entry> {
         return title.compareTo(other.title);
     }
 
-    public static Comparator<Entry> SORT_NUMBER = new Comparator<Entry>() {
-            @Override
-            public int compare(Entry o1, Entry o2) {
-                return o1.getNumber().compareTo(o2.getNumber());
-            }
-        };
+    public static Comparator<Entry> SORT_NUMBER = Comparator.comparing(Entry::getNumber);
 }

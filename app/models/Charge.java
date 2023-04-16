@@ -64,8 +64,8 @@ public class Charge extends Model implements Comparable<Charge> {
 
     public static Finder<Integer, Charge> find = new Finder<>(Charge.class);
 
-    public static Charge findById(int id) {
-        return find.query().where().eq("the_case.meeting.organization", Organization.getByHost())
+    public static Charge findById(int id, Organization org) {
+        return find.query().where().eq("the_case.meeting.organization", org)
             .eq("id", id).findOne();
     }
 
@@ -78,12 +78,12 @@ public class Charge extends Model implements Comparable<Charge> {
         return result;
     }
 
-    public static Charge generateFromReference(Case c, Charge referenced_charge)
+    public static Charge generateFromReference(Case c, Charge referenced_charge, Organization org)
     {
         Charge result = new Charge();
         result.the_case = c;
         result.person = referenced_charge.person;
-        result.rule = Entry.findBreakingResPlanEntry();
+        result.rule = Entry.findBreakingResPlanEntry(org);
         result.referenced_charge = referenced_charge;
         result.referred_to_sm = referenced_charge.referred_to_sm && referenced_charge.sm_decision == null;
         result.save();

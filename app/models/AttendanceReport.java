@@ -20,18 +20,16 @@ public class AttendanceReport {
 
     public Time latest_departure_time;
 
-    public AttendanceReport() {
+    public AttendanceReport(Organization org) {
         late_departures = new ArrayList<>();
-
-        Organization org = Organization.getByHost();
         latest_departure_time = org.attendance_report_latest_departure_time;
     }
 
-    public static AttendanceReport createFromForm(Form<AttendanceReport> form) {
+    public static AttendanceReport createFromForm(Form<AttendanceReport> form, Organization org) {
         AttendanceReport model = form.get();
 
         List<AttendanceDay> events = AttendanceDay.find.query().where()
-            .eq("person.organization", Organization.getByHost())
+            .eq("person.organization", org)
             .ge("day", model.start_date)
             .le("day", model.end_date)
             .gt("end_time", model.latest_departure_time)
@@ -45,7 +43,7 @@ public class AttendanceReport {
                 .findAny().orElse(null);
 
             if (group == null) {
-                group = new LateDepartureGroup(name);
+                group = new LateDepartureGroup(name, org);
                 model.late_departures.add(group);
             }
             group.events.add(event);

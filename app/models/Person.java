@@ -108,12 +108,12 @@ public class Person extends Model implements Comparable<Person> {
             Person.class
     );
 
-    public static Person findById(int id) {
-        return find.query().where().eq("organization", Organization.getByHost())
+    public static Person findById(int id, Organization org) {
+        return find.query().where().eq("organization", org)
             .eq("person_id", id).findOne();
     }
 
-    public static Person findByIdWithJCData(int id) {
+    public static Person findByIdWithJCData(int id, Organization org) {
         return find.query()
             .fetch("charges", new FetchConfig().query())
             .fetch("charges.the_case", new FetchConfig().query())
@@ -132,7 +132,7 @@ public class Person extends Model implements Comparable<Person> {
             .fetch("cases_involved_in.the_case.charges.rule", new FetchConfig().query())
             .fetch("cases_involved_in.the_case.charges.rule.section", new FetchConfig().query())
             .fetch("cases_involved_in.the_case.charges.rule.section.chapter", new FetchConfig().query())
-            .where().eq("organization", Organization.getByHost())
+            .where().eq("organization", org)
             .eq("person_id", id).findOne();
     }
 
@@ -175,9 +175,9 @@ public class Person extends Model implements Comparable<Person> {
         }
     }
 
-    public static List<Person> all() {
+    public static List<Person> all(Organization org) {
         return find.query().where()
-            .eq("organization", Organization.getByHost())
+            .eq("organization", org)
             .eq("is_family", Boolean.FALSE)
             .orderBy("last_name, first_name ASC")
             .fetch("phone_numbers", new FetchConfig().query())
@@ -213,19 +213,7 @@ public class Person extends Model implements Comparable<Person> {
         return result;
     }
 
-    @JsonIgnore
-    public List<Case> getCasesWrittenUp() {
-        List<Case> result = new ArrayList<>();
-        for (PersonAtCase pac : cases_involved_in) {
-            if (pac.role == PersonAtCase.ROLE_WRITER) {
-                result.add(pac.the_case);
-            }
-        }
-
-        return result;
-    }
-
-    public void attachToPersonAsFamily(String id_string) {
+    public void attachToPersonAsFamily(String id_string, Organization org) {
         if (id_string == null || id_string.equals("")) {
             return;
         }
@@ -239,7 +227,7 @@ public class Person extends Model implements Comparable<Person> {
             // Create a new family to hold these two people.
             Person family = new Person();
             family.is_family = true;
-            family.organization = Organization.getByHost();
+            family.organization = org;
             family.save();
             this.family = family;
             other_family_member.family = family;
@@ -274,25 +262,25 @@ public class Person extends Model implements Comparable<Person> {
 		school_district = school_district.trim();
 	}
 
-    public static Person create(Form<Person> form) {
+    public static Person create(Form<Person> form, Organization org) {
         Person person = form.get();
         person.is_family = false;
-        person.attachToPersonAsFamily(form.field("same_family_id").value().get());
-        person.organization = Organization.getByHost();
+        person.attachToPersonAsFamily(form.field("same_family_id").value().get(), org);
+        person.organization = org;
 		person.trimSpaces();
         person.save();
 
-        if (Organization.getByHost().show_accounting) {
-            Account.create(AccountType.PersonalChecking, "", person);
+        if (org.show_accounting) {
+            Account.create(AccountType.PersonalChecking, "", person, org);
         }
 
         person.addPhoneNumbers(form);
         return person;
     }
 
-    public static Person updateFromForm(Form<Person> form) {
+    public static Person updateFromForm(Form<Person> form, Organization org) {
         Person p = form.get();
-        p.attachToPersonAsFamily(form.field("same_family_id").value().get());
+        p.attachToPersonAsFamily(form.field("same_family_id").value().get(), org);
 
         if (!p.is_family) {
             // Remove all existing phone numbers -- they are not loaded
@@ -304,7 +292,7 @@ public class Person extends Model implements Comparable<Person> {
 
             p.addPhoneNumbers(form);
 
-            Person old_p = Person.findById(p.person_id);
+            Person old_p = Person.findById(p.person_id, org);
             if (!old_p.email.equals(p.email)) {
                 PersonChange.create(old_p, p.email);
             }
@@ -373,9 +361,6 @@ public class Person extends Model implements Comparable<Person> {
 
         tags = Ebean.find(Tag.class).setRawSql(rawSql).
             where().eq("person.person_id", person_id).findList();
-        if (tags == null) {
-            tags = new ArrayList<>();
-        }
     }
 
 	public String getDisplayName()

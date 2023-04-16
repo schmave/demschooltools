@@ -348,7 +348,7 @@ public class Public extends Controller {
 
     public Result index(Http.Request request)
     {
-		if (Organization.getByHost() == null) {
+		if (Organization.getByHost(request) == null) {
 			return unauthorized("Unknown organization");
 		}
         return ok(views.html.login.render(

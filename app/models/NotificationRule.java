@@ -34,25 +34,20 @@ public class NotificationRule extends Model {
             NotificationRule.class
     );
 
-    public static NotificationRule findById(int id) {
-        return find.query().where().eq("organization", Organization.getByHost())
+    public static NotificationRule findById(int id, Organization org) {
+        return find.query().where().eq("organization", org)
             .eq("id", id).findOne();
     }
 
-    public static List<NotificationRule> findByType(int type) {
-        return find.query().where().eq("organization", Organization.getByHost())
+    public static List<NotificationRule> findByType(int type, Organization org) {
+        return find.query().where().eq("organization", org)
             .eq("the_type", type).findList();
     }
 
-    public static List<NotificationRule> findByType(int type, OrgConfig org_config) {
-        return find.query().where().eq("organization", org_config.org)
-                .eq("the_type", type).findList();
-    }
-
-    public static NotificationRule create(int type, Tag tag, String email) {
+    public static NotificationRule create(int type, Tag tag, String email, Organization org) {
         NotificationRule result = new NotificationRule();
 
-        result.organization = Organization.getByHost();
+        result.organization = org;
 
         result.the_type = type;
         if (type == TYPE_TAG) {

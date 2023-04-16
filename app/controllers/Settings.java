@@ -31,18 +31,18 @@ public class Settings extends Controller {
 
     public Result viewSettings() {
         List<NotificationRule> rules = NotificationRule.find.query().where()
-            .eq("organization", Organization.getByHost())
+            .eq("organization", Organization.getByHost(request))
             .order("the_type DESC, tag.id")
             .findList();
 
-        return ok(views.html.view_settings.render(rules, Organization.getByHost(), Public.sConfig.getConfig("school_crm")));
+        return ok(views.html.view_settings.render(rules, Organization.getByHost(request), Public.sConfig.getConfig("school_crm")));
     }
 
     public Result editSettings() {
         final Map<String, String[]> values = request().body().asFormUrlEncoded();
-        final Organization org = Organization.getByHost();
-        org.updateFromForm(values);
-        CachedPage.clearAll();
+        final Organization org = Organization.getByHost(request);
+        org.updateFromForm(values, org);
+        CachedPage.clearAll(org);
 
         {
             String new_password = null;
@@ -83,7 +83,7 @@ public class Settings extends Controller {
 
         if (values.containsKey("remove_notification_id")) {
             NotificationRule.findById(
-                Integer.parseInt(values.get("remove_notification_id")[0])).delete();
+                Integer.parseInt(values.get("remove_notification_id")[0]), Organization.getByHost(request)).delete();
         } else {
             String email = values.get("email")[0];
             if (!email.matches("^\\S+@\\S+.\\S+$")) {
@@ -93,14 +93,14 @@ public class Settings extends Controller {
 
             if (values.containsKey("tag_id")) {
                 Tag t = Tag.findById(Integer.parseInt(values.get("tag_id")[0]), Organization.getByHost(request));
-                NotificationRule.create(NotificationRule.TYPE_TAG, t, email);
+                NotificationRule.create(NotificationRule.TYPE_TAG, t, email, Organization.getByHost(request));
             }
 
             if (values.containsKey("comment")) {
-                NotificationRule.create(NotificationRule.TYPE_COMMENT, null, email);
+                NotificationRule.create(NotificationRule.TYPE_COMMENT, null, email, Organization.getByHost(request));
             }
             if (values.containsKey("school_meeting")) {
-                NotificationRule.create(NotificationRule.TYPE_SCHOOL_MEETING, null, email);
+                NotificationRule.create(NotificationRule.TYPE_SCHOOL_MEETING, null, email, Organization.getByHost(request));
             }
         }
 
@@ -132,7 +132,7 @@ public class Settings extends Controller {
     public Result newTaskList() {
         Form<TaskList> list_form = mFormFactory.form(TaskList.class);
         TaskList list = list_form.bindFromRequest().get();
-        list.organization = Organization.getByHost();
+        list.organization = Organization.getByHost(request);
 
         list.title = list.title.trim();
         if (list.title.equals("")) {
@@ -188,7 +188,7 @@ public class Settings extends Controller {
     }
 
     public Result viewAccess() {
-        Organization org = Organization.getByHost();
+        Organization org = Organization.getByHost(request);
         List<User> users =
             User.find.query().where().eq("organization", org)
             .order("name ASC")
@@ -218,7 +218,7 @@ public class Settings extends Controller {
 
     public Result saveAccess() {
         Map<String, String[]> form_data = request().body().asFormUrlEncoded();
-        Organization org = Organization.getByHost();
+        Organization org = Organization.getByHost(request);
 
         if (form_data.containsKey("allowed_ip")) {
             String sql = "DELETE from allowed_ips where organization_id=:org_id";
@@ -278,7 +278,7 @@ public class Settings extends Controller {
     public Result newUser() {
         Map<String, String[]> form_data = request().body().asFormUrlEncoded();
 
-        Organization org = Organization.getByHost();
+        Organization org = Organization.getByHost(request);
         final String email = form_data.get("email")[0].trim();
         final String name = form_data.get("name")[0].trim();
 

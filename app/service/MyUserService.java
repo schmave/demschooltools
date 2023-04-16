@@ -38,7 +38,7 @@ public class MyUserService extends AbstractUserService {
                     Logger.debug("    found user by email");
                 } else {
                 	Logger.debug("    creating new account");
-                	Organization org = Organization.getByHost();
+                	Organization org = Organization.getByHost(request);
                 	Logger.error("New login from unknown user: " + identity.getEmail() + ", org: " + org.name);
                 	u = User.create(identity.getEmail(), DUMMY_USERNAME, org);
                 }

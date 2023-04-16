@@ -30,14 +30,14 @@ public class Email extends Model {
 			Email.class
 	);
 
-    public static Email findById(int id) {
-        return find.query().where().eq("organization", Organization.getByHost())
+    public static Email findById(int id, Organization org) {
+        return find.query().where().eq("organization", org)
             .eq("id", id).findOne();
     }
 
-	public static Email create(String message) {
+	public static Email create(String message, Organization org) {
 		Email e = new Email();
-        e.organization = Organization.getByHost();
+        e.organization = org;
 		e.message = message;
 		e.save();
 		return e;

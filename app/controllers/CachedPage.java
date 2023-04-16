@@ -23,18 +23,18 @@ public abstract class CachedPage {
     public String selected_button;
     public String cache_key;
 
-    static String getKey(String key_base) {
-        return key_base + "-" + Organization.getByHost().id;
+    static String getKey(String key_base, Organization org) {
+        return key_base + "-" + org.id;
     }
 
-    public static void remove(String key_base) {
-        Public.sCache.remove(getKey(key_base));
+    public static void remove(String key_base, Organization org) {
+        Public.sCache.remove(getKey(key_base, org));
     }
 
     public CachedPage(String key_base, String title, String menu,
-        String selected_button) {
+                      String selected_button, Organization org) {
         this.title = title;
-        this.cache_key = getKey(key_base);
+        this.cache_key = getKey(key_base, org);
         this.menu = menu;
         this.selected_button = selected_button;
     }
@@ -92,18 +92,18 @@ public abstract class CachedPage {
 
     abstract String render();
 
-    public static void clearAll() {
-        remove(ATTENDANCE_INDEX);
-        remove(JC_INDEX);
-        remove(MANUAL_INDEX);
-        remove(RECENT_COMMENTS);
+    public static void clearAll(Organization org) {
+        remove(ATTENDANCE_INDEX, org);
+        remove(JC_INDEX, org);
+        remove(MANUAL_INDEX, org);
+        remove(RECENT_COMMENTS, org);
         Utils.updateCustodia();
     }
 
-    public static void onPeopleChanged() {
-        remove(ATTENDANCE_INDEX);
-        remove(JC_INDEX);
-        remove(RECENT_COMMENTS);
+    public static void onPeopleChanged(Organization org) {
+        remove(ATTENDANCE_INDEX, org);
+        remove(JC_INDEX, org);
+        remove(RECENT_COMMENTS, org);
         Utils.updateCustodia();
     }
 }

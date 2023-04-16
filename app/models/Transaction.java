@@ -144,8 +144,8 @@ public class Transaction extends Model {
                                      Organization org, User current_user) throws Exception {
         Transaction transaction = form.get();
 
-        transaction.from_account = findAccountById(form.field("from_account_id").value().get());
-        transaction.to_account = findAccountById(form.field("to_account_id").value().get());
+        transaction.from_account = findAccountById(form.field("from_account_id").value().get(), org);
+        transaction.to_account = findAccountById(form.field("to_account_id").value().get(), org);
 
         DateFormat format = new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
         transaction.date_created = format.parse(form.field("date_created").value().get());
@@ -169,9 +169,9 @@ public class Transaction extends Model {
         return transaction;
     }
 
-    private static Account findAccountById(String id) {
+    private static Account findAccountById(String id, Organization org) {
         if (id == null || id.trim().length() == 0) return null;
-        return Account.findById(Integer.valueOf(id));
+        return Account.findById(Integer.valueOf(id), org);
     }
 
     public static void delete(Integer id) {

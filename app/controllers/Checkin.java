@@ -16,7 +16,7 @@ import play.mvc.*;
 @Secured.Auth(UserRole.ROLE_CHECKIN_APP)
 public class Checkin extends Controller {
 
-    public Result checkinData(String time) throws ParseException {
+    public Result checkinData(String time, Http.Request request) throws ParseException {
         // As of April 2023, some browsers are including non-breaking spaces in
         // their localized time strings, so we need to replace them with regular
         // spaces before trying to parse.
@@ -27,20 +27,23 @@ public class Checkin extends Controller {
         Date end_date = new Date();
         Map<Person, AttendanceStats> person_to_stats = Attendance.mapPeopleToStats(start_date, end_date);
 
+        Organization organization = Organization.getByHost(request);
+        boolean show_weighted_percent = organization.attendance_show_weighted_percent;
+
         List<CheckinPerson> people = Application.attendancePeople().stream()
             .sorted(Comparator.comparing(Person::getDisplayName))
             .filter(p -> p.pin != null && !p.pin.isEmpty())
-            .map(p -> new CheckinPerson(p, AttendanceDay.findCurrentDay(date, p.person_id), person_to_stats.get(p)))
+            .map(p -> new CheckinPerson(p, AttendanceDay.findCurrentDay(date, p.person_id, organization), person_to_stats.get(p), show_weighted_percent))
             .collect(Collectors.toList());
 
         // add admin
         Person admin = new Person();
         admin.person_id = -1;
         admin.first_name = "Admin";
-        admin.pin = Organization.getByHost().attendance_admin_pin;
-        people.add(0, new CheckinPerson(admin, null, null));
+        admin.pin = organization.attendance_admin_pin;
+        people.add(0, new CheckinPerson(admin, null, null, show_weighted_percent));
 
-        List<String> absence_codes = AttendanceCode.all(Organization.getByHost()).stream()
+        List<String> absence_codes = AttendanceCode.all(organization).stream()
             .map(c -> c.code)
             .collect(Collectors.toList());
 
@@ -50,7 +53,7 @@ public class Checkin extends Controller {
     public Result checkinMessage(String time_string, int person_id, boolean is_arriving) throws ParseException {
         Date date = new SimpleDateFormat("M/d/yyyy, h:mm:ss a").parse(time_string);
         Time time = new Time(date.getTime());
-        AttendanceDay attendance_day = AttendanceDay.findCurrentDay(date, person_id);
+        AttendanceDay attendance_day = AttendanceDay.findCurrentDay(date, person_id, Organization.getByHost(request));
         // if this is an invalid day, ignore the message
         if (attendance_day == null) {
             return ok();
@@ -78,7 +81,7 @@ public class Checkin extends Controller {
         if (!time_string.isEmpty()) {
             date = new SimpleDateFormat("M/d/yyyy, h:mm:ss a").parse(time_string);
         }
-        AttendanceDay attendance_day = AttendanceDay.findCurrentDay(date, person_id);
+        AttendanceDay attendance_day = AttendanceDay.findCurrentDay(date, person_id, Organization.getByHost(request));
         if (attendance_day != null) {
             attendance_day.edit(absence_code, in_time, out_time);
         }

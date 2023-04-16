@@ -72,22 +72,6 @@ public class ManualChange extends Model {
             !this.new_content.equals(old_content));
     }
 
-    public static ManualChange recordSectionCreate(Section s) {
-		ManualChange result = new ManualChange();
-        result.section = s;
-        result.initCreate(s.getNumber(), s.title, null);
-		result.save();
-		return result;
-	}
-
-    public static ManualChange recordChapterCreate(Chapter c) {
-        ManualChange result = new ManualChange();
-        result.chapter = c;
-        result.initCreate("" + c.num, c.title, null);
-        result.save();
-        return result;
-    }
-
     public static ManualChange recordEntryCreate(Entry e) {
         ManualChange result = new ManualChange();
         result.entry = e;
@@ -96,21 +80,6 @@ public class ManualChange extends Model {
         return result;
     }
 
-    public static ManualChange recordSectionDelete(Section s) {
-        ManualChange result = new ManualChange();
-        result.section = s;
-        result.initDelete(s.getNumber(), s.title, null);
-        result.save();
-        return result;
-    }
-
-    public static ManualChange recordChapterDelete(Chapter c) {
-        ManualChange result = new ManualChange();
-        result.chapter = c;
-        result.initDelete("" + c.num, c.title, null);
-        result.save();
-        return result;
-    }
 
     public static ManualChange recordEntryDelete(Entry e) {
         ManualChange result = new ManualChange();
@@ -124,26 +93,6 @@ public class ManualChange extends Model {
         ManualChange result = new ManualChange();
         result.entry = e;
         if (result.initChange(e.getNumber(), old_num, e.title, old_title, e.content, old_content)) {
-            result.save();
-            return result;
-        }
-        return null;
-    }
-
-    public static ManualChange recordSectionChange(Section s, String old_num, String old_title) {
-        ManualChange result = new ManualChange();
-        result.section = s;
-        if (result.initChange(s.getNumber(), old_num, s.title, old_title, null, null)) {
-            result.save();
-            return result;
-        }
-        return null;
-    }
-
-    public static ManualChange recordChapterChange(Chapter c, String old_num, String old_title) {
-        ManualChange result = new ManualChange();
-        result.chapter = c;
-        if (result.initChange("" + c.num, old_num, c.title, old_title, null, null)) {
             result.save();
             return result;
         }

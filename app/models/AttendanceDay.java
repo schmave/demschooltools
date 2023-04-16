@@ -111,7 +111,7 @@ public class AttendanceDay extends Model {
 
     @JsonIgnore
     public boolean isPartial() {
-        Organization org = Organization.getByHost();
+        Organization org = person.organization;
 
         if (org.attendance_enable_partial_days) {
             Double min_hours = org.attendance_day_min_hours;
@@ -133,7 +133,7 @@ public class AttendanceDay extends Model {
         return sdf.format(day);
     }
 
-    public static AttendanceDay findCurrentDay(Date day, int person_id) {
+    public static AttendanceDay findCurrentDay(Date day, int person_id, Organization org) {
         // if the day is Saturday or Sunday, there can't be an attendance day
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(day);
@@ -142,7 +142,7 @@ public class AttendanceDay extends Model {
             return null;
         }
         // find or create AttendanceWeek and AttendanceDay objects
-        Person person = Person.findById(person_id);
+        Person person = Person.findById(person_id, org);
         AttendanceWeek.findOrCreate(day, person);
         return AttendanceDay.find.query().where()
             .eq("person", person)

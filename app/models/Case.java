@@ -77,14 +77,14 @@ public class Case extends Model implements Comparable<Case> {
             Case.class
     );
 
-    public static Case findById(Integer id) {
-        return find.query().where().eq("meeting.organization", Organization.getByHost())
+    public static Case findById(Integer id, Organization org) {
+        return find.query().where().eq("meeting.organization", org)
             .eq("id", id).findOne();
     }
 
-    public static List<Case> getOpenCases() {
+    public static List<Case> getOpenCases(Organization org) {
         return find.query().where()
-            .eq("meeting.organization", Organization.getByHost())
+            .eq("meeting.organization", org)
             .eq("date_closed", null)
             .order("case_number ASC")
             .findList();
@@ -236,7 +236,7 @@ public class Case extends Model implements Comparable<Case> {
     // on picking charge references, so we don't know which charges will be needed. As a result, we will include
     // information on all charges from the referenced cases.
     public String generateCompositeFindingsFromCaseReferences() {
-        if (!Organization.getByHost().enable_case_references) {
+        if (!meeting.organization.enable_case_references) {
             return findings;
         }
         return generateCompositeFindings(null, null);
@@ -245,7 +245,7 @@ public class Case extends Model implements Comparable<Case> {
     // We use this method everywhere besides the edit minutes page. At this point the minutes have been finalized and the
     // charge references have been selected. We don't need to include information about charges that weren't referenced.
     public String generateCompositeFindingsFromChargeReferences() {
-        if (!Organization.getByHost().enable_case_references) {
+        if (!meeting.organization.enable_case_references) {
             return findings;
         }
         ArrayList<Charge> relevant_charges = new ArrayList<>();
@@ -319,7 +319,7 @@ public class Case extends Model implements Comparable<Case> {
                     else {
                         result += " and were each assigned";
                     }
-                    result += " the " + OrgConfig.get().str_res_plan + " \"" + resolution_plan;
+                    result += " the " + OrgConfig.get(meeting.organization).str_res_plan + " \"" + resolution_plan;
                     if (!result.endsWith(".")) {
                         result += ".";
                     }
@@ -331,7 +331,7 @@ public class Case extends Model implements Comparable<Case> {
             result += " Then per case " + case_number + ", ";
         }
         if (findings.isEmpty()) {
-            findings = "the " + OrgConfig.get().str_res_plan + " was not completed.";
+            findings = "the " + OrgConfig.get(meeting.organization).str_res_plan + " was not completed.";
         }
         result += findings;
         return result;

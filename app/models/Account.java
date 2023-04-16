@@ -46,10 +46,10 @@ public class Account extends Model {
     @play.data.format.Formats.DateTime(pattern="MM/dd/yyyy")
     public Date date_last_monthly_credit;
 
-    public static void createPersonalAccounts() {
-        for (Person person : allPeople()) {
+    public static void createPersonalAccounts(Organization org) {
+        for (Person person : allPeople(org)) {
             if (!person.hasAccount(AccountType.PersonalChecking)) {
-                create(AccountType.PersonalChecking, "", person);
+                create(AccountType.PersonalChecking, "", person, org);
             }
         }
     }
@@ -139,31 +139,31 @@ public class Account extends Model {
 
     private static final Finder<Integer, Account> find = new Finder<>(Account.class);
 
-    public static List<Account> all() {
+    public static List<Account> all(Organization org) {
         return baseQuery().where()
-                .eq("organization", Organization.getByHost())
+                .eq("organization", org)
                 .findList();
     }
 
-    public static List<Account> allPersonalChecking() {
+    public static List<Account> allPersonalChecking(Organization org) {
         return baseQuery().where()
-            .in("person", allPeople())
+            .in("person", allPeople(org))
             .eq("type", AccountType.PersonalChecking)
             .findList();
     }
 
-    public static List<Account> allNonPersonalChecking() {
+    public static List<Account> allNonPersonalChecking(Organization org) {
         return baseQuery().where()
-            .eq("organization", Organization.getByHost())
+            .eq("organization", org)
             .eq("is_active", true)
             .ne("type", AccountType.Cash)
             .ne("type", AccountType.PersonalChecking)
             .findList();
     }
 
-    public static List<Account> allWithMonthlyCredits() {
+    public static List<Account> allWithMonthlyCredits(Organization org) {
         return baseQuery().where()
-                .eq("organization", Organization.getByHost())
+                .eq("organization", org)
                 .eq("is_active", true)
                 .ne("monthly_credit", BigDecimal.ZERO)
                 .findList();
@@ -176,10 +176,10 @@ public class Account extends Model {
             .fetch("credit_transactions", new FetchConfig().query());
     }
 
-    private static List<Person> allPeople() {
+    private static List<Person> allPeople(Organization org) {
         List<Tag> tags = Tag.find.query().where()
             .eq("show_in_account_balances", true)
-            .eq("organization", Organization.getByHost())
+            .eq("organization", org)
             .findList();
 
         Set<Person> people = new HashSet<>();
@@ -189,20 +189,20 @@ public class Account extends Model {
         return new ArrayList<>(people);
     }
 
-    public static Account findById(Integer id) {
+    public static Account findById(Integer id, Organization org) {
         return find.query().where()
-            .eq("organization", Organization.getByHost())
+            .eq("organization", org)
             .eq("id", id)
             .findOne();
     }
 
-    public static Account create(AccountType type, String name, Person person) {
+    public static Account create(AccountType type, String name, Person person, Organization org) {
         Account account = new Account();
         account.person = person;
         account.name = name;
         account.type = type;
         account.is_active = true;
-        account.organization = Organization.getByHost();
+        account.organization = org;
         account.save();
         return account;
     }
@@ -219,8 +219,8 @@ public class Account extends Model {
         save();
     }
 
-    public void createMonthlyCreditTransaction(Date date) {
-        Transaction.createMonthlyCreditTransaction(this, date, Organization.getByHost(request));
+    public void createMonthlyCreditTransaction(Date date, Organization org) {
+        Transaction.createMonthlyCreditTransaction(this, date, org);
         date_last_monthly_credit = date;
         save();
     }

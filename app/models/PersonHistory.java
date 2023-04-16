@@ -41,12 +41,8 @@ public class PersonHistory {
             }
 
 			if (c.rule != null) {
-				List<Charge> cur_list = charges_by_rule.get(c.rule);
-				if (cur_list == null) {
-					cur_list = new ArrayList<>();
-					charges_by_rule.put(c.rule, cur_list);
-				}
-				cur_list.add(c);
+                List<Charge> cur_list = charges_by_rule.computeIfAbsent(c.rule, k -> new ArrayList<>());
+                cur_list.add(c);
 			}
 			
 			charges_by_date.add(c);

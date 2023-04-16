@@ -31,9 +31,9 @@ public class AttendanceCode extends Model {
         return find.query().where().eq("organization", org).findList();
     }
 
-    public static AttendanceCode findById(Integer id) {
+    public static AttendanceCode findById(Integer id, Organization org) {
         return find.query().where()
-            .eq("organization", Organization.getByHost())
+            .eq("organization", org)
             .eq("id", id)
             .findOne();
     }

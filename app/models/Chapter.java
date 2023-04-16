@@ -34,15 +34,15 @@ public class Chapter extends Model {
             Chapter.class
     );
 
-    public static Chapter findById(int id) {
-        return find.query().where().eq("organization", Organization.getByHost())
+    public static Chapter findById(int id, Organization org) {
+        return find.query().where().eq("organization", org)
             .eq("id", id).findOne();
     }
 
-    public static List<Chapter> all() {
+    public static List<Chapter> all(Organization org) {
         return find.query().where()
             .eq("deleted", Boolean.FALSE)
-            .eq("organization", Organization.getByHost())
+            .eq("organization", org)
             .orderBy("num ASC").findList();
     }
 
@@ -53,9 +53,9 @@ public class Chapter extends Model {
         save();
     }
 
-    public static Chapter create(Form<Chapter> form) {
+    public static Chapter create(Form<Chapter> form, Organization org) {
         Chapter result = form.get();
-        result.organization = Organization.getByHost();
+        result.organization = org;
         result.updateFromForm(form);
         result.save();
         return result;

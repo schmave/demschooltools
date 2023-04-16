@@ -5,13 +5,13 @@ import java.util.*;
 public class MailChimpSyncInfo {
 
     public Map<String, ListRecord> list_changes =
-        new HashMap<String, ListRecord>();
+            new HashMap<>();
 
     public class ListRecord {
-        public List<Person> adds = new ArrayList<Person>();
-        public List<Person> removes = new ArrayList<Person>();
-        public List<Person> updates = new ArrayList<Person>();
-        public List<String> errors = new ArrayList<String>();
+        public List<Person> adds = new ArrayList<>();
+        public List<Person> removes = new ArrayList<>();
+        public List<Person> updates = new ArrayList<>();
+        public List<String> errors = new ArrayList<>();
     }
 
     public boolean isEmpty() {

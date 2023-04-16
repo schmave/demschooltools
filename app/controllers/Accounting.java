@@ -36,8 +36,8 @@ public class Accounting extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result newTransaction() {
-        applyMonthlyCredits();
+    public Result newTransaction(Http.Request request) {
+        applyMonthlyCredits(Organization.getByHost(request));
         Form<Transaction> form = mFormFactory.form(Transaction.class);
         return ok(views.html.create_transaction.render(form));
     }
@@ -80,10 +80,11 @@ public class Accounting extends Controller {
         return redirect(routes.Accounting.balances());
     }
 
-    public Result balances() {
-        applyMonthlyCredits();
-        List<Account> personalAccounts = Account.allPersonalChecking();
-        List<Account> nonPersonalAccounts = Account.allNonPersonalChecking();
+    public Result balances(Http.Request request) {
+        Organization org = Organization.getByHost(request);
+        applyMonthlyCredits(org);
+        List<Account> personalAccounts = Account.allPersonalChecking(org);
+        List<Account> nonPersonalAccounts = Account.allNonPersonalChecking(org);
         personalAccounts.sort(Comparator.comparing(Account::getName));
         nonPersonalAccounts.sort(Comparator.comparing(Account::getName));
         return ok(views.html.balances.render(personalAccounts, nonPersonalAccounts));
@@ -91,13 +92,13 @@ public class Accounting extends Controller {
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result bankCashBalance(Http.Request request) {
-        applyMonthlyCredits();
+        applyMonthlyCredits(Organization.getByHost(request));
         return ok(views.html.bank_cash_balance.render(TransactionList.allCash(Organization.getByHost(request))));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result transactionsReport() {
-        applyMonthlyCredits();
+    public Result transactionsReport(Http.Request request) {
+        applyMonthlyCredits(Organization.getByHost(request));
         return ok(views.html.transactions_report.render(TransactionList.blank()));
     }
 
@@ -159,8 +160,8 @@ public class Accounting extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result report() {
-        applyMonthlyCredits();
+    public Result report(Http.Request request) {
+        applyMonthlyCredits(Organization.getByHost(request));
         return ok(views.html.accounting_report.render(new AccountingReport()));
     }
 
@@ -172,13 +173,14 @@ public class Accounting extends Controller {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
             return badRequest(views.html.accounting_report.render(new AccountingReport()));
         }
-        AccountingReport report = AccountingReport.create(filledForm);
+        AccountingReport report = AccountingReport.create(filledForm, Organization.getByHost(request));
         return ok(views.html.accounting_report.render(report));
     }
 
-    public Result account(Integer id) {
-        applyMonthlyCredits();
-        Account account = Account.findById(id);
+    public Result account(Integer id, Http.Request request) {
+        Organization org = Organization.getByHost(request);
+        applyMonthlyCredits(org);
+        Account account = Account.findById(id, org);
         return ok(views.html.account.render(account));
     }
 
@@ -189,9 +191,10 @@ public class Accounting extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result accounts() {
-        applyMonthlyCredits();
-        List<Account> accounts = Account.all();
+    public Result accounts(Http.Request request) {
+        Organization org = Organization.getByHost(request);
+        applyMonthlyCredits(org);
+        List<Account> accounts = Account.all(org);
         accounts.sort(Comparator.comparing(Account::getName));
         return ok(views.html.accounts.render(accounts));
     }
@@ -213,14 +216,14 @@ public class Accounting extends Controller {
         else {
             String name = filledForm.field("name").value().get();
             AccountType type = AccountType.valueOf(filledForm.field("type").value().get());
-            Account account = Account.create(type, name, null);
+            Account account = Account.create(type, name, null, Organization.getByHost(request));
             return redirect(routes.Accounting.account(account.id));
         }
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result editAccount(Integer id) {
-        Account account = Account.findById(id);
+    public Result editAccount(Integer id, Http.Request request) {
+        Account account = Account.findById(id, Organization.getByHost(request));
         Form<Account> form = mFormFactory.form(Account.class).fill(account);
         return ok(views.html.edit_account.render(form, account.is_active));
     }
@@ -228,16 +231,16 @@ public class Accounting extends Controller {
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result saveAccount(Http.Request request) {
         Form<Account> form = mFormFactory.form(Account.class).bindFromRequest(request);
-        Account account = Account.findById(Integer.parseInt(form.field("id").value().get()));
+        Account account = Account.findById(Integer.parseInt(form.field("id").value().get()), Organization.getByHost(request));
         account.updateFromForm(form);
         return redirect(routes.Accounting.account(account.id));
     }
 
-    public static String accountsJson() {
+    public static String accountsJson(Organization org) {
         List<Map<String, String>> result = new ArrayList<>();
         List<Account> accounts = new ArrayList<>();
-        accounts.addAll(Account.allPersonalChecking());
-        accounts.addAll(Account.allNonPersonalChecking());
+        accounts.addAll(Account.allPersonalChecking(org));
+        accounts.addAll(Account.allNonPersonalChecking(org));
         for (Account a : accounts) {
             HashMap<String, String> values = new HashMap<>();
             values.put("label", a.getName());
@@ -248,7 +251,7 @@ public class Accounting extends Controller {
         return Json.stringify(Json.toJson(result));
     }
 
-    static void applyMonthlyCredits() {
+    static void applyMonthlyCredits(Organization org) {
         Calendar c = Calendar.getInstance();
         c.set(Calendar.DAY_OF_MONTH, 1);
         c.set(Calendar.HOUR_OF_DAY, 0);
@@ -261,12 +264,12 @@ public class Accounting extends Controller {
         // no credits in the months of July and August
         if (month == 7 || month == 8) return;
 
-        List<Account> accounts = Account.allWithMonthlyCredits().stream()
+        List<Account> accounts = Account.allWithMonthlyCredits(org).stream()
             .filter(a -> a.date_last_monthly_credit == null || a.date_last_monthly_credit.before(monthStartDate))
             .collect(Collectors.toList());
 
         for (Account a : accounts) {
-            a.createMonthlyCreditTransaction(monthStartDate);
+            a.createMonthlyCreditTransaction(monthStartDate, org);
         }
     }
 }

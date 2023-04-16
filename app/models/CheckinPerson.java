@@ -13,12 +13,12 @@ public class CheckinPerson {
     public String current_day_end_time;
     public String attendance_rate;
 
-    public CheckinPerson(Person person, AttendanceDay current_day, AttendanceStats stats) {
+    public CheckinPerson(Person person, AttendanceDay current_day, AttendanceStats stats, boolean show_weighted_percent) {
         person_id = person.person_id;
         pin = person.pin;
         name = person.getDisplayName();
 
-        if (stats != null && Organization.getByHost().attendance_show_weighted_percent) {
+        if (stats != null && show_weighted_percent) {
             double rate = stats.weightedAttendanceRate();
             if (!Double.isNaN(rate)) {
                 attendance_rate = Attendance.formatAsPercent(rate);

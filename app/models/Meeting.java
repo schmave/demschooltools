@@ -36,8 +36,8 @@ public class Meeting extends Model {
             Meeting.class
     );
 
-    public static Meeting findById(int id) {
-        return find.query().where().eq("organization", Organization.getByHost())
+    public static Meeting findById(int id, Organization org) {
+        return find.query().where().eq("organization", org)
             .eq("id", id).findOne();
     }
 
@@ -56,16 +56,16 @@ public class Meeting extends Model {
         return Json.stringify(Json.toJson(result));
     }
 
-    public static Meeting create(Date d)
+    public static Meeting create(Date d, Organization org)
     {
         Meeting result = new Meeting();
         result.date = d;
-        result.organization = Organization.getByHost();
+        result.organization = org;
         return result;
     }
 
-    public void prepareForEditing() {
-        if (Organization.getByHost().enable_case_references) {
+    public void prepareForEditing(Organization org) {
+        if (org.enable_case_references) {
             for (Case c : cases) {
                 for (Charge charge : c.charges) {
                     charge.is_referenced = charge.referencing_charges.size() > 0 || charge.referencing_cases.size() > 0;

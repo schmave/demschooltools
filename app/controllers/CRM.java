@@ -48,14 +48,14 @@ public class CRM extends Controller {
             new CachedPage(CachedPage.RECENT_COMMENTS,
                 "All people",
                 "crm",
-                "recent_comments") {
+                "recent_comments", Organization.getByHost(request)) {
                 @Override
                 String render() {
                     List<Comment> recent_comments = Comment.find.query()
                         .fetch("person")
                         .fetch("completed_tasks", new FetchConfig().query())
                         .fetch("completed_tasks.task", new FetchConfig().query())
-                        .where().eq("person.organization", Organization.getByHost())
+                        .where().eq("person.organization", Organization.getByHost(request))
                         .orderBy("created DESC").setMaxRows(20).findList();
 
                     return views.html.people_index.render(recent_comments).toString();
@@ -64,7 +64,7 @@ public class CRM extends Controller {
     }
 
     public Result person(Integer id) {
-        Person the_person = Person.findById(id);
+        Person the_person = Person.findById(id, Organization.getByHost(request));
 
         List<Person> family_members =
             Person.find.query().where().isNotNull("family").eq("family", the_person.family).
@@ -82,7 +82,7 @@ public class CRM extends Controller {
         String comment_destination = "<No email set>";
         boolean first = true;
         for (NotificationRule rule :
-                NotificationRule.findByType(NotificationRule.TYPE_COMMENT)) {
+                NotificationRule.findByType(NotificationRule.TYPE_COMMENT, Organization.getByHost(request))) {
             if (first) {
                 comment_destination = rule.email;
                 first = false;
@@ -122,13 +122,13 @@ public class CRM extends Controller {
 
             people_matched_this_round =
                     Person.find.query().where().add(this_expr)
-                            .eq("organization", Organization.getByHost())
+                            .eq("organization", Organization.getByHost(request))
                             .eq("is_family", false)
                     .findList();
 
             List<PhoneNumber> phone_numbers =
                     PhoneNumber.find.query().where().ilike("number", "%" + term + "%")
-                    .eq("owner.organization", Organization.getByHost())
+                    .eq("owner.organization", Organization.getByHost(request))
                     .findList();
             for (PhoneNumber pn : phone_numbers) {
                 people_matched_this_round.add(pn.owner);
@@ -173,13 +173,13 @@ public class CRM extends Controller {
     public Result jsonTags(String term, Integer personId) {
         List<Tag> selected_tags =
             Tag.find.query().where()
-                .eq("organization", Organization.getByHost())
+                .eq("organization", Organization.getByHost(request))
                 .eq("show_in_menu", true)
                 .ilike("title", "%" + term + "%").findList();
 
         List<Tag> existing_tags = null;
         if (personId >= 0) {
-            Person p = Person.findById(personId);
+            Person p = Person.findById(personId, Organization.getByHost(request));
             if (p != null) {
                 existing_tags = p.tags;
             }
@@ -247,7 +247,7 @@ public class CRM extends Controller {
     }
 
     public Result addTag(Integer tagId, String title, Integer personId, Http.Request request) {
-        Person p = Person.findById(personId);
+        Person p = Person.findById(personId, Organization.getByHost(request));
         if (p == null) {
             return badRequest();
         }
@@ -260,7 +260,7 @@ public class CRM extends Controller {
         }
 
         addTag(the_tag, p, Application.getCurrentUser(request));
-        CachedPage.onPeopleChanged();
+        CachedPage.onPeopleChanged(Organization.getByHost(request));
         return ok(views.html.tag_fragment.render(the_tag, p));
     }
 
@@ -286,10 +286,10 @@ public class CRM extends Controller {
 
     public Result removeTag(Integer person_id, Integer tag_id, Http.Request request) {
         Tag t = Tag.findById(tag_id, Organization.getByHost(request));
-        Person p = Person.findById(person_id);
+        Person p = Person.findById(person_id, Organization.getByHost(request));
 
         removeTag(t, p, Application.getCurrentUser(request));
-        CachedPage.onPeopleChanged();
+        CachedPage.onPeopleChanged(Organization.getByHost(request));
 
         return ok();
     }
@@ -327,12 +327,12 @@ public class CRM extends Controller {
     }
 
     public Result allPeople() {
-        return ok(views.html.all_people.render(Person.all()));
+        return ok(views.html.all_people.render(Person.all(Organization.getByHost(request))));
     }
 
     public Result viewAllTags() {
         List<Tag> tags = Tag.find.query()
-            .where().eq("organization", Organization.getByHost())
+            .where().eq("organization", Organization.getByHost(request))
             .orderBy("lower(title)")
             .findList();
 
@@ -363,7 +363,7 @@ public class CRM extends Controller {
             Tag t = Tag.findById(Integer.parseInt(form.field("id").value().get()), Organization.getByHost(request));
             t.updateFromForm(form);
 
-            CachedPage.onPeopleChanged();
+            CachedPage.onPeopleChanged(Organization.getByHost(request));
 
             return redirect(routes.CRM.viewTag(t.id));
         }
@@ -379,7 +379,7 @@ public class CRM extends Controller {
             addTag(dest_tag, p, current_user);
         }
 
-        CachedPage.onPeopleChanged();
+        CachedPage.onPeopleChanged(Organization.getByHost(request));
         return redirect(routes.CRM.viewTag(dest_tag.id));
     }
 
@@ -388,11 +388,11 @@ public class CRM extends Controller {
         Tag dest_tag = Tag.findById(Integer.parseInt(values.get("dest_id")[0]), Organization.getByHost(request));
 
         for (String person_id_str : values.get("person_id")) {
-            Person p = Person.findById(Integer.parseInt(person_id_str));
+            Person p = Person.findById(Integer.parseInt(person_id_str), Organization.getByHost(request));
             addTag(dest_tag, p, Application.getCurrentUser(request));
         }
 
-        CachedPage.onPeopleChanged();
+        CachedPage.onPeopleChanged(Organization.getByHost(request));
         return redirect(routes.CRM.viewTag(dest_tag.id));
     }
 
@@ -403,12 +403,12 @@ public class CRM extends Controller {
         String prefix = "person-";
         for (String key_name : values.keySet()) {
             if (key_name.startsWith(prefix) && values.get(key_name)[0].equals("on")) {
-                Person p = Person.findById(Integer.parseInt(key_name.substring(prefix.length())));
+                Person p = Person.findById(Integer.parseInt(key_name.substring(prefix.length())), Organization.getByHost(request));
                 removeTag(tag, p, Application.getCurrentUser(request));
             }
         }
 
-        CachedPage.onPeopleChanged();
+        CachedPage.onPeopleChanged(Organization.getByHost(request));
         return redirect(routes.CRM.viewTag(tag.id));
     }
 
@@ -436,7 +436,7 @@ public class CRM extends Controller {
             }
         }
 
-        CachedPage.onPeopleChanged();
+        CachedPage.onPeopleChanged(Organization.getByHost(request));
         return redirect(routes.CRM.viewTag(tag.id).url() + "#!history");
     }
 
@@ -446,7 +446,7 @@ public class CRM extends Controller {
             .fetch("people.phone_numbers", new FetchConfig().query())
             .fetch("people.family", new FetchConfig().query())
             .fetch("people.family.family_members", new FetchConfig().query())
-            .where().eq("organization", Organization.getByHost())
+            .where().eq("organization", Organization.getByHost(request))
             .eq("id", id).findOne();
 
         List<Person> people = the_tag.people;
@@ -488,7 +488,7 @@ public class CRM extends Controller {
             .fetch("people.phone_numbers", new FetchConfig().query())
             .fetch("people.family", new FetchConfig().query())
             .fetch("people.family.family_members", new FetchConfig().query())
-            .where().eq("organization", Organization.getByHost())
+            .where().eq("organization", Organization.getByHost(request))
             .eq("id", id).findOne();
 
         response().setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -651,14 +651,14 @@ public class CRM extends Controller {
                 views.html.new_person.render(filledForm)
             );
         } else {
-            Person new_person = Person.create(filledForm);
+            Person new_person = Person.create(filledForm, Organization.getByHost(request));
             return redirect(routes.CRM.person(new_person.person_id));
         }
     }
 
     static Email getPendingEmail() {
         return Email.find.query().where()
-            .eq("organization", Organization.getByHost())
+            .eq("organization", Organization.getByHost(request))
             .eq("deleted", false).eq("sent", false).orderBy("id ASC").setMaxRows(1).findOne();
     }
 
@@ -669,7 +669,7 @@ public class CRM extends Controller {
         }
 
         Tag staff_tag = Tag.find.query().where()
-            .eq("organization", Organization.getByHost())
+            .eq("organization", Organization.getByHost(request))
             .eq("title", "Staff").findOne();
         List<Person> people = staff_tag.people;
 
@@ -693,7 +693,7 @@ public class CRM extends Controller {
 
     public Result sendTestEmail() {
         final Map<String, String[]> values = request().body().asFormUrlEncoded();
-        Email e = Email.findById(Integer.parseInt(values.get("id")[0]));
+        Email e = Email.findById(Integer.parseInt(values.get("id")[0]), Organization.getByHost(request));
         e.parseMessage();
 
         try {
@@ -711,7 +711,7 @@ public class CRM extends Controller {
 
     public Result sendEmail() {
         final Map<String, String[]> values = request().body().asFormUrlEncoded();
-        Email e = Email.findById(Integer.parseInt(values.get("id")[0]));
+        Email e = Email.findById(Integer.parseInt(values.get("id")[0]), Organization.getByHost(request));
         e.parseMessage();
 
         int tagId = Integer.parseInt(values.get("tagId")[0]);
@@ -758,7 +758,7 @@ public class CRM extends Controller {
 
     public Result deleteEmail() {
         final Map<String, String[]> values = request().body().asFormUrlEncoded();
-        Email e = Email.findById(Integer.parseInt(values.get("id")[0]));
+        Email e = Email.findById(Integer.parseInt(values.get("id")[0]), Organization.getByHost(request));
         e.delete();
 
         return ok();
@@ -770,12 +770,12 @@ public class CRM extends Controller {
     }
 
     public Result editPerson(Integer id) {
-        Person p = Person.findById(id);
+        Person p = Person.findById(id, Organization.getByHost(request));
         return ok(views.html.edit_person.render(p.fillForm()));
     }
 
     public Result savePersonEdits() {
-        CachedPage.onPeopleChanged();
+        CachedPage.onPeopleChanged(Organization.getByHost(request));
 
         Form<Person> personForm = mFormFactory.form(Person.class);
         Form<Person> filledForm = personForm.bindFromRequest();
@@ -789,17 +789,17 @@ public class CRM extends Controller {
             );
         }
 
-        Person updatedPerson = Person.updateFromForm(filledForm);
+        Person updatedPerson = Person.updateFromForm(filledForm, Organization.getByHost(request));
         return redirect(routes.CRM.person(
                 (updatedPerson.is_family ? updatedPerson.family_members.get(0) : updatedPerson).person_id));
     }
 
     public Result addComment(User current_user) {
-        CachedPage.remove(CachedPage.RECENT_COMMENTS);
+        CachedPage.remove(CachedPage.RECENT_COMMENTS, Organization.getByHost(request));
         Form<Comment> filledForm = mFormFactory.form(Comment.class).bindFromRequest();
         Comment new_comment = new Comment();
 
-        new_comment.person = Person.findById(Integer.parseInt(filledForm.field("person").value().get()));
+        new_comment.person = Person.findById(Integer.parseInt(filledForm.field("person").value().get()), Organization.getByHost(request));
         new_comment.user = current_user;
         new_comment.message = filledForm.field("message").value().get();
 
@@ -820,7 +820,7 @@ public class CRM extends Controller {
 
             if (filledForm.field("send_email").value().isPresent()) {
                 for (NotificationRule rule :
-                        NotificationRule.findByType(NotificationRule.TYPE_COMMENT)) {
+                        NotificationRule.findByType(NotificationRule.TYPE_COMMENT, Organization.getByHost(request))) {
                     play.libs.mailer.Email mail = new play.libs.mailer.Email();
                     mail.setSubject("DemSchoolTools comment: " + new_comment.user.name + " & " + new_comment.person.getInitials());
                     mail.addTo(rule.email);
@@ -889,14 +889,14 @@ public class CRM extends Controller {
 
     public Result viewMailchimpSettings() {
         MailChimpClient mailChimpClient = new MailChimpClient();
-        Organization org = Organization.getByHost();
+        Organization org = Organization.getByHost(request);
 
         Map<String, ListMethodResult.Data> mc_list_map =
             Public.getMailChimpLists(mailChimpClient, org.mailchimp_api_key);
 
         return ok(views.html.view_mailchimp_settings.render(
             mFormFactory.form(Organization.class), org,
-            MailchimpSync.find.query().where().eq("tag.organization", Organization.getByHost()).findList(),
+            MailchimpSync.find.query().where().eq("tag.organization", Organization.getByHost(request)).findList(),
             mc_list_map));
     }
 
@@ -904,11 +904,11 @@ public class CRM extends Controller {
         final Map<String, String[]> values = request().body().asFormUrlEncoded();
 
         if (values.containsKey("mailchimp_api_key")) {
-            Organization.getByHost().setMailChimpApiKey(values.get("mailchimp_api_key")[0]);
+            Organization.getByHost(request).setMailChimpApiKey(values.get("mailchimp_api_key")[0]);
         }
 
         if (values.containsKey("mailchimp_updates_email")) {
-            Organization.getByHost().setMailChimpUpdatesEmail(values.get("mailchimp_updates_email")[0]);
+            Organization.getByHost(request).setMailChimpUpdatesEmail(values.get("mailchimp_updates_email")[0]);
         }
 
         if (values.containsKey("sync_type")) {

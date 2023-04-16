@@ -18,11 +18,11 @@ public class AttendanceStats {
 
     private double partial_day_value;
 
-    public AttendanceStats() {
+    public AttendanceStats(Organization org) {
         values = new HashMap<>();
         partial_day_value = 0;
-        if (Organization.getByHost().attendance_partial_day_value != null) {
-            partial_day_value = Organization.getByHost().attendance_partial_day_value.doubleValue();
+        if (org.attendance_partial_day_value != null) {
+            partial_day_value = org.attendance_partial_day_value.doubleValue();
         }
     }
 

@@ -97,7 +97,7 @@ public class Secured {
                     return username;
                 }
             } else if (u.active && u.hasRole(role) &&
-                       (u.organization == null || u.organization.equals(Organization.getByHost()))) {
+                       (u.organization == null || u.organization.equals(Organization.getByHost(request)))) {
                 // Allow access if this user belongs to this organization or is a
                 // multi-domain admin (null organization). Also, the user must
                 // have the required role.
@@ -119,12 +119,12 @@ public class Secured {
             }
 
             // If we don't have a logged-in user, try going by IP address.
-            if (allow_ip && Organization.getByHost() != null) {
+            if (allow_ip && Organization.getByHost(request) != null) {
                 String sql = "select ip from allowed_ips where ip like :ip and organization_id=:org_id";
                 SqlQuery sqlQuery = Ebean.createSqlQuery(sql);
                 String address = Application.getRemoteIp(ctx.request());
                 sqlQuery.setParameter("ip", address);
-                sqlQuery.setParameter("org_id", Organization.getByHost().id);
+                sqlQuery.setParameter("org_id", Organization.getByHost(request).id);
 
                 // execute the query returning a List of MapBean objects
                 SqlRow result = sqlQuery.findOne();

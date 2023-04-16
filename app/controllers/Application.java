@@ -94,20 +94,20 @@ public class Application extends Controller {
         }
     }
 
-    public static List<Charge> getActiveSchoolMeetingReferrals() {
+    public static List<Charge> getActiveSchoolMeetingReferrals(Organization org) {
         return Charge.find.query().where()
             .eq("referred_to_sm", true)
             .eq("sm_decision", null)
-            .eq("person.organization", Organization.getByHost())
+            .eq("person.organization", org)
             .orderBy("id DESC").findList();
     }
 
-    public Result viewSchoolMeetingReferrals() {
+    public Result viewSchoolMeetingReferrals(Http.Request request) {
         return ok(views.html.view_sm_referrals.render(
-            getActiveSchoolMeetingReferrals()));
+            getActiveSchoolMeetingReferrals(Organization.getByHost(request))));
     }
 
-    public Result viewSchoolMeetingDecisions() {
+    public Result viewSchoolMeetingDecisions(Http.Request request) {
         List<Charge> the_charges =
             Charge.find.query()
                 .fetch("rule")
@@ -117,24 +117,24 @@ public class Application extends Controller {
                 .fetch("the_case")
                 .where()
                 .eq("referred_to_sm", true)
-                .eq("person.organization", Organization.getByHost())
+                .eq("person.organization", Organization.getByHost(request))
                 .gt("sm_decision_date", Application.getStartOfYear())
                 .isNotNull("sm_decision")
                 .orderBy("id DESC").findList();
         return ok(views.html.view_sm_decisions.render(the_charges));
     }
 
-    public static List<Person> jcPeople() {
-        return peopleByTagType("show_in_jc");
+    public static List<Person> jcPeople(Http.Request request) {
+        return peopleByTagType("show_in_jc", Organization.getByHost(request));
     }
 
-    public static List<Person> attendancePeople() {
-        return peopleByTagType("show_in_attendance");
+    public static List<Person> attendancePeople(Organization org) {
+        return peopleByTagType("show_in_attendance", org);
     }
 
-    public static String attendancePeopleJson() {
+    public static String attendancePeopleJson(Organization org) {
         List<Map<String, String>> result = new ArrayList<>();
-        List<Person> people = attendancePeople();
+        List<Person> people = attendancePeople(org);
         for (Person p : people) {
             HashMap<String, String> values = new HashMap<>();
             values.put("label", p.getDisplayName());
@@ -144,10 +144,10 @@ public class Application extends Controller {
         return Json.stringify(Json.toJson(result));
     }
 
-    private static List<Person> peopleByTagType(String tag_type) {
+    private static List<Person> peopleByTagType(String tag_type, Organization org) {
         List<Tag> tags = Tag.find.query().where()
             .eq(tag_type, true)
-            .eq("organization", Organization.getByHost())
+            .eq("organization", org)
             .findList();
 
         Set<Person> people = new HashSet<>();
@@ -157,22 +157,22 @@ public class Application extends Controller {
         return new ArrayList<>(people);
     }
 
-    public Result index() {
+    public Result index(Http.Request request) {
         return ok(views.html.cached_page.render(
             new CachedPage(CachedPage.JC_INDEX,
                 "JC database",
                 "jc",
-                "jc_home") {
+                "jc_home", Organization.getByHost(request)) {
                 @Override
                 String render() {
         List<Meeting> meetings = Meeting.find.query()
             .fetch("cases")
-            .where().eq("organization", Organization.getByHost())
+            .where().eq("organization", Organization.getByHost(request))
             .orderBy("date DESC").findList();
 
         List<Tag> tags = Tag.find.query().where()
             .eq("show_in_jc", true)
-            .eq("organization", Organization.getByHost())
+            .eq("organization", Organization.getByHost(request))
             .findList();
 
         Set<Person> peopleSet = Person.find.query()
@@ -195,7 +195,7 @@ public class Application extends Controller {
             .fetch("charges.the_case.meeting")
             .fetch("section")
             .fetch("section.chapter")
-            .where().eq("section.chapter.organization", Organization.getByHost())
+            .where().eq("section.chapter.organization", Organization.getByHost(request))
             .eq("section.chapter.deleted", false)
             .eq("section.deleted", false)
             .eq("deleted", false)
@@ -214,10 +214,13 @@ public class Application extends Controller {
                 }}));
     }
 
-    public Result downloadCharges() throws IOException {
+    public Result downloadCharges(Http.Request request) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Charset charset = StandardCharsets.UTF_8;
         CsvWriter writer = new CsvWriter(baos, ',', charset);
+
+        final Organization org = Organization.getByHost(request);
+        final OrgConfig org_config = OrgConfig.get(org);
 
         writer.write("Name");
         writer.write("Age");
@@ -227,15 +230,15 @@ public class Application extends Controller {
         writer.write("Location of event");
         writer.write("Date of meeting");
         writer.write("Case #");
-        writer.write(OrgConfig.get().str_findings);
+        writer.write(org_config.str_findings);
         writer.write("Rule");
         writer.write("Plea");
-        writer.write(OrgConfig.get().str_res_plan_cap);
-        writer.write(OrgConfig.get().str_res_plan_cap + " complete?");
-        if (OrgConfig.get().show_severity) {
+        writer.write(org_config.str_res_plan_cap);
+        writer.write(org_config.str_res_plan_cap + " complete?");
+        if (org_config.show_severity) {
             writer.write("Severity");
         }
-        if (OrgConfig.get().use_minor_referrals) {
+        if (org_config.use_minor_referrals) {
             writer.write("Referred to");
         }
         writer.write("Referred to SM?");
@@ -243,14 +246,12 @@ public class Application extends Controller {
         writer.write("SM decision date");
         writer.endRecord();
 
-        OrgConfig config = OrgConfig.get();
-
         List<Charge> charges = Charge.find.query()
             .fetch("the_case")
             .fetch("person")
             .fetch("rule")
             .fetch("the_case.meeting", new FetchConfig().query())
-            .where().eq("person.organization", Organization.getByHost())
+            .where().eq("person.organization", org)
                 .ge("the_case.meeting.date", getStartOfYear())
             .findList();
         for (Charge c : charges) {
@@ -283,14 +284,14 @@ public class Application extends Controller {
             } else {
                 writer.write("");
             }
-            writer.write(config.translatePlea(c.plea));
+            writer.write(org_config.translatePlea(c.plea));
             writer.write(c.resolution_plan);
             writer.write("" + c.rp_complete);
-            if (config.show_severity) {
+            if (org_config.show_severity) {
                 writer.write(c.severity);
             }
 
-            if (config.use_minor_referrals) {
+            if (org_config.use_minor_referrals) {
                 writer.write(c.minor_referral_destination);
             }
             writer.write("" + c.referred_to_sm);
@@ -319,18 +320,19 @@ public class Application extends Controller {
 
     }
 
-    public Result viewMeeting(int meeting_id) {
-        return ok(views.html.view_meeting.render(Meeting.findById(meeting_id)));
+    public Result viewMeeting(int meeting_id, Http.Request request) {
+        return ok(views.html.view_meeting.render(Meeting.findById(meeting_id, Organization.getByHost(request))));
     }
 
-    public Result printMeeting(int meeting_id) throws Exception {
+    public Result printMeeting(int meeting_id, Http.Request request) throws Exception {
         return renderToPDF(
-                views.html.view_meeting.render(Meeting.findById(meeting_id)).toString());
+                views.html.view_meeting.render(Meeting.findById(meeting_id, Organization.getByHost(request))).toString());
     }
 
-    public Result editResolutionPlanList() {
-        List<Integer> referenced_charge_ids = getReferencedChargeIds();
-        List<Charge> active_rps = getActiveResolutionPlans(referenced_charge_ids);
+    public Result editResolutionPlanList(Http.Request request) {
+        final Organization org = Organization.getByHost(request);
+        List<Integer> referenced_charge_ids = getReferencedChargeIds(org);
+        List<Charge> active_rps = getActiveResolutionPlans(referenced_charge_ids, org);
 
         List<Charge> completed_rps =
             Charge.find.query()
@@ -341,7 +343,7 @@ public class Application extends Controller {
                 .fetch("rule.section")
                 .fetch("rule.section.chapter")
                 .where()
-                .eq("person.organization", Organization.getByHost())
+                .eq("person.organization", Organization.getByHost(request))
                 .ne("person", null)
                 .eq("rp_complete", true)
                 .not(Expr.in("id", referenced_charge_ids))
@@ -357,7 +359,7 @@ public class Application extends Controller {
                 .fetch("rule.section")
                 .fetch("rule.section.chapter")
                 .where()
-                .eq("person.organization", Organization.getByHost())
+                .eq("person.organization", Organization.getByHost(request))
                 .ne("person", null)
                 .in("id", referenced_charge_ids)
                 .orderBy("id DESC")
@@ -380,10 +382,10 @@ public class Application extends Controller {
 
     }
 
-    private List<Integer> getReferencedChargeIds() {
+    private List<Integer> getReferencedChargeIds(Organization org) {
         return Charge.find.query()
             .where()
-            .eq("person.organization", Organization.getByHost())
+            .eq("person.organization", org)
             .isNotNull("referenced_charge_id")
             .select("referenced_charge")
             .findList()
@@ -392,7 +394,7 @@ public class Application extends Controller {
             .collect(Collectors.toList());
     }
 
-    private List<Charge> getActiveResolutionPlans(List<Integer> referenced_charge_ids) {
+    private List<Charge> getActiveResolutionPlans(List<Integer> referenced_charge_ids, Organization org) {
         return Charge.find.query()
             .fetch("the_case")
             .fetch("the_case.meeting")
@@ -401,7 +403,7 @@ public class Application extends Controller {
             .fetch("rule.section")
             .fetch("rule.section.chapter")
             .where()
-            .eq("person.organization", Organization.getByHost())
+            .eq("person.organization", org)
             .or(Expr.ne("plea", "Not Guilty"),
                 Expr.isNotNull("sm_decision"))
             .ne("person", null)
@@ -410,9 +412,10 @@ public class Application extends Controller {
             .orderBy("id DESC").findList();
     }
 
-    public Result viewSimpleResolutionPlans() throws Exception {
-        List<Integer> referenced_charge_ids = getReferencedChargeIds();
-        List<Charge> charges = getActiveResolutionPlans(referenced_charge_ids);
+    public Result viewSimpleResolutionPlans(Http.Request request) throws Exception {
+        final Organization org = Organization.getByHost(request);
+        List<Integer> referenced_charge_ids = getReferencedChargeIds(org);
+        List<Charge> charges = getActiveResolutionPlans(referenced_charge_ids, org);
 
         HashMap<String, List<Charge>> groups = new HashMap<>();
 
@@ -433,22 +436,24 @@ public class Application extends Controller {
 
     }
 
-    public Result viewMeetingResolutionPlans(int meeting_id) {
-        return ok(views.html.view_meeting_resolution_plans.render(Meeting.findById(meeting_id)));
+    public Result viewMeetingResolutionPlans(int meeting_id, Http.Request request) {
+        return ok(views.html.view_meeting_resolution_plans.render(Meeting.findById(meeting_id,
+                Organization.getByHost(request))));
     }
 
-    public Result downloadMeetingResolutionPlans(int meeting_id) throws IOException {
+    public Result downloadMeetingResolutionPlans(int meeting_id, Http.Request request) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Charset charset = StandardCharsets.UTF_8;
         CsvWriter writer = new CsvWriter(baos, ',', charset);
 
+        Organization org = Organization.getByHost(request);
         writer.write("Person");
         writer.write("Case #");
         writer.write("Rule");
-        writer.write(OrgConfig.get().str_res_plan_cap);
+        writer.write(OrgConfig.get(org).str_res_plan_cap);
         writer.endRecord();
 
-        Meeting m = Meeting.findById(meeting_id);
+        Meeting m = Meeting.findById(meeting_id, org);
         for (Case c : m.cases) {
             for (Charge charge : c.charges) {
                 if (charge.displayInResolutionPlanList() && !charge.referred_to_sm) {
@@ -478,15 +483,16 @@ public class Application extends Controller {
         // that the file is Unicode-encoded.
         return ok("\ufeff" + new String(baos.toByteArray(), charset))
                 .withHeader("Content-Type", "text/csv; charset=utf-8")
-                .withHeader("Content-Disposition", "attachment; filename=" + OrgConfig.get().str_res_plans + ".csv");
+                .withHeader("Content-Disposition", "attachment; filename=" +
+                        OrgConfig.get(org).str_res_plans + ".csv");
 
     }
 
-    public Result viewManual() {
-        return ok(renderManualTOC());
+    public Result viewManual(Http.Request request) {
+        return ok(renderManualTOC(Organization.getByHost(request)));
     }
 
-    public Result viewManualChanges(String begin_date_string) {
+    public Result viewManualChanges(String begin_date_string, Http.Request request) {
         Date begin_date;
 
         try {
@@ -500,7 +506,7 @@ public class Application extends Controller {
         List<ManualChange> changes =
             ManualChange.find.query().where()
                 .gt("date_entered", begin_date)
-                .eq("entry.section.chapter.organization", Organization.getByHost())
+                .eq("entry.section.chapter.organization", Organization.getByHost(request))
                 .findList();
 
         changes.sort(ManualChange.SORT_NUM_DATE);
@@ -510,8 +516,8 @@ public class Application extends Controller {
             changes));
     }
 
-    public Result printManual() {
-        return ok(views.html.print_manual.render(Chapter.all()));
+    public Result printManual(Http.Request request) {
+        return ok(views.html.print_manual.render(Chapter.all(Organization.getByHost(request))));
     }
 
     static Path print_temp_dir;
@@ -622,36 +628,37 @@ public class Application extends Controller {
         }
     }
 
-    static play.twirl.api.Html renderManualTOC() {
+    static play.twirl.api.Html renderManualTOC(Organization org) {
         return views.html.cached_page.render(
             new CachedPage(CachedPage.MANUAL_INDEX,
-                OrgConfig.get().str_manual_title,
+                OrgConfig.get(org).str_manual_title,
                 "manual",
-                "toc") {
+                "toc", org) {
                 @Override
                 String render() {
-                    return views.html.view_manual.render(Chapter.all()).toString();
+                    return views.html.view_manual.render(Chapter.all(org)).toString();
                 }
             });
     }
 
-    public Result printManualChapter(Integer id) throws Exception {
+    public Result printManualChapter(Integer id, Http.Request request) throws Exception {
 
+        Organization org = Organization.getByHost(request);
         if (id == -1) {
             ArrayList<String> documents = new ArrayList<>();
             // render TOC
-            documents.add(renderManualTOC().toString());
+            documents.add(renderManualTOC(org).toString());
             // then render all chapters
-            for (Chapter chapter : Chapter.all()) {
+            for (Chapter chapter : Chapter.all(org)) {
                 documents.add(views.html.view_chapter.render(chapter).toString());
             }
             return renderToPDF(documents);
         } else {
             if (id == -2) {
-                return renderToPDF(renderManualTOC().toString());
+                return renderToPDF(renderManualTOC(org).toString());
 
             } else {
-                Chapter chapter = Chapter.findById(id);
+                Chapter chapter = Chapter.findById(id, org);
                 return renderToPDF(
                     views.html.view_chapter.render(chapter).toString());
 
@@ -659,17 +666,17 @@ public class Application extends Controller {
         }
     }
 
-    public Result viewChapter(Integer id) {
+    public Result viewChapter(Integer id, Http.Request request) {
         Chapter c = Chapter.find.query()
             .fetch("sections", new FetchConfig().query())
             .fetch("sections.entries", new FetchConfig().query())
-            .where().eq("organization", Organization.getByHost())
+            .where().eq("organization", Organization.getByHost(request))
             .eq("id", id).findOne();
 
         return ok(views.html.view_chapter.render(c));
     }
 
-    public Result searchManual(String searchString) {
+    public Result searchManual(String searchString, Http.Request request) {
         Map<String, Object> scopes = new HashMap<>();
         scopes.put("searchString", searchString);
 
@@ -680,7 +687,7 @@ public class Application extends Controller {
             "and ei.organization_id=:orgId " +
             "ORDER BY ts_rank(ei.document, plainto_tsquery(:searchString), 0) DESC";
 
-        OrgConfig orgConfig = OrgConfig.get();
+        OrgConfig orgConfig = OrgConfig.get(Organization.getByHost(request));
         SqlQuery sqlQuery = Ebean.createSqlQuery(sql);
         sqlQuery.setParameter("orgId", orgConfig.org.id);
         sqlQuery.setParameter("searchString", searchString);
@@ -765,9 +772,9 @@ public class Application extends Controller {
         return rps;
     }
 
-    public Result getPersonRuleHistory(Integer personId, Integer ruleId) {
-        Person p = Person.findByIdWithJCData(personId);
-        Entry r = Entry.findById(ruleId);
+    public Result getPersonRuleHistory(Integer personId, Integer ruleId, Http.Request request) {
+        Person p = Person.findByIdWithJCData(personId, Organization.getByHost(request));
+        Entry r = Entry.findById(ruleId, Organization.getByHost(request));
 
         PersonHistory history = new PersonHistory(p, false, getStartOfYear(), null);
         PersonHistory.Record rule_record = null;
@@ -782,8 +789,8 @@ public class Application extends Controller {
             p, r, rule_record, history.charges_by_rule.get(r), history));
     }
 
-    public Result getPersonHistory(Integer id) {
-        Person p = Person.findByIdWithJCData(id);
+    public Result getPersonHistory(Integer id, Http.Request request) {
+        Person p = Person.findByIdWithJCData(id, Organization.getByHost(request));
         return ok(views.html.person_history.render(
             p,
             new PersonHistory(p, false, getStartOfYear(), null),
@@ -820,7 +827,7 @@ public class Application extends Controller {
         }
 
         Date restricted_start_date = restrictStartDate(start_date, getCurrentUser(request));
-        Person p = Person.findByIdWithJCData(id);
+        Person p = Person.findByIdWithJCData(id, Organization.getByHost(request));
         Result result = ok(views.html.view_person_history.render(
             p,
             new PersonHistory(p, true, start_date, end_date),
@@ -834,8 +841,8 @@ public class Application extends Controller {
         return result;
     }
 
-    public Result getRuleHistory(Integer id) {
-        Entry r = Entry.findByIdWithJCData(id);
+    public Result getRuleHistory(Integer id, Http.Request request) {
+        Entry r = Entry.findByIdWithJCData(id, Organization.getByHost(request));
         return ok(views.html.rule_history.render(
             r,
             new RuleHistory(r, false, getStartOfYear(), null),
@@ -855,7 +862,7 @@ public class Application extends Controller {
 
         Date restricted_start_date = restrictStartDate(start_date, getCurrentUser(request));
 
-        Entry r = Entry.findByIdWithJCData(id);
+        Entry r = Entry.findByIdWithJCData(id, Organization.getByHost(request));
         Result result = ok(views.html.view_rule_history.render(
             r,
             new RuleHistory(r, true, start_date, end_date),
@@ -868,8 +875,8 @@ public class Application extends Controller {
         return result;
     }
 
-    public Result viewPersonsWriteups(Integer id) {
-        Person p = Person.findByIdWithJCData(id);
+    public Result viewPersonsWriteups(Integer id, Http.Request request) {
+        Person p = Person.findByIdWithJCData(id, Organization.getByHost(request));
 
         List<Case> cases_written_up = new ArrayList<>(p.getThisYearCasesWrittenUp());
 
@@ -879,11 +886,11 @@ public class Application extends Controller {
         return ok(views.html.view_persons_writeups.render(p, cases_written_up));
     }
 
-    public Result thisWeekReport() {
-        return viewWeeklyReport("");
+    public Result thisWeekReport(Http.Request request) {
+        return viewWeeklyReport("", request);
     }
 
-    public Result printWeeklyMinutes(String date_string) throws Exception {
+    public Result printWeeklyMinutes(String date_string, Http.Request request) throws Exception {
         Calendar start_date = new GregorianCalendar();
         try {
             Date parsed_date = new SimpleDateFormat("yyyy-M-d").parse(date_string);
@@ -898,16 +905,16 @@ public class Application extends Controller {
         end_date.add(GregorianCalendar.DATE, 6);
 
         List<Meeting> meetings = Meeting.find.query().where()
-            .eq("organization", Organization.getByHost())
+            .eq("organization", Organization.getByHost(request))
             .le("date", end_date.getTime())
             .ge("date", start_date.getTime()).findList();
 
         return renderToPDF(views.html.multi_meetings.render(meetings).toString());
     }
 
-    public Result viewWeeklyReport(String date_string) {
+    public Result viewWeeklyReport(String date_string, Http.Request request) {
         Calendar start_date = Utils.parseDateOrNow(date_string);
-        Utils.adjustToPreviousDay(start_date, Organization.getByHost().jc_reset_day + 1);
+        Utils.adjustToPreviousDay(start_date, Organization.getByHost(request).jc_reset_day + 1);
 
         Calendar end_date = (Calendar)start_date.clone();
         end_date.add(GregorianCalendar.DATE, 6);
@@ -917,7 +924,7 @@ public class Application extends Controller {
             .fetch("person")
             .fetch("rule")
             .fetch("the_case.meeting", new FetchConfig().query())
-            .where().eq("person.organization", Organization.getByHost())
+            .where().eq("person.organization", Organization.getByHost(request))
                 .ge("the_case.meeting.date", getStartOfYear(start_date.getTime()))
             .findList();
         WeeklyStats result = new WeeklyStats();
@@ -948,7 +955,7 @@ public class Application extends Controller {
         List<Case> all_cases = new ArrayList<>();
 
         List<Meeting> meetings = Meeting.find.query().where()
-            .eq("organization", Organization.getByHost())
+            .eq("organization", Organization.getByHost(request))
             .le("date", end_date.getTime())
             .ge("date", start_date.getTime()).findList();
 
@@ -960,7 +967,7 @@ public class Application extends Controller {
             }
         }
 
-        result.uncharged_people = jcPeople();
+        result.uncharged_people = jcPeople(request);
         for (Map.Entry<Person, WeeklyStats.PersonCounts> entry : result.person_counts.entrySet()) {
             if (entry.getValue().this_period > 0) {
                 result.uncharged_people.remove(entry.getKey());
@@ -1004,9 +1011,9 @@ public class Application extends Controller {
         return Json.stringify(Json.toJson(result));
     }
 
-    public static String jsonRules(Boolean includeBreakingResPlan) {
+    public static String jsonRules(Boolean includeBreakingResPlan, Http.Request request) {
 
-        ExpressionList<Entry> expr = Entry.find.query().where().eq("section.chapter.organization", Organization.getByHost());
+        ExpressionList<Entry> expr = Entry.find.query().where().eq("section.chapter.organization", Organization.getByHost(request));
         if (!includeBreakingResPlan) {
             expr = expr.eq("is_breaking_res_plan", false);
         }
@@ -1027,11 +1034,11 @@ public class Application extends Controller {
         return Json.stringify(Json.toJson(result));
     }
 
-    public static String jsonCases(String term) {
+    public static String jsonCases(String term, Http.Request request) {
         term = term.toLowerCase();
 
         List<Case> cases = Case.find.query().where()
-            .eq("meeting.organization", Organization.getByHost())
+            .eq("meeting.organization", Organization.getByHost(request))
             .ge("meeting.date", Application.getStartOfYear())
             .like("case_number", term + "%")
             .orderBy("case_number ASC").findList();
@@ -1047,16 +1054,16 @@ public class Application extends Controller {
         return Json.stringify(Json.toJson(result));
     }
 
-    public static String jsonBreakingResPlanEntry() {
-        return Utils.toJson(Entry.findBreakingResPlanEntry());
+    public static String jsonBreakingResPlanEntry(Organization org) {
+        return Utils.toJson(Entry.findBreakingResPlanEntry(org));
     }
 
-    public Result getLastRp(Integer personId, Integer ruleId) {
+    public Result getLastRp(Integer personId, Integer ruleId, Http.Request request) {
         Date now = new Date();
 
         // Look up person using findById to guarantee that the current user
         // has access to that organization.
-        Person p = Person.findById(personId);
+        Person p = Person.findById(personId, Organization.getByHost(request));
         List<Charge> charges = Charge.find.query().where().eq("person", p)
                 .eq("rule_id", ruleId)
                 .lt("the_case.meeting.date", now)
@@ -1203,18 +1210,18 @@ public class Application extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_ALL_ACCESS)
-    public Result fileSharing() {
+    public Result fileSharing(Http.Request request) {
         Map<String, Object> scopes = new HashMap<>();
 
         ArrayList<String> existingFiles = new ArrayList<>();
-        File[] files = getSharedFileDirectory().listFiles();
+        File[] files = getSharedFileDirectory(Organization.getByHost(request)).listFiles();
         for (File f : files) {
             existingFiles.add(f.getName());
         }
 
         scopes.put("existing_files", existingFiles);
 
-        scopes.put("printer_email", Organization.getByHost().printer_email);
+        scopes.put("printer_email", Organization.getByHost(request).printer_email);
         return ok(views.html.main_with_mustache.render(
             "File Sharing config",
             "misc",
@@ -1228,7 +1235,7 @@ public class Application extends Controller {
         final Map<String, String[]> values = request.body().asFormUrlEncoded();
 
         if (values.containsKey("printer_email")) {
-            Organization.getByHost().setPrinterEmail(values.get("printer_email")[0]);
+            Organization.getByHost(request).setPrinterEmail(values.get("printer_email")[0]);
         }
 
         return redirect(routes.Application.fileSharing());
@@ -1241,15 +1248,15 @@ public class Application extends Controller {
         if (pdf != null) {
             String fileName = pdf.getFilename();
             if (!fileName.equals("")) {
-                File outputFile = new File(getSharedFileDirectory(), fileName);
+                File outputFile = new File(getSharedFileDirectory(Organization.getByHost(request)), fileName);
                 copyFileUsingStream(pdf.getRef().getAbsoluteFile(), outputFile);
             }
         }
         return redirect(routes.Application.fileSharing());
     }
 
-    private static File getSharedFileDirectory() {
-        File result = new File("/www-dst", "" + Organization.getByHost().id);
+    private static File getSharedFileDirectory(Organization org) {
+        File result = new File("/www-dst", "" + org.id);
         if (!result.exists()) {
             result.mkdir();
         }
@@ -1261,7 +1268,7 @@ public class Application extends Controller {
         final Map<String, String[]> values = request.body().asFormUrlEncoded();
 
         if (values.containsKey("filename")) {
-            File the_file = new File(getSharedFileDirectory(), values.get("filename")[0]);
+            File the_file = new File(getSharedFileDirectory(Organization.getByHost(request)), values.get("filename")[0]);
             if (the_file.exists()) {
                 the_file.delete();
             }
@@ -1270,18 +1277,19 @@ public class Application extends Controller {
         return redirect(routes.Application.fileSharing());
     }
 
-    public Result viewFiles() {
+    public Result viewFiles(Http.Request request) {
         Map<String, Object> scopes = new HashMap<>();
 
         ArrayList<String> existingFiles = new ArrayList<>();
-        File[] files = getSharedFileDirectory().listFiles();
+        final Organization org = Organization.getByHost(request);
+        File[] files = getSharedFileDirectory(org).listFiles();
         for (File f : files) {
             existingFiles.add(f.getName());
         }
 
         scopes.put("existing_files", existingFiles);
 
-        scopes.put("printer_email", Organization.getByHost().printer_email);
+        scopes.put("printer_email", org.printer_email);
         return ok(views.html.main_with_mustache.render(
             "DemSchoolTools shared files",
             "misc",
@@ -1294,11 +1302,11 @@ public class Application extends Controller {
         final Map<String, String[]> values = request.body().asFormUrlEncoded();
 
         if (values.containsKey("filename")) {
-            File the_file = new File(getSharedFileDirectory(), values.get("filename")[0]);
+            File the_file = new File(getSharedFileDirectory(Organization.getByHost(request)), values.get("filename")[0]);
             if (the_file.exists()) {
                 play.libs.mailer.Email mail = new play.libs.mailer.Email();
                 mail.setSubject("Print from DemSchoolTools");
-                mail.addTo(Organization.getByHost().printer_email);
+                mail.addTo(Organization.getByHost(request).printer_email);
                 mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
                 mail.addAttachment(the_file.getName(), the_file);
                 mMailer.send(mail);
