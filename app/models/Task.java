@@ -27,8 +27,8 @@ public class Task extends Model {
             Task.class
     );
 
-    public static Task findById(int id) {
-        return find.query().where().eq("task_list.organization", Organization.getByHost())
+    public static Task findById(int id, Organization org) {
+        return find.query().where().eq("task_list.organization", org)
             .eq("id", id).findOne();
     }
 }

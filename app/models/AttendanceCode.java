@@ -33,7 +33,7 @@ public class AttendanceCode extends Model {
 
     public static AttendanceCode findById(Integer id) {
         return find.query().where()
-            .eq("organization", OrgConfig.get().org)
+            .eq("organization", Organization.getByHost())
             .eq("id", id)
             .findOne();
     }

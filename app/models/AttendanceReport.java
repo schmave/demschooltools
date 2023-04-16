@@ -23,7 +23,7 @@ public class AttendanceReport {
     public AttendanceReport() {
         late_departures = new ArrayList<>();
 
-        Organization org = OrgConfig.get().org;
+        Organization org = Organization.getByHost();
         latest_departure_time = org.attendance_report_latest_departure_time;
     }
 
@@ -31,7 +31,7 @@ public class AttendanceReport {
         AttendanceReport model = form.get();
 
         List<AttendanceDay> events = AttendanceDay.find.query().where()
-            .eq("person.organization", OrgConfig.get().org)
+            .eq("person.organization", Organization.getByHost())
             .ge("day", model.start_date)
             .le("day", model.end_date)
             .gt("end_time", model.latest_departure_time)

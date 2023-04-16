@@ -214,7 +214,7 @@ public class CRM extends Controller {
     }
 
     public Collection<Person> getTagMembers(Integer tagId, String familyMode) {
-        List<Person> people = Tag.findById(tagId).people;
+        List<Person> people = Tag.findById(tagId, Organization.getByHost(request)).people;
 
         Set<Person> selected_people = new HashSet<>(people);
 
@@ -241,7 +241,7 @@ public class CRM extends Controller {
     }
 
     public Result renderTagMembers(Integer tagId, String familyMode) {
-        Tag the_tag = Tag.findById(tagId);
+        Tag the_tag = Tag.findById(tagId, Organization.getByHost(request));
         return ok(views.html.to_address_fragment.render(the_tag.title,
                 getTagMembers(tagId, familyMode)));
     }
@@ -254,7 +254,7 @@ public class CRM extends Controller {
 
         Tag the_tag;
         if (tagId == null) {
-            the_tag = Tag.create(title);
+            the_tag = Tag.create(title, Organization.getByHost(request));
         } else {
             the_tag = Tag.find.ref(tagId);
         }
@@ -285,7 +285,7 @@ public class CRM extends Controller {
     }
 
     public Result removeTag(Integer person_id, Integer tag_id, Http.Request request) {
-        Tag t = Tag.findById(tag_id);
+        Tag t = Tag.findById(tag_id, Organization.getByHost(request));
         Person p = Person.findById(person_id);
 
         removeTag(t, p, Application.getCurrentUser(request));
@@ -352,7 +352,7 @@ public class CRM extends Controller {
     }
 
     public Result editTag(Integer id) {
-        Form<Tag> filled_form = mFormFactory.form(Tag.class).fill(Tag.findById(id));
+        Form<Tag> filled_form = mFormFactory.form(Tag.class).fill(Tag.findById(id, Organization.getByHost(request)));
         return ok(views.html.edit_tag.render(filled_form));
     }
 
@@ -360,7 +360,7 @@ public class CRM extends Controller {
         Form<Tag> form = mFormFactory.form(Tag.class).bindFromRequest();
 
         if (form.field("id").value().isPresent()) {
-            Tag t = Tag.findById(Integer.parseInt(form.field("id").value().get()));
+            Tag t = Tag.findById(Integer.parseInt(form.field("id").value().get()), Organization.getByHost(request));
             t.updateFromForm(form);
 
             CachedPage.onPeopleChanged();
@@ -372,8 +372,8 @@ public class CRM extends Controller {
 
     public Result addPeopleFromTag(User current_user) {
         final Map<String, String[]> values = request().body().asFormUrlEncoded();
-        Tag dest_tag = Tag.findById(Integer.parseInt(values.get("dest_id")[0]));
-        Tag src_tag = Tag.findById(Integer.parseInt(values.get("tag_id")[0]));
+        Tag dest_tag = Tag.findById(Integer.parseInt(values.get("dest_id")[0]), Organization.getByHost(request));
+        Tag src_tag = Tag.findById(Integer.parseInt(values.get("tag_id")[0]), Organization.getByHost(request));
 
         for (Person p : src_tag.people) {
             addTag(dest_tag, p, current_user);
@@ -385,7 +385,7 @@ public class CRM extends Controller {
 
     public Result addPeopleToTag(Http.Request request) {
         final Map<String, String[]> values = request().body().asFormUrlEncoded();
-        Tag dest_tag = Tag.findById(Integer.parseInt(values.get("dest_id")[0]));
+        Tag dest_tag = Tag.findById(Integer.parseInt(values.get("dest_id")[0]), Organization.getByHost(request));
 
         for (String person_id_str : values.get("person_id")) {
             Person p = Person.findById(Integer.parseInt(person_id_str));
@@ -398,7 +398,7 @@ public class CRM extends Controller {
 
     public Result removePeopleFromTag(Http.Request request) {
         final Map<String, String[]> values = request().body().asFormUrlEncoded();
-        Tag tag = Tag.findById(Integer.parseInt(values.get("tag_id")[0]));
+        Tag tag = Tag.findById(Integer.parseInt(values.get("tag_id")[0]), Organization.getByHost(request));
 
         String prefix = "person-";
         for (String key_name : values.keySet()) {
@@ -414,7 +414,7 @@ public class CRM extends Controller {
 
     public Result undoTagChanges() {
         final Map<String, String[]> values = request().body().asFormUrlEncoded();
-        Tag tag = Tag.findById(Integer.parseInt(values.get("tag_id")[0]));
+        Tag tag = Tag.findById(Integer.parseInt(values.get("tag_id")[0]), Organization.getByHost(request));
 
         String prefix = "tag-change-";
         for (String key_name : values.keySet()) {
@@ -715,7 +715,7 @@ public class CRM extends Controller {
         e.parseMessage();
 
         int tagId = Integer.parseInt(values.get("tagId")[0]);
-        Tag theTag = Tag.findById(tagId);
+        Tag theTag = Tag.findById(tagId, Organization.getByHost(request));
         String familyMode = values.get("familyMode")[0];
         Collection<Person> recipients = getTagMembers(tagId, familyMode);
 
@@ -813,7 +813,7 @@ public class CRM extends Controller {
                 if (!id_string.isEmpty()) {
                     int id = Integer.parseInt(id_string);
                     if (id >= 1) {
-                        CompletedTask.create(Task.findById(id), new_comment);
+                        CompletedTask.create(Task.findById(id, Organization.getByHost(request)), new_comment);
                     }
                 }
             }
@@ -881,7 +881,7 @@ public class CRM extends Controller {
     }
 
     public Result viewTaskList(Integer id) {
-        TaskList list = TaskList.findById(id);
+        TaskList list = TaskList.findById(id, Organization.getByHost(request));
         List<Person> people = list.tag.people;
 
         return ok(views.html.task_list.render(list, people));
@@ -889,14 +889,14 @@ public class CRM extends Controller {
 
     public Result viewMailchimpSettings() {
         MailChimpClient mailChimpClient = new MailChimpClient();
-        Organization org = OrgConfig.get().org;
+        Organization org = Organization.getByHost();
 
         Map<String, ListMethodResult.Data> mc_list_map =
             Public.getMailChimpLists(mailChimpClient, org.mailchimp_api_key);
 
         return ok(views.html.view_mailchimp_settings.render(
             mFormFactory.form(Organization.class), org,
-            MailchimpSync.find.query().where().eq("tag.organization", OrgConfig.get().org).findList(),
+            MailchimpSync.find.query().where().eq("tag.organization", Organization.getByHost()).findList(),
             mc_list_map));
     }
 
@@ -904,16 +904,16 @@ public class CRM extends Controller {
         final Map<String, String[]> values = request().body().asFormUrlEncoded();
 
         if (values.containsKey("mailchimp_api_key")) {
-            OrgConfig.get().org.setMailChimpApiKey(values.get("mailchimp_api_key")[0]);
+            Organization.getByHost().setMailChimpApiKey(values.get("mailchimp_api_key")[0]);
         }
 
         if (values.containsKey("mailchimp_updates_email")) {
-            OrgConfig.get().org.setMailChimpUpdatesEmail(values.get("mailchimp_updates_email")[0]);
+            Organization.getByHost().setMailChimpUpdatesEmail(values.get("mailchimp_updates_email")[0]);
         }
 
         if (values.containsKey("sync_type")) {
             for (String tag_id : values.get("tag_id")) {
-                Tag t = Tag.findById(Integer.parseInt(tag_id));
+                Tag t = Tag.findById(Integer.parseInt(tag_id), Organization.getByHost(request));
                 MailchimpSync.create(t,
                     values.get("mailchimp_list_id")[0],
                     values.get("sync_type")[0].equals("local_add"),

@@ -28,14 +28,14 @@ public class TaskList extends Model {
             TaskList.class
     );
 
-    public static TaskList findById(int id) {
-        return find.query().where().eq("organization", Organization.getByHost())
+    public static TaskList findById(int id, Organization org) {
+        return find.query().where().eq("organization", org)
             .eq("id", id).findOne();
     }
 
-    public static List<TaskList> allForOrg() {
+    public static List<TaskList> allForOrg(Organization org) {
         return TaskList.find.query()
-            .where().eq("organization", OrgConfig.get().org)
+            .where().eq("organization", org)
             .order("title ASC")
             .findList();
     }

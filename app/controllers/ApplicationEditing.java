@@ -399,7 +399,7 @@ public class ApplicationEditing extends Controller {
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
 	public Result editSection(Integer id) {
-		Section existing_section = Section.findById(id);
+		Section existing_section = Section.findById(id, Organization.getByHost(request));
 		Form<Section> filled_form = mFormFactory.form(Section.class).fill(existing_section);
 		return ok(views.html.edit_section.render(filled_form, existing_section.chapter, false, Chapter.all()));
 	}
@@ -410,7 +410,7 @@ public class ApplicationEditing extends Controller {
 
 		Section s;
 		if (form.field("id").value().isPresent()) {
-			s = Section.findById(Integer.parseInt(form.field("id").value().get()));
+			s = Section.findById(Integer.parseInt(form.field("id").value().get()), Organization.getByHost(request));
 			s.updateFromForm(form);
 		} else {
 			s = Section.create(form);
@@ -426,7 +426,7 @@ public class ApplicationEditing extends Controller {
 		Map<String, String> map = new HashMap<>();
 		map.put("section.id", "" + sectionId);
 		form = form.bind(map, "section.id");
-		return ok(views.html.edit_entry.render(form, Section.findById(sectionId), true, Chapter.all()));
+		return ok(views.html.edit_entry.render(form, Section.findById(sectionId, Organization.getByHost(request)), true, Chapter.all()));
 	}
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)

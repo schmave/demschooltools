@@ -35,12 +35,12 @@ public class NotificationRule extends Model {
     );
 
     public static NotificationRule findById(int id) {
-        return find.query().where().eq("organization", OrgConfig.get().org)
+        return find.query().where().eq("organization", Organization.getByHost())
             .eq("id", id).findOne();
     }
 
     public static List<NotificationRule> findByType(int type) {
-        return find.query().where().eq("organization", OrgConfig.get().org)
+        return find.query().where().eq("organization", Organization.getByHost())
             .eq("the_type", type).findList();
     }
 
@@ -52,7 +52,7 @@ public class NotificationRule extends Model {
     public static NotificationRule create(int type, Tag tag, String email) {
         NotificationRule result = new NotificationRule();
 
-        result.organization = OrgConfig.get().org;
+        result.organization = Organization.getByHost();
 
         result.the_type = type;
         if (type == TYPE_TAG) {

@@ -47,15 +47,15 @@ public class Tag extends Model {
             Tag.class
     );
 
-    public static Tag findById(int id) {
-        return find.query().where().eq("organization", Organization.getByHost())
+    public static Tag findById(int id, Organization org) {
+        return find.query().where().eq("organization", org)
             .eq("id", id).findOne();
     }
 
-    public static Tag create(String title) {
+    public static Tag create(String title, Organization org) {
         Tag result = new Tag();
         result.title = title;
-        result.organization = Organization.getByHost();
+        result.organization = org;
         result.show_in_menu = true;
 
         result.save();
@@ -82,11 +82,11 @@ public class Tag extends Model {
         save();
     }
 
-    public static Map<String, List<Tag>> getWithPrefixes() {
+    public static Map<String, List<Tag>> getWithPrefixes(Organization org) {
         Map<String, List<Tag>> result = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
         for (Tag t : find.query().where()
-                .eq("organization", Organization.getByHost())
+                .eq("organization", org)
                 .eq("show_in_menu", true)
                 .order("title ASC").findList()) {
             String[] splits = t.title.split(":");

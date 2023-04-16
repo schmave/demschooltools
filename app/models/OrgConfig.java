@@ -42,8 +42,7 @@ public class OrgConfig {
 
     public TimeZone time_zone = TimeZone.getTimeZone("US/Eastern");
 
-    public static OrgConfig get() {
-        Organization org = Organization.getByHost();
+    public static OrgConfig get(Organization org) {
         OrgConfig result = configs.get(org.name);
         result.org = org;
         return result;

@@ -31,16 +31,16 @@ public class Settings extends Controller {
 
     public Result viewSettings() {
         List<NotificationRule> rules = NotificationRule.find.query().where()
-            .eq("organization", OrgConfig.get().org)
+            .eq("organization", Organization.getByHost())
             .order("the_type DESC, tag.id")
             .findList();
 
-        return ok(views.html.view_settings.render(rules, OrgConfig.get().org, Public.sConfig.getConfig("school_crm")));
+        return ok(views.html.view_settings.render(rules, Organization.getByHost(), Public.sConfig.getConfig("school_crm")));
     }
 
     public Result editSettings() {
         final Map<String, String[]> values = request().body().asFormUrlEncoded();
-        final Organization org = OrgConfig.get().org;
+        final Organization org = Organization.getByHost();
         org.updateFromForm(values);
         CachedPage.clearAll();
 
@@ -92,7 +92,7 @@ public class Settings extends Controller {
             }
 
             if (values.containsKey("tag_id")) {
-                Tag t = Tag.findById(Integer.parseInt(values.get("tag_id")[0]));
+                Tag t = Tag.findById(Integer.parseInt(values.get("tag_id")[0]), Organization.getByHost(request));
                 NotificationRule.create(NotificationRule.TYPE_TAG, t, email);
             }
 
@@ -109,11 +109,11 @@ public class Settings extends Controller {
 
     public Result viewTaskLists() {
         Form<TaskList> list_form = mFormFactory.form(TaskList.class);
-        return ok(views.html.view_task_lists.render(TaskList.allForOrg(), list_form));
+        return ok(views.html.view_task_lists.render(TaskList.allForOrg(Organization.getByHost(request)), list_form));
     }
 
     public Result viewTaskList(Integer id) {
-        TaskList list = TaskList.findById(id);
+        TaskList list = TaskList.findById(id, Organization.getByHost(request));
         Form<TaskList> list_form = mFormFactory.form(TaskList.class);
         Form<Task> task_form = mFormFactory.form(Task.class);
         return ok(views.html.settings_task_list.render(
@@ -132,7 +132,7 @@ public class Settings extends Controller {
     public Result newTaskList() {
         Form<TaskList> list_form = mFormFactory.form(TaskList.class);
         TaskList list = list_form.bindFromRequest().get();
-        list.organization = OrgConfig.get().org;
+        list.organization = Organization.getByHost();
 
         list.title = list.title.trim();
         if (list.title.equals("")) {
@@ -144,7 +144,7 @@ public class Settings extends Controller {
             flash("error", "No tag specified for checklist. No checklist was created.");
             return redirect(routes.Settings.viewTaskLists());
         }
-        list.tag = Tag.findById(Integer.parseInt(form_data.get("tag_id")[0]));
+        list.tag = Tag.findById(Integer.parseInt(form_data.get("tag_id")[0]), Organization.getByHost(request));
 
         list.save();
         list.refresh();
@@ -154,10 +154,10 @@ public class Settings extends Controller {
 
     public Result editTask(Integer id) {
         Form<Task> task_form = mFormFactory.form(Task.class);
-        Form<Task> filled_form = task_form.fill(Task.findById(id));
+        Form<Task> filled_form = task_form.fill(Task.findById(id, Organization.getByHost(request)));
 
         return ok(views.html.edit_task.render(filled_form,
-            TaskList.allForOrg()));
+            TaskList.allForOrg(Organization.getByHost(request))));
     }
 
     public Result saveTask() {
@@ -179,7 +179,7 @@ public class Settings extends Controller {
 
         Map<String, String[]> form_data = request().body().asFormUrlEncoded();
         if (form_data.containsKey("tag_id")) {
-            list.tag = Tag.findById(Integer.parseInt(form_data.get("tag_id")[0]));
+            list.tag = Tag.findById(Integer.parseInt(form_data.get("tag_id")[0]), Organization.getByHost(request));
         }
 
         list.update();
@@ -188,7 +188,7 @@ public class Settings extends Controller {
     }
 
     public Result viewAccess() {
-        Organization org = OrgConfig.get().org;
+        Organization org = Organization.getByHost();
         List<User> users =
             User.find.query().where().eq("organization", org)
             .order("name ASC")
@@ -218,7 +218,7 @@ public class Settings extends Controller {
 
     public Result saveAccess() {
         Map<String, String[]> form_data = request().body().asFormUrlEncoded();
-        Organization org = OrgConfig.get().org;
+        Organization org = Organization.getByHost();
 
         if (form_data.containsKey("allowed_ip")) {
             String sql = "DELETE from allowed_ips where organization_id=:org_id";
@@ -237,7 +237,7 @@ public class Settings extends Controller {
     }
 
     public Result editUser(Integer id) {
-        User u = User.findById(id);
+        User u = User.findById(id, Organization.getByHost(request));
 
         Form<User> user_form = mFormFactory.form(User.class);
         return ok(views.html.edit_user.render(u, user_form.fill(u)));
@@ -249,7 +249,7 @@ public class Settings extends Controller {
         User u = filled_form.get();
         Map<String, String[]> form_data = request().body().asFormUrlEncoded();
 
-        User orig_user = User.findById(u.id);
+        User orig_user = User.findById(u.id, Organization.getByHost(request));
 
         for (UserRole r : orig_user.roles) {
             r.delete();
@@ -278,7 +278,7 @@ public class Settings extends Controller {
     public Result newUser() {
         Map<String, String[]> form_data = request().body().asFormUrlEncoded();
 
-        Organization org = OrgConfig.get().org;
+        Organization org = Organization.getByHost();
         final String email = form_data.get("email")[0].trim();
         final String name = form_data.get("name")[0].trim();
 

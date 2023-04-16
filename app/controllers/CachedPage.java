@@ -24,7 +24,7 @@ public abstract class CachedPage {
     public String cache_key;
 
     static String getKey(String key_base) {
-        return key_base + "-" + OrgConfig.get().org.id;
+        return key_base + "-" + Organization.getByHost().id;
     }
 
     public static void remove(String key_base) {

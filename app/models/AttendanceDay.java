@@ -39,9 +39,9 @@ public class AttendanceDay extends Model {
             AttendanceDay.class
     );
 
-    public static AttendanceDay findById(int id) {
+    public static AttendanceDay findById(int id, Organization org) {
         return find.query().where()
-            .eq("person.organization", Organization.getByHost())
+            .eq("person.organization", org)
             .eq("id", id)
             .findOne();
     }
@@ -111,7 +111,7 @@ public class AttendanceDay extends Model {
 
     @JsonIgnore
     public boolean isPartial() {
-        Organization org = OrgConfig.get().org;
+        Organization org = Organization.getByHost();
 
         if (org.attendance_enable_partial_days) {
             Double min_hours = org.attendance_day_min_hours;

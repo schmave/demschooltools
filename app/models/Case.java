@@ -236,7 +236,7 @@ public class Case extends Model implements Comparable<Case> {
     // on picking charge references, so we don't know which charges will be needed. As a result, we will include
     // information on all charges from the referenced cases.
     public String generateCompositeFindingsFromCaseReferences() {
-        if (!OrgConfig.get().org.enable_case_references) {
+        if (!Organization.getByHost().enable_case_references) {
             return findings;
         }
         return generateCompositeFindings(null, null);
@@ -245,7 +245,7 @@ public class Case extends Model implements Comparable<Case> {
     // We use this method everywhere besides the edit minutes page. At this point the minutes have been finalized and the
     // charge references have been selected. We don't need to include information about charges that weren't referenced.
     public String generateCompositeFindingsFromChargeReferences() {
-        if (!OrgConfig.get().org.enable_case_references) {
+        if (!Organization.getByHost().enable_case_references) {
             return findings;
         }
         ArrayList<Charge> relevant_charges = new ArrayList<>();

@@ -112,7 +112,7 @@ public class Attendance extends Controller {
 
         List<AttendanceDay> days =
             AttendanceDay.find.query().where()
-                .eq("person.organization", OrgConfig.get().org)
+                .eq("person.organization", Organization.getByHost())
                 .ge("day", start_date.getTime())
                 .lt("day", end_date.getTime())
                 .order("day ASC")
@@ -132,7 +132,7 @@ public class Attendance extends Controller {
 
         List<AttendanceWeek> weeks =
             AttendanceWeek.find.query().where()
-                .eq("person.organization", OrgConfig.get().org)
+                .eq("person.organization", Organization.getByHost())
                 .eq("monday", start_date.getTime())
                 .findList();
 
@@ -322,7 +322,7 @@ public class Attendance extends Controller {
 
         List<AttendanceDay> days =
                 AttendanceDay.find.query().where()
-                        .eq("person.organization", OrgConfig.get().org)
+                        .eq("person.organization", Organization.getByHost())
                         .ge("day", start_date.getTime())
                         .le("day", end_date.getTime())
                         .findList();
@@ -502,7 +502,7 @@ public class Attendance extends Controller {
 
         List<AttendanceDay> days =
             AttendanceDay.find.query().where()
-                .eq("person.organization", OrgConfig.get().org)
+                .eq("person.organization", Organization.getByHost())
                 .ge("day", start_date)
                 .le("day", end_date)
                 .findList();
@@ -525,7 +525,7 @@ public class Attendance extends Controller {
 
         List<AttendanceWeek> weeks =
             AttendanceWeek.find.query().where()
-                .eq("person.organization", OrgConfig.get().org)
+                .eq("person.organization", Organization.getByHost())
                 .ge("monday", start_date)
                 .le("monday", end_date)
                 .findList();
@@ -670,7 +670,7 @@ public class Attendance extends Controller {
     public static Map<String, AttendanceCode> getCodesMap(boolean include_no_school) {
         Map<String, AttendanceCode> codes = new HashMap<>();
 
-        for (AttendanceCode code : AttendanceCode.all(OrgConfig.get().org)) {
+        for (AttendanceCode code : AttendanceCode.all(Organization.getByHost())) {
             codes.put(code.code, code);
         }
 
@@ -704,7 +704,7 @@ public class Attendance extends Controller {
 
         List<AttendanceWeek> weeks =
                 AttendanceWeek.find.query().where()
-                        .eq("person.organization", OrgConfig.get().org)
+                        .eq("person.organization", Organization.getByHost())
                         .ge("monday", start_date)
                         .le("monday", end_date)
                         .findList();
@@ -725,7 +725,7 @@ public class Attendance extends Controller {
         List<List<AttendanceDay>> school_days = new ArrayList<>();
 
         List<AttendanceDay> days = AttendanceDay.find.query().where()
-            .eq("person.organization", OrgConfig.get().org)
+            .eq("person.organization", Organization.getByHost())
             .ge("day", start_date)
             .le("day", end_date)
             .findList();
@@ -759,7 +759,7 @@ public class Attendance extends Controller {
         Map<String, Object> scopes = new HashMap<>();
         Config conf = Public.sConfig;
         scopes.put("custodiaUrl", conf.getString("custodia_url"));
-        scopes.put("custodiaUsername", OrgConfig.get().org.short_name + "-admin");
+        scopes.put("custodiaUsername", Organization.getByHost().short_name + "-admin");
         scopes.put("custodiaPassword", conf.getString("custodia_password"));
         return ok(views.html.main_with_mustache.render(
                 "Sign in system",
@@ -771,7 +771,7 @@ public class Attendance extends Controller {
 
     public Result offCampusTime() {
         List<AttendanceDay> events = AttendanceDay.find.query().where()
-            .eq("person.organization", OrgConfig.get().org)
+            .eq("person.organization", Organization.getByHost())
             .gt("day", Application.getStartOfYear())
             .ne("off_campus_departure_time", null)
             .order("day ASC")
@@ -786,7 +786,7 @@ public class Attendance extends Controller {
         for (Map.Entry<String, String> entry : data.entrySet()) {
             if (entry.getKey().isEmpty()) continue;
             Integer attendance_day_id = Integer.parseInt(entry.getKey());
-            AttendanceDay attendance_day = AttendanceDay.findById(attendance_day_id);
+            AttendanceDay attendance_day = AttendanceDay.findById(attendance_day_id, Organization.getByHost(request));
             attendance_day.off_campus_departure_time = null;
             attendance_day.off_campus_return_time = null;
             attendance_day.update();
@@ -850,7 +850,7 @@ public class Attendance extends Controller {
         Person admin = new Person();
         admin.person_id = -1;
         admin.first_name = "Admin";
-        admin.pin = OrgConfig.get().org.attendance_admin_pin;
+        admin.pin = Organization.getByHost().attendance_admin_pin;
         people.add(0, admin);
         return ok(views.html.attendance_pins.render(people));
     }
@@ -865,7 +865,7 @@ public class Attendance extends Controller {
         for (Map.Entry<String, String[]> entry : entries) {
             Integer person_id = Integer.parseInt(entry.getKey());
             if (person_id == -1) {
-                OrgConfig.get().org.setAttendanceAdminPIN(entry.getValue()[0]);
+                Organization.getByHost().setAttendanceAdminPIN(entry.getValue()[0]);
             }
             else {
                 Person person = people_by_id.get(person_id);
@@ -884,12 +884,12 @@ public class Attendance extends Controller {
 
     public Result viewCodes() {
         return ok(views.html.attendance_codes.render(
-            AttendanceCode.all(OrgConfig.get().org),
+            AttendanceCode.all(Organization.getByHost()),
             getCodeForm()));
     }
 
     public Result newCode() {
-        AttendanceCode ac = AttendanceCode.create(OrgConfig.get().org);
+        AttendanceCode ac = AttendanceCode.create(Organization.getByHost());
         Form<AttendanceCode> filled_form = getCodeForm().bindFromRequest();
         ac.edit(filled_form);
 

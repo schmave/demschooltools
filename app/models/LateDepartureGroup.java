@@ -17,7 +17,7 @@ public class LateDepartureGroup {
         name = person_name;
         events = new ArrayList<>();
 
-        Organization org = OrgConfig.get().org;
+        Organization org = Organization.getByHost();
         late_fee = org.attendance_report_late_fee;
         late_fee_interval = org.attendance_report_late_fee_interval;
         latest_departure_time = org.attendance_report_latest_departure_time;

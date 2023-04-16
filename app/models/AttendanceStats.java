@@ -21,8 +21,8 @@ public class AttendanceStats {
     public AttendanceStats() {
         values = new HashMap<>();
         partial_day_value = 0;
-        if (OrgConfig.get().org.attendance_partial_day_value != null) {
-            partial_day_value = OrgConfig.get().org.attendance_partial_day_value.doubleValue();
+        if (Organization.getByHost().attendance_partial_day_value != null) {
+            partial_day_value = Organization.getByHost().attendance_partial_day_value.doubleValue();
         }
     }
 

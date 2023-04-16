@@ -907,7 +907,7 @@ public class Application extends Controller {
 
     public Result viewWeeklyReport(String date_string) {
         Calendar start_date = Utils.parseDateOrNow(date_string);
-        Utils.adjustToPreviousDay(start_date, OrgConfig.get().org.jc_reset_day + 1);
+        Utils.adjustToPreviousDay(start_date, Organization.getByHost().jc_reset_day + 1);
 
         Calendar end_date = (Calendar)start_date.clone();
         end_date.add(GregorianCalendar.DATE, 6);
@@ -1214,7 +1214,7 @@ public class Application extends Controller {
 
         scopes.put("existing_files", existingFiles);
 
-        scopes.put("printer_email", OrgConfig.get().org.printer_email);
+        scopes.put("printer_email", Organization.getByHost().printer_email);
         return ok(views.html.main_with_mustache.render(
             "File Sharing config",
             "misc",
@@ -1228,7 +1228,7 @@ public class Application extends Controller {
         final Map<String, String[]> values = request.body().asFormUrlEncoded();
 
         if (values.containsKey("printer_email")) {
-            OrgConfig.get().org.setPrinterEmail(values.get("printer_email")[0]);
+            Organization.getByHost().setPrinterEmail(values.get("printer_email")[0]);
         }
 
         return redirect(routes.Application.fileSharing());
@@ -1249,7 +1249,7 @@ public class Application extends Controller {
     }
 
     private static File getSharedFileDirectory() {
-        File result = new File("/www-dst", "" + OrgConfig.get().org.id);
+        File result = new File("/www-dst", "" + Organization.getByHost().id);
         if (!result.exists()) {
             result.mkdir();
         }
@@ -1281,7 +1281,7 @@ public class Application extends Controller {
 
         scopes.put("existing_files", existingFiles);
 
-        scopes.put("printer_email", OrgConfig.get().org.printer_email);
+        scopes.put("printer_email", Organization.getByHost().printer_email);
         return ok(views.html.main_with_mustache.render(
             "DemSchoolTools shared files",
             "misc",
@@ -1298,7 +1298,7 @@ public class Application extends Controller {
             if (the_file.exists()) {
                 play.libs.mailer.Email mail = new play.libs.mailer.Email();
                 mail.setSubject("Print from DemSchoolTools");
-                mail.addTo(OrgConfig.get().org.printer_email);
+                mail.addTo(Organization.getByHost().printer_email);
                 mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
                 mail.addAttachment(the_file.getName(), the_file);
                 mMailer.send(mail);

@@ -37,10 +37,10 @@ public class Checkin extends Controller {
         Person admin = new Person();
         admin.person_id = -1;
         admin.first_name = "Admin";
-        admin.pin = OrgConfig.get().org.attendance_admin_pin;
+        admin.pin = Organization.getByHost().attendance_admin_pin;
         people.add(0, new CheckinPerson(admin, null, null));
 
-        List<String> absence_codes = AttendanceCode.all(OrgConfig.get().org).stream()
+        List<String> absence_codes = AttendanceCode.all(Organization.getByHost()).stream()
             .map(c -> c.code)
             .collect(Collectors.toList());
 

@@ -40,8 +40,8 @@ public class User extends Model {
 	public static final Finder<Integer, User> find = new Finder<>(
 			User.class);
 
-    public static User findById(Integer id) {
-        return find.query().where().eq("organization", OrgConfig.get().org)
+    public static User findById(Integer id, Organization org) {
+        return find.query().where().eq("organization", org)
             .eq("id", id)
             .findOne();
     }

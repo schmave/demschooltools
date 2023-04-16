@@ -34,8 +34,8 @@ public class Section extends Model {
 			Section.class
 	);
 
-    public static Section findById(int id) {
-        return find.query().where().eq("chapter.organization", Organization.getByHost())
+    public static Section findById(int id, Organization org) {
+        return find.query().where().eq("chapter.organization", org)
             .eq("id", id).findOne();
     }
 

@@ -97,7 +97,7 @@ public class Secured {
                     return username;
                 }
             } else if (u.active && u.hasRole(role) &&
-                       (u.organization == null || u.organization.equals(OrgConfig.get().org))) {
+                       (u.organization == null || u.organization.equals(Organization.getByHost()))) {
                 // Allow access if this user belongs to this organization or is a
                 // multi-domain admin (null organization). Also, the user must
                 // have the required role.
