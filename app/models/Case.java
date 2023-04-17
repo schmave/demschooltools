@@ -144,7 +144,7 @@ public class Case extends Model implements Comparable<Case> {
                 charges.size() == 0;
     }
 
-    public void loadNames() {
+    public void loadNames(Organization org) {
         if (names != null) {
             return;
         }
@@ -172,14 +172,14 @@ public class Case extends Model implements Comparable<Case> {
         }
 
         // Add first and display names of all people in JC db
-        for(Person p : Application.jcPeople()) {
+        for(Person p : Application.jcPeople(org)) {
             names.add(p.first_name.trim().toLowerCase());
             names.add(p.getDisplayName().trim().toLowerCase());
         }
     }
 
     public String getRedactedFindings(Person keep_this_persons_name) {
-        loadNames();
+        loadNames(meeting.organization);
 
         String composite_findings = generateCompositeFindingsFromChargeReferences();
 

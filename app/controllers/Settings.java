@@ -29,7 +29,7 @@ public class Settings extends Controller {
         mFormFactory = ff;
     }
 
-    public Result viewSettings() {
+    public Result viewSettings(Http.Request request) {
         List<NotificationRule> rules = NotificationRule.find.query().where()
             .eq("organization", Organization.getByHost(request))
             .order("the_type DESC, tag.id")
@@ -38,8 +38,8 @@ public class Settings extends Controller {
         return ok(views.html.view_settings.render(rules, Organization.getByHost(request), Public.sConfig.getConfig("school_crm")));
     }
 
-    public Result editSettings() {
-        final Map<String, String[]> values = request().body().asFormUrlEncoded();
+    public Result editSettings(Http.Request request) {
+        final Map<String, String[]> values = request.body().asFormUrlEncoded();
         final Organization org = Organization.getByHost(request);
         org.updateFromForm(values, org);
         CachedPage.clearAll(org);
@@ -78,8 +78,8 @@ public class Settings extends Controller {
         return redirect(routes.Settings.viewSettings());
     }
 
-    public Result editNotifications() {
-        final Map<String, String[]> values = request().body().asFormUrlEncoded();
+    public Result editNotifications(Http.Request request) {
+        final Map<String, String[]> values = request.body().asFormUrlEncoded();
 
         if (values.containsKey("remove_notification_id")) {
             NotificationRule.findById(
@@ -87,8 +87,8 @@ public class Settings extends Controller {
         } else {
             String email = values.get("email")[0];
             if (!email.matches("^\\S+@\\S+.\\S+$")) {
-                flash("error", "'" + email + "' does not seem to be a valid email address. Notification not created.");
-                return redirect(routes.Settings.viewSettings());
+                return redirect(routes.Settings.viewSettings()).flashing(
+                        "error", "'" + email + "' does not seem to be a valid email address. Notification not created.");
             }
 
             if (values.containsKey("tag_id")) {
@@ -107,12 +107,12 @@ public class Settings extends Controller {
         return redirect(routes.Settings.viewSettings());
     }
 
-    public Result viewTaskLists() {
+    public Result viewTaskLists(Http.Request request) {
         Form<TaskList> list_form = mFormFactory.form(TaskList.class);
         return ok(views.html.view_task_lists.render(TaskList.allForOrg(Organization.getByHost(request)), list_form));
     }
 
-    public Result viewTaskList(Integer id) {
+    public Result viewTaskList(Integer id, Http.Request request) {
         TaskList list = TaskList.findById(id, Organization.getByHost(request));
         Form<TaskList> list_form = mFormFactory.form(TaskList.class);
         Form<Task> task_form = mFormFactory.form(Task.class);
@@ -120,18 +120,18 @@ public class Settings extends Controller {
             list, list_form.fill(list), task_form));
     }
 
-    public Result newTask() {
+    public Result newTask(Http.Request request) {
         Form<Task> task_form = mFormFactory.form(Task.class);
-        Task t = task_form.bindFromRequest().get();
+        Task t = task_form.bindFromRequest(request).get();
         t.enabled = true;
         t.save();
 
         return redirect(routes.Settings.viewTaskList(t.task_list.id));
     }
 
-    public Result newTaskList() {
+    public Result newTaskList(Http.Request request) {
         Form<TaskList> list_form = mFormFactory.form(TaskList.class);
-        TaskList list = list_form.bindFromRequest().get();
+        TaskList list = list_form.bindFromRequest(request).get();
         list.organization = Organization.getByHost(request);
 
         list.title = list.title.trim();
@@ -139,10 +139,9 @@ public class Settings extends Controller {
             list.title = "Untitled checklist";
         }
 
-        Map<String, String[]> form_data = request().body().asFormUrlEncoded();
+        Map<String, String[]> form_data = request.body().asFormUrlEncoded();
         if (form_data.get("tag_id") == null) {
-            flash("error", "No tag specified for checklist. No checklist was created.");
-            return redirect(routes.Settings.viewTaskLists());
+            return redirect(routes.Settings.viewTaskLists()).flashing("error", "No tag specified for checklist. No checklist was created.");
         }
         list.tag = Tag.findById(Integer.parseInt(form_data.get("tag_id")[0]), Organization.getByHost(request));
 
@@ -152,7 +151,7 @@ public class Settings extends Controller {
         return redirect(routes.Settings.viewTaskList(list.id));
     }
 
-    public Result editTask(Integer id) {
+    public Result editTask(Integer id, Http.Request request) {
         Form<Task> task_form = mFormFactory.form(Task.class);
         Form<Task> filled_form = task_form.fill(Task.findById(id, Organization.getByHost(request)));
 
@@ -160,9 +159,9 @@ public class Settings extends Controller {
             TaskList.allForOrg(Organization.getByHost(request))));
     }
 
-    public Result saveTask() {
+    public Result saveTask(Http.Request request) {
         Form<Task> task_form = mFormFactory.form(Task.class);
-        Form<Task> filled_form = task_form.bindFromRequest();
+        Form<Task> filled_form = task_form.bindFromRequest(request);
         Task t = filled_form.get();
         if (filled_form.apply("enabled").value().get().equals("false")) {
             t.enabled = false;
@@ -172,12 +171,12 @@ public class Settings extends Controller {
         return redirect(routes.Settings.viewTaskList(t.task_list.id));
     }
 
-    public Result saveTaskList() {
+    public Result saveTaskList(Http.Request request) {
         Form<TaskList> list_form = mFormFactory.form(TaskList.class);
-        Form<TaskList> filled_form = list_form.bindFromRequest();
+        Form<TaskList> filled_form = list_form.bindFromRequest(request);
         TaskList list = filled_form.get();
 
-        Map<String, String[]> form_data = request().body().asFormUrlEncoded();
+        Map<String, String[]> form_data = request.body().asFormUrlEncoded();
         if (form_data.containsKey("tag_id")) {
             list.tag = Tag.findById(Integer.parseInt(form_data.get("tag_id")[0]), Organization.getByHost(request));
         }
@@ -187,7 +186,7 @@ public class Settings extends Controller {
         return redirect(routes.Settings.viewTaskList(list.id));
     }
 
-    public Result viewAccess() {
+    public Result viewAccess(Http.Request request) {
         Organization org = Organization.getByHost(request);
         List<User> users =
             User.find.query().where().eq("organization", org)
@@ -216,8 +215,8 @@ public class Settings extends Controller {
         return ok(views.html.view_access.render(users_to_show, allowed_ip, user_form));
     }
 
-    public Result saveAccess() {
-        Map<String, String[]> form_data = request().body().asFormUrlEncoded();
+    public Result saveAccess(Http.Request request) {
+        Map<String, String[]> form_data = request.body().asFormUrlEncoded();
         Organization org = Organization.getByHost(request);
 
         if (form_data.containsKey("allowed_ip")) {
@@ -236,18 +235,18 @@ public class Settings extends Controller {
         return redirect(routes.Settings.viewAccess());
     }
 
-    public Result editUser(Integer id) {
+    public Result editUser(Integer id, Http.Request request) {
         User u = User.findById(id, Organization.getByHost(request));
 
         Form<User> user_form = mFormFactory.form(User.class);
         return ok(views.html.edit_user.render(u, user_form.fill(u)));
     }
 
-    public Result saveUser() {
+    public Result saveUser(Http.Request request) {
         Form<User> user_form = mFormFactory.form(User.class);
-        Form<User> filled_form = user_form.bindFromRequest();
+        Form<User> filled_form = user_form.bindFromRequest(request);
         User u = filled_form.get();
-        Map<String, String[]> form_data = request().body().asFormUrlEncoded();
+        Map<String, String[]> form_data = request.body().asFormUrlEncoded();
 
         User orig_user = User.findById(u.id, Organization.getByHost(request));
 
@@ -275,8 +274,8 @@ public class Settings extends Controller {
         return redirect(routes.Settings.viewAccess());
     }
 
-    public Result newUser() {
-        Map<String, String[]> form_data = request().body().asFormUrlEncoded();
+    public Result newUser(Http.Request request) {
+        Map<String, String[]> form_data = request.body().asFormUrlEncoded();
 
         Organization org = Organization.getByHost(request);
         final String email = form_data.get("email")[0].trim();
@@ -292,13 +291,11 @@ public class Settings extends Controller {
                     new_user.name = name;
                     new_user.save();
                 } else {
-                    flash("error", "That email address (" + email + ") already has an account.");
-                    return redirect(routes.Settings.viewAccess());
+                    return redirect(routes.Settings.viewAccess()).flashing("error", "That email address (" + email + ") already has an account.");
                 }
             } else {
-                flash("error", "That email address (" + email + ") already has an account for another school. " +
-                    "Please contact Evan at schmave@gmail.com for help.");
-                return redirect(routes.Settings.viewAccess());
+                return redirect(routes.Settings.viewAccess()).flashing("error", "That email address (" + email + ") already has an account for another school. " +
+                        "Please contact Evan at schmave@gmail.com for help.");
             }
         }
 

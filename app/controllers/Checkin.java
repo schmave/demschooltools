@@ -25,12 +25,12 @@ public class Checkin extends Controller {
 
         Date start_date = Application.getStartOfYear();
         Date end_date = new Date();
-        Map<Person, AttendanceStats> person_to_stats = Attendance.mapPeopleToStats(start_date, end_date);
-
         Organization organization = Organization.getByHost(request);
+        Map<Person, AttendanceStats> person_to_stats = Attendance.mapPeopleToStats(start_date, end_date, organization);
+
         boolean show_weighted_percent = organization.attendance_show_weighted_percent;
 
-        List<CheckinPerson> people = Application.attendancePeople().stream()
+        List<CheckinPerson> people = Application.attendancePeople(organization).stream()
             .sorted(Comparator.comparing(Person::getDisplayName))
             .filter(p -> p.pin != null && !p.pin.isEmpty())
             .map(p -> new CheckinPerson(p, AttendanceDay.findCurrentDay(date, p.person_id, organization), person_to_stats.get(p), show_weighted_percent))
@@ -50,7 +50,8 @@ public class Checkin extends Controller {
         return ok(Json.stringify(Json.toJson(new CheckinData(people, absence_codes))));
     }
 
-    public Result checkinMessage(String time_string, int person_id, boolean is_arriving) throws ParseException {
+    public Result checkinMessage(String time_string, int person_id, boolean is_arriving,
+                                 Http.Request request) throws ParseException {
         Date date = new SimpleDateFormat("M/d/yyyy, h:mm:ss a").parse(time_string);
         Time time = new Time(date.getTime());
         AttendanceDay attendance_day = AttendanceDay.findCurrentDay(date, person_id, Organization.getByHost(request));
@@ -74,7 +75,8 @@ public class Checkin extends Controller {
         return ok();
     }
 
-    public Result adminMessage(int person_id, String in_time, String out_time, String absence_code, String time_string) throws Exception {
+    public Result adminMessage(int person_id, String in_time, String out_time, String absence_code, String time_string,
+                               Http.Request request) throws Exception {
         Date date = new Date();
         // We use time_string to determine which day it is according to the client. This could be different
         // from the current day according to the server, depending on the client's time zone.

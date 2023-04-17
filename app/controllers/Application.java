@@ -124,8 +124,8 @@ public class Application extends Controller {
         return ok(views.html.view_sm_decisions.render(the_charges));
     }
 
-    public static List<Person> jcPeople(Http.Request request) {
-        return peopleByTagType("show_in_jc", Organization.getByHost(request));
+    public static List<Person> jcPeople(Organization org) {
+        return peopleByTagType("show_in_jc", org);
     }
 
     public static List<Person> attendancePeople(Organization org) {
@@ -914,7 +914,8 @@ public class Application extends Controller {
 
     public Result viewWeeklyReport(String date_string, Http.Request request) {
         Calendar start_date = Utils.parseDateOrNow(date_string);
-        Utils.adjustToPreviousDay(start_date, Organization.getByHost(request).jc_reset_day + 1);
+        Organization org = Organization.getByHost(request);
+        Utils.adjustToPreviousDay(start_date, org.jc_reset_day + 1);
 
         Calendar end_date = (Calendar)start_date.clone();
         end_date.add(GregorianCalendar.DATE, 6);
@@ -924,7 +925,7 @@ public class Application extends Controller {
             .fetch("person")
             .fetch("rule")
             .fetch("the_case.meeting", new FetchConfig().query())
-            .where().eq("person.organization", Organization.getByHost(request))
+            .where().eq("person.organization", org)
                 .ge("the_case.meeting.date", getStartOfYear(start_date.getTime()))
             .findList();
         WeeklyStats result = new WeeklyStats();
@@ -955,7 +956,7 @@ public class Application extends Controller {
         List<Case> all_cases = new ArrayList<>();
 
         List<Meeting> meetings = Meeting.find.query().where()
-            .eq("organization", Organization.getByHost(request))
+            .eq("organization", org)
             .le("date", end_date.getTime())
             .ge("date", start_date.getTime()).findList();
 
@@ -967,7 +968,7 @@ public class Application extends Controller {
             }
         }
 
-        result.uncharged_people = jcPeople(request);
+        result.uncharged_people = jcPeople(org);
         for (Map.Entry<Person, WeeklyStats.PersonCounts> entry : result.person_counts.entrySet()) {
             if (entry.getValue().this_period > 0) {
                 result.uncharged_people.remove(entry.getKey());
@@ -992,8 +993,8 @@ public class Application extends Controller {
             referral_destinations));
     }
 
-    public static String jcPeople(String term) {
-        List<Person> people = jcPeople();
+    public static String jcPeople(String term, Organization org) {
+        List<Person> people = jcPeople(org);
         people.sort(Person.SORT_DISPLAY_NAME);
 
         term = term.toLowerCase();

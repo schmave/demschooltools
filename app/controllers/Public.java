@@ -357,8 +357,8 @@ public class Public extends Controller {
                 Application.getRemoteIp(request));
     }
 
-    public Result doLogin() {
-        final Map<String, String[]> values = request().body().asFormUrlEncoded();
+    public Result doLogin(Http.Request request) {
+        final Map<String, String[]> values = request.body().asFormUrlEncoded();
 
         String email = values.get("email")[0];
         User u = User.findByEmail(email);
@@ -371,17 +371,19 @@ public class Public extends Controller {
             }
         }
 
-        if (u != null && u.hashed_password.length() == 0) {
-            flash("notice", "Failed to login: password login is not enabled for your account");
-        } else {
-            flash("notice", "Failed to login: wrong email address or password");
-        }
-
+        Result result;
         if (values.get("noredirect") != null) {
-            return unauthorized();
+            result = unauthorized();
+        } else {
+            result = redirect(routes.Public.index());
         }
 
-        return redirect(routes.Public.index());
+        if (u != null && u.hashed_password.length() == 0) {
+            result = result.flashing("notice", "Failed to login: password login is not enabled for your account");
+        } else {
+            result = result.flashing("notice", "Failed to login: wrong email address or password");
+        }
+        return result;
     }
 
     public Result authenticate(String provider) {
