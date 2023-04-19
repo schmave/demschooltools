@@ -3,7 +3,7 @@
 @import helper._
 @import com.feth.play.module.pa.views.html._
 
-@main("DemSchoolTools login (" + Organization.getByHost().short_name + ")", "none") {
+@main("DemSchoolTools login (" + OrgConfig.get().org.short_name + ")", "none") {
 
 	@if( notice != null ) { <div class="alert alert-warning">@notice</div> }
 	<a href="@routes.Application.index()" class="btn btn-large btn-primary" style="color:white;">
@@ -51,5 +51,5 @@
 	</div>
 
 	<p style="padding-top: 100px; font-size:0.8em">Your IP address is: @remote_ip</p>
-	<hr/><p align=right>@Organization.getByHost().name</p>
+	<hr/><p align=right>@OrgConfig.get().org.name</p>
 }

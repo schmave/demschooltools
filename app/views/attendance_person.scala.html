@@ -38,17 +38,17 @@
         <label>Unknown/missing code<br/>
         <input type="checkbox" checked data-code="__null"/></label>
     </th>
-    <th width=100><label>@if( Organization.getByHost().attendance_enable_partial_days ) { Full Days } else { Days Present }<br/>
+    <th width=100><label>@if( OrgConfig.get().org.attendance_enable_partial_days ) { Full Days } else { Days Present }<br/>
         <input type="checkbox" checked data-code="__present"/></label>
     </th>
-    @if( Organization.getByHost().attendance_enable_partial_days ) {
+    @if( OrgConfig.get().org.attendance_enable_partial_days ) {
 	    <th width=100 class="partial-days"><label>Partial Days<br/>
 	        <input type="checkbox" checked data-code="__partial"/></label>
 	    </th>
 	}
     <th width=100>Total hours</th>
     <th width=100>Avg. hours per day</th>
-    @if( Organization.getByHost().attendance_show_percent ) {
+    @if( OrgConfig.get().org.attendance_show_percent ) {
     	<th width=100>Attendance Rate</th>
 	}
 </thead>
@@ -66,12 +66,12 @@
     <td align="center" class="empty">0</td>
 }
 <td align="center">@stats.days_present</td>
-@if( Organization.getByHost().attendance_enable_partial_days ) {
+@if( OrgConfig.get().org.attendance_enable_partial_days ) {
 	<td align="center" class="partial-days">@stats.partial_days_present</td>
 }
 <td align="center">@Attendance.format(stats.total_hours)</td>
 <td align="center">@Attendance.format(stats.averageHoursPerDay())</td>
-@if( Organization.getByHost().attendance_show_percent ) {
+@if( OrgConfig.get().org.attendance_show_percent ) {
 	<td align="center">@Attendance.formatAsPercent(stats.attendanceRate())</td>
 }
 </table>

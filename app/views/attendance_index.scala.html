@@ -83,16 +83,16 @@ $(function() {
 		</th>
 	}
 	<th width=100 class="attendance-code">Unknown/missing code</th>
-	<th width=100>@if( Organization.getByHost().attendance_enable_partial_days ) { Full Days } else { Days Present }</th>
-	@if( Organization.getByHost().attendance_enable_partial_days ) {
+	<th width=100>@if( OrgConfig.get().org.attendance_enable_partial_days ) { Full Days } else { Days Present }</th>
+	@if( OrgConfig.get().org.attendance_enable_partial_days ) {
 		<th width=100>Partial Days</th>
 	}
 	<th width=100>Total hours</th>
 	<th width=100>Avg. hours per day</th>
-	@if( Organization.getByHost().attendance_show_percent ) {
+	@if( OrgConfig.get().org.attendance_show_percent ) {
 		<th width=100>Attendance Rate</th>
 	}
-	@if( Organization.getByHost().attendance_show_weighted_percent ) {
+	@if( OrgConfig.get().org.attendance_show_weighted_percent ) {
 		@if( !is_custom_date ) {
 			<th width=100>
 				Weighted Att. Rate
@@ -134,15 +134,15 @@ $(function() {
 		<td align="center" class="empty">0</td>
 	}
 	<td align="center">@person_to_stats.get(p).days_present</td>
-	@if( Organization.getByHost().attendance_enable_partial_days ) {
+	@if( OrgConfig.get().org.attendance_enable_partial_days ) {
 		<td align="center">@person_to_stats.get(p).partial_days_present</td>
 	}
 	<td align="center">@Attendance.format(person_to_stats.get(p).total_hours)</td>
 	<td align="center">@Attendance.format(person_to_stats.get(p).averageHoursPerDay())</td>
-	@if( Organization.getByHost().attendance_show_percent ) {
+	@if( OrgConfig.get().org.attendance_show_percent ) {
 		<td align="center">@Attendance.formatAsPercent(person_to_stats.get(p).attendanceRate())</td>
 	}
-	@if( Organization.getByHost().attendance_show_weighted_percent ) {
+	@if( OrgConfig.get().org.attendance_show_weighted_percent ) {
 		@if( !is_custom_date ) {
 			<td align="center" class="attendance-weighted-value">
 				@Attendance.formatAsPercent(person_to_stats.get(p).weightedAttendanceRate())

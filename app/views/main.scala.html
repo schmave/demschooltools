@@ -42,12 +42,12 @@
             <li @if(menu.equals("crm")) { class="active" }>
                 <a href="@routes.CRM.recentComments()">People</a>
             </li>
-            @if(Organization.getByHost().show_attendance) {
+            @if(OrgConfig.get().org.show_attendance) {
                 <li @if(menu.equals("attendance")) { class="active" }>
                     <a href="@routes.Attendance.index()">Attendance</a>
                 </li>
             }
-            @if(Organization.getByHost().show_custodia) {
+            @if(OrgConfig.get().org.show_custodia) {
                 <li @if(menu.equals("custodia")) { class="active" }>
                     <a href="@routes.Attendance.viewCustodiaAdmin()">Custodia</a>
                 </li>
@@ -58,7 +58,7 @@
             <li @if(menu.equals("manual")) { class="active" }>
                 <a href="@routes.Application.viewManual()">@OrgConfig.get().str_manual_title_short</a>
             </li>
-            @if(Organization.getByHost().show_accounting) {
+            @if(OrgConfig.get().org.show_accounting) {
                 <li @if(menu.equals("accounting")) { class="active" }>
                     <a href="@routes.Accounting.balances()">Accounting</a>
                 </li>
@@ -123,7 +123,7 @@
             </span>
             <span class="dropdown">
                 <ul class="dropdown-menu">
-                    @for( l <- TaskList.find.query().where().eq("organization", Organization.getByHost()).findList() ) {
+                    @for( l <- TaskList.find.query().where().eq("organization", OrgConfig.get().org).findList() ) {
                         <li><a href="@routes.CRM.viewTaskList(l.id)">@l.title</a></li>
                         }
                 </ul>
@@ -150,17 +150,17 @@
             </a><a @if(selectedBtn.equals("attendance_codes")) { class="active" }
                 href="@routes.Attendance.viewCodes">Absence codes
             </a>
-            @if(Organization.getByHost().attendance_enable_off_campus) {
+            @if(OrgConfig.get().org.attendance_enable_off_campus) {
                 <a @if(selectedBtn.equals("off_campus_time")) { class="active" }
                     href="@routes.Attendance.offCampusTime">Off campus time
                 </a>
             }
-            @if(Organization.getByHost().attendance_show_reports) {
+            @if(OrgConfig.get().org.attendance_show_reports) {
                 <a @if(selectedBtn.equals("reports")) { class="active" }
                     href="@routes.Attendance.reports">Reports
                 </a>
             }
-            @if(Organization.getByHost().show_electronic_signin) {
+            @if(OrgConfig.get().org.show_electronic_signin) {
                 <a @if(selectedBtn.equals("attendance_pins")) { class="active" }
                     href="@routes.Attendance.assignPINs">Assign PINs
                 </a>

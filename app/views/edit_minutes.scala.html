@@ -226,7 +226,7 @@ $(function () {
     {{render "people-chooser" clazz="testifier"}}
 </tr>
 
-@if( Organization.getByHost().enable_case_references ) {
+@if( OrgConfig.get().org.enable_case_references ) {
     <tr>
         <td class="esm-form-label">Referenced cases:</td>
         <td>{{render "case-chooser"}}</td>
