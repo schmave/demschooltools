@@ -1,7 +1,7 @@
-@(m : Meeting)
+@(orgConfig: OrgConfig, m : Meeting)
 
 @import helper._
 
-@main(OrgConfig.get().str_jc_name_short + " minutes from " + Application.formatMeetingDate(m.date), "jc") {
-    @meetingHelper(m)
+@main(orgConfig, orgConfig.str_jc_name_short + " minutes from " + Application.formatMeetingDate(m.date), "jc") {
+    @meetingHelper(orgConfig, m)
 }

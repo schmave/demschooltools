@@ -1,4 +1,4 @@
-@(c : Charge, show_chargee : Boolean, show_rule : Boolean, redact_findings: Boolean)
+@(orgConfig: OrgConfig, c : Charge, show_chargee : Boolean, show_rule : Boolean, redact_findings: Boolean)
 
 <p>
 
@@ -12,18 +12,17 @@
 	(@c.severity)
 }
 
-<i>@OrgConfig.get().str_findings</i>:
+<i>@orgConfig.str_findings</i>:
 @if( redact_findings ) { @c.the_case.getRedactedFindings(c.person) } else { @c.the_case.generateCompositeFindingsFromChargeReferences() }
 
 @if( !c.plea.equals("Guilty") ) {
-	Plead <b>@OrgConfig.get().translatePlea(c.plea)</b>.
+	Plead <b>@orgConfig.translatePlea(c.plea)</b>.
 }
 
-<u>@OrgConfig.get().str_res_plan_short: @c.resolution_plan</u>
+<u>@orgConfig.str_res_plan_short: @c.resolution_plan</u>
 
 @if( c.sm_decision != null) {
 	<span class="sm-decision"><i>School Meeting ruled@if(
-		c.sm_decision_date != null) { on @Application.yymmddDate(OrgConfig.get(), c.sm_decision_date)}</i>:
+		c.sm_decision_date != null) { on @Application.yymmddDate(orgConfig, c.sm_decision_date)}</i>:
 		@c.sm_decision</span>
 }
-

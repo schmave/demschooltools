@@ -1,12 +1,11 @@
-@(people: List[Person])
+@(orgConfig: OrgConfig, people: List[Person])
 
 @import helper._
 
-@main("All people", "crm", "all_people") {
+@main(orgConfig, "All people", "crm", "all_people") {
 <h1>All people</h1>
 <p>@people.size() people</p>
 
 @people_list(people, false)
 
 }
-

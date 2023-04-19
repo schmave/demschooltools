@@ -1,8 +1,8 @@
-@(personForm: Form[Person])
+@(orgConfig: OrgConfig, personForm: Form[Person])
 
-@main("Editing person", "crm") {
+@main(orgConfig, "Editing person", "crm") {
 
-    @person_form(personForm,
+    @person_form(orgConfig, personForm,
 		routes.CRM.savePersonEdits(),
 		"Save")
 }

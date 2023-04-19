@@ -1,4 +1,4 @@
-@(c : Charge)
+@(orgConfig: OrgConfig, c : Charge)
 
 @import helper._
 
@@ -7,13 +7,13 @@
 	@if(c.person != null) { @c.person.getDisplayName() } &bull;
 	@c.getRuleTitle()</div>
 <div class="panel-body">
-@caseTableOpen()
-@caseTableRow(c.the_case, false)
+@caseTableOpen(orgConfig)
+@caseTableRow(orgConfig, c.the_case, false)
 </table>
 
-<p>The recommended @OrgConfig.get().str_res_plan was:
+<p>The recommended @orgConfig.str_res_plan was:
 	<p style="padding-left:1in">@c.resolution_plan
-<p>The plea was @OrgConfig.get().translatePlea(c.plea).
+<p>The plea was @orgConfig.translatePlea(c.plea).
 
 <form class="form-horizontal" method=POST action="@routes.ApplicationEditing.saveSchoolMeetingDecisions()">
 <input type="hidden" name="charge_id" value="@c.id">
@@ -28,5 +28,3 @@
 <br><input style="margin-left: 200px" type="submit" class="btn btn-primary" value="Submit and mark as closed">
 </form>
 </div></div>
-
-

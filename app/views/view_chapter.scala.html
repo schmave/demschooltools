@@ -1,11 +1,11 @@
-@(chapter : Chapter)
+@(orgConfig: OrgConfig, chapter : Chapter)
 
 @import helper._
 
-@main("" + chapter.num + " " + chapter.title, "manual") {
+@main(orgConfig, "" + chapter.num + " " + chapter.title, "manual") {
 
 <div id="footer">
-Printed on @Application.yymmddDate(OrgConfig.get(), ).
+Printed on @Application.yymmddDate(orgConfig).
 </div>
 
 <div class="man-chapter">@chapter.num @chapter.title <a class="man-edit no-print" href="@routes.ApplicationEditing.editChapter(chapter.id)">Edit</a></div>
@@ -22,8 +22,8 @@ Printed on @Application.yymmddDate(OrgConfig.get(), ).
 		<a name="entry_@entry.id"></a>
 		<p class="man-entry-num">@entry.getNumber() @entry.title <a class="no-print man-edit" href="@routes.ApplicationEditing.editEntry(entry.id)">Edit</a>
 			@if( entry.changes.size() > 0 ) {
-				<span class="man-last-modify-date @if(!OrgConfig.get().org.show_last_modified_in_print){no-print}">
-                    changed @Application.yymmddDate(OrgConfig.get(), entry.changes.get(entry.changes.size()-1).date_entered)
+				<span class="man-last-modify-date @if(!orgConfig.org.show_last_modified_in_print){no-print}">
+                    changed @Application.yymmddDate(orgConfig, entry.changes.get(entry.changes.size()-1).date_entered)
                 </span>
 			}
 									</p>
@@ -31,7 +31,7 @@ Printed on @Application.yymmddDate(OrgConfig.get(), ).
 
 			@defining(entry.changes) { changes =>
 			@if( changes.size() > 1) {
-			<p class="man-entry-change-history @if(!OrgConfig.get().org.show_history_in_print){no-print}">
+			<p class="man-entry-change-history @if(!orgConfig.org.show_history_in_print){no-print}">
 				@for( i <- 0 to changes.size() - 1) {
                     @if( (i == 0) ||
                         (changes.get(i).date_entered.getDate() != changes.get(i-1).date_entered.getDate() ||
@@ -41,7 +41,7 @@ Printed on @Application.yymmddDate(OrgConfig.get(), ).
                             @if( change.was_created ) { Adopted
                             } else { @if( change.was_deleted ) { Repealed
                             } else { Amended } }
-                            @Application.yymmddDate(OrgConfig.get(), change.date_entered);
+                            @Application.yymmddDate(orgConfig, change.date_entered);
                         }
                     }
                 }
@@ -56,4 +56,3 @@ Printed on @Application.yymmddDate(OrgConfig.get(), ).
 
 
 }
-

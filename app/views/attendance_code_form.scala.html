@@ -1,4 +1,4 @@
-@(code_form : Form[AttendanceCode], destination : play.api.mvc.Call, is_editing: Boolean)
+@(orgConfig: OrgConfig, code_form : Form[AttendanceCode], destination : play.api.mvc.Call, is_editing: Boolean)
 
 @import helper._
 
@@ -39,7 +39,7 @@ $(function() {
 
 @inputText(code_form("color"), '_label -> "Color", 'class -> "colorpicker")
 
-@if( OrgConfig.get().org.attendance_show_percent || OrgConfig.get().org.attendance_show_weighted_percent ) {
+@if( orgConfig.org.attendance_show_percent || orgConfig.org.attendance_show_weighted_percent ) {
 	@checkbox(code_form("counts_toward_attendance"), '_label -> "Counts toward attendance rate", 'class -> "absence-checkbox")
 	@checkbox(code_form("not_counted"), '_label -> "Neither counts toward nor against attendance rate", 'class -> "absence-checkbox")
 }
@@ -54,4 +54,3 @@ $(function() {
 }
 
 </div>
-

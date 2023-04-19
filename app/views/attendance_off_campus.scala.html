@@ -1,8 +1,8 @@
-@(days : List[AttendanceDay])
+@(orgConfig: OrgConfig, days : List[AttendanceDay])
 
 @import helper._
 
-@main("Off Campus Time", "attendance", "off_campus_time") {
+@main(orgConfig, "Off Campus Time", "attendance", "off_campus_time") {
 
 <h3>Off Campus Time</h3>
 
@@ -22,7 +22,7 @@
 	@for( d <- days ) {
 		<tr>
 			<td><input type="checkbox" name="@d.id"></td>
-			<td>@Application.formatDateMdy(OrgConfig.get(), d.day)</td>
+			<td>@Application.formatDateMdy(orgConfig, d.day)</td>
 			<td>@d.person.getDisplayName()</td>
 			<td>@Attendance.formatTime(d.off_campus_departure_time)</td>
 			<td>@Attendance.formatTime(d.off_campus_return_time)</td>

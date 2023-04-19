@@ -1,4 +1,5 @@
-<table class="table case_notes">
-<thead><tr><th width="150">Case</th><th>@OrgConfig.get().str_findings</th>
-	<th width='250'>Charges</th></tr></thead>
+@(orgConfig: OrgConfig)
 
+<table class="table case_notes">
+<thead><tr><th width="150">Case</th><th>@orgConfig.str_findings</th>
+	<th width='250'>Charges</th></tr></thead>

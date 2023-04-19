@@ -1,8 +1,8 @@
-@(current_date : String, people_json : String)
+@(orgConfig: OrgConfig, current_date : String, people_json : String)
 
 @import helper._
 
-@main("Off Campus Time", "attendance", "off_campus_time") {
+@main(orgConfig, "Off Campus Time", "attendance", "off_campus_time") {
 
 <h3>Add Off Campus Time</h3>
 

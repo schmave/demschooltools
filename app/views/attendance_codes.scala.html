@@ -1,6 +1,6 @@
-@(codes : List[AttendanceCode], form : Form[AttendanceCode])
+@(orgConfig: OrgConfig, codes : List[AttendanceCode], form : Form[AttendanceCode])
 
-@main("Attendance codes", "attendance", "attendance_codes") {
+@main(orgConfig, "Attendance codes", "attendance", "attendance_codes") {
 
 <h3>Existing absence codes</h3>
 
@@ -13,7 +13,6 @@
 
 <hr/>
 <h4>Create a new code</h4>
-@attendance_code_form(form, routes.Attendance.newCode, false)
+@attendance_code_form(orgConfig, form, routes.Attendance.newCode, false)
 
 }
-

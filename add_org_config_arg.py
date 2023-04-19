@@ -20,7 +20,7 @@ def add_org_config_to_file(filename, template_name):
                     f'{search_string}OrgConfig.get(Organization.getByHost(request)), ')
     elif f'/{template_name}.scala.html' in filename:
         search_string = '@('
-        assert search_string in lines[0]
+        assert search_string in lines[0], filename
         if 'orgConfig' not in lines[0]:
             needs_save = True
             lines[0] = lines[0].replace('@(', '@(orgConfig: OrgConfig, ')
@@ -31,6 +31,9 @@ def add_org_config_to_file(filename, template_name):
                 lines[i] = line.replace(search_string, 'orgConfig')
                 needs_save = True
     else:
+        if 'orgConfig' in existing_content and 'orgConfig: OrgConfig' not in existing_content:
+            print(filename, 'needs orgConfig argument')
+
         search_string = f'@{template_name}('
         for i, line in enumerate(lines):
             if search_string in line and 'orgConfig' not in line:

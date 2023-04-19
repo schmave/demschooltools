@@ -1,4 +1,4 @@
-@(p : Person, e: Entry, record : PersonHistory.Record, charges: List[Charge],
+@(orgConfig: OrgConfig, p : Person, e: Entry, record : PersonHistory.Record, charges: List[Charge],
 history: PersonHistory)
 
 @import helper._
@@ -8,10 +8,10 @@ history: PersonHistory)
 
 <div class="should-limit"><b>Rule text:</b> @Html(Application.markdown(e.content))</div>
 
-<p><b>Most recent charge</b>: @Application.formatDateShort(OrgConfig.get(), record.most_recent_charge)</p>
+<p><b>Most recent charge</b>: @Application.formatDateShort(orgConfig, record.most_recent_charge)</p>
 <p><b>Total charges</b>: @record.count</p>
 
 <h5 style="margin-top: 30px;">Case Details</h5>
 @for( c <- charges) {
-	@historyCharge(c, false, false, false)
+	@historyCharge(orgConfig, c, false, false, false)
 }

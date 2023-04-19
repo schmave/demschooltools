@@ -1,4 +1,4 @@
-@(t : Tag, p : Person, was_add : Boolean)
+@(orgConfig: OrgConfig, t : Tag, p : Person, was_add : Boolean)
 
 <html>
 <body>
@@ -6,16 +6,16 @@
 
 <p><b>@Application.getCurrentUser().name</b>
 @if( was_add ) { added } else { removed }
-<a href="@{OrgConfig.get().people_url}@routes.CRM.person(p.person_id)">
+<a href="@{orgConfig.people_url}@routes.CRM.person(p.person_id)">
 @p.first_name @p.last_name</a>
 @if( was_add ) { to } else { from }
 tag
-<a href="@{OrgConfig.get().people_url}@routes.CRM.viewTag(t.id)">
+<a href="@{orgConfig.people_url}@routes.CRM.viewTag(t.id)">
 @t.title</a>
 </p>
 
 <p>You can also view the
-<a href="@{OrgConfig.get().people_url}@routes.CRM.viewTag(t.id)#!history">full history</a>
+<a href="@{orgConfig.people_url}@routes.CRM.viewTag(t.id)#!history">full history</a>
  of that tag.</p>
 
 </body>

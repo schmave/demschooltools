@@ -330,7 +330,7 @@ public class Public extends Controller {
                 mail.setSubject("People database: Nightly updates");
                 mail.addTo(org.mailchimp_updates_email);
                 mail.setFrom("Papal DB <noreply@threeriversvillageschool.org>");
-                mail.setBodyHtml(views.html.sync_email.render(mc_lists, info).toString());
+                mail.setBodyHtml(views.html.sync_email.render(OrgConfig.get(Organization.getByHost(request)), mc_lists, info).toString());
                 mMailer.send(mail);
             }
         }
@@ -351,7 +351,7 @@ public class Public extends Controller {
 		if (Organization.getByHost(request) == null) {
 			return unauthorized("Unknown organization");
 		}
-        return ok(views.html.login.render(
+        return ok(views.html.login.render(OrgConfig.get(Organization.getByHost(request)), 
                 mPlayAuth,
                 request.flash().getOptional("notice").orElse("")),
                 Application.getRemoteIp(request));
@@ -391,6 +391,6 @@ public class Public extends Controller {
     }
 
     public Result loggedOut() {
-        return ok(views.html.logged_out.render());
+        return ok(views.html.logged_out.render(OrgConfig.get(Organization.getByHost(request)), ));
     }
 }

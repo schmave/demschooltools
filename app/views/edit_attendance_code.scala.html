@@ -1,11 +1,10 @@
-@(form : Form[AttendanceCode])
+@(orgConfig: OrgConfig, form : Form[AttendanceCode])
 
-@main("Edit Attendance code", "attendance") {
+@main(orgConfig, "Edit Attendance code", "attendance") {
 
 
 <h3>Edit Attendance Code</h3>
 
-@attendance_code_form(form, routes.Attendance.saveCode, true)
+@attendance_code_form(orgConfig, form, routes.Attendance.saveCode, true)
 
 }
-

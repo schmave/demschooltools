@@ -1,4 +1,4 @@
-@(meetings : List [ Meeting ], people : List[ Person ],
+@(orgConfig: OrgConfig, meetings : List [ Meeting ], people : List[ Person ],
 rules : List[ Entry ])
 
 @import helper._
@@ -6,7 +6,7 @@ rules : List[ Entry ])
 <script type="text/javascript">
 $(function() {
     var meeting_info = [ @Html(
-        meetings.map( m => "{ date: \"" + Application.yymmddDate(OrgConfig.get(), (m.date) +
+        meetings.map( m => "{ date: \"" + Application.yymmddDate(orgConfig, (m.date)) +
                 "\", link: \"" + routes.Application.viewMeeting(m.id) +
                 "\", case_count: " + m.cases.size() + "}").mkString(",")) ];
 
@@ -53,17 +53,17 @@ $(function() {
 <h4>People</h4>
 <div class="scroll-table">
 <table class="table table-hover table-condensed">
-<thead><th height=50 width=@if(OrgConfig.get().track_writer){200}else{250}>Person
-	@if(OrgConfig.get().track_writer){<th align=right width=50>Complaint count}
+<thead><th height=50 width=@if(orgConfig.track_writer){200}else{250}>Person
+	@if(orgConfig.track_writer){<th align=right width=50>Complaint count}
 		<th align=right width=50>Charge count</thead>
 @for( p <- people ) {
-	<tr><td width=@if(OrgConfig.get().track_writer){200}else{250}>
+	<tr><td width=@if(orgConfig.track_writer){200}else{250}>
 		<a href="@routes.Application.viewPersonHistory(p.person_id)">
 		@p.getDisplayName()
-	@if(OrgConfig.get().track_writer){
+	@if(orgConfig.track_writer){
 		<td align=right width=50><a class="cases-written-link" href="@routes.Application.viewPersonsWriteups(p.person_id)">@p.getThisYearCasesWrittenUp().size()</a>
 	}
-	<td align=right width=50><a @if(OrgConfig.get().track_writer){class="charges-link"}
+	<td align=right width=50><a @if(orgConfig.track_writer){class="charges-link"}
 		 href="@routes.Application.viewPersonHistory(p.person_id)">@p.getThisYearCharges().size()</a>
 }
 </table>

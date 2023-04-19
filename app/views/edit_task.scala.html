@@ -1,9 +1,9 @@
-@(taskForm:Form[Task], list_options : List[TaskList])
+@(orgConfig: OrgConfig, taskForm:Form[Task], list_options : List[TaskList])
 
 @import helper._
 @implicitField = @{ FieldConstructor(myConstructor.f) }
 
-@main("Edit task", "settings") {
+@main(orgConfig, "Edit task", "settings") {
 
 <h3>Edit task</h3>
 
@@ -21,4 +21,3 @@
 		<input type="submit" value="Save">
 	}
 }
-

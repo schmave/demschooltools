@@ -1,23 +1,23 @@
-@(c : Case, show_links: Boolean)
+@(orgConfig: OrgConfig, c : Case, show_links: Boolean)
 
 @import helper._
 
 	<tr valign="top">
 	<td valign="top"><h5>@if(show_links) {<a href="@routes.Application.viewMeeting(c.meeting.id)">}
 		#@c.case_number @if(show_links) {</a>} @if( c.date_closed == null ) { (OPEN) }</h5>
-	<p>@if( c.date != null ) { @Application.formatDateShort(OrgConfig.get(), c.date)@if( !c.time.equals("") ){, @c.time}. }
-	@if(OrgConfig.get().track_writer) {
+	<p>@if( c.date != null ) { @Application.formatDateShort(orgConfig, c.date)@if( !c.time.equals("") ){, @c.time}. }
+	@if(orgConfig.track_writer) {
 		<i>Writers</i>: @c.people_at_case.filter((p: PersonAtCase) =>
 			p.role == PersonAtCase.ROLE_WRITER).map { tr =>
 				@tr.person.getDisplayName()}.mkString(", ").
 	}
-    <span class=@if( OrgConfig.get().hide_location_for_print ) { "no-print" } else { "" }>
+    <span class=@if( orgConfig.hide_location_for_print ) { "no-print" } else { "" }>
         <i>Location</i>: @if(!c.location.equals("")) {@c.location} else {unknown}.
     </span>
     </p></td>
 	<td valign="top"><p>
 		<i>Testifiers</i>:
-		@if( c.charges.size() == 0 && OrgConfig.get().filter_no_charge_cases ) {
+		@if( c.charges.size() == 0 && orgConfig.filter_no_charge_cases ) {
 			@defining( c.people_at_case.filter(_.role == PersonAtCase.ROLE_TESTIFIER).size() ) { num =>
 				@num @if(num==1) { person } else { people } testified.
 			}
@@ -26,7 +26,7 @@
 		}
 		</p>
 		<p>
-		@if( OrgConfig.get().filter_no_charge_cases && c.date_closed == null &&	c.charges.size() == 0 ) {
+		@if( orgConfig.filter_no_charge_cases && c.date_closed == null &&	c.charges.size() == 0 ) {
 			<i>The findings are not shown here because this case has no charges and is not closed.</i>
 		} else {
 			@Utils.newlineToBr(c.generateCompositeFindingsFromChargeReferences())
@@ -44,9 +44,9 @@
 				@if( charge.rule != null) {
 					@charge.rule.getNumber() @charge.rule.title.
 					@if( !charge.severity.equals("")){(@charge.severity)}
-					@if( !charge.plea.equals("Guilty") ) { <b>@OrgConfig.get().translatePlea(charge.plea).</b> }
+					@if( !charge.plea.equals("Guilty") ) { <b>@orgConfig.translatePlea(charge.plea).</b> }
 				}
-				<u>@OrgConfig.get().str_res_plan_short: @charge.resolution_plan</u>
+				<u>@orgConfig.str_res_plan_short: @charge.resolution_plan</u>
 				</li>
 			}
 			</ol>
@@ -57,7 +57,7 @@
 
 	@for( charge <- c.charges ) {
 		@if( charge.referred_to_sm && charge.sm_decision == null) {
-			<tr><td colspan="3" class="sm_decision">*** Awaiting @OrgConfig.get().getReferralDestination(charge) decision on charging
+			<tr><td colspan="3" class="sm_decision">*** Awaiting @orgConfig.getReferralDestination(charge) decision on charging
 			@if(charge.person != null) { @charge.person.getDisplayName() } else { ??? } with
 			@charge.getRuleTitle().
 			</td></tr>

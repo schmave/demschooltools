@@ -1,8 +1,8 @@
-@(form: Form[Section], chapter : Chapter, is_new : Boolean, chapter_options : List [ Chapter ])
+@(orgConfig: OrgConfig, form: Form[Section], chapter : Chapter, is_new : Boolean, chapter_options : List [ Chapter ])
 
 @implicitField = @{ helper.FieldConstructor(myConstructor.f) }
 
-@main("Edit a section", "manual") {
+@main(orgConfig, "Edit a section", "manual") {
 
 @if( is_new ) {
     <h2>New section</h2>

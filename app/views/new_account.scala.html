@@ -1,8 +1,8 @@
-@(accountForm: Form[Account])
+@(orgConfig: OrgConfig, accountForm: Form[Account])
 
 @import helper._
 
-@main("New Account", "accounting") {
+@main(orgConfig, "New Account", "accounting") {
 	@form(routes.Accounting.makeNewAccount()) {
 		<h2>New Account</h2>
 		<div class="col-sm-6">

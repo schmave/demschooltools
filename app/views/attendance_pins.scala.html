@@ -1,8 +1,8 @@
-@(people : List[Person])
+@(orgConfig: OrgConfig, people : List[Person])
 
 @import helper._
 
-@main("Assign PINs", "attendance", "attendance_pins") {
+@main(orgConfig, "Assign PINs", "attendance", "attendance_pins") {
 
 <h3>Assign PINs</h3>
 

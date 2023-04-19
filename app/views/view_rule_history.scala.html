@@ -1,8 +1,8 @@
-@(r : Entry, history : RuleHistory, recent_rps : Collection[ String ])
+@(orgConfig: OrgConfig, r : Entry, history : RuleHistory, recent_rps : Collection[ String ])
 
 @import helper._
 
-@main("History of " + r.getNumber() + " " + r.title, "jc") {
+@main(orgConfig, "History of " + r.getNumber() + " " + r.title, "jc") {
 
 @if(flash.containsKey("notice")) {
     <div class="flash-error">@flash.get("notice")</div>
@@ -25,6 +25,6 @@ $(function() {
 </p>
 </form>
 
-@rule_history(r, history, recent_rps)
+@rule_history(orgConfig, r, history, recent_rps)
 
 }

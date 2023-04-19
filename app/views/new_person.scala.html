@@ -1,10 +1,10 @@
-@(personForm: Form[Person])
+@(orgConfig: OrgConfig, personForm: Form[Person])
 
 @import helper._
 
-@main("Create a new person", "crm") {
+@main(orgConfig, "Create a new person", "crm") {
 
     <h2>Add a new person</h2>
 
-	@person_form(personForm, routes.CRM.makeNewPerson(), "Create")
+	@person_form(orgConfig, personForm, routes.CRM.makeNewPerson(), "Create")
 }

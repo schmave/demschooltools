@@ -1,8 +1,8 @@
-@(tag: Tag, people: List[Person], people_with_family: Collection[Person], use_student_display: Boolean, allow_edit: Boolean)
+@(orgConfig: OrgConfig, tag: Tag, people: List[Person], people_with_family: Collection[Person], use_student_display: Boolean, allow_edit: Boolean)
 
 @import helper._
 
-@main("All people tagged " + tag.title, "crm") {
+@main(orgConfig, "All people tagged " + tag.title, "crm") {
 <h1>@tag.title
 @if( allow_edit ) {
     <a class="man-edit no-print" href="@routes.CRM.editTag(tag.id)">Edit Tag</a>
@@ -67,7 +67,7 @@
                 <a href="@routes.CRM.person(c.person.person_id)">
                     @c.person.first_name @c.person.last_name
                 </a></td>
-                <td>@Application.yymmddDate(OrgConfig.get(), c.time)</td>
+                <td>@Application.yymmddDate(orgConfig, c.time)</td>
                 <td>@c.creator.name</td>
                 </tr>
             }

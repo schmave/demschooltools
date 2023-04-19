@@ -1,8 +1,8 @@
-@(active_rps : List[Charge], completed_rps : List[Charge], nullified_rps : List[Charge])
+@(orgConfig: OrgConfig, active_rps : List[Charge], completed_rps : List[Charge], nullified_rps : List[Charge])
 
 @import helper._
 
-@main("Edit " + OrgConfig.get().str_res_plans + " list", "jc", "rps") {
+@main(orgConfig, "Edit " + orgConfig.str_res_plans + " list", "jc", "rps") {
 
 <script type="text/javascript">
 app = {};
@@ -16,7 +16,7 @@ app.initial_data = {
     nullified_rps : @Html(Utils.toJson(nullified_rps))
 }
 
-config = @Html(Utils.toJson(OrgConfig.get()));
+config = @Html(Utils.toJson(orgConfig));
 
 $(function() {
     initRpList();
@@ -25,23 +25,23 @@ $(function() {
 
 <p>
     <a href="#" onclick="print();return false;" class="no-print btn btn-success">
-        Print active @OrgConfig.get().str_res_plans
+        Print active @orgConfig.str_res_plans
     </a>
     <a href="/viewSimpleResolutionPlans" class="no-print btn btn-primary">
         Print simple view
     </a>
 </p>
 
-<h2>Active @OrgConfig.get().str_res_plans <span class="comment_time">as of @Application.formatDateTimeLong()</span></h2>
+<h2>Active @orgConfig.str_res_plans <span class="comment_time">as of @Application.formatDateTimeLong()</span></h2>
 <table class="table active-rps printable-res-plans">
 </table>
 
-<h2 class="no-print">Recently completed @OrgConfig.get().str_res_plans</h2>
+<h2 class="no-print">Recently completed @orgConfig.str_res_plans</h2>
 <table class="table completed-rps printable-res-plans no-print">
 </table>
 
 @if(nullified_rps.size > 0) {
-    <h2 class="no-print">Recently nullified @OrgConfig.get().str_res_plans</h2>
+    <h2 class="no-print">Recently nullified @orgConfig.str_res_plans</h2>
     <table class="table nullified-rps printable-res-plans no-print">
     </table>
 }
@@ -53,8 +53,8 @@ $(function() {
 	{{#if closed_date}}<br/>Closed on {{closed_date}} ({{closed_day_of_week}}) {{/if}}
 	{{#if sm_date}}<br/>SM ruled on {{sm_date}} ({{sm_day_of_week}}) {{/if}}
 	<br/>{{rule_title}}
-    @if( OrgConfig.get().show_findings_in_rp_list ) {
-	   <td class="col-xs-4">@OrgConfig.get().str_findings: {{findings}}</td>
+    @if( orgConfig.show_findings_in_rp_list ) {
+	   <td class="col-xs-4">@orgConfig.str_findings: {{findings}}</td>
     }
 	<td class="col-xs-3">{{resolution_plan}}
     {{#if referred_to_sm}}

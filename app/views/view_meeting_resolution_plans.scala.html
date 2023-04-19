@@ -1,8 +1,8 @@
-@(m : Meeting)
+@(orgConfig: OrgConfig, m : Meeting)
 
 @import helper._
 
-@main(OrgConfig.get().str_jc_name_short + " " + OrgConfig.get().str_res_plans + " from " + Application.formatMeetingDate(m.date), "jc") {
+@main(orgConfig, orgConfig.str_jc_name_short + " " + orgConfig.str_res_plans + " from " + Application.formatMeetingDate(m.date), "jc") {
 
 <script>
 $(function() {
@@ -14,11 +14,10 @@ $(function() {
 	@for(c <- m.cases) {
 		@for(charge <- c.charges) {
 			@if(charge.displayInResolutionPlanList() && !charge.referred_to_sm) {
-				@resolution_plan(charge)
+				@resolution_plan(orgConfig, charge)
 			}
 		}
 	}
 </table>
 
 }
-

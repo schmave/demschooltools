@@ -1,10 +1,10 @@
-@(begin_date : String, changes : List [ ManualChange ] )
+@(orgConfig: OrgConfig, begin_date : String, changes : List [ ManualChange ] )
 
 @import helper._
 
-@main(OrgConfig.get().str_manual_title, "manual", "manual_changes") {
+@main(orgConfig, orgConfig.str_manual_title, "manual", "manual_changes") {
 
-<h3>Changes to the @OrgConfig.get().str_manual_title</h3>
+<h3>Changes to the @orgConfig.str_manual_title</h3>
 
 <form method="GET">
 <p class="highlight">Show changes since
@@ -18,7 +18,7 @@
 @defining(changes.get(i)) { c =>
 	<div class="change_log">
 	<div class="date_entered">
-		@Application.formatDateMdy(OrgConfig.get(), c.date_entered)
+		@Application.formatDateMdy(orgConfig, c.date_entered)
 	</div>
 	@if( c.was_created ) {
 		<table cellpadding=20>

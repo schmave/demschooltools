@@ -1,8 +1,8 @@
-@(transactionForm: Form[Transaction])
+@(orgConfig: OrgConfig, transactionForm: Form[Transaction])
 
 @import helper._
 
-@main("New Transaction", "accounting", "new_transaction") {
+@main(orgConfig, "New Transaction", "accounting", "new_transaction") {
 
 	@helper.form(routes.Accounting.makeNewTransaction()) {
 		<h2>New Transaction</h2>
@@ -76,6 +76,6 @@
 </script>
 
 <script type="text/javascript">
-	var accounts = @Html(Accounting.accountsJson());
+	var accounts = @Html(Accounting.accountsJson(orgConfig.org));
 	initCreateTransaction(accounts);
 </script>
