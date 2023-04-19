@@ -23,7 +23,7 @@
 
 @if( c.sm_decision != null) {
 	<span class="sm-decision"><i>School Meeting ruled@if(
-		c.sm_decision_date != null) { on @Application.yymmddDate(c.sm_decision_date)}</i>:
+		c.sm_decision_date != null) { on @Application.yymmddDate(OrgConfig.get(), c.sm_decision_date)}</i>:
 		@c.sm_decision</span>
 }
 

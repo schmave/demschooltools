@@ -67,7 +67,7 @@
                 <a href="@routes.CRM.person(c.person.person_id)">
                     @c.person.first_name @c.person.last_name
                 </a></td>
-                <td>@Application.yymmddDate(c.time)</td>
+                <td>@Application.yymmddDate(OrgConfig.get(), c.time)</td>
                 <td>@c.creator.name</td>
                 </tr>
             }

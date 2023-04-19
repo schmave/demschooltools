@@ -3,7 +3,7 @@
 @import helper._
 
 <div id="footer">
-Printed on @Application.yymmddDate().
+Printed on @Application.yymmddDate(OrgConfig.get(), ).
 </div>
 
 <h1>@OrgConfig.get().org.short_name @OrgConfig.get().str_manual_title</h1>

@@ -42,7 +42,7 @@ $(function() {
 
 <h3>Attendance Summary</h3>
 @if( !is_custom_date ) {
-	<h4>For one year starting @Application.yymmddDate(start_date)
+	<h4>For one year starting @Application.yymmddDate(OrgConfig.get(), start_date)
 	    <a href="@routes.Attendance.download(Application.forDateInput(start_date))" class="download-link">
 	        <span class="glyphicon glyphicon-download-alt"></span>Download as spreadsheet
 	    </a>

@@ -268,11 +268,11 @@ public class Application extends Controller {
             }
 
             writer.write(c.person.gender);
-            writer.write(yymmddDate(
+            writer.write(yymmddDate(org_config,
                 c.the_case.date != null ? c.the_case.date : c.the_case.meeting.date));
             writer.write(c.the_case.time);
             writer.write(c.the_case.location);
-            writer.write(yymmddDate(c.the_case.meeting.date));
+            writer.write(yymmddDate(org_config,c.the_case.meeting.date));
 
             // Adding a space to the front of the case number prevents MS Excel
             // from misinterpreting it as a date.
@@ -301,7 +301,7 @@ public class Application extends Controller {
                 writer.write("");
             }
             if (c.sm_decision_date != null) {
-                writer.write(Application.yymmddDate(c.sm_decision_date));
+                writer.write(Application.yymmddDate(org_config,c.sm_decision_date));
             } else {
                 writer.write("");
             }
@@ -809,9 +809,11 @@ public class Application extends Controller {
         return d;
     }
 
-    Result addRestrictStartDateMessage(Result result) {
+    Result addRestrictStartDateMessage(Result result, OrgConfig orgConfig) {
         return result.flashing("notice", "You must be logged in to view info prior to " +
-                Application.yymmddDate(Application.getStartOfYear()) + ".");
+                Application.yymmddDate(
+                        orgConfig,
+                        Application.getStartOfYear()) + ".");
     }
 
     public Result viewPersonHistory(Integer id, Boolean redact_names,
@@ -835,7 +837,8 @@ public class Application extends Controller {
             redact_names));
 
         if (restricted_start_date != start_date) {
-            result = addRestrictStartDateMessage(result);
+            result = addRestrictStartDateMessage(result,
+                    OrgConfig.get(Organization.getByHost(request)));
 
         }
         return result;
@@ -869,7 +872,8 @@ public class Application extends Controller {
             getRecentResolutionPlans(r)));
 
         if (restricted_start_date != start_date) {
-            result = addRestrictStartDateMessage(result);
+            result = addRestrictStartDateMessage(result,
+                    OrgConfig.get(Organization.getByHost(request)));
 
         }
         return result;
@@ -1108,15 +1112,15 @@ public class Application extends Controller {
         return new SimpleDateFormat("EE").format(d);
     }
 
-    public static String formatDateShort(Date d) {
-        if (OrgConfig.get().euro_dates) {
+    public static String formatDateShort(OrgConfig orgConfig, Date d) {
+        if (orgConfig.euro_dates) {
             return new SimpleDateFormat("dd/MM").format(d);
         }
         return new SimpleDateFormat("MM/dd").format(d);
     }
 
-    public static String formatDateMdy(Date d) {
-        if (OrgConfig.get().euro_dates) {
+    public static String formatDateMdy(OrgConfig orgConfig, Date d) {
+        if (orgConfig.euro_dates) {
             return new SimpleDateFormat("dd/MM/yyyy").format(d);
         }
         return new SimpleDateFormat("MM/dd/yyyy").format(d);
@@ -1130,16 +1134,16 @@ public class Application extends Controller {
         return new SimpleDateFormat("yyyy-MM-dd").format(d);
     }
 
-    public static String yymmddDate(Date d) {
-        if (OrgConfig.get().euro_dates) {
+    public static String yymmddDate(OrgConfig orgConfig, Date d) {
+        if (orgConfig.euro_dates) {
             return new SimpleDateFormat("dd-MM-yyyy").format(d);
         }
         return new SimpleDateFormat("yyyy-MM-dd").format(d);
     }
 
-    public static String yymmddDate() {
+    public static String yymmddDate(OrgConfig orgConfig) {
         Date d = new Date();
-        if (OrgConfig.get().euro_dates) {
+        if (orgConfig.euro_dates) {
             return new SimpleDateFormat("dd-MM-yyyy").format(d);
         }
         return new SimpleDateFormat("yyyy-MM-dd").format(d);
@@ -1149,8 +1153,8 @@ public class Application extends Controller {
         return new SimpleDateFormat("EEEE, MMMM d, h:mm a").format(Utils.localNow());
     }
 
-    public static String yymdDate(Date d) {
-        if (OrgConfig.get().euro_dates) {
+    public static String yymdDate(OrgConfig orgConfig, Date d) {
+        if (orgConfig.euro_dates) {
             return new SimpleDateFormat("d-M-yyyy").format(d);
         }
         return new SimpleDateFormat("yyyy-M-d").format(d);

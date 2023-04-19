@@ -10,8 +10,8 @@
 <h2>@person.first_name @person.last_name attendance</h2>
 
 @if( min_date != null && max_date != null ) {
-    <p>@person.first_name's first recorded day at school was @Application.formatDateMdy(min_date), and
-    last recorded day at school was @Application.formatDateMdy(max_date).</p>
+    <p>@person.first_name's first recorded day at school was @Application.formatDateMdy(OrgConfig.get(), min_date), and
+    last recorded day at school was @Application.formatDateMdy(OrgConfig.get(), max_date).</p>
 }
 <form method="GET">
 	<p>Show @person.first_name's attendance from
@@ -114,7 +114,7 @@
     	friday-row
     }">
     <td width="25">@Application.formatDayOfWeek(d.day)
-    <td width="75">@Application.formatDateMdy(d.day)</td>
+    <td width="75">@Application.formatDateMdy(OrgConfig.get(), d.day)</td>
 	<td>@if(d.start_time != null && d.end_time != null) {
 			@Attendance.format(d.getHours())
 		} else {

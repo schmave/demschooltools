@@ -2,7 +2,7 @@
 
 @import helper._
 
-<h3>@p.getDisplayName()'s @OrgConfig.get().str_jc_name_short history, @Application.yymmddDate(history.start_date) to @Application.yymmddDate(history.end_date)</h3>
+<h3>@p.getDisplayName()'s @OrgConfig.get().str_jc_name_short history, @Application.yymmddDate(OrgConfig.get(), history.start_date) to @Application.yymmddDate(OrgConfig.get(), history.end_date)</h3>
 <h4>Recent @OrgConfig.get().str_res_plans</h4>
 
 @if( recent_rps.size() == 0 ) {
@@ -28,7 +28,7 @@
 	<tr><td width=50%>@if(r.rule != null) { @r.rule.getNumber() @r.rule.title } else { <i>unknown</i> }
 		<td>
 		@if( r.most_recent_charge != null ) {
-			@Application.formatDateShort(r.most_recent_charge)
+			@Application.formatDateShort(OrgConfig.get(), r.most_recent_charge)
 		}
 		<td align=right>@r.count</tr>
 }

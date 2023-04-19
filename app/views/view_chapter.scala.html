@@ -5,7 +5,7 @@
 @main("" + chapter.num + " " + chapter.title, "manual") {
 
 <div id="footer">
-Printed on @Application.yymmddDate().
+Printed on @Application.yymmddDate(OrgConfig.get(), ).
 </div>
 
 <div class="man-chapter">@chapter.num @chapter.title <a class="man-edit no-print" href="@routes.ApplicationEditing.editChapter(chapter.id)">Edit</a></div>
@@ -23,7 +23,7 @@ Printed on @Application.yymmddDate().
 		<p class="man-entry-num">@entry.getNumber() @entry.title <a class="no-print man-edit" href="@routes.ApplicationEditing.editEntry(entry.id)">Edit</a>
 			@if( entry.changes.size() > 0 ) {
 				<span class="man-last-modify-date @if(!OrgConfig.get().org.show_last_modified_in_print){no-print}">
-                    changed @Application.yymmddDate(entry.changes.get(entry.changes.size()-1).date_entered)
+                    changed @Application.yymmddDate(OrgConfig.get(), entry.changes.get(entry.changes.size()-1).date_entered)
                 </span>
 			}
 									</p>
@@ -41,7 +41,7 @@ Printed on @Application.yymmddDate().
                             @if( change.was_created ) { Adopted
                             } else { @if( change.was_deleted ) { Repealed
                             } else { Amended } }
-                            @Application.yymmddDate(change.date_entered);
+                            @Application.yymmddDate(OrgConfig.get(), change.date_entered);
                         }
                     }
                 }

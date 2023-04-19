@@ -3,7 +3,7 @@
 @import helper._
 
 <h3>@r.getNumber() @r.title</h3>
-<p>@Application.yymmddDate(history.start_date) to @Application.yymmddDate(history.end_date)</p>
+<p>@Application.yymmddDate(OrgConfig.get(), history.start_date) to @Application.yymmddDate(OrgConfig.get(), history.end_date)</p>
 
 <div class="should-limit"><b>Rule text:</b> @Html(Application.markdown(r.content))</div>
 
@@ -26,7 +26,7 @@
 	<tr><td>@if(r.person != null) { @r.person.getDisplayName() } else { <i>unknown</i> }
 		<td>
 		@if( r.most_recent_charge != null ) {
-			@Application.formatDateShort(r.most_recent_charge)
+			@Application.formatDateShort(OrgConfig.get(), r.most_recent_charge)
 		}
 		<td align=right>@r.count</tr>
 }

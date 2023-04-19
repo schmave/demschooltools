@@ -7,7 +7,7 @@
 
 @import helper._
 
-@main("Edit attendance for week of " + Application.yymmddDate(monday), "attendance") {
+@main("Edit attendance for week of " + Application.yymmddDate(OrgConfig.get(), monday), "attendance") {
 
 <script type="text/javascript">
 app = {};
@@ -37,7 +37,7 @@ $(function() {
 });
 </script>
 
-<h3>Editing week of @Application.yymmddDate(monday)</h3>
+<h3>Editing week of @Application.yymmddDate(OrgConfig.get(), monday)</h3>
 <form method="POST" action="@routes.Attendance.importFromCustodia()">
 <p><a class="btn btn-success" href="@routes.Attendance.viewWeek()?date=@Application.forDateInput(monday)">Done editing; return to viewing</a>
 @if( OrgConfig.get().org.show_custodia ) {

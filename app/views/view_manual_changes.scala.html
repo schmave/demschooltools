@@ -18,7 +18,7 @@
 @defining(changes.get(i)) { c =>
 	<div class="change_log">
 	<div class="date_entered">
-		@Application.formatDateMdy(c.date_entered)
+		@Application.formatDateMdy(OrgConfig.get(), c.date_entered)
 	</div>
 	@if( c.was_created ) {
 		<table cellpadding=20>
