@@ -58,7 +58,7 @@ public class CRM extends Controller {
                         .where().eq("person.organization", Organization.getByHost(request))
                         .orderBy("created DESC").setMaxRows(20).findList();
 
-                    return views.html.people_index.render(recent_comments).toString();
+                    return views.html.people_index.render(OrgConfig.get(Organization.getByHost(request)), recent_comments).toString();
                 }
             }));
     }
@@ -261,12 +261,12 @@ public class CRM extends Controller {
             the_tag = Tag.find.ref(tagId);
         }
 
-        addTag(the_tag, p, Application.getCurrentUser(request));
+        addTag(the_tag, p, Application.getCurrentUser(request), request);
         CachedPage.onPeopleChanged(org);
         return ok(views.html.tag_fragment.render(the_tag, p));
     }
 
-    public void addTag(Tag tag, Person person, User current_user) {
+    public void addTag(Tag tag, Person person, User current_user, Http.Request request) {
         if (tag.people.contains(person)) {
             return;
         }
@@ -282,7 +282,7 @@ public class CRM extends Controller {
                     true);
 
             person.tags.add(tag);
-            notifyAboutTag(tag, person, true);
+            notifyAboutTag(tag, person, true, request);
         });
     }
 
@@ -290,13 +290,13 @@ public class CRM extends Controller {
         Tag t = Tag.findById(tag_id, Organization.getByHost(request));
         Person p = Person.findById(person_id, Organization.getByHost(request));
 
-        removeTag(t, p, Application.getCurrentUser(request));
+        removeTag(t, p, Application.getCurrentUser(request), request);
         CachedPage.onPeopleChanged(Organization.getByHost(request));
 
         return ok();
     }
 
-    public void removeTag(Tag tag, Person person, User current_user) {
+    public void removeTag(Tag tag, Person person, User current_user, Http.Request request) {
         if (!tag.people.contains(person)) {
             return;
         }
@@ -309,11 +309,11 @@ public class CRM extends Controller {
                         current_user,
                         false);
             }
-            notifyAboutTag(tag, person, false);
+            notifyAboutTag(tag, person, false, request);
         });
     }
 
-    public static void notifyAboutTag(Tag t, Person p, boolean was_add) {
+    public static void notifyAboutTag(Tag t, Person p, boolean was_add, Http.Request request) {
         for (NotificationRule rule : t.notification_rules) {
             play.libs.mailer.Email mail = new play.libs.mailer.Email();
             if (was_add) {
@@ -323,7 +323,11 @@ public class CRM extends Controller {
             }
             mail.addTo(rule.email);
             mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
-            mail.setBodyHtml(views.html.tag_email.render(OrgConfig.get(Organization.getByHost(request)), t, p, was_add).toString());
+            mail.setBodyHtml(views.html.tag_email.render(
+                    OrgConfig.get(Organization.getByHost(request)),
+                    t,
+                    Application.getCurrentUser(request).name,
+                    p, was_add).toString());
             sMailer.send(mail);
         }
     }
@@ -378,7 +382,7 @@ public class CRM extends Controller {
         Tag src_tag = Tag.findById(Integer.parseInt(values.get("tag_id")[0]), Organization.getByHost(request));
 
         for (Person p : src_tag.people) {
-            addTag(dest_tag, p, Application.getCurrentUser(request));
+            addTag(dest_tag, p, Application.getCurrentUser(request), request);
         }
 
         CachedPage.onPeopleChanged(Organization.getByHost(request));
@@ -391,7 +395,7 @@ public class CRM extends Controller {
 
         for (String person_id_str : values.get("person_id")) {
             Person p = Person.findById(Integer.parseInt(person_id_str), Organization.getByHost(request));
-            addTag(dest_tag, p, Application.getCurrentUser(request));
+            addTag(dest_tag, p, Application.getCurrentUser(request), request);
         }
 
         CachedPage.onPeopleChanged(Organization.getByHost(request));
@@ -406,7 +410,7 @@ public class CRM extends Controller {
         for (String key_name : values.keySet()) {
             if (key_name.startsWith(prefix) && values.get(key_name)[0].equals("on")) {
                 Person p = Person.findById(Integer.parseInt(key_name.substring(prefix.length())), Organization.getByHost(request));
-                removeTag(tag, p, Application.getCurrentUser(request));
+                removeTag(tag, p, Application.getCurrentUser(request), request);
             }
         }
 
@@ -433,7 +437,7 @@ public class CRM extends Controller {
                     }
                     tag.save();
                     change.delete();
-                    notifyAboutTag(tag, change.person, !change.was_add);
+                    notifyAboutTag(tag, change.person, !change.was_add, request);
                 });
             }
         }
@@ -639,7 +643,7 @@ public class CRM extends Controller {
 
     }
 
-    public Result newPerson() {
+    public Result newPerson(Http.Request request) {
         Form<Person> personForm = mFormFactory.form(Person.class);
         return ok(views.html.new_person.render(OrgConfig.get(Organization.getByHost(request)), personForm));
     }
@@ -829,7 +833,7 @@ public class CRM extends Controller {
                 }
             }
 
-            return ok(views.html.comment_fragment.render(Comment.find.byId(new_comment.id), false));
+            return ok(views.html.comment_fragment.render(OrgConfig.get(Organization.getByHost(request)), Comment.find.byId(new_comment.id), false));
         } else {
             return ok();
         }
@@ -846,19 +850,19 @@ public class CRM extends Controller {
         return (int)((Application.getStartOfYear().getTime() - p.dob.getTime()) / 1000 / 60 / 60 / 24 / 365.25);
     }
 
-    public static String formatDob(Date d) {
+    public static String formatDob(Date d, OrgConfig orgConfig) {
         if (d == null) {
             return "---";
         }
-        if (OrgConfig.get().euro_dates) {
+        if (orgConfig.euro_dates) {
             return new SimpleDateFormat("dd/MM/yy").format(d);
         }
         return new SimpleDateFormat("MM/dd/yy").format(d);
     }
 
-    public static String formatDate(Date d) {
-        d = new Date(d.getTime() + OrgConfig.get().time_zone.getOffset(d.getTime()));
-        Date now = Utils.localNow();
+    public static String formatDate(Date d, OrgConfig orgConfig) {
+        d = new Date(d.getTime() + orgConfig.time_zone.getOffset(d.getTime()));
+        Date now = Utils.localNow(orgConfig);
 
         long diffHours = (now.getTime() - d.getTime()) / 1000 / 60 / 60;
 
@@ -870,7 +874,7 @@ public class CRM extends Controller {
         } else if (diffHours < 24 * 7) {
             format = "EEEE, MMMM d";
         } else {
-            if (OrgConfig.get().euro_dates) {
+            if (orgConfig.euro_dates) {
                 format = "dd/MM/yy";
             } else {
                 format = "MM/dd/yy";

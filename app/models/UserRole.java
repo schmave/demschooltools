@@ -71,15 +71,15 @@ public class UserRole extends Model {
         return false;
     }
 
-    public static String getDescription(String role) {
-        String jc_name = OrgConfig.get().str_jc_name_short;
+    public static String getDescription(OrgConfig orgConfig, String role) {
+        String jc_name = orgConfig.str_jc_name_short;
         switch (role) {
             case ROLE_VIEW_JC:
                 return "View " + jc_name + " records & rules";
             case ROLE_EDIT_MANUAL:
-                return "Edit " + OrgConfig.get().str_manual_title_short;
+                return "Edit " + orgConfig.str_manual_title_short;
             case ROLE_EDIT_RESOLUTION_PLANS:
-                return "Check off " + jc_name + " " + OrgConfig.get().str_res_plans;
+                return "Check off " + jc_name + " " + orgConfig.str_res_plans;
             case ROLE_EDIT_7_DAY_JC:
                 return "Edit " + jc_name + " records up to 7 days old";
             case ROLE_EDIT_31_DAY_JC:

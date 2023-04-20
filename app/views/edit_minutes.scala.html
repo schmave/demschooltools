@@ -23,9 +23,9 @@ app.ROLE_RUNNER = @PersonAtMeeting.ROLE_RUNNER
 app.ROLE_TESTIFIER = @PersonAtCase.ROLE_TESTIFIER
 app.ROLE_WRITER = @PersonAtCase.ROLE_WRITER
 
-app.people = @Html(Application.jcPeople(""))
-app.rules = @Html(Application.jsonRules(false))
-app.cases = @Html(Application.jsonCases(""))
+app.people = @Html(Application.jcPeople("", orgConfig.org))
+app.rules = @Html(Application.jsonRules(false, orgConfig.org))
+app.cases = @Html(Application.jsonCases("", orgConfig.org))
 
 app.initial_data = {
 	committee : @Html(meeting.getJsonPeople(PersonAtMeeting.ROLE_JC_MEMBER)),

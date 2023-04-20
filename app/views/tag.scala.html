@@ -38,7 +38,7 @@
                        type="submit" value="Remove selected people"/>
             </p>
             @if(use_student_display) {
-                @student_list(people)
+                @student_list(orgConfig, people)
             } else {
                 @people_list(people, true)
             }

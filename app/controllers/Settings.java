@@ -50,7 +50,7 @@ public class Settings extends Controller {
                 new_password = values.get("custodia_student_password")[0];
             }
             if (new_password != null && !new_password.trim().isEmpty()) {
-                Utils.setCustodiaPassword(new_password);
+                Utils.setCustodiaPassword(new_password, org);
             }
         }
 

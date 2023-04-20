@@ -64,7 +64,7 @@ $(function () {
         $('#breaking-res-plan-entry-chooser'),
         false,
         2,
-        @Html(Application.jsonRules(true)),
+        @Html(Application.jsonRules(true, orgConfig.org)),
         function(json) { return json.title; },
         null,
         null,

@@ -11,7 +11,6 @@ import org.xhtmlrenderer.pdf.ITextRenderer;
 import play.api.libs.mailer.MailerClient;
 import play.libs.Json;
 import play.mvc.*;
-import play.mvc.Http.Context;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -71,7 +70,7 @@ public class Application extends Controller {
             mail.addTo(u.email);
             mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
             mail.setBodyText("Hi " + u.name + ",\n\nYour DemSchoolTools password was changed today (" +
-                Application.formatDateTimeLong() +
+                Application.formatDateTimeLong(OrgConfig.get(Organization.getByHost(request))) +
                 "). \n\nIf it was not you who changed it, please investigate what is going on! " +
                 "Feel free to contact Evan (schmave@gmail.com) for help.");
             mMailer.send(mail);
@@ -629,14 +628,14 @@ public class Application extends Controller {
     }
 
     static play.twirl.api.Html renderManualTOC(Organization org) {
-        return views.html.cached_page.render(OrgConfig.get(Organization.getByHost(request)), 
+        return views.html.cached_page.render(OrgConfig.get(org),
             new CachedPage(CachedPage.MANUAL_INDEX,
                 OrgConfig.get(org).str_manual_title,
                 "manual",
                 "toc", org) {
                 @Override
                 String render() {
-                    return views.html.view_manual.render(OrgConfig.get(Organization.getByHost(request)), Chapter.all(org)).toString();
+                    return views.html.view_manual.render(OrgConfig.get(org), Chapter.all(org)).toString();
                 }
             });
     }
@@ -1016,9 +1015,9 @@ public class Application extends Controller {
         return Json.stringify(Json.toJson(result));
     }
 
-    public static String jsonRules(Boolean includeBreakingResPlan, Http.Request request) {
-
-        ExpressionList<Entry> expr = Entry.find.query().where().eq("section.chapter.organization", Organization.getByHost(request));
+    public static String jsonRules(Boolean includeBreakingResPlan, Organization org) {
+        ExpressionList<Entry> expr = Entry.find.query().where().eq("section.chapter.organization",
+                org);
         if (!includeBreakingResPlan) {
             expr = expr.eq("is_breaking_res_plan", false);
         }
@@ -1039,11 +1038,11 @@ public class Application extends Controller {
         return Json.stringify(Json.toJson(result));
     }
 
-    public static String jsonCases(String term, Http.Request request) {
+    public static String jsonCases(String term, Organization org) {
         term = term.toLowerCase();
 
         List<Case> cases = Case.find.query().where()
-            .eq("meeting.organization", Organization.getByHost(request))
+            .eq("meeting.organization", org)
             .ge("meeting.date", Application.getStartOfYear())
             .like("case_number", term + "%")
             .orderBy("case_number ASC").findList();
@@ -1149,8 +1148,8 @@ public class Application extends Controller {
         return new SimpleDateFormat("yyyy-MM-dd").format(d);
     }
 
-    public static String formatDateTimeLong() {
-        return new SimpleDateFormat("EEEE, MMMM d, h:mm a").format(Utils.localNow());
+    public static String formatDateTimeLong(OrgConfig orgConfig) {
+        return new SimpleDateFormat("EEEE, MMMM d, h:mm a").format(Utils.localNow(orgConfig));
     }
 
     public static String yymdDate(OrgConfig orgConfig, Date d) {
@@ -1160,16 +1159,16 @@ public class Application extends Controller {
         return new SimpleDateFormat("yyyy-M-d").format(d);
     }
 
-    public static String currentUsername() {
-        return Context.current().request().attrs().getOptional(Security.USERNAME).orElse(null);
+    public static String currentUsername(Http.Request request) {
+        return request.attrs().getOptional(Security.USERNAME).orElse(null);
     }
 
     public static boolean isUserEditor(String username) {
         return username != null && username.contains("@");
     }
 
-    public static boolean isCurrentUserLoggedIn() {
-        return isUserEditor(currentUsername());
+    public static boolean isCurrentUserLoggedIn(Http.Request request) {
+        return isUserEditor(currentUsername(request));
     }
 
     public static String getRemoteIp(Http.Request request) {

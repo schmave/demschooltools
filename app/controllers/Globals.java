@@ -5,7 +5,7 @@ import models.Organization;
 import play.mvc.Http;
 
 public class Globals {
-    static ThreadLocal<Globals> sGlobals;
+    static ThreadLocal<Globals> sGlobals = new ThreadLocal<>();
 
     Http.Request mRequest;
 

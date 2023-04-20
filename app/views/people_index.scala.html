@@ -1,4 +1,4 @@
-@(recent_comments: List[Comment])
+@(orgConfig: OrgConfig, recent_comments: List[Comment])
 
 @import helper._
 
@@ -6,9 +6,8 @@
 <div class="col-sm-8">
 <h3>Recent Comments</h3>
 	@for( c <- recent_comments ) {
-		@comment_fragment(c, true)
+		@comment_fragment(orgConfig, c, true)
 	}
 </div>
 
 </div>
-

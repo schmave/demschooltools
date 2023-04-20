@@ -12,7 +12,9 @@ import models.Organization;
 import models.OrgConfig;
 import models.User;
 
+import play.ApplicationLoader;
 import play.Logger;
+import play.mvc.Http;
 
 public class MyUserService extends AbstractUserService {
 
@@ -38,7 +40,7 @@ public class MyUserService extends AbstractUserService {
                     Logger.debug("    found user by email");
                 } else {
                 	Logger.debug("    creating new account");
-                	Organization org = Organization.getByHost(request);
+                	Organization org = Organization.getByHost(Http.Context.current().request());
                 	Logger.error("New login from unknown user: " + identity.getEmail() + ", org: " + org.name);
                 	u = User.create(identity.getEmail(), DUMMY_USERNAME, org);
                 }

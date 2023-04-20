@@ -156,7 +156,7 @@ public class ApplicationEditing extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
-    public Result addPersonAtCase(Integer case_id, Integer person_id, Integer role)
+    public Result addPersonAtCase(Integer case_id, Integer person_id, Integer role, Http.Request request)
     {
         CachedPage.remove(CachedPage.JC_INDEX, Organization.getByHost(request));
         PersonAtCase.create(Case.find.ref(case_id), Person.find.ref(person_id), role);
@@ -352,8 +352,8 @@ public class ApplicationEditing extends Controller {
         return redirect(routes.ApplicationEditing.enterSchoolMeetingDecisions());
     }
 
-    void onManualChange() {
-        CachedPage.remove(CachedPage.MANUAL_INDEX, Organization.getByHost(request));
+    void onManualChange(Organization org) {
+        CachedPage.remove(CachedPage.MANUAL_INDEX, org);
         try {
             Connection conn = mDatabase.getConnection();
             conn.prepareStatement("REFRESH MATERIALIZED VIEW entry_index WITH DATA").execute();
@@ -364,7 +364,7 @@ public class ApplicationEditing extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
-    public Result addChapter() {
+    public Result addChapter(Http.Request request) {
         Form<Chapter> form = mFormFactory.form(Chapter.class);
         return ok(views.html.edit_chapter.render(OrgConfig.get(Organization.getByHost(request)), form, true));
     }
@@ -387,7 +387,7 @@ public class ApplicationEditing extends Controller {
             c = Chapter.create(form, Organization.getByHost(request));
         }
 
-        onManualChange();
+        onManualChange(Organization.getByHost(request));
         return redirect(routes.Application.viewChapter(c.id));
     }
 
@@ -419,7 +419,7 @@ public class ApplicationEditing extends Controller {
             s = Section.create(form);
         }
 
-        onManualChange();
+        onManualChange(Organization.getByHost(request));
         return redirect(routes.Application.viewChapter(s.chapter.id).url() + "#section_" + s.id);
     }
 
@@ -451,7 +451,7 @@ public class ApplicationEditing extends Controller {
             e = Entry.create(form);
         }
 
-        onManualChange();
+        onManualChange(Organization.getByHost(request));
         return redirect(routes.Application.viewChapter(e.section.chapter.id).url() + "#entry_" + e.id);
     }
 

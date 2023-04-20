@@ -15,7 +15,7 @@
 <hr/>
 	@for( role <- UserRole.ALL_ROLES ) {
 		@simpleCheckbox(role,
-			UserRole.getDescription(role),
+			UserRole.getDescription(orgConfig, role),
 			u.hasRole(role))
 	}
 <input type="submit" value="Save"/>

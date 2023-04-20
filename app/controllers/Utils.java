@@ -17,6 +17,7 @@ import java.util.concurrent.Executors;
 
 import com.typesafe.config.Config;
 import models.OrgConfig;
+import models.Organization;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -166,8 +167,8 @@ public class Utils
         makeCustodiaPost(client, school_crm_config.getString("custodia_url") + "/users/login", nvps);
     }
 
-    public static void setCustodiaPassword(String new_password) {
-        final OrgConfig config = OrgConfig.get();
+    public static void setCustodiaPassword(String new_password, Organization org) {
+        final OrgConfig config = OrgConfig.get(org);
         sCustodiaService.submit(() -> {
             try {
                 CloseableHttpClient httpclient = HttpClients.createDefault();
@@ -196,8 +197,8 @@ public class Utils
         });
     }
 
-    public static Date localNow() {
+    public static Date localNow(OrgConfig orgConfig) {
         Date utcNow = new Date();
-        return new Date(utcNow.getTime() + OrgConfig.get().time_zone.getOffset(utcNow.getTime()));
+        return new Date(utcNow.getTime() + orgConfig.time_zone.getOffset(utcNow.getTime()));
     }
 }

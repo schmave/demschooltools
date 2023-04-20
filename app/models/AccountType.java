@@ -23,12 +23,16 @@ public enum AccountType
 
     @Override
    	public String toString() {
+        throw new UnsupportedOperationException("Use toString(OrgConfig) instead");
+    }
+
+    public String toString(OrgConfig orgConfig) {
     	switch (this) {
     		case Cash: return "Cash";
     		case PersonalChecking: return "Personal";
-    		case Committee: return OrgConfig.get().str_committee;
-    		case Corporation: return OrgConfig.get().str_corporation;
-    		case Clerk: return OrgConfig.get().str_clerk;
+    		case Committee: return orgConfig.str_committee;
+    		case Corporation: return orgConfig.str_corporation;
+    		case Clerk: return orgConfig.str_clerk;
     		default: throw new IllegalArgumentException();
     	}
    	}

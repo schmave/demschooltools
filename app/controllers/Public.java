@@ -182,7 +182,7 @@ public class Public extends Controller {
         return result;
     }
 
-    public Result syncMailchimp() {
+    public Result syncMailchimp(Http.Request request) {
         // Disable mailchimp integration for now.
         if (1 == 1) {
             return ok("");
@@ -353,8 +353,8 @@ public class Public extends Controller {
 		}
         return ok(views.html.login.render(OrgConfig.get(Organization.getByHost(request)), 
                 mPlayAuth,
-                request.flash().getOptional("notice").orElse("")),
-                Application.getRemoteIp(request));
+                request.flash().getOptional("notice").orElse(""),
+                Application.getRemoteIp(request)));
     }
 
     public Result doLogin(Http.Request request) {
@@ -390,7 +390,7 @@ public class Public extends Controller {
         return mAuth.authenticate(provider);
     }
 
-    public Result loggedOut() {
-        return ok(views.html.logged_out.render(OrgConfig.get(Organization.getByHost(request)), ));
+    public Result loggedOut(Http.Request request) {
+        return ok(views.html.logged_out.render(OrgConfig.get(Organization.getByHost(request))));
     }
 }

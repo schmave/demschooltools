@@ -18,7 +18,7 @@
 	<h3>Recent Comments</h3>
 	<div class="span6">
 		@for( c <- recent_comments ) {
-			@comment_fragment(c, true)
+			@comment_fragment(orgConfig, c, true)
 		}
 	</div>
 

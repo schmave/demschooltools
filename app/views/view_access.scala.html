@@ -11,7 +11,7 @@
 <table class="table" style="width: 400px">
 <thead><th>Name</th><th>Email</th>
 	@for( role <- UserRole.ALL_ROLES ) {
-		<th class="center">@UserRole.getDescription(role)</th>
+		<th class="center">@UserRole.getDescription(orgConfig, role)</th>
 	}
 <th></th></thead>
 @for( u <- users ) { @if( u.active ) {
@@ -28,7 +28,7 @@
 }}
 </table>
 
-<p class=>Access at the "@UserRole.getDescription(UserRole.ROLE_VIEW_JC)" level is available
+<p class=>Access at the "@UserRole.getDescription(orgConfig, UserRole.ROLE_VIEW_JC)" level is available
 for all traffic from a particular IP address. This can be used to give read-only
 access to @orgConfig.str_jc_name_short records and the @orgConfig.str_manual_title to anyone connecting
 through your school's internet connection. Enter an IP address to allow below to enable this feature.

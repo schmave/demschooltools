@@ -62,7 +62,7 @@ public class Attendance extends Controller {
             next_date = null;
         }
 
-        return views.html.attendance_index.render(OrgConfig.get(Organization.getByHost(request)), 
+        return views.html.attendance_index.render(OrgConfig.get(org),
             all_people, person_to_stats, all_codes, codes_map,
             Application.attendancePeople(org), start_date, end_date, is_custom_date, prev_date, next_date
         ).toString();
@@ -505,16 +505,18 @@ public class Attendance extends Controller {
         writer.write("Extra hours");
         writer.endRecord();
 
+        final Organization org = Organization.getByHost(request);
         List<AttendanceDay> days =
             AttendanceDay.find.query().where()
-                .eq("person.organization", Organization.getByHost(request))
+                .eq("person.organization", org)
                 .ge("day", start_date)
                 .le("day", end_date)
                 .findList();
 
+        final OrgConfig orgConfig = OrgConfig.get(org);
         for (AttendanceDay day : days) {
             writer.write(day.person.first_name + " " + day.person.last_name);
-            writer.write(Application.yymmddDate(day.day));
+            writer.write(Application.yymmddDate(orgConfig, day.day));
             if (day.code != null) {
                 writer.write(day.code);
                 writer.write(""); // empty start_time and end_time
@@ -530,14 +532,14 @@ public class Attendance extends Controller {
 
         List<AttendanceWeek> weeks =
             AttendanceWeek.find.query().where()
-                .eq("person.organization", Organization.getByHost(request))
+                .eq("person.organization", org)
                 .ge("monday", start_date)
                 .le("monday", end_date)
                 .findList();
 
         for (AttendanceWeek week : weeks) {
             writer.write(week.person.first_name + " " + week.person.last_name);
-            writer.write(Application.yymmddDate(week.monday));
+            writer.write(Application.yymmddDate(orgConfig, week.monday));
             for (int i = 0; i < 3; i++) {
                 writer.write("");
             }
@@ -576,14 +578,14 @@ public class Attendance extends Controller {
         // Adding the BOM here causes Excel 2010 on Windows to realize
         // that the file is Unicode-encoded.
         zos.write("\ufeff".getBytes(charset));
-        zos.write(getDailyHoursFile(allDates, personDateAttendance, charset));
+        zos.write(getDailyHoursFile(allDates, personDateAttendance, charset, orgConfig));
         zos.closeEntry();
 
         zos.putNextEntry(new ZipEntry("attendance/daily_signins.csv"));
         // Adding the BOM here causes Excel 2010 on Windows to realize
         // that the file is Unicode-encoded.
         zos.write("\ufeff".getBytes(charset));
-        zos.write(getDailySigninsFile(allDates, personDateAttendance, charset));
+        zos.write(getDailySigninsFile(allDates, personDateAttendance, charset, orgConfig));
         zos.closeEntry();
 
         zos.close();
@@ -592,12 +594,12 @@ public class Attendance extends Controller {
 
     private byte[] getDailyHoursFile(TreeSet<Date> allDates,
                                      TreeMap<String, HashMap<Date, AttendanceDay>> personDateAttendance,
-                                     Charset charset) throws IOException {
+                                     Charset charset, OrgConfig orgConfig) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         CsvWriter writer = new CsvWriter(baos, ',', charset);
         writer.write("Name");
         for (Date d : allDates) {
-            writer.write(Application.yymmddDate(d));
+            writer.write(Application.yymmddDate(orgConfig, d));
         }
         writer.endRecord();
 
@@ -619,13 +621,13 @@ public class Attendance extends Controller {
     }
 
     private byte[] getDailySigninsFile(TreeSet<Date> allDates,
-            TreeMap<String, HashMap<Date, AttendanceDay>> personDateAttendance,
-            Charset charset) throws IOException {
+                                       TreeMap<String, HashMap<Date, AttendanceDay>> personDateAttendance,
+                                       Charset charset, OrgConfig orgConfig) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         CsvWriter writer = new CsvWriter(baos, ',', charset);
         writer.write("Name");
         for (Date d : allDates) {
-            writer.write(Application.yymmddDate(d));
+            writer.write(Application.yymmddDate(orgConfig, d));
         }
         writer.endRecord();
 
@@ -658,7 +660,7 @@ public class Attendance extends Controller {
         return viewOrEditWeek(date, false, request);
     }
 
-    public Result saveWeek(Integer week_id, Double extra_hours) {
+    public Result saveWeek(Integer week_id, Double extra_hours, Http.Request request) {
         CachedPage.remove(CachedPage.ATTENDANCE_INDEX, Organization.getByHost(request));
 
         AttendanceWeek.find.byId(week_id).edit(extra_hours);
@@ -666,7 +668,7 @@ public class Attendance extends Controller {
     }
 
     public Result saveDay(Integer day_id, String code,
-        String start_time, String end_time) throws Exception {
+                          String start_time, String end_time, Http.Request request) throws Exception {
         CachedPage.remove(CachedPage.ATTENDANCE_INDEX, Organization.getByHost(request));
 
         AttendanceDay.find.byId(day_id).edit(code, start_time, end_time);

@@ -1,10 +1,10 @@
-@(orgConfig: OrgConfig, t : Tag, p : Person, was_add : Boolean)
+@(orgConfig: OrgConfig, t : Tag, actor_name: String, p : Person, was_add : Boolean)
 
 <html>
 <body>
 <h3>An update from DemSchoolTools</h3>
 
-<p><b>@Application.getCurrentUser().name</b>
+<p><b>@actor_name</b>
 @if( was_add ) { added } else { removed }
 <a href="@{orgConfig.people_url}@routes.CRM.person(p.person_id)">
 @p.first_name @p.last_name</a>

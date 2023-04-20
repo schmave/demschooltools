@@ -200,7 +200,7 @@ public class Accounting extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result newAccount() {
+    public Result newAccount(Http.Request request) {
         Form<Account> form = mFormFactory.form(Account.class);
         return ok(views.html.new_account.render(OrgConfig.get(Organization.getByHost(request)), form));
     }

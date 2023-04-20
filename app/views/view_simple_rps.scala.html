@@ -7,7 +7,7 @@
 
 @main(orgConfig, "Print simple " + orgConfig.str_res_plans, "jc", "rps") {
 
-<h2>Active @orgConfig.str_res_plans <span class="comment_time">as of @Application.formatDateTimeLong()</span></h2>
+<h2>Active @orgConfig.str_res_plans <span class="comment_time">as of @Application.formatDateTimeLong(orgConfig)</span></h2>
 
 @for(key <- sorted_keys) {
     <h3>@key</h3>

@@ -1,4 +1,4 @@
-@(person: Person, is_primary: Boolean)
+@(orgConfig: OrgConfig, person: Person, is_primary: Boolean)
 
 @import helper._
 
@@ -79,7 +79,7 @@ enableTagBox("#person_tag_entry_@person.person_id",
 }
 
 @if(person.dob != null) {
-	<br>Age @CRM.calcAge(person) (born @CRM.formatDob(person.dob))
+	<br>Age @CRM.calcAge(person) (born @CRM.formatDob(person.dob, orgConfig))
 }
 @if(!person.grade.equals("")) {
 	<br>Grade @person.grade<br>

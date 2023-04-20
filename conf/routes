@@ -47,7 +47,7 @@ POST /addPersonAtMeeting    controllers.ApplicationEditing.addPersonAtMeeting(me
 POST /removePersonAtMeeting    controllers.ApplicationEditing.removePersonAtMeeting(meeting_id : Integer, person_id : Integer, role : Integer)
 
 
-POST /addPersonAtCase controllers.ApplicationEditing.addPersonAtCase(case_id : Integer, person_id : Integer, role : Integer)
+POST /addPersonAtCase controllers.ApplicationEditing.addPersonAtCase(case_id : Integer, person_id : Integer, role : Integer, request: Request)
 POST /removePersonAtCase controllers.ApplicationEditing.removePersonAtCase(case_id : Integer, person_id : Integer, role : Integer)
 
 GET /getCaseReferencesJson controllers.ApplicationEditing.getCaseReferencesJson(case_id : Integer, request: Request)
@@ -79,7 +79,7 @@ GET /thisWeekReport	controllers.Application.thisWeekReport(request: Request)
 GET /viewWeeklyReport/:date	controllers.Application.viewWeeklyReport(date : String, request: Request)
 
 
-GET /addChapter			controllers.ApplicationEditing.addChapter()
+GET /addChapter			controllers.ApplicationEditing.addChapter(request: Request)
 GET /editChapter/:id		controllers.ApplicationEditing.editChapter(id : Integer, request: Request)
 POST /saveChapter	controllers.ApplicationEditing.saveChapter(request: Request)
 GET /addSection/:chapterId		controllers.ApplicationEditing.addSection(chapterId : Integer, request: Request)
@@ -95,7 +95,7 @@ GET     /custodia                   controllers.Attendance.viewCustodiaAdmin(req
 GET     /jsonPeople               controllers.CRM.jsonPeople(term ?= "", request: Request)
 GET     /people                   controllers.CRM.recentComments(request: Request)
 GET     /allPeople                controllers.CRM.allPeople(request: Request)
-GET     /people/new               controllers.CRM.newPerson()
+GET     /people/new               controllers.CRM.newPerson(request: Request)
 GET     /people/:id               controllers.CRM.person(id: Integer, request: Request)
 POST    /people                   controllers.CRM.makeNewPerson(request: Request)
 POST    /people/:id/delete        controllers.CRM.deletePerson(id: Integer)
@@ -126,8 +126,8 @@ GET     /attendance/forPerson/:id controllers.Attendance.viewPersonReport(id : I
 
 POST    /attendance/createPersonWeek  controllers.Attendance.createPersonWeek(request: Request)
 POST    /attendance/deletePersonWeek  controllers.Attendance.deletePersonWeek(person_id : Integer, monday : String, request: Request)
-POST    /attendance/saveWeek          controllers.Attendance.saveWeek(week_id : Integer, extra_hours : Double)
-POST    /attendance/saveDay           controllers.Attendance.saveDay(day_id : Integer, code ?= "", start_time ?= "", end_time ?= "")
+POST    /attendance/saveWeek          controllers.Attendance.saveWeek(week_id : Integer, extra_hours : Double, request: Request)
+POST    /attendance/saveDay           controllers.Attendance.saveDay(day_id : Integer, code ?= "", start_time ?= "", end_time ?= "", request: Request)
 
 POST    /attendance/importFromCustodia     controllers.Attendance.importFromCustodia(request: Request)
 
@@ -143,7 +143,7 @@ POST 	/accounting/transactions		  			controllers.Accounting.runTransactionsRepor
 POST 	/accounting/toggleTransactionArchived/:id	controllers.Accounting.toggleTransactionArchived(id: Integer, request: Request)
 GET 	/accounting/accounts			  			controllers.Accounting.accounts(request: Request)
 GET 	/accounting/account/:id		  				controllers.Accounting.account(id: Integer, request: Request)
-GET 	/accounting/newAccount			  			controllers.Accounting.newAccount()
+GET 	/accounting/newAccount			  			controllers.Accounting.newAccount(request: Request)
 POST 	/accounting/newAccount			  			controllers.Accounting.makeNewAccount(request: Request)
 GET 	/accounting/editAccount/:id		  			controllers.Accounting.editAccount(id: Integer, request: Request)
 POST 	/accounting/editAccount			  			controllers.Accounting.saveAccount(request: Request)
@@ -183,7 +183,7 @@ POST      /sendFeedbackEmail          controllers.Application.sendFeedbackEmail(
 
 GET     /mailchimpSettings	controllers.CRM.viewMailchimpSettings(request: Request)
 POST	/mailchimpSettings	controllers.CRM.saveMailchimpSettings(request: Request)
-GET	/syncMailchimp		controllers.Public.syncMailchimp()
+GET	/syncMailchimp		controllers.Public.syncMailchimp(request: Request)
 
 
 GET     /settings               controllers.Settings.viewSettings(request: Request)
@@ -226,6 +226,6 @@ GET     /fb-delete-info                         controllers.Public.facebookDelet
 POST    /login                controllers.Public.doLogin(request: Request)
 
 GET     /logout                     com.feth.play.module.pa.controllers.Authenticate.logout
-GET     /out		            controllers.Public.loggedOut
+GET     /out		            controllers.Public.loggedOut(request: Request)
 GET     /authenticate/:provider     controllers.Public.authenticate(provider: String)
 GET     /authenticate/:provider/denied     controllers.Public.oAuthDenied(provider: String)
