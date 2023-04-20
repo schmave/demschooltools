@@ -790,7 +790,7 @@ public class Attendance extends Controller {
     }
 
     public Result deleteOffCampusTime(Http.Request request) {
-        DynamicForm form = mFormFactory.form().bindFromRequest();
+        DynamicForm form = mFormFactory.form().bindFromRequest(request);
         Map<String, String> data = form.rawData();
         for (Map.Entry<String, String> entry : data.entrySet()) {
             if (entry.getKey().isEmpty()) continue;
@@ -813,7 +813,7 @@ public class Attendance extends Controller {
 
     public Result saveOffCampusTime(Http.Request request) throws ParseException {
         DateFormat df = new SimpleDateFormat("MM/dd/yyyy");
-        DynamicForm form = mFormFactory.form().bindFromRequest();
+        DynamicForm form = mFormFactory.form().bindFromRequest(request);
         Map<String, String> data = form.rawData();
 
         for (int i = 0; i < 10; i++) {
@@ -843,7 +843,7 @@ public class Attendance extends Controller {
 
     public Result runReport(Http.Request request) {
         Form<AttendanceReport> form = mFormFactory.form(AttendanceReport.class);
-        Form<AttendanceReport> filledForm = form.bindFromRequest();
+        Form<AttendanceReport> filledForm = form.bindFromRequest(request);
         if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
             return badRequest(views.html.attendance_reports.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), new AttendanceReport(Organization.getByHost(request))));
@@ -900,7 +900,7 @@ public class Attendance extends Controller {
 
     public Result newCode(Http.Request request) {
         AttendanceCode ac = AttendanceCode.create(Organization.getByHost(request));
-        Form<AttendanceCode> filled_form = getCodeForm().bindFromRequest();
+        Form<AttendanceCode> filled_form = getCodeForm().bindFromRequest(request);
         ac.edit(filled_form);
 
         CachedPage.remove(CachedPage.ATTENDANCE_INDEX, Organization.getByHost(request));
@@ -915,7 +915,7 @@ public class Attendance extends Controller {
     }
 
     public Result saveCode(Http.Request request) {
-        Form<AttendanceCode> filled_form = getCodeForm().bindFromRequest();
+        Form<AttendanceCode> filled_form = getCodeForm().bindFromRequest(request);
         AttendanceCode ac = AttendanceCode.findById(
             Integer.parseInt(filled_form.field("id").value().get()), Organization.getByHost(request));
         ac.edit(filled_form);

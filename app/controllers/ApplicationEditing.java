@@ -14,6 +14,7 @@ import models.*;
 import play.api.libs.mailer.MailerClient;
 import play.db.Database;
 import play.data.*;
+import play.i18n.Lang;
 import play.mvc.*;
 
 @With(DumpOnError.class)

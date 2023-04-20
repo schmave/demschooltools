@@ -1,27 +1,25 @@
 package controllers;
 
-import java.lang.annotation.*;
-
-import java.util.concurrent.CompletionStage;
-import java.util.concurrent.CompletableFuture;
-import javax.inject.Inject;
-
+import com.feth.play.module.pa.PlayAuthenticate;
+import com.feth.play.module.pa.user.AuthUser;
 import io.ebean.Ebean;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
-import com.feth.play.module.pa.PlayAuthenticate;
-import com.feth.play.module.pa.user.AuthUser;
-
-import models.OrgConfig;
 import models.Organization;
 import models.User;
 import models.UserRole;
-
+import play.Logger;
 import play.mvc.*;
+import play.mvc.Http.Context;
 import service.MyUserService;
 
-import play.Logger;
-import play.mvc.Http.Context;
+import javax.inject.Inject;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 
 // Lifted from play.mvc.Security
@@ -54,17 +52,17 @@ public class Secured {
         }
 
         @Override
-        public CompletionStage<Result> call(final Context ctx) {
+        public CompletionStage<Result> call(final Http.Request request) {
             try {
                 Authenticator authenticator = new Authenticator(mAuth);
-                String username = authenticator.getUsername(ctx, configuration.value());
+                String username = authenticator.getUsername(request, configuration.value());
                 if (username == null) {
-                    Result unauthorized = authenticator.onUnauthorized(ctx);
+                    Result unauthorized = authenticator.onUnauthorized(request);
                     return CompletableFuture.completedFuture(unauthorized);
                 } else {
-                    Context childCtx = ctx.withRequest(ctx.request().withAttrs(
-                            ctx.request().attrs().put(Security.USERNAME, username)));
-                    return delegate.call(childCtx);
+                    Http.Request childRequest = request.withAttrs(
+                            request.attrs().put(Security.USERNAME, username));
+                    return delegate.call(childRequest);
                 }
             } catch(RuntimeException e) {
                 throw e;
@@ -84,8 +82,8 @@ public class Secured {
             mAuth = auth;
         }
 
-        public String getUsername(final Context ctx, String role) {
-            String username = getUsernameOrIP(ctx, true);
+        public String getUsername(final Http.Request request, String role) {
+            String username = getUsernameOrIP(request, true);
             User u = User.findByEmail(username);
 
             if (u == null) {
@@ -93,11 +91,11 @@ public class Secured {
                 // may be null if not from a valid IP, which will deny access.
                 if (role.equals(UserRole.ROLE_VIEW_JC) &&
                     // Don't let IP address users change their password
-                    !ctx.request().path().equals(routes.Application.viewPassword().path())) {
+                    request.path().equals(routes.Application.viewPassword().path())) {
                     return username;
                 }
             } else if (u.active && u.hasRole(role) &&
-                       (u.organization == null || u.organization.equals(Organization.getByHost(ctx.request())))) {
+                       (u.organization == null || u.organization.equals(Organization.getByHost(request)))) {
                 // Allow access if this user belongs to this organization or is a
                 // multi-domain admin (null organization). Also, the user must
                 // have the required role.
@@ -107,9 +105,9 @@ public class Secured {
             return null;
         }
 
-        public String getUsernameOrIP(final Context ctx, boolean allow_ip) {
-            Logger.debug("Authenticator::getUsername " + ctx + ", " + allow_ip);
-            final AuthUser u = mAuth.getUser(ctx.session());
+        public String getUsernameOrIP(final Http.Request request, boolean allow_ip) {
+            Logger.debug("Authenticator::getUsername " + request + ", " + allow_ip);
+            final AuthUser u = mAuth.getUser(request.session());
 
             if (u != null) {
                 User the_user = User.findByAuthUserIdentity(u);
@@ -119,12 +117,12 @@ public class Secured {
             }
 
             // If we don't have a logged-in user, try going by IP address.
-            if (allow_ip && Organization.getByHost(ctx.request()) != null) {
+            if (allow_ip && Organization.getByHost(request) != null) {
                 String sql = "select ip from allowed_ips where ip like :ip and organization_id=:org_id";
                 SqlQuery sqlQuery = Ebean.createSqlQuery(sql);
-                String address = Application.getRemoteIp(ctx.request());
+                String address = Application.getRemoteIp(request);
                 sqlQuery.setParameter("ip", address);
-                sqlQuery.setParameter("org_id", Organization.getByHost(ctx.request()).id);
+                sqlQuery.setParameter("org_id", Organization.getByHost(request).id);
 
                 // execute the query returning a List of MapBean objects
                 SqlRow result = sqlQuery.findOne();
@@ -137,8 +135,8 @@ public class Secured {
             return null;
         }
 
-        public Result onUnauthorized(final Context ctx) {
-            final AuthUser u = mAuth.getUser(ctx.session());
+        public Result onUnauthorized(final Http.Request request) {
+            final AuthUser u = mAuth.getUser(request.session());
             if (u != null) {
                 User the_user = User.findByAuthUserIdentity(u);
                 if (the_user != null) {
@@ -155,14 +153,14 @@ public class Secured {
                 }
             }
 
-            if (getUsernameOrIP(ctx, false) == null) {
+            if (getUsernameOrIP(request, false) == null) {
                 // Only redirect to the login screen if there
                 // is no user logged in.
                 //
                 // If a user is logged in, but they don't have the proper role
                 // for the page they are trying to access, logging in again
                 // isn't going to help them.
-                mAuth.storeOriginalUrl(ctx);
+                mAuth.storeOriginalUrl(Context.current());
                 return redirect(routes.Public.index());
             } else {
                 return unauthorized("You can't access this page.");
