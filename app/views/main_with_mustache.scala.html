@@ -1,5 +1,5 @@
-@(orgConfig: OrgConfig, title: String, menu : String, selectedBtn : String, templateName: String, scopes: Object)
+@(currentUsername: Optional[String], orgConfig: OrgConfig, title: String, menu : String, selectedBtn : String, templateName: String, scopes: Object)
 
-@main(orgConfig, title, menu, selectedBtn) {
+@main(currentUsername, orgConfig, title, menu, selectedBtn) {
 	@Html(Utils.renderMustache(templateName, scopes))
 }

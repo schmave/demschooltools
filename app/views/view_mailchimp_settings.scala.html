@@ -1,7 +1,7 @@
-@(orgConfig: OrgConfig, form: Form[Organization], org : Organization, mc_syncs : List [ MailchimpSync ],
+@(currentUsername: Optional[String], orgConfig: OrgConfig, form: Form[Organization], org : Organization, mc_syncs : List [ MailchimpSync ],
   mc_lists : Map [ String, com.ecwid.mailchimp.method.v2_0.lists.ListMethodResult.Data ])
 
-@main(orgConfig, "Mailchimp Settings", "settings") {
+@main(currentUsername, orgConfig, "Mailchimp Settings", "settings") {
 
 <h1>MailChimp integration is disabled.</h1>
 

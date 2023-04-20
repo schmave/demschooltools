@@ -1,6 +1,6 @@
-@(orgConfig: OrgConfig, model : TransactionList)
+@(currentUsername: Optional[String], orgConfig: OrgConfig, model : TransactionList)
 
-@main(orgConfig, "Transactions", "accounting", "accounting_transactions") {
+@main(currentUsername, orgConfig, "Transactions", "accounting", "accounting_transactions") {
 
 	<h2>Transactions</h2>
 

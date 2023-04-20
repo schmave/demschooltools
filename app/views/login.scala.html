@@ -1,9 +1,9 @@
-@(orgConfig: OrgConfig, playAuth: com.feth.play.module.pa.PlayAuthenticate, notice : String, remote_ip: String)
+@(currentUsername: Optional[String], orgConfig: OrgConfig, playAuth: com.feth.play.module.pa.PlayAuthenticate, notice : String, remote_ip: String)
 
 @import helper._
 @import com.feth.play.module.pa.views.html._
 
-@main(orgConfig, "DemSchoolTools login (" + orgConfig.org.short_name + ")", "none") {
+@main(currentUsername, orgConfig, "DemSchoolTools login (" + orgConfig.org.short_name + ")", "none") {
 
 	@if( notice != null ) { <div class="alert alert-warning">@notice</div> }
 	<a href="@routes.Application.index()" class="btn btn-large btn-primary" style="color:white;">

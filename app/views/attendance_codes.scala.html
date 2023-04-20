@@ -1,6 +1,6 @@
-@(orgConfig: OrgConfig, codes : List[AttendanceCode], form : Form[AttendanceCode])
+@(currentUsername: Optional[String], orgConfig: OrgConfig, codes : List[AttendanceCode], form : Form[AttendanceCode])
 
-@main(orgConfig, "Attendance codes", "attendance", "attendance_codes") {
+@main(currentUsername, orgConfig, "Attendance codes", "attendance", "attendance_codes") {
 
 <h3>Existing absence codes</h3>
 

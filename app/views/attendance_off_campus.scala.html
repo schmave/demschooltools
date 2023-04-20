@@ -1,8 +1,8 @@
-@(orgConfig: OrgConfig, days : List[AttendanceDay])
+@(currentUsername: Optional[String], orgConfig: OrgConfig, days : List[AttendanceDay])
 
 @import helper._
 
-@main(orgConfig, "Off Campus Time", "attendance", "off_campus_time") {
+@main(currentUsername, orgConfig, "Off Campus Time", "attendance", "off_campus_time") {
 
 <h3>Off Campus Time</h3>
 

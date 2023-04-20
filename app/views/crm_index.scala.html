@@ -1,8 +1,8 @@
-@(orgConfig: OrgConfig, people: List[Person], recent_comments: List[Comment])
+@(currentUsername: Optional[String], orgConfig: OrgConfig, people: List[Person], recent_comments: List[Comment])
 
 @import helper._
 
-@main(orgConfig, "All people", "crm", "crm_home") {
+@main(currentUsername, orgConfig, "All people", "crm", "crm_home") {
 
 	<div class="row">
 	<div class="span4">

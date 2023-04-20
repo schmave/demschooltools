@@ -1,9 +1,9 @@
-@(orgConfig: OrgConfig, lists: List[TaskList], listForm : Form[TaskList])
+@(currentUsername: Optional[String], orgConfig: OrgConfig, lists: List[TaskList], listForm : Form[TaskList])
 
 @import helper._
 @implicitField = @{ FieldConstructor(myConstructor.f) }
 
-@main(orgConfig, "All Checklists", "settings", "settings_checklists") {
+@main(currentUsername, orgConfig, "All Checklists", "settings", "settings_checklists") {
 
 <h3>All Checklists</h3>
 

@@ -1,6 +1,6 @@
-@(orgConfig: OrgConfig, personalAccounts: List[Account], nonPersonalAccounts: List[Account])
+@(currentUsername: Optional[String], orgConfig: OrgConfig, personalAccounts: List[Account], nonPersonalAccounts: List[Account])
 
-@main(orgConfig, "Account Balances", "accounting", "accounting_balances") {
+@main(currentUsername, orgConfig, "Account Balances", "accounting", "accounting_balances") {
 
 	<h2>Account Balances</h2>
 

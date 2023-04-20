@@ -1,8 +1,8 @@
-@(orgConfig: OrgConfig, meeting : Meeting, open_cases: List[Case])
+@(currentUsername: Optional[String], orgConfig: OrgConfig, meeting : Meeting, open_cases: List[Case])
 
 @import helper._
 
-@main(orgConfig, "Edit meeting minutes for date " + meeting.date, "jc") {
+@main(currentUsername, orgConfig, "Edit meeting minutes for date " + meeting.date, "jc") {
 
 <style>
 body

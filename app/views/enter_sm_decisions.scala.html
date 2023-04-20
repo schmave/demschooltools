@@ -1,8 +1,8 @@
-@(orgConfig: OrgConfig, sm_charges : List [ Charge ])
+@(currentUsername: Optional[String], orgConfig: OrgConfig, sm_charges : List [ Charge ])
 
 @import helper._
 
-@main(orgConfig, "Enter School Meeting charges", "jc") {
+@main(currentUsername, orgConfig, "Enter School Meeting charges", "jc") {
 
 <h3> Charges awaiting School Meeting decision</h3>
 

@@ -1,8 +1,8 @@
-@(orgConfig: OrgConfig, active_rps : List[Charge], completed_rps : List[Charge], nullified_rps : List[Charge])
+@(currentUsername: Optional[String], orgConfig: OrgConfig, active_rps : List[Charge], completed_rps : List[Charge], nullified_rps : List[Charge])
 
 @import helper._
 
-@main(orgConfig, "Edit " + orgConfig.str_res_plans + " list", "jc", "rps") {
+@main(currentUsername, orgConfig, "Edit " + orgConfig.str_res_plans + " list", "jc", "rps") {
 
 <script type="text/javascript">
 app = {};

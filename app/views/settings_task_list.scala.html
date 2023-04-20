@@ -1,9 +1,9 @@
-@(orgConfig: OrgConfig, list: TaskList, listForm : Form[TaskList], taskForm : Form[Task])
+@(currentUsername: Optional[String], orgConfig: OrgConfig, list: TaskList, listForm : Form[TaskList], taskForm : Form[Task])
 
 @import helper._
 @implicitField = @{ FieldConstructor(myConstructor.f) }
 
-@main(orgConfig, "Settings for " + list.title, "settings") {
+@main(currentUsername, orgConfig, "Settings for " + list.title, "settings") {
 
 <h3>@list.title settings</h3>
 

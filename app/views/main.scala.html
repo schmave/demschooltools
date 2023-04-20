@@ -1,4 +1,4 @@
-@(orgConfig: OrgConfig, title: String, menu : String, selectedBtn : String = "")(content: Html)
+@(currentUsername: Optional[String], orgConfig: OrgConfig, title: String, menu : String, selectedBtn : String = "")(content: Html)
 @import com.feth.play.module.pa.views.html._
 
 <!DOCTYPE html>
@@ -36,7 +36,8 @@
     </form>
     </div></div>
 
-        @ifAuth() { username =>
+    @defining(currentUsername) { username =>
+    @if( username != null ) {
 <div class="tabbable">
             <ul class="dst-nav nav nav-tabs navbar-default no-print">
             <li @if(menu.equals("crm")) { class="active" }>
@@ -72,7 +73,7 @@
                 </li>
             }
             <li style="float:right;">
-                @if(Application.isCurrentUserLoggedIn()) {
+                @if(Application.isCurrentUserLoggedIn(currentUsername)) {
                     <a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout">
                         Logout</a>
                 } else {
@@ -80,7 +81,7 @@
                     Login</a>
                 }
             </li>
-            <li @if(menu.equals("account")) { class="username active" } else { class="username" }><a @if(Application.isCurrentUserLoggedIn()) {
+            <li @if(menu.equals("account")) { class="username active" } else { class="username" }><a @if(Application.isCurrentUserLoggedIn(currentUsername)) {
                 href="@routes.Application.viewPassword()"
             } class="username">@username</a></li>
             </ul>
@@ -272,7 +273,7 @@
 
     </div>
 </div>
-    }
+    }}
 
     @if(flash.containsKey("error")) {
         <div class="flash-error"><b>Error</b><br/><br/>@flash.get("error")</div>

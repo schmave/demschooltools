@@ -1,8 +1,8 @@
-@(orgConfig: OrgConfig, r : Entry, history : RuleHistory, recent_rps : Collection[ String ])
+@(currentUsername: Optional[String], orgConfig: OrgConfig, r : Entry, history : RuleHistory, recent_rps : Collection[ String ])
 
 @import helper._
 
-@main(orgConfig, "History of " + r.getNumber() + " " + r.title, "jc") {
+@main(currentUsername, orgConfig, "History of " + r.getNumber() + " " + r.title, "jc") {
 
 @if(flash.containsKey("notice")) {
     <div class="flash-error">@flash.get("notice")</div>

@@ -351,7 +351,7 @@ public class Public extends Controller {
 		if (Organization.getByHost(request) == null) {
 			return unauthorized("Unknown organization");
 		}
-        return ok(views.html.login.render(OrgConfig.get(Organization.getByHost(request)), 
+        return ok(views.html.login.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), 
                 mPlayAuth,
                 request.flash().getOptional("notice").orElse(""),
                 Application.getRemoteIp(request)));
@@ -391,6 +391,6 @@ public class Public extends Controller {
     }
 
     public Result loggedOut(Http.Request request) {
-        return ok(views.html.logged_out.render(OrgConfig.get(Organization.getByHost(request))));
+        return ok(views.html.logged_out.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request))));
     }
 }

@@ -1,6 +1,6 @@
-@(orgConfig: OrgConfig, page : CachedPage)
+@(currentUsername: Optional[String], orgConfig: OrgConfig, page : CachedPage)
 
-@main(orgConfig, page.title, page.menu, page.selected_button) {
+@main(currentUsername, orgConfig, page.title, page.menu, page.selected_button) {
 
 @Html(page.getPage())
 

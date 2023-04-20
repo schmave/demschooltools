@@ -1,8 +1,8 @@
-@(orgConfig: OrgConfig, chapter : Chapter)
+@(currentUsername: Optional[String], orgConfig: OrgConfig, chapter : Chapter)
 
 @import helper._
 
-@main(orgConfig, "" + chapter.num + " " + chapter.title, "manual") {
+@main(currentUsername, orgConfig, "" + chapter.num + " " + chapter.title, "manual") {
 
 <div id="footer">
 Printed on @Application.yymmddDate(orgConfig).

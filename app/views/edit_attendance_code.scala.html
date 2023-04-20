@@ -1,6 +1,6 @@
-@(orgConfig: OrgConfig, form : Form[AttendanceCode])
+@(currentUsername: Optional[String], orgConfig: OrgConfig, form : Form[AttendanceCode])
 
-@main(orgConfig, "Edit Attendance code", "attendance") {
+@main(currentUsername, orgConfig, "Edit Attendance code", "attendance") {
 
 
 <h3>Edit Attendance Code</h3>

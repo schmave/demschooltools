@@ -1,9 +1,9 @@
-@(orgConfig: OrgConfig, start_date : Date, end_date: Date, data : WeeklyStats, cases: List[ Case ],
+@(currentUsername: Optional[String], orgConfig: OrgConfig, start_date : Date, end_date: Date, data : WeeklyStats, cases: List[ Case ],
 minor_referral_destinations : List[ String ])
 
 @import helper._
 
-@main(orgConfig, "Weekly report starting on " + Application.formatDateShort(orgConfig, start_date), "jc", "weekly_report") {
+@main(currentUsername, orgConfig, "Weekly report starting on " + Application.formatDateShort(orgConfig, start_date), "jc", "weekly_report") {
 
 <h3> Weekly report </h3>
 <p><a href="@routes.Application.viewWeeklyReport(Application.forDateInput(Application.addWeek(end_date, -1)))">&lt;&lt; Prev week</a>

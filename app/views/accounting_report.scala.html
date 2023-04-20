@@ -1,8 +1,8 @@
-@(orgConfig: OrgConfig, report: AccountingReport)
+@(currentUsername: Optional[String], orgConfig: OrgConfig, report: AccountingReport)
 
 @import helper._
 
-@main(orgConfig, "Report", "accounting", "accounting_report") {
+@main(currentUsername, orgConfig, "Report", "accounting", "accounting_report") {
 
 	<h2>Accounting Report</h2>
 

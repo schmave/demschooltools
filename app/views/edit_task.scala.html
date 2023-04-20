@@ -1,9 +1,9 @@
-@(orgConfig: OrgConfig, taskForm:Form[Task], list_options : List[TaskList])
+@(currentUsername: Optional[String], orgConfig: OrgConfig, taskForm:Form[Task], list_options : List[TaskList])
 
 @import helper._
 @implicitField = @{ FieldConstructor(myConstructor.f) }
 
-@main(orgConfig, "Edit task", "settings") {
+@main(currentUsername, orgConfig, "Edit task", "settings") {
 
 <h3>Edit task</h3>
 

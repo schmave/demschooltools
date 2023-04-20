@@ -1,8 +1,8 @@
-@(orgConfig: OrgConfig, m : Meeting)
+@(currentUsername: Optional[String], orgConfig: OrgConfig, m : Meeting)
 
 @import helper._
 
-@main(orgConfig, orgConfig.str_jc_name_short + " " + orgConfig.str_res_plans + " from " + Application.formatMeetingDate(m.date), "jc") {
+@main(currentUsername, orgConfig, orgConfig.str_jc_name_short + " " + orgConfig.str_res_plans + " from " + Application.formatMeetingDate(m.date), "jc") {
 
 <script>
 $(function() {

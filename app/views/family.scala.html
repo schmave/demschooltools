@@ -1,9 +1,9 @@
-@(orgConfig: OrgConfig, p : Person, family_members: List[Person], comments: List[Comment],
+@(currentUsername: Optional[String], orgConfig: OrgConfig, p : Person, family_members: List[Person], comments: List[Comment],
   comment_email : String)
 
 @import helper._
 
-@main(orgConfig, p.first_name + " " + p.last_name, "crm") {
+@main(currentUsername, orgConfig, p.first_name + " " + p.last_name, "crm") {
 
 @if(p.family != null) {
 	<p class="center">

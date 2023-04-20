@@ -1,8 +1,8 @@
-@(orgConfig: OrgConfig, charges : List [ Charge ])
+@(currentUsername: Optional[String], orgConfig: OrgConfig, charges : List [ Charge ])
 
 @import helper._
 
-@main(orgConfig, "Past School Meeting decisions", "jc", "view_sm") {
+@main(currentUsername, orgConfig, "Past School Meeting decisions", "jc", "view_sm") {
 
 <h3>Past School Meeting decisions</h3>
 <table class="table printable-res-plans">

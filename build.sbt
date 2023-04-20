@@ -23,7 +23,7 @@ pipelineStages := Seq(digest, gzip)
 // These settings from
 //  https://github.com/playframework/play-ebean/blob/main/docs/manual/working/javaGuide/main/sql/code/ebean.sbt
 Compile / playEbeanModels := Seq("models.*")
-playEbeanDebugLevel := 4
+playEbeanDebugLevel := 2
 
 libraryDependencies ++= Seq(
   javaJdbc,

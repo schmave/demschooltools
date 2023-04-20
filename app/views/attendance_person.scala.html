@@ -1,11 +1,11 @@
-@(orgConfig: OrgConfig, person : Person, days : List[AttendanceDay], weeks: Map[Date, AttendanceWeek],
+@(currentUsername: Optional[String], orgConfig: OrgConfig, person : Person, days : List[AttendanceDay], weeks: Map[Date, AttendanceWeek],
   codes : List[String], codes_map : Map[String, AttendanceCode], stats: AttendanceStats,
   start_date: Date, end_date: Date, min_date: Date, max_date: Date,
   has_off_campus_time: Boolean, table_width: Integer)
 
 @import helper._
 
-@main(orgConfig, person.first_name + " " + person.last_name + " attendance", "attendance", "person") {
+@main(currentUsername, orgConfig, person.first_name + " " + person.last_name + " attendance", "attendance", "person") {
 
 <h2>@person.first_name @person.last_name attendance</h2>
 
