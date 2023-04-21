@@ -42,7 +42,7 @@ public class Attendance extends Controller {
         this.mFormFactory = ff;
     }
 
-    String renderIndexContent(Date start_date, Date end_date, Boolean is_custom_date, Organization org) {
+    String renderIndexContent(Date start_date, Date end_date, Boolean is_custom_date, Organization org, Http.Request request) {
         if (end_date == null) {
             end_date = new Date(start_date.getTime());
             end_date.setYear(end_date.getYear() + 1);
@@ -63,7 +63,7 @@ public class Attendance extends Controller {
             next_date = null;
         }
 
-        return attendance_index.render(OrgConfig.get(org),
+        return attendance_index.render(
             all_people, person_to_stats, all_codes, codes_map,
             Application.attendancePeople(org), start_date, end_date, is_custom_date, prev_date, next_date, request).toString();
     }
@@ -76,7 +76,7 @@ public class Attendance extends Controller {
                             "attendance_home", Organization.getByHost(request)) {
                         @Override
                         String render() {
-                            return renderIndexContent(Application.getStartOfYear(), null, false, Organization.getByHost(request));
+                            return renderIndexContent(Application.getStartOfYear(), null, false, Organization.getByHost(request), request);
                         }
                     }, request));
         } else {
@@ -91,7 +91,7 @@ public class Attendance extends Controller {
                             if (!end_date_str.equals("")) {
                                 end_date = Utils.parseDateOrNow(end_date_str).getTime();
                             }
-                            return renderIndexContent(start_date, end_date, is_custom_date, Organization.getByHost(request));
+                            return renderIndexContent(start_date, end_date, is_custom_date, Organization.getByHost(request), request);
                         }
 
                         @Override

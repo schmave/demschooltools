@@ -1,5 +1,7 @@
 package models;
 
+import play.mvc.Http;
+
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.TimeZone;
@@ -46,6 +48,10 @@ public class OrgConfig {
         OrgConfig result = configs.get(org.name);
         result.org = org;
         return result;
+    }
+
+    public static OrgConfig get(Http.Request request) {
+        return OrgConfig.get(Organization.getByHost(request));
     }
 
     public String getReferralDestination(Charge c) {

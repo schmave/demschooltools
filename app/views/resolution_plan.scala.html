@@ -1,4 +1,4 @@
-@(charge : Charge)(implicit request: Request)
+@(charge : Charge)(implicit request: play.mvc.Http.Request)
 
 @import helper._
 
@@ -9,5 +9,5 @@
 					@charge.getRuleTitle()
 				<td class="col-xs-7">@charge.resolution_plan
 				@if(charge.sm_decision != null) { <b>[Sch. Mtg. decided:</b> @charge.sm_decision<b>]</b> }
-				<td class="col-xs-1" style="vertical-align:middle;">@if( orgConfig.show_checkbox_for_res_plan ) {<div class="checkbox"></div>}
+				<td class="col-xs-1" style="vertical-align:middle;">@if( OrgConfig.get(request).show_checkbox_for_res_plan ) {<div class="checkbox"></div>}
 			</tr>

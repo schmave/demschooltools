@@ -1,13 +1,13 @@
-@(groups : HashMap[String, List[Charge]])(implicit request: Request)
+@(groups : HashMap[String, List[Charge]])(implicit request: play.mvc.Http.Request)
 
 @sorted_keys = @{ new ArrayList(groups.keySet()) }
 @{ Collections.sort(sorted_keys) }
 
 @import helper._
 
-@main("Print simple " + orgConfig.str_res_plans, "jc", "rps") {
+@main("Print simple " + OrgConfig.get(request).str_res_plans, "jc", "rps") {
 
-<h2>Active @orgConfig.str_res_plans <span class="comment_time">as of @Application.formatDateTimeLong(orgConfig)</span></h2>
+<h2>Active @OrgConfig.get(request).str_res_plans <span class="comment_time">as of @Application.formatDateTimeLong(OrgConfig.get(request))</span></h2>
 
 @for(key <- sorted_keys) {
     <h3>@key</h3>

@@ -1,7 +1,7 @@
-@(lists: List[TaskList], listForm : Form[TaskList])(implicit request: Request)
+@(lists: List[TaskList], listForm : Form[TaskList])(implicit request: play.mvc.Http.Request)
 
 @import helper._
-@implicitField = @{ FieldConstructor(myConstructor.f) }
+
 
 @main("All Checklists", "settings", "settings_checklists") {
 

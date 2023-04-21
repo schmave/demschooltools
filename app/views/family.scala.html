@@ -1,5 +1,5 @@
 @(p : Person, family_members: List[Person], comments: List[Comment],
-  comment_email : String)(implicit request: Request)
+  comment_email : String)(implicit request: play.mvc.Http.Request)
 
 @import helper._
 
@@ -45,7 +45,7 @@
 				}
 				<label for="task_checkbox_@task.id" style="display:inline">@task.title</label>
 				@if( ct != null ) {
-					<i>(@ct.comment.user.name, @CRM.formatDate(ct.comment.created, orgConfig))</i>
+					<i>(@ct.comment.user.name, @CRM.formatDate(ct.comment.created, OrgConfig.get(request)))</i>
 					@if(ct.comment.message.length() > 0) {
 						-- @ct.comment.message
 					}

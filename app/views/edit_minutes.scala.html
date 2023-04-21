@@ -1,4 +1,4 @@
-@(meeting : Meeting, open_cases: List[Case])(implicit request: Request)
+@(meeting : Meeting, open_cases: List[Case])(implicit request: play.mvc.Http.Request)
 
 @import helper._
 
@@ -23,9 +23,9 @@ app.ROLE_RUNNER = @PersonAtMeeting.ROLE_RUNNER
 app.ROLE_TESTIFIER = @PersonAtCase.ROLE_TESTIFIER
 app.ROLE_WRITER = @PersonAtCase.ROLE_WRITER
 
-app.people = @Html(Application.jcPeople("", orgConfig.org))
-app.rules = @Html(Application.jsonRules(false, orgConfig.org))
-app.cases = @Html(Application.jsonCases("", orgConfig.org))
+app.people = @Html(Application.jcPeople("", OrgConfig.get(request).org))
+app.rules = @Html(Application.jsonRules(false, OrgConfig.get(request).org))
+app.cases = @Html(Application.jsonCases("", OrgConfig.get(request).org))
 
 app.initial_data = {
 	committee : @Html(meeting.getJsonPeople(PersonAtMeeting.ROLE_JC_MEMBER)),
@@ -40,7 +40,7 @@ app.initial_data = {
 	app.initial_data.cases.push( @Html(Utils.toJson(c)) );
 }
 
-config = @Html(Utils.toJson(orgConfig));
+config = @Html(Utils.toJson(OrgConfig.get(request)));
 $(function () {
 	initMinutesPage();
 });
@@ -59,7 +59,7 @@ $(function () {
 </div>
 
 <script id="meeting-template" type="text/x-handlebars-template">
-<h2>@orgConfig.str_jc_name minutes<br>@Application.formatMeetingDate(meeting.date)</h2>
+<h2>@OrgConfig.get(request).str_jc_name minutes<br>@Application.formatMeetingDate(meeting.date)</h2>
 <p>
     <a href="@routes.Application.viewMeeting(meeting.id)" class="btn btn-warning">
         View printable minutes</a>
@@ -116,7 +116,7 @@ $(function () {
                 <input type="checkbox" value="{{is_referenced}}" data-id="{{charge_id}}" {{#if is_referenced}}checked{{/if}}>
                 {{person}} was charged with {{rule}}
                 {{#if is_sm_decision}}and School Meeting decided on{{else}}and was assigned{{/if}}
-                the @orgConfig.str_res_plan "{{resolution_plan}}"
+                the @OrgConfig.get(request).str_res_plan "{{resolution_plan}}"
                 {{#if previously_referenced_in_case}}
                     (Previously referenced in case {{previously_referenced_in_case}})
                 {{else}}
@@ -137,26 +137,26 @@ $(function () {
 	<b>Entry:</b> {{> rule-chooser}}
 	<tr><td class="esm-form-label">Plea:<td colspan=2>
 <div class="radio-inline">
-  <label><input type="radio" class="plea plea-guilty" value="Guilty"><span>@orgConfig.str_guilty</span></label>
+  <label><input type="radio" class="plea plea-guilty" value="Guilty"><span>@OrgConfig.get(request).str_guilty</span></label>
 </div>
-@if( orgConfig.show_no_contest_plea ) {
+@if( OrgConfig.get(request).show_no_contest_plea ) {
 <div class="radio-inline">
   <label><input type="radio" class="plea plea-no-contest" value="No Contest"><span>No Contest</span></label>
 </div>
 }
 <div class="radio-inline">
-  <label><input type="radio" class="plea plea-not-guilty" value="Not Guilty"><span>@orgConfig.str_not_guilty</span></label>
+  <label><input type="radio" class="plea plea-not-guilty" value="Not Guilty"><span>@OrgConfig.get(request).str_not_guilty</span></label>
 </div>
-@if( orgConfig.show_na_plea ) {
+@if( OrgConfig.get(request).show_na_plea ) {
 <div class="radio-inline">
-  <label><input type="radio" class="plea plea-na" value="N/A"><span>@orgConfig.str_na</span></label>
+  <label><input type="radio" class="plea plea-na" value="N/A"><span>@OrgConfig.get(request).str_na</span></label>
 </div>
 }
 &nbsp;&nbsp;&nbsp;<label><input type="checkbox" class="refer-to-sm"><span> Refer to School Meeting</span></label>
-	@if( orgConfig.use_minor_referrals ) {
+	@if( OrgConfig.get(request).use_minor_referrals ) {
         <label><span class="minor-referral-label">Refer to:</span><input type="text" class="minor-referral-destination"></label>
     }
-@if( orgConfig.show_severity ) {
+@if( OrgConfig.get(request).show_severity ) {
     <tr><td class="esm-form-label">Severity:<td>
     <div class="radio-inline">
       <label><input type="radio" class="severity severity-mild" value="Mild"><span>Mild</span></label>
@@ -179,7 +179,7 @@ $(function () {
     </td>
 </tr>
 <tr>
-    <td class="esm-form-label">@orgConfig.str_res_plan_cap:</td>
+    <td class="esm-form-label">@OrgConfig.get(request).str_res_plan_cap:</td>
     <td colspan="2">
         <div class="rp-followups" hidden>
             <div class="radio-inline">
@@ -188,7 +188,7 @@ $(function () {
             </div>
             <div class="radio-inline">
               <label><input type="radio" class="rp-followup rp-followup-new-rp">
-                <span>Delete & replace original @orgConfig.str_res_plan</span></label>
+                <span>Delete & replace original @OrgConfig.get(request).str_res_plan</span></label>
             </div>
         </div>
         <div class="rp-row">
@@ -213,7 +213,7 @@ $(function () {
 <div class="panel-body">
 
 <table>
-@if(orgConfig.track_writer) {
+@if(OrgConfig.get(request).track_writer) {
     <tr><td class="esm-form-label">Who wrote complaint:
     <td>{{render "people-chooser" clazz="writer"}}</tr>
 }
@@ -226,7 +226,7 @@ $(function () {
     {{render "people-chooser" clazz="testifier"}}
 </tr>
 
-@if( orgConfig.org.enable_case_references ) {
+@if( OrgConfig.get(request).org.enable_case_references ) {
     <tr>
         <td class="esm-form-label">Referenced cases:</td>
         <td>{{render "case-chooser"}}</td>
@@ -237,7 +237,7 @@ $(function () {
     </tr>
 }
 
-<tr><td class="esm-form-label">@orgConfig.str_findings: <td><textarea class="findings"></textarea></tr>
+<tr><td class="esm-form-label">@OrgConfig.get(request).str_findings: <td><textarea class="findings"></textarea></tr>
 
 </table>
 <div class="charges"></div>

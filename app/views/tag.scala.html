@@ -1,4 +1,4 @@
-@(tag: Tag, people: List[Person], people_with_family: Collection[Person], use_student_display: Boolean, allow_edit: Boolean)(implicit request: Request)
+@(tag: Tag, people: List[Person], people_with_family: Collection[Person], use_student_display: Boolean, allow_edit: Boolean)(implicit request: play.mvc.Http.Request)
 
 @import helper._
 
@@ -67,7 +67,7 @@
                 <a href="@routes.CRM.person(c.person.person_id)">
                     @c.person.first_name @c.person.last_name
                 </a></td>
-                <td>@Application.yymmddDate(orgConfig, c.time)</td>
+                <td>@Application.yymmddDate(OrgConfig.get(request), c.time)</td>
                 <td>@c.creator.name</td>
                 </tr>
             }

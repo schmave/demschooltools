@@ -1,6 +1,6 @@
-@(u : User, userForm : Form[User])(implicit request: Request)
+@(u : User, userForm : Form[User])(implicit request: play.mvc.Http.Request)
 @import helper._
-@implicitField = @{ FieldConstructor(myConstructor.f) }
+
 
 
 @main("Edit user " + u.name, "settings") {
@@ -15,7 +15,7 @@
 <hr/>
 	@for( role <- UserRole.ALL_ROLES ) {
 		@simpleCheckbox(role,
-			UserRole.getDescription(orgConfig, role),
+			UserRole.getDescription(OrgConfig.get(request), role),
 			u.hasRole(role))
 	}
 <input type="submit" value="Save"/>

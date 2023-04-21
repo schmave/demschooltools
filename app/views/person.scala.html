@@ -1,4 +1,4 @@
-@(person: Person, is_primary: Boolean)(implicit request: Request)
+@(person: Person, is_primary: Boolean)(implicit request: play.mvc.Http.Request)
 
 @import helper._
 
@@ -79,7 +79,7 @@ enableTagBox("#person_tag_entry_@person.person_id",
 }
 
 @if(person.dob != null) {
-	<br>Age @CRM.calcAge(person) (born @CRM.formatDob(person.dob, orgConfig))
+	<br>Age @CRM.calcAge(person) (born @CRM.formatDob(person.dob, OrgConfig.get(request)))
 }
 @if(!person.grade.equals("")) {
 	<br>Grade @person.grade<br>

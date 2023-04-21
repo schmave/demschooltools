@@ -1,12 +1,12 @@
 @(p : Person, history : PersonHistory, recent_rps : List[ Charge ],
- redact_names : Boolean)(implicit request: Request)
+ redact_names : Boolean)(implicit request: play.mvc.Http.Request)
 
 @import helper._
 
-@main(p.getDisplayName() + "'s " + orgConfig.str_jc_name_short + " history", "jc") {
+@main(p.getDisplayName() + "'s " + OrgConfig.get(request).str_jc_name_short + " history", "jc") {
 
-@if(flash.containsKey("notice")) {
-    <div class="flash-error">@flash.get("notice")</div>
+@if(request.flash.containsKey("notice")) {
+    <div class="flash-error">@request.flash.get("notice")</div>
 }
 
 

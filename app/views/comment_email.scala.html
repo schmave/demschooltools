@@ -1,11 +1,11 @@
-@(c : Comment)(implicit request: Request)
+@(c : Comment)(implicit request: play.mvc.Http.Request)
 
 <html>
 <body>
 <h3>An update from DemSchoolTools</h3>
 
 <p><b>@c.user.name</b> communicated with
-<a href="@{orgConfig.people_url}@routes.CRM.person(c.person.person_id)">
+<a href="@{OrgConfig.get(request).people_url}@routes.CRM.person(c.person.person_id)">
 <b>@c.person.first_name @c.person.last_name</b>
 </a>
 
@@ -16,7 +16,7 @@
 <p>The following tasks were marked complete:
 <ul>
 @for( ct <- c.completed_tasks ) {
-	<li><a href="@{orgConfig.people_url}@routes.CRM.viewTaskList(ct.task.task_list.id)" class="label label-info">@ct.task.title</a>
+	<li><a href="@{OrgConfig.get(request).people_url}@routes.CRM.viewTaskList(ct.task.task_list.id)" class="label label-info">@ct.task.title</a>
 }
 </ul>
 }

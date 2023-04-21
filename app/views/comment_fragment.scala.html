@@ -1,4 +1,4 @@
-@(c : Comment, show_last_name: Boolean)(implicit request: Request)
+@(c : Comment, show_last_name: Boolean)(implicit request: play.mvc.Http.Request)
 
 
 <div class="comment">
@@ -18,5 +18,5 @@
 	<a href="@routes.CRM.viewTaskList(ct.task.task_list.id)"><span class="label label-primary">@ct.task.title</span></a>
 }
 </div>
-<div class="comment_time">@CRM.formatDate(c.created, orgConfig)</div>
+<div class="comment_time">@CRM.formatDate(c.created, OrgConfig.get(request))</div>
 </div>

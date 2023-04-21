@@ -1,7 +1,7 @@
-@(list: TaskList, listForm : Form[TaskList], taskForm : Form[Task])(implicit request: Request)
+@(list: TaskList, listForm : Form[TaskList], taskForm : Form[Task])(implicit request: play.mvc.Http.Request)
 
 @import helper._
-@implicitField = @{ FieldConstructor(myConstructor.f) }
+
 
 @main("Settings for " + list.title, "settings") {
 

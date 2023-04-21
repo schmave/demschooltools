@@ -1,16 +1,16 @@
 @(start_date : Date, end_date: Date, data : WeeklyStats, cases: List[ Case ],
-minor_referral_destinations : List[ String ])(implicit request: Request)
+minor_referral_destinations : List[ String ])(implicit request: play.mvc.Http.Request)
 
 @import helper._
 
-@main("Weekly report starting on " + Application.formatDateShort(orgConfig, start_date), "jc", "weekly_report") {
+@main("Weekly report starting on " + Application.formatDateShort(OrgConfig.get(request), start_date), "jc", "weekly_report") {
 
 <h3> Weekly report </h3>
 <p><a href="@routes.Application.viewWeeklyReport(Application.forDateInput(Application.addWeek(end_date, -1)))">&lt;&lt; Prev week</a>
 &nbsp;&nbsp;&nbsp;&nbsp;
 Period from
-@Application.formatDayOfWeek(start_date) @Application.formatDateShort(orgConfig, start_date) to
-@Application.formatDayOfWeek(end_date) @Application.formatDateShort(orgConfig, end_date), inclusive.
+@Application.formatDayOfWeek(start_date) @Application.formatDateShort(OrgConfig.get(request), start_date) to
+@Application.formatDayOfWeek(end_date) @Application.formatDateShort(OrgConfig.get(request), end_date), inclusive.
 &nbsp;&nbsp;&nbsp;&nbsp;
 <a href="@routes.Application.viewWeeklyReport(Application.forDateInput(Application.addWeek(end_date, 1)))">Next week &gt;&gt;</a>
 <p>
@@ -57,7 +57,7 @@ Period from
 </div>
 
 <h4>&nbsp;<br>Cases with no charges</h4>
-@caseTableOpen(orgConfig)
+@caseTableOpen()
 @for(c <- cases) {
 	@if( !c.empty() && c.charges.size() == 0 ) {
 		@caseTableRow(c, true)
@@ -65,7 +65,7 @@ Period from
 }
 </table>
 
-@if( orgConfig.use_minor_referrals ) {
+@if( OrgConfig.get(request).use_minor_referrals ) {
   @for( dest <- minor_referral_destinations ) {
 	<h4>&nbsp;<br>Charges referred to @dest</h4>
 	@for(c <- cases) {

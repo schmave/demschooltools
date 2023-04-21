@@ -1,11 +1,11 @@
-@(p : Person, cases : List[ Case ])(implicit request: Request)
+@(p : Person, cases : List[ Case ])(implicit request: play.mvc.Http.Request)
 
 @import helper._
 
 @main("Cases written up by " + p.getDisplayName(), "jc") {
 
 <h4>&nbsp;<br>Cases written up by @p.getDisplayName()</h4>
-@caseTableOpen(orgConfig)
+@caseTableOpen()
 @for(c <- cases) {
 	@if( !c.empty() ) {
 		@caseTableRow(c, true)

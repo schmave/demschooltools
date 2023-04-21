@@ -2,17 +2,17 @@
   codes : Map[String, AttendanceCode],
   people : List[Person],
   days : Map[Person, List[AttendanceDay]],
-  weeks : Map[Person, AttendanceWeek])(implicit request: Request)
+  weeks : Map[Person, AttendanceWeek])(implicit request: play.mvc.Http.Request)
 
 @import helper._
 
 @main("Attendance data", "attendance", "week") {
 
-<h3>Attendance weekly report @Application.yymmddDate(orgConfig, monday)
+<h3>Attendance weekly report @Application.yymmddDate(OrgConfig.get(request), monday)
 <a class="edit-link" href="@routes.Attendance.editWeek()?date=@Application.forDateInput(monday)">Edit</a>
 </h3>
 <p><a href="@routes.Attendance.viewWeek()?date=@Application.forDateInput(Application.addWeek(monday, -1))">&lt;&lt; Prev week</a>
- @Application.yymmddDate(orgConfig, monday) <a href="@routes.Attendance.viewWeek()?date=@Application.forDateInput(Application.addWeek(monday, 1))">Next week &gt;&gt;</a>
+ @Application.yymmddDate(OrgConfig.get(request), monday) <a href="@routes.Attendance.viewWeek()?date=@Application.forDateInput(Application.addWeek(monday, 1))">Next week &gt;&gt;</a>
 </p>
 
 <table class="attendance-view table sortable">

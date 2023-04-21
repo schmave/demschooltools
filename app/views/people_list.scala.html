@@ -1,4 +1,4 @@
-@(people : List[Person], show_checkboxes: Boolean)(implicit request: Request)
+@(people : List[Person], show_checkboxes: Boolean)(implicit request: play.mvc.Http.Request)
 
 <table class="table sortable">
 <tr>@if( show_checkboxes ) { <th> }

@@ -3,11 +3,11 @@
   people : List[Person],
   additional_people : List[Person],
   days : Map[Person, List[AttendanceDay]],
-  weeks : Map[Person, AttendanceWeek])(implicit request: Request)
+  weeks : Map[Person, AttendanceWeek])(implicit request: play.mvc.Http.Request)
 
 @import helper._
 
-@main("Edit attendance for week of " + Application.yymmddDate(orgConfig, monday), "attendance") {
+@main("Edit attendance for week of " + Application.yymmddDate(OrgConfig.get(request), monday), "attendance") {
 
 <script type="text/javascript">
 app = {};
@@ -31,16 +31,16 @@ app.initial_data = {
 	app.initial_data.weeks[@week.person.person_id] = @Html(Utils.toJson(week));
 }
 
-config = @Html(Utils.toJson(orgConfig));
+config = @Html(Utils.toJson(OrgConfig.get(request)));
 $(function() {
     initAttendanceWeek();
 });
 </script>
 
-<h3>Editing week of @Application.yymmddDate(orgConfig, monday)</h3>
+<h3>Editing week of @Application.yymmddDate(OrgConfig.get(request), monday)</h3>
 <form method="POST" action="@routes.Attendance.importFromCustodia()">
 <p><a class="btn btn-success" href="@routes.Attendance.viewWeek()?date=@Application.forDateInput(monday)">Done editing; return to viewing</a>
-@if( orgConfig.org.show_custodia ) {
+@if( OrgConfig.get(request).org.show_custodia ) {
   <input type="hidden" name="monday" value="@Application.forDateInput(monday)">
   <button class="btn btn-primary">Import from Custodia</button>
 }

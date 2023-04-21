@@ -1,10 +1,10 @@
-@(chapters : List [ Chapter ] )(implicit request: Request)
+@(chapters : List [ Chapter ] )(implicit request: play.mvc.Http.Request)
 
 @import helper._
 
-@main(orgConfig.str_manual_title, "manual", "manual_print") {
+@main(OrgConfig.get(request).str_manual_title, "manual", "manual_print") {
 
-<h2>Download @orgConfig.str_manual_title as a PDF</h2>
+<h2>Download @OrgConfig.get(request).str_manual_title as a PDF</h2>
 
 <p><a href="@routes.Application.printManualChapter(-1)">Entire manual</a>
 

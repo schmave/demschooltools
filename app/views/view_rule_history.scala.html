@@ -1,11 +1,11 @@
-@(r : Entry, history : RuleHistory, recent_rps : Collection[ String ])(implicit request: Request)
+@(r : Entry, history : RuleHistory, recent_rps : Collection[ String ])(implicit request: play.mvc.Http.Request)
 
 @import helper._
 
 @main("History of " + r.getNumber() + " " + r.title, "jc") {
 
-@if(flash.containsKey("notice")) {
-    <div class="flash-error">@flash.get("notice")</div>
+@if(request.flash.containsKey("notice")) {
+    <div class="flash-error">@request.flash.get("notice")</div>
 }
 
 <script type="text/javascript">

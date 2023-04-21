@@ -1,15 +1,15 @@
-@(m : Meeting)(implicit request: Request)
+@(m : Meeting)(implicit request: play.mvc.Http.Request)
 
 @import helper._
 
-<h3>@orgConfig.str_jc_name_short minutes from @Application.formatMeetingDate(m.date)</h3>
+<h3>@OrgConfig.get(request).str_jc_name_short minutes from @Application.formatMeetingDate(m.date)</h3>
 <p><a href="@routes.Application.printMeeting(m.id)" class="btn btn-success no-print">
 1. Print minutes</a>
 <a href="@routes.Application.viewMeetingResolutionPlans(m.id)"
 class="btn btn-success no-print" style="margin-left: 75px">
-2. Print @orgConfig.str_res_plans</a>
+2. Print @OrgConfig.get(request).str_res_plans</a>
 <span class="no-print">or <a href="@routes.Application.downloadMeetingResolutionPlans(m.id)">
-Download @orgConfig.str_res_plans</a></span></p>
+Download @OrgConfig.get(request).str_res_plans</a></span></p>
 <p><a href="@routes.ApplicationEditing.editMeeting(m.id)" class="btn btn-warning no-print">
 Edit minutes</a></p>
 
@@ -31,7 +31,7 @@ Edit minutes</a></p>
 </p>
 
 <h4>&nbsp;<br/>Case Notes</h4>
-@caseTableOpen(orgConfig)
+@caseTableOpen()
 @for(c <- m.cases) {
 	@if( !c.empty() ) {
 		@caseTableRow(c, false)
@@ -43,7 +43,7 @@ Edit minutes</a></p>
 	<td><h5>#@c.case_number	@if( c.date_closed == null ) { (OPEN) }</h5></td>
 	<td>Case discussed today, but kept open for further investigation. Latest notes available
 		in meeting held on <a href="@routes.Application.viewMeeting(c.meeting.id)">
-			@Application.yymmddDate(orgConfig, c.meeting.date)</a></td>
+			@Application.yymmddDate(OrgConfig.get(request), c.meeting.date)</a></td>
 	</tr>
 
 }

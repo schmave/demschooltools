@@ -65,7 +65,7 @@ public abstract class CachedPage {
         String result;
         // Only render one cached page at a time (per server process)
         synchronized(JC_INDEX) {
-            result = render( request);
+            result = render();
         }
 
         try {

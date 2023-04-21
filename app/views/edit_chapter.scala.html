@@ -1,6 +1,6 @@
-@(form: Form[Chapter], is_new : Boolean)(implicit request: Request)
+@(form: Form[Chapter], is_new : Boolean)(implicit request: play.mvc.Http.Request)
 
-@implicitField = @{ helper.FieldConstructor(myConstructor.f) }
+
 
 @main("Edit a chapter", "manual") {
 

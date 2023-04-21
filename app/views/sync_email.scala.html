@@ -1,6 +1,6 @@
 @(
   mc_lists : Map [ String, com.ecwid.mailchimp.method.v2_0.lists.ListMethodResult.Data ],
-  info : MailChimpSyncInfo)(implicit request: Request)
+  info : MailChimpSyncInfo)(implicit request: play.mvc.Http.Request)
 
 <html>
 <body>
@@ -13,7 +13,7 @@
 The following people were added to the list:
 <ul>
 	@for( p <- info.list_changes.get(list_id).adds) {
-		<li><a href="@{orgConfig.people_url}@routes.CRM.person(p.person_id)">
+		<li><a href="@{OrgConfig.get(request).people_url}@routes.CRM.person(p.person_id)">
 		@p.first_name @p.last_name</a>
 	}
 </ul>
@@ -23,7 +23,7 @@ The following people were added to the list:
 The following people were removed from the list:
 <ul>
 	@for( p <- info.list_changes.get(list_id).removes) {
-		<li><a href="@{orgConfig.people_url}@routes.CRM.person(p.person_id)">
+		<li><a href="@{OrgConfig.get(request).people_url}@routes.CRM.person(p.person_id)">
 		@p.first_name @p.last_name</a>
 	}
 </ul>
@@ -33,7 +33,7 @@ The following people were removed from the list:
 The following people's email address was updated:
 <ul>
 	@for( p <- info.list_changes.get(list_id).updates) {
-		<li><a href="@{orgConfig.people_url}@routes.CRM.person(p.person_id)">
+		<li><a href="@{OrgConfig.get(request).people_url}@routes.CRM.person(p.person_id)">
 		@p.first_name @p.last_name</a>
 	}
 </ul>

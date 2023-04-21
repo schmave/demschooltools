@@ -207,7 +207,7 @@ public class Application extends Controller {
         entries_with_charges.sort(Entry.SORT_NUMBER);
 
         return jc_index.render(meetings, people,
-            entries_with_charges).toString();
+            entries_with_charges, request).toString();
                 }}, request));
     }
 
@@ -625,14 +625,14 @@ public class Application extends Controller {
     }
 
     static play.twirl.api.Html renderManualTOC(Organization org, Http.Request request) {
-        return cached_page.render(Application.currentUsername(request), OrgConfig.get(org),
+        return cached_page.render(
             new CachedPage(CachedPage.MANUAL_INDEX,
                 OrgConfig.get(org).str_manual_title,
                 "manual",
                 "toc", org) {
                 @Override
                 String render() {
-                    return view_manual.render(OrgConfig.get(org), Chapter.all(org)).toString();
+                    return view_manual.render(Chapter.all(org), request).toString();
                 }
             }, request);
     }

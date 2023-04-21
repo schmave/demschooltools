@@ -1,12 +1,12 @@
-@(chapters : List [ Chapter ] )(implicit request: Request)
+@(chapters : List [ Chapter ] )(implicit request: play.mvc.Http.Request)
 
 @import helper._
 
 <div id="footer">
-Printed on @Application.yymmddDate(orgConfig).
+Printed on @Application.yymmddDate(OrgConfig.get(request)).
 </div>
 
-<h1>@orgConfig.org.short_name @orgConfig.str_manual_title</h1>
+<h1>@OrgConfig.get(request).org.short_name @OrgConfig.get(request).str_manual_title</h1>
 
 <p class="no-print"><a class="btn btn-primary" href="@routes.ApplicationEditing.addChapter()">Add new chapter</a></p>
 

@@ -1,8 +1,8 @@
-@(personForm: Form[Person], destination : play.api.mvc.Call, submit_title : String)(implicit request: Request)
+@(personForm: Form[Person], destination : play.api.mvc.Call, submit_title : String)(implicit request: play.mvc.Http.Request)
 
 @import helper._
 
-@implicitField = @{ FieldConstructor(myConstructor.f) }
+
 
 <div class="row">
 @form(destination, 'class -> "form-horizontal", 'role -> "form") {
@@ -85,7 +85,7 @@
 		@inputText(personForm("grade"), '_label -> "Current Grade", 'class -> "form-control")
 		@inputDate(personForm("dob"), '_label -> "Date of Birth", 'class -> "form-control")
 
-		@if(orgConfig.org.show_electronic_signin) {
+		@if(OrgConfig.get(request).org.show_electronic_signin) {
 			@inputText(personForm("pin"), '_label -> "Attendance PIN", 'class -> "form-control")
 		}
 

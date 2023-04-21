@@ -58,7 +58,7 @@ public class CRM extends Controller {
                         .where().eq("person.organization", Organization.getByHost(request))
                         .orderBy("created DESC").setMaxRows(20).findList();
 
-                    return people_index.render(recent_comments).toString();
+                    return people_index.render(recent_comments, request).toString();
                 }
             }, request));
     }
@@ -322,7 +322,7 @@ public class CRM extends Controller {
             }
             mail.addTo(rule.email);
             mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
-            mail.setBodyHtml(tag_email.render(OrgConfig.get(Organization.getByHost(request)),
+            mail.setBodyHtml(tag_email.render(
                     t,
                     Application.getCurrentUser(request).name,
                     p, was_add, request).toString());

@@ -1,5 +1,5 @@
 @(form: Form[Organization], org : Organization, mc_syncs : List [ MailchimpSync ],
-  mc_lists : Map [ String, com.ecwid.mailchimp.method.v2_0.lists.ListMethodResult.Data ])(implicit request: Request)
+  mc_lists : Map [ String, com.ecwid.mailchimp.method.v2_0.lists.ListMethodResult.Data ])(implicit request: play.mvc.Http.Request)
 
 @main("Mailchimp Settings", "settings") {
 

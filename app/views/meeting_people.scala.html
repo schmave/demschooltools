@@ -1,4 +1,4 @@
-@(people : List[PersonAtMeeting], role: Integer)(implicit request: Request)
+@(people : List[PersonAtMeeting], role: Integer)(implicit request: play.mvc.Http.Request)
 
 @defining(people.filter(_.role == role)) { selected_people =>
 	@if( selected_people.size() > 0) {

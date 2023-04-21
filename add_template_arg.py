@@ -121,7 +121,7 @@ def add_request_to_file(filename, template_name):
             if ')' in line:
                 if 'implicit' not in line:
                     last_paren_i = line.rindex(')')
-                    lines[i] = line[:last_paren_i] + ')(implicit request: Request)'
+                    lines[i] = line[:last_paren_i] + ')(implicit request: play.mvc.Http.Request)'
                     needs_save = True
                 break
 

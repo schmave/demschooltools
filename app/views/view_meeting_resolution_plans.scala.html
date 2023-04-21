@@ -1,8 +1,8 @@
-@(m : Meeting)(implicit request: Request)
+@(m : Meeting)(implicit request: play.mvc.Http.Request)
 
 @import helper._
 
-@main(orgConfig.str_jc_name_short + " " + orgConfig.str_res_plans + " from " + Application.formatMeetingDate(m.date), "jc") {
+@main(OrgConfig.get(request).str_jc_name_short + " " + OrgConfig.get(request).str_res_plans + " from " + Application.formatMeetingDate(m.date), "jc") {
 
 <script>
 $(function() {

@@ -393,6 +393,6 @@ public class Public extends Controller {
     }
 
     public Result loggedOut(Http.Request request) {
-        return ok(logged_out.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), request));
+        return ok(logged_out.render(request));
     }
 }
