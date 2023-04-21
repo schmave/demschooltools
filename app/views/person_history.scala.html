@@ -1,4 +1,4 @@
-@(p : Person, history : PersonHistory, recent_rps : List[ Charge ], redact_names: Boolean)(implicit request: play.mvc.Http.Request)
+@(p : Person, history : PersonHistory, recent_rps : List[ Charge ], redact_names: Boolean)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
 

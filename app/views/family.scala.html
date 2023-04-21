@@ -1,5 +1,5 @@
 @(p : Person, family_members: List[Person], comments: List[Comment],
-  comment_email : String)(implicit request: play.mvc.Http.Request)
+  comment_email : String)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
 

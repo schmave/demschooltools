@@ -3,7 +3,7 @@
   people : List[Person],
   additional_people : List[Person],
   days : Map[Person, List[AttendanceDay]],
-  weeks : Map[Person, AttendanceWeek])(implicit request: play.mvc.Http.Request)
+  weeks : Map[Person, AttendanceWeek])(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
 

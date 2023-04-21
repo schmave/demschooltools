@@ -1,4 +1,4 @@
-@(title: String, menu : String, selectedBtn : String, templateName: String, scopes: Object)(implicit request: play.mvc.Http.Request)
+@(title: String, menu : String, selectedBtn : String, templateName: String, scopes: Object)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @main(title, menu, selectedBtn) {
 	@Html(Utils.renderMustache(templateName, scopes))

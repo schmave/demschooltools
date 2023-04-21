@@ -11,6 +11,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import models.*;
 
+import play.i18n.MessagesApi;
 import service.MyUserService;
 
 import play.data.*;
@@ -24,10 +25,14 @@ import javax.inject.Inject;
 public class Settings extends Controller {
 
     FormFactory mFormFactory;
+    final MessagesApi mMessagesApi;
+
 
     @Inject
-    public Settings(final FormFactory ff) {
+    public Settings(final FormFactory ff,
+                    MessagesApi messagesApi) {
         mFormFactory = ff;
+        mMessagesApi = messagesApi;
     }
 
     public Result viewSettings(Http.Request request) {

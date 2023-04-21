@@ -24,6 +24,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import play.*;
 import play.api.libs.mailer.MailerClient;
 import play.cache.SyncCacheApi;
+import play.i18n.MessagesApi;
 import play.mvc.*;
 import play.mvc.Http.Context;
 import views.html.logged_out;
@@ -41,16 +42,20 @@ public class Public extends Controller {
     public static Environment sEnvironment;
     public static Config sConfig;
     MailerClient mMailer;
+    final MessagesApi mMessagesApi;
+
 
     @Inject
     public Public(final PlayAuthenticate playAuth, final Authenticate auth, final SyncCacheApi cache,
-                  final Environment environment, final Config config, final MailerClient mailer) {
+                  final Environment environment, final Config config, final MailerClient mailer,
+                  MessagesApi messagesApi) {
         mPlayAuth = playAuth;
         mAuth = auth;
         sCache = cache;
         sEnvironment = environment;
         sConfig = config;
         mMailer = mailer;
+        mMessagesApi = messagesApi;
     }
 
     public Result facebookDeleteInfo() {

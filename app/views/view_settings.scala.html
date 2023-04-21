@@ -1,4 +1,4 @@
-@(notifications : List [ NotificationRule ], org: Organization, play_config: com.typesafe.config.Config)(implicit request: play.mvc.Http.Request)
+@(notifications : List [ NotificationRule ], org: Organization, play_config: com.typesafe.config.Config)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @main("Settings", "settings", "settings") {
 

@@ -1,5 +1,5 @@
 @(meetings : List [ Meeting ], people : List[ Person ],
-rules : List[ Entry ])(implicit request: play.mvc.Http.Request)
+rules : List[ Entry ])(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
 

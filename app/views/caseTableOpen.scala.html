@@ -1,4 +1,4 @@
-@()(implicit request: play.mvc.Http.Request)
+@()(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 <table class="table case_notes">
 <thead><tr><th width="150">Case</th><th>@OrgConfig.get(request).str_findings</th>

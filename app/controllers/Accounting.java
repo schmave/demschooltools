@@ -4,6 +4,7 @@ import com.csvreader.CsvWriter;
 import models.*;
 import play.data.Form;
 import play.data.FormFactory;
+import play.i18n.MessagesApi;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Http;
@@ -24,10 +25,13 @@ import java.util.stream.Collectors;
 public class Accounting extends Controller {
 
     FormFactory mFormFactory;
+    final MessagesApi mMessagesApi;
 
     @Inject
-    public Accounting(FormFactory formFactory) {
+    public Accounting(FormFactory formFactory,
+                      MessagesApi messagesApi) {
         mFormFactory = formFactory;
+        mMessagesApi = messagesApi;
     }
 
     public Result transaction(Integer id, Http.Request request) {

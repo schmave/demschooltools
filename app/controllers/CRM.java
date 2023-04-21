@@ -22,6 +22,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import play.api.libs.mailer.MailerClient;
 import play.data.*;
 import play.data.validation.ValidationError;
+import play.i18n.MessagesApi;
 import play.libs.Json;
 import play.mvc.*;
 import views.html.*;
@@ -33,15 +34,18 @@ public class CRM extends Controller {
 
     Application mApplication;
     FormFactory mFormFactory;
+    final MessagesApi mMessagesApi;
     static MailerClient sMailer;
 
     @Inject
     public CRM(final Application app,
                final FormFactory ff,
-               final MailerClient mailer) {
+               final MailerClient mailer,
+               MessagesApi messagesApi) {
         mApplication = app;
         mFormFactory = ff;
         sMailer = mailer;
+        mMessagesApi = messagesApi;
     }
 
     public Result recentComments(Http.Request request) {

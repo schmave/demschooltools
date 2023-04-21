@@ -117,11 +117,17 @@ def add_request_to_file(filename, template_name):
         search_string = '@('
         assert search_string in lines[0], filename
 
+        needs_messages = True # any(x in existing_content for x in ['@main', 'inputText', 'textarea', 'select', 'checkbox'])
+
         for i, line in enumerate(lines):
             if ')' in line:
                 if 'implicit' not in line:
                     last_paren_i = line.rindex(')')
                     lines[i] = line[:last_paren_i] + ')(implicit request: play.mvc.Http.Request)'
+                    needs_save = True
+                if needs_messages and 'messages' not in line:
+                    last_paren_i = line.rindex(')')
+                    lines[i] = line[:last_paren_i] + ', messages: play.i18n.Messages)'
                     needs_save = True
                 break
 

@@ -15,6 +15,7 @@ import play.api.libs.mailer.MailerClient;
 import play.db.Database;
 import play.data.*;
 import play.i18n.Lang;
+import play.i18n.MessagesApi;
 import play.mvc.*;
 import views.html.*;
 
@@ -23,6 +24,7 @@ public class ApplicationEditing extends Controller {
 
     private final Database mDatabase;
     MailerClient mMailer;
+    final MessagesApi mMessagesApi;
 
 
     static ExecutorService sExecutor = Executors.newFixedThreadPool(2);
@@ -32,10 +34,12 @@ public class ApplicationEditing extends Controller {
     @Inject
     public ApplicationEditing(Database db,
                               FormFactory formFactory,
-                              MailerClient mailer) {
+                              MailerClient mailer,
+                              MessagesApi messagesApi) {
         this.mDatabase = db;
         this.mFormFactory = formFactory;
         mMailer = mailer;
+        mMessagesApi = messagesApi;
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)

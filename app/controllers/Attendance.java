@@ -9,6 +9,7 @@ import models.*;
 import play.data.DynamicForm;
 import play.data.Form;
 import play.data.FormFactory;
+import play.i18n.MessagesApi;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Http;
@@ -36,10 +37,12 @@ import java.util.zip.ZipOutputStream;
 public class Attendance extends Controller {
 
     FormFactory mFormFactory;
-    
+    final MessagesApi mMessagesApi;
+
     @Inject
-    public Attendance(FormFactory ff) {
+    public Attendance(FormFactory ff, MessagesApi messagesApi) {
         this.mFormFactory = ff;
+        mMessagesApi = messagesApi;
     }
 
     String renderIndexContent(Date start_date, Date end_date, Boolean is_custom_date, Organization org, Http.Request request) {

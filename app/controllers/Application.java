@@ -9,6 +9,7 @@ import org.markdown4j.Markdown4jProcessor;
 import org.mindrot.jbcrypt.BCrypt;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 import play.api.libs.mailer.MailerClient;
+import play.i18n.MessagesApi;
 import play.libs.Json;
 import play.mvc.*;
 import views.html.*;
@@ -33,16 +34,19 @@ public class Application extends Controller {
 
     PlayAuthenticate mAuth;
     MailerClient mMailer;
+    private final MessagesApi mMessagesApi;
 
     // TODO: Remove this once we change the main template to not use it
     static Application sInstance = null;
 
     @Inject
     public Application(final PlayAuthenticate auth,
-                       final MailerClient mailerClient) {
+                       final MailerClient mailerClient,
+                       MessagesApi messagesApi) {
         mAuth = auth;
         sInstance = this;
         mMailer = mailerClient;
+        mMessagesApi = messagesApi;
     }
 
     public Result viewPassword(Http.Request request) {

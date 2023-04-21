@@ -1,4 +1,4 @@
-@(personalAccounts: List[Account], nonPersonalAccounts: List[Account])(implicit request: play.mvc.Http.Request)
+@(personalAccounts: List[Account], nonPersonalAccounts: List[Account])(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @main("Account Balances", "accounting", "accounting_balances") {
 

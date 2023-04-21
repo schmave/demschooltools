@@ -1,4 +1,4 @@
-@(groups : HashMap[String, List[Charge]])(implicit request: play.mvc.Http.Request)
+@(groups : HashMap[String, List[Charge]])(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @sorted_keys = @{ new ArrayList(groups.keySet()) }
 @{ Collections.sort(sorted_keys) }
