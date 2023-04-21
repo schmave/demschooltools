@@ -165,14 +165,14 @@ public class Attendance extends Controller {
 
             additional_people.sort(Person.SORT_DISPLAY_NAME);
 
-            response().setHeader("Cache-Control", "max-age=0, no-cache, no-store");
-            response().setHeader("Pragma", "no-cache");
             return ok(edit_attendance_week.render(start_date.getTime(),
                 codes,
                 all_people,
                 additional_people,
                 person_to_days,
-                person_to_week, request));
+                person_to_week, request))
+                    .withHeader("Cache-Control", "max-age=0, no-cache, no-store")
+                    .withHeader("Pragma", "no-cache");
         }
     }
 
@@ -543,10 +543,6 @@ public class Attendance extends Controller {
 
         writer.close();
 
-        response().setHeader("Content-Type", "application/zip");
-        response().setHeader("Content-Disposition",
-                "attachment; filename=attendance.zip");
-
         ByteArrayOutputStream zipBytes = new ByteArrayOutputStream();
         ZipOutputStream zos = new ZipOutputStream(zipBytes);
         zos.putNextEntry(new ZipEntry("attendance/all_data.csv"));
@@ -583,7 +579,10 @@ public class Attendance extends Controller {
         zos.closeEntry();
 
         zos.close();
-        return ok(zipBytes.toByteArray());
+        return ok(zipBytes.toByteArray())
+                .withHeader("Content-Type", "application/zip")
+                .withHeader("Content-Disposition",
+                "attachment; filename=attendance.zip");
     }
 
     private byte[] getDailyHoursFile(TreeSet<Date> allDates,

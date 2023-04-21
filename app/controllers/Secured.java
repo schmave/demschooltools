@@ -25,6 +25,7 @@ import java.util.concurrent.CompletionStage;
 // Lifted from play.mvc.Security
 
 public class Secured {
+    static Logger.ALogger sLogger = Logger.of("application");
 
     /**
      * Wraps the annotated action in an <code>AuthenticatedAction</code>.
@@ -106,7 +107,7 @@ public class Secured {
         }
 
         public String getUsernameOrIP(final Http.Request request, boolean allow_ip) {
-            Logger.debug("Authenticator::getUsername " + request + ", " + allow_ip);
+            sLogger.debug("Authenticator::getUsername " + request + ", " + allow_ip);
             final AuthUser u = mAuth.getUser(request.session());
 
             if (u != null) {
