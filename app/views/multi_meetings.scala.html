@@ -1,4 +1,4 @@
-@(orgConfig: OrgConfig, meetings : List[Meeting])
+@(meetings : List[Meeting])
 
 @import helper._
 
@@ -15,7 +15,7 @@
     </head>
     <body>
         @for(m <- meetings) {
-            @meetingHelper(orgConfig, m)
+            @meetingHelper(m)
             <div style="page-break-after: always" />
         }
     </body>

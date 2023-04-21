@@ -1,4 +1,4 @@
-@(orgConfig: OrgConfig, p : Person, history : PersonHistory, recent_rps : List[ Charge ], redact_names: Boolean)
+@(p : Person, history : PersonHistory, recent_rps : List[ Charge ], redact_names: Boolean)
 
 @import helper._
 
@@ -62,7 +62,7 @@
 			<h4 style="margin-top: 2em;">@rule.getNumber() @rule.title</h4>
 		}
 		@for( c <- charges) {
-			@historyCharge(orgConfig, c, false, false, redact_names)
+			@historyCharge(c, false, false, redact_names)
 		}
 	}
 	</div>
@@ -70,7 +70,7 @@
 	<div class="tab-pane" id="bydate">
 	<p>&nbsp;</p>
 	@for( c <- history.charges_by_date) {
-		@historyCharge(orgConfig, c, false, true, redact_names)
+		@historyCharge(c, false, true, redact_names)
 	}
 	</div>
 </div>

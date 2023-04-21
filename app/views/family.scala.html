@@ -1,9 +1,9 @@
-@(currentUsername: Optional[String], orgConfig: OrgConfig, p : Person, family_members: List[Person], comments: List[Comment],
+@(p : Person, family_members: List[Person], comments: List[Comment],
   comment_email : String)
 
 @import helper._
 
-@main(currentUsername, orgConfig, p.first_name + " " + p.last_name, "crm") {
+@main(p.first_name + " " + p.last_name, "crm") {
 
 @if(p.family != null) {
 	<p class="center">
@@ -18,11 +18,11 @@
 @defining(if(family_members.size() >= 2){ "col-xs-12 col-md-3" } else {"col-xs-12 col-md-6"}) { size =>
 <div class="row">
 	<div class="@size">
-	@person(orgConfig, p, true)
+	@person(p, true)
 	</div>
 
 	@for( family_member <- family_members ) {
-		<div class="@size">@person(orgConfig, family_member, false)</div>
+		<div class="@size">@person(family_member, false)</div>
 	}
 </div>
 }
@@ -95,7 +95,7 @@
 @for( c <- comments ) {
 	@if( c.completed_tasks.size() == 0 ||
 		c.message.length() > 80) {
-		@comment_fragment(orgConfig, c, false)
+		@comment_fragment(c, false)
 	}
 }
 </div>

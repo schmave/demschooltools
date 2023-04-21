@@ -1,9 +1,9 @@
-@(currentUsername: Optional[String], orgConfig: OrgConfig, u : User, userForm : Form[User])
+@(u : User, userForm : Form[User])
 @import helper._
 @implicitField = @{ FieldConstructor(myConstructor.f) }
 
 
-@main(currentUsername, orgConfig, "Edit user " + u.name, "settings") {
+@main("Edit user " + u.name, "settings") {
 
 <h3>Edit user</h3>
 

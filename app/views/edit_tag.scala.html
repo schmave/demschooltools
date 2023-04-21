@@ -1,8 +1,8 @@
-@(currentUsername: Optional[String], orgConfig: OrgConfig, form: Form[Tag])
+@(form: Form[Tag])
 
 @implicitField = @{ helper.FieldConstructor(myConstructor.f) }
 
-@main(currentUsername, orgConfig, "Edit tag " + form("title").value().get(), "crm") {
+@main("Edit tag " + form("title").value().get(), "crm") {
     <h3 class="big-margin-top">Edit tag "@form("title").value().get()"</h3>
 
     @helper.form(routes.CRM.saveTag(), 'class -> "form-horizontal") {

@@ -1,8 +1,8 @@
-@(currentUsername: Optional[String], orgConfig: OrgConfig, transaction : Transaction, transactionForm: Form[Transaction])
+@(transaction : Transaction, transactionForm: Form[Transaction])
 
 @import helper._
 
-@main(currentUsername, orgConfig, "Transaction #" + transaction.id, "accounting") {
+@main("Transaction #" + transaction.id, "accounting") {
 
 	<h2>Transaction #@transaction.id</h2>
 	@helper.form(routes.Accounting.saveTransaction()) {

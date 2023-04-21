@@ -1,8 +1,8 @@
-@(currentUsername: Optional[String], orgConfig: OrgConfig, people: List[Person], recent_comments: List[Comment])
+@(people: List[Person], recent_comments: List[Comment])
 
 @import helper._
 
-@main(currentUsername, orgConfig, "All people", "crm", "crm_home") {
+@main("All people", "crm", "crm_home") {
 
 	<div class="row">
 	<div class="span4">
@@ -18,7 +18,7 @@
 	<h3>Recent Comments</h3>
 	<div class="span6">
 		@for( c <- recent_comments ) {
-			@comment_fragment(orgConfig, c, true)
+			@comment_fragment(c, true)
 		}
 	</div>
 

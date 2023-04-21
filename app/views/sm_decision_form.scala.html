@@ -1,4 +1,4 @@
-@(orgConfig: OrgConfig, c : Charge)
+@(c : Charge)
 
 @import helper._
 
@@ -8,7 +8,7 @@
 	@c.getRuleTitle()</div>
 <div class="panel-body">
 @caseTableOpen(orgConfig)
-@caseTableRow(orgConfig, c.the_case, false)
+@caseTableRow(c.the_case, false)
 </table>
 
 <p>The recommended @orgConfig.str_res_plan was:

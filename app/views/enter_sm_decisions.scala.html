@@ -1,15 +1,15 @@
-@(currentUsername: Optional[String], orgConfig: OrgConfig, sm_charges : List [ Charge ])
+@(sm_charges : List [ Charge ])
 
 @import helper._
 
-@main(currentUsername, orgConfig, "Enter School Meeting charges", "jc") {
+@main("Enter School Meeting charges", "jc") {
 
 <h3> Charges awaiting School Meeting decision</h3>
 
 @if( sm_charges.size() > 0 ) {
 
 	@for( c <- sm_charges ) {
-		@sm_decision_form(orgConfig, c)
+		@sm_decision_form(c)
 	}
 } else {
    <p>None!!!

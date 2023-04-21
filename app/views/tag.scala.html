@@ -1,8 +1,8 @@
-@(currentUsername: Optional[String], orgConfig: OrgConfig, tag: Tag, people: List[Person], people_with_family: Collection[Person], use_student_display: Boolean, allow_edit: Boolean)
+@(tag: Tag, people: List[Person], people_with_family: Collection[Person], use_student_display: Boolean, allow_edit: Boolean)
 
 @import helper._
 
-@main(currentUsername, orgConfig, "All people tagged " + tag.title, "crm") {
+@main("All people tagged " + tag.title, "crm") {
 <h1>@tag.title
 @if( allow_edit ) {
     <a class="man-edit no-print" href="@routes.CRM.editTag(tag.id)">Edit Tag</a>
@@ -38,7 +38,7 @@
                        type="submit" value="Remove selected people"/>
             </p>
             @if(use_student_display) {
-                @student_list(orgConfig, people)
+                @student_list(people)
             } else {
                 @people_list(people, true)
             }

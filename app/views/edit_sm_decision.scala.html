@@ -1,11 +1,11 @@
-@(currentUsername: Optional[String], orgConfig: OrgConfig, charge : Charge)
+@(charge : Charge)
 
 @import helper._
 
-@main(currentUsername, orgConfig, "Edit School Meeting decision", "jc") {
+@main("Edit School Meeting decision", "jc") {
 
 <h3>Edit School Meeting decision</h3>
 
-@sm_decision_form(orgConfig, charge)
+@sm_decision_form(charge)
 
 }

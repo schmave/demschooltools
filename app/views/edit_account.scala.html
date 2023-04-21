@@ -1,8 +1,8 @@
-@(currentUsername: Optional[String], orgConfig: OrgConfig, accountForm: Form[Account], is_active: Boolean)
+@(accountForm: Form[Account], is_active: Boolean)
 
 @import helper._
 
-@main(currentUsername, orgConfig, "Edit Account", "accounting") {
+@main("Edit Account", "accounting") {
 	<h2>Edit Account</h2>
 	@form(routes.Accounting.saveAccount()) {
 		<input type="hidden" name="id" value="@accountForm("id").value.get"/>

@@ -1,9 +1,9 @@
-@(currentUsername: Optional[String], orgConfig: OrgConfig, p : Person, history : PersonHistory, recent_rps : List[ Charge ],
+@(p : Person, history : PersonHistory, recent_rps : List[ Charge ],
  redact_names : Boolean)
 
 @import helper._
 
-@main(currentUsername, orgConfig, p.getDisplayName() + "'s " + orgConfig.str_jc_name_short + " history", "jc") {
+@main(p.getDisplayName() + "'s " + orgConfig.str_jc_name_short + " history", "jc") {
 
 @if(flash.containsKey("notice")) {
     <div class="flash-error">@flash.get("notice")</div>
@@ -27,6 +27,6 @@ $(function() {
 </p>
 </form>
 
-@person_history(orgConfig, p, history, recent_rps, redact_names)
+@person_history(p, history, recent_rps, redact_names)
 
 }

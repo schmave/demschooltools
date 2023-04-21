@@ -1,10 +1,10 @@
-@(currentUsername: Optional[String], orgConfig: OrgConfig, users : List[User], allowed_ip : String, userForm : Form[User])
+@(users : List[User], allowed_ip : String, userForm : Form[User])
 
 @import helper._
 @implicitField = @{ FieldConstructor(myConstructor.f) }
 
 
-@main(currentUsername, orgConfig, "Users & Access", "settings", "settings_access") {
+@main("Users & Access", "settings", "settings_access") {
 
 <h3>Current users</h3>
 

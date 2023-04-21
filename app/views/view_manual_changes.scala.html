@@ -1,8 +1,8 @@
-@(currentUsername: Optional[String], orgConfig: OrgConfig, begin_date : String, changes : List [ ManualChange ] )
+@(begin_date : String, changes : List [ ManualChange ] )
 
 @import helper._
 
-@main(currentUsername, orgConfig, orgConfig.str_manual_title, "manual", "manual_changes") {
+@main(orgConfig.str_manual_title, "manual", "manual_changes") {
 
 <h3>Changes to the @orgConfig.str_manual_title</h3>
 

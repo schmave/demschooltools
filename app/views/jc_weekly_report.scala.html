@@ -1,9 +1,9 @@
-@(currentUsername: Optional[String], orgConfig: OrgConfig, start_date : Date, end_date: Date, data : WeeklyStats, cases: List[ Case ],
+@(start_date : Date, end_date: Date, data : WeeklyStats, cases: List[ Case ],
 minor_referral_destinations : List[ String ])
 
 @import helper._
 
-@main(currentUsername, orgConfig, "Weekly report starting on " + Application.formatDateShort(orgConfig, start_date), "jc", "weekly_report") {
+@main("Weekly report starting on " + Application.formatDateShort(orgConfig, start_date), "jc", "weekly_report") {
 
 <h3> Weekly report </h3>
 <p><a href="@routes.Application.viewWeeklyReport(Application.forDateInput(Application.addWeek(end_date, -1)))">&lt;&lt; Prev week</a>
@@ -60,7 +60,7 @@ Period from
 @caseTableOpen(orgConfig)
 @for(c <- cases) {
 	@if( !c.empty() && c.charges.size() == 0 ) {
-		@caseTableRow(orgConfig, c, true)
+		@caseTableRow(c, true)
 	}
 }
 </table>
@@ -71,7 +71,7 @@ Period from
 	@for(c <- cases) {
 	  @for(ch <- c.charges) {
 		@if( ch.minor_referral_destination.equals(dest) ) {
-		  @historyCharge(orgConfig, ch, true, true, false)
+		  @historyCharge(ch, true, true, false)
 		}
 	  }
 	}

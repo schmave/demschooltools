@@ -1,4 +1,4 @@
-@(orgConfig: OrgConfig, r : Entry, history : RuleHistory, recent_rps : Collection[ String ])
+@(r : Entry, history : RuleHistory, recent_rps : Collection[ String ])
 
 @import helper._
 
@@ -36,5 +36,5 @@
 <hr>
 
 @for( c <- history.charges) {
-	@historyCharge(orgConfig, c, true, false, false)
+	@historyCharge(c, true, false, false)
 }

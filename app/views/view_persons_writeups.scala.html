@@ -1,14 +1,14 @@
-@(currentUsername: Optional[String], orgConfig: OrgConfig, p : Person, cases : List[ Case ])
+@(p : Person, cases : List[ Case ])
 
 @import helper._
 
-@main(currentUsername, orgConfig, "Cases written up by " + p.getDisplayName(), "jc") {
+@main("Cases written up by " + p.getDisplayName(), "jc") {
 
 <h4>&nbsp;<br>Cases written up by @p.getDisplayName()</h4>
 @caseTableOpen(orgConfig)
 @for(c <- cases) {
 	@if( !c.empty() ) {
-		@caseTableRow(orgConfig, c, true)
+		@caseTableRow(c, true)
 	}
 }
 </table>    

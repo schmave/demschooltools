@@ -1,4 +1,4 @@
-@(orgConfig: OrgConfig, p : Person, e: Entry, record : PersonHistory.Record, charges: List[Charge],
+@(p : Person, e: Entry, record : PersonHistory.Record, charges: List[Charge],
 history: PersonHistory)
 
 @import helper._
@@ -13,5 +13,5 @@ history: PersonHistory)
 
 <h5 style="margin-top: 30px;">Case Details</h5>
 @for( c <- charges) {
-	@historyCharge(orgConfig, c, false, false, false)
+	@historyCharge(c, false, false, false)
 }

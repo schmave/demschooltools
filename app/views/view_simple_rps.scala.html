@@ -1,11 +1,11 @@
-@(currentUsername: Optional[String], orgConfig: OrgConfig, groups : HashMap[String, List[Charge]])
+@(groups : HashMap[String, List[Charge]])
 
 @sorted_keys = @{ new ArrayList(groups.keySet()) }
 @{ Collections.sort(sorted_keys) }
 
 @import helper._
 
-@main(currentUsername, orgConfig, "Print simple " + orgConfig.str_res_plans, "jc", "rps") {
+@main("Print simple " + orgConfig.str_res_plans, "jc", "rps") {
 
 <h2>Active @orgConfig.str_res_plans <span class="comment_time">as of @Application.formatDateTimeLong(orgConfig)</span></h2>
 

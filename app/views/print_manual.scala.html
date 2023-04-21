@@ -1,8 +1,8 @@
-@(currentUsername: Optional[String], orgConfig: OrgConfig, chapters : List [ Chapter ] )
+@(chapters : List [ Chapter ] )
 
 @import helper._
 
-@main(currentUsername, orgConfig, orgConfig.str_manual_title, "manual", "manual_print") {
+@main(orgConfig.str_manual_title, "manual", "manual_print") {
 
 <h2>Download @orgConfig.str_manual_title as a PDF</h2>
 

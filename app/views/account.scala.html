@@ -1,6 +1,6 @@
-@(currentUsername: Optional[String], orgConfig: OrgConfig, account : Account)
+@(account : Account)
 
-@main(currentUsername, orgConfig, account.getTitle(), "accounting") {
+@main(account.getTitle(), "accounting") {
 
 	<h2>@account.getTitle</h2>
 

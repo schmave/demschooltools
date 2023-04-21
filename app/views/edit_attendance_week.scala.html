@@ -1,4 +1,4 @@
-@(currentUsername: Optional[String], orgConfig: OrgConfig, monday : Date,
+@(monday : Date,
   codes : Map[String, AttendanceCode],
   people : List[Person],
   additional_people : List[Person],
@@ -7,7 +7,7 @@
 
 @import helper._
 
-@main(currentUsername, orgConfig, "Edit attendance for week of " + Application.yymmddDate(orgConfig, monday), "attendance") {
+@main("Edit attendance for week of " + Application.yymmddDate(orgConfig, monday), "attendance") {
 
 <script type="text/javascript">
 app = {};

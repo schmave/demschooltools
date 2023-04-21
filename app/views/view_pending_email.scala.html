@@ -1,8 +1,8 @@
-@(currentUsername: Optional[String], orgConfig: OrgConfig, email : Email, test_addresses : List [ String ], from_addresses : List [ String ] )
+@(email : Email, test_addresses : List [ String ], from_addresses : List [ String ] )
 
 @import helper._
 
-@main(currentUsername, orgConfig, "Pending Email", "crm") {
+@main("Pending Email", "crm") {
 
 <script src="@routes.Assets.versioned("javascripts/send_email.js")" type="text/javascript">
 </script>

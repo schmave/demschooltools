@@ -1,8 +1,8 @@
-@(currentUsername: Optional[String], orgConfig: OrgConfig, list: TaskList, people : List[Person])
+@(list: TaskList, people : List[Person])
 
 @import helper._
 
-@main(currentUsername, orgConfig, "List: " + list.title, "crm") {
+@main("List: " + list.title, "crm") {
 <h1>@list.title <a class="edit-link" href="@routes.Settings.viewTaskList(list.id)">Edit</a></h1>
 
 @defining(new HashSet[Person]()) { people_with_uncompleted_task =>

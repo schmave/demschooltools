@@ -1,20 +1,20 @@
-@(currentUsername: Optional[String], orgConfig: OrgConfig, charges : List [ Charge ])
+@(charges : List [ Charge ])
 
 @import helper._
 
-@main(currentUsername, orgConfig, "Past School Meeting decisions", "jc", "view_sm") {
+@main("Past School Meeting decisions", "jc", "view_sm") {
 
 <h3>Past School Meeting decisions</h3>
 <table class="table printable-res-plans">
 @for( c <- charges ) {
 	@if( c.sm_decision_date != null &&
 		c.sm_decision_date.equals(charges.head.sm_decision_date) ) {
-		@resolution_plan(orgConfig, c)
+		@resolution_plan(c)
 	}
 }
 </table>
 @for( c <- charges) {
-	@historyCharge(orgConfig, c, true, true, false)
+	@historyCharge(c, true, true, false)
 	<a href="@routes.ApplicationEditing.editSchoolMeetingDecision(c.id)" class="man-edit">Edit</a>
 }
 

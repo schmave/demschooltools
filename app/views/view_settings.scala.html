@@ -1,6 +1,6 @@
-@(currentUsername: Optional[String], orgConfig: OrgConfig, notifications : List [ NotificationRule ], org: Organization, play_config: com.typesafe.config.Config)
+@(notifications : List [ NotificationRule ], org: Organization, play_config: com.typesafe.config.Config)
 
-@main(currentUsername, orgConfig, "Settings", "settings", "settings") {
+@main("Settings", "settings", "settings") {
 
 <script>
 $(function () {

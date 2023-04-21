@@ -1,4 +1,4 @@
-@(orgConfig: OrgConfig, m : Meeting)
+@(m : Meeting)
 
 @import helper._
 
@@ -34,7 +34,7 @@ Edit minutes</a></p>
 @caseTableOpen(orgConfig)
 @for(c <- m.cases) {
 	@if( !c.empty() ) {
-		@caseTableRow(orgConfig, c, false)
+		@caseTableRow(c, false)
 	}
 }
 
