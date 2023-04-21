@@ -45,7 +45,7 @@ public class Application extends Controller {
     }
 
     public Result viewPassword(Http.Request request) {
-        return ok(views.html.view_password.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), 
+        return ok(views.html.view_password.render(
                 request.flash().getOptional("notice").orElse("")));
     }
 
@@ -102,7 +102,7 @@ public class Application extends Controller {
     }
 
     public Result viewSchoolMeetingReferrals(Http.Request request) {
-        return ok(views.html.view_sm_referrals.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), 
+        return ok(views.html.view_sm_referrals.render(
             getActiveSchoolMeetingReferrals(Organization.getByHost(request))));
     }
 
@@ -120,7 +120,7 @@ public class Application extends Controller {
                 .gt("sm_decision_date", Application.getStartOfYear())
                 .isNotNull("sm_decision")
                 .orderBy("id DESC").findList();
-        return ok(views.html.view_sm_decisions.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), the_charges));
+        return ok(views.html.view_sm_decisions.render(the_charges));
     }
 
     public static List<Person> jcPeople(Organization org) {
@@ -157,7 +157,7 @@ public class Application extends Controller {
     }
 
     public Result index(Http.Request request) {
-        return ok(views.html.cached_page.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), 
+        return ok(views.html.cached_page.render(
             new CachedPage(CachedPage.JC_INDEX,
                 "JC database",
                 "jc",
@@ -208,7 +208,7 @@ public class Application extends Controller {
 
         entries_with_charges.sort(Entry.SORT_NUMBER);
 
-        return views.html.jc_index.render(OrgConfig.get(Organization.getByHost(request)), meetings, people,
+        return views.html.jc_index.render(meetings, people,
             entries_with_charges).toString();
                 }}));
     }
@@ -320,12 +320,12 @@ public class Application extends Controller {
     }
 
     public Result viewMeeting(int meeting_id, Http.Request request) {
-        return ok(views.html.view_meeting.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), Meeting.findById(meeting_id, Organization.getByHost(request))));
+        return ok(views.html.view_meeting.render(Meeting.findById(meeting_id, Organization.getByHost(request))));
     }
 
     public Result printMeeting(int meeting_id, Http.Request request) throws Exception {
         return renderToPDF(
-                views.html.view_meeting.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), Meeting.findById(meeting_id, Organization.getByHost(request))).toString());
+                views.html.view_meeting.render(Meeting.findById(meeting_id, Organization.getByHost(request))).toString());
     }
 
     public Result editResolutionPlanList(Http.Request request) {
@@ -375,7 +375,7 @@ public class Application extends Controller {
             }
         }
 
-        return ok(views.html.edit_rp_list.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), active_rps, completed_rps, nullified_rps))
+        return ok(views.html.edit_rp_list.render(active_rps, completed_rps, nullified_rps))
         .withHeader("Cache-Control", "max-age=0, no-cache, no-store")
         .withHeader("Pragma", "no-cache");
 
@@ -430,13 +430,13 @@ public class Application extends Controller {
                 }
             }
         }
-        return renderToPDF(views.html.view_simple_rps.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), groups).toString())
+        return renderToPDF(views.html.view_simple_rps.render(groups).toString())
                 ;
 
     }
 
     public Result viewMeetingResolutionPlans(int meeting_id, Http.Request request) {
-        return ok(views.html.view_meeting_resolution_plans.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), Meeting.findById(meeting_id,
+        return ok(views.html.view_meeting_resolution_plans.render(Meeting.findById(meeting_id,
                 Organization.getByHost(request))));
     }
 
@@ -510,13 +510,13 @@ public class Application extends Controller {
 
         changes.sort(ManualChange.SORT_NUM_DATE);
 
-        return ok(views.html.view_manual_changes.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), 
+        return ok(views.html.view_manual_changes.render(
             forDateInput(begin_date),
             changes));
     }
 
     public Result printManual(Http.Request request) {
-        return ok(views.html.print_manual.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), Chapter.all(Organization.getByHost(request))));
+        return ok(views.html.print_manual.render(Chapter.all(Organization.getByHost(request))));
     }
 
     static Path print_temp_dir;
@@ -649,7 +649,7 @@ public class Application extends Controller {
             documents.add(renderManualTOC(org, request).toString());
             // then render all chapters
             for (Chapter chapter : Chapter.all(org)) {
-                documents.add(views.html.view_chapter.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), chapter).toString());
+                documents.add(views.html.view_chapter.render(chapter).toString());
             }
             return renderToPDF(documents);
         } else {
@@ -659,7 +659,7 @@ public class Application extends Controller {
             } else {
                 Chapter chapter = Chapter.findById(id, org);
                 return renderToPDF(
-                    views.html.view_chapter.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), chapter).toString());
+                    views.html.view_chapter.render(chapter).toString());
 
             }
         }
@@ -672,7 +672,7 @@ public class Application extends Controller {
             .where().eq("organization", Organization.getByHost(request))
             .eq("id", id).findOne();
 
-        return ok(views.html.view_chapter.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), c));
+        return ok(views.html.view_chapter.render(c));
     }
 
     public Result searchManual(String searchString, Http.Request request) {
@@ -726,7 +726,7 @@ public class Application extends Controller {
         }
         scopes.put("entries", entriesList);
 
-        return ok(views.html.main_with_mustache.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), 
+        return ok(views.html.main_with_mustache.render(
             "Manual Search: " + searchString,
             "manual",
             "",
@@ -784,13 +784,13 @@ public class Application extends Controller {
             }
         }
 
-        return ok(views.html.person_rule_history.render(OrgConfig.get(Organization.getByHost(request)), 
+        return ok(views.html.person_rule_history.render(
             p, r, rule_record, history.charges_by_rule.get(r), history));
     }
 
     public Result getPersonHistory(Integer id, Http.Request request) {
         Person p = Person.findByIdWithJCData(id, Organization.getByHost(request));
-        return ok(views.html.person_history.render(OrgConfig.get(Organization.getByHost(request)), 
+        return ok(views.html.person_history.render(
             p,
             new PersonHistory(p, false, getStartOfYear(), null),
             getLastWeekCharges(p),
@@ -829,7 +829,7 @@ public class Application extends Controller {
 
         Date restricted_start_date = restrictStartDate(start_date, getCurrentUser(request));
         Person p = Person.findByIdWithJCData(id, Organization.getByHost(request));
-        Result result = ok(views.html.view_person_history.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), 
+        Result result = ok(views.html.view_person_history.render(
             p,
             new PersonHistory(p, true, start_date, end_date),
             getLastWeekCharges(p),
@@ -845,7 +845,7 @@ public class Application extends Controller {
 
     public Result getRuleHistory(Integer id, Http.Request request) {
         Entry r = Entry.findByIdWithJCData(id, Organization.getByHost(request));
-        return ok(views.html.rule_history.render(OrgConfig.get(Organization.getByHost(request)), 
+        return ok(views.html.rule_history.render(
             r,
             new RuleHistory(r, false, getStartOfYear(), null),
             getRecentResolutionPlans(r)));
@@ -865,7 +865,7 @@ public class Application extends Controller {
         Date restricted_start_date = restrictStartDate(start_date, getCurrentUser(request));
 
         Entry r = Entry.findByIdWithJCData(id, Organization.getByHost(request));
-        Result result = ok(views.html.view_rule_history.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), 
+        Result result = ok(views.html.view_rule_history.render(
             r,
             new RuleHistory(r, true, start_date, end_date),
             getRecentResolutionPlans(r)));
@@ -886,7 +886,7 @@ public class Application extends Controller {
         Collections.sort(cases_written_up);
         Collections.reverse(cases_written_up);
 
-        return ok(views.html.view_persons_writeups.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), p, cases_written_up));
+        return ok(views.html.view_persons_writeups.render(p, cases_written_up));
     }
 
     public Result thisWeekReport(Http.Request request) {
@@ -912,7 +912,7 @@ public class Application extends Controller {
             .le("date", end_date.getTime())
             .ge("date", start_date.getTime()).findList();
 
-        return renderToPDF(views.html.multi_meetings.render(OrgConfig.get(Organization.getByHost(request)), meetings).toString());
+        return renderToPDF(views.html.multi_meetings.render(meetings).toString());
     }
 
     public Result viewWeeklyReport(String date_string, Http.Request request) {
@@ -988,7 +988,7 @@ public class Application extends Controller {
             }
         }
 
-        return ok(views.html.jc_weekly_report.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), 
+        return ok(views.html.jc_weekly_report.render(
             start_date.getTime(),
             end_date.getTime(),
             result,
@@ -1077,7 +1077,7 @@ public class Application extends Controller {
 
         if (charges.size() > 0) {
             Charge c = charges.get(0);
-            return ok(views.html.last_rp.render(OrgConfig.get(Organization.getByHost(request)), charges.size(), c));
+            return ok(views.html.last_rp.render(charges.size(), c));
         }
 
         return ok("No previous charge.");
@@ -1226,7 +1226,7 @@ public class Application extends Controller {
         scopes.put("existing_files", existingFiles);
 
         scopes.put("printer_email", Organization.getByHost(request).printer_email);
-        return ok(views.html.main_with_mustache.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), 
+        return ok(views.html.main_with_mustache.render(
             "File Sharing config",
             "misc",
             "file_sharing",
@@ -1294,7 +1294,7 @@ public class Application extends Controller {
         scopes.put("existing_files", existingFiles);
 
         scopes.put("printer_email", org.printer_email);
-        return ok(views.html.main_with_mustache.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), 
+        return ok(views.html.main_with_mustache.render(
             "DemSchoolTools shared files",
             "misc",
             "view_files",

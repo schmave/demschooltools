@@ -70,7 +70,7 @@ public class Attendance extends Controller {
 
     public Result index(String start_date_str, String end_date_str, Boolean is_custom_date, Http.Request request) {
         if (start_date_str.equals("")) {
-            return ok(views.html.cached_page.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), 
+            return ok(views.html.cached_page.render(
                     new CachedPage(CachedPage.ATTENDANCE_INDEX,
                             "Attendance",
                             "attendance",
@@ -81,7 +81,7 @@ public class Attendance extends Controller {
                         }
                     }));
         } else {
-            return ok(views.html.cached_page.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), 
+            return ok(views.html.cached_page.render(
                     new CachedPage("",
                             "Attendance",
                             "attendance",
@@ -156,7 +156,7 @@ public class Attendance extends Controller {
         Map<String, AttendanceCode> codes = getCodesMap(do_view, org);
 
         if (do_view) {
-            return ok(views.html.attendance_week.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), 
+            return ok(views.html.attendance_week.render(
                 start_date.getTime(),
                 codes,
                 all_people,
@@ -170,7 +170,7 @@ public class Attendance extends Controller {
 
             response().setHeader("Cache-Control", "max-age=0, no-cache, no-store");
             response().setHeader("Pragma", "no-cache");
-            return ok(views.html.edit_attendance_week.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), 
+            return ok(views.html.edit_attendance_week.render(
                 start_date.getTime(),
                 codes,
                 all_people,
@@ -302,7 +302,7 @@ public class Attendance extends Controller {
 
         int table_width = has_off_campus_time ? 900 : 700;
 
-        return ok(views.html.attendance_person.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), 
+        return ok(views.html.attendance_person.render(
             p,
             days,
             day_to_week,
@@ -770,7 +770,7 @@ public class Attendance extends Controller {
         scopes.put("custodiaUrl", conf.getString("custodia_url"));
         scopes.put("custodiaUsername", Organization.getByHost(request).short_name + "-admin");
         scopes.put("custodiaPassword", conf.getString("custodia_password"));
-        return ok(views.html.main_with_mustache.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), 
+        return ok(views.html.main_with_mustache.render(
                 "Sign in system",
                 "custodia",
                 "",
@@ -786,7 +786,7 @@ public class Attendance extends Controller {
             .order("day ASC")
             .findList();
 
-        return ok(views.html.attendance_off_campus.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), events));
+        return ok(views.html.attendance_off_campus.render(events));
     }
 
     public Result deleteOffCampusTime(Http.Request request) {
@@ -808,7 +808,7 @@ public class Attendance extends Controller {
         Date today = Calendar.getInstance().getTime();
         String current_date = df.format(today);
         String people_json = Application.attendancePeopleJson(Organization.getByHost(request));
-        return ok(views.html.attendance_add_off_campus.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), current_date, people_json));
+        return ok(views.html.attendance_add_off_campus.render(current_date, people_json));
     }
 
     public Result saveOffCampusTime(Http.Request request) throws ParseException {
@@ -838,7 +838,7 @@ public class Attendance extends Controller {
     }
 
     public Result reports(Http.Request request) {
-        return ok(views.html.attendance_reports.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), new AttendanceReport(Organization.getByHost(request))));
+        return ok(views.html.attendance_reports.render(new AttendanceReport(Organization.getByHost(request))));
     }
 
     public Result runReport(Http.Request request) {
@@ -846,10 +846,10 @@ public class Attendance extends Controller {
         Form<AttendanceReport> filledForm = form.bindFromRequest(request);
         if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
-            return badRequest(views.html.attendance_reports.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), new AttendanceReport(Organization.getByHost(request))));
+            return badRequest(views.html.attendance_reports.render(new AttendanceReport(Organization.getByHost(request))));
         }
         AttendanceReport report = AttendanceReport.createFromForm(filledForm, Organization.getByHost(request));
-        return ok(views.html.attendance_reports.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), report));
+        return ok(views.html.attendance_reports.render(report));
     }
 
     public Result assignPINs(Http.Request request) {
@@ -862,7 +862,7 @@ public class Attendance extends Controller {
         admin.first_name = "Admin";
         admin.pin = org.attendance_admin_pin;
         people.add(0, admin);
-        return ok(views.html.attendance_pins.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), people));
+        return ok(views.html.attendance_pins.render(people));
     }
 
     public Result savePINs(Http.Request request) {
@@ -893,7 +893,7 @@ public class Attendance extends Controller {
     }
 
     public Result viewCodes(Http.Request request) {
-        return ok(views.html.attendance_codes.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), 
+        return ok(views.html.attendance_codes.render(
             AttendanceCode.all(Organization.getByHost(request)),
             getCodeForm()));
     }
@@ -911,7 +911,7 @@ public class Attendance extends Controller {
     public Result editCode(Integer code_id, Http.Request request) {
         AttendanceCode ac = AttendanceCode.findById(code_id, Organization.getByHost(request));
         Form<AttendanceCode> filled_form = getCodeForm().fill(ac);
-        return ok(views.html.edit_attendance_code.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), filled_form));
+        return ok(views.html.edit_attendance_code.render(filled_form));
     }
 
     public Result saveCode(Http.Request request) {

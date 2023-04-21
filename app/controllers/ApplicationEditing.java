@@ -75,7 +75,7 @@ public class ApplicationEditing extends Controller {
         }
         meeting.prepareForEditing(Organization.getByHost(request));
 
-        return ok(views.html.edit_minutes.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), meeting, Case.getOpenCases(Organization.getByHost(request))))
+        return ok(views.html.edit_minutes.render(meeting, Case.getOpenCases(Organization.getByHost(request))))
                 .withHeader("Cache-Control", "max-age=0, no-cache, no-store")
                 .withHeader("Pragma", "no-cache");
     }
@@ -322,7 +322,7 @@ public class ApplicationEditing extends Controller {
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
     public Result enterSchoolMeetingDecisions(Http.Request request) {
-        return ok(views.html.enter_sm_decisions.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), Application.getActiveSchoolMeetingReferrals(
+        return ok(views.html.enter_sm_decisions.render(Application.getActiveSchoolMeetingReferrals(
                 Organization.getByHost(request))));
     }
 
@@ -334,7 +334,7 @@ public class ApplicationEditing extends Controller {
             return tooOldToEdit();
         }
 
-        return ok(views.html.edit_sm_decision.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), c));
+        return ok(views.html.edit_sm_decision.render(c));
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
@@ -367,13 +367,13 @@ public class ApplicationEditing extends Controller {
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
     public Result addChapter(Http.Request request) {
         Form<Chapter> form = mFormFactory.form(Chapter.class);
-        return ok(views.html.edit_chapter.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), form, true));
+        return ok(views.html.edit_chapter.render(form, true));
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
     public Result editChapter(Integer id, Http.Request request) {
         Form<Chapter> filled_form = mFormFactory.form(Chapter.class).fill(Chapter.findById(id, Organization.getByHost(request)));
-        return ok(views.html.edit_chapter.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), filled_form, false));
+        return ok(views.html.edit_chapter.render(filled_form, false));
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
@@ -398,14 +398,14 @@ public class ApplicationEditing extends Controller {
         Map<String, String> map = new HashMap<>();
         map.put("chapter.id", "" + chapterId);
         form = form.bind(map, "chapter.id");
-        return ok(views.html.edit_section.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), form, Chapter.findById(chapterId, Organization.getByHost(request)), true, Chapter.all(Organization.getByHost(request))));
+        return ok(views.html.edit_section.render(form, Chapter.findById(chapterId, Organization.getByHost(request)), true, Chapter.all(Organization.getByHost(request))));
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
     public Result editSection(Integer id, Http.Request request) {
         Section existing_section = Section.findById(id, Organization.getByHost(request));
         Form<Section> filled_form = mFormFactory.form(Section.class).fill(existing_section);
-        return ok(views.html.edit_section.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), filled_form, existing_section.chapter, false, Chapter.all(Organization.getByHost(request))));
+        return ok(views.html.edit_section.render(filled_form, existing_section.chapter, false, Chapter.all(Organization.getByHost(request))));
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
@@ -430,14 +430,14 @@ public class ApplicationEditing extends Controller {
         Map<String, String> map = new HashMap<>();
         map.put("section.id", "" + sectionId);
         form = form.bind(map, "section.id");
-        return ok(views.html.edit_entry.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), form, Section.findById(sectionId, Organization.getByHost(request)), true, Chapter.all(Organization.getByHost(request))));
+        return ok(views.html.edit_entry.render(form, Section.findById(sectionId, Organization.getByHost(request)), true, Chapter.all(Organization.getByHost(request))));
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
     public Result editEntry(Integer id, Http.Request request) {
         Entry e = Entry.findById(id, Organization.getByHost(request));
         Form<Entry> filled_form = mFormFactory.form(Entry.class).fill(e);
-        return ok(views.html.edit_entry.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), filled_form, e.section, false, Chapter.all(Organization.getByHost(request))));
+        return ok(views.html.edit_entry.render(filled_form, e.section, false, Chapter.all(Organization.getByHost(request))));
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)

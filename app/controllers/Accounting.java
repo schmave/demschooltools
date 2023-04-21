@@ -32,14 +32,14 @@ public class Accounting extends Controller {
     public Result transaction(Integer id, Http.Request request) {
         Transaction transaction = Transaction.findById(id, Organization.getByHost(request));
         Form<Transaction> form = mFormFactory.form(Transaction.class).fill(transaction);
-        return ok(views.html.transaction.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), transaction, form));
+        return ok(views.html.transaction.render(transaction, form));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result newTransaction(Http.Request request) {
         applyMonthlyCredits(Organization.getByHost(request));
         Form<Transaction> form = mFormFactory.form(Transaction.class);
-        return ok(views.html.create_transaction.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), form));
+        return ok(views.html.create_transaction.render(form));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
@@ -48,7 +48,7 @@ public class Accounting extends Controller {
         Form<Transaction> filledForm = form.bindFromRequest(request);
         if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
-            return badRequest(views.html.create_transaction.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), filledForm));
+            return badRequest(views.html.create_transaction.render(filledForm));
         } else {
             try {
                 Transaction transaction = Transaction.create(filledForm,
@@ -87,19 +87,19 @@ public class Accounting extends Controller {
         List<Account> nonPersonalAccounts = Account.allNonPersonalChecking(org);
         personalAccounts.sort(Comparator.comparing(Account::getName));
         nonPersonalAccounts.sort(Comparator.comparing(Account::getName));
-        return ok(views.html.balances.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), personalAccounts, nonPersonalAccounts));
+        return ok(views.html.balances.render(personalAccounts, nonPersonalAccounts));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result bankCashBalance(Http.Request request) {
         applyMonthlyCredits(Organization.getByHost(request));
-        return ok(views.html.bank_cash_balance.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), TransactionList.allCash(Organization.getByHost(request))));
+        return ok(views.html.bank_cash_balance.render(TransactionList.allCash(Organization.getByHost(request))));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result transactionsReport(Http.Request request) {
         applyMonthlyCredits(Organization.getByHost(request));
-        return ok(views.html.transactions_report.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), TransactionList.blank()));
+        return ok(views.html.transactions_report.render(TransactionList.blank()));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
@@ -108,7 +108,7 @@ public class Accounting extends Controller {
         Form<TransactionList> filledForm = form.bindFromRequest(request);
         if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
-            return badRequest(views.html.transactions_report.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), TransactionList.blank()));
+            return badRequest(views.html.transactions_report.render(TransactionList.blank()));
         }
         TransactionList report = TransactionList.createFromForm(filledForm, Organization.getByHost(request));
         String action = request.body().asFormUrlEncoded().get("action")[0];
@@ -116,7 +116,7 @@ public class Accounting extends Controller {
             return downloadTransactionReport(report);
         }
         else {
-            return ok(views.html.transactions_report.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), report));
+            return ok(views.html.transactions_report.render(report));
         }
     }
 
@@ -162,7 +162,7 @@ public class Accounting extends Controller {
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result report(Http.Request request) {
         applyMonthlyCredits(Organization.getByHost(request));
-        return ok(views.html.accounting_report.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), new AccountingReport()));
+        return ok(views.html.accounting_report.render(new AccountingReport()));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
@@ -171,17 +171,17 @@ public class Accounting extends Controller {
         Form<AccountingReport> filledForm = form.bindFromRequest(request);
         if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
-            return badRequest(views.html.accounting_report.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), new AccountingReport()));
+            return badRequest(views.html.accounting_report.render(new AccountingReport()));
         }
         AccountingReport report = AccountingReport.create(filledForm, Organization.getByHost(request));
-        return ok(views.html.accounting_report.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), report));
+        return ok(views.html.accounting_report.render(report));
     }
 
     public Result account(Integer id, Http.Request request) {
         Organization org = Organization.getByHost(request);
         applyMonthlyCredits(org);
         Account account = Account.findById(id, org);
-        return ok(views.html.account.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), account));
+        return ok(views.html.account.render(account));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
@@ -196,13 +196,13 @@ public class Accounting extends Controller {
         applyMonthlyCredits(org);
         List<Account> accounts = Account.all(org);
         accounts.sort(Comparator.comparing(Account::getName));
-        return ok(views.html.accounts.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), accounts));
+        return ok(views.html.accounts.render(accounts));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result newAccount(Http.Request request) {
         Form<Account> form = mFormFactory.form(Account.class);
-        return ok(views.html.new_account.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), form));
+        return ok(views.html.new_account.render(form));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
@@ -211,7 +211,7 @@ public class Accounting extends Controller {
         Form<Account> filledForm = form.bindFromRequest(request);
         if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
-            return badRequest(views.html.new_account.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), filledForm));
+            return badRequest(views.html.new_account.render(filledForm));
         }
         else {
             String name = filledForm.field("name").value().get();
@@ -225,7 +225,7 @@ public class Accounting extends Controller {
     public Result editAccount(Integer id, Http.Request request) {
         Account account = Account.findById(id, Organization.getByHost(request));
         Form<Account> form = mFormFactory.form(Account.class).fill(account);
-        return ok(views.html.edit_account.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), form, account.is_active));
+        return ok(views.html.edit_account.render(form, account.is_active));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
