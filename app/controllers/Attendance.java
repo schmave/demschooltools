@@ -315,7 +315,7 @@ public class Attendance extends Controller {
     }
 
     public Result importFromCustodia(Http.Request request) {
-        Map<String,String[]> data = request().body().asFormUrlEncoded();
+        Map<String,String[]> data = request.body().asFormUrlEncoded();
         Calendar start_date = Utils.parseDateOrNow(data.get("monday")[0]);
         Calendar end_date = (Calendar) start_date.clone();
         end_date.add(Calendar.DAY_OF_MONTH, 4);
@@ -395,7 +395,7 @@ public class Attendance extends Controller {
     public Result createPersonWeek(Http.Request request) {
         CachedPage.remove(CachedPage.ATTENDANCE_INDEX, Organization.getByHost(request));
 
-        Map<String,String[]> data = request().body().asFormUrlEncoded();
+        Map<String,String[]> data = request.body().asFormUrlEncoded();
         Calendar start_date = Utils.parseDateOrNow(data.get("monday")[0]);
 
         ArrayList<Object> result = new ArrayList<>();
@@ -865,7 +865,7 @@ public class Attendance extends Controller {
         for (Person p : people) {
             people_by_id.put(p.person_id, p);
         }
-        Set<Map.Entry<String,String[]>> entries = request().queryString().entrySet();
+        Set<Map.Entry<String,String[]>> entries = request.queryString().entrySet();
         for (Map.Entry<String, String[]> entry : entries) {
             Integer person_id = Integer.parseInt(entry.getKey());
             if (person_id == -1) {

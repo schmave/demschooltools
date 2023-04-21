@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -40,10 +41,10 @@ public abstract class CachedPage {
     }
 
     public String getPage() {
-        byte[] cached_bytes = Public.sCache.get(cache_key);
-        if (cached_bytes != null) {
+        Optional<byte[]> cached_bytes = Public.sCache.getOptional(cache_key);
+        if (cached_bytes.isPresent()) {
             try {
-                ByteArrayInputStream bais = new ByteArrayInputStream(cached_bytes);
+                ByteArrayInputStream bais = new ByteArrayInputStream(cached_bytes.get());
                 GZIPInputStream gzis = new GZIPInputStream(bais);
                 BufferedReader reader = new BufferedReader(new InputStreamReader(gzis));
 
