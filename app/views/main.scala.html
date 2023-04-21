@@ -275,8 +275,8 @@
 </div>
     }}
 
-    @if(request.flash.containsKey("error")) {
-        <div class="flash-error"><b>Error</b><br/><br/>@request.flash.get("error")</div>
+    @if(request.flash.getOptional("error").isPresent()) {
+        <div class="flash-error"><b>Error</b><br/><br/>@request.flash.getOptional("error").get()</div>
     }
 
         @content
