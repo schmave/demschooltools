@@ -767,6 +767,44 @@ public class Attendance extends Controller {
         return result;
     }
 
+    public Result rules() {
+        Organization org = OrgConfig.get().org;
+        Map<String, AttendanceCode> codes_map = getCodesMap(false);
+        List<AttendanceRule> current_rules = AttendanceRule.all();
+        List<AttendanceRule> past_rules = AttendanceRule.all();
+
+        return ok(views.html.attendance_rules.render(
+            current_rules,
+            past_rules,
+            codes_map,
+            org.attendance_enable_partial_days,
+            org.attendance_show_reports
+        ));
+    }
+
+    public Result newRule() {
+        AttendanceRule rule = new AttendanceRule();
+        Form<AttendanceRule> form = Form.form(AttendanceRule.class);
+        String people_json = Application.attendancePeopleJson();
+        return ok(views.html.attendance_edit_rule.render(
+            rule,
+            form,
+            people_json
+        ));
+    }
+
+    public Result rule(Integer id) {
+        return redirect(routes.Attendance.rules());
+    }
+
+    public Result saveRule() {
+        return redirect(routes.Attendance.rules());
+    }
+
+    public Result deleteRule(Integer id) {
+        return redirect(routes.Attendance.rules());
+    }
+
     public Result offCampusTime() {
         List<AttendanceDay> events = AttendanceDay.find.where()
             .eq("person.organization", OrgConfig.get().org)

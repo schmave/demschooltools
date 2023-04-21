@@ -1,0 +1,55 @@
+@(rule : AttendanceRule, ruleForm: Form[AttendanceRule], people_json : String)
+
+@import helper._
+
+@main(if(rule.id == null) "New Attendance Rule" else "Attendance Rule #" + rule.id, "attendance") {
+
+	@if(rule.id == null) {
+		<h2>New Attendance Rule</h2>
+	} else {
+		<h2>Attendance Rule #@rule.id</h2>
+	}
+
+	@helper.form(routes.Attendance.saveRule()) {
+		<input type="hidden" name="id" value="@ruleForm("id").value"/>
+		<div class="attendance-edit-rule">
+			<table class="attendance-edit-rule-table">
+				<tr>
+					<th>Person</th>
+					<td class="js-person">
+						<div class="attendance-edit-rule-person-selected js-person-name-selected name">
+							<span class="js-person-name-selected-text label label-primary"></span>
+							<img src="/assets/images/x.png">
+						</div>
+						<input type="text" class="js-person-name">
+						<input type="hidden" class="js-person-id" name="person-id"/>
+					</td>
+				</tr>
+				<tr>
+					<th>Start Date</th>
+					<td><input type="textfield" name="start-date" class="js-date" value=""></td>
+				</tr>
+				<tr>
+					<th>End Date</th>
+					<td><input type="textfield" name="end-date" class="js-date" value=""></td>
+				</tr>
+			</table>
+			<input type="submit" value="Update" class="btn btn-primary">
+		</div>
+	}
+
+	@if(rule.id != null) {
+		<form action="@routes.Attendance.deleteRule(rule.id)" method="post">
+			<button type="submit" class="btn-link"
+				onclick="return confirm('Are you sure you want to delete this rule? This cannot be undone.');">
+				Delete Rule
+			</button>
+		</form>
+	}
+}
+
+<script type="text/javascript">
+	var people = @Html(people_json);
+	var selectedPersonId = @Html(if (rule.person != null) Integer.toString(rule.person.person_id) else "null");
+	initAttendanceRule(selectedPersonId, people);
+</script>
