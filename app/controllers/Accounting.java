@@ -37,14 +37,14 @@ public class Accounting extends Controller {
     public Result transaction(Integer id, Http.Request request) {
         Transaction transaction = Transaction.findById(id, Organization.getByHost(request));
         Form<Transaction> form = mFormFactory.form(Transaction.class).fill(transaction);
-        return ok(views.html.transaction.render(transaction, form, request));
+        return ok(views.html.transaction.render(transaction, form, request, mMessagesApi.preferred(request)));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result newTransaction(Http.Request request) {
         applyMonthlyCredits(Organization.getByHost(request));
         Form<Transaction> form = mFormFactory.form(Transaction.class);
-        return ok(create_transaction.render(form, request));
+        return ok(create_transaction.render(form, request, mMessagesApi.preferred(request)));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
@@ -53,7 +53,7 @@ public class Accounting extends Controller {
         Form<Transaction> filledForm = form.bindFromRequest(request);
         if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
-            return badRequest(create_transaction.render(filledForm, request));
+            return badRequest(create_transaction.render(filledForm, request, mMessagesApi.preferred(request)));
         } else {
             try {
                 Transaction transaction = Transaction.create(filledForm,
@@ -92,19 +92,19 @@ public class Accounting extends Controller {
         List<Account> nonPersonalAccounts = Account.allNonPersonalChecking(org);
         personalAccounts.sort(Comparator.comparing(Account::getName));
         nonPersonalAccounts.sort(Comparator.comparing(Account::getName));
-        return ok(balances.render(personalAccounts, nonPersonalAccounts, request));
+        return ok(balances.render(personalAccounts, nonPersonalAccounts, request, mMessagesApi.preferred(request)));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result bankCashBalance(Http.Request request) {
         applyMonthlyCredits(Organization.getByHost(request));
-        return ok(bank_cash_balance.render(TransactionList.allCash(Organization.getByHost(request)), request));
+        return ok(bank_cash_balance.render(TransactionList.allCash(Organization.getByHost(request)), request, mMessagesApi.preferred(request)));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result transactionsReport(Http.Request request) {
         applyMonthlyCredits(Organization.getByHost(request));
-        return ok(transactions_report.render(TransactionList.blank(), request));
+        return ok(transactions_report.render(TransactionList.blank(), request, mMessagesApi.preferred(request)));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
@@ -113,7 +113,7 @@ public class Accounting extends Controller {
         Form<TransactionList> filledForm = form.bindFromRequest(request);
         if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
-            return badRequest(transactions_report.render(TransactionList.blank(), request));
+            return badRequest(transactions_report.render(TransactionList.blank(), request, mMessagesApi.preferred(request)));
         }
         TransactionList report = TransactionList.createFromForm(filledForm, Organization.getByHost(request));
         String action = request.body().asFormUrlEncoded().get("action")[0];
@@ -121,7 +121,7 @@ public class Accounting extends Controller {
             return downloadTransactionReport(report);
         }
         else {
-            return ok(transactions_report.render(report, request));
+            return ok(transactions_report.render(report, request, mMessagesApi.preferred(request)));
         }
     }
 
@@ -167,7 +167,7 @@ public class Accounting extends Controller {
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result report(Http.Request request) {
         applyMonthlyCredits(Organization.getByHost(request));
-        return ok(accounting_report.render(new AccountingReport(), request));
+        return ok(accounting_report.render(new AccountingReport(), request, mMessagesApi.preferred(request)));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
@@ -176,17 +176,17 @@ public class Accounting extends Controller {
         Form<AccountingReport> filledForm = form.bindFromRequest(request);
         if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
-            return badRequest(accounting_report.render(new AccountingReport(), request));
+            return badRequest(accounting_report.render(new AccountingReport(), request, mMessagesApi.preferred(request)));
         }
         AccountingReport report = AccountingReport.create(filledForm, Organization.getByHost(request));
-        return ok(accounting_report.render(report, request));
+        return ok(accounting_report.render(report, request, mMessagesApi.preferred(request)));
     }
 
     public Result account(Integer id, Http.Request request) {
         Organization org = Organization.getByHost(request);
         applyMonthlyCredits(org);
         Account account = Account.findById(id, org);
-        return ok(views.html.account.render(account, request));
+        return ok(views.html.account.render(account, request, mMessagesApi.preferred(request)));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
@@ -201,13 +201,13 @@ public class Accounting extends Controller {
         applyMonthlyCredits(org);
         List<Account> accounts = Account.all(org);
         accounts.sort(Comparator.comparing(Account::getName));
-        return ok(views.html.accounts.render(accounts, request));
+        return ok(views.html.accounts.render(accounts, request, mMessagesApi.preferred(request)));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result newAccount(Http.Request request) {
         Form<Account> form = mFormFactory.form(Account.class);
-        return ok(new_account.render(form, request));
+        return ok(new_account.render(form, request, mMessagesApi.preferred(request)));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
@@ -216,7 +216,7 @@ public class Accounting extends Controller {
         Form<Account> filledForm = form.bindFromRequest(request);
         if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
-            return badRequest(new_account.render(filledForm, request));
+            return badRequest(new_account.render(filledForm, request, mMessagesApi.preferred(request)));
         }
         else {
             String name = filledForm.field("name").value().get();
@@ -230,7 +230,7 @@ public class Accounting extends Controller {
     public Result editAccount(Integer id, Http.Request request) {
         Account account = Account.findById(id, Organization.getByHost(request));
         Form<Account> form = mFormFactory.form(Account.class).fill(account);
-        return ok(edit_account.render(form, account.is_active, request));
+        return ok(edit_account.render(form, account.is_active, request, mMessagesApi.preferred(request)));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)

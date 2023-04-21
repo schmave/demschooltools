@@ -50,7 +50,7 @@ public class Application extends Controller {
     }
 
     public Result viewPassword(Http.Request request) {
-        return ok(view_password.render(request.flash().getOptional("notice").orElse(""), request));
+        return ok(view_password.render(request.flash().getOptional("notice").orElse(""), request, mMessagesApi.preferred(request)));
     }
 
     public Result editPassword(Http.Request request) {
@@ -106,7 +106,7 @@ public class Application extends Controller {
     }
 
     public Result viewSchoolMeetingReferrals(Http.Request request) {
-        return ok(view_sm_referrals.render(getActiveSchoolMeetingReferrals(Organization.getByHost(request)), request));
+        return ok(view_sm_referrals.render(getActiveSchoolMeetingReferrals(Organization.getByHost(request)), request, mMessagesApi.preferred(request)));
     }
 
     public Result viewSchoolMeetingDecisions(Http.Request request) {
@@ -123,7 +123,7 @@ public class Application extends Controller {
                 .gt("sm_decision_date", Application.getStartOfYear())
                 .isNotNull("sm_decision")
                 .orderBy("id DESC").findList();
-        return ok(view_sm_decisions.render(the_charges, request));
+        return ok(view_sm_decisions.render(the_charges, request, mMessagesApi.preferred(request)));
     }
 
     public static List<Person> jcPeople(Organization org) {
@@ -211,8 +211,8 @@ public class Application extends Controller {
         entries_with_charges.sort(Entry.SORT_NUMBER);
 
         return jc_index.render(meetings, people,
-            entries_with_charges, request).toString();
-                }}, request));
+            entries_with_charges, request, mMessagesApi.preferred(request)).toString();
+                }}, request, mMessagesApi.preferred(request)));
     }
 
     public Result downloadCharges(Http.Request request) throws IOException {
@@ -322,12 +322,12 @@ public class Application extends Controller {
     }
 
     public Result viewMeeting(int meeting_id, Http.Request request) {
-        return ok(view_meeting.render(Meeting.findById(meeting_id, Organization.getByHost(request)), request));
+        return ok(view_meeting.render(Meeting.findById(meeting_id, Organization.getByHost(request)), request, mMessagesApi.preferred(request)));
     }
 
     public Result printMeeting(int meeting_id, Http.Request request) throws Exception {
         return renderToPDF(
-                view_meeting.render(Meeting.findById(meeting_id, Organization.getByHost(request)), request).toString());
+                view_meeting.render(Meeting.findById(meeting_id, Organization.getByHost(request)), request, mMessagesApi.preferred(request)).toString());
     }
 
     public Result editResolutionPlanList(Http.Request request) {
@@ -377,7 +377,7 @@ public class Application extends Controller {
             }
         }
 
-        return ok(edit_rp_list.render(active_rps, completed_rps, nullified_rps, request))
+        return ok(edit_rp_list.render(active_rps, completed_rps, nullified_rps, request, mMessagesApi.preferred(request)))
         .withHeader("Cache-Control", "max-age=0, no-cache, no-store")
         .withHeader("Pragma", "no-cache");
 
@@ -432,14 +432,14 @@ public class Application extends Controller {
                 }
             }
         }
-        return renderToPDF(view_simple_rps.render(groups, request).toString())
+        return renderToPDF(view_simple_rps.render(groups, request, mMessagesApi.preferred(request)).toString())
                 ;
 
     }
 
     public Result viewMeetingResolutionPlans(int meeting_id, Http.Request request) {
         return ok(view_meeting_resolution_plans.render(Meeting.findById(meeting_id,
-                Organization.getByHost(request)), request));
+                Organization.getByHost(request)), request, mMessagesApi.preferred(request)));
     }
 
     public Result downloadMeetingResolutionPlans(int meeting_id, Http.Request request) throws IOException {
@@ -513,11 +513,11 @@ public class Application extends Controller {
         changes.sort(ManualChange.SORT_NUM_DATE);
 
         return ok(view_manual_changes.render(forDateInput(begin_date),
-            changes, request));
+            changes, request, mMessagesApi.preferred(request)));
     }
 
     public Result printManual(Http.Request request) {
-        return ok(print_manual.render(Chapter.all(Organization.getByHost(request)), request));
+        return ok(print_manual.render(Chapter.all(Organization.getByHost(request)), request, mMessagesApi.preferred(request)));
     }
 
     static Path print_temp_dir;
@@ -628,17 +628,16 @@ public class Application extends Controller {
         }
     }
 
-    static play.twirl.api.Html renderManualTOC(Organization org, Http.Request request) {
-        return cached_page.render(
-            new CachedPage(CachedPage.MANUAL_INDEX,
+    play.twirl.api.Html renderManualTOC(Organization org, Http.Request request) {
+        return cached_page.render(new CachedPage(CachedPage.MANUAL_INDEX,
                 OrgConfig.get(org).str_manual_title,
                 "manual",
                 "toc", org) {
                 @Override
                 String render() {
-                    return view_manual.render(Chapter.all(org), request).toString();
+                    return view_manual.render(Chapter.all(org), request, mMessagesApi.preferred(request)).toString();
                 }
-            }, request);
+            }, request, mMessagesApi.preferred(request));
     }
 
     public Result printManualChapter(Integer id, Http.Request request) throws Exception {
@@ -650,7 +649,7 @@ public class Application extends Controller {
             documents.add(renderManualTOC(org, request).toString());
             // then render all chapters
             for (Chapter chapter : Chapter.all(org)) {
-                documents.add(view_chapter.render(chapter, request).toString());
+                documents.add(view_chapter.render(chapter, request, mMessagesApi.preferred(request)).toString());
             }
             return renderToPDF(documents);
         } else {
@@ -660,7 +659,7 @@ public class Application extends Controller {
             } else {
                 Chapter chapter = Chapter.findById(id, org);
                 return renderToPDF(
-                    view_chapter.render(chapter, request).toString());
+                    view_chapter.render(chapter, request, mMessagesApi.preferred(request)).toString());
 
             }
         }
@@ -673,7 +672,7 @@ public class Application extends Controller {
             .where().eq("organization", Organization.getByHost(request))
             .eq("id", id).findOne();
 
-        return ok(view_chapter.render(c, request));
+        return ok(view_chapter.render(c, request, mMessagesApi.preferred(request)));
     }
 
     public Result searchManual(String searchString, Http.Request request) {
@@ -731,7 +730,7 @@ public class Application extends Controller {
             "manual",
             "",
             "manual_search.html",
-            scopes, request));
+            scopes, request, mMessagesApi.preferred(request)));
     }
 
     static List<Charge> getLastWeekCharges(Person p) {
@@ -784,7 +783,7 @@ public class Application extends Controller {
             }
         }
 
-        return ok(person_rule_history.render(p, r, rule_record, history.charges_by_rule.get(r), history, request));
+        return ok(person_rule_history.render(p, r, rule_record, history.charges_by_rule.get(r), history, request, mMessagesApi.preferred(request)));
     }
 
     public Result getPersonHistory(Integer id, Http.Request request) {
@@ -792,7 +791,7 @@ public class Application extends Controller {
         return ok(person_history.render(p,
             new PersonHistory(p, false, getStartOfYear(), null),
             getLastWeekCharges(p),
-            false, request));
+            false, request, mMessagesApi.preferred(request)));
     }
 
 
@@ -830,7 +829,7 @@ public class Application extends Controller {
         Result result = ok(view_person_history.render(p,
             new PersonHistory(p, true, start_date, end_date),
             getLastWeekCharges(p),
-            redact_names, request));
+            redact_names, request, mMessagesApi.preferred(request)));
 
         if (restricted_start_date != start_date) {
             result = addRestrictStartDateMessage(result,
@@ -844,7 +843,7 @@ public class Application extends Controller {
         Entry r = Entry.findByIdWithJCData(id, Organization.getByHost(request));
         return ok(rule_history.render(r,
             new RuleHistory(r, false, getStartOfYear(), null),
-            getRecentResolutionPlans(r), request));
+            getRecentResolutionPlans(r), request, mMessagesApi.preferred(request)));
     }
 
     public Result viewRuleHistory(Integer id, String start_date_str, String end_date_str,
@@ -863,7 +862,7 @@ public class Application extends Controller {
         Entry r = Entry.findByIdWithJCData(id, Organization.getByHost(request));
         Result result = ok(view_rule_history.render(r,
             new RuleHistory(r, true, start_date, end_date),
-            getRecentResolutionPlans(r), request));
+            getRecentResolutionPlans(r), request, mMessagesApi.preferred(request)));
 
         if (restricted_start_date != start_date) {
             result = addRestrictStartDateMessage(result,
@@ -881,7 +880,7 @@ public class Application extends Controller {
         Collections.sort(cases_written_up);
         Collections.reverse(cases_written_up);
 
-        return ok(view_persons_writeups.render(p, cases_written_up, request));
+        return ok(view_persons_writeups.render(p, cases_written_up, request, mMessagesApi.preferred(request)));
     }
 
     public Result thisWeekReport(Http.Request request) {
@@ -907,7 +906,7 @@ public class Application extends Controller {
             .le("date", end_date.getTime())
             .ge("date", start_date.getTime()).findList();
 
-        return renderToPDF(multi_meetings.render(meetings, request).toString());
+        return renderToPDF(multi_meetings.render(meetings, request, mMessagesApi.preferred(request)).toString());
     }
 
     public Result viewWeeklyReport(String date_string, Http.Request request) {
@@ -987,7 +986,7 @@ public class Application extends Controller {
             end_date.getTime(),
             result,
             all_cases,
-            referral_destinations, request));
+            referral_destinations, request, mMessagesApi.preferred(request)));
     }
 
     public static String jcPeople(String term, Organization org) {
@@ -1071,7 +1070,7 @@ public class Application extends Controller {
 
         if (charges.size() > 0) {
             Charge c = charges.get(0);
-            return ok(last_rp.render(charges.size(), c, request));
+            return ok(last_rp.render(charges.size(), c, request, mMessagesApi.preferred(request)));
         }
 
         return ok("No previous charge.");
@@ -1224,7 +1223,7 @@ public class Application extends Controller {
             "misc",
             "file_sharing",
             "file_sharing.html",
-            scopes, request));
+            scopes, request, mMessagesApi.preferred(request)));
     }
 
     @Secured.Auth(UserRole.ROLE_ALL_ACCESS)
@@ -1291,7 +1290,7 @@ public class Application extends Controller {
             "misc",
             "view_files",
             "view_files.html",
-            scopes, request));
+            scopes, request, mMessagesApi.preferred(request)));
     }
 
     public Result emailFile(Http.Request request) {

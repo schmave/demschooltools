@@ -66,9 +66,8 @@ public class Attendance extends Controller {
             next_date = null;
         }
 
-        return attendance_index.render(
-            all_people, person_to_stats, all_codes, codes_map,
-            Application.attendancePeople(org), start_date, end_date, is_custom_date, prev_date, next_date, request).toString();
+        return attendance_index.render(all_people, person_to_stats, all_codes, codes_map,
+            Application.attendancePeople(org), start_date, end_date, is_custom_date, prev_date, next_date, request, mMessagesApi.preferred(request)).toString();
     }
 
     public Result index(String start_date_str, String end_date_str, Boolean is_custom_date, Http.Request request) {
@@ -81,7 +80,7 @@ public class Attendance extends Controller {
                         String render() {
                             return renderIndexContent(Application.getStartOfYear(), null, false, Organization.getByHost(request), request);
                         }
-                    }, request));
+                    }, request, mMessagesApi.preferred(request)));
         } else {
             return ok(cached_page.render(new CachedPage("",
                             "Attendance",
@@ -101,7 +100,7 @@ public class Attendance extends Controller {
                         String render() {
                             throw new RuntimeException("This shouldn't be called");
                         }
-                    }, request));
+                    }, request, mMessagesApi.preferred(request)));
         }
     }
 
@@ -161,7 +160,7 @@ public class Attendance extends Controller {
                 codes,
                 all_people,
                 person_to_days,
-                person_to_week, request));
+                person_to_week, request, mMessagesApi.preferred(request)));
         } else {
             List<Person> additional_people = Application.attendancePeople(org);
             additional_people.removeAll(all_people);
@@ -173,7 +172,7 @@ public class Attendance extends Controller {
                 all_people,
                 additional_people,
                 person_to_days,
-                person_to_week, request))
+                person_to_week, request, mMessagesApi.preferred(request)))
                     .withHeader("Cache-Control", "max-age=0, no-cache, no-store")
                     .withHeader("Pragma", "no-cache");
         }
@@ -312,7 +311,7 @@ public class Attendance extends Controller {
             row == null ? null : row.getDate("min_date"),
             row == null ? null : row.getDate("max_date"),
             has_off_campus_time,
-            table_width, request));
+            table_width, request, mMessagesApi.preferred(request)));
     }
 
     public Result importFromCustodia(Http.Request request) {
@@ -770,7 +769,7 @@ public class Attendance extends Controller {
                 "custodia",
                 "",
                 "custodia_admin.html",
-                scopes, request));
+                scopes, request, mMessagesApi.preferred(request)));
     }
 
     public Result offCampusTime(Http.Request request) {
@@ -781,7 +780,7 @@ public class Attendance extends Controller {
             .order("day ASC")
             .findList();
 
-        return ok(attendance_off_campus.render(events, request));
+        return ok(attendance_off_campus.render(events, request, mMessagesApi.preferred(request)));
     }
 
     public Result deleteOffCampusTime(Http.Request request) {
@@ -803,7 +802,7 @@ public class Attendance extends Controller {
         Date today = Calendar.getInstance().getTime();
         String current_date = df.format(today);
         String people_json = Application.attendancePeopleJson(Organization.getByHost(request));
-        return ok(attendance_add_off_campus.render(current_date, people_json, request));
+        return ok(attendance_add_off_campus.render(current_date, people_json, request, mMessagesApi.preferred(request)));
     }
 
     public Result saveOffCampusTime(Http.Request request) throws ParseException {
@@ -833,7 +832,7 @@ public class Attendance extends Controller {
     }
 
     public Result reports(Http.Request request) {
-        return ok(attendance_reports.render(new AttendanceReport(Organization.getByHost(request)), request));
+        return ok(attendance_reports.render(new AttendanceReport(Organization.getByHost(request)), request, mMessagesApi.preferred(request)));
     }
 
     public Result runReport(Http.Request request) {
@@ -841,10 +840,10 @@ public class Attendance extends Controller {
         Form<AttendanceReport> filledForm = form.bindFromRequest(request);
         if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
-            return badRequest(attendance_reports.render(new AttendanceReport(Organization.getByHost(request)), request));
+            return badRequest(attendance_reports.render(new AttendanceReport(Organization.getByHost(request)), request, mMessagesApi.preferred(request)));
         }
         AttendanceReport report = AttendanceReport.createFromForm(filledForm, Organization.getByHost(request));
-        return ok(attendance_reports.render(report, request));
+        return ok(attendance_reports.render(report, request, mMessagesApi.preferred(request)));
     }
 
     public Result assignPINs(Http.Request request) {
@@ -857,7 +856,7 @@ public class Attendance extends Controller {
         admin.first_name = "Admin";
         admin.pin = org.attendance_admin_pin;
         people.add(0, admin);
-        return ok(attendance_pins.render(people, request));
+        return ok(attendance_pins.render(people, request, mMessagesApi.preferred(request)));
     }
 
     public Result savePINs(Http.Request request) {
@@ -889,7 +888,7 @@ public class Attendance extends Controller {
 
     public Result viewCodes(Http.Request request) {
         return ok(attendance_codes.render(AttendanceCode.all(Organization.getByHost(request)),
-            getCodeForm(), request));
+            getCodeForm(), request, mMessagesApi.preferred(request)));
     }
 
     public Result newCode(Http.Request request) {
@@ -905,7 +904,7 @@ public class Attendance extends Controller {
     public Result editCode(Integer code_id, Http.Request request) {
         AttendanceCode ac = AttendanceCode.findById(code_id, Organization.getByHost(request));
         Form<AttendanceCode> filled_form = getCodeForm().fill(ac);
-        return ok(edit_attendance_code.render(filled_form, request));
+        return ok(edit_attendance_code.render(filled_form, request, mMessagesApi.preferred(request)));
     }
 
     public Result saveCode(Http.Request request) {

@@ -62,9 +62,9 @@ public class CRM extends Controller {
                         .where().eq("person.organization", Organization.getByHost(request))
                         .orderBy("created DESC").setMaxRows(20).findList();
 
-                    return people_index.render(recent_comments, request).toString();
+                    return people_index.render(recent_comments, request, mMessagesApi.preferred(request)).toString();
                 }
-            }, request));
+            }, request, mMessagesApi.preferred(request)));
     }
 
     public Result person(Integer id, Http.Request request) {
@@ -99,7 +99,7 @@ public class CRM extends Controller {
         return ok(family.render(the_person,
             family_members,
             all_comments,
-            comment_destination, request));
+            comment_destination, request, mMessagesApi.preferred(request)));
     }
 
     public Result jsonPeople(String query, Http.Request request) {
@@ -247,7 +247,7 @@ public class CRM extends Controller {
         Organization org = Organization.getByHost(request);
         Tag the_tag = Tag.findById(tagId, org);
         return ok(to_address_fragment.render(the_tag.title,
-                getTagMembers(tagId, familyMode, org), request));
+                getTagMembers(tagId, familyMode, org), request, mMessagesApi.preferred(request)));
     }
 
     public Result addTag(Integer tagId, String title, Integer personId, Http.Request request) {
@@ -266,7 +266,7 @@ public class CRM extends Controller {
 
         addTag(the_tag, p, Application.getCurrentUser(request), request);
         CachedPage.onPeopleChanged(org);
-        return ok(tag_fragment.render(the_tag, p, request));
+        return ok(tag_fragment.render(the_tag, p, request, mMessagesApi.preferred(request)));
     }
 
     public void addTag(Tag tag, Person person, User current_user, Http.Request request) {
@@ -316,7 +316,7 @@ public class CRM extends Controller {
         });
     }
 
-    public static void notifyAboutTag(Tag t, Person p, boolean was_add, Http.Request request) {
+    public void notifyAboutTag(Tag t, Person p, boolean was_add, Http.Request request) {
         for (NotificationRule rule : t.notification_rules) {
             play.libs.mailer.Email mail = new play.libs.mailer.Email();
             if (was_add) {
@@ -326,16 +326,15 @@ public class CRM extends Controller {
             }
             mail.addTo(rule.email);
             mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
-            mail.setBodyHtml(tag_email.render(
-                    t,
+            mail.setBodyHtml(tag_email.render(t,
                     Application.getCurrentUser(request).name,
-                    p, was_add, request).toString());
+                    p, was_add, request, mMessagesApi.preferred(request)).toString());
             sMailer.send(mail);
         }
     }
 
     public Result allPeople(Http.Request request) {
-        return ok(all_people.render(Person.all(Organization.getByHost(request)), request));
+        return ok(all_people.render(Person.all(Organization.getByHost(request)), request, mMessagesApi.preferred(request)));
     }
 
     public Result viewAllTags(Http.Request request) {
@@ -355,12 +354,12 @@ public class CRM extends Controller {
             "crm",
             "",
             "view_all_tags.html",
-            scopes, request));
+            scopes, request, mMessagesApi.preferred(request)));
     }
 
     public Result editTag(Integer id, Http.Request request) {
         Form<Tag> filled_form = mFormFactory.form(Tag.class).fill(Tag.findById(id, Organization.getByHost(request)));
-        return ok(edit_tag.render(filled_form, request));
+        return ok(edit_tag.render(filled_form, request, mMessagesApi.preferred(request)));
     }
 
     public Result saveTag(Http.Request request) {
@@ -465,7 +464,7 @@ public class CRM extends Controller {
             }
         }
 
-        return ok(tag.render(the_tag, people, people_with_family, the_tag.use_student_display, true, request));
+        return ok(tag.render(the_tag, people, people_with_family, the_tag.use_student_display, true, request, mMessagesApi.preferred(request)));
     }
 
     private static void createCell(Row row, int j, Object value, CellStyle style) {
@@ -645,7 +644,7 @@ public class CRM extends Controller {
 
     public Result newPerson(Http.Request request) {
         Form<Person> personForm = mFormFactory.form(Person.class);
-        return ok(new_person.render(personForm, request));
+        return ok(new_person.render(personForm, request, mMessagesApi.preferred(request)));
     }
 
     public Result makeNewPerson(Http.Request request) {
@@ -654,7 +653,7 @@ public class CRM extends Controller {
         if(filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
             return badRequest(
-                new_person.render(filledForm, request)
+                new_person.render(filledForm, request, mMessagesApi.preferred(request))
             );
         } else {
             Person new_person = Person.create(filledForm, Organization.getByHost(request));
@@ -691,7 +690,7 @@ public class CRM extends Controller {
         from_addresses.add("staff@threeriversvillageschool.org");
 
         e.parseMessage();
-        return ok(view_pending_email.render(e, test_addresses, from_addresses, request));
+        return ok(view_pending_email.render(e, test_addresses, from_addresses, request, mMessagesApi.preferred(request)));
     }
 
     public Result sendTestEmail(Http.Request request) {
@@ -774,7 +773,7 @@ public class CRM extends Controller {
 
     public Result editPerson(Integer id, Http.Request request) {
         Person p = Person.findById(id, Organization.getByHost(request));
-        return ok(edit_person.render(p.fillForm(), request));
+        return ok(edit_person.render(p.fillForm(), request, mMessagesApi.preferred(request)));
     }
 
     public Result savePersonEdits(Http.Request request) {
@@ -788,7 +787,7 @@ public class CRM extends Controller {
                 System.out.println(error.key() + ", " + error.message());
             }
             return badRequest(
-                edit_person.render(filledForm, request)
+                edit_person.render(filledForm, request, mMessagesApi.preferred(request))
             );
         }
 
@@ -828,12 +827,12 @@ public class CRM extends Controller {
                     mail.setSubject("DemSchoolTools comment: " + new_comment.user.name + " & " + new_comment.person.getInitials());
                     mail.addTo(rule.email);
                     mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
-                    mail.setBodyHtml(comment_email.render(Comment.find.byId(new_comment.id), request).toString());
+                    mail.setBodyHtml(comment_email.render(Comment.find.byId(new_comment.id), request, mMessagesApi.preferred(request)).toString());
                     sMailer.send(mail);
                 }
             }
 
-            return ok(comment_fragment.render(Comment.find.byId(new_comment.id), false, request));
+            return ok(comment_fragment.render(Comment.find.byId(new_comment.id), false, request, mMessagesApi.preferred(request)));
         } else {
             return ok();
         }
@@ -887,7 +886,7 @@ public class CRM extends Controller {
         TaskList list = TaskList.findById(id, Organization.getByHost(request));
         List<Person> people = list.tag.people;
 
-        return ok(task_list.render(list, people, request));
+        return ok(task_list.render(list, people, request, mMessagesApi.preferred(request)));
     }
 
     public Result viewMailchimpSettings(Http.Request request) {
@@ -899,7 +898,7 @@ public class CRM extends Controller {
 
         return ok(view_mailchimp_settings.render(mFormFactory.form(Organization.class), org,
             MailchimpSync.find.query().where().eq("tag.organization", Organization.getByHost(request)).findList(),
-            mc_list_map, request));
+            mc_list_map, request, mMessagesApi.preferred(request)));
     }
 
     public Result saveMailchimpSettings(Http.Request request) {

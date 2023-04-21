@@ -338,7 +338,7 @@ public class Public extends Controller {
                 mail.setSubject("People database: Nightly updates");
                 mail.addTo(org.mailchimp_updates_email);
                 mail.setFrom("Papal DB <noreply@threeriversvillageschool.org>");
-                mail.setBodyHtml(sync_email.render(mc_lists, info, request).toString());
+                mail.setBodyHtml(sync_email.render(mc_lists, info, request, mMessagesApi.preferred(request)).toString());
                 mMailer.send(mail);
             }
         }
@@ -361,7 +361,7 @@ public class Public extends Controller {
 		}
         return ok(login.render(mPlayAuth,
                 request.flash().getOptional("notice").orElse(""),
-                Application.getRemoteIp(request), request));
+                Application.getRemoteIp(request), request, mMessagesApi.preferred(request)));
     }
 
     public Result doLogin(Http.Request request) {
@@ -398,6 +398,6 @@ public class Public extends Controller {
     }
 
     public Result loggedOut(Http.Request request) {
-        return ok(logged_out.render(request));
+        return ok(logged_out.render(request, mMessagesApi.preferred(request)));
     }
 }
