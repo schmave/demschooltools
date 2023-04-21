@@ -26,6 +26,9 @@ import play.api.libs.mailer.MailerClient;
 import play.cache.SyncCacheApi;
 import play.mvc.*;
 import play.mvc.Http.Context;
+import views.html.logged_out;
+import views.html.login;
+import views.html.sync_email;
 
 @Singleton
 @With(DumpOnError.class)
@@ -330,7 +333,7 @@ public class Public extends Controller {
                 mail.setSubject("People database: Nightly updates");
                 mail.addTo(org.mailchimp_updates_email);
                 mail.setFrom("Papal DB <noreply@threeriversvillageschool.org>");
-                mail.setBodyHtml(views.html.sync_email.render(mc_lists, info).toString());
+                mail.setBodyHtml(sync_email.render(mc_lists, info, request).toString());
                 mMailer.send(mail);
             }
         }
@@ -351,10 +354,9 @@ public class Public extends Controller {
 		if (Organization.getByHost(request) == null) {
 			return unauthorized("Unknown organization");
 		}
-        return ok(views.html.login.render(
-                mPlayAuth,
+        return ok(login.render(mPlayAuth,
                 request.flash().getOptional("notice").orElse(""),
-                Application.getRemoteIp(request)));
+                Application.getRemoteIp(request), request));
     }
 
     public Result doLogin(Http.Request request) {
@@ -391,6 +393,6 @@ public class Public extends Controller {
     }
 
     public Result loggedOut(Http.Request request) {
-        return ok(views.html.logged_out.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request))));
+        return ok(logged_out.render(Application.currentUsername(request), OrgConfig.get(Organization.getByHost(request)), request));
     }
 }

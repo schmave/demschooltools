@@ -11,6 +11,7 @@ import org.xhtmlrenderer.pdf.ITextRenderer;
 import play.api.libs.mailer.MailerClient;
 import play.libs.Json;
 import play.mvc.*;
+import views.html.*;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -45,8 +46,7 @@ public class Application extends Controller {
     }
 
     public Result viewPassword(Http.Request request) {
-        return ok(views.html.view_password.render(
-                request.flash().getOptional("notice").orElse("")));
+        return ok(view_password.render(request.flash().getOptional("notice").orElse(""), request));
     }
 
     public Result editPassword(Http.Request request) {
@@ -102,8 +102,7 @@ public class Application extends Controller {
     }
 
     public Result viewSchoolMeetingReferrals(Http.Request request) {
-        return ok(views.html.view_sm_referrals.render(
-            getActiveSchoolMeetingReferrals(Organization.getByHost(request))));
+        return ok(view_sm_referrals.render(getActiveSchoolMeetingReferrals(Organization.getByHost(request)), request));
     }
 
     public Result viewSchoolMeetingDecisions(Http.Request request) {
@@ -120,7 +119,7 @@ public class Application extends Controller {
                 .gt("sm_decision_date", Application.getStartOfYear())
                 .isNotNull("sm_decision")
                 .orderBy("id DESC").findList();
-        return ok(views.html.view_sm_decisions.render(the_charges));
+        return ok(view_sm_decisions.render(the_charges, request));
     }
 
     public static List<Person> jcPeople(Organization org) {
@@ -157,8 +156,7 @@ public class Application extends Controller {
     }
 
     public Result index(Http.Request request) {
-        return ok(views.html.cached_page.render(
-            new CachedPage(CachedPage.JC_INDEX,
+        return ok(cached_page.render(new CachedPage(CachedPage.JC_INDEX,
                 "JC database",
                 "jc",
                 "jc_home", Organization.getByHost(request)) {
@@ -208,9 +206,9 @@ public class Application extends Controller {
 
         entries_with_charges.sort(Entry.SORT_NUMBER);
 
-        return views.html.jc_index.render(meetings, people,
+        return jc_index.render(meetings, people,
             entries_with_charges).toString();
-                }}));
+                }}, request));
     }
 
     public Result downloadCharges(Http.Request request) throws IOException {
@@ -320,12 +318,12 @@ public class Application extends Controller {
     }
 
     public Result viewMeeting(int meeting_id, Http.Request request) {
-        return ok(views.html.view_meeting.render(Meeting.findById(meeting_id, Organization.getByHost(request))));
+        return ok(view_meeting.render(Meeting.findById(meeting_id, Organization.getByHost(request)), request));
     }
 
     public Result printMeeting(int meeting_id, Http.Request request) throws Exception {
         return renderToPDF(
-                views.html.view_meeting.render(Meeting.findById(meeting_id, Organization.getByHost(request))).toString());
+                view_meeting.render(Meeting.findById(meeting_id, Organization.getByHost(request)), request).toString());
     }
 
     public Result editResolutionPlanList(Http.Request request) {
@@ -375,7 +373,7 @@ public class Application extends Controller {
             }
         }
 
-        return ok(views.html.edit_rp_list.render(active_rps, completed_rps, nullified_rps))
+        return ok(edit_rp_list.render(active_rps, completed_rps, nullified_rps, request))
         .withHeader("Cache-Control", "max-age=0, no-cache, no-store")
         .withHeader("Pragma", "no-cache");
 
@@ -430,14 +428,14 @@ public class Application extends Controller {
                 }
             }
         }
-        return renderToPDF(views.html.view_simple_rps.render(groups).toString())
+        return renderToPDF(view_simple_rps.render(groups, request).toString())
                 ;
 
     }
 
     public Result viewMeetingResolutionPlans(int meeting_id, Http.Request request) {
-        return ok(views.html.view_meeting_resolution_plans.render(Meeting.findById(meeting_id,
-                Organization.getByHost(request))));
+        return ok(view_meeting_resolution_plans.render(Meeting.findById(meeting_id,
+                Organization.getByHost(request)), request));
     }
 
     public Result downloadMeetingResolutionPlans(int meeting_id, Http.Request request) throws IOException {
@@ -510,13 +508,12 @@ public class Application extends Controller {
 
         changes.sort(ManualChange.SORT_NUM_DATE);
 
-        return ok(views.html.view_manual_changes.render(
-            forDateInput(begin_date),
-            changes));
+        return ok(view_manual_changes.render(forDateInput(begin_date),
+            changes, request));
     }
 
     public Result printManual(Http.Request request) {
-        return ok(views.html.print_manual.render(Chapter.all(Organization.getByHost(request))));
+        return ok(print_manual.render(Chapter.all(Organization.getByHost(request)), request));
     }
 
     static Path print_temp_dir;
@@ -628,16 +625,16 @@ public class Application extends Controller {
     }
 
     static play.twirl.api.Html renderManualTOC(Organization org, Http.Request request) {
-        return views.html.cached_page.render(Application.currentUsername(request), OrgConfig.get(org),
+        return cached_page.render(Application.currentUsername(request), OrgConfig.get(org),
             new CachedPage(CachedPage.MANUAL_INDEX,
                 OrgConfig.get(org).str_manual_title,
                 "manual",
                 "toc", org) {
                 @Override
                 String render() {
-                    return views.html.view_manual.render(OrgConfig.get(org), Chapter.all(org)).toString();
+                    return view_manual.render(OrgConfig.get(org), Chapter.all(org)).toString();
                 }
-            });
+            }, request);
     }
 
     public Result printManualChapter(Integer id, Http.Request request) throws Exception {
@@ -649,7 +646,7 @@ public class Application extends Controller {
             documents.add(renderManualTOC(org, request).toString());
             // then render all chapters
             for (Chapter chapter : Chapter.all(org)) {
-                documents.add(views.html.view_chapter.render(chapter).toString());
+                documents.add(view_chapter.render(chapter, request).toString());
             }
             return renderToPDF(documents);
         } else {
@@ -659,7 +656,7 @@ public class Application extends Controller {
             } else {
                 Chapter chapter = Chapter.findById(id, org);
                 return renderToPDF(
-                    views.html.view_chapter.render(chapter).toString());
+                    view_chapter.render(chapter, request).toString());
 
             }
         }
@@ -672,7 +669,7 @@ public class Application extends Controller {
             .where().eq("organization", Organization.getByHost(request))
             .eq("id", id).findOne();
 
-        return ok(views.html.view_chapter.render(c));
+        return ok(view_chapter.render(c, request));
     }
 
     public Result searchManual(String searchString, Http.Request request) {
@@ -726,12 +723,11 @@ public class Application extends Controller {
         }
         scopes.put("entries", entriesList);
 
-        return ok(views.html.main_with_mustache.render(
-            "Manual Search: " + searchString,
+        return ok(main_with_mustache.render("Manual Search: " + searchString,
             "manual",
             "",
             "manual_search.html",
-            scopes));
+            scopes, request));
     }
 
     static List<Charge> getLastWeekCharges(Person p) {
@@ -784,17 +780,15 @@ public class Application extends Controller {
             }
         }
 
-        return ok(views.html.person_rule_history.render(
-            p, r, rule_record, history.charges_by_rule.get(r), history));
+        return ok(person_rule_history.render(p, r, rule_record, history.charges_by_rule.get(r), history, request));
     }
 
     public Result getPersonHistory(Integer id, Http.Request request) {
         Person p = Person.findByIdWithJCData(id, Organization.getByHost(request));
-        return ok(views.html.person_history.render(
-            p,
+        return ok(person_history.render(p,
             new PersonHistory(p, false, getStartOfYear(), null),
             getLastWeekCharges(p),
-            false));
+            false, request));
     }
 
 
@@ -829,11 +823,10 @@ public class Application extends Controller {
 
         Date restricted_start_date = restrictStartDate(start_date, getCurrentUser(request));
         Person p = Person.findByIdWithJCData(id, Organization.getByHost(request));
-        Result result = ok(views.html.view_person_history.render(
-            p,
+        Result result = ok(view_person_history.render(p,
             new PersonHistory(p, true, start_date, end_date),
             getLastWeekCharges(p),
-            redact_names));
+            redact_names, request));
 
         if (restricted_start_date != start_date) {
             result = addRestrictStartDateMessage(result,
@@ -845,10 +838,9 @@ public class Application extends Controller {
 
     public Result getRuleHistory(Integer id, Http.Request request) {
         Entry r = Entry.findByIdWithJCData(id, Organization.getByHost(request));
-        return ok(views.html.rule_history.render(
-            r,
+        return ok(rule_history.render(r,
             new RuleHistory(r, false, getStartOfYear(), null),
-            getRecentResolutionPlans(r)));
+            getRecentResolutionPlans(r), request));
     }
 
     public Result viewRuleHistory(Integer id, String start_date_str, String end_date_str,
@@ -865,10 +857,9 @@ public class Application extends Controller {
         Date restricted_start_date = restrictStartDate(start_date, getCurrentUser(request));
 
         Entry r = Entry.findByIdWithJCData(id, Organization.getByHost(request));
-        Result result = ok(views.html.view_rule_history.render(
-            r,
+        Result result = ok(view_rule_history.render(r,
             new RuleHistory(r, true, start_date, end_date),
-            getRecentResolutionPlans(r)));
+            getRecentResolutionPlans(r), request));
 
         if (restricted_start_date != start_date) {
             result = addRestrictStartDateMessage(result,
@@ -886,7 +877,7 @@ public class Application extends Controller {
         Collections.sort(cases_written_up);
         Collections.reverse(cases_written_up);
 
-        return ok(views.html.view_persons_writeups.render(p, cases_written_up));
+        return ok(view_persons_writeups.render(p, cases_written_up, request));
     }
 
     public Result thisWeekReport(Http.Request request) {
@@ -912,7 +903,7 @@ public class Application extends Controller {
             .le("date", end_date.getTime())
             .ge("date", start_date.getTime()).findList();
 
-        return renderToPDF(views.html.multi_meetings.render(meetings).toString());
+        return renderToPDF(multi_meetings.render(meetings, request).toString());
     }
 
     public Result viewWeeklyReport(String date_string, Http.Request request) {
@@ -988,12 +979,11 @@ public class Application extends Controller {
             }
         }
 
-        return ok(views.html.jc_weekly_report.render(
-            start_date.getTime(),
+        return ok(jc_weekly_report.render(start_date.getTime(),
             end_date.getTime(),
             result,
             all_cases,
-            referral_destinations));
+            referral_destinations, request));
     }
 
     public static String jcPeople(String term, Organization org) {
@@ -1077,7 +1067,7 @@ public class Application extends Controller {
 
         if (charges.size() > 0) {
             Charge c = charges.get(0);
-            return ok(views.html.last_rp.render(charges.size(), c));
+            return ok(last_rp.render(charges.size(), c, request));
         }
 
         return ok("No previous charge.");
@@ -1226,12 +1216,11 @@ public class Application extends Controller {
         scopes.put("existing_files", existingFiles);
 
         scopes.put("printer_email", Organization.getByHost(request).printer_email);
-        return ok(views.html.main_with_mustache.render(
-            "File Sharing config",
+        return ok(main_with_mustache.render("File Sharing config",
             "misc",
             "file_sharing",
             "file_sharing.html",
-            scopes));
+            scopes, request));
     }
 
     @Secured.Auth(UserRole.ROLE_ALL_ACCESS)
@@ -1294,12 +1283,11 @@ public class Application extends Controller {
         scopes.put("existing_files", existingFiles);
 
         scopes.put("printer_email", org.printer_email);
-        return ok(views.html.main_with_mustache.render(
-            "DemSchoolTools shared files",
+        return ok(main_with_mustache.render("DemSchoolTools shared files",
             "misc",
             "view_files",
             "view_files.html",
-            scopes));
+            scopes, request));
     }
 
     public Result emailFile(Http.Request request) {

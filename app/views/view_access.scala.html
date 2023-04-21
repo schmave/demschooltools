@@ -1,4 +1,4 @@
-@(users : List[User], allowed_ip : String, userForm : Form[User])
+@(users : List[User], allowed_ip : String, userForm : Form[User])(implicit request: Request)
 
 @import helper._
 @implicitField = @{ FieldConstructor(myConstructor.f) }

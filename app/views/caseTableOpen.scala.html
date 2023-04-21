@@ -1,4 +1,4 @@
-@(orgConfig: OrgConfig)
+@(orgConfig: OrgConfig)(implicit request: Request)
 
 <table class="table case_notes">
 <thead><tr><th width="150">Case</th><th>@orgConfig.str_findings</th>

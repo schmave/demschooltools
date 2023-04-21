@@ -1,4 +1,4 @@
-@(taskForm:Form[Task], list_options : List[TaskList])
+@(taskForm:Form[Task], list_options : List[TaskList])(implicit request: Request)
 
 @import helper._
 @implicitField = @{ FieldConstructor(myConstructor.f) }

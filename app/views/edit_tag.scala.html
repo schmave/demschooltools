@@ -1,4 +1,4 @@
-@(form: Form[Tag])
+@(form: Form[Tag])(implicit request: Request)
 
 @implicitField = @{ helper.FieldConstructor(myConstructor.f) }
 

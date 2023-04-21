@@ -91,12 +91,49 @@ def add_current_user_to_file(filename, template_name):
             f.write('\n'.join(lines))
 
 
+def add_request_to_file(filename, template_name):
+    existing_content = None
+    with open(filename) as f:
+        existing_content = f.read()
+
+    lines = existing_content.splitlines()
+
+    needs_save = False
+
+    if filename.endswith('.java'):
+        pass
+        # Use IntelliJ structural replace for this
+        # in_call = False
+        # for i, line in enumerate(lines):
+        #     if f'{template_name}.render(' in line:
+        #         in_call = True
+        #     if in_call and ';' in line:
+        #         assert '));' in line, f'{filename} - {line}'
+        #         needs_save = True
+        #         in_call = False
+        #         lines[i] = line.replace('));', ', request));')
+
+    elif f'.scala.html' in filename:
+        search_string = '@('
+        assert search_string in lines[0], filename
+
+        for i, line in enumerate(lines):
+            if ')' in line:
+                if 'implicit' not in line:
+                    last_paren_i = line.rindex(')')
+                    lines[i] = line[:last_paren_i] + ')(implicit request: Request)'
+                    needs_save = True
+                break
+
+    if needs_save:
+        with open(filename, 'w') as f:
+            f.write('\n'.join(lines))
+
 def modify_file(template_name):
     for root, unused_dirs, files in os.walk('app'):
         for filename in files:
             if filename.endswith('.java') or filename.endswith('.scala.html'):
-                # add_org_config_to_file(os.path.join(root, filename), template_name)
-                add_current_user_to_file(os.path.join(root, filename), template_name)
+                add_request_to_file(os.path.join(root, filename), template_name)
 
 def main():
     for arg in sys.argv[1:]:

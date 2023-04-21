@@ -1,4 +1,4 @@
-@(lists: List[TaskList], listForm : Form[TaskList])
+@(lists: List[TaskList], listForm : Form[TaskList])(implicit request: Request)
 
 @import helper._
 @implicitField = @{ FieldConstructor(myConstructor.f) }

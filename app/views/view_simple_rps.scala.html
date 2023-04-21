@@ -1,4 +1,4 @@
-@(groups : HashMap[String, List[Charge]])
+@(groups : HashMap[String, List[Charge]])(implicit request: Request)
 
 @sorted_keys = @{ new ArrayList(groups.keySet()) }
 @{ Collections.sort(sorted_keys) }

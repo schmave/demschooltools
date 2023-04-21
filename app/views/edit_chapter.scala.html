@@ -1,4 +1,4 @@
-@(form: Form[Chapter], is_new : Boolean)
+@(form: Form[Chapter], is_new : Boolean)(implicit request: Request)
 
 @implicitField = @{ helper.FieldConstructor(myConstructor.f) }
 

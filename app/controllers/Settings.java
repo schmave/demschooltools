@@ -15,6 +15,7 @@ import service.MyUserService;
 
 import play.data.*;
 import play.mvc.*;
+import views.html.*;
 
 import javax.inject.Inject;
 
@@ -35,7 +36,7 @@ public class Settings extends Controller {
             .order("the_type DESC, tag.id")
             .findList();
 
-        return ok(views.html.view_settings.render(rules, Organization.getByHost(request), Public.sConfig.getConfig("school_crm")));
+        return ok(view_settings.render(rules, Organization.getByHost(request), Public.sConfig.getConfig("school_crm"), request));
     }
 
     public Result editSettings(Http.Request request) {
@@ -109,15 +110,14 @@ public class Settings extends Controller {
 
     public Result viewTaskLists(Http.Request request) {
         Form<TaskList> list_form = mFormFactory.form(TaskList.class);
-        return ok(views.html.view_task_lists.render(TaskList.allForOrg(Organization.getByHost(request)), list_form));
+        return ok(view_task_lists.render(TaskList.allForOrg(Organization.getByHost(request)), list_form, request));
     }
 
     public Result viewTaskList(Integer id, Http.Request request) {
         TaskList list = TaskList.findById(id, Organization.getByHost(request));
         Form<TaskList> list_form = mFormFactory.form(TaskList.class);
         Form<Task> task_form = mFormFactory.form(Task.class);
-        return ok(views.html.settings_task_list.render(
-            list, list_form.fill(list), task_form));
+        return ok(settings_task_list.render(list, list_form.fill(list), task_form, request));
     }
 
     public Result newTask(Http.Request request) {
@@ -155,8 +155,8 @@ public class Settings extends Controller {
         Form<Task> task_form = mFormFactory.form(Task.class);
         Form<Task> filled_form = task_form.fill(Task.findById(id, Organization.getByHost(request)));
 
-        return ok(views.html.edit_task.render(filled_form,
-            TaskList.allForOrg(Organization.getByHost(request))));
+        return ok(edit_task.render(filled_form,
+            TaskList.allForOrg(Organization.getByHost(request)), request));
     }
 
     public Result saveTask(Http.Request request) {
@@ -212,7 +212,7 @@ public class Settings extends Controller {
         }
 
         Form<User> user_form = mFormFactory.form(User.class);
-        return ok(views.html.view_access.render(users_to_show, allowed_ip, user_form));
+        return ok(view_access.render(users_to_show, allowed_ip, user_form, request));
     }
 
     public Result saveAccess(Http.Request request) {
@@ -239,7 +239,7 @@ public class Settings extends Controller {
         User u = User.findById(id, Organization.getByHost(request));
 
         Form<User> user_form = mFormFactory.form(User.class);
-        return ok(views.html.edit_user.render(u, user_form.fill(u)));
+        return ok(edit_user.render(u, user_form.fill(u), request));
     }
 
     public Result saveUser(Http.Request request) {

@@ -14,6 +14,7 @@ import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.With;
+import views.html.*;
 
 import javax.inject.Inject;
 import java.io.ByteArrayOutputStream;
@@ -62,16 +63,14 @@ public class Attendance extends Controller {
             next_date = null;
         }
 
-        return views.html.attendance_index.render(OrgConfig.get(org),
+        return attendance_index.render(OrgConfig.get(org),
             all_people, person_to_stats, all_codes, codes_map,
-            Application.attendancePeople(org), start_date, end_date, is_custom_date, prev_date, next_date
-        ).toString();
+            Application.attendancePeople(org), start_date, end_date, is_custom_date, prev_date, next_date, request).toString();
     }
 
     public Result index(String start_date_str, String end_date_str, Boolean is_custom_date, Http.Request request) {
         if (start_date_str.equals("")) {
-            return ok(views.html.cached_page.render(
-                    new CachedPage(CachedPage.ATTENDANCE_INDEX,
+            return ok(cached_page.render(new CachedPage(CachedPage.ATTENDANCE_INDEX,
                             "Attendance",
                             "attendance",
                             "attendance_home", Organization.getByHost(request)) {
@@ -79,10 +78,9 @@ public class Attendance extends Controller {
                         String render() {
                             return renderIndexContent(Application.getStartOfYear(), null, false, Organization.getByHost(request));
                         }
-                    }));
+                    }, request));
         } else {
-            return ok(views.html.cached_page.render(
-                    new CachedPage("",
+            return ok(cached_page.render(new CachedPage("",
                             "Attendance",
                             "attendance",
                             "attendance_home", Organization.getByHost(request)) {
@@ -100,7 +98,7 @@ public class Attendance extends Controller {
                         String render() {
                             throw new RuntimeException("This shouldn't be called");
                         }
-                    }));
+                    }, request));
         }
     }
 
@@ -156,12 +154,11 @@ public class Attendance extends Controller {
         Map<String, AttendanceCode> codes = getCodesMap(do_view, org);
 
         if (do_view) {
-            return ok(views.html.attendance_week.render(
-                start_date.getTime(),
+            return ok(attendance_week.render(start_date.getTime(),
                 codes,
                 all_people,
                 person_to_days,
-                person_to_week));
+                person_to_week, request));
         } else {
             List<Person> additional_people = Application.attendancePeople(org);
             additional_people.removeAll(all_people);
@@ -170,13 +167,12 @@ public class Attendance extends Controller {
 
             response().setHeader("Cache-Control", "max-age=0, no-cache, no-store");
             response().setHeader("Pragma", "no-cache");
-            return ok(views.html.edit_attendance_week.render(
-                start_date.getTime(),
+            return ok(edit_attendance_week.render(start_date.getTime(),
                 codes,
                 all_people,
                 additional_people,
                 person_to_days,
-                person_to_week));
+                person_to_week, request));
         }
     }
 
@@ -302,8 +298,7 @@ public class Attendance extends Controller {
 
         int table_width = has_off_campus_time ? 900 : 700;
 
-        return ok(views.html.attendance_person.render(
-            p,
+        return ok(attendance_person.render(p,
             days,
             day_to_week,
             codes,
@@ -314,8 +309,7 @@ public class Attendance extends Controller {
             row == null ? null : row.getDate("min_date"),
             row == null ? null : row.getDate("max_date"),
             has_off_campus_time,
-            table_width
-        ));
+            table_width, request));
     }
 
     public Result importFromCustodia(Http.Request request) {
@@ -770,12 +764,11 @@ public class Attendance extends Controller {
         scopes.put("custodiaUrl", conf.getString("custodia_url"));
         scopes.put("custodiaUsername", Organization.getByHost(request).short_name + "-admin");
         scopes.put("custodiaPassword", conf.getString("custodia_password"));
-        return ok(views.html.main_with_mustache.render(
-                "Sign in system",
+        return ok(main_with_mustache.render("Sign in system",
                 "custodia",
                 "",
                 "custodia_admin.html",
-                scopes));
+                scopes, request));
     }
 
     public Result offCampusTime(Http.Request request) {
@@ -786,7 +779,7 @@ public class Attendance extends Controller {
             .order("day ASC")
             .findList();
 
-        return ok(views.html.attendance_off_campus.render(events));
+        return ok(attendance_off_campus.render(events, request));
     }
 
     public Result deleteOffCampusTime(Http.Request request) {
@@ -808,7 +801,7 @@ public class Attendance extends Controller {
         Date today = Calendar.getInstance().getTime();
         String current_date = df.format(today);
         String people_json = Application.attendancePeopleJson(Organization.getByHost(request));
-        return ok(views.html.attendance_add_off_campus.render(current_date, people_json));
+        return ok(attendance_add_off_campus.render(current_date, people_json, request));
     }
 
     public Result saveOffCampusTime(Http.Request request) throws ParseException {
@@ -838,7 +831,7 @@ public class Attendance extends Controller {
     }
 
     public Result reports(Http.Request request) {
-        return ok(views.html.attendance_reports.render(new AttendanceReport(Organization.getByHost(request))));
+        return ok(attendance_reports.render(new AttendanceReport(Organization.getByHost(request)), request));
     }
 
     public Result runReport(Http.Request request) {
@@ -846,10 +839,10 @@ public class Attendance extends Controller {
         Form<AttendanceReport> filledForm = form.bindFromRequest(request);
         if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
-            return badRequest(views.html.attendance_reports.render(new AttendanceReport(Organization.getByHost(request))));
+            return badRequest(attendance_reports.render(new AttendanceReport(Organization.getByHost(request)), request));
         }
         AttendanceReport report = AttendanceReport.createFromForm(filledForm, Organization.getByHost(request));
-        return ok(views.html.attendance_reports.render(report));
+        return ok(attendance_reports.render(report, request));
     }
 
     public Result assignPINs(Http.Request request) {
@@ -862,7 +855,7 @@ public class Attendance extends Controller {
         admin.first_name = "Admin";
         admin.pin = org.attendance_admin_pin;
         people.add(0, admin);
-        return ok(views.html.attendance_pins.render(people));
+        return ok(attendance_pins.render(people, request));
     }
 
     public Result savePINs(Http.Request request) {
@@ -893,9 +886,8 @@ public class Attendance extends Controller {
     }
 
     public Result viewCodes(Http.Request request) {
-        return ok(views.html.attendance_codes.render(
-            AttendanceCode.all(Organization.getByHost(request)),
-            getCodeForm()));
+        return ok(attendance_codes.render(AttendanceCode.all(Organization.getByHost(request)),
+            getCodeForm(), request));
     }
 
     public Result newCode(Http.Request request) {
@@ -911,7 +903,7 @@ public class Attendance extends Controller {
     public Result editCode(Integer code_id, Http.Request request) {
         AttendanceCode ac = AttendanceCode.findById(code_id, Organization.getByHost(request));
         Form<AttendanceCode> filled_form = getCodeForm().fill(ac);
-        return ok(views.html.edit_attendance_code.render(filled_form));
+        return ok(edit_attendance_code.render(filled_form, request));
     }
 
     public Result saveCode(Http.Request request) {

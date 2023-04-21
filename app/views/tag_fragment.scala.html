@@ -1,4 +1,4 @@
-@(t : Tag, p : Person)
+@(t : Tag, p : Person)(implicit request: Request)
 
 
 <span style="white-space: nowrap;"><a
@@ -6,4 +6,3 @@
 		class="label label-success">@t.title</span></a><a class="tag_x"
 		href="#" onclick="removeTag($('#@{p.person_id}_@t.id'),@p.person_id, @t.id); return false;"
 id="@{p.person_id}_@t.id"><img src="/assets/images/x.png"></a></span>
-

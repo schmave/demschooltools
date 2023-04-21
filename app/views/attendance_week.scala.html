@@ -2,7 +2,7 @@
   codes : Map[String, AttendanceCode],
   people : List[Person],
   days : Map[Person, List[AttendanceDay]],
-  weeks : Map[Person, AttendanceWeek])
+  weeks : Map[Person, AttendanceWeek])(implicit request: Request)
 
 @import helper._
 

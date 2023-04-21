@@ -1,4 +1,4 @@
-@(notifications : List [ NotificationRule ], org: Organization, play_config: com.typesafe.config.Config)
+@(notifications : List [ NotificationRule ], org: Organization, play_config: com.typesafe.config.Config)(implicit request: Request)
 
 @main("Settings", "settings", "settings") {
 

@@ -24,6 +24,7 @@ import play.data.*;
 import play.data.validation.ValidationError;
 import play.libs.Json;
 import play.mvc.*;
+import views.html.*;
 
 
 @With(DumpOnError.class)
@@ -44,8 +45,7 @@ public class CRM extends Controller {
     }
 
     public Result recentComments(Http.Request request) {
-        return ok(views.html.cached_page.render(
-            new CachedPage(CachedPage.RECENT_COMMENTS,
+        return ok(cached_page.render(new CachedPage(CachedPage.RECENT_COMMENTS,
                 "All people",
                 "crm",
                 "recent_comments", Organization.getByHost(request)) {
@@ -58,9 +58,9 @@ public class CRM extends Controller {
                         .where().eq("person.organization", Organization.getByHost(request))
                         .orderBy("created DESC").setMaxRows(20).findList();
 
-                    return views.html.people_index.render(recent_comments).toString();
+                    return people_index.render(recent_comments).toString();
                 }
-            }));
+            }, request));
     }
 
     public Result person(Integer id, Http.Request request) {
@@ -92,11 +92,10 @@ public class CRM extends Controller {
         }
 
 
-        return ok(views.html.family.render(
-            the_person,
+        return ok(family.render(the_person,
             family_members,
             all_comments,
-            comment_destination));
+            comment_destination, request));
     }
 
     public Result jsonPeople(String query, Http.Request request) {
@@ -243,8 +242,8 @@ public class CRM extends Controller {
     public Result renderTagMembers(Integer tagId, String familyMode, Http.Request request) {
         Organization org = Organization.getByHost(request);
         Tag the_tag = Tag.findById(tagId, org);
-        return ok(views.html.to_address_fragment.render(the_tag.title,
-                getTagMembers(tagId, familyMode, org)));
+        return ok(to_address_fragment.render(the_tag.title,
+                getTagMembers(tagId, familyMode, org), request));
     }
 
     public Result addTag(Integer tagId, String title, Integer personId, Http.Request request) {
@@ -263,7 +262,7 @@ public class CRM extends Controller {
 
         addTag(the_tag, p, Application.getCurrentUser(request), request);
         CachedPage.onPeopleChanged(org);
-        return ok(views.html.tag_fragment.render(the_tag, p));
+        return ok(tag_fragment.render(the_tag, p, request));
     }
 
     public void addTag(Tag tag, Person person, User current_user, Http.Request request) {
@@ -323,17 +322,16 @@ public class CRM extends Controller {
             }
             mail.addTo(rule.email);
             mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
-            mail.setBodyHtml(views.html.tag_email.render(
-                    OrgConfig.get(Organization.getByHost(request)),
+            mail.setBodyHtml(tag_email.render(OrgConfig.get(Organization.getByHost(request)),
                     t,
                     Application.getCurrentUser(request).name,
-                    p, was_add).toString());
+                    p, was_add, request).toString());
             sMailer.send(mail);
         }
     }
 
     public Result allPeople(Http.Request request) {
-        return ok(views.html.all_people.render(Person.all(Organization.getByHost(request))));
+        return ok(all_people.render(Person.all(Organization.getByHost(request)), request));
     }
 
     public Result viewAllTags(Http.Request request) {
@@ -349,17 +347,16 @@ public class CRM extends Controller {
         }
         scopes.put("tags", serialized_tags);
 
-        return ok(views.html.main_with_mustache.render(
-            "All Tags",
+        return ok(main_with_mustache.render("All Tags",
             "crm",
             "",
             "view_all_tags.html",
-            scopes));
+            scopes, request));
     }
 
     public Result editTag(Integer id, Http.Request request) {
         Form<Tag> filled_form = mFormFactory.form(Tag.class).fill(Tag.findById(id, Organization.getByHost(request)));
-        return ok(views.html.edit_tag.render(filled_form));
+        return ok(edit_tag.render(filled_form, request));
     }
 
     public Result saveTag(Http.Request request) {
@@ -464,8 +461,7 @@ public class CRM extends Controller {
             }
         }
 
-        return ok(views.html.tag.render(
-            the_tag, people, people_with_family, the_tag.use_student_display, true));
+        return ok(tag.render(the_tag, people, people_with_family, the_tag.use_student_display, true, request));
     }
 
     private static void createCell(Row row, int j, Object value, CellStyle style) {
@@ -645,7 +641,7 @@ public class CRM extends Controller {
 
     public Result newPerson(Http.Request request) {
         Form<Person> personForm = mFormFactory.form(Person.class);
-        return ok(views.html.new_person.render(personForm));
+        return ok(new_person.render(personForm, request));
     }
 
     public Result makeNewPerson(Http.Request request) {
@@ -654,7 +650,7 @@ public class CRM extends Controller {
         if(filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
             return badRequest(
-                views.html.new_person.render(filledForm)
+                new_person.render(filledForm, request)
             );
         } else {
             Person new_person = Person.create(filledForm, Organization.getByHost(request));
@@ -691,7 +687,7 @@ public class CRM extends Controller {
         from_addresses.add("staff@threeriversvillageschool.org");
 
         e.parseMessage();
-        return ok(views.html.view_pending_email.render(e, test_addresses, from_addresses));
+        return ok(view_pending_email.render(e, test_addresses, from_addresses, request));
     }
 
     public Result sendTestEmail(Http.Request request) {
@@ -774,7 +770,7 @@ public class CRM extends Controller {
 
     public Result editPerson(Integer id, Http.Request request) {
         Person p = Person.findById(id, Organization.getByHost(request));
-        return ok(views.html.edit_person.render(p.fillForm()));
+        return ok(edit_person.render(p.fillForm(), request));
     }
 
     public Result savePersonEdits(Http.Request request) {
@@ -788,7 +784,7 @@ public class CRM extends Controller {
                 System.out.println(error.key() + ", " + error.message());
             }
             return badRequest(
-                views.html.edit_person.render(filledForm)
+                edit_person.render(filledForm, request)
             );
         }
 
@@ -828,12 +824,12 @@ public class CRM extends Controller {
                     mail.setSubject("DemSchoolTools comment: " + new_comment.user.name + " & " + new_comment.person.getInitials());
                     mail.addTo(rule.email);
                     mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
-                    mail.setBodyHtml(views.html.comment_email.render(Comment.find.byId(new_comment.id)).toString());
+                    mail.setBodyHtml(comment_email.render(Comment.find.byId(new_comment.id), request).toString());
                     sMailer.send(mail);
                 }
             }
 
-            return ok(views.html.comment_fragment.render(Comment.find.byId(new_comment.id), false));
+            return ok(comment_fragment.render(Comment.find.byId(new_comment.id), false, request));
         } else {
             return ok();
         }
@@ -887,7 +883,7 @@ public class CRM extends Controller {
         TaskList list = TaskList.findById(id, Organization.getByHost(request));
         List<Person> people = list.tag.people;
 
-        return ok(views.html.task_list.render(list, people));
+        return ok(task_list.render(list, people, request));
     }
 
     public Result viewMailchimpSettings(Http.Request request) {
@@ -897,10 +893,9 @@ public class CRM extends Controller {
         Map<String, ListMethodResult.Data> mc_list_map =
             Public.getMailChimpLists(mailChimpClient, org.mailchimp_api_key);
 
-        return ok(views.html.view_mailchimp_settings.render(
-            mFormFactory.form(Organization.class), org,
+        return ok(view_mailchimp_settings.render(mFormFactory.form(Organization.class), org,
             MailchimpSync.find.query().where().eq("tag.organization", Organization.getByHost(request)).findList(),
-            mc_list_map));
+            mc_list_map, request));
     }
 
     public Result saveMailchimpSettings(Http.Request request) {
