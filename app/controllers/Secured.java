@@ -160,8 +160,8 @@ public class Secured {
                 // If a user is logged in, but they don't have the proper role
                 // for the page they are trying to access, logging in again
                 // isn't going to help them.
-                mAuth.storeOriginalUrl(request);
-                return redirect(routes.Public.index());
+                ;
+                return redirect(routes.Public.index()).withSession(mAuth.storeOriginalUrl(request));
             } else {
                 return unauthorized("You can't access this page.");
             }

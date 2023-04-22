@@ -15,14 +15,17 @@ import play.inject.ApplicationLifecycle;
 import play.libs.ws.WSClient;
 import play.libs.ws.WSRequest;
 import play.libs.ws.WSResponse;
+import play.mvc.Controller;
 import play.mvc.Http.Request;
 import play.mvc.Http.Session;
+import play.mvc.Result;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static play.libs.F.Tuple;
 
 public abstract class OAuth2AuthProvider<U extends AuthUserIdentity, I extends OAuth2AuthInfo>
 		extends ExternalAuthProvider {
@@ -219,7 +222,7 @@ public abstract class OAuth2AuthProvider<U extends AuthUserIdentity, I extends O
             if(storedState == null) {
                 sLogger.warn("Cache either timed out, or you are using a setup with multiple servers and a non-shared cache implementation");
                 // we will just behave as if there was no auth, yet...
-                return generateRedirectUrl(request);
+                return generateRedirect(request);
             }
             final String callbackState = request.getQueryString(Constants.STATE);
             if(!storedState.equals(UUID.fromString(callbackState))) {
@@ -231,16 +234,17 @@ public abstract class OAuth2AuthProvider<U extends AuthUserIdentity, I extends O
             return transform(info, callbackState);
 		} else {
 			// no auth, yet
-            return generateRedirectUrl(request);
+            return generateRedirect(request);
 		}
 	}
 
-    private String generateRedirectUrl(Request request) throws AuthException {
+    private Result generateRedirect(Request request) throws AuthException {
         final UUID state = UUID.randomUUID();
-		this.auth.storeInCache(request.session(), STATE_TOKEN, state);
+		Session resultSession =
+				this.auth.storeInCache(request.session(), STATE_TOKEN, state);
         final String url = getAuthUrl(request, state.toString());
         sLogger.debug("generated redirect URL for dialog: " + url);
-        return url;
+		return Controller.redirect(url).withSession(resultSession);
     }
 
     protected boolean isCallbackRequest(final Request request) {

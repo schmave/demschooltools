@@ -19,6 +19,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.*;
 
+import static play.libs.F.Tuple;
+
 @Singleton
 public class PlayAuthenticate {
 	static Logger.ALogger sLogger = Logger.of("application");
@@ -28,7 +30,6 @@ public class PlayAuthenticate {
 	private static final String SETTING_KEY_AFTER_LOGOUT_FALLBACK = "afterLogoutFallback";
 	private static final String SETTING_KEY_ACCOUNT_MERGE_ENABLED = "accountMergeEnabled";
 	private static final String SETTING_KEY_ACCOUNT_AUTO_LINK = "accountAutoLink";
-	private static final String SETTING_KEY_ACCOUNT_AUTO_MERGE = "accountAutoMerge";
 
 	private final List<Lang> preferredLangs;
 	private final Config config;
@@ -79,14 +80,10 @@ public class PlayAuthenticate {
 	}
 
 	public static final long TIMEOUT = 10L * 1000;
-	private static final String MERGE_USER_KEY = null;
-	private static final String LINK_USER_KEY = null;
 
-	public String getOriginalUrl(Http.Request request) {
-		return request.session().remove(PlayAuthenticate.ORIGINAL_URL);
-	}
 
-	public String storeOriginalUrl(final Http.Request request) {
+	public Session storeOriginalUrl(final Http.Request request) {
+		Session session = request.session();
 		String loginUrl = null;
 		if (this.getResolver().login() != null) {
 			loginUrl = this.getResolver().login().url();
@@ -99,13 +96,13 @@ public class PlayAuthenticate {
 			sLogger.debug("Path where we are coming from ("
 					+ request.uri()
 					+ ") is different than the login URL (" + loginUrl + ")");
-			request.session().put(PlayAuthenticate.ORIGINAL_URL,
+			session = session.adding(PlayAuthenticate.ORIGINAL_URL,
 					request.uri());
 		} else {
 			sLogger.debug("The path we are coming from is the Login URL - delete jumpback");
-			request.session().remove(PlayAuthenticate.ORIGINAL_URL);
+			session = session.removing(PlayAuthenticate.ORIGINAL_URL);
 		}
-		return request.session().get(ORIGINAL_URL);
+		return session;
 	}
 
 	public Session storeUser(Session session, final AuthUser authUser) {
@@ -141,16 +138,9 @@ public class PlayAuthenticate {
 	}
 
 	public Result logout(final Session session) {
-		session.remove(USER_KEY);
-		session.remove(PROVIDER_KEY);
-		session.remove(EXPIRES_KEY);
-
-		// shouldn't be in any more, but just in case lets kill it from the
-		// cookie
-		session.remove(ORIGINAL_URL);
-
 		return Controller.redirect(getUrl(getResolver().afterLogout(),
-				SETTING_KEY_AFTER_LOGOUT_FALLBACK));
+				SETTING_KEY_AFTER_LOGOUT_FALLBACK)).withSession(
+						session.removing(USER_KEY, PROVIDER_KEY, EXPIRES_KEY, ORIGINAL_URL));
 	}
 
 
@@ -184,10 +174,6 @@ public class PlayAuthenticate {
 		}
 	}
 
-	public boolean isAccountAutoMerge() {
-		return getConfiguration().getBoolean(SETTING_KEY_ACCOUNT_AUTO_MERGE);
-	}
-
 	public boolean isAccountAutoLink() {
 		return getConfiguration().getBoolean(SETTING_KEY_ACCOUNT_AUTO_LINK);
 	}
@@ -196,92 +182,40 @@ public class PlayAuthenticate {
 		return getConfiguration().getBoolean(SETTING_KEY_ACCOUNT_MERGE_ENABLED);
 	}
 
-	private String getPlayAuthSessionId(final Session session) {
+	public Session storeInCache(final Session session, final String key,
+			final Object o) {
+		Tuple<String, Session> result = getCacheKey(session, key);
+		cacheApi.set(result._1, o);
+		return result._2;
+	}
+
+    public void removeFromCache(final Session session, final String key) {
+		final String k = getCacheKey(session, key)._1;
+		cacheApi.remove(k);
+	}
+
+	private Tuple<String, Session> getCacheKey(final Session session, final String key) {
 		// Generate a unique id
+		Session resultSession = session;
 		Optional<String> uuid = session.getOptional(SESSION_ID_KEY);
 		if (!uuid.isPresent()) {
-			uuid = Optional.of(java.util.UUID.randomUUID().toString());
-			session.put(SESSION_ID_KEY, uuid.get());
+			uuid = Optional.of(UUID.randomUUID().toString());
+			resultSession = session.adding(SESSION_ID_KEY, uuid.get());
 		}
-		return uuid.get();
-	}
-
-	private void storeUserInCache(final Session session,
-			final String key, final AuthUser identity) {
-		storeInCache(session, key, identity);
-	}
-
-	public void storeInCache(final Session session, final String key,
-			final Object o) {
-		cacheApi.set(getCacheKey(session, key), o);
-	}
-
-    public <T> T removeFromCache(final Session session, final String key) {
-        final T o = getFromCache(session, key);
-
-		final String k = getCacheKey(session, key);
-		cacheApi.remove(k);
-		return o;
-	}
-
-	private String getCacheKey(final Session session, final String key) {
-		final String id = getPlayAuthSessionId(session);
-		return id + "_" + key;
+		final String id = uuid.get();
+		return Tuple(id + "_" + key, resultSession);
 	}
 
     @SuppressWarnings("unchecked")
     public <T> T getFromCache(final Session session, final String key) {
-        return (T) cacheApi.get(getCacheKey(session, key));
-	}
-
-	private AuthUser getUserFromCache(final Session session,
-			final String key) {
-
-		final Object o = getFromCache(session, key);
-		if (o instanceof AuthUser) {
-			return (AuthUser) o;
-		}
-		return null;
-	}
-
-	public void storeMergeUser(final AuthUser identity,
-			final Session session) {
-		// TODO the cache is not ideal for this, because it might get cleared
-		// any time
-		storeUserInCache(session, MERGE_USER_KEY, identity);
-	}
-
-	public AuthUser getMergeUser(final Session session) {
-		return getUserFromCache(session, MERGE_USER_KEY);
-	}
-
-	public void removeMergeUser(final Session session) {
-		removeFromCache(session, MERGE_USER_KEY);
-	}
-
-	public void storeLinkUser(final AuthUser identity,
-			final Session session) {
-		// TODO the cache is not ideal for this, because it might get cleared
-		// any time
-		storeUserInCache(session, LINK_USER_KEY, identity);
-	}
-
-	public AuthUser getLinkUser(final Session session) {
-		return getUserFromCache(session, LINK_USER_KEY);
-	}
-
-	public void removeLinkUser(final Session session) {
-		removeFromCache(session, LINK_USER_KEY);
+		assert session.getOptional(key).isPresent();
+        return (T) cacheApi.getOptional(getCacheKey(session, key)._1).orElse(null);
 	}
 
 	private String getJumpUrl(final Http.Request request) {
-		final String originalUrl = getOriginalUrl(request);
-		if (originalUrl != null) {
-			return originalUrl;
-		} else {
-			return getUrl(getResolver().afterAuth(),
-					SETTING_KEY_AFTER_AUTH_FALLBACK);
-		}
+		Optional<String> originalUrl = request.session().getOptional(PlayAuthenticate.ORIGINAL_URL);
+		return originalUrl.orElseGet(() -> getUrl(getResolver().afterAuth(),
+				SETTING_KEY_AFTER_AUTH_FALLBACK));
 	}
 
 	private String getUrl(final Call c, final String settingFallback) {
@@ -304,54 +238,11 @@ public class PlayAuthenticate {
 		}
 	}
 
-	public Result link(final Http.Request request, final boolean link) {
-		final AuthUser linkUser = getLinkUser(request.session());
-
-		if (linkUser == null) {
-			return Controller.forbidden();
-		}
-
-		final AuthUser loginUser;
-		if (link) {
-			// User accepted link - add account to existing local user
-			loginUser = getUserService().link(getUser(request.session()),
-					linkUser);
-		} else {
-			// User declined link - create new user
-			try {
-				loginUser = signupUser(linkUser, request.session(), getProvider(linkUser.getProvider()));
-			} catch (final AuthException e) {
-				return Controller.internalServerError(e.getMessage());
-			}
-		}
-		removeLinkUser(request.session());
-		return loginAndRedirect(request, loginUser);
-	}
-
 	public Result loginAndRedirect(final Http.Request request,
 								   final AuthUser loginUser) {
+		Session session = request.session().removing(PlayAuthenticate.ORIGINAL_URL);
 		return Controller.redirect(getJumpUrl(request)).withSession(
-				storeUser(request.session(), loginUser));
-	}
-
-	public Result merge(final Http.Request request, final boolean merge) {
-		final AuthUser mergeUser = getMergeUser(request.session());
-
-		if (mergeUser == null) {
-			return Controller.forbidden();
-		}
-		final AuthUser loginUser;
-		if (merge) {
-			// User accepted merge, so do it
-			loginUser = getUserService().merge(mergeUser,
-					getUser(request.session()));
-		} else {
-			// User declined merge, so log out the old user, and log out with
-			// the new one
-			loginUser = mergeUser;
-		}
-		removeMergeUser(request.session());
-		return loginAndRedirect(request, loginUser);
+				storeUser(session, loginUser));
 	}
 
 	private AuthUser signupUser(final AuthUser u, final Session session, final AuthProvider provider) throws AuthException {
@@ -439,28 +330,11 @@ public class PlayAuthenticate {
 					// to use for the log in
 					if (isAccountMergeEnabled()
 							&& !loginIdentity.equals(oldIdentity)) {
+						throw new UnsupportedOperationException("account merge is disabled");
 						// account merge is enabled
 						// and
 						// The currently logged in user and the one to log in
 						// are not the same, so shall we merge?
-
-						if (isAccountAutoMerge()) {
-							// Account auto merging is enabled
-							loginUser = getUserService()
-									.merge(newUser, oldUser);
-						} else {
-							// Account auto merging is disabled - forward user
-							// to merge request page
-							final Call c = getResolver().askMerge();
-							if (c == null) {
-								throw new RuntimeException(
-										messagesApi.preferred(preferredLangs).at(
-												"playauthenticate.core.exception.merge.controller_undefined",
-												SETTING_KEY_ACCOUNT_AUTO_MERGE));
-							}
-							storeMergeUser(newUser, session);
-							return Controller.redirect(c);
-						}
 					} else {
 						// the currently logged in user and the new login belong
 						// to the same local user,
@@ -481,17 +355,7 @@ public class PlayAuthenticate {
 
 						loginUser = getUserService().link(oldUser, newUser);
 					} else {
-						// Account auto linking is disabled - forward user to
-						// link suggestion page
-						final Call c = getResolver().askLink();
-						if (c == null) {
-							throw new RuntimeException(
-									messagesApi.preferred(preferredLangs).at(
-											"playauthenticate.core.exception.link.controller_undefined",
-											SETTING_KEY_ACCOUNT_AUTO_LINK));
-						}
-						storeLinkUser(newUser, session);
-						return Controller.redirect(c);
+						throw new UnsupportedOperationException("link suggestion page is disabled");
 					}
 
 				}
