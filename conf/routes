@@ -227,5 +227,5 @@ POST    /login                controllers.Public.doLogin(request: Request)
 
 GET     /logout                     com.feth.play.module.pa.controllers.Authenticate.logout
 GET     /out		            controllers.Public.loggedOut(request: Request)
-GET     /authenticate/:provider     controllers.Public.authenticate(provider: String)
+GET     /authenticate/:provider     controllers.Public.authenticate(provider: String, request: Request)
 GET     /authenticate/:provider/denied     controllers.Public.oAuthDenied(provider: String)

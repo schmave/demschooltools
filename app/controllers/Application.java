@@ -50,7 +50,7 @@ public class Application extends Controller {
     }
 
     public Result viewPassword(Http.Request request) {
-        return ok(view_password.render(request.flash().getOptional("notice").orElse(""), request, mMessagesApi.preferred(request)));
+        return ok(view_password.render(request.flash().getOptional("notice").orElse(null), request, mMessagesApi.preferred(request)));
     }
 
     public Result editPassword(Http.Request request) {

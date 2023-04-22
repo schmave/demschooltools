@@ -10,7 +10,6 @@ import models.User;
 import models.UserRole;
 import play.Logger;
 import play.mvc.*;
-import play.mvc.Http.Context;
 import service.MyUserService;
 
 import javax.inject.Inject;
@@ -161,7 +160,7 @@ public class Secured {
                 // If a user is logged in, but they don't have the proper role
                 // for the page they are trying to access, logging in again
                 // isn't going to help them.
-                mAuth.storeOriginalUrl(Context.current());
+                mAuth.storeOriginalUrl(request);
                 return redirect(routes.Public.index());
             } else {
                 return unauthorized("You can't access this page.");

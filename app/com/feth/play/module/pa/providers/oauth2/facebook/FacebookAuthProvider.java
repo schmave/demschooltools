@@ -22,6 +22,7 @@ import java.util.List;
 @Singleton
 public class FacebookAuthProvider extends
         OAuth2AuthProvider<FacebookAuthUser, FacebookAuthInfo> {
+    static Logger.ALogger sLogger = Logger.of("application");
 
     private static final String MESSAGE = "message";
     private static final String ERROR = "error";
@@ -64,7 +65,7 @@ public class FacebookAuthProvider extends
         if (result.get(OAuth2AuthProvider.Constants.ERROR) != null) {
             throw new AuthException(result.get(ERROR).get(MESSAGE).asText());
         } else {
-            Logger.debug(result.toString());
+            sLogger.debug(result.toString());
             return new FacebookAuthUser(result, info, state);
         }
     }

@@ -5,7 +5,7 @@ import com.feth.play.module.pa.providers.AuthProvider;
 import com.feth.play.module.pa.user.AuthUser;
 import models.User;
 import play.inject.ApplicationLifecycle;
-import play.mvc.Http.Context;
+import play.mvc.Http;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -20,7 +20,7 @@ public class EvanAuthProvider extends AuthProvider {
     }
 
     @Override
-    public Object authenticate(final Context context, final Object payload) {
+    public Object authenticate(final Http.Request request, final Object payload) {
         final User user = (User) payload;
         return new AuthUser() {
             private static final long serialVersionUID = 1L;

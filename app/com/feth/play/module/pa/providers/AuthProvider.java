@@ -7,7 +7,6 @@ import com.feth.play.module.pa.user.SessionAuthUser;
 import com.typesafe.config.Config;
 import play.Logger;
 import play.inject.ApplicationLifecycle;
-import play.mvc.Http.Context;
 import play.mvc.Http.Request;
 import play.mvc.Http.Session;
 
@@ -18,14 +17,15 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public abstract class AuthProvider {
+	static Logger.ALogger sLogger = Logger.of("application");
 
 	public abstract static class Registry {
-		private static Map<String, AuthProvider> providers = new HashMap<String, AuthProvider>();
+		private static final Map<String, AuthProvider> providers = new HashMap<>();
 
 		public static void register(final String provider, final AuthProvider p) {
 			final Object previous = providers.put(provider, p);
 			if (previous != null) {
-				Logger.warn("There are multiple AuthProviders registered for key '"
+				sLogger.warn("There are multiple AuthProviders registered for key '"
 						+ provider + "'");
 			}
 		}
@@ -81,7 +81,7 @@ public abstract class AuthProvider {
 		}
 
 		Registry.register(getKey(), this);
-		Logger.debug("Registered AuthProvider '" + getKey() + "'");
+		sLogger.debug("Registered AuthProvider '" + getKey() + "'");
 	}
 
 	protected void onStop() {
@@ -92,11 +92,6 @@ public abstract class AuthProvider {
 		return this.auth.getResolver().auth(getKey()).url();
 	}
 
-	protected String getAbsoluteUrl(final Request request) {
-		return this.auth.getResolver().auth(getKey())
-				.absoluteURL(request);
-	}
-
 	public abstract String getKey();
 
 	protected Config getConfiguration() {
@@ -105,14 +100,15 @@ public abstract class AuthProvider {
 
 	/**
 	 *
-	 * @param context
+	 * @param request
+	 *            The current request
 	 * @param payload
 	 *            Some arbitrary payload that shall get passed into the
 	 *            authentication process
 	 * @return either an AuthUser object or a String (URL)
 	 * @throws AuthException
 	 */
-	public abstract Object authenticate(final Context context,
+	public abstract Object authenticate(final Request request,
 			final Object payload) throws AuthException;
 
 	protected List<String> neededSettingKeys() {

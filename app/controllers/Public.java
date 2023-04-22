@@ -1,35 +1,30 @@
 package controllers;
 
-import java.io.IOException;
-import java.util.*;
-
-import javax.inject.Singleton;
-
-import com.ecwid.mailchimp.*;
-import com.ecwid.mailchimp.method.v2_0.lists.ListMethod;
-import com.ecwid.mailchimp.method.v2_0.lists.ListMethodResult;
-import com.ecwid.mailchimp.method.v2_0.lists.SubscribeMethod;
-import com.ecwid.mailchimp.method.v2_0.lists.UnsubscribeMethod;
-import com.ecwid.mailchimp.method.v2_0.lists.UpdateMemberMethod;
-import com.feth.play.module.pa.controllers.Authenticate;
+import com.ecwid.mailchimp.MailChimpClient;
+import com.ecwid.mailchimp.MailChimpException;
+import com.ecwid.mailchimp.MailChimpObject;
+import com.ecwid.mailchimp.method.v2_0.lists.*;
 import com.feth.play.module.pa.PlayAuthenticate;
-import javax.inject.Inject;
-
+import com.feth.play.module.pa.controllers.Authenticate;
 import com.typesafe.config.Config;
 import models.*;
-
 import org.mindrot.jbcrypt.BCrypt;
-
-
-import play.*;
+import play.Environment;
 import play.api.libs.mailer.MailerClient;
 import play.cache.SyncCacheApi;
 import play.i18n.MessagesApi;
-import play.mvc.*;
-import play.mvc.Http.Context;
+import play.mvc.Controller;
+import play.mvc.Http;
+import play.mvc.Result;
+import play.mvc.With;
 import views.html.logged_out;
 import views.html.login;
 import views.html.sync_email;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.io.IOException;
+import java.util.*;
 
 @Singleton
 @With(DumpOnError.class)
@@ -360,7 +355,7 @@ public class Public extends Controller {
 			return unauthorized("Unknown organization");
 		}
         return ok(login.render(mPlayAuth,
-                request.flash().getOptional("notice").orElse(""),
+                request.flash().getOptional("notice").orElse(null),
                 Application.getRemoteIp(request), request, mMessagesApi.preferred(request)));
     }
 
@@ -374,7 +369,7 @@ public class Public extends Controller {
 
         if (u != null && u.hashed_password.length() > 0) {
             if (BCrypt.checkpw(password, u.hashed_password)) {
-                return mPlayAuth.handleAuthentication("evan-auth-provider", Context.current(), u);
+                return mPlayAuth.handleAuthentication("evan-auth-provider", request, u);
             }
         }
 
@@ -393,8 +388,8 @@ public class Public extends Controller {
         return result;
     }
 
-    public Result authenticate(String provider) {
-        return mAuth.authenticate(provider);
+    public Result authenticate(String provider, Http.Request request) {
+        return mAuth.authenticate(provider, request);
     }
 
     public Result loggedOut(Http.Request request) {

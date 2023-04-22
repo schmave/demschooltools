@@ -1,5 +1,4 @@
 @(title: String, menu : String, selectedBtn : String = "")(content: Html)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
-@import com.feth.play.module.pa.views.html._
 
 <!DOCTYPE html>
 
@@ -37,7 +36,7 @@
     </div></div>
 
     @defining(Application.currentUsername(request)) { username =>
-    @if( username != null ) {
+    @if( username.isPresent() ) {
 <div class="tabbable">
             <ul class="dst-nav nav nav-tabs navbar-default no-print">
             <li @if(menu.equals("crm")) { class="active" }>
@@ -83,7 +82,7 @@
             </li>
             <li @if(menu.equals("account")) { class="username active" } else { class="username" }><a @if(Application.isCurrentUserLoggedIn(username)) {
                 href="@routes.Application.viewPassword()"
-            } class="username">@username</a></li>
+            } class="username">@username.orElse("")</a></li>
             </ul>
 
       <div class="tab-content no-print">

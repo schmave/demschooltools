@@ -17,6 +17,7 @@ import javax.inject.Singleton;
 @Singleton
 public class GoogleAuthProvider extends
 		OAuth2AuthProvider<GoogleAuthUser, GoogleAuthInfo> {
+	static Logger.ALogger sLogger = Logger.of("application");
 
 	public static final String PROVIDER_KEY = "google";
 
@@ -48,7 +49,7 @@ public class GoogleAuthProvider extends
 			throw new AuthException(result.get(
 					OAuth2AuthProvider.Constants.ERROR).asText());
 		} else {
-			Logger.debug(result.toString());
+			sLogger.debug(result.toString());
 			return new GoogleAuthUser(result, info, state);
 		}
 	}
@@ -57,7 +58,7 @@ public class GoogleAuthProvider extends
 	protected GoogleAuthInfo buildInfo(final WSResponse r)
 			throws AccessTokenException {
 		final JsonNode n = r.asJson();
-		Logger.debug(n.toString());
+		sLogger.debug(n.toString());
 
 		if (n.get(OAuth2AuthProvider.Constants.ERROR) != null) {
 			throw new AccessTokenException(n.get(

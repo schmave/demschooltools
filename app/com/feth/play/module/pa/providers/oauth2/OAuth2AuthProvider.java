@@ -15,7 +15,6 @@ import play.inject.ApplicationLifecycle;
 import play.libs.ws.WSClient;
 import play.libs.ws.WSRequest;
 import play.libs.ws.WSResponse;
-import play.mvc.Http.Context;
 import play.mvc.Http.Request;
 import play.mvc.Http.Session;
 
@@ -27,10 +26,11 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 public abstract class OAuth2AuthProvider<U extends AuthUserIdentity, I extends OAuth2AuthInfo>
 		extends ExternalAuthProvider {
+	static Logger.ALogger sLogger = Logger.of("application");
 
 	protected class QueryParam {
-		private String param;
-		private String value;
+		private final String param;
+		private final String value;
 
 		public QueryParam(String param, String value) {
 			this.param = param;
@@ -52,8 +52,7 @@ public abstract class OAuth2AuthProvider<U extends AuthUserIdentity, I extends O
 
 	@Override
 	protected List<String> neededSettingKeys() {
-		final List<String> ret = new ArrayList<String>();
-		ret.addAll(super.neededSettingKeys());
+		final List<String> ret = new ArrayList<>(super.neededSettingKeys());
 		ret.add(SettingKeys.ACCESS_TOKEN_URL);
 		ret.add(SettingKeys.AUTHORIZATION_URL);
 		ret.add(SettingKeys.CLIENT_ID);
@@ -93,9 +92,8 @@ public abstract class OAuth2AuthProvider<U extends AuthUserIdentity, I extends O
 	}
 
 	protected WSResponse fetchAuthResponse(String url, QueryParam...params) throws AuthException {
-		final List<QueryParam> queryParams = Arrays.asList(params);
 		final WSRequest request = wsClient.url(url);
-		for(QueryParam param : queryParams) {
+		for(QueryParam param : params) {
 			request.addQueryParameter(param.param, param.value);
 		}
 
@@ -121,7 +119,7 @@ public abstract class OAuth2AuthProvider<U extends AuthUserIdentity, I extends O
 	}
 
     protected Map<String, String> getHeaders() {
-        return Collections.<String, String>emptyMap();
+        return Collections.emptyMap();
     }
 
 	protected I getAccessToken(final String code, final Request request)
@@ -182,7 +180,7 @@ public abstract class OAuth2AuthProvider<U extends AuthUserIdentity, I extends O
 
 	protected List<NameValuePair> getParams(final Request request,
 			final Config c) throws ResolverMissingException {
-		final List<NameValuePair> params = new ArrayList<NameValuePair>();
+		final List<NameValuePair> params = new ArrayList<>();
 		params.add(new BasicNameValuePair(Constants.CLIENT_ID, c
 				.getString(SettingKeys.CLIENT_ID)));
 		params.add(new BasicNameValuePair(getRedirectUriKey(),
@@ -195,13 +193,11 @@ public abstract class OAuth2AuthProvider<U extends AuthUserIdentity, I extends O
 	}
 
 	@Override
-	public Object authenticate(final Context context, final Object payload)
+	public Object authenticate(final Request request, final Object payload)
 			throws AuthException {
 
-		final Request request = context.request();
-
-		if (Logger.isDebugEnabled()) {
-			Logger.debug("Returned with URL: '" + request.uri() + "'");
+		if (sLogger.isDebugEnabled()) {
+			sLogger.debug("Returned with URL: '" + request.uri() + "'");
 		}
 
 		final String error = request.getQueryString(getErrorParameterKey());
@@ -210,20 +206,20 @@ public abstract class OAuth2AuthProvider<U extends AuthUserIdentity, I extends O
 			if (error.equals(Constants.ACCESS_DENIED)) {
 				throw new AccessDeniedException(getKey());
 			} else if (error.equals(Constants.REDIRECT_URI_MISMATCH)) {
-				Logger.error("You must set the redirect URI for your provider to whatever you defined in your routes file."
+				sLogger.error("You must set the redirect URI for your provider to whatever you defined in your routes file."
 						+ "For this provider it is: '"
 						+ getRedirectUrl(request) + "'");
 				throw new RedirectUriMismatch();
 			} else {
 				throw new AuthException(error);
 			}
-		} else if (isCallbackRequest(context)) {
+		} else if (isCallbackRequest(request)) {
 			// second step in auth process
-            final UUID storedState = this.auth.getFromCache(context.session(), STATE_TOKEN);
+            final UUID storedState = this.auth.getFromCache(request.session(), STATE_TOKEN);
             if(storedState == null) {
-                Logger.warn("Cache either timed out, or you are using a setup with multiple servers and a non-shared cache implementation");
+                sLogger.warn("Cache either timed out, or you are using a setup with multiple servers and a non-shared cache implementation");
                 // we will just behave as if there was no auth, yet...
-                return generateRedirectUrl(context, request);
+                return generateRedirectUrl(request);
             }
             final String callbackState = request.getQueryString(Constants.STATE);
             if(!storedState.equals(UUID.fromString(callbackState))) {
@@ -235,20 +231,20 @@ public abstract class OAuth2AuthProvider<U extends AuthUserIdentity, I extends O
             return transform(info, callbackState);
 		} else {
 			// no auth, yet
-            return generateRedirectUrl(context, request);
+            return generateRedirectUrl(request);
 		}
 	}
 
-    private String generateRedirectUrl(Context context, Request request) throws AuthException {
+    private String generateRedirectUrl(Request request) throws AuthException {
         final UUID state = UUID.randomUUID();
-		this.auth.storeInCache(context.session(), STATE_TOKEN, state);
+		this.auth.storeInCache(request.session(), STATE_TOKEN, state);
         final String url = getAuthUrl(request, state.toString());
-        Logger.debug("generated redirect URL for dialog: " + url);
+        sLogger.debug("generated redirect URL for dialog: " + url);
         return url;
     }
 
-    protected boolean isCallbackRequest(final Context context) {
-		return context.request().queryString().containsKey(Constants.CODE);
+    protected boolean isCallbackRequest(final Request request) {
+		return request.queryString().containsKey(Constants.CODE);
 	}
 
 	protected String getErrorParameterKey() {

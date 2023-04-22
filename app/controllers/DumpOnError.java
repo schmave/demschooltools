@@ -10,7 +10,6 @@ import play.mvc.*;
 public class DumpOnError extends Action.Simple {
     static Logger.ALogger sLogger = Logger.of("application");
     public CompletionStage<Result> call(Http.Request request) {
-        Globals.setRequest(request);
         return delegate.call(request).whenComplete((result, e) -> {
             if (e != null) {
                 e.printStackTrace();
