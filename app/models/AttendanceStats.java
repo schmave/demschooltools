@@ -26,7 +26,7 @@ public class AttendanceStats {
         }
     }
 
-    public void processDay(AttendanceDay day, int index, Map<String, AttendanceCode> codes_map) {
+    public void processDay(AttendanceDay day, int index, Map<String, AttendanceCode> codes_map, Organization org) {
         if (day == null) {
             return;
         }
@@ -34,7 +34,7 @@ public class AttendanceStats {
             incrementCodeCount(codes_map.get(day.code), index);
         }
         else {
-            incrementAttendance(day, index);
+            incrementAttendance(day, index, org);
         }
     }
 
@@ -57,11 +57,11 @@ public class AttendanceStats {
         absence_counts.put(code, absence_counts.get(code) + 1);
     }
 
-    private void incrementAttendance(AttendanceDay day, int index) {
+    private void incrementAttendance(AttendanceDay day, int index, Organization org) {
         double hours = day.getHours();
         total_hours += hours;
 
-        if (day.isPartial()) {
+        if (day.isPartial(org)) {
             partial_days_present++;
             values.put(index, partial_day_value);
         } else {

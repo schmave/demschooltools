@@ -103,7 +103,7 @@
         @if(d.start_time == null || d.end_time == null) {
         	code-__null
         } else {
-        	@if(d.isPartial()) {
+        	@if(d.isPartial(OrgConfig.get(request).org)) {
         		code-__partial
         	} else {
         		code-__present

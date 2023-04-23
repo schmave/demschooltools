@@ -278,7 +278,7 @@ public class Attendance extends Controller {
             AttendanceDay day = school_day.stream().filter(d -> d.person.person_id.equals(person_id)).findAny().orElse(null);
             
             if (day != null) {
-                stats.processDay(day, i, codes_map);
+                stats.processDay(day, i, codes_map, org);
                 if (day.off_campus_departure_time != null || day.off_campus_return_time != null) {
                     has_off_campus_time = true;
                 }
@@ -702,7 +702,7 @@ public class Attendance extends Controller {
                     person_to_stats.put(day.person, new AttendanceStats(org));
                 }
                 AttendanceStats stats = person_to_stats.get(day.person);
-                stats.processDay(day, i, codes_map);
+                stats.processDay(day, i, codes_map, org);
             }
         }
 

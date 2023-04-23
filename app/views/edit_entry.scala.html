@@ -16,7 +16,8 @@
 @if(form("id").value().isPresent()) {
 	<input type="hidden" name="id" value="@form("id").value().get()"/>
 }
-	@helper.select(form("section.id"), options = chapters.flatMap (c => c.sections.map(s => ("" + s.id, s.chapter.num + "" + s.num + " " + s.title))),
+	@helper.select(form("section.id"), options = chapters.flatMap (
+			c => c.sections.map(s => ("" + s.id, s.chapter.num + "" + s.num + " " + s.title))).to(Seq),
 		'_label -> "Section", 'class -> "form-control")
 <div class="form-group" id="num_field">
     <label for="num" class="col-sm-3 control-label">Number</label>

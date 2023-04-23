@@ -45,6 +45,26 @@ public class OrgConfig {
     public TimeZone time_zone = TimeZone.getTimeZone("US/Eastern");
 
     public static OrgConfig get(Organization org) {
+        // This variable is needed so that the classes actually get created.
+        // There is probably a nicer way of doing this.
+        final OrgConfig[] allConfigs = {
+                ThreeRiversVillageSchool.getInstance(),
+                PhillyFreeSchool.getInstance(),
+                Fairhaven.getInstance(),
+                TheCircleSchool.getInstance(),
+                MakariosLearningCommunity.getInstance(),
+                TheOpenSchool.getInstance(),
+                TheOpenSchool2.getInstance(),
+                Houston.getInstance(),
+                Sandbox.getInstance(),
+                Clearview.getInstance(),
+                Wicklow.getInstance(),
+                Tallgrass.getInstance(),
+                MiamiSudburySchool.getInstance(),
+                SligoSudburySchool.getInstance(),
+                LearningProjectIbiza.getInstance(),
+                Wilmington.getInstance(),
+        };
         OrgConfig result = configs.get(org.name);
         result.org = org;
         return result;

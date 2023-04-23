@@ -12,7 +12,7 @@
 		<input type="hidden" name="id" value="@taskForm("id").value().get()"/>
 
 		@helper.select(taskForm("task_list.id"), options =
-			list_options.map (l => ("" + l.id, l.title)), '_label -> "Checklist",
+			list_options.map (l => ("" + l.id, l.title)).to(Seq), '_label -> "Checklist",
 			'class -> "form-control")
 		@inputText(taskForm("title"), '_label -> "Title", 'class -> "form-control")
 		@inputText(taskForm("sort_order"), '_label -> "Sort order", 'class -> "form-control")

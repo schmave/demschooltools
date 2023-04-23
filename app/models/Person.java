@@ -176,11 +176,12 @@ public class Person extends Model implements Comparable<Person> {
     }
 
     public static List<Person> all(Organization org) {
-        return find.query().where()
+        return find.query()
+                .fetch("phone_numbers", new FetchConfig().query())
+                .where()
             .eq("organization", org)
             .eq("is_family", Boolean.FALSE)
             .orderBy("last_name, first_name ASC")
-            .fetch("phone_numbers", new FetchConfig().query())
             .findList();
     }
 

@@ -59,10 +59,6 @@ public class Case extends Model implements Comparable<Case> {
     @JsonIgnore
     public List<Case> referenced_cases;
 
-    @ManyToMany(mappedBy="referenced_cases")
-    @JsonIgnore
-    public List<Case> referencing_cases;
-
     @ManyToMany
     @JoinTable(name="charge_reference",
         joinColumns=@JoinColumn(name="referencing_case", referencedColumnName="id"),

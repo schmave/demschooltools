@@ -18,7 +18,7 @@ javacOptions ++= Seq("-Xlint:unchecked", "-Xlint:deprecation")
 
 pipelineStages := Seq(digest, gzip)
 
- resolvers += Resolver.bintrayRepo("playframework", "maven")
+//resolvers += Resolver.bintrayRepo("playframework", "maven")
 
 // These settings from
 //  https://github.com/playframework/play-ebean/blob/main/docs/manual/working/javaGuide/main/sql/code/ebean.sbt
