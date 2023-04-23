@@ -1,23 +1,24 @@
 package controllers;
 
+import io.ebean.Ebean;
+import io.ebean.SqlUpdate;
+import models.*;
+import play.api.libs.mailer.MailerClient;
+import play.data.Form;
+import play.data.FormFactory;
+import play.db.Database;
+import play.i18n.MessagesApi;
+import play.mvc.Controller;
+import play.mvc.Http;
+import play.mvc.Result;
+import play.mvc.With;
+import views.html.*;
+
+import javax.inject.Inject;
 import java.sql.Connection;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import io.ebean.Ebean;
-import io.ebean.SqlUpdate;
-import javax.inject.Inject;
-
-import models.*;
-
-import play.api.libs.mailer.MailerClient;
-import play.db.Database;
-import play.data.*;
-import play.i18n.Lang;
-import play.i18n.MessagesApi;
-import play.mvc.*;
-import views.html.*;
 
 @With(DumpOnError.class)
 public class ApplicationEditing extends Controller {
@@ -400,9 +401,9 @@ public class ApplicationEditing extends Controller {
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
     public Result addSection(Integer chapterId, Http.Request request) {
         Form<Section> form = mFormFactory.form(Section.class);
-        Map<String, String> map = new HashMap<>();
-        map.put("chapter.id", "" + chapterId);
-        form = form.bind(map, "chapter.id");
+        Section section = new Section();
+        section.chapter = Chapter.findById(chapterId, Organization.getByHost(request));
+        form = form.fill(section);
         return ok(edit_section.render(form, Chapter.findById(chapterId, Organization.getByHost(request)), true, Chapter.all(Organization.getByHost(request)), request, mMessagesApi.preferred(request)));
     }
 
@@ -432,9 +433,9 @@ public class ApplicationEditing extends Controller {
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
     public Result addEntry(Integer sectionId, Http.Request request) {
         Form<Entry> form = mFormFactory.form(Entry.class);
-        Map<String, String> map = new HashMap<>();
-        map.put("section.id", "" + sectionId);
-        form = form.bind(map, "section.id");
+        Entry entry = new Entry();
+        entry.section = Section.findById(sectionId, Organization.getByHost(request));
+        form = form.fill(entry);
         return ok(edit_entry.render(form, Section.findById(sectionId, Organization.getByHost(request)), true, Chapter.all(Organization.getByHost(request)), request, mMessagesApi.preferred(request)));
     }
 
