@@ -225,7 +225,7 @@ GET     /robots.txt                 controllers.Assets.at(path="/public", file="
 GET     /fb-delete-info                         controllers.Public.facebookDeleteInfo()
 POST    /login                controllers.Public.doLogin(request: Request)
 
-GET     /logout                     com.feth.play.module.pa.controllers.Authenticate.logout
+GET     /logout                     com.feth.play.module.pa.controllers.Authenticate.logout(request: Request)
 GET     /out		            controllers.Public.loggedOut(request: Request)
 GET     /authenticate/:provider     controllers.Public.authenticate(provider: String, request: Request)
 GET     /authenticate/:provider/denied     controllers.Public.oAuthDenied(provider: String)

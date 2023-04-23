@@ -245,13 +245,13 @@ public class PlayAuthenticate {
 				storeUser(session, loginUser));
 	}
 
-	private AuthUser signupUser(final AuthUser u, final Session session, final AuthProvider provider) throws AuthException {
-        final Object id = getUserService().save(u);
+	private AuthUser signupUser(final AuthUser u, final Http.Request request, final AuthProvider provider) throws AuthException {
+        final Object id = getUserService().save(u, request);
 		if (id == null) {
 			throw new AuthException(
 					messagesApi.preferred(preferredLangs).at("playauthenticate.core.exception.signupuser_failed"));
 		}
-        provider.afterSave(u, id, session);
+        provider.afterSave(u, id, request.session());
 		return u;
 	}
 
@@ -345,7 +345,7 @@ public class PlayAuthenticate {
 
 				} else if (!isLoggedIn) {
 					// 3. -> Signup
-					loginUser = signupUser(newUser, session, ap);
+					loginUser = signupUser(newUser, request, ap);
 				} else {
 					// !isLinked && isLoggedIn:
 

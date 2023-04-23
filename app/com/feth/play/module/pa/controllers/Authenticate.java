@@ -16,13 +16,11 @@ public class Authenticate extends AuthenticateBase {
 	}
 
 	public Result authenticate(final String provider, Http.Request request) {
-		noCache(response());
 		final String payload = request.getQueryString(PAYLOAD_KEY);
-		return this.auth.handleAuthentication(provider, request, payload);
+		return noCache(this.auth.handleAuthentication(provider, request, payload));
 	}
 
-	public Result logout() {
-		noCache(response());
-		return this.auth.logout(session());
+	public Result logout(Http.Request request) {
+		return noCache(this.auth.logout(request.session()));
 	}
 }

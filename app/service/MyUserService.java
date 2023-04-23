@@ -26,7 +26,7 @@ public class MyUserService extends AbstractUserService {
     // We do not create new user accounts. If you aren't already approved,
     // you can't log in.
 	@Override
-	public Object save(final AuthUser authUser) {
+	public Object save(final AuthUser authUser, final Http.Request request) {
         sLogger.debug("MyUserService::save " + authUser);
 		final boolean isLinked = User.existsByAuthUserIdentity(authUser);
 		if (!isLinked) {
@@ -38,7 +38,7 @@ public class MyUserService extends AbstractUserService {
                     sLogger.debug("    found user by email");
                 } else {
                 	sLogger.debug("    creating new account");
-                	Organization org = Organization.getByHost(Http.Context.current().request());
+                	Organization org = Organization.getByHost(request);
                 	sLogger.error("New login from unknown user: " + identity.getEmail() + ", org: " + org.name);
                 	u = User.create(identity.getEmail(), DUMMY_USERNAME, org);
                 }
