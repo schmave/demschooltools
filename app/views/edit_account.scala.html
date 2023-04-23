@@ -7,15 +7,15 @@
 	@form(routes.Accounting.saveAccount()) {
 		<input type="hidden" name="id" value="@accountForm("id").value.get"/>
 		<div class="col-sm-6">
-			@inputText(accountForm("name"), '_label -> "Name", 'class -> "form-control")
+			@inputText(accountForm("name"), Symbol("_label") -> "Name", Symbol("class") -> "form-control")
 			@select(
 				accountForm("type"),
 				options(AccountType.options()),
-				'_label -> "Type",
-				'_default -> "",
-				'class -> "form-control"
+				Symbol("_label") -> "Type",
+				Symbol("_default") -> "",
+				Symbol("class") -> "form-control"
 			)
-			@inputText(accountForm("monthly_credit"), 'type -> "number", '_label -> "Monthly Credit", 'class -> "form-control")
+			@inputText(accountForm("monthly_credit"), Symbol("type") -> "number", Symbol("_label") -> "Monthly Credit", Symbol("class") -> "form-control")
 			<input type="checkbox" id="is_active" name="is_active" @if(is_active) { value="true" checked="checked" }> Is Active
 			<br><br>
 			<input type="submit" value="Save"/>

@@ -10,22 +10,22 @@
     <h2>Edit section "@form("title").value().get()"</h2>
 }
 
-@helper.form(routes.ApplicationEditing.saveSection(), 'class -> "form-horizontal") {
+@helper.form(routes.ApplicationEditing.saveSection(), Symbol("class") -> "form-horizontal") {
 
 
 @if(form("id").value().isPresent()) {
 	<input type="hidden" name="id" value="@form("id").value().get()"/>
 }
 		@helper.select(form("chapter.id"), options = chapter_options.map (
-        c => ("" + c.id, c.num + " " + c.title)).to(Seq), '_label -> "Chapter", 'class -> "form-control")
+        c => ("" + c.id, c.num + " " + c.title)).to(Seq), Symbol("_label") -> "Chapter", Symbol("class") -> "form-control")
 <div class="form-group" id="num_field">
     <label for="num" class="col-sm-3 control-label">Number</label>
     <div class="col-sm-6">
     @chapter.num<input type="text" id="num" name="num" value="@form("num").value().get()" size="10">
 	</div>
 </div>
-        @helper.inputText(form("title"), '_label -> "Title", 'class -> "form-control")
-		@helper.checkbox(form("deleted"), '_label -> "Check this to delete")
+        @helper.inputText(form("title"), Symbol("_label") -> "Title", Symbol("class") -> "form-control")
+		@helper.checkbox(form("deleted"), Symbol("_label") -> "Check this to delete")
         @save_button("Save")
 }
 }

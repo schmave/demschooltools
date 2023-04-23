@@ -28,20 +28,20 @@ $(function() {
 <link rel='stylesheet' href='@routes.Assets.versioned("stylesheets/spectrum.css")' />
 
 <div class="row">
-@form(destination, 'class -> "form-horizontal", 'role -> "form") {
+@form(destination, Symbol("class") -> "form-horizontal", Symbol("role") -> "form") {
 
 <div class="col-sm-6">
 @if(code_form("id").value().isPresent()) {
 	<input type="hidden" name="id" value="@code_form("id").value().get()"/>
 }
-@inputText(code_form("code"), '_label -> "Code", 'class -> "form-control")
-@inputText(code_form("description"), '_label -> "Description", 'class -> "form-control")
+@inputText(code_form("code"), Symbol("_label") -> "Code", Symbol("class") -> "form-control")
+@inputText(code_form("description"), Symbol("_label") -> "Description", Symbol("class") -> "form-control")
 
-@inputText(code_form("color"), '_label -> "Color", 'class -> "colorpicker")
+@inputText(code_form("color"), Symbol("_label") -> "Color", Symbol("class") -> "colorpicker")
 
 @if( OrgConfig.get(request).org.attendance_show_percent || OrgConfig.get(request).org.attendance_show_weighted_percent ) {
-	@checkbox(code_form("counts_toward_attendance"), '_label -> "Counts toward attendance rate", 'class -> "absence-checkbox")
-	@checkbox(code_form("not_counted"), '_label -> "Neither counts toward nor against attendance rate", 'class -> "absence-checkbox")
+	@checkbox(code_form("counts_toward_attendance"), Symbol("_label") -> "Counts toward attendance rate", Symbol("class") -> "absence-checkbox")
+	@checkbox(code_form("not_counted"), Symbol("_label") -> "Neither counts toward nor against attendance rate", Symbol("class") -> "absence-checkbox")
 }
 
 @if(is_editing) {

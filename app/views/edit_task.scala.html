@@ -7,16 +7,16 @@
 
 <h3>Edit task</h3>
 
-	@form(routes.Settings.saveTask(), 'class -> "form-horizontal", 'role -> "form") {
+	@form(routes.Settings.saveTask(), Symbol("class") -> "form-horizontal", Symbol("role") -> "form") {
 
 		<input type="hidden" name="id" value="@taskForm("id").value().get()"/>
 
 		@helper.select(taskForm("task_list.id"), options =
-			list_options.map (l => ("" + l.id, l.title)).to(Seq), '_label -> "Checklist",
-			'class -> "form-control")
-		@inputText(taskForm("title"), '_label -> "Title", 'class -> "form-control")
-		@inputText(taskForm("sort_order"), '_label -> "Sort order", 'class -> "form-control")
-		@checkbox(taskForm("enabled"), '_label -> "Enabled")
+			list_options.map (l => ("" + l.id, l.title)).to(Seq), Symbol("_label") -> "Checklist",
+			Symbol("class") -> "form-control")
+		@inputText(taskForm("title"), Symbol("_label") -> "Title", Symbol("class") -> "form-control")
+		@inputText(taskForm("sort_order"), Symbol("_label") -> "Sort order", Symbol("class") -> "form-control")
+		@checkbox(taskForm("enabled"), Symbol("_label") -> "Enabled")
 
 		<input type="submit" value="Save">
 	}

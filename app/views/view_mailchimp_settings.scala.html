@@ -39,7 +39,7 @@ the person is subscribed to.
   tag <label class="label label-success">@sync.tag.title</label>, the same change is made to MailChimp list
 	  @if(mc_lists.get(sync.mailchimp_list_id) != null){ "@mc_lists.get(sync.mailchimp_list_id).name"
 		  } else { with ID @sync.mailchimp_list_id }.
-  @helper.form(routes.CRM.saveMailchimpSettings(), 'style -> "display: inline") {
+  @helper.form(routes.CRM.saveMailchimpSettings(), Symbol("style") -> "display: inline") {
   <input type="hidden" name="remove_sync_id" value=@sync.id>
   <input type="submit" value="Remove">
 }

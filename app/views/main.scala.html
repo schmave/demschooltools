@@ -73,7 +73,7 @@
             }
             <li style="float:right;">
                 @if(Application.isCurrentUserLoggedIn(username)) {
-                    <a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout">
+                    <a href="@com.feth.play.module.pa.controllers.routes.Authenticate.logout()">
                         Logout</a>
                 } else {
                     <a href="@routes.Public.index()">
@@ -148,24 +148,24 @@
                 By person:
                 <input id="navbar_attendance_people_search" type="search" placeholder="Search people..."/>
             </a><a @if(selectedBtn.equals("attendance_codes")) { class="active" }
-                href="@routes.Attendance.viewCodes">Absence codes
+                href="@routes.Attendance.viewCodes()">Absence codes
             </a>
             @if(OrgConfig.get(request).org.attendance_enable_off_campus) {
                 <a @if(selectedBtn.equals("off_campus_time")) { class="active" }
-                    href="@routes.Attendance.offCampusTime">Off campus time
+                    href="@routes.Attendance.offCampusTime()">Off campus time
                 </a>
             }
             @if(OrgConfig.get(request).org.attendance_show_reports) {
                 <a @if(selectedBtn.equals("reports")) { class="active" }
-                    href="@routes.Attendance.reports">Reports
+                    href="@routes.Attendance.reports()">Reports
                 </a>
             }
             @if(OrgConfig.get(request).org.show_electronic_signin) {
                 <a @if(selectedBtn.equals("attendance_pins")) { class="active" }
-                    href="@routes.Attendance.assignPINs">Assign PINs
+                    href="@routes.Attendance.assignPINs()">Assign PINs
                 </a>
                 <a @if(selectedBtn.equals("attendance_checkin")) { class="active" }
-                    href="@routes.Public.checkin">Check-in app
+                    href="@routes.Public.checkin()">Check-in app
                 </a>
             }
             </div>
@@ -195,16 +195,16 @@
         <div class="tab-pane  active" id="jc">
             <div class="subnav">
             <a @if(selectedBtn.equals("jc_home")) { class="active" }
-                href="@routes.Application.index">Home</a>
-            <a href="@routes.ApplicationEditing.editTodaysMinutes">
+                href="@routes.Application.index()">Home</a>
+            <a href="@routes.ApplicationEditing.editTodaysMinutes()">
                 Edit today's minutes</a>
             <a @if(selectedBtn.equals("rps")) { class="active" }
-                href="@routes.Application.editResolutionPlanList">
+                href="@routes.Application.editResolutionPlanList()">
                 @OrgConfig.get(request).str_res_plans_cap</a>
             <a @if(selectedBtn.equals("weekly_report")) { class="active" }
-                href="@routes.Application.thisWeekReport">Weekly Report</a>
+                href="@routes.Application.thisWeekReport()">Weekly Report</a>
             <a @if(selectedBtn.equals("view_referred")) { class="active" }
-                href="@routes.Application.viewSchoolMeetingReferrals">
+                href="@routes.Application.viewSchoolMeetingReferrals()">
                 Charges referred to S.M.
                 @defining( Application.getActiveSchoolMeetingReferrals(OrgConfig.get(request).org) ) { sm_charges =>
                     @if( sm_charges.size() > 0 ) {
@@ -215,7 +215,7 @@
                 }
             </a>
             <a @if(selectedBtn.equals("view_sm")) { class="active" }
-                href="@routes.Application.viewSchoolMeetingDecisions">
+                href="@routes.Application.viewSchoolMeetingDecisions()">
                 View S.M. decisions</a>
             <a href="@routes.Application.downloadCharges()">
                 Download charges
@@ -274,8 +274,8 @@
 </div>
     }}
 
-    @if(request.flash.getOptional("error").isPresent()) {
-        <div class="flash-error"><b>Error</b><br/><br/>@request.flash.getOptional("error").get()</div>
+    @if(request.flash.get("error").isPresent()) {
+        <div class="flash-error"><b>Error</b><br/><br/>@request.flash.get("error").get()</div>
     }
 
         @content

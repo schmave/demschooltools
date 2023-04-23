@@ -29,7 +29,7 @@
 
 <hr>
 
-@form(routes.CRM.addComment(), args = 'id -> "comment_form") {
+@form(routes.CRM.addComment(), args = Symbol("id") -> "comment_form") {
 <div class="row">
 @for( tag <- p.tags ) {
 	@for( task_list <- tag.task_lists ) {

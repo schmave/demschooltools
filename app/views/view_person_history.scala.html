@@ -5,8 +5,8 @@
 
 @main(p.getDisplayName() + "'s " + OrgConfig.get(request).str_jc_name_short + " history", "jc") {
 
-@if(request.flash.getOptional("notice").isPresent()) {
-    <div class="flash-error">@request.flash.getOptional("notice").get()</div>
+@if(request.flash.get("notice").isPresent()) {
+    <div class="flash-error">@request.flash.get("notice").get()</div>
 }
 
 

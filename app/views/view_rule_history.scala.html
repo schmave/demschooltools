@@ -4,8 +4,8 @@
 
 @main("History of " + r.getNumber() + " " + r.title, "jc") {
 
-@if(request.flash.getOptional("notice").isPresent()) {
-    <div class="flash-error">@request.flash.getOptional("notice").get()</div>
+@if(request.flash.get("notice").isPresent()) {
+    <div class="flash-error">@request.flash.get("notice").get()</div>
 }
 
 <script type="text/javascript">
