@@ -1,8 +1,8 @@
 @(account : Account)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
-@main(account.getTitle(), "accounting") {
+@main(account.getTitle(OrgConfig.get(request)), "accounting") {
 
-	<h2>@account.getTitle</h2>
+	<h2>@account.getTitle(OrgConfig.get(request))</h2>
 
 	@if(account.person == null) {
 		<a href="@routes.Accounting.editAccount(account.id)">Edit Account</a>
@@ -10,6 +10,7 @@
 
 	@if(account.person == null && !account.hasTransactions()) {
 		<form action="@routes.Accounting.deleteAccount(account.id)" method="post">
+
 			<button type="submit" class="delete-account-button btn-link">Delete Account</button>
 		</form>
 		<br>

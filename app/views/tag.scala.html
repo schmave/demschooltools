@@ -32,7 +32,8 @@
   <div class="tab-content">
     <div class="tab-pane active" id="tag-people">
         @helper.form(routes.CRM.removePeopleFromTag()) {
-            <input type="hidden" name="tag_id" value="@tag.id">
+
+        <input type="hidden" name="tag_id" value="@tag.id">
             <p style="margin-top: 15px; margin-left: 15px">
                 <input id="remove-people" class="btn btn-warning" disabled="disabled"
                        type="submit" value="Remove selected people"/>
@@ -48,6 +49,7 @@
 		<table class="table" style="width: 400px;">
 		<thead><th><th>Name<th>Date of change<th>Changed by</thead><tbody>
         @helper.form(routes.CRM.undoTagChanges()) {
+
             <p style="margin-top: 15px; margin-left: 15px">
                 <input id="undo-changes" class="btn btn-warning" disabled="disabled"
                        type="submit" value="Undo selected changes"/>
@@ -77,6 +79,7 @@
     <div class="tab-pane" id="bulk-add">
         <h3>Add people by name</h3>
         @helper.form(routes.CRM.addPeopleToTag()) {
+
             <input type="hidden" name="dest_id" value="@tag.id">
             <div class="row">
                 <div class="col-sm-2">
@@ -99,6 +102,7 @@
         }
         <h3>Add people by tag</h3>
         @helper.form(routes.CRM.addPeopleFromTag()) {
+
             <input type="hidden" name="dest_id" value="@tag.id">
             Add everyone who is already tagged
             <span id="tags-entered"></span>

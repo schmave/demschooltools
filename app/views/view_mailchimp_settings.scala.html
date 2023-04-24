@@ -11,6 +11,7 @@ from the extras menu. Click on the "Create A Key" button, then copy and paste th
 into the text field below.
 
 @helper.form(routes.CRM.saveMailchimpSettings()) {
+
 	<p>MailChimp API key:
 		<input type="text" size=80 name="mailchimp_api_key", value="@org.mailchimp_api_key"/>
 	<p>Send confirmation of updates to this email:
@@ -40,6 +41,7 @@ the person is subscribed to.
 	  @if(mc_lists.get(sync.mailchimp_list_id) != null){ "@mc_lists.get(sync.mailchimp_list_id).name"
 		  } else { with ID @sync.mailchimp_list_id }.
   @helper.form(routes.CRM.saveMailchimpSettings(), Symbol("style") -> "display: inline") {
+
   <input type="hidden" name="remove_sync_id" value=@sync.id>
   <input type="submit" value="Remove">
 }
@@ -51,6 +53,7 @@ the person is subscribed to.
 <h4>Add new MailChimp connection</h4>
 
 @helper.form(routes.CRM.saveMailchimpSettings()) {
+
 
 When people are <select name="sync_type">
 	<option value="local_add">added to</option>

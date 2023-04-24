@@ -39,6 +39,7 @@
 
 @form(routes.Settings.newTask(), Symbol("class") -> "form-horizontal", Symbol("role") -> "form") {
 
+
 	@inputText(taskForm("title"), Symbol("_label") -> "Title", Symbol("class") -> "form-control")
 	@inputText(taskForm("sort_order"), Symbol("_label") -> "Sort order", Symbol("class") -> "form-control")
 	<input type="hidden" name="task_list.id" value="@list.id"/>
@@ -51,6 +52,7 @@
 	<h4>Modify this list</h4>
 
 @form(routes.Settings.saveTaskList(), Symbol("class") -> "form-horizontal", Symbol("role") -> "form") {
+
 
 	<input type="hidden" name="id" value="@listForm("id").value().get()"/>
 	@inputText(listForm("title"), Symbol("_label") -> "Title", Symbol("class") -> "form-control")

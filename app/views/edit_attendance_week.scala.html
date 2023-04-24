@@ -39,6 +39,7 @@ $(function() {
 
 <h3>Editing week of @Application.yymmddDate(OrgConfig.get(request), monday)</h3>
 <form method="POST" action="@routes.Attendance.importFromCustodia()">
+
 <p><a class="btn btn-success" href="@routes.Attendance.viewWeek()?date=@Application.forDateInput(monday)">Done editing; return to viewing</a>
 @if( OrgConfig.get(request).org.show_custodia ) {
   <input type="hidden" name="monday" value="@Application.forDateInput(monday)">

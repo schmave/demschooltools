@@ -1,9 +1,6 @@
 package models;
 
 import io.ebean.*;
-import play.data.Form;
-
-import javax.persistence.*;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -13,6 +10,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import javax.persistence.*;
+import play.data.Form;
 
 @Entity
 @Table(name="transactions")
@@ -144,6 +143,7 @@ public class Transaction extends Model {
                                      Organization org, User current_user) throws Exception {
         Transaction transaction = form.get();
 
+//        transaction.type = TransactionType.valueOf(form.field("type").value().get());
         transaction.from_account = findAccountById(form.field("from_account_id").value().get(), org);
         transaction.to_account = findAccountById(form.field("to_account_id").value().get(), org);
 

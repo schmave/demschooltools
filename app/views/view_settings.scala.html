@@ -27,6 +27,7 @@ $(function () {
     <li>When a JC charge is referred to School Meeting, email <u>@n.email</u>
     }
     @helper.form(routes.Settings.editNotifications(), Symbol("style") -> "display: inline") {
+
         <input type="hidden" name="remove_notification_id" value=@n.id>
         <input type="submit" value="Remove">
     }
@@ -37,6 +38,7 @@ $(function () {
 <h4>Add a new notification</h4>
 
 @helper.form(routes.Settings.editNotifications()) {
+
 When people are added to or removed from tag
 <span id="tags-entered"></span><input type="text" id="tag-entry">,
 email <input type="text" name="email"/>
@@ -44,6 +46,7 @@ email <input type="text" name="email"/>
 }
 
 @helper.form(routes.Settings.editNotifications()) {
+
 When a comment about a person is entered,
 email <input type="text" name="email"/>
 <input type="hidden" name="comment"/>
@@ -51,6 +54,7 @@ email <input type="text" name="email"/>
 }
 
 @helper.form(routes.Settings.editNotifications()) {
+
 When a JC charge is referred to School Meeting,
 email <input type="text" name="email"/>
 <input type="hidden" name="school_meeting"/>
@@ -85,6 +89,7 @@ It is totally fine to have both enabled at once. Data in Custodia can be importe
 the other way around.</p>
 
 @helper.form(routes.Settings.editSettings()) {
+
 <p>
     <label>
         <input type="checkbox" name="show_attendance" id="show-attendance" @if(org.show_attendance){ checked }
@@ -214,6 +219,7 @@ created for every person who is tagged with a tag that is enabled for the accoun
 the "Current Student" and "Staff" tags). Accounts can be created manually for groups within the school.</p>
 
 @helper.form(routes.Settings.editSettings()) {
+
     <p>
         <label>
             <input type="checkbox" name="show_accounting" @if(org.show_accounting){ checked }>
@@ -228,6 +234,7 @@ the "Current Student" and "Staff" tags). Accounts can be created manually for gr
 <h2>@OrgConfig.get(request).str_jc_name_short</h2>
 <h4>Weekly Report</h4>
 @helper.form(routes.Settings.editSettings()) {
+
     <p>The @OrgConfig.get(request).str_jc_name_short Weekly Report includes five full school days.</p>
     <p>Reset the report every <select name="jc_reset_day">
         <option value="1" @if(org.jc_reset_day == 1){selected}>Monday</option>
@@ -239,6 +246,7 @@ the "Current Student" and "Staff" tags). Accounts can be created manually for gr
 }
 
 @helper.form(routes.Settings.editSettings()) {
+
     <h4>Case References</h4>
     <p class="instructions">
         This feature allows you to reference a previous @OrgConfig.get(request).str_jc_name_short case when creating a
@@ -289,6 +297,7 @@ the "Current Student" and "Staff" tags). Accounts can be created manually for gr
 <hr/>
 <h2>@OrgConfig.get(request).str_manual_title</h2>
 @helper.form(routes.Settings.editSettings()) {
+
 <h4>Printing options</h4>
 <p><label><input type="checkbox" name="show_last_modified_in_print"
         @if(org.show_last_modified_in_print){ checked }>

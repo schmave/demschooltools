@@ -636,7 +636,7 @@ public class CRM extends Controller {
         wb.write(baos);
         baos.close();
         return ok(baos.toByteArray())
-                .withHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                .as("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         .withHeader("Content-Disposition", "attachment; filename=" +
                 the_tag.title + ".xlsx");
 

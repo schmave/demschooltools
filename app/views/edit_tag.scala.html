@@ -7,6 +7,7 @@
 
     @helper.form(routes.CRM.saveTag(), Symbol("class") -> "form-horizontal") {
 
+
         @if(form("id").value().isPresent()) {
         	<input type="hidden" name="id" value="@form("id").value().get()"/>
         }

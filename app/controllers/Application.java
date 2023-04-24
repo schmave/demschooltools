@@ -314,7 +314,7 @@ public class Application extends Controller {
         // Adding the BOM here causes Excel 2010 on Windows to realize
         // that the file is Unicode-encoded.
         return ok("\ufeff" + new String(baos.toByteArray(), charset))
-                .withHeader("Content-Type", "text/csv; charset=utf-8")
+                .as("text/csv; charset=utf-8")
         .withHeader("Content-Disposition",
                 "attachment; filename=All charges.csv");
 
@@ -483,7 +483,7 @@ public class Application extends Controller {
         // Adding the BOM here causes Excel 2010 on Windows to realize
         // that the file is Unicode-encoded.
         return ok("\ufeff" + new String(baos.toByteArray(), charset))
-                .withHeader("Content-Type", "text/csv; charset=utf-8")
+                .as("text/csv; charset=utf-8")
                 .withHeader("Content-Disposition", "attachment; filename=" +
                         OrgConfig.get(org).str_res_plans + ".csv");
 
@@ -589,7 +589,7 @@ public class Application extends Controller {
             renderer.layout();
             renderer.createPDF(baos);
 
-            return ok(baos.toByteArray()).withHeader("Content-Type", "application/pdf");
+            return ok(baos.toByteArray()).as("application/pdf");
         } finally {
             if (html_file != null) {
                 html_file.delete();
@@ -620,7 +620,7 @@ public class Application extends Controller {
             }
 
             renderer.finishPDF();
-            return ok(baos.toByteArray()).withHeader("Content-Type", "application/pdf");
+            return ok(baos.toByteArray()).as("application/pdf");
         } finally {
             if (html_file != null) {
                 html_file.delete();

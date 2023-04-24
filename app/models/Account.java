@@ -72,13 +72,13 @@ public class Account extends Model {
         return "<no name>";
     }
 
-    public String getTitle() {
-        String typeName = type == AccountType.PersonalChecking ? getTypeName() + " " : "";
+    public String getTitle(OrgConfig orgConfig) {
+        String typeName = type == AccountType.PersonalChecking ? getTypeName(orgConfig) + " " : "";
         return getName() + "'s " + typeName + "Account";
     }
 
-    public String getTypeName() {
-        return type.toString();
+    public String getTypeName(OrgConfig orgConfig) {
+        return type.toString(orgConfig);
     }
 
     public boolean hasTransactions() {

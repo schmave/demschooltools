@@ -4,12 +4,13 @@
 
 @main("New Account", "accounting") {
 	@form(routes.Accounting.makeNewAccount()) {
+
 		<h2>New Account</h2>
 		<div class="col-sm-6">
 			@inputText(accountForm("name"), Symbol("_label") -> "Name", Symbol("class") -> "form-control")
 			@select(
 				accountForm("type"),
-				options(AccountType.options()),
+				options(AccountType.options(OrgConfig.get(request))),
 				Symbol("_label") -> "Type",
 				Symbol("_default") -> "",
 				Symbol("class") -> "form-control"

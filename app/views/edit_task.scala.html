@@ -9,6 +9,7 @@
 
 	@form(routes.Settings.saveTask(), Symbol("class") -> "form-horizontal", Symbol("role") -> "form") {
 
+
 		<input type="hidden" name="id" value="@taskForm("id").value().get()"/>
 
 		@helper.select(taskForm("task_list.id"), options =

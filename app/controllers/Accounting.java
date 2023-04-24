@@ -152,7 +152,7 @@ public class Accounting extends Controller {
 
         writer.close();
 
-        return ok(baos.toByteArray()).withHeader("Content-Type", "application/csv")
+        return ok(baos.toByteArray()).as("application/csv")
                 .withHeader("Content-Disposition", "attachment; filename=transactions.csv");
     }
 

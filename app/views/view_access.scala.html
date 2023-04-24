@@ -35,6 +35,7 @@ through your school's internet connection. Enter an IP address to allow below to
 (To see your current IP address, visit <a href="http://whatismyipaddress.com/">whatismyipaddress.com</a>).</p>
 
 @form(routes.Settings.saveAccess()) {
+
 <p>Allow read-only access, as described above, from this IP address:
 <input type="textfield" name="allowed_ip" value="@allowed_ip"/>
 <input type="submit" value="Save"/>
@@ -44,6 +45,7 @@ through your school's internet connection. Enter an IP address to allow below to
 <h3>Add a new user</h3>
 
 @form(routes.Settings.newUser(), Symbol("class") -> "form-horizontal", Symbol("role") -> "form") {
+
 	@inputText(userForm("name"), Symbol("_label") -> "Name", Symbol("class") -> "form-control")
 	@inputText(userForm("email"), Symbol("_label") -> "Email", Symbol("class") -> "form-control")
 <input type="submit" value="Add new user"/>

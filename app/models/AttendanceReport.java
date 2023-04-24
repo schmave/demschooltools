@@ -20,13 +20,14 @@ public class AttendanceReport {
 
     public Time latest_departure_time;
 
-    public AttendanceReport(Organization org) {
+    public AttendanceReport() {
         late_departures = new ArrayList<>();
-        latest_departure_time = org.attendance_report_latest_departure_time;
     }
 
     public static AttendanceReport createFromForm(Form<AttendanceReport> form, Organization org) {
         AttendanceReport model = form.get();
+
+        model.latest_departure_time = org.attendance_report_latest_departure_time;
 
         List<AttendanceDay> events = AttendanceDay.find.query().where()
             .eq("person.organization", org)

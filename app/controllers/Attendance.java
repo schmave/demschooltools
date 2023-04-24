@@ -19,6 +19,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.inject.Inject;
 import models.*;
+import play.api.mvc.RequestHeader;
 import play.data.DynamicForm;
 import play.data.Form;
 import play.data.FormFactory;
@@ -164,7 +165,6 @@ public class Attendance extends Controller {
             additional_people.removeAll(all_people);
 
             additional_people.sort(Person.SORT_DISPLAY_NAME);
-
             return ok(edit_attendance_week.render(start_date.getTime(),
                 codes,
                 all_people,
@@ -580,7 +580,7 @@ public class Attendance extends Controller {
 
         zos.close();
         return ok(zipBytes.toByteArray())
-                .withHeader("Content-Type", "application/zip")
+                .as("application/zip")
                 .withHeader("Content-Disposition",
                 "attachment; filename=attendance.zip");
     }
@@ -759,7 +759,7 @@ public class Attendance extends Controller {
 
     public Result viewCustodiaAdmin(Http.Request request) {
         Map<String, Object> scopes = new HashMap<>();
-        Config conf = Public.sConfig;
+        Config conf = Public.sConfig.getConfig("school_crm");
         scopes.put("custodiaUrl", conf.getString("custodia_url"));
         scopes.put("custodiaUsername", Organization.getByHost(request).short_name + "-admin");
         scopes.put("custodiaPassword", conf.getString("custodia_password"));
@@ -830,7 +830,7 @@ public class Attendance extends Controller {
     }
 
     public Result reports(Http.Request request) {
-        return ok(attendance_reports.render(new AttendanceReport(Organization.getByHost(request)), request, mMessagesApi.preferred(request)));
+        return ok(attendance_reports.render(new AttendanceReport(), request, mMessagesApi.preferred(request)));
     }
 
     public Result runReport(Http.Request request) {
@@ -838,7 +838,7 @@ public class Attendance extends Controller {
         Form<AttendanceReport> filledForm = form.bindFromRequest(request);
         if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
-            return badRequest(attendance_reports.render(new AttendanceReport(Organization.getByHost(request)), request, mMessagesApi.preferred(request)));
+            return badRequest(attendance_reports.render(new AttendanceReport(), request, mMessagesApi.preferred(request)));
         }
         AttendanceReport report = AttendanceReport.createFromForm(filledForm, Organization.getByHost(request));
         return ok(attendance_reports.render(report, request, mMessagesApi.preferred(request)));

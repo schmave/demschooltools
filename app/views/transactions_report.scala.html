@@ -5,6 +5,7 @@
 	<h2>Transactions</h2>
 
 	@helper.form(routes.Accounting.runTransactionsReport()) {
+
 		<label class="transactions-report-condition">
 			<input type="checkbox" name="include_personal" @if(model.include_personal){checked="checked"}>
 			Include personal
