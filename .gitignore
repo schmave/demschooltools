@@ -6,6 +6,7 @@ project/target
 target
 dist
 
+.bsp/
 /.idea/
 
 # JS stuff
