@@ -50,7 +50,7 @@ public class Application extends Controller {
     }
 
     public Result viewPassword(Http.Request request) {
-        return ok(view_password.render(request.flash().getOptional("notice").orElse(null), request, mMessagesApi.preferred(request)));
+        return ok(view_password.render(request.flash().get("notice").orElse(null), request, mMessagesApi.preferred(request)));
     }
 
     public Result editPassword(Http.Request request) {
@@ -100,7 +100,7 @@ public class Application extends Controller {
     public static List<Charge> getActiveSchoolMeetingReferrals(Organization org) {
         return Charge.find.query().where()
             .eq("referred_to_sm", true)
-            .eq("sm_decision", null)
+            .isNull("sm_decision")
             .eq("person.organization", org)
             .orderBy("id DESC").findList();
     }
@@ -180,9 +180,9 @@ public class Application extends Controller {
             .fetch("charges")
             .fetch("charges.the_case")
             .fetch("charges.the_case.meeting")
-            .fetch("cases_involved_in", new FetchConfig().query())
-            .fetch("cases_involved_in.the_case", new FetchConfig().query())
-            .fetch("cases_involved_in.the_case.meeting", new FetchConfig().query())
+            .fetch("cases_involved_in", FetchConfig.ofQuery())
+            .fetch("cases_involved_in.the_case", FetchConfig.ofQuery())
+            .fetch("cases_involved_in.the_case.meeting", FetchConfig.ofQuery())
             .where()
             .in("tags", tags)
             .findSet();
@@ -251,7 +251,7 @@ public class Application extends Controller {
             .fetch("the_case")
             .fetch("person")
             .fetch("rule")
-            .fetch("the_case.meeting", new FetchConfig().query())
+            .fetch("the_case.meeting", FetchConfig.ofQuery())
             .where().eq("person.organization", org)
                 .ge("the_case.meeting.date", getStartOfYear())
             .findList();
@@ -345,7 +345,7 @@ public class Application extends Controller {
                 .fetch("rule.section.chapter")
                 .where()
                 .eq("person.organization", Organization.getByHost(request))
-                .ne("person", null)
+                .isNotNull("person")
                 .eq("rp_complete", true)
                 .not(Expr.in("id", referenced_charge_ids))
                 .orderBy("rp_complete_date DESC")
@@ -361,7 +361,7 @@ public class Application extends Controller {
                 .fetch("rule.section.chapter")
                 .where()
                 .eq("person.organization", Organization.getByHost(request))
-                .ne("person", null)
+                .isNotNull("person")
                 .in("id", referenced_charge_ids)
                 .orderBy("id DESC")
                 .setMaxRows(10).findList();
@@ -407,7 +407,7 @@ public class Application extends Controller {
             .eq("person.organization", org)
             .or(Expr.ne("plea", "Not Guilty"),
                 Expr.isNotNull("sm_decision"))
-            .ne("person", null)
+            .isNotNull("person")
             .eq("rp_complete", false)
             .not(Expr.in("id", referenced_charge_ids))
             .orderBy("id DESC").findList();
@@ -667,8 +667,8 @@ public class Application extends Controller {
 
     public Result viewChapter(Integer id, Http.Request request) {
         Chapter c = Chapter.find.query()
-            .fetch("sections", new FetchConfig().query())
-            .fetch("sections.entries", new FetchConfig().query())
+            .fetch("sections", FetchConfig.ofQuery())
+            .fetch("sections.entries", FetchConfig.ofQuery())
             .where().eq("organization", Organization.getByHost(request))
             .eq("id", id).findOne();
 
@@ -687,7 +687,7 @@ public class Application extends Controller {
             "ORDER BY ts_rank(ei.document, plainto_tsquery(:searchString), 0) DESC";
 
         OrgConfig orgConfig = OrgConfig.get(Organization.getByHost(request));
-        SqlQuery sqlQuery = Ebean.createSqlQuery(sql);
+        SqlQuery sqlQuery = DB.sqlQuery(sql);
         sqlQuery.setParameter("orgId", orgConfig.org.id);
         sqlQuery.setParameter("searchString", searchString);
 
@@ -701,7 +701,7 @@ public class Application extends Controller {
         if (entryIds.size() > 0) {
             sql = "SELECT e.id, ts_headline(e.content, plainto_tsquery(:searchString), 'MaxFragments=5') as headline " +
                 "FROM entry e WHERE e.id IN (:entryIds)";
-            sqlQuery = Ebean.createSqlQuery(sql);
+            sqlQuery = DB.sqlQuery(sql);
             sqlQuery.setParameter("searchString", searchString);
             sqlQuery.setParameter("entryIds", entryIds);
             List<SqlRow> headlines = sqlQuery.findList();
@@ -712,8 +712,8 @@ public class Application extends Controller {
         }
 
         Map<Integer, Entry> entries = Entry.find.query()
-            .fetch("section", new FetchConfig().query())
-            .fetch("section.chapter", new FetchConfig().query())
+            .fetch("section", FetchConfig.ofQuery())
+            .fetch("section.chapter", FetchConfig.ofQuery())
             .where().in("id", entryIds).findMap();
 
         ArrayList<Map<String, Object>> entriesList = new ArrayList<>();
@@ -921,7 +921,7 @@ public class Application extends Controller {
             .fetch("the_case")
             .fetch("person")
             .fetch("rule")
-            .fetch("the_case.meeting", new FetchConfig().query())
+            .fetch("the_case.meeting", FetchConfig.ofQuery())
             .where().eq("person.organization", org)
                 .ge("the_case.meeting.date", getStartOfYear(start_date.getTime()))
             .findList();
@@ -1145,21 +1145,16 @@ public class Application extends Controller {
         return new SimpleDateFormat("EEEE, MMMM d, h:mm a").format(Utils.localNow(orgConfig));
     }
 
-    public static String yymdDate(OrgConfig orgConfig, Date d) {
-        if (orgConfig.euro_dates) {
-            return new SimpleDateFormat("d-M-yyyy").format(d);
-        }
-        return new SimpleDateFormat("yyyy-M-d").format(d);
-    }
-
     public static Optional<String> currentUsername(Http.Request request) {
         return request.attrs().getOptional(Security.USERNAME);
     }
 
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public static boolean isUserEditor(Optional<String> username) {
         return username.isPresent() && username.get().contains("@");
     }
 
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public static boolean isCurrentUserLoggedIn(Optional<String> currentUsername) {
         return isUserEditor(currentUsername);
     }

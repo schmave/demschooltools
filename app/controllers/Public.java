@@ -355,7 +355,7 @@ public class Public extends Controller {
 			return unauthorized("Unknown organization");
 		}
         return ok(login.render(mPlayAuth,
-                request.flash().getOptional("notice").orElse(null),
+                request.flash().get("notice").orElse(null),
                 Application.getRemoteIp(request), request, mMessagesApi.preferred(request)));
     }
 

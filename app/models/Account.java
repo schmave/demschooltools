@@ -171,9 +171,9 @@ public class Account extends Model {
 
     private static Query<Account> baseQuery() {
         return find.query()
-            .fetch("person", new FetchConfig().query())
-            .fetch("payment_transactions", new FetchConfig().query())
-            .fetch("credit_transactions", new FetchConfig().query());
+            .fetch("person", FetchConfig.ofQuery())
+            .fetch("payment_transactions", FetchConfig.ofQuery())
+            .fetch("credit_transactions", FetchConfig.ofQuery());
     }
 
     private static List<Person> allPeople(Organization org) {

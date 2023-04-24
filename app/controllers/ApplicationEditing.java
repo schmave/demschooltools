@@ -1,5 +1,6 @@
 package controllers;
 
+import io.ebean.DB;
 import io.ebean.Ebean;
 import io.ebean.SqlUpdate;
 import models.*;
@@ -150,14 +151,14 @@ public class ApplicationEditing extends Controller {
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
     public Result removePersonAtMeeting(Integer meeting_id, Integer person_id,
         Integer role) {
-        SqlUpdate update = Ebean.createSqlUpdate(
+        SqlUpdate update = DB.sqlUpdate(
             "DELETE from person_at_meeting where meeting_id = :meeting_id"+
             " and person_id = :person_id and role = :role");
         update.setParameter("meeting_id", meeting_id);
         update.setParameter("person_id", person_id);
         update.setParameter("role", role);
 
-        Ebean.execute(update);
+        update.executeNow();
 
         return ok();
     }
@@ -173,15 +174,14 @@ public class ApplicationEditing extends Controller {
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
     public Result removePersonAtCase(Integer case_id, Integer person_id, Integer role)
     {
-        SqlUpdate update = Ebean.createSqlUpdate(
-            "DELETE from person_at_case where case_id = :case_id "+
-            "and person_id = :person_id "+
-            "and role = :role");
-        update.setParameter("case_id", case_id);
-        update.setParameter("person_id", person_id);
-        update.setParameter("role", role);
-
-        Ebean.execute(update);
+        DB.sqlUpdate(
+                        "DELETE from person_at_case where case_id = :case_id " +
+                                "and person_id = :person_id " +
+                                "and role = :role")
+                .setParameter("case_id", case_id)
+                .setParameter("person_id", person_id)
+                .setParameter("role", role)
+                .executeNow();
         return ok();
     }
 

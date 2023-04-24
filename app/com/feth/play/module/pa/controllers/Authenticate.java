@@ -16,7 +16,7 @@ public class Authenticate extends AuthenticateBase {
 	}
 
 	public Result authenticate(final String provider, Http.Request request) {
-		final String payload = request.getQueryString(PAYLOAD_KEY);
+		final String payload = request.queryString(PAYLOAD_KEY).orElse(null);
 		return noCache(this.auth.handleAuthentication(provider, request, payload));
 	}
 

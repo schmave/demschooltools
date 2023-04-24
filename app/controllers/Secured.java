@@ -2,24 +2,22 @@ package controllers;
 
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.user.AuthUser;
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
-import models.Organization;
-import models.User;
-import models.UserRole;
-import play.Logger;
-import play.mvc.*;
-import service.MyUserService;
-
-import javax.inject.Inject;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
-
+import javax.inject.Inject;
+import models.Organization;
+import models.User;
+import models.UserRole;
+import play.Logger;
+import play.mvc.*;
+import service.MyUserService;
 
 // Lifted from play.mvc.Security
 
@@ -119,7 +117,7 @@ public class Secured {
             // If we don't have a logged-in user, try going by IP address.
             if (allow_ip && Organization.getByHost(request) != null) {
                 String sql = "select ip from allowed_ips where ip like :ip and organization_id=:org_id";
-                SqlQuery sqlQuery = Ebean.createSqlQuery(sql);
+                SqlQuery sqlQuery = DB.sqlQuery(sql);
                 String address = Application.getRemoteIp(request);
                 sqlQuery.setParameter("ip", address);
                 sqlQuery.setParameter("org_id", Organization.getByHost(request).id);
@@ -160,7 +158,6 @@ public class Secured {
                 // If a user is logged in, but they don't have the proper role
                 // for the page they are trying to access, logging in again
                 // isn't going to help them.
-                ;
                 return redirect(routes.Public.index()).withSession(mAuth.storeOriginalUrl(request));
             } else {
                 return unauthorized("You can't access this page.");

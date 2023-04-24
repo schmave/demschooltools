@@ -120,13 +120,13 @@ public class PlayAuthenticate {
 	}
 
 	public boolean isLoggedIn(final Session session) {
-		boolean ret = session.getOptional(USER_KEY).isPresent() // user is set
-				&& session.getOptional(PROVIDER_KEY).isPresent(); // provider is set
-		ret &= AuthProvider.Registry.hasProvider(session.getOptional(PROVIDER_KEY).orElse("")); // this
+		boolean ret = session.get(USER_KEY).isPresent() // user is set
+				&& session.get(PROVIDER_KEY).isPresent(); // provider is set
+		ret &= AuthProvider.Registry.hasProvider(session.get(PROVIDER_KEY).orElse("")); // this
 																				// provider
 																				// is
 																				// active
-		if (session.getOptional(EXPIRES_KEY).isPresent()) {
+		if (session.get(EXPIRES_KEY).isPresent()) {
 			// expiration is set
 			final long expires = getExpiration(session);
 			if (expires != AuthUser.NO_EXPIRATION) {
@@ -150,9 +150,9 @@ public class PlayAuthenticate {
 
 	private long getExpiration(final Session session) {
 		long expires;
-		if (session.getOptional(EXPIRES_KEY).isPresent()) {
+		if (session.get(EXPIRES_KEY).isPresent()) {
 			try {
-				expires = Long.parseLong(session.getOptional(EXPIRES_KEY).orElse(""));
+				expires = Long.parseLong(session.get(EXPIRES_KEY).orElse(""));
 			} catch (final NumberFormatException nfe) {
 				expires = AuthUser.NO_EXPIRATION;
 			}
@@ -163,8 +163,8 @@ public class PlayAuthenticate {
 	}
 
 	public AuthUser getUser(final Session session) {
-		final String provider = session.getOptional(PROVIDER_KEY).orElse(null);
-		final String id = session.getOptional(USER_KEY).orElse(null);
+		final String provider = session.get(PROVIDER_KEY).orElse(null);
+		final String id = session.get(USER_KEY).orElse(null);
 		final long expires = getExpiration(session);
 
 		if (provider != null && id != null) {
@@ -197,7 +197,7 @@ public class PlayAuthenticate {
 	private Tuple<String, Session> getCacheKey(final Session session, final String key) {
 		// Generate a unique id
 		Session resultSession = session;
-		Optional<String> uuid = session.getOptional(SESSION_ID_KEY);
+		Optional<String> uuid = session.get(SESSION_ID_KEY);
 		if (!uuid.isPresent()) {
 			uuid = Optional.of(UUID.randomUUID().toString());
 			resultSession = session.adding(SESSION_ID_KEY, uuid.get());
@@ -208,12 +208,12 @@ public class PlayAuthenticate {
 
     @SuppressWarnings("unchecked")
     public <T> T getFromCache(final Session session, final String key) {
-		assert session.getOptional(key).isPresent();
-        return (T) cacheApi.getOptional(getCacheKey(session, key)._1).orElse(null);
+		assert session.get(key).isPresent();
+        return (T) cacheApi.get(getCacheKey(session, key)._1).orElse(null);
 	}
 
 	private String getJumpUrl(final Http.Request request) {
-		Optional<String> originalUrl = request.session().getOptional(PlayAuthenticate.ORIGINAL_URL);
+		Optional<String> originalUrl = request.session().get(PlayAuthenticate.ORIGINAL_URL);
 		return originalUrl.orElseGet(() -> getUrl(getResolver().afterAuth(),
 				SETTING_KEY_AFTER_AUTH_FALLBACK));
 	}

@@ -110,8 +110,8 @@ public class Transaction extends Model {
             Boolean include_archived, Organization org) {
         
         return find.query()
-            .fetch("to_account", new FetchConfig().query())
-            .fetch("from_account", new FetchConfig().query())
+            .fetch("to_account", FetchConfig.ofQuery())
+            .fetch("from_account", FetchConfig.ofQuery())
             .where()
             .eq("organization", org)
             .findList()

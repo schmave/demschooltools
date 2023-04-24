@@ -25,7 +25,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static play.libs.F.Tuple;
 
 public abstract class OAuth2AuthProvider<U extends AuthUserIdentity, I extends OAuth2AuthInfo>
 		extends ExternalAuthProvider {
@@ -203,18 +202,18 @@ public abstract class OAuth2AuthProvider<U extends AuthUserIdentity, I extends O
 			sLogger.debug("Returned with URL: '" + request.uri() + "'");
 		}
 
-		final String error = request.getQueryString(getErrorParameterKey());
+		final Optional<String> error = request.queryString(getErrorParameterKey());
 
-		if (error != null) {
-			if (error.equals(Constants.ACCESS_DENIED)) {
+		if (error.isPresent()) {
+			if (error.get().equals(Constants.ACCESS_DENIED)) {
 				throw new AccessDeniedException(getKey());
-			} else if (error.equals(Constants.REDIRECT_URI_MISMATCH)) {
+			} else if (error.get().equals(Constants.REDIRECT_URI_MISMATCH)) {
 				sLogger.error("You must set the redirect URI for your provider to whatever you defined in your routes file."
 						+ "For this provider it is: '"
 						+ getRedirectUrl(request) + "'");
 				throw new RedirectUriMismatch();
 			} else {
-				throw new AuthException(error);
+				throw new AuthException(error.get());
 			}
 		} else if (isCallbackRequest(request)) {
 			// second step in auth process
@@ -224,12 +223,12 @@ public abstract class OAuth2AuthProvider<U extends AuthUserIdentity, I extends O
                 // we will just behave as if there was no auth, yet...
                 return generateRedirect(request);
             }
-            final String callbackState = request.getQueryString(Constants.STATE);
+            final String callbackState = request.queryString(Constants.STATE).orElse(null);
             if(!storedState.equals(UUID.fromString(callbackState))) {
                 // the return callback may have been forged
                 throw new AuthException(messagesApi.preferred(request).at("playauthenticate.core.exception.oauth2.state_param_forged"));
             }
-			final String code = request.getQueryString(Constants.CODE);
+			final String code = request.queryString(Constants.CODE).orElse(null);
 			final I info = getAccessToken(code, request);
             return transform(info, callbackState);
 		} else {

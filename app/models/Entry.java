@@ -54,14 +54,14 @@ public class Entry extends Model implements Comparable<Entry> {
 
     public static Entry findByIdWithJCData(int id, Organization org) {
         return find.query()
-            .fetch("charges", new FetchConfig().query())
-            .fetch("charges.the_case", new FetchConfig().query())
-            .fetch("charges.the_case.meeting", new FetchConfig().query())
-            .fetch("charges.the_case.charges", new FetchConfig().query())
-            .fetch("charges.the_case.charges.person", new FetchConfig().query())
-            .fetch("charges.the_case.charges.rule", new FetchConfig().query())
-            .fetch("charges.the_case.charges.rule.section", new FetchConfig().query())
-            .fetch("charges.the_case.charges.rule.section.chapter", new FetchConfig().query())
+            .fetch("charges", FetchConfig.ofQuery())
+            .fetch("charges.the_case", FetchConfig.ofQuery())
+            .fetch("charges.the_case.meeting", FetchConfig.ofQuery())
+            .fetch("charges.the_case.charges", FetchConfig.ofQuery())
+            .fetch("charges.the_case.charges.person", FetchConfig.ofQuery())
+            .fetch("charges.the_case.charges.rule", FetchConfig.ofQuery())
+            .fetch("charges.the_case.charges.rule.section", FetchConfig.ofQuery())
+            .fetch("charges.the_case.charges.rule.section.chapter", FetchConfig.ofQuery())
             .where().eq("section.chapter.organization", org)
             .eq("id", id).findOne();
     }

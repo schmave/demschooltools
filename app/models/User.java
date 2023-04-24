@@ -98,7 +98,7 @@ public class User extends Model {
 
 		// deactivate the merged user that got added to this one
 		otherUser.active = false;
-		Ebean.save(Arrays.asList(otherUser, this));
+		DB.save(Arrays.asList(otherUser, this));
 	}
 
 	//public static User create(final AuthUser authUser) {

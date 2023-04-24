@@ -2,10 +2,7 @@ package controllers;
 
 import java.util.*;
 
-import io.ebean.Ebean;
-import io.ebean.SqlQuery;
-import io.ebean.SqlRow;
-import io.ebean.SqlUpdate;
+import io.ebean.*;
 
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -209,7 +206,7 @@ public class Settings extends Controller {
 
         String allowed_ip = "";
         String sql = "select ip from allowed_ips where organization_id=:org_id";
-        SqlQuery sqlQuery = Ebean.createSqlQuery(sql);
+        SqlQuery sqlQuery = DB.sqlQuery(sql);
         sqlQuery.setParameter("org_id", org.id);
         List<SqlRow> result = sqlQuery.findList();
         if (result.size() > 0) {
@@ -226,12 +223,12 @@ public class Settings extends Controller {
 
         if (form_data.containsKey("allowed_ip")) {
             String sql = "DELETE from allowed_ips where organization_id=:org_id";
-            SqlUpdate update = Ebean.createSqlUpdate(sql);
+            SqlUpdate update = DB.sqlUpdate(sql);
             update.setParameter("org_id", org.id);
             update.execute();
 
             sql = "INSERT into allowed_ips (ip, organization_id) VALUES(:ip, :org_id)";
-            update = Ebean.createSqlUpdate(sql);
+            update = DB.sqlUpdate(sql);
             update.setParameter("org_id", org.id);
             update.setParameter("ip", form_data.get("allowed_ip")[0]);
             update.execute();
@@ -267,11 +264,11 @@ public class Settings extends Controller {
 
         if (filled_form.apply("active").value().get().equals("false")) {
             u.active = false;
-            Ebean.deleteAll(orig_user.linkedAccounts);
+            DB.deleteAll(orig_user.linkedAccounts);
         }
 
         if (!orig_user.email.equals(u.email)) {
-            Ebean.deleteAll(orig_user.linkedAccounts);
+            DB.deleteAll(orig_user.linkedAccounts);
         }
 
         u.update();

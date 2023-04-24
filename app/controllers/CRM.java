@@ -57,8 +57,8 @@ public class CRM extends Controller {
                 String render() {
                     List<Comment> recent_comments = Comment.find.query()
                         .fetch("person")
-                        .fetch("completed_tasks", new FetchConfig().query())
-                        .fetch("completed_tasks.task", new FetchConfig().query())
+                        .fetch("completed_tasks", FetchConfig.ofQuery())
+                        .fetch("completed_tasks.task", FetchConfig.ofQuery())
                         .where().eq("person.organization", Organization.getByHost(request))
                         .orderBy("created DESC").setMaxRows(20).findList();
 
@@ -274,7 +274,7 @@ public class CRM extends Controller {
             return;
         }
 
-        Ebean.execute(() -> {
+        DB.execute(() -> {
             tag.people.add(person);
             tag.save();
 
@@ -303,8 +303,8 @@ public class CRM extends Controller {
         if (!tag.people.contains(person)) {
             return;
         }
-        Ebean.execute(() -> {
-            if (Ebean.createSqlUpdate("DELETE from person_tag where person_id=" + person.person_id +
+        DB.execute(() -> {
+            if (DB.sqlUpdate("DELETE from person_tag where person_id=" + person.person_id +
                     " AND tag_id=" + tag.id).execute() == 1) {
                 PersonTagChange.create(
                         tag,
@@ -427,7 +427,7 @@ public class CRM extends Controller {
             if (key_name.startsWith(prefix) && values.get(key_name)[0].equals("on")) {
                 PersonTagChange change =
                     PersonTagChange.find.byId(Integer.parseInt(key_name.substring(prefix.length())));
-                Ebean.execute(() -> {
+                DB.execute(() -> {
                     if (change.was_add) {
                         tag.people.remove(change.person);
                     } else {
@@ -449,9 +449,9 @@ public class CRM extends Controller {
     public Result viewTag(Integer id, Http.Request request) {
         Tag the_tag = Tag.find.query()
             .fetch("people")
-            .fetch("people.phone_numbers", new FetchConfig().query())
-            .fetch("people.family", new FetchConfig().query())
-            .fetch("people.family.family_members", new FetchConfig().query())
+            .fetch("people.phone_numbers", FetchConfig.ofQuery())
+            .fetch("people.family", FetchConfig.ofQuery())
+            .fetch("people.family.family_members", FetchConfig.ofQuery())
             .where().eq("organization", Organization.getByHost(request))
             .eq("id", id).findOne();
 
@@ -490,9 +490,9 @@ public class CRM extends Controller {
     public Result downloadTag(Integer id, Http.Request request) throws IOException {
         Tag the_tag = Tag.find.query()
             .fetch("people")
-            .fetch("people.phone_numbers", new FetchConfig().query())
-            .fetch("people.family", new FetchConfig().query())
-            .fetch("people.family.family_members", new FetchConfig().query())
+            .fetch("people.phone_numbers", FetchConfig.ofQuery())
+            .fetch("people.family", FetchConfig.ofQuery())
+            .fetch("people.family.family_members", FetchConfig.ofQuery())
             .where().eq("organization", Organization.getByHost(request))
             .eq("id", id).findOne();
 

@@ -41,7 +41,7 @@ public abstract class CachedPage {
     }
 
     public String getPage() {
-        Optional<byte[]> cached_bytes = Public.sCache.getOptional(cache_key);
+        Optional<byte[]> cached_bytes = Public.sCache.get(cache_key);
         if (cached_bytes.isPresent()) {
             try {
                 ByteArrayInputStream bais = new ByteArrayInputStream(cached_bytes.get());

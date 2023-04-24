@@ -1,23 +1,10 @@
 package controllers;
 
-import io.ebean.Ebean;
-import io.ebean.Expr;
-import io.ebean.SqlRow;
 import com.csvreader.CsvWriter;
 import com.typesafe.config.Config;
-import models.*;
-import play.data.DynamicForm;
-import play.data.Form;
-import play.data.FormFactory;
-import play.i18n.MessagesApi;
-import play.libs.Json;
-import play.mvc.Controller;
-import play.mvc.Http;
-import play.mvc.Result;
-import play.mvc.With;
-import views.html.*;
-
-import javax.inject.Inject;
+import io.ebean.DB;
+import io.ebean.Expr;
+import io.ebean.SqlRow;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -30,7 +17,18 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
+import javax.inject.Inject;
+import models.*;
+import play.data.DynamicForm;
+import play.data.Form;
+import play.data.FormFactory;
+import play.i18n.MessagesApi;
+import play.libs.Json;
+import play.mvc.Controller;
+import play.mvc.Http;
+import play.mvc.Result;
+import play.mvc.With;
+import views.html.*;
 
 @With(DumpOnError.class)
 @Secured.Auth(UserRole.ROLE_ATTENDANCE)
@@ -248,7 +246,7 @@ public class Attendance extends Controller {
                 "((code is not null and code != '_NS_') or " +
                 "(start_time is not null and end_time is not null)) " +
                 "group by person_id";
-        SqlRow row = Ebean.createSqlQuery(sql)
+        SqlRow row = DB.sqlQuery(sql)
                 .setParameter("person_id", p.person_id)
                 .findOne();
 
@@ -348,7 +346,7 @@ public class Attendance extends Controller {
                     "and swipe_day >= :first_date and swipe_day <= :last_date " +
                     "group by dst_id, swipe_day";
 
-            List<SqlRow> custodiaRows = Ebean.createSqlQuery(sql)
+            List<SqlRow> custodiaRows = DB.sqlQuery(sql)
                     .setParameter("time_zone", OrgConfig.get(org).time_zone.getID())
                     .setParameter("person_ids", person_ids)
                     .setParameter("first_date", start_date.getTime())

@@ -77,13 +77,13 @@ public class Organization extends Model {
 
         String cache_key = "Organization::getByHost::" + host;
 
-        Optional<Organization> cached_val = Public.sCache.getOptional(cache_key);
+        Optional<Organization> cached_val = Public.sCache.get(cache_key);
         if (cached_val.isPresent()) {
             return cached_val.get();
         }
 
         String sql = "select organization_id from organization_hosts where host like :host";
-        SqlQuery sqlQuery = Ebean.createSqlQuery(sql);
+        SqlQuery sqlQuery = DB.sqlQuery(sql);
         sqlQuery.setParameter("host", host);
 
         // execute the query returning a List of MapBean objects

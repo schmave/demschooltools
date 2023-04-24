@@ -115,23 +115,23 @@ public class Person extends Model implements Comparable<Person> {
 
     public static Person findByIdWithJCData(int id, Organization org) {
         return find.query()
-            .fetch("charges", new FetchConfig().query())
-            .fetch("charges.the_case", new FetchConfig().query())
-            .fetch("charges.the_case.meeting", new FetchConfig().query())
-            .fetch("charges.the_case.charges", new FetchConfig().query())
-            .fetch("charges.the_case.charges.person", new FetchConfig().query())
-            .fetch("charges.the_case.charges.rule", new FetchConfig().query())
-            .fetch("charges.the_case.charges.rule.section", new FetchConfig().query())
-            .fetch("charges.the_case.charges.rule.section.chapter", new FetchConfig().query())
-            .fetch("cases_involved_in", new FetchConfig().query())
-            .fetch("cases_involved_in.the_case.people_at_case", new FetchConfig().query())
-            .fetch("cases_involved_in.the_case", new FetchConfig().query())
-            .fetch("cases_involved_in.the_case.meeting", new FetchConfig().query())
-            .fetch("cases_involved_in.the_case.charges", new FetchConfig().query())
-            .fetch("cases_involved_in.the_case.charges.person", new FetchConfig().query())
-            .fetch("cases_involved_in.the_case.charges.rule", new FetchConfig().query())
-            .fetch("cases_involved_in.the_case.charges.rule.section", new FetchConfig().query())
-            .fetch("cases_involved_in.the_case.charges.rule.section.chapter", new FetchConfig().query())
+            .fetch("charges", FetchConfig.ofQuery())
+            .fetch("charges.the_case", FetchConfig.ofQuery())
+            .fetch("charges.the_case.meeting", FetchConfig.ofQuery())
+            .fetch("charges.the_case.charges", FetchConfig.ofQuery())
+            .fetch("charges.the_case.charges.person", FetchConfig.ofQuery())
+            .fetch("charges.the_case.charges.rule", FetchConfig.ofQuery())
+            .fetch("charges.the_case.charges.rule.section", FetchConfig.ofQuery())
+            .fetch("charges.the_case.charges.rule.section.chapter", FetchConfig.ofQuery())
+            .fetch("cases_involved_in", FetchConfig.ofQuery())
+            .fetch("cases_involved_in.the_case.people_at_case", FetchConfig.ofQuery())
+            .fetch("cases_involved_in.the_case", FetchConfig.ofQuery())
+            .fetch("cases_involved_in.the_case.meeting", FetchConfig.ofQuery())
+            .fetch("cases_involved_in.the_case.charges", FetchConfig.ofQuery())
+            .fetch("cases_involved_in.the_case.charges.person", FetchConfig.ofQuery())
+            .fetch("cases_involved_in.the_case.charges.rule", FetchConfig.ofQuery())
+            .fetch("cases_involved_in.the_case.charges.rule.section", FetchConfig.ofQuery())
+            .fetch("cases_involved_in.the_case.charges.rule.section.chapter", FetchConfig.ofQuery())
             .where().eq("organization", org)
             .eq("person_id", id).findOne();
     }
@@ -177,7 +177,7 @@ public class Person extends Model implements Comparable<Person> {
 
     public static List<Person> all(Organization org) {
         return find.query()
-                .fetch("phone_numbers", new FetchConfig().query())
+                .fetch("phone_numbers", FetchConfig.ofQuery())
                 .where()
             .eq("organization", org)
             .eq("is_family", Boolean.FALSE)
@@ -301,7 +301,7 @@ public class Person extends Model implements Comparable<Person> {
 
 		p.trimSpaces();
         p.update();
-        Ebean.update(p);
+        DB.update(p);
         return p;
     }
 
@@ -360,7 +360,7 @@ public class Person extends Model implements Comparable<Person> {
             parse("SELECT tag.id, tag.title from person join person_tag pt on person.person_id = pt.person_id join tag on pt.tag_id=tag.id").
             create();
 
-        tags = Ebean.find(Tag.class).setRawSql(rawSql).
+        tags = DB.find(Tag.class).setRawSql(rawSql).
             where().eq("person.person_id", person_id).findList();
     }
 
