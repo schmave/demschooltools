@@ -1,29 +1,41 @@
 import scala.sys.process._
 
-scalaVersion := "2.13.10"
 name := "DemSchoolTools"
+ThisBuild / scalaVersion := "2.13.10"
+ThisBuild / version := "1.1"
+ThisBuild / javacOptions ++= Seq("-Xlint:unchecked", "-Xlint:deprecation")
 
-version := "1.1"
+// I think these aren't working yet
+ThisBuild / Compile / doc / sources := Seq.empty
+ThisBuild / Compile / packageDoc / publishArtifact := false
+
+lazy val authLibrary = (project in file("authLibrary")).enablePlugins(PlayJava)
+  .settings(
+  libraryDependencies ++= Seq(
+    "org.apache.httpcomponents" % "httpclient" % "4.5.14",
+    "org.apache.commons" % "commons-lang3" % "3.12.0",
+    javaWs,
+    ehcache,
+  )
+  )
+
+lazy val modelsLibrary = (project in file("modelsLibrary")).enablePlugins(PlayJava, PlayEbean)
+.settings(
+  libraryDependencies ++= Seq(
+    "com.typesafe.play" %% "play-mailer" % "8.0.1",
+  )
+).aggregate(authLibrary)
+  .dependsOn(authLibrary)
+
 
 lazy val root = (project in file("."))
-//	.settings(
-//		publishArtifact / (Compile, packageDoc) := false,
-//		publishArtifact / packageDoc := false,
-//		sources / (Compile,doc) := Seq.empty
-//	    )
 	.enablePlugins(PlayJava, PlayEbean)
-
+  .aggregate(modelsLibrary, authLibrary)
+  .dependsOn(modelsLibrary, authLibrary)
 
 javacOptions ++= Seq("-Xlint:unchecked", "-Xlint:deprecation")
-
 pipelineStages := Seq(digest, gzip)
-
-//resolvers += Resolver.bintrayRepo("playframework", "maven")
-
-// These settings from
-//  https://github.com/playframework/play-ebean/blob/main/docs/manual/working/javaGuide/main/sql/code/ebean.sbt
-Compile / playEbeanModels := Seq("models.*")
-//playEbeanDebugLevel := 2
+ThisBuild / Compile / playEbeanModels := Seq("models.*")
 
 libraryDependencies ++= Seq(
   javaJdbc,
@@ -38,11 +50,6 @@ libraryDependencies ++= Seq(
   "com.github.spullara.mustache.java" % "compiler" % "0.9.10",
   "org.apache.poi" % "poi-ooxml" % "5.2.2",
   "org.mindrot" % "jbcrypt" % "0.4",
-
-  // play-authenticate stuff
-  "org.apache.httpcomponents" % "httpclient" % "4.5.14",
-  "org.apache.commons" % "commons-lang3" % "3.12.0",
-  javaWs,
 )
 
 // Run webpack
@@ -63,9 +70,7 @@ webpack := {
 }
 
 dist := (dist dependsOn webpack).value
-
 stage := (stage dependsOn webpack).value
-
 PlayKeys.playRunHooks += baseDirectory.map(Webpack.apply).value
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
