@@ -20,4 +20,4 @@ CREATE TABLE attendance_rule (
 
 # --- !Downs
 
-DROP TABLE transaction;
+DROP TABLE attendance_rule;

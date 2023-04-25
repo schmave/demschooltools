@@ -24,7 +24,10 @@ public class AttendanceRule extends Model {
     @JoinColumn(name="person_id")
     public Person person;
 
+    @play.data.format.Formats.DateTime(pattern="MM/dd/yyyy")
     public Date start_date;
+
+    @play.data.format.Formats.DateTime(pattern="MM/dd/yyyy")
     public Date end_date;
 
     public String notification_email;
@@ -66,6 +69,19 @@ public class AttendanceRule extends Model {
     public static AttendanceRule create(Form<AttendanceRule> form) throws Exception {
         AttendanceRule rule = form.get();
 
+        String person_id = form.field("person_id").value();
+        if (person_id != null && person_id.trim().length() > 0) {
+            rule.person = Person.findById(Integer.valueOf(person_id));
+        }
+
+        // if (values.containsKey("monday")) {
+        //     this.show_attendance = Utils.getBooleanFromFormValue(values.get("monday")[0]);
+        // } else {
+        //     this.show_attendance = false;
+        // }
+
+        rule.organization = Organization.getByHost();
+
         rule.save();
         return rule;
     }
@@ -95,19 +111,19 @@ public class AttendanceRule extends Model {
 
     public String getFormattedDaysOfWeek() {
         List<String> result = new ArrayList<String>();
-        if ((days_of_week & MONDAY) == MONDAY) {
+        if (isMonday()) {
             result.add("M");
         }
-        if ((days_of_week & TUESDAY) == TUESDAY) {
+        if (isTuesday()) {
             result.add("T");
         }
-        if ((days_of_week & WEDNESDAY) == WEDNESDAY) {
+        if (isWednesday()) {
             result.add("W");
         }
-        if ((days_of_week & THURSDAY) == THURSDAY) {
+        if (isThursday()) {
             result.add("Th");
         }
-        if ((days_of_week & FRIDAY) == FRIDAY) {
+        if (isFriday()) {
             result.add("F");
         }
         return String.join(",", result);
@@ -127,5 +143,25 @@ public class AttendanceRule extends Model {
             return code.color;
         }
         return "transparent";
+    }
+
+    public boolean isMonday() {
+        return (days_of_week & MONDAY) == MONDAY;
+    }
+
+    public boolean isTuesday() {
+        return (days_of_week & TUESDAY) == TUESDAY;
+    }
+
+    public boolean isWednesday() {
+        return (days_of_week & WEDNESDAY) == WEDNESDAY;
+    }
+
+    public boolean isThursday() {
+        return (days_of_week & THURSDAY) == THURSDAY;
+    }
+
+    public boolean isFriday() {
+        return (days_of_week & FRIDAY) == FRIDAY;
     }
 }
