@@ -783,10 +783,17 @@ public class Attendance extends Controller {
     }
 
     public Result newRule() {
+        Organization org = OrgConfig.get().org;
         AttendanceRule rule = new AttendanceRule();
         Form<AttendanceRule> form = Form.form(AttendanceRule.class);
         String people_json = Application.attendancePeopleJson();
-        return ok(views.html.attendance_edit_rule.render(rule, form, people_json));
+        return ok(views.html.attendance_edit_rule.render(
+            rule,
+            form,
+            people_json,
+            org.attendance_enable_partial_days,
+            org.attendance_show_reports
+        ));
     }
 
     public Result rule(Integer id) {
@@ -796,12 +803,8 @@ public class Attendance extends Controller {
     public Result saveRule() throws Exception {
         Form<AttendanceRule> form = Form.form(AttendanceRule.class);
         Form<AttendanceRule> filledForm = form.bindFromRequest();
-        if (filledForm.hasErrors()) {
-            return badRequest("ERRORS: " + filledForm.errorsAsJson().toString());
-        } else {
-            AttendanceRule rule = AttendanceRule.create(filledForm);
-            return redirect(routes.Attendance.rules());
-        }
+        AttendanceRule rule = AttendanceRule.create(filledForm);
+        return redirect(routes.Attendance.rules());
     }
 
     public Result deleteRule(Integer id) {

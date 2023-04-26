@@ -34,25 +34,19 @@ public class AttendanceRule extends Model {
 
     public boolean expired;
 
-    public int days_of_week;
+    public boolean monday;
+    public boolean tuesday;
+    public boolean wednesday;
+    public boolean thursday;
+    public boolean friday;
 
     public String absence_code;
 
     public Double min_hours;
 
     public Time latest_start_time;
-    public Time latest_departure_time;
-
-    @Transient
-    final int MONDAY = 1;
-    @Transient
-    final int TUESDAY = 2;
-    @Transient
-    final int WEDNESDAY = 4;
-    @Transient
-    final int THURSDAY = 8;
-    @Transient
-    final int FRIDAY = 16;
+    
+    public boolean exempt_from_fees;
 
     public static Finder<Integer, AttendanceRule> find = new Finder<Integer, AttendanceRule>(
         AttendanceRule.class
@@ -70,15 +64,14 @@ public class AttendanceRule extends Model {
         AttendanceRule rule = form.get();
 
         String person_id = form.field("person_id").value();
-        if (person_id != null && person_id.trim().length() > 0) {
+        if (!person_id.isEmpty()) {
             rule.person = Person.findById(Integer.valueOf(person_id));
         }
 
-        // if (values.containsKey("monday")) {
-        //     this.show_attendance = Utils.getBooleanFromFormValue(values.get("monday")[0]);
-        // } else {
-        //     this.show_attendance = false;
-        // }
+        String _latest_start_time = form.field("_latest_start_time").value();
+        if (!_latest_start_time.isEmpty()) {
+            rule.latest_start_time = AttendanceDay.parseTime(_latest_start_time);
+        }
 
         rule.organization = Organization.getByHost();
 
@@ -111,19 +104,19 @@ public class AttendanceRule extends Model {
 
     public String getFormattedDaysOfWeek() {
         List<String> result = new ArrayList<String>();
-        if (isMonday()) {
+        if (monday) {
             result.add("M");
         }
-        if (isTuesday()) {
+        if (tuesday) {
             result.add("T");
         }
-        if (isWednesday()) {
+        if (wednesday) {
             result.add("W");
         }
-        if (isThursday()) {
+        if (thursday) {
             result.add("Th");
         }
-        if (isFriday()) {
+        if (friday) {
             result.add("F");
         }
         return String.join(",", result);
@@ -137,31 +130,18 @@ public class AttendanceRule extends Model {
         return format.format(time.getTime());
     }
 
+    public String getFormattedBoolean(boolean b) {
+        if (b) {
+            return "Yes";
+        }
+        return "No";
+    }
+
     public String getCodeColor(Map<String, AttendanceCode> codes_map) {
         AttendanceCode code = codes_map.get(absence_code);
         if (code != null) {
             return code.color;
         }
         return "transparent";
-    }
-
-    public boolean isMonday() {
-        return (days_of_week & MONDAY) == MONDAY;
-    }
-
-    public boolean isTuesday() {
-        return (days_of_week & TUESDAY) == TUESDAY;
-    }
-
-    public boolean isWednesday() {
-        return (days_of_week & WEDNESDAY) == WEDNESDAY;
-    }
-
-    public boolean isThursday() {
-        return (days_of_week & THURSDAY) == THURSDAY;
-    }
-
-    public boolean isFriday() {
-        return (days_of_week & FRIDAY) == FRIDAY;
     }
 }

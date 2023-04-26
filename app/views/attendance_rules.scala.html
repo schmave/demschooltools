@@ -25,11 +25,11 @@ enable_late_fees : Boolean
 		<th>Days of Week</th>
 		<th>Default Code</th>
 		@if(enable_partial_days) {
-			<th>Min Hours per<br>Day Override</th>
-			<th>Latest Start<br>Time Override</th>
+			<th>Min Hours</th>
+			<th>Latest Arrival Time</th>
 		}
 		@if(enable_late_fees) {
-			<th>Latest Departure<br>Time Override</th>
+			<th>Exempt from Fees</th>
 		}
 	</tr>
 	@for( rule <- current_rules ) {
@@ -45,7 +45,7 @@ enable_late_fees : Boolean
 				<td>@rule.getFormattedTime(rule.latest_start_time)</td>
 			}
 			@if(enable_late_fees) {
-				<td>@rule.getFormattedTime(rule.latest_departure_time)</td>
+				<td>@rule.getFormattedBoolean(rule.exempt_from_fees)</td>
 			}
 		</tr>
 	}
