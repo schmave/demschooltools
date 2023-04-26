@@ -11,9 +11,9 @@
 @caseTableRow(c.the_case, false)
 </table>
 
-<p>The recommended @OrgConfig.get(request).str_res_plan was:
+<p>The recommended @Utils.getOrgConfig(request).str_res_plan was:
 	<p style="padding-left:1in">@c.resolution_plan
-<p>The plea was @OrgConfig.get(request).translatePlea(c.plea).
+<p>The plea was @Utils.getOrgConfig(request).translatePlea(c.plea).
 
 <form class="form-horizontal" method=POST action="@routes.ApplicationEditing.saveSchoolMeetingDecisions()">
 

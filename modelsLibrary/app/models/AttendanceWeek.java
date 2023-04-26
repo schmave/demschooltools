@@ -1,7 +1,6 @@
 package models;
 
 import io.ebean.*;
-import controllers.Utils;
 
 import javax.persistence.*;
 import java.util.Calendar;
@@ -39,7 +38,7 @@ public class AttendanceWeek extends Model {
     public static AttendanceWeek findOrCreate(Date day, Person person) {
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(day);
-        Utils.adjustToPreviousDay(calendar, Calendar.MONDAY);
+        ModelUtils.adjustToPreviousDay(calendar, Calendar.MONDAY);
         Date monday = calendar.getTime();
 
         AttendanceWeek result = AttendanceWeek.find.query().where()

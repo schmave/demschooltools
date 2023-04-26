@@ -77,6 +77,6 @@
 </script>
 
 <script type="text/javascript">
-	var accounts = @Html(Accounting.accountsJson(OrgConfig.get(request).org));
+	var accounts = @Html(Accounting.accountsJson(Utils.getOrgConfig(request).org));
 	initCreateTransaction(accounts);
 </script>

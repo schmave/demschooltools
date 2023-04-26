@@ -4,17 +4,10 @@ import io.ebean.*;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import controllers.Application;
-import controllers.Public;
-import controllers.Utils;
 
 import javax.persistence.*;
 import javax.persistence.OrderBy;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name="`case`")
@@ -47,8 +40,6 @@ public class Case extends Model implements Comparable<Case> {
     @OneToMany(mappedBy="the_case")
     @OrderBy("id ASC")
     public List<Charge> charges;
-
-    static Set<String> names;
 
     public Date date_closed;
 
@@ -106,7 +97,7 @@ public class Case extends Model implements Comparable<Case> {
         catch (PersistenceException pe) {
             // Throw the exception only if this is something other than a
             // "unique_violation", meaning that this CaseMeeting already exists.
-            Utils.eatIfUniqueViolation(pe);
+            ModelUtils.eatIfUniqueViolation(pe);
         }
 
         this.meeting = m;
@@ -119,7 +110,7 @@ public class Case extends Model implements Comparable<Case> {
         location = query_string.get("location")[0];
 
         String date_string = query_string.get("date")[0];
-        date = controllers.Application.getDateFromString(date_string);
+        date = ModelUtils.getDateFromString(date_string);
         time = query_string.get("time")[0];
 
         System.out.println("closed: " + query_string.get("closed")[0]);
@@ -138,70 +129,6 @@ public class Case extends Model implements Comparable<Case> {
             time.equals("") &&
                 people_at_case.size() == 0 &&
                 charges.size() == 0;
-    }
-
-    public void loadNames(Organization org) {
-        if (names != null) {
-            return;
-        }
-
-        names = new HashSet<>();
-
-        try {
-            BufferedReader r = new BufferedReader(new InputStreamReader(
-                    Public.sEnvironment.resourceAsStream("names.txt")));
-            while (true) {
-                String line = r.readLine();
-                if (line == null) {
-                    break;
-                }
-
-                String n = line.trim().toLowerCase();
-                if (n.length() > 2) {
-                    // don't add 2-letter names
-                    names.add(n);
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("ERROR loading names file");
-            e.printStackTrace();
-        }
-
-        // Add first and display names of all people in JC db
-        for(Person p : Application.jcPeople(org)) {
-            names.add(p.first_name.trim().toLowerCase());
-            names.add(p.getDisplayName().trim().toLowerCase());
-        }
-    }
-
-    public String getRedactedFindings(Person keep_this_persons_name) {
-        loadNames(meeting.organization);
-
-        String composite_findings = generateCompositeFindingsFromChargeReferences();
-
-        String keep_first_name = keep_this_persons_name.first_name.trim().toLowerCase();
-        String keep_display_name = keep_this_persons_name.getDisplayName().trim().toLowerCase();
-
-        String[] words = composite_findings.split("\\b");
-        Map<String, String> replacement_names = new HashMap<>();
-        char next_replacement = 'A';
-
-        for (String w : words) {
-            w = w.toLowerCase();
-            if (!w.equals(keep_first_name) && !w.equals(keep_display_name) &&
-                names.contains(w) && replacement_names.get(w) == null) {
-                replacement_names.put(w, next_replacement + "___");
-
-                next_replacement++;
-            }
-        }
-
-        String new_findings = composite_findings;
-        for (String name : replacement_names.keySet()) {
-            new_findings = new_findings.replaceAll("(?i)" + name, replacement_names.get(name));
-        }
-
-        return new_findings;
     }
 
     public int compareTo(Case other) {
@@ -228,144 +155,4 @@ public class Case extends Model implements Comparable<Case> {
         save();
     }
 
-    // We use this method while editing minutes. At this time the user has picked case references, but is still working
-    // on picking charge references, so we don't know which charges will be needed. As a result, we will include
-    // information on all charges from the referenced cases.
-    public String generateCompositeFindingsFromCaseReferences() {
-        if (!meeting.organization.enable_case_references) {
-            return findings;
-        }
-        return generateCompositeFindings(null, null);
-    }
-
-    // We use this method everywhere besides the edit minutes page. At this point the minutes have been finalized and the
-    // charge references have been selected. We don't need to include information about charges that weren't referenced.
-    public String generateCompositeFindingsFromChargeReferences() {
-        if (!meeting.organization.enable_case_references) {
-            return findings;
-        }
-        ArrayList<Charge> relevant_charges = new ArrayList<>();
-        for (Charge charge : charges) {
-            charge.buildChargeReferenceChain(relevant_charges);
-        }
-        return generateCompositeFindings(relevant_charges, null);
-    }
-
-    private String generateCompositeFindings(List<Charge> relevant_charges, List<Case> used_cases) {
-
-        if (used_cases == null) {
-            used_cases = new ArrayList<>();
-        }
-        used_cases.add(this);
-        String result = "";
-
-        referenced_cases.sort(Comparator.comparing(a -> a.case_number));
-
-        for (Case c : referenced_cases) {
-            if (used_cases.contains(c)) {
-                continue;
-            }
-            if (!isCaseRelevant(c, relevant_charges)) {
-                continue;
-            }
-            ArrayList<Case> _used_cases = new ArrayList<>(used_cases);
-            boolean hasRelevantReferences = c.referenced_cases.stream()
-                .anyMatch(rc -> isCaseRelevant(rc, relevant_charges) && !_used_cases.contains(rc));
-            if (!hasRelevantReferences) {
-                if (result.isEmpty()) {
-                    result += "Per case ";
-                } else {
-                    result += " Then per case ";
-                }
-                result += c.case_number + ",";
-            }
-            if (!result.isEmpty()) {
-                result += " ";
-            }
-            result += c.generateCompositeFindings(relevant_charges, used_cases);
-            if (!result.endsWith(".")) {
-                result += ".";
-            }
-            Map<String, List<Charge>> groups = groupChargesByRuleAndResolutionPlan(findRelevantCharges(c, relevant_charges));
-            for (Map.Entry<String, List<Charge>> entry : groups.entrySet()) {
-                List<Charge> group = entry.getValue();
-                result += " " + group.get(0).person.getDisplayName();
-                if (group.size() == 1) {
-                    result += " was ";    
-                } else {
-                    if (group.size() > 2) {
-                        for (Charge ch : group.subList(1, group.size() - 1)) {
-                            result += ", " + ch.person.getDisplayName();
-                        }
-                        result += ",";
-                    }
-                    result += " and " + group.get(group.size() - 1).person.getDisplayName() + " were "; 
-                }
-                result += "charged with " + group.get(0).getRuleTitle();
-                String resolution_plan = getResolutionPlanForCompositeFindings(group.get(0));
-                if (resolution_plan.isEmpty()) {
-                    result += ".";
-                } else {
-                    if (group.get(0).sm_decision != null && !group.get(0).sm_decision.isEmpty()) {
-                        result += " and School Meeting decided on";
-                    }
-                    else if (group.size() == 1) {
-                        result += " and was assigned";
-                    }
-                    else {
-                        result += " and were each assigned";
-                    }
-                    result += " the " + OrgConfig.get(meeting.organization).str_res_plan + " \"" + resolution_plan;
-                    if (!result.endsWith(".")) {
-                        result += ".";
-                    }
-                    result += "\"";
-                }
-            }  
-        }
-        if (!result.isEmpty()) {
-            result += " Then per case " + case_number + ", ";
-        }
-        if (findings.isEmpty()) {
-            findings = "the " + OrgConfig.get(meeting.organization).str_res_plan + " was not completed.";
-        }
-        result += findings;
-        return result;
-    }
-
-    private static List<Charge> findRelevantCharges(Case c, List<Charge> relevant_charges) {
-
-        List<Charge> charges =
-            Charge.find.query()
-                .fetch("person")
-                .fetch("rule")
-                .fetch("rule.section")
-                .fetch("rule.section.chapter")
-                .where()
-                .eq("case_id", c.id)
-                .ne("person", null)
-                .findList();
-
-        return charges.stream()
-            .filter(ch -> relevant_charges == null || relevant_charges.contains(ch))
-            .collect(Collectors.toList());
-    }
-
-    private static Map<String, List<Charge>> groupChargesByRuleAndResolutionPlan(List<Charge> charges) {
-        return charges.stream().collect(Collectors.groupingBy(ch -> ch.getRuleTitle() + getResolutionPlanForCompositeFindings(ch)));
-    }
-
-    private static boolean isCaseRelevant(Case c, List<Charge> relevant_charges) {
-        return c.charges.stream().anyMatch(ch -> relevant_charges == null || relevant_charges.contains(ch));
-    }
-
-    private static String getResolutionPlanForCompositeFindings(Charge charge) {
-        if (charge.sm_decision != null && !charge.sm_decision.isEmpty()) {
-            return charge.sm_decision;
-        }
-        if (charge.referred_to_sm && charge.resolution_plan.isEmpty()) {
-            return "[Referred to School Meeting]";
-        }
-        return charge.resolution_plan;
-    }
 }

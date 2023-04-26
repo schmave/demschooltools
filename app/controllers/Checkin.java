@@ -23,9 +23,9 @@ public class Checkin extends Controller {
         time = time.replace('\u00A0',' ').replace('\u2007',' ').replace('\u202F',' ');
         Date date = new SimpleDateFormat("M/d/yyyy, h:mm:ss a").parse(time);
 
-        Date start_date = Application.getStartOfYear();
+        Date start_date = ModelUtils.getStartOfYear();
         Date end_date = new Date();
-        Organization organization = Organization.getByHost(request);
+        Organization organization = Utils.getOrg(request);
         Map<Person, AttendanceStats> person_to_stats = Attendance.mapPeopleToStats(start_date, end_date, organization);
 
         boolean show_weighted_percent = organization.attendance_show_weighted_percent;
@@ -54,7 +54,7 @@ public class Checkin extends Controller {
                                  Http.Request request) throws ParseException {
         Date date = new SimpleDateFormat("M/d/yyyy, h:mm:ss a").parse(time_string);
         Time time = new Time(date.getTime());
-        AttendanceDay attendance_day = AttendanceDay.findCurrentDay(date, person_id, Organization.getByHost(request));
+        AttendanceDay attendance_day = AttendanceDay.findCurrentDay(date, person_id, Utils.getOrg(request));
         // if this is an invalid day, ignore the message
         if (attendance_day == null) {
             return ok();
@@ -83,7 +83,7 @@ public class Checkin extends Controller {
         if (!time_string.isEmpty()) {
             date = new SimpleDateFormat("M/d/yyyy, h:mm:ss a").parse(time_string);
         }
-        AttendanceDay attendance_day = AttendanceDay.findCurrentDay(date, person_id, Organization.getByHost(request));
+        AttendanceDay attendance_day = AttendanceDay.findCurrentDay(date, person_id, Utils.getOrg(request));
         if (attendance_day != null) {
             attendance_day.edit(absence_code, in_time, out_time);
         }

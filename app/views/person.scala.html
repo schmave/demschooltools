@@ -79,7 +79,7 @@ enableTagBox("#person_tag_entry_@person.person_id",
 }
 
 @if(person.dob != null) {
-	<br>Age @CRM.calcAge(person) (born @CRM.formatDob(person.dob, OrgConfig.get(request)))
+	<br>Age @person.calcAge() (born @CRM.formatDob(person.dob, Utils.getOrgConfig(request)))
 }
 @if(!person.grade.equals("")) {
 	<br>Grade @person.grade<br>

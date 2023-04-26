@@ -19,7 +19,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.inject.Inject;
 import models.*;
-import play.api.mvc.RequestHeader;
 import play.data.DynamicForm;
 import play.data.Form;
 import play.data.FormFactory;
@@ -61,7 +60,7 @@ public class Attendance extends Controller {
         prev_date.setYear(prev_date.getYear() - 1);
         Date next_date = new Date(start_date.getTime());
         next_date.setYear(next_date.getYear() + 1);
-        if (start_date.getYear() == Application.getStartOfYear().getYear()) {
+        if (start_date.getYear() == ModelUtils.getStartOfYear().getYear()) {
             next_date = null;
         }
 
@@ -74,17 +73,17 @@ public class Attendance extends Controller {
             return ok(cached_page.render(new CachedPage(CachedPage.ATTENDANCE_INDEX,
                             "Attendance",
                             "attendance",
-                            "attendance_home", Organization.getByHost(request)) {
+                            "attendance_home", Utils.getOrg(request)) {
                         @Override
                         String render() {
-                            return renderIndexContent(Application.getStartOfYear(), null, false, Organization.getByHost(request), request);
+                            return renderIndexContent(ModelUtils.getStartOfYear(), null, false, Utils.getOrg(request), request);
                         }
                     }, request, mMessagesApi.preferred(request)));
         } else {
             return ok(cached_page.render(new CachedPage("",
                             "Attendance",
                             "attendance",
-                            "attendance_home", Organization.getByHost(request)) {
+                            "attendance_home", Utils.getOrg(request)) {
                         @Override
                         public String getPage() {
                             Date start_date = Utils.parseDateOrNow(start_date_str).getTime();
@@ -92,7 +91,7 @@ public class Attendance extends Controller {
                             if (!end_date_str.equals("")) {
                                 end_date = Utils.parseDateOrNow(end_date_str).getTime();
                             }
-                            return renderIndexContent(start_date, end_date, is_custom_date, Organization.getByHost(request), request);
+                            return renderIndexContent(start_date, end_date, is_custom_date, Utils.getOrg(request), request);
                         }
 
                         @Override
@@ -110,7 +109,7 @@ public class Attendance extends Controller {
         Calendar end_date = (Calendar)start_date.clone();
         end_date.add(Calendar.DAY_OF_MONTH, 5);
 
-        Organization org = Organization.getByHost(request);
+        Organization org = Utils.getOrg(request);
         List<AttendanceDay> days =
             AttendanceDay.find.query().where()
                 .eq("person.organization", org)
@@ -184,7 +183,7 @@ public class Attendance extends Controller {
                         Expr.or(
                             Expr.ilike("first_name", "%" + term + "%"),
                             Expr.ilike("display_name", "%" + term + "%"))))
-                    .eq("organization", Organization.getByHost(request))
+                    .eq("organization", Utils.getOrg(request))
                     .eq("is_family", false)
                     .findList();
 
@@ -216,10 +215,10 @@ public class Attendance extends Controller {
 
     public Result viewPersonReport(Integer person_id, String start_date_str, String end_date_str,
                                    Http.Request request) {
-        Organization org = Organization.getByHost(request);
+        Organization org = Utils.getOrg(request);
         Person p = Person.findById(person_id, org);
 
-        Date start_date = Application.getStartOfYear();
+        Date start_date = ModelUtils.getStartOfYear();
         Date end_date = new Date();
 
         if (!start_date_str.trim().isEmpty() || !end_date_str.trim().isEmpty()) {
@@ -237,7 +236,7 @@ public class Attendance extends Controller {
                             .findOne();
             if (last_day != null) {
                 end_date = last_day.day;
-                start_date = Application.getStartOfYear(end_date);
+                start_date = ModelUtils.getStartOfYear(end_date);
             }
         }
 
@@ -318,7 +317,7 @@ public class Attendance extends Controller {
         Calendar end_date = (Calendar) start_date.clone();
         end_date.add(Calendar.DAY_OF_MONTH, 4);
 
-        Organization org = Organization.getByHost(request);
+        Organization org = Utils.getOrg(request);
         List<AttendanceDay> days =
                 AttendanceDay.find.query().where()
                         .eq("person.organization", org)
@@ -347,7 +346,7 @@ public class Attendance extends Controller {
                     "group by dst_id, swipe_day";
 
             List<SqlRow> custodiaRows = DB.sqlQuery(sql)
-                    .setParameter("time_zone", OrgConfig.get(org).time_zone.getID())
+                    .setParameter("time_zone", Utils.getOrgConfig(org).time_zone.getID())
                     .setParameter("person_ids", person_ids)
                     .setParameter("first_date", start_date.getTime())
                     .setParameter("last_date", end_date.getTime())
@@ -391,7 +390,7 @@ public class Attendance extends Controller {
 
 
     public Result createPersonWeek(Http.Request request) {
-        CachedPage.remove(CachedPage.ATTENDANCE_INDEX, Organization.getByHost(request));
+        CachedPage.remove(CachedPage.ATTENDANCE_INDEX, Utils.getOrg(request));
 
         Map<String,String[]> data = request.body().asFormUrlEncoded();
         Calendar start_date = Utils.parseDateOrNow(data.get("monday")[0]);
@@ -406,11 +405,11 @@ public class Attendance extends Controller {
         for (String person_id : person_ids) {
             Calendar end_date = (Calendar)start_date.clone();
             boolean alreadyExists = false;
-            Person p = Person.findById(Integer.parseInt(person_id), Organization.getByHost(request));
+            Person p = Person.findById(Integer.parseInt(person_id), Utils.getOrg(request));
             try {
                 AttendanceWeek.create(start_date.getTime(), p);
             } catch (javax.persistence.PersistenceException pe) {
-                Utils.eatIfUniqueViolation(pe);
+                ModelUtils.eatIfUniqueViolation(pe);
                 alreadyExists = true;
             }
             Map<String, Object> one_result = new HashMap<>();
@@ -425,7 +424,7 @@ public class Attendance extends Controller {
                 try {
                     AttendanceDay.create(end_date.getTime(), p);
                 } catch (javax.persistence.PersistenceException pe) {
-                    Utils.eatIfUniqueViolation(pe);
+                    ModelUtils.eatIfUniqueViolation(pe);
                     alreadyExists = true;
                 }
                 end_date.add(Calendar.DAY_OF_MONTH, 1);
@@ -449,13 +448,13 @@ public class Attendance extends Controller {
     }
 
     public Result deletePersonWeek(int person_id, String monday, Http.Request request) {
-        CachedPage.remove(CachedPage.ATTENDANCE_INDEX, Organization.getByHost(request));
+        CachedPage.remove(CachedPage.ATTENDANCE_INDEX, Utils.getOrg(request));
 
         Calendar start_date = Utils.parseDateOrNow(monday);
         Calendar end_date = (Calendar)start_date.clone();
         end_date.add(Calendar.DAY_OF_MONTH, 5);
 
-        Person p = Person.findById(person_id, Organization.getByHost(request));
+        Person p = Person.findById(person_id, Utils.getOrg(request));
 
         List<AttendanceDay> days = AttendanceDay.find.query().where()
             .eq("person", p)
@@ -480,7 +479,7 @@ public class Attendance extends Controller {
     }
 
     public Result download(String start_date_str, Http.Request request) throws IOException {
-        Date start_date = Application.getStartOfYear();
+        Date start_date = ModelUtils.getStartOfYear();
         if (!start_date_str.equals("")) {
             start_date = Utils.parseDateOrNow(start_date_str).getTime();
         }
@@ -499,7 +498,7 @@ public class Attendance extends Controller {
         writer.write("Extra hours");
         writer.endRecord();
 
-        final Organization org = Organization.getByHost(request);
+        final Organization org = Utils.getOrg(request);
         List<AttendanceDay> days =
             AttendanceDay.find.query().where()
                 .eq("person.organization", org)
@@ -507,7 +506,7 @@ public class Attendance extends Controller {
                 .le("day", end_date)
                 .findList();
 
-        final OrgConfig orgConfig = OrgConfig.get(org);
+        final OrgConfig orgConfig = Utils.getOrgConfig(org);
         for (AttendanceDay day : days) {
             writer.write(day.person.first_name + " " + day.person.last_name);
             writer.write(Application.yymmddDate(orgConfig, day.day));
@@ -654,7 +653,7 @@ public class Attendance extends Controller {
     }
 
     public Result saveWeek(Integer week_id, Double extra_hours, Http.Request request) {
-        CachedPage.remove(CachedPage.ATTENDANCE_INDEX, Organization.getByHost(request));
+        CachedPage.remove(CachedPage.ATTENDANCE_INDEX, Utils.getOrg(request));
 
         AttendanceWeek.find.byId(week_id).edit(extra_hours);
         return ok();
@@ -662,7 +661,7 @@ public class Attendance extends Controller {
 
     public Result saveDay(Integer day_id, String code,
                           String start_time, String end_time, Http.Request request) throws Exception {
-        CachedPage.remove(CachedPage.ATTENDANCE_INDEX, Organization.getByHost(request));
+        CachedPage.remove(CachedPage.ATTENDANCE_INDEX, Utils.getOrg(request));
 
         AttendanceDay.find.byId(day_id).edit(code, start_time, end_time);
         return ok();
@@ -761,7 +760,7 @@ public class Attendance extends Controller {
         Map<String, Object> scopes = new HashMap<>();
         Config conf = Public.sConfig.getConfig("school_crm");
         scopes.put("custodiaUrl", conf.getString("custodia_url"));
-        scopes.put("custodiaUsername", Organization.getByHost(request).short_name + "-admin");
+        scopes.put("custodiaUsername", Utils.getOrg(request).short_name + "-admin");
         scopes.put("custodiaPassword", conf.getString("custodia_password"));
         return ok(main_with_mustache.render("Sign in system",
                 "custodia",
@@ -772,8 +771,8 @@ public class Attendance extends Controller {
 
     public Result offCampusTime(Http.Request request) {
         List<AttendanceDay> events = AttendanceDay.find.query().where()
-            .eq("person.organization", Organization.getByHost(request))
-            .gt("day", Application.getStartOfYear())
+            .eq("person.organization", Utils.getOrg(request))
+            .gt("day", ModelUtils.getStartOfYear())
             .ne("off_campus_departure_time", null)
             .order("day ASC")
             .findList();
@@ -787,7 +786,7 @@ public class Attendance extends Controller {
         for (Map.Entry<String, String> entry : data.entrySet()) {
             if (entry.getKey().isEmpty()) continue;
             Integer attendance_day_id = Integer.parseInt(entry.getKey());
-            AttendanceDay attendance_day = AttendanceDay.findById(attendance_day_id, Organization.getByHost(request));
+            AttendanceDay attendance_day = AttendanceDay.findById(attendance_day_id, Utils.getOrg(request));
             attendance_day.off_campus_departure_time = null;
             attendance_day.off_campus_return_time = null;
             attendance_day.update();
@@ -799,7 +798,7 @@ public class Attendance extends Controller {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         Date today = Calendar.getInstance().getTime();
         String current_date = df.format(today);
-        String people_json = Application.attendancePeopleJson(Organization.getByHost(request));
+        String people_json = Application.attendancePeopleJson(Utils.getOrg(request));
         return ok(attendance_add_off_campus.render(current_date, people_json, request, mMessagesApi.preferred(request)));
     }
 
@@ -817,7 +816,7 @@ public class Attendance extends Controller {
                 Integer minutes_exempted = AttendanceDay.parseInt(data.get("minutesexempted-" + i));
 
                 if (day != null && departure_time != null && return_time != null) {
-                    AttendanceDay attendance_day = AttendanceDay.findCurrentDay(day, person_id, Organization.getByHost(request));
+                    AttendanceDay attendance_day = AttendanceDay.findCurrentDay(day, person_id, Utils.getOrg(request));
                     attendance_day.off_campus_departure_time = departure_time;
                     attendance_day.off_campus_return_time = return_time;
                     attendance_day.off_campus_minutes_exempted = minutes_exempted;
@@ -840,12 +839,12 @@ public class Attendance extends Controller {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
             return badRequest(attendance_reports.render(new AttendanceReport(), request, mMessagesApi.preferred(request)));
         }
-        AttendanceReport report = AttendanceReport.createFromForm(filledForm, Organization.getByHost(request));
+        AttendanceReport report = AttendanceReport.createFromForm(filledForm, Utils.getOrg(request));
         return ok(attendance_reports.render(report, request, mMessagesApi.preferred(request)));
     }
 
     public Result assignPINs(Http.Request request) {
-        Organization org = Organization.getByHost(request);
+        Organization org = Utils.getOrg(request);
         List<Person> people = Application.attendancePeople(org);
         people.sort(Person.SORT_DISPLAY_NAME);
         // add admin PIN
@@ -858,7 +857,7 @@ public class Attendance extends Controller {
     }
 
     public Result savePINs(Http.Request request) {
-        List<Person> people = Application.attendancePeople(Organization.getByHost(request));
+        List<Person> people = Application.attendancePeople(Utils.getOrg(request));
         HashMap<Integer, Person> people_by_id = new HashMap<>();
         for (Person p : people) {
             people_by_id.put(p.person_id, p);
@@ -867,7 +866,7 @@ public class Attendance extends Controller {
         for (Map.Entry<String, String[]> entry : entries) {
             Integer person_id = Integer.parseInt(entry.getKey());
             if (person_id == -1) {
-                Organization.getByHost(request).setAttendanceAdminPIN(entry.getValue()[0]);
+                Utils.getOrg(request).setAttendanceAdminPIN(entry.getValue()[0]);
             }
             else {
                 Person person = people_by_id.get(person_id);
@@ -885,22 +884,22 @@ public class Attendance extends Controller {
     }
 
     public Result viewCodes(Http.Request request) {
-        return ok(attendance_codes.render(AttendanceCode.all(Organization.getByHost(request)),
+        return ok(attendance_codes.render(AttendanceCode.all(Utils.getOrg(request)),
             getCodeForm(), request, mMessagesApi.preferred(request)));
     }
 
     public Result newCode(Http.Request request) {
-        AttendanceCode ac = AttendanceCode.create(Organization.getByHost(request));
+        AttendanceCode ac = AttendanceCode.create(Utils.getOrg(request));
         Form<AttendanceCode> filled_form = getCodeForm().bindFromRequest(request);
         ac.edit(filled_form);
 
-        CachedPage.remove(CachedPage.ATTENDANCE_INDEX, Organization.getByHost(request));
+        CachedPage.remove(CachedPage.ATTENDANCE_INDEX, Utils.getOrg(request));
 
         return redirect(routes.Attendance.viewCodes());
     }
 
     public Result editCode(Integer code_id, Http.Request request) {
-        AttendanceCode ac = AttendanceCode.findById(code_id, Organization.getByHost(request));
+        AttendanceCode ac = AttendanceCode.findById(code_id, Utils.getOrg(request));
         Form<AttendanceCode> filled_form = getCodeForm().fill(ac);
         return ok(edit_attendance_code.render(filled_form, request, mMessagesApi.preferred(request)));
     }
@@ -908,10 +907,10 @@ public class Attendance extends Controller {
     public Result saveCode(Http.Request request) {
         Form<AttendanceCode> filled_form = getCodeForm().bindFromRequest(request);
         AttendanceCode ac = AttendanceCode.findById(
-            Integer.parseInt(filled_form.field("id").value().get()), Organization.getByHost(request));
+            Integer.parseInt(filled_form.field("id").value().get()), Utils.getOrg(request));
         ac.edit(filled_form);
 
-        CachedPage.remove(CachedPage.ATTENDANCE_INDEX, Organization.getByHost(request));
+        CachedPage.remove(CachedPage.ATTENDANCE_INDEX, Utils.getOrg(request));
 
         return redirect(routes.Attendance.viewCodes());
     }

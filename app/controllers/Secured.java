@@ -12,12 +12,11 @@ import java.lang.annotation.Target;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import javax.inject.Inject;
-import models.Organization;
+
 import models.User;
 import models.UserRole;
 import play.Logger;
 import play.mvc.*;
-import service.MyUserService;
 
 // Lifted from play.mvc.Security
 
@@ -93,7 +92,7 @@ public class Secured {
                     return username;
                 }
             } else if (u.active && u.hasRole(role) &&
-                       (u.organization == null || u.organization.equals(Organization.getByHost(request)))) {
+                       (u.organization == null || u.organization.equals(Utils.getOrg(request)))) {
                 // Allow access if this user belongs to this organization or is a
                 // multi-domain admin (null organization). Also, the user must
                 // have the required role.
@@ -115,12 +114,12 @@ public class Secured {
             }
 
             // If we don't have a logged-in user, try going by IP address.
-            if (allow_ip && Organization.getByHost(request) != null) {
+            if (allow_ip && Utils.getOrg(request) != null) {
                 String sql = "select ip from allowed_ips where ip like :ip and organization_id=:org_id";
                 SqlQuery sqlQuery = DB.sqlQuery(sql);
                 String address = Application.getRemoteIp(request);
                 sqlQuery.setParameter("ip", address);
-                sqlQuery.setParameter("org_id", Organization.getByHost(request).id);
+                sqlQuery.setParameter("org_id", Utils.getOrg(request).id);
 
                 // execute the query returning a List of MapBean objects
                 SqlRow result = sqlQuery.findOne();
@@ -138,7 +137,7 @@ public class Secured {
             if (u != null) {
                 User the_user = User.findByAuthUserIdentity(u);
                 if (the_user != null) {
-                    if (the_user.name.equals(MyUserService.DUMMY_USERNAME)) {
+                    if (the_user.name.equals(User.DUMMY_USERNAME)) {
                         return ok(
                             "You logged in with Facebook or Google, but Evan hasn't made a" +
                             " DemSchoolTools account for you yet. Please contact him for help:" +

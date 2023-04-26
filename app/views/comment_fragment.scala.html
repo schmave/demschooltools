@@ -18,5 +18,5 @@
 	<a href="@routes.CRM.viewTaskList(ct.task.task_list.id)"><span class="label label-primary">@ct.task.title</span></a>
 }
 </div>
-<div class="comment_time">@CRM.formatDate(c.created, OrgConfig.get(request))</div>
+<div class="comment_time">@CRM.formatDate(c.created, Utils.getOrgConfig(request))</div>
 </div>

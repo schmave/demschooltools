@@ -1,14 +1,7 @@
 package models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import controllers.Public;
-import controllers.Utils;
 import io.ebean.*;
-import play.Logger;
-import play.mvc.Http;
-
-import javax.annotation.Nonnull;
-import javax.persistence.*;
 import java.math.BigDecimal;
 import java.sql.Time;
 import java.text.DateFormat;
@@ -16,7 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import javax.persistence.*;
 
 @Entity
 public class Organization extends Model {
@@ -66,41 +59,9 @@ public class Organization extends Model {
     @JsonIgnore
     public List<NotificationRule> notification_rules;
 
-    static Logger.ALogger sLogger = Logger.of("application");
-
     public static Finder<Integer, Organization> find = new Finder<>(
             Organization.class
     );
-
-    public static @Nonnull Organization getByHost(Http.Request request) {
-        String host = request.host();
-
-        String cache_key = "Organization::getByHost::" + host;
-
-        Optional<Organization> cached_val = Public.sCache.get(cache_key);
-        if (cached_val.isPresent()) {
-            return cached_val.get();
-        }
-
-        String sql = "select organization_id from organization_hosts where host like :host";
-        SqlQuery sqlQuery = DB.sqlQuery(sql);
-        sqlQuery.setParameter("host", host);
-
-        // execute the query returning a List of MapBean objects
-        SqlRow result = sqlQuery.findOne();
-
-        if (result != null) {
-            Organization org_result = find.byId(result.getInteger("organization_id"));
-            Public.sCache.set(cache_key, org_result, 60); // cache for 1 minute
-            return org_result;
-        } else {
-			if (host.matches("[a-z]")) {
-                sLogger.error("Unknown organization for host: " + host);
-			}
-        }
-
-        return null;
-    }
 
     public void setMailChimpApiKey(String key) {
         this.mailchimp_api_key = key;
@@ -149,7 +110,7 @@ public class Organization extends Model {
         }
         if (values.containsKey("case_reference_settings")) {
             if (values.containsKey("enable_case_references")) {
-                this.enable_case_references = Utils.getBooleanFromFormValue(values.get("enable_case_references")[0]);
+                this.enable_case_references = ModelUtils.getBooleanFromFormValue(values.get("enable_case_references")[0]);
             } else {
                 this.enable_case_references = false;
             }
@@ -165,54 +126,54 @@ public class Organization extends Model {
         }
         if (values.containsKey("manual_settings")) {
             if (values.containsKey("show_last_modified_in_print")) {
-                this.show_last_modified_in_print = Utils.getBooleanFromFormValue(values.get("show_last_modified_in_print")[0]);
+                this.show_last_modified_in_print = ModelUtils.getBooleanFromFormValue(values.get("show_last_modified_in_print")[0]);
             } else {
                 this.show_last_modified_in_print = false;
             }
             if (values.containsKey("show_history_in_print")) {
-                this.show_history_in_print = Utils.getBooleanFromFormValue(values.get("show_history_in_print")[0]);
+                this.show_history_in_print = ModelUtils.getBooleanFromFormValue(values.get("show_history_in_print")[0]);
             } else {
                 this.show_history_in_print = false;
             }
         }
         if (values.containsKey("attendance_settings")) {
             if (values.containsKey("show_attendance")) {
-                this.show_attendance = Utils.getBooleanFromFormValue(values.get("show_attendance")[0]);
+                this.show_attendance = ModelUtils.getBooleanFromFormValue(values.get("show_attendance")[0]);
             } else {
                 this.show_attendance = false;
             }
             if (values.containsKey("show_electronic_signin")) {
-                this.show_electronic_signin = Utils.getBooleanFromFormValue(values.get("show_electronic_signin")[0]);
+                this.show_electronic_signin = ModelUtils.getBooleanFromFormValue(values.get("show_electronic_signin")[0]);
             } else {
                 this.show_electronic_signin = false;
             }
             if (values.containsKey("attendance_enable_off_campus")) {
-                this.attendance_enable_off_campus = Utils.getBooleanFromFormValue(values.get("attendance_enable_off_campus")[0]);
+                this.attendance_enable_off_campus = ModelUtils.getBooleanFromFormValue(values.get("attendance_enable_off_campus")[0]);
             } else {
                 this.attendance_enable_off_campus = false;
             }
             if (values.containsKey("attendance_show_reports")) {
-                this.attendance_show_reports = Utils.getBooleanFromFormValue(values.get("attendance_show_reports")[0]);
+                this.attendance_show_reports = ModelUtils.getBooleanFromFormValue(values.get("attendance_show_reports")[0]);
             } else {
                 this.attendance_show_reports = false;
             }
             if (values.containsKey("attendance_show_percent")) {
-                this.attendance_show_percent = Utils.getBooleanFromFormValue(values.get("attendance_show_percent")[0]);
+                this.attendance_show_percent = ModelUtils.getBooleanFromFormValue(values.get("attendance_show_percent")[0]);
             } else {
                 this.attendance_show_percent = false;
             }
             if (values.containsKey("attendance_show_weighted_percent")) {
-                this.attendance_show_weighted_percent = Utils.getBooleanFromFormValue(values.get("attendance_show_weighted_percent")[0]);
+                this.attendance_show_weighted_percent = ModelUtils.getBooleanFromFormValue(values.get("attendance_show_weighted_percent")[0]);
             } else {
                 this.attendance_show_weighted_percent = false;
             }
             if (values.containsKey("attendance_enable_partial_days")) {
-                this.attendance_enable_partial_days = Utils.getBooleanFromFormValue(values.get("attendance_enable_partial_days")[0]);
+                this.attendance_enable_partial_days = ModelUtils.getBooleanFromFormValue(values.get("attendance_enable_partial_days")[0]);
             } else {
                 this.attendance_enable_partial_days = false;
             }
             if (values.containsKey("show_custodia")) {
-                this.show_custodia = Utils.getBooleanFromFormValue(values.get("show_custodia")[0]);
+                this.show_custodia = ModelUtils.getBooleanFromFormValue(values.get("show_custodia")[0]);
             } else {
                 this.show_custodia = false;
             }
@@ -249,7 +210,7 @@ public class Organization extends Model {
         }
         if (values.containsKey("accounting_settings")) {
             if (values.containsKey("show_accounting")) {
-                this.show_accounting = Utils.getBooleanFromFormValue(values.get("show_accounting")[0]);
+                this.show_accounting = ModelUtils.getBooleanFromFormValue(values.get("show_accounting")[0]);
                 if (this.show_accounting) {
                     Account.createPersonalAccounts(org);
                 }

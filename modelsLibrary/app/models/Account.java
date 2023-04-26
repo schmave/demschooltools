@@ -10,7 +10,6 @@ import io.ebean.Query;
 import play.data.*;
 import io.ebean.*;
 
-import controllers.Utils;
 
 @Entity
 public class Account extends Model {
@@ -208,7 +207,7 @@ public class Account extends Model {
     }
 
     public void updateFromForm(Form<Account> form) {
-        is_active = Utils.getBooleanFromFormValue(form.field("is_active"));
+        is_active = ModelUtils.getBooleanFromFormValue(form.field("is_active"));
         name = form.field("name").value().get();
         type = AccountType.valueOf(form.field("type").value().get());
         monthly_credit = new BigDecimal(form.field("monthly_credit").value().get());

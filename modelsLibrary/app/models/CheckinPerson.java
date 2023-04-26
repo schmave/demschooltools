@@ -1,7 +1,6 @@
 package models;
 
 import java.text.SimpleDateFormat;
-import controllers.Attendance;
 
 public class CheckinPerson {
     
@@ -21,7 +20,7 @@ public class CheckinPerson {
         if (stats != null && show_weighted_percent) {
             double rate = stats.weightedAttendanceRate();
             if (!Double.isNaN(rate)) {
-                attendance_rate = Attendance.formatAsPercent(rate);
+                attendance_rate = ModelUtils.formatAsPercent(rate);
             }
         }
 

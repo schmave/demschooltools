@@ -1,7 +1,6 @@
 package models;
 
 import io.ebean.*;
-import controllers.Utils;
 import play.data.Form;
 
 import javax.persistence.*;
@@ -55,8 +54,8 @@ public class AttendanceCode extends Model {
         description = form.field("description").value().get();
         code = form.field("code").value().get();
         color = form.field("color").value().get();
-        counts_toward_attendance = Utils.getBooleanFromFormValue(form.field("counts_toward_attendance"));
-        not_counted = Utils.getBooleanFromFormValue(form.field("not_counted"));
+        counts_toward_attendance = ModelUtils.getBooleanFromFormValue(form.field("counts_toward_attendance"));
+        not_counted = ModelUtils.getBooleanFromFormValue(form.field("not_counted"));
 
         this.update();
     }

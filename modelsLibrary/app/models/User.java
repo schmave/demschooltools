@@ -1,21 +1,19 @@
 package models;
 
-import io.ebean.Ebean;
-import io.ebean.ExpressionList;
-import io.ebean.*;
 import com.feth.play.module.pa.user.AuthUser;
 import com.feth.play.module.pa.user.AuthUserIdentity;
-import service.MyUserService;
-
-import javax.persistence.*;
+import io.ebean.*;
+import io.ebean.ExpressionList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "users")
 public class User extends Model {
+	public final static String DUMMY_USERNAME = "__DUMMY_USERNAME__";
 	private static final long serialVersionUID = 1L;
 
     @ManyToOne()
@@ -61,7 +59,7 @@ public class User extends Model {
     }
 
     public boolean hasRole(String role) {
-    	if (this.name.equals(MyUserService.DUMMY_USERNAME)) {
+    	if (this.name.equals(DUMMY_USERNAME)) {
     		return false;
     	}
         for (UserRole r : roles) {

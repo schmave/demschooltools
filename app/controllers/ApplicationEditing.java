@@ -1,7 +1,6 @@
 package controllers;
 
 import io.ebean.DB;
-import io.ebean.Ebean;
 import io.ebean.SqlUpdate;
 import models.*;
 import play.api.libs.mailer.MailerClient;
@@ -47,11 +46,11 @@ public class ApplicationEditing extends Controller {
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
     public Result editTodaysMinutes(Http.Request request) {
         Meeting the_meeting = Meeting.find.query().where()
-            .eq("organization", Organization.getByHost(request))
+            .eq("organization", Utils.getOrg(request))
             .eq("date", new Date()).findOne();
         if (the_meeting == null) {
-            CachedPage.remove(CachedPage.JC_INDEX, Organization.getByHost(request));
-            the_meeting = Meeting.create(new Date(), Organization.getByHost(request));
+            CachedPage.remove(CachedPage.JC_INDEX, Utils.getOrg(request));
+            the_meeting = Meeting.create(new Date(), Utils.getOrg(request));
             the_meeting.save();
         }
         return editMinutes(the_meeting, request);
@@ -80,16 +79,16 @@ public class ApplicationEditing extends Controller {
         if (!authToEdit(meeting.date, request)) {
             return tooOldToEdit();
         }
-        meeting.prepareForEditing(Organization.getByHost(request));
+        meeting.prepareForEditing(Utils.getOrg(request));
 
-        return ok(edit_minutes.render(meeting, Case.getOpenCases(Organization.getByHost(request)), request, mMessagesApi.preferred(request)))
+        return ok(edit_minutes.render(meeting, Case.getOpenCases(Utils.getOrg(request)), request, mMessagesApi.preferred(request)))
                 .withHeader("Cache-Control", "max-age=0, no-cache, no-store")
                 .withHeader("Pragma", "no-cache");
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
     public Result editMeeting(int meeting_id, Http.Request request) {
-        Meeting the_meeting = Meeting.findById(meeting_id, Organization.getByHost(request));
+        Meeting the_meeting = Meeting.findById(meeting_id, Utils.getOrg(request));
         return editMinutes(the_meeting, request);
     }
 
@@ -100,14 +99,14 @@ public class ApplicationEditing extends Controller {
     // the second case is persisted because of a violated unique constraint.
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
     public synchronized Result createCase(Integer meeting_id, Http.Request request) {
-        Organization org = Organization.getByHost(request);
+        Organization org = Utils.getOrg(request);
         Meeting m = Meeting.findById(meeting_id, org);
 
         String next_num = "" + (m.cases.size() + 1);
         if (next_num.length() == 1) {
             next_num = "0" + next_num;
         }
-        String case_num = OrgConfig.get(org).getCaseNumberPrefix(m) + next_num;
+        String case_num = Utils.getOrgConfig(org).getCaseNumberPrefix(m) + next_num;
 
         Case new_case = Case.create(case_num, m);
         return ok("[" + new_case.id + ", \"" + new_case.case_number + "\"]");
@@ -115,8 +114,8 @@ public class ApplicationEditing extends Controller {
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
     public Result continueCase(Integer meeting_id, Integer case_id, Http.Request request) {
-        Meeting m = Meeting.findById(meeting_id, Organization.getByHost(request));
-        Case c = Case.findById(case_id, Organization.getByHost(request));
+        Meeting m = Meeting.findById(meeting_id, Utils.getOrg(request));
+        Case c = Case.findById(case_id, Utils.getOrg(request));
 
         if (m == null || c == null || c.date_closed != null || c.meeting == m) {
             System.out.println("Error in continueCase -- illegal access");
@@ -129,8 +128,8 @@ public class ApplicationEditing extends Controller {
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
     public Result saveCase(Integer id, Http.Request request) {
-        CachedPage.remove(CachedPage.JC_INDEX, Organization.getByHost(request));
-        Case c = Case.findById(id, Organization.getByHost(request));
+        CachedPage.remove(CachedPage.JC_INDEX, Utils.getOrg(request));
+        Case c = Case.findById(id, Utils.getOrg(request));
 
         c.edit(request.body().asFormUrlEncoded());
         c.save();
@@ -166,7 +165,7 @@ public class ApplicationEditing extends Controller {
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
     public Result addPersonAtCase(Integer case_id, Integer person_id, Integer role, Http.Request request)
     {
-        CachedPage.remove(CachedPage.JC_INDEX, Organization.getByHost(request));
+        CachedPage.remove(CachedPage.JC_INDEX, Utils.getOrg(request));
         PersonAtCase.create(Case.find.ref(case_id), Person.find.ref(person_id), role);
         return ok();
     }
@@ -188,43 +187,43 @@ public class ApplicationEditing extends Controller {
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
     public Result addReferencedCase(Integer case_id, Integer referenced_case_id, Http.Request request)
     {
-        Case referencing_case = Case.findById(case_id, Organization.getByHost(request));
-        Case referenced_case = Case.findById(referenced_case_id, Organization.getByHost(request));
+        Case referencing_case = Case.findById(case_id, Utils.getOrg(request));
+        Case referenced_case = Case.findById(referenced_case_id, Utils.getOrg(request));
         referencing_case.addReferencedCase(referenced_case);
-        return ok(Utils.toJson(CaseReference.create(referencing_case, Organization.getByHost(request))));
+        return ok(Utils.toJson(CaseReference.create(referencing_case, Utils.getOrg(request))));
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
     public Result removeReferencedCase(Integer case_id, Integer referenced_case_id, Http.Request request)
     {
-        Case referencing_case = Case.findById(case_id, Organization.getByHost(request));
-        Case referenced_case = Case.findById(referenced_case_id, Organization.getByHost(request));
+        Case referencing_case = Case.findById(case_id, Utils.getOrg(request));
+        Case referenced_case = Case.findById(referenced_case_id, Utils.getOrg(request));
         referencing_case.removeReferencedCase(referenced_case);
-        return ok(Utils.toJson(CaseReference.create(referencing_case, Organization.getByHost(request))));
+        return ok(Utils.toJson(CaseReference.create(referencing_case, Utils.getOrg(request))));
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
     public Result clearAllReferencedCases(Integer case_id, Http.Request request)
     {
-        Case referencing_case = Case.findById(case_id, Organization.getByHost(request));
+        Case referencing_case = Case.findById(case_id, Utils.getOrg(request));
         for (Case referenced_case : new ArrayList<>(referencing_case.referenced_cases)) {
             referencing_case.removeReferencedCase(referenced_case);
         }
-        return ok(Utils.toJson(CaseReference.create(referencing_case, Organization.getByHost(request))));
+        return ok(Utils.toJson(CaseReference.create(referencing_case, Utils.getOrg(request))));
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
     public Result getCaseReferencesJson(Integer case_id, Http.Request request)
     {
-        Case referencing_case = Case.findById(case_id, Organization.getByHost(request));
-        return ok(Utils.toJson(CaseReference.create(referencing_case, Organization.getByHost(request))));
+        Case referencing_case = Case.findById(case_id, Utils.getOrg(request));
+        return ok(Utils.toJson(CaseReference.create(referencing_case, Utils.getOrg(request))));
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
     public Result addChargeReferenceToCase(Integer case_id, Integer charge_id, Http.Request request)
     {
-        Case referencing_case = Case.findById(case_id, Organization.getByHost(request));
-        Charge charge = Charge.findById(charge_id, Organization.getByHost(request));
+        Case referencing_case = Case.findById(case_id, Utils.getOrg(request));
+        Charge charge = Charge.findById(charge_id, Utils.getOrg(request));
         if (!referencing_case.referenced_charges.contains(charge)) {
             referencing_case.referenced_charges.add(charge);
             referencing_case.save();
@@ -235,8 +234,8 @@ public class ApplicationEditing extends Controller {
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
     public Result removeChargeReferenceFromCase(Integer case_id, Integer charge_id, Http.Request request)
     {
-        Case referencing_case = Case.findById(case_id, Organization.getByHost(request));
-        Charge charge = Charge.findById(charge_id, Organization.getByHost(request));
+        Case referencing_case = Case.findById(case_id, Utils.getOrg(request));
+        Charge charge = Charge.findById(charge_id, Utils.getOrg(request));
         referencing_case.referenced_charges.remove(charge);
         referencing_case.save();
         return ok();
@@ -252,14 +251,14 @@ public class ApplicationEditing extends Controller {
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
     public Result generateChargeFromReference(Integer case_id, Integer referenced_charge_id, Http.Request request)
     {
-        Charge charge = Charge.generateFromReference(Case.find.ref(case_id), Charge.find.ref(referenced_charge_id), Organization.getByHost(request));
+        Charge charge = Charge.generateFromReference(Case.find.ref(case_id), Charge.find.ref(referenced_charge_id), Utils.getOrg(request));
         return ok(Utils.toJson(charge));
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
     public Result saveCharge(int id, Http.Request request) {
-        CachedPage.remove(CachedPage.JC_INDEX, Organization.getByHost(request));
-        Organization org = Organization.getByHost(request);
+        CachedPage.remove(CachedPage.JC_INDEX, Utils.getOrg(request));
+        Organization org = Utils.getOrg(request);
         Charge c = Charge.findById(id, org);
 
         if (c == null) {
@@ -271,7 +270,7 @@ public class ApplicationEditing extends Controller {
         if (!was_referred_to_sm && c.referred_to_sm &&
                 !sAlreadyEmailedCharges.contains(c.id) &&
                 !NotificationRule.findByType(NotificationRule.TYPE_SCHOOL_MEETING, org).isEmpty()) {
-            final OrgConfig org_config = OrgConfig.get(org);
+            final OrgConfig org_config = Utils.getOrgConfig(org);
             sExecutor.submit(() -> {
                 try {
                     Thread.sleep(1000 * 60 * 5);
@@ -309,7 +308,7 @@ public class ApplicationEditing extends Controller {
 
     @Secured.Auth(UserRole.ROLE_EDIT_RESOLUTION_PLANS)
     public Result setResolutionPlanComplete(Integer chargeId, Boolean complete, Http.Request request) {
-        Charge c = Charge.findById(chargeId, Organization.getByHost(request));
+        Charge c = Charge.findById(chargeId, Utils.getOrg(request));
         c.setRPComplete(complete);
 
         return ok();
@@ -317,7 +316,7 @@ public class ApplicationEditing extends Controller {
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
     public Result removeCharge(int id, Http.Request request) {
-        Charge c = Charge.findById(id, Organization.getByHost(request));
+        Charge c = Charge.findById(id, Utils.getOrg(request));
         if (c == null) {
             return notFound();
         }
@@ -329,12 +328,12 @@ public class ApplicationEditing extends Controller {
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
     public Result enterSchoolMeetingDecisions(Http.Request request) {
         return ok(enter_sm_decisions.render(Application.getActiveSchoolMeetingReferrals(
-                Organization.getByHost(request)), request, mMessagesApi.preferred(request)));
+                Utils.getOrg(request)), request, mMessagesApi.preferred(request)));
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
     public Result editSchoolMeetingDecision(Integer charge_id, Http.Request request) {
-        Charge c = Charge.findById(charge_id, Organization.getByHost(request));
+        Charge c = Charge.findById(charge_id, Utils.getOrg(request));
 
         if (!authToEdit(c.sm_decision_date, request)) {
             return tooOldToEdit();
@@ -345,14 +344,14 @@ public class ApplicationEditing extends Controller {
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
     public Result saveSchoolMeetingDecisions(Http.Request request) {
-        CachedPage.remove(CachedPage.JC_INDEX, Organization.getByHost(request));
+        CachedPage.remove(CachedPage.JC_INDEX, Utils.getOrg(request));
         Map<String, String[]> form_data = request.body().asFormUrlEncoded();
 
         int charge_id = Integer.parseInt(form_data.get("charge_id")[0]);
         String decision = form_data.get("sm_decision")[0];
         Date date = Application.getDateFromString(form_data.get("date")[0]);
 
-        Charge c = Charge.findById(charge_id, Organization.getByHost(request));
+        Charge c = Charge.findById(charge_id, Utils.getOrg(request));
         c.updateSchoolMeetingDecision(decision, date);
         c.save();
 
@@ -378,7 +377,7 @@ public class ApplicationEditing extends Controller {
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
     public Result editChapter(Integer id, Http.Request request) {
-        Form<Chapter> filled_form = mFormFactory.form(Chapter.class).fill(Chapter.findById(id, Organization.getByHost(request)));
+        Form<Chapter> filled_form = mFormFactory.form(Chapter.class).fill(Chapter.findById(id, Utils.getOrg(request)));
         return ok(edit_chapter.render(filled_form, false, request, mMessagesApi.preferred(request)));
     }
 
@@ -388,13 +387,13 @@ public class ApplicationEditing extends Controller {
 
         Chapter c;
         if (form.field("id").value().isPresent()) {
-            c = Chapter.findById(Integer.parseInt(form.field("id").value().get()), Organization.getByHost(request));
+            c = Chapter.findById(Integer.parseInt(form.field("id").value().get()), Utils.getOrg(request));
             c.updateFromForm(form);
         } else {
-            c = Chapter.create(form, Organization.getByHost(request));
+            c = Chapter.create(form, Utils.getOrg(request));
         }
 
-        onManualChange(Organization.getByHost(request));
+        onManualChange(Utils.getOrg(request));
         return redirect(routes.Application.viewChapter(c.id));
     }
 
@@ -402,16 +401,16 @@ public class ApplicationEditing extends Controller {
     public Result addSection(Integer chapterId, Http.Request request) {
         Form<Section> form = mFormFactory.form(Section.class);
         Section section = new Section();
-        section.chapter = Chapter.findById(chapterId, Organization.getByHost(request));
+        section.chapter = Chapter.findById(chapterId, Utils.getOrg(request));
         form = form.fill(section);
-        return ok(edit_section.render(form, Chapter.findById(chapterId, Organization.getByHost(request)), true, Chapter.all(Organization.getByHost(request)), request, mMessagesApi.preferred(request)));
+        return ok(edit_section.render(form, Chapter.findById(chapterId, Utils.getOrg(request)), true, Chapter.all(Utils.getOrg(request)), request, mMessagesApi.preferred(request)));
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
     public Result editSection(Integer id, Http.Request request) {
-        Section existing_section = Section.findById(id, Organization.getByHost(request));
+        Section existing_section = Section.findById(id, Utils.getOrg(request));
         Form<Section> filled_form = mFormFactory.form(Section.class).fill(existing_section);
-        return ok(edit_section.render(filled_form, existing_section.chapter, false, Chapter.all(Organization.getByHost(request)), request, mMessagesApi.preferred(request)));
+        return ok(edit_section.render(filled_form, existing_section.chapter, false, Chapter.all(Utils.getOrg(request)), request, mMessagesApi.preferred(request)));
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
@@ -420,13 +419,13 @@ public class ApplicationEditing extends Controller {
 
         Section s;
         if (form.field("id").value().isPresent()) {
-            s = Section.findById(Integer.parseInt(form.field("id").value().get()), Organization.getByHost(request));
+            s = Section.findById(Integer.parseInt(form.field("id").value().get()), Utils.getOrg(request));
             s.updateFromForm(form);
         } else {
             s = Section.create(form);
         }
 
-        onManualChange(Organization.getByHost(request));
+        onManualChange(Utils.getOrg(request));
         return redirect(routes.Application.viewChapter(s.chapter.id).url() + "#section_" + s.id);
     }
 
@@ -434,16 +433,16 @@ public class ApplicationEditing extends Controller {
     public Result addEntry(Integer sectionId, Http.Request request) {
         Form<Entry> form = mFormFactory.form(Entry.class);
         Entry entry = new Entry();
-        entry.section = Section.findById(sectionId, Organization.getByHost(request));
+        entry.section = Section.findById(sectionId, Utils.getOrg(request));
         form = form.fill(entry);
-        return ok(edit_entry.render(form, Section.findById(sectionId, Organization.getByHost(request)), true, Chapter.all(Organization.getByHost(request)), request, mMessagesApi.preferred(request)));
+        return ok(edit_entry.render(form, Section.findById(sectionId, Utils.getOrg(request)), true, Chapter.all(Utils.getOrg(request)), request, mMessagesApi.preferred(request)));
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
     public Result editEntry(Integer id, Http.Request request) {
-        Entry e = Entry.findById(id, Organization.getByHost(request));
+        Entry e = Entry.findById(id, Utils.getOrg(request));
         Form<Entry> filled_form = mFormFactory.form(Entry.class).fill(e);
-        return ok(edit_entry.render(filled_form, e.section, false, Chapter.all(Organization.getByHost(request)), request, mMessagesApi.preferred(request)));
+        return ok(edit_entry.render(filled_form, e.section, false, Chapter.all(Utils.getOrg(request)), request, mMessagesApi.preferred(request)));
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
@@ -452,13 +451,13 @@ public class ApplicationEditing extends Controller {
 
         Entry e;
         if (form.field("id").value().isPresent()) {
-            e = Entry.findById(Integer.parseInt(form.field("id").value().get()), Organization.getByHost(request));
+            e = Entry.findById(Integer.parseInt(form.field("id").value().get()), Utils.getOrg(request));
             e.updateFromForm(form);
         } else {
             e = Entry.create(form);
         }
 
-        onManualChange(Organization.getByHost(request));
+        onManualChange(Utils.getOrg(request));
         return redirect(routes.Application.viewChapter(e.section.chapter.id).url() + "#entry_" + e.id);
     }
 

@@ -43,23 +43,23 @@
             <li @if(menu.equals("crm")) { class="active" }>
                 <a href="@routes.CRM.recentComments()">People</a>
             </li>
-            @if(OrgConfig.get(request).org.show_attendance) {
+            @if(Utils.getOrgConfig(request).org.show_attendance) {
                 <li @if(menu.equals("attendance")) { class="active" }>
                     <a href="@routes.Attendance.index()">Attendance</a>
                 </li>
             }
-            @if(OrgConfig.get(request).org.show_custodia) {
+            @if(Utils.getOrgConfig(request).org.show_custodia) {
                 <li @if(menu.equals("custodia")) { class="active" }>
                     <a href="@routes.Attendance.viewCustodiaAdmin()">Custodia</a>
                 </li>
             }
             <li @if(menu.equals("jc")) { class="active" }>
-                <a href="@routes.Application.index()">@OrgConfig.get(request).str_jc_name_short</a>
+                <a href="@routes.Application.index()">@Utils.getOrgConfig(request).str_jc_name_short</a>
             </li>
             <li @if(menu.equals("manual")) { class="active" }>
-                <a href="@routes.Application.viewManual()">@OrgConfig.get(request).str_manual_title_short</a>
+                <a href="@routes.Application.viewManual()">@Utils.getOrgConfig(request).str_manual_title_short</a>
             </li>
-            @if(OrgConfig.get(request).org.show_accounting) {
+            @if(Utils.getOrgConfig(request).org.show_accounting) {
                 <li @if(menu.equals("accounting")) { class="active" }>
                     <a href="@routes.Accounting.balances()">Accounting</a>
                 </li>
@@ -67,7 +67,7 @@
             <li @if(menu.equals("settings")) { class="active" } class="dropdown">
                 <a href="@routes.Settings.viewSettings()">Settings</a>
             </li>
-            @if(OrgConfig.get(request).enable_file_sharing) {
+            @if(Utils.getOrgConfig(request).enable_file_sharing) {
                 <li @if(menu.equals("misc")) { class="active" } class="dropdown">
                     <a href="@routes.Application.viewFiles()">Misc</a>
                 </li>
@@ -97,7 +97,7 @@
                 All people</a>
             <span class="dropdown">
                 <ul class="dropdown-menu">
-                    @for( kv <- Tag.getWithPrefixes(OrgConfig.get(request).org) ) {
+                    @for( kv <- Tag.getWithPrefixes(Utils.getOrgConfig(request).org) ) {
                         @if( kv._2.size() > 1 ) {
                             <li class="dropdown-submenu">
                             <a tabindex="-1" href="#">@kv._1</a>
@@ -124,7 +124,7 @@
             </span>
             <span class="dropdown">
                 <ul class="dropdown-menu">
-                    @for( l <- TaskList.find.query().where().eq("organization", OrgConfig.get(request).org).findList() ) {
+                    @for( l <- TaskList.find.query().where().eq("organization", Utils.getOrgConfig(request).org).findList() ) {
                         <li><a href="@routes.CRM.viewTaskList(l.id)">@l.title</a></li>
                         }
                 </ul>
@@ -151,17 +151,17 @@
             </a><a @if(selectedBtn.equals("attendance_codes")) { class="active" }
                 href="@routes.Attendance.viewCodes()">Absence codes
             </a>
-            @if(OrgConfig.get(request).org.attendance_enable_off_campus) {
+            @if(Utils.getOrgConfig(request).org.attendance_enable_off_campus) {
                 <a @if(selectedBtn.equals("off_campus_time")) { class="active" }
                     href="@routes.Attendance.offCampusTime()">Off campus time
                 </a>
             }
-            @if(OrgConfig.get(request).org.attendance_show_reports) {
+            @if(Utils.getOrgConfig(request).org.attendance_show_reports) {
                 <a @if(selectedBtn.equals("reports")) { class="active" }
                     href="@routes.Attendance.reports()">Reports
                 </a>
             }
-            @if(OrgConfig.get(request).org.show_electronic_signin) {
+            @if(Utils.getOrgConfig(request).org.show_electronic_signin) {
                 <a @if(selectedBtn.equals("attendance_pins")) { class="active" }
                     href="@routes.Attendance.assignPINs()">Assign PINs
                 </a>
@@ -201,13 +201,13 @@
                 Edit today's minutes</a>
             <a @if(selectedBtn.equals("rps")) { class="active" }
                 href="@routes.Application.editResolutionPlanList()">
-                @OrgConfig.get(request).str_res_plans_cap</a>
+                @Utils.getOrgConfig(request).str_res_plans_cap</a>
             <a @if(selectedBtn.equals("weekly_report")) { class="active" }
                 href="@routes.Application.thisWeekReport()">Weekly Report</a>
             <a @if(selectedBtn.equals("view_referred")) { class="active" }
                 href="@routes.Application.viewSchoolMeetingReferrals()">
                 Charges referred to S.M.
-                @defining( Application.getActiveSchoolMeetingReferrals(OrgConfig.get(request).org) ) { sm_charges =>
+                @defining( Application.getActiveSchoolMeetingReferrals(Utils.getOrgConfig(request).org) ) { sm_charges =>
                     @if( sm_charges.size() > 0 ) {
                         <span class="badge">
                             @sm_charges.size()

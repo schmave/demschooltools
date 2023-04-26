@@ -2,6 +2,6 @@
 
 @import helper._
 
-@main(OrgConfig.get(request).str_jc_name_short + " minutes from " + Application.formatMeetingDate(m.date), "jc") {
+@main(Utils.getOrgConfig(request).str_jc_name_short + " minutes from " + Application.formatMeetingDate(m.date), "jc") {
     @meetingHelper(m)
 }

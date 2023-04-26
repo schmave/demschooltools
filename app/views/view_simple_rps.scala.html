@@ -5,9 +5,9 @@
 
 @import helper._
 
-@main("Print simple " + OrgConfig.get(request).str_res_plans, "jc", "rps") {
+@main("Print simple " + Utils.getOrgConfig(request).str_res_plans, "jc", "rps") {
 
-<h2>Active @OrgConfig.get(request).str_res_plans <span class="comment_time">as of @Application.formatDateTimeLong(OrgConfig.get(request))</span></h2>
+<h2>Active @Utils.getOrgConfig(request).str_res_plans <span class="comment_time">as of @Application.formatDateTimeLong(Utils.getOrgConfig(request))</span></h2>
 
 @for(key <- sorted_keys) {
     <h3>@key</h3>

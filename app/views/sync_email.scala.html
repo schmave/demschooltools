@@ -13,7 +13,7 @@
 The following people were added to the list:
 <ul>
 	@for( p <- info.list_changes.get(list_id).adds) {
-		<li><a href="@{OrgConfig.get(request).people_url}@routes.CRM.person(p.person_id)">
+		<li><a href="@{Utils.getOrgConfig(request).people_url}@routes.CRM.person(p.person_id)">
 		@p.first_name @p.last_name</a>
 	}
 </ul>
@@ -23,7 +23,7 @@ The following people were added to the list:
 The following people were removed from the list:
 <ul>
 	@for( p <- info.list_changes.get(list_id).removes) {
-		<li><a href="@{OrgConfig.get(request).people_url}@routes.CRM.person(p.person_id)">
+		<li><a href="@{Utils.getOrgConfig(request).people_url}@routes.CRM.person(p.person_id)">
 		@p.first_name @p.last_name</a>
 	}
 </ul>
@@ -33,7 +33,7 @@ The following people were removed from the list:
 The following people's email address was updated:
 <ul>
 	@for( p <- info.list_changes.get(list_id).updates) {
-		<li><a href="@{OrgConfig.get(request).people_url}@routes.CRM.person(p.person_id)">
+		<li><a href="@{Utils.getOrgConfig(request).people_url}@routes.CRM.person(p.person_id)">
 		@p.first_name @p.last_name</a>
 	}
 </ul>

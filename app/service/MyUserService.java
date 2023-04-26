@@ -5,6 +5,7 @@ import com.feth.play.module.pa.service.AbstractUserService;
 import com.feth.play.module.pa.user.AuthUser;
 import com.feth.play.module.pa.user.AuthUserIdentity;
 import com.feth.play.module.pa.user.EmailIdentity;
+import controllers.Utils;
 import models.LinkedAccount;
 import models.Organization;
 import models.User;
@@ -15,7 +16,6 @@ import javax.inject.Inject;
 
 public class MyUserService extends AbstractUserService {
 
-	public final static String DUMMY_USERNAME = "__DUMMY_USERNAME__";
 	static Logger.ALogger sLogger = Logger.of("application");
 
     @Inject
@@ -38,9 +38,9 @@ public class MyUserService extends AbstractUserService {
                     sLogger.debug("    found user by email");
                 } else {
                 	sLogger.debug("    creating new account");
-                	Organization org = Organization.getByHost(request);
+                	Organization org = Utils.getOrg(request);
                 	sLogger.error("New login from unknown user: " + identity.getEmail() + ", org: " + org.name);
-                	u = User.create(identity.getEmail(), DUMMY_USERNAME, org);
+                	u = User.create(identity.getEmail(), User.DUMMY_USERNAME, org);
                 }
                 u.linkedAccounts.add(LinkedAccount.create(authUser));
                 u.save();

@@ -11,7 +11,7 @@
 <table class="table" style="width: 400px">
 <thead><th>Name</th><th>Email</th>
 	@for( role <- UserRole.ALL_ROLES ) {
-		<th class="center">@UserRole.getDescription(OrgConfig.get(request), role)</th>
+		<th class="center">@UserRole.getDescription(Utils.getOrgConfig(request), role)</th>
 	}
 <th></th></thead>
 @for( u <- users ) { @if( u.active ) {
@@ -28,9 +28,9 @@
 }}
 </table>
 
-<p class=>Access at the "@UserRole.getDescription(OrgConfig.get(request), UserRole.ROLE_VIEW_JC)" level is available
+<p class=>Access at the "@UserRole.getDescription(Utils.getOrgConfig(request), UserRole.ROLE_VIEW_JC)" level is available
 for all traffic from a particular IP address. This can be used to give read-only
-access to @OrgConfig.get(request).str_jc_name_short records and the @OrgConfig.get(request).str_manual_title to anyone connecting
+access to @Utils.getOrgConfig(request).str_jc_name_short records and the @Utils.getOrgConfig(request).str_manual_title to anyone connecting
 through your school's internet connection. Enter an IP address to allow below to enable this feature.
 (To see your current IP address, visit <a href="http://whatismyipaddress.com/">whatismyipaddress.com</a>).</p>
 

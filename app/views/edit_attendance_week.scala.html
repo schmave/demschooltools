@@ -7,7 +7,7 @@
 
 @import helper._
 
-@main("Edit attendance for week of " + Application.yymmddDate(OrgConfig.get(request), monday), "attendance") {
+@main("Edit attendance for week of " + Application.yymmddDate(Utils.getOrgConfig(request), monday), "attendance") {
 
 <script type="text/javascript">
 app = {};
@@ -31,17 +31,17 @@ app.initial_data = {
 	app.initial_data.weeks[@week.person.person_id] = @Html(Utils.toJson(week));
 }
 
-config = @Html(Utils.toJson(OrgConfig.get(request)));
+config = @Html(Utils.toJson(Utils.getOrgConfig(request)));
 $(function() {
     initAttendanceWeek();
 });
 </script>
 
-<h3>Editing week of @Application.yymmddDate(OrgConfig.get(request), monday)</h3>
+<h3>Editing week of @Application.yymmddDate(Utils.getOrgConfig(request), monday)</h3>
 <form method="POST" action="@routes.Attendance.importFromCustodia()">
 
 <p><a class="btn btn-success" href="@routes.Attendance.viewWeek()?date=@Application.forDateInput(monday)">Done editing; return to viewing</a>
-@if( OrgConfig.get(request).org.show_custodia ) {
+@if( Utils.getOrgConfig(request).org.show_custodia ) {
   <input type="hidden" name="monday" value="@Application.forDateInput(monday)">
   <button class="btn btn-primary">Import from Custodia</button>
 }

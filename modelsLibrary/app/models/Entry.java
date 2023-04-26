@@ -1,18 +1,12 @@
 package models;
 
+import com.fasterxml.jackson.annotation.*;
+import io.ebean.*;
+import io.ebean.FetchConfig;
 import java.util.*;
-
 import javax.persistence.*;
 import javax.persistence.OrderBy;
-
-import com.fasterxml.jackson.annotation.*;
-
-import io.ebean.FetchConfig;
-
-import controllers.*;
-
 import play.data.*;
-import io.ebean.*;
 
 @Entity
 public class Entry extends Model implements Comparable<Entry> {
@@ -88,7 +82,7 @@ public class Entry extends Model implements Comparable<Entry> {
 
     @JsonIgnore
     public List<Charge> getThisYearCharges() {
-        Date beginning_of_year = Application.getStartOfYear();
+        Date beginning_of_year = ModelUtils.getStartOfYear();
 
         List<Charge> result = new ArrayList<>();
         for (Charge c : charges) {

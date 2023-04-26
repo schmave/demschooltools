@@ -2,7 +2,7 @@
 
 @import helper._
 
-@main(OrgConfig.get(request).str_jc_name_short + " " + OrgConfig.get(request).str_res_plans + " from " + Application.formatMeetingDate(m.date), "jc") {
+@main(Utils.getOrgConfig(request).str_jc_name_short + " " + Utils.getOrgConfig(request).str_res_plans + " from " + Application.formatMeetingDate(m.date), "jc") {
 
 <script>
 $(function() {

@@ -3,7 +3,6 @@ package models;
 import io.ebean.*;
 import io.ebean.annotation.Where;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import controllers.Utils;
 import play.data.Form;
 
 import javax.persistence.*;
@@ -49,7 +48,7 @@ public class Chapter extends Model {
     public void updateFromForm(Form<Chapter> form) {
         title = form.field("title").value().get();
         num = form.field("num").value().get();
-        deleted = Utils.getBooleanFromFormValue(form.field("deleted"));
+        deleted = ModelUtils.getBooleanFromFormValue(form.field("deleted"));
         save();
     }
 

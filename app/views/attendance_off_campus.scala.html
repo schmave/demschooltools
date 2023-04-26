@@ -23,7 +23,7 @@
 	@for( d <- days ) {
 		<tr>
 			<td><input type="checkbox" name="@d.id"></td>
-			<td>@Application.formatDateMdy(OrgConfig.get(request), d.day)</td>
+			<td>@Application.formatDateMdy(Utils.getOrgConfig(request), d.day)</td>
 			<td>@d.person.getDisplayName()</td>
 			<td>@Attendance.formatTime(d.off_campus_departure_time)</td>
 			<td>@Attendance.formatTime(d.off_campus_return_time)</td>

@@ -59,28 +59,6 @@ public class Public extends Controller {
             "please send an email with your request to schmave@gmail.com.");
     }
 
-	public Result postEmail() {
-		/*final java.util.Map<String, String[]> values = request().body().asFormUrlEncoded();
-
-		Email new_email = Email.create(values.get("email")[0]);
-		 new_email.parseMessage();
-
-		boolean autoSend = false;
-		Address[] rcpts = new_email.parsedMessage.getRecipients(Message.ReceipientType.TO);
-		for (Address a : rcpts) {
-			if (a.toString().contains("papal+parents@")) {
-				autoSend = true;
-			}
-		}
-
-		if (autoSend) {
-
-		}
-		*/
-
-        return ok();
-	}
-
     static void addPersonToList(MailChimpClient client, String api_key, String list_id, Person p) throws MailChimpException, IOException {
         SubscribeMethod method = new SubscribeMethod();
         method.apikey = api_key;
@@ -351,7 +329,7 @@ public class Public extends Controller {
 
     public Result index(Http.Request request)
     {
-		if (Organization.getByHost(request) == null) {
+		if (Utils.getOrg(request) == null) {
 			return unauthorized("Unknown organization");
 		}
         return ok(login.render(mPlayAuth,

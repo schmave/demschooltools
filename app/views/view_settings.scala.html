@@ -68,13 +68,13 @@ $(function () {
         $('#breaking-res-plan-entry-chooser'),
         false,
         2,
-        @Html(Application.jsonRules(true, OrgConfig.get(request).org)),
+        @Html(Application.jsonRules(true, Utils.getOrgConfig(request).org)),
         function(json) { return json.title; },
         null,
         null,
         function(id) { $('#breaking-res-plan-entry').val(id); },
         function() { $('#breaking-res-plan-entry').val(null); },
-        @Html(Application.jsonBreakingResPlanEntry(OrgConfig.get(request).org)));
+        @Html(Application.jsonBreakingResPlanEntry(Utils.getOrgConfig(request).org)));
 });
 </script>
 
@@ -106,7 +106,7 @@ the other way around.</p>
     </label>
 
     <p class="depends-on-electronic-signin">The <a target="_blank" href="@routes.Public.checkin()">electronic check-in app</a> username is
-        "@OrgConfig.get(request).org.short_name" (case-sensitive). To reset the password, enter a new one here:
+        "@Utils.getOrgConfig(request).org.short_name" (case-sensitive). To reset the password, enter a new one here:
         <br>
         <input type="text" size="30" placeholder="New password" name="electronic_signin_password" />
     </p>
@@ -202,7 +202,7 @@ the other way around.</p>
 </p>
 <div class="depends-on-custodia">
     <p>The Custodia <a target="_blank" href="@play_config.getString("custodia_url")">electronic sign-in sheet</a> username is
-        "@OrgConfig.get(request).org.short_name" (case-sensitive). To reset the password, enter a new one here:
+        "@Utils.getOrgConfig(request).org.short_name" (case-sensitive). To reset the password, enter a new one here:
         <br>
         <input type="text" size="30" placeholder="New password" name="custodia_student_password" />
     </p>
@@ -231,11 +231,11 @@ the "Current Student" and "Staff" tags). Accounts can be created manually for gr
 }
 
 <hr/>
-<h2>@OrgConfig.get(request).str_jc_name_short</h2>
+<h2>@Utils.getOrgConfig(request).str_jc_name_short</h2>
 <h4>Weekly Report</h4>
 @helper.form(routes.Settings.editSettings()) {
 
-    <p>The @OrgConfig.get(request).str_jc_name_short Weekly Report includes five full school days.</p>
+    <p>The @Utils.getOrgConfig(request).str_jc_name_short Weekly Report includes five full school days.</p>
     <p>Reset the report every <select name="jc_reset_day">
         <option value="1" @if(org.jc_reset_day == 1){selected}>Monday</option>
         <option value="2" @if(org.jc_reset_day == 2){selected}>Tuesday</option>
@@ -249,13 +249,13 @@ the "Current Student" and "Staff" tags). Accounts can be created manually for gr
 
     <h4>Case References</h4>
     <p class="instructions">
-        This feature allows you to reference a previous @OrgConfig.get(request).str_jc_name_short case when creating a
-        new case, for example if a @OrgConfig.get(request).str_res_plan was broken.
-        This makes it easier to retrieve information about previous cases and @OrgConfig.get(request).str_res_plans
-        when you need it. This feature really shines when you have a chain of broken @OrgConfig.get(request).str_res_plans,
+        This feature allows you to reference a previous @Utils.getOrgConfig(request).str_jc_name_short case when creating a
+        new case, for example if a @Utils.getOrgConfig(request).str_res_plan was broken.
+        This makes it easier to retrieve information about previous cases and @Utils.getOrgConfig(request).str_res_plans
+        when you need it. This feature really shines when you have a chain of broken @Utils.getOrgConfig(request).str_res_plans,
         as it enables you to see the full history of the issue without having to look anything up.
-        Additionally, it automatically replaces the original @OrgConfig.get(request).str_res_plan when
-        a new @OrgConfig.get(request).str_res_plan is created.
+        Additionally, it automatically replaces the original @Utils.getOrgConfig(request).str_res_plan when
+        a new @Utils.getOrgConfig(request).str_res_plan is created.
     </p>
     <p>
         <label>
@@ -264,38 +264,38 @@ the "Current Student" and "Staff" tags). Accounts can be created manually for gr
         </label>
     </p>
     <p>
-        Enter the rule that someone is charged with when they violate a @OrgConfig.get(request).str_res_plan:
+        Enter the rule that someone is charged with when they violate a @Utils.getOrgConfig(request).str_res_plan:
         <span id="breaking-res-plan-entry-chooser">
             <span class="results"></span>
             <input class="search" type="text">
         </span>
     </p>
     <p>
-        <input type="hidden" id="breaking-res-plan-entry" name="breaking_res_plan_entry_id" value="@Entry.findBreakingResPlanEntryId(OrgConfig.get(request).org)">
+        <input type="hidden" id="breaking-res-plan-entry" name="breaking_res_plan_entry_id" value="@Entry.findBreakingResPlanEntryId(Utils.getOrgConfig(request).org)">
         <input type="submit" value="Save case reference settings"/>
         <input type="hidden" name="case_reference_settings" value="true"/>
     </p>
 }
 
-<h4>Other @OrgConfig.get(request).str_jc_name_short options</h4>
-<p class="instructions">The following behaviors of the @OrgConfig.get(request).str_jc_name_short system can be changed easily by Evan, but not
+<h4>Other @Utils.getOrgConfig(request).str_jc_name_short options</h4>
+<p class="instructions">The following behaviors of the @Utils.getOrgConfig(request).str_jc_name_short system can be changed easily by Evan, but not
     yet directly by you. Please <a class="feedback_open">contact me</a> if you would like to change any of them.
 <ul>
     <li>The format of case numbers, e.g. 2017-03-02-11</li>
-    <li>Whether to include the @OrgConfig.get(request).str_findings in the list of @OrgConfig.get(request).str_res_plans</li>
+    <li>Whether to include the @Utils.getOrgConfig(request).str_findings in the list of @Utils.getOrgConfig(request).str_res_plans</li>
     <li>Whether to track and display who wrote up a particular complaint</li>
     <li>Whether to have the ability to refer charges to a destination of your choice (there's a text input next to
     each charge for this)</li>
     <li>Whether to include the ability to rate charges by severity, e.g. "mild", "moderate", "serious", "severe"</li>
     <li>Whether to include the plea options "No Contest" and/or "N/A"</li>
     <li>Whether to include the case location in printed minutes</li>
-    <li>The words that your school uses, e.g. "@OrgConfig.get(request).str_jc_name", "@OrgConfig.get(request).str_manual_title",
-        "@OrgConfig.get(request).str_findings", etc.</li>
+    <li>The words that your school uses, e.g. "@Utils.getOrgConfig(request).str_jc_name", "@Utils.getOrgConfig(request).str_manual_title",
+        "@Utils.getOrgConfig(request).str_findings", etc.</li>
 </ul>
 
 
 <hr/>
-<h2>@OrgConfig.get(request).str_manual_title</h2>
+<h2>@Utils.getOrgConfig(request).str_manual_title</h2>
 @helper.form(routes.Settings.editSettings()) {
 
 <h4>Printing options</h4>
@@ -308,5 +308,5 @@ the "Current Student" and "Staff" tags). Accounts can be created manually for gr
     Include the date of each change for each rule, e.g. "Adopted 2016-1-2; Amended 2016-3-25"</label>
 </p>
 <input type="hidden" name="manual_settings" value="true"/>
-<input type="submit" value="Save @OrgConfig.get(request).str_manual_title settings"/></p>
+<input type="submit" value="Save @Utils.getOrgConfig(request).str_manual_title settings"/></p>
 }

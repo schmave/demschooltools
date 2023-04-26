@@ -10,8 +10,8 @@
 <h2>@person.first_name @person.last_name attendance</h2>
 
 @if( min_date != null && max_date != null ) {
-    <p>@person.first_name's first recorded day at school was @Application.formatDateMdy(OrgConfig.get(request), min_date), and
-    last recorded day at school was @Application.formatDateMdy(OrgConfig.get(request), max_date).</p>
+    <p>@person.first_name's first recorded day at school was @Application.formatDateMdy(Utils.getOrgConfig(request), min_date), and
+    last recorded day at school was @Application.formatDateMdy(Utils.getOrgConfig(request), max_date).</p>
 }
 <form method="GET">
 	<p>Show @person.first_name's attendance from
@@ -38,17 +38,17 @@
         <label>Unknown/missing code<br/>
         <input type="checkbox" checked data-code="__null"/></label>
     </th>
-    <th width=100><label>@if( OrgConfig.get(request).org.attendance_enable_partial_days ) { Full Days } else { Days Present }<br/>
+    <th width=100><label>@if( Utils.getOrgConfig(request).org.attendance_enable_partial_days ) { Full Days } else { Days Present }<br/>
         <input type="checkbox" checked data-code="__present"/></label>
     </th>
-    @if( OrgConfig.get(request).org.attendance_enable_partial_days ) {
+    @if( Utils.getOrgConfig(request).org.attendance_enable_partial_days ) {
 	    <th width=100 class="partial-days"><label>Partial Days<br/>
 	        <input type="checkbox" checked data-code="__partial"/></label>
 	    </th>
 	}
     <th width=100>Total hours</th>
     <th width=100>Avg. hours per day</th>
-    @if( OrgConfig.get(request).org.attendance_show_percent ) {
+    @if( Utils.getOrgConfig(request).org.attendance_show_percent ) {
     	<th width=100>Attendance Rate</th>
 	}
 </thead>
@@ -66,12 +66,12 @@
     <td align="center" class="empty">0</td>
 }
 <td align="center">@stats.days_present</td>
-@if( OrgConfig.get(request).org.attendance_enable_partial_days ) {
+@if( Utils.getOrgConfig(request).org.attendance_enable_partial_days ) {
 	<td align="center" class="partial-days">@stats.partial_days_present</td>
 }
 <td align="center">@Attendance.format(stats.total_hours)</td>
 <td align="center">@Attendance.format(stats.averageHoursPerDay())</td>
-@if( OrgConfig.get(request).org.attendance_show_percent ) {
+@if( Utils.getOrgConfig(request).org.attendance_show_percent ) {
 	<td align="center">@Attendance.formatAsPercent(stats.attendanceRate())</td>
 }
 </table>
@@ -103,7 +103,7 @@
         @if(d.start_time == null || d.end_time == null) {
         	code-__null
         } else {
-        	@if(d.isPartial(OrgConfig.get(request).org)) {
+        	@if(d.isPartial(Utils.getOrgConfig(request).org)) {
         		code-__partial
         	} else {
         		code-__present
@@ -114,7 +114,7 @@
     	friday-row
     }">
     <td width="25">@Application.formatDayOfWeek(d.day)
-    <td width="75">@Application.formatDateMdy(OrgConfig.get(request), d.day)</td>
+    <td width="75">@Application.formatDateMdy(Utils.getOrgConfig(request), d.day)</td>
 	<td>@if(d.start_time != null && d.end_time != null) {
 			@Attendance.format(d.getHours())
 		} else {

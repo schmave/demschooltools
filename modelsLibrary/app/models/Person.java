@@ -2,8 +2,6 @@ package models;
 
 import io.ebean.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import controllers.Application;
-import controllers.CRM;
 import play.data.Form;
 
 import javax.persistence.OrderBy;
@@ -99,7 +97,7 @@ public class Person extends Model implements Comparable<Person> {
 
     static Set<String> fieldsToUpdateExplicitly = new HashSet<>();
 
-    {
+    static {
         fieldsToUpdateExplicitly.add("dob");
         fieldsToUpdateExplicitly.add("approximate_dob");
     }
@@ -134,6 +132,10 @@ public class Person extends Model implements Comparable<Person> {
             .fetch("cases_involved_in.the_case.charges.rule.section.chapter", FetchConfig.ofQuery())
             .where().eq("organization", org)
             .eq("person_id", id).findOne();
+    }
+
+    public int calcAge() {
+        return (int)((new Date().getTime() - dob.getTime()) / 1000 / 60 / 60 / 24 / 365.25);
     }
 
     @JsonIgnore
@@ -187,7 +189,7 @@ public class Person extends Model implements Comparable<Person> {
 
     @JsonIgnore
     public List<Charge> getThisYearCharges() {
-        Date beginning_of_year = Application.getStartOfYear();
+        Date beginning_of_year = ModelUtils.getStartOfYear();
 
         List<Charge> result = new ArrayList<>();
         for (Charge c : charges) {
@@ -201,7 +203,7 @@ public class Person extends Model implements Comparable<Person> {
 
     @JsonIgnore
     public List<Case> getThisYearCasesWrittenUp() {
-        Date beginning_of_year = Application.getStartOfYear();
+        Date beginning_of_year = ModelUtils.getStartOfYear();
 
         List<Case> result = new ArrayList<>();
         for (PersonAtCase pac : cases_involved_in) {
@@ -344,7 +346,7 @@ public class Person extends Model implements Comparable<Person> {
         if (this.dob !=  null) {
             // The default form filler writes the DOB in an unparseable
             // format, so override it with this.
-            data.put("dob", Application.forDateInput(this.dob));
+            data.put("dob", ModelUtils.forDateInput(this.dob));
         }
 
         // This is how you create a hybrid form based
@@ -403,7 +405,7 @@ public class Person extends Model implements Comparable<Person> {
             {
                 if (this != p &&
                     p.dob != null &&
-                    CRM.calcAge(p) < 18)
+                    p.calcAge() < 18)
                 {
                     num_siblings++;
                 }

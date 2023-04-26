@@ -1,21 +1,15 @@
 package controllers;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import javax.mail.*;
-import javax.mail.internet.*;
-
-import io.ebean.*;
 import com.ecwid.mailchimp.*;
 import com.ecwid.mailchimp.method.v2_0.lists.ListMethodResult;
+import io.ebean.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import javax.inject.Inject;
 
 import models.*;
-
 import models.Comment;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -26,7 +20,6 @@ import play.i18n.MessagesApi;
 import play.libs.Json;
 import play.mvc.*;
 import views.html.*;
-
 
 @With(DumpOnError.class)
 @Secured.Auth(UserRole.ROLE_ALL_ACCESS)
@@ -52,14 +45,14 @@ public class CRM extends Controller {
         return ok(cached_page.render(new CachedPage(CachedPage.RECENT_COMMENTS,
                 "All people",
                 "crm",
-                "recent_comments", Organization.getByHost(request)) {
+                "recent_comments", Utils.getOrg(request)) {
                 @Override
                 String render() {
                     List<Comment> recent_comments = Comment.find.query()
                         .fetch("person")
                         .fetch("completed_tasks", FetchConfig.ofQuery())
                         .fetch("completed_tasks.task", FetchConfig.ofQuery())
-                        .where().eq("person.organization", Organization.getByHost(request))
+                        .where().eq("person.organization", Utils.getOrg(request))
                         .orderBy("created DESC").setMaxRows(20).findList();
 
                     return people_index.render(recent_comments, request, mMessagesApi.preferred(request)).toString();
@@ -68,7 +61,7 @@ public class CRM extends Controller {
     }
 
     public Result person(Integer id, Http.Request request) {
-        Person the_person = Person.findById(id, Organization.getByHost(request));
+        Person the_person = Person.findById(id, Utils.getOrg(request));
 
         List<Person> family_members =
             Person.find.query().where().isNotNull("family").eq("family", the_person.family).
@@ -86,7 +79,7 @@ public class CRM extends Controller {
         String comment_destination = "<No email set>";
         boolean first = true;
         for (NotificationRule rule :
-                NotificationRule.findByType(NotificationRule.TYPE_COMMENT, Organization.getByHost(request))) {
+                NotificationRule.findByType(NotificationRule.TYPE_COMMENT, Utils.getOrg(request))) {
             if (first) {
                 comment_destination = rule.email;
                 first = false;
@@ -125,13 +118,13 @@ public class CRM extends Controller {
 
             people_matched_this_round =
                     Person.find.query().where().add(this_expr)
-                            .eq("organization", Organization.getByHost(request))
+                            .eq("organization", Utils.getOrg(request))
                             .eq("is_family", false)
                     .findList();
 
             List<PhoneNumber> phone_numbers =
                     PhoneNumber.find.query().where().ilike("number", "%" + term + "%")
-                    .eq("owner.organization", Organization.getByHost(request))
+                    .eq("owner.organization", Utils.getOrg(request))
                     .findList();
             for (PhoneNumber pn : phone_numbers) {
                 people_matched_this_round.add(pn.owner);
@@ -176,13 +169,13 @@ public class CRM extends Controller {
     public Result jsonTags(String term, Integer personId, Http.Request request) {
         List<Tag> selected_tags =
             Tag.find.query().where()
-                .eq("organization", Organization.getByHost(request))
+                .eq("organization", Utils.getOrg(request))
                 .eq("show_in_menu", true)
                 .ilike("title", "%" + term + "%").findList();
 
         List<Tag> existing_tags = null;
         if (personId >= 0) {
-            Person p = Person.findById(personId, Organization.getByHost(request));
+            Person p = Person.findById(personId, Utils.getOrg(request));
             if (p != null) {
                 existing_tags = p.tags;
             }
@@ -233,7 +226,7 @@ public class CRM extends Controller {
             Set<Person> no_kids = new HashSet<>();
             for (Person p2 : selected_people) {
                 if (p2.dob == null ||
-                        CRM.calcAge(p2) > 18) {
+                        p2.calcAge() > 18) {
                     no_kids.add(p2);
                 }
             }
@@ -244,14 +237,14 @@ public class CRM extends Controller {
     }
 
     public Result renderTagMembers(Integer tagId, String familyMode, Http.Request request) {
-        Organization org = Organization.getByHost(request);
+        Organization org = Utils.getOrg(request);
         Tag the_tag = Tag.findById(tagId, org);
         return ok(to_address_fragment.render(the_tag.title,
                 getTagMembers(tagId, familyMode, org), request, mMessagesApi.preferred(request)));
     }
 
     public Result addTag(Integer tagId, String title, Integer personId, Http.Request request) {
-        Organization org = Organization.getByHost(request);
+        Organization org = Utils.getOrg(request);
         Person p = Person.findById(personId, org);
         if (p == null) {
             return badRequest();
@@ -290,11 +283,11 @@ public class CRM extends Controller {
     }
 
     public Result removeTag(Integer person_id, Integer tag_id, Http.Request request) {
-        Tag t = Tag.findById(tag_id, Organization.getByHost(request));
-        Person p = Person.findById(person_id, Organization.getByHost(request));
+        Tag t = Tag.findById(tag_id, Utils.getOrg(request));
+        Person p = Person.findById(person_id, Utils.getOrg(request));
 
         removeTag(t, p, Application.getCurrentUser(request), request);
-        CachedPage.onPeopleChanged(Organization.getByHost(request));
+        CachedPage.onPeopleChanged(Utils.getOrg(request));
 
         return ok();
     }
@@ -334,12 +327,12 @@ public class CRM extends Controller {
     }
 
     public Result allPeople(Http.Request request) {
-        return ok(all_people.render(Person.all(Organization.getByHost(request)), request, mMessagesApi.preferred(request)));
+        return ok(all_people.render(Person.all(Utils.getOrg(request)), request, mMessagesApi.preferred(request)));
     }
 
     public Result viewAllTags(Http.Request request) {
         List<Tag> tags = Tag.find.query()
-            .where().eq("organization", Organization.getByHost(request))
+            .where().eq("organization", Utils.getOrg(request))
             .orderBy("lower(title)")
             .findList();
 
@@ -358,7 +351,7 @@ public class CRM extends Controller {
     }
 
     public Result editTag(Integer id, Http.Request request) {
-        Form<Tag> filled_form = mFormFactory.form(Tag.class).fill(Tag.findById(id, Organization.getByHost(request)));
+        Form<Tag> filled_form = mFormFactory.form(Tag.class).fill(Tag.findById(id, Utils.getOrg(request)));
         return ok(edit_tag.render(filled_form, request, mMessagesApi.preferred(request)));
     }
 
@@ -366,10 +359,10 @@ public class CRM extends Controller {
         Form<Tag> form = mFormFactory.form(Tag.class).bindFromRequest(request);
 
         if (form.field("id").value().isPresent()) {
-            Tag t = Tag.findById(Integer.parseInt(form.field("id").value().get()), Organization.getByHost(request));
+            Tag t = Tag.findById(Integer.parseInt(form.field("id").value().get()), Utils.getOrg(request));
             t.updateFromForm(form);
 
-            CachedPage.onPeopleChanged(Organization.getByHost(request));
+            CachedPage.onPeopleChanged(Utils.getOrg(request));
 
             return redirect(routes.CRM.viewTag(t.id));
         }
@@ -378,49 +371,49 @@ public class CRM extends Controller {
 
     public Result addPeopleFromTag(Http.Request request) {
         final Map<String, String[]> values = request.body().asFormUrlEncoded();
-        Tag dest_tag = Tag.findById(Integer.parseInt(values.get("dest_id")[0]), Organization.getByHost(request));
-        Tag src_tag = Tag.findById(Integer.parseInt(values.get("tag_id")[0]), Organization.getByHost(request));
+        Tag dest_tag = Tag.findById(Integer.parseInt(values.get("dest_id")[0]), Utils.getOrg(request));
+        Tag src_tag = Tag.findById(Integer.parseInt(values.get("tag_id")[0]), Utils.getOrg(request));
 
         for (Person p : src_tag.people) {
             addTag(dest_tag, p, Application.getCurrentUser(request), request);
         }
 
-        CachedPage.onPeopleChanged(Organization.getByHost(request));
+        CachedPage.onPeopleChanged(Utils.getOrg(request));
         return redirect(routes.CRM.viewTag(dest_tag.id));
     }
 
     public Result addPeopleToTag(Http.Request request) {
         final Map<String, String[]> values = request.body().asFormUrlEncoded();
-        Tag dest_tag = Tag.findById(Integer.parseInt(values.get("dest_id")[0]), Organization.getByHost(request));
+        Tag dest_tag = Tag.findById(Integer.parseInt(values.get("dest_id")[0]), Utils.getOrg(request));
 
         for (String person_id_str : values.get("person_id")) {
-            Person p = Person.findById(Integer.parseInt(person_id_str), Organization.getByHost(request));
+            Person p = Person.findById(Integer.parseInt(person_id_str), Utils.getOrg(request));
             addTag(dest_tag, p, Application.getCurrentUser(request), request);
         }
 
-        CachedPage.onPeopleChanged(Organization.getByHost(request));
+        CachedPage.onPeopleChanged(Utils.getOrg(request));
         return redirect(routes.CRM.viewTag(dest_tag.id));
     }
 
     public Result removePeopleFromTag(Http.Request request) {
         final Map<String, String[]> values = request.body().asFormUrlEncoded();
-        Tag tag = Tag.findById(Integer.parseInt(values.get("tag_id")[0]), Organization.getByHost(request));
+        Tag tag = Tag.findById(Integer.parseInt(values.get("tag_id")[0]), Utils.getOrg(request));
 
         String prefix = "person-";
         for (String key_name : values.keySet()) {
             if (key_name.startsWith(prefix) && values.get(key_name)[0].equals("on")) {
-                Person p = Person.findById(Integer.parseInt(key_name.substring(prefix.length())), Organization.getByHost(request));
+                Person p = Person.findById(Integer.parseInt(key_name.substring(prefix.length())), Utils.getOrg(request));
                 removeTag(tag, p, Application.getCurrentUser(request), request);
             }
         }
 
-        CachedPage.onPeopleChanged(Organization.getByHost(request));
+        CachedPage.onPeopleChanged(Utils.getOrg(request));
         return redirect(routes.CRM.viewTag(tag.id));
     }
 
     public Result undoTagChanges(Http.Request request) {
         final Map<String, String[]> values = request.body().asFormUrlEncoded();
-        Tag tag = Tag.findById(Integer.parseInt(values.get("tag_id")[0]), Organization.getByHost(request));
+        Tag tag = Tag.findById(Integer.parseInt(values.get("tag_id")[0]), Utils.getOrg(request));
 
         String prefix = "tag-change-";
         for (String key_name : values.keySet()) {
@@ -442,7 +435,7 @@ public class CRM extends Controller {
             }
         }
 
-        CachedPage.onPeopleChanged(Organization.getByHost(request));
+        CachedPage.onPeopleChanged(Utils.getOrg(request));
         return redirect(routes.CRM.viewTag(tag.id).url() + "#!history");
     }
 
@@ -452,7 +445,7 @@ public class CRM extends Controller {
             .fetch("people.phone_numbers", FetchConfig.ofQuery())
             .fetch("people.family", FetchConfig.ofQuery())
             .fetch("people.family.family_members", FetchConfig.ofQuery())
-            .where().eq("organization", Organization.getByHost(request))
+            .where().eq("organization", Utils.getOrg(request))
             .eq("id", id).findOne();
 
         List<Person> people = the_tag.people;
@@ -493,7 +486,7 @@ public class CRM extends Controller {
             .fetch("people.phone_numbers", FetchConfig.ofQuery())
             .fetch("people.family", FetchConfig.ofQuery())
             .fetch("people.family.family_members", FetchConfig.ofQuery())
-            .where().eq("organization", Organization.getByHost(request))
+            .where().eq("organization", Utils.getOrg(request))
             .eq("id", id).findOne();
 
         List<Person> people = the_tag.people;
@@ -656,114 +649,9 @@ public class CRM extends Controller {
                 new_person.render(filledForm, request, mMessagesApi.preferred(request))
             );
         } else {
-            Person new_person = Person.create(filledForm, Organization.getByHost(request));
+            Person new_person = Person.create(filledForm, Utils.getOrg(request));
             return redirect(routes.CRM.person(new_person.person_id));
         }
-    }
-
-    public Result viewPendingEmail(Http.Request request) {
-        Email e =Email.find.query().where()
-                .eq("organization", Organization.getByHost(request))
-                .eq("deleted", false).eq("sent", false).orderBy("id ASC").setMaxRows(1).findOne();
-
-        if (e == null) {
-            return redirect(routes.CRM.recentComments());
-        }
-
-        Tag staff_tag = Tag.find.query().where()
-            .eq("organization", Organization.getByHost(request))
-            .eq("title", "Staff").findOne();
-        List<Person> people = staff_tag.people;
-
-        ArrayList<String> test_addresses = new ArrayList<>();
-        for (Person p : people) {
-            test_addresses.add(p.email);
-        }
-        test_addresses.add("staff@threeriversvillageschool.org");
-
-        ArrayList<String> from_addresses = new ArrayList<>();
-        from_addresses.add("office@threeriversvillageschool.org");
-        from_addresses.add("evan@threeriversvillageschool.org");
-        from_addresses.add("jmp@threeriversvillageschool.org");
-        from_addresses.add("jancey@threeriversvillageschool.org");
-        from_addresses.add("info@threeriversvillageschool.org");
-        from_addresses.add("staff@threeriversvillageschool.org");
-
-        e.parseMessage();
-        return ok(view_pending_email.render(e, test_addresses, from_addresses, request, mMessagesApi.preferred(request)));
-    }
-
-    public Result sendTestEmail(Http.Request request) {
-        final Map<String, String[]> values = request.body().asFormUrlEncoded();
-        Email e = Email.findById(Integer.parseInt(values.get("id")[0]), Organization.getByHost(request));
-        e.parseMessage();
-
-        try {
-            MimeMessage to_send = new MimeMessage(e.parsedMessage);
-            to_send.addRecipient(Message.RecipientType.TO,
-                    new InternetAddress(values.get("dest_email")[0]));
-            to_send.setFrom(new InternetAddress("Papal DB <noreply@threeriversvillageschool.org>"));
-            Transport.send(to_send);
-        } catch (MessagingException ex) {
-            ex.printStackTrace();
-        }
-
-        return ok();
-    }
-
-    public Result sendEmail(Http.Request request) {
-        final Map<String, String[]> values = request.body().asFormUrlEncoded();
-        Email e = Email.findById(Integer.parseInt(values.get("id")[0]), Organization.getByHost(request));
-        e.parseMessage();
-
-        int tagId = Integer.parseInt(values.get("tagId")[0]);
-        Tag theTag = Tag.findById(tagId, Organization.getByHost(request));
-        String familyMode = values.get("familyMode")[0];
-        Collection<Person> recipients = getTagMembers(tagId, familyMode, Organization.getByHost(request));
-
-        boolean hadErrors = false;
-
-        for (Person p : recipients) {
-            if (p.email != null && !p.email.equals("")) {
-                try {
-                    MimeMessage to_send = new MimeMessage(e.parsedMessage);
-                    to_send.addRecipient(Message.RecipientType.TO,
-                            new InternetAddress(p.email, p.first_name + " " + p.last_name));
-                    to_send.setFrom(new InternetAddress(values.get("from")[0]));
-                    Transport.send(to_send);
-                } catch (MessagingException | UnsupportedEncodingException ex) {
-                    ex.printStackTrace();
-                    hadErrors = true;
-                }
-            }
-        }
-
-        // Send confirmation email
-        try {
-            MimeMessage to_send = new MimeMessage(e.parsedMessage);
-            to_send.addRecipient(Message.RecipientType.TO,
-                    new InternetAddress("Staff <staff@threeriversvillageschool.org>"));
-            String subject = "(Sent to " + theTag.title + " " + familyMode + ") " + to_send.getSubject();
-            if (hadErrors) {
-                subject = "***ERRORS*** " + subject;
-            }
-            to_send.setSubject(subject);
-            to_send.setFrom(new InternetAddress(values.get("from")[0]));
-            Transport.send(to_send);
-        } catch (MessagingException ex) {
-            ex.printStackTrace();
-        }
-
-        e.delete();
-        return ok();
-    }
-
-    public Result deleteEmail(Http.Request request) {
-        final Map<String, String[]> values = request.body().asFormUrlEncoded();
-        Email e = Email.findById(Integer.parseInt(values.get("id")[0]), Organization.getByHost(request));
-        e.delete();
-
-        return ok();
     }
 
     public Result deletePerson(Integer id) {
@@ -772,12 +660,12 @@ public class CRM extends Controller {
     }
 
     public Result editPerson(Integer id, Http.Request request) {
-        Person p = Person.findById(id, Organization.getByHost(request));
+        Person p = Person.findById(id, Utils.getOrg(request));
         return ok(edit_person.render(p.fillForm(), request, mMessagesApi.preferred(request)));
     }
 
     public Result savePersonEdits(Http.Request request) {
-        CachedPage.onPeopleChanged(Organization.getByHost(request));
+        CachedPage.onPeopleChanged(Utils.getOrg(request));
 
         Form<Person> personForm = mFormFactory.form(Person.class);
         Form<Person> filledForm = personForm.bindFromRequest(request);
@@ -791,17 +679,17 @@ public class CRM extends Controller {
             );
         }
 
-        Person updatedPerson = Person.updateFromForm(filledForm, Organization.getByHost(request));
+        Person updatedPerson = Person.updateFromForm(filledForm, Utils.getOrg(request));
         return redirect(routes.CRM.person(
                 (updatedPerson.is_family ? updatedPerson.family_members.get(0) : updatedPerson).person_id));
     }
 
     public Result addComment(Http.Request request) {
-        CachedPage.remove(CachedPage.RECENT_COMMENTS, Organization.getByHost(request));
+        CachedPage.remove(CachedPage.RECENT_COMMENTS, Utils.getOrg(request));
         Form<Comment> filledForm = mFormFactory.form(Comment.class).bindFromRequest(request);
         Comment new_comment = new Comment();
 
-        new_comment.person = Person.findById(Integer.parseInt(filledForm.field("person").value().get()), Organization.getByHost(request));
+        new_comment.person = Person.findById(Integer.parseInt(filledForm.field("person").value().get()), Utils.getOrg(request));
         new_comment.user = Application.getCurrentUser(request);
         new_comment.message = filledForm.field("message").value().get();
 
@@ -815,14 +703,14 @@ public class CRM extends Controller {
                 if (!id_string.isEmpty()) {
                     int id = Integer.parseInt(id_string);
                     if (id >= 1) {
-                        CompletedTask.create(Task.findById(id, Organization.getByHost(request)), new_comment);
+                        CompletedTask.create(Task.findById(id, Utils.getOrg(request)), new_comment);
                     }
                 }
             }
 
             if (filledForm.field("send_email").value().isPresent()) {
                 for (NotificationRule rule :
-                        NotificationRule.findByType(NotificationRule.TYPE_COMMENT, Organization.getByHost(request))) {
+                        NotificationRule.findByType(NotificationRule.TYPE_COMMENT, Utils.getOrg(request))) {
                     play.libs.mailer.Email mail = new play.libs.mailer.Email();
                     mail.setSubject("DemSchoolTools comment: " + new_comment.user.name + " & " + new_comment.person.getInitials());
                     mail.addTo(rule.email);
@@ -838,15 +726,11 @@ public class CRM extends Controller {
         }
     }
 
-    public static int calcAge(Person p) {
-        return (int)((new Date().getTime() - p.dob.getTime()) / 1000 / 60 / 60 / 24 / 365.25);
-    }
-
     public static int calcAgeAtBeginningOfSchool(Person p) {
         if (p.dob == null) {
             return -1;
         }
-        return (int)((Application.getStartOfYear().getTime() - p.dob.getTime()) / 1000 / 60 / 60 / 24 / 365.25);
+        return (int)((ModelUtils.getStartOfYear().getTime() - p.dob.getTime()) / 1000 / 60 / 60 / 24 / 365.25);
     }
 
     public static String formatDob(Date d, OrgConfig orgConfig) {
@@ -883,7 +767,7 @@ public class CRM extends Controller {
     }
 
     public Result viewTaskList(Integer id, Http.Request request) {
-        TaskList list = TaskList.findById(id, Organization.getByHost(request));
+        TaskList list = TaskList.findById(id, Utils.getOrg(request));
         List<Person> people = list.tag.people;
 
         return ok(task_list.render(list, people, request, mMessagesApi.preferred(request)));
@@ -891,13 +775,13 @@ public class CRM extends Controller {
 
     public Result viewMailchimpSettings(Http.Request request) {
         MailChimpClient mailChimpClient = new MailChimpClient();
-        Organization org = Organization.getByHost(request);
+        Organization org = Utils.getOrg(request);
 
         Map<String, ListMethodResult.Data> mc_list_map =
             Public.getMailChimpLists(mailChimpClient, org.mailchimp_api_key);
 
         return ok(view_mailchimp_settings.render(mFormFactory.form(Organization.class), org,
-            MailchimpSync.find.query().where().eq("tag.organization", Organization.getByHost(request)).findList(),
+            MailchimpSync.find.query().where().eq("tag.organization", Utils.getOrg(request)).findList(),
             mc_list_map, request, mMessagesApi.preferred(request)));
     }
 
@@ -905,16 +789,16 @@ public class CRM extends Controller {
         final Map<String, String[]> values = request.body().asFormUrlEncoded();
 
         if (values.containsKey("mailchimp_api_key")) {
-            Organization.getByHost(request).setMailChimpApiKey(values.get("mailchimp_api_key")[0]);
+            Utils.getOrg(request).setMailChimpApiKey(values.get("mailchimp_api_key")[0]);
         }
 
         if (values.containsKey("mailchimp_updates_email")) {
-            Organization.getByHost(request).setMailChimpUpdatesEmail(values.get("mailchimp_updates_email")[0]);
+            Utils.getOrg(request).setMailChimpUpdatesEmail(values.get("mailchimp_updates_email")[0]);
         }
 
         if (values.containsKey("sync_type")) {
             for (String tag_id : values.get("tag_id")) {
-                Tag t = Tag.findById(Integer.parseInt(tag_id), Organization.getByHost(request));
+                Tag t = Tag.findById(Integer.parseInt(tag_id), Utils.getOrg(request));
                 MailchimpSync.create(t,
                     values.get("mailchimp_list_id")[0],
                     values.get("sync_type")[0].equals("local_add"),

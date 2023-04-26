@@ -11,14 +11,14 @@
 			<th width="20">Person
 			<th width="150">Entry
 			<th width="70">Plea
-			<th>@OrgConfig.get(request).str_res_plan_cap<th>@OrgConfig.get(request).str_findings</thead>
+			<th>@Utils.getOrgConfig(request).str_res_plan_cap<th>@Utils.getOrgConfig(request).str_findings</thead>
 	@for( c <- sm_charges ) {
 		<tr><td>@c.the_case.case_number
 			<td>@if(c.person != null) { @c.person.getDisplayName() } else { <i>No one</i> }
 			<td>@c.getRuleTitle()
-			<td>@OrgConfig.get(request).translatePlea(c.plea)
+			<td>@Utils.getOrgConfig(request).translatePlea(c.plea)
 			<td>@c.resolution_plan
-			<td>@Utils.newlineToBr(c.the_case.generateCompositeFindingsFromChargeReferences())
+			<td>@Utils.newlineToBr(Application.generateCompositeFindingsFromChargeReferences(c.the_case))
 	}
 	</table>
 

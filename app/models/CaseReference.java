@@ -1,5 +1,7 @@
 package models;
 
+import controllers.Application;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +20,7 @@ public class CaseReference {
 			CaseReference result = new CaseReference();
 			result.id = referenced_case.id;
 			result.case_number = referenced_case.case_number;
-			result.findings = referenced_case.generateCompositeFindingsFromCaseReferences();
+			result.findings = Application.generateCompositeFindingsFromCaseReferences(referenced_case);
 			result.charges = new ArrayList<>();
 
 			for (Charge charge : referenced_case.charges) {

@@ -17,7 +17,7 @@ def add_org_config_to_file(filename, template_name):
             if search_string in line and 'OrgConfig' not in line:
                 needs_save = True
                 lines[i] = line.replace(search_string,
-                    f'{search_string}OrgConfig.get(Organization.getByHost(request)), ')
+                    f'{search_string}Utils.getOrgConfig(Organization.getByHost(request)), ')
     elif f'/{template_name}.scala.html' in filename:
         search_string = '@('
         assert search_string in lines[0], filename
@@ -26,7 +26,7 @@ def add_org_config_to_file(filename, template_name):
             lines[0] = lines[0].replace('@(', '@(orgConfig: OrgConfig, ')
 
         for i, line in enumerate(lines):
-            search_string = 'OrgConfig.get()'
+            search_string = 'Utils.getOrgConfig()'
             if search_string in line:
                 lines[i] = line.replace(search_string, 'orgConfig')
                 needs_save = True

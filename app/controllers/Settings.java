@@ -9,7 +9,6 @@ import org.mindrot.jbcrypt.BCrypt;
 import models.*;
 
 import play.i18n.MessagesApi;
-import service.MyUserService;
 
 import play.data.*;
 import play.mvc.*;
@@ -34,16 +33,16 @@ public class Settings extends Controller {
 
     public Result viewSettings(Http.Request request) {
         List<NotificationRule> rules = NotificationRule.find.query().where()
-            .eq("organization", Organization.getByHost(request))
+            .eq("organization", Utils.getOrg(request))
             .order("the_type DESC, tag.id")
             .findList();
 
-        return ok(view_settings.render(rules, Organization.getByHost(request), Public.sConfig.getConfig("school_crm"), request, mMessagesApi.preferred(request)));
+        return ok(view_settings.render(rules, Utils.getOrg(request), Public.sConfig.getConfig("school_crm"), request, mMessagesApi.preferred(request)));
     }
 
     public Result editSettings(Http.Request request) {
         final Map<String, String[]> values = request.body().asFormUrlEncoded();
-        final Organization org = Organization.getByHost(request);
+        final Organization org = Utils.getOrg(request);
         org.updateFromForm(values, org);
         CachedPage.clearAll(org);
 
@@ -86,7 +85,7 @@ public class Settings extends Controller {
 
         if (values.containsKey("remove_notification_id")) {
             NotificationRule.findById(
-                Integer.parseInt(values.get("remove_notification_id")[0]), Organization.getByHost(request)).delete();
+                Integer.parseInt(values.get("remove_notification_id")[0]), Utils.getOrg(request)).delete();
         } else {
             String email = values.get("email")[0];
             if (!email.matches("^\\S+@\\S+.\\S+$")) {
@@ -95,15 +94,15 @@ public class Settings extends Controller {
             }
 
             if (values.containsKey("tag_id")) {
-                Tag t = Tag.findById(Integer.parseInt(values.get("tag_id")[0]), Organization.getByHost(request));
-                NotificationRule.create(NotificationRule.TYPE_TAG, t, email, Organization.getByHost(request));
+                Tag t = Tag.findById(Integer.parseInt(values.get("tag_id")[0]), Utils.getOrg(request));
+                NotificationRule.create(NotificationRule.TYPE_TAG, t, email, Utils.getOrg(request));
             }
 
             if (values.containsKey("comment")) {
-                NotificationRule.create(NotificationRule.TYPE_COMMENT, null, email, Organization.getByHost(request));
+                NotificationRule.create(NotificationRule.TYPE_COMMENT, null, email, Utils.getOrg(request));
             }
             if (values.containsKey("school_meeting")) {
-                NotificationRule.create(NotificationRule.TYPE_SCHOOL_MEETING, null, email, Organization.getByHost(request));
+                NotificationRule.create(NotificationRule.TYPE_SCHOOL_MEETING, null, email, Utils.getOrg(request));
             }
         }
 
@@ -112,11 +111,11 @@ public class Settings extends Controller {
 
     public Result viewTaskLists(Http.Request request) {
         Form<TaskList> list_form = mFormFactory.form(TaskList.class);
-        return ok(view_task_lists.render(TaskList.allForOrg(Organization.getByHost(request)), list_form, request, mMessagesApi.preferred(request)));
+        return ok(view_task_lists.render(TaskList.allForOrg(Utils.getOrg(request)), list_form, request, mMessagesApi.preferred(request)));
     }
 
     public Result viewTaskList(Integer id, Http.Request request) {
-        TaskList list = TaskList.findById(id, Organization.getByHost(request));
+        TaskList list = TaskList.findById(id, Utils.getOrg(request));
         Form<TaskList> list_form = mFormFactory.form(TaskList.class);
         Form<Task> task_form = mFormFactory.form(Task.class);
         return ok(settings_task_list.render(list, list_form.fill(list), task_form, request, mMessagesApi.preferred(request)));
@@ -134,7 +133,7 @@ public class Settings extends Controller {
     public Result newTaskList(Http.Request request) {
         Form<TaskList> list_form = mFormFactory.form(TaskList.class);
         TaskList list = list_form.bindFromRequest(request).get();
-        list.organization = Organization.getByHost(request);
+        list.organization = Utils.getOrg(request);
 
         list.title = list.title.trim();
         if (list.title.equals("")) {
@@ -145,7 +144,7 @@ public class Settings extends Controller {
         if (form_data.get("tag_id") == null) {
             return redirect(routes.Settings.viewTaskLists()).flashing("error", "No tag specified for checklist. No checklist was created.");
         }
-        list.tag = Tag.findById(Integer.parseInt(form_data.get("tag_id")[0]), Organization.getByHost(request));
+        list.tag = Tag.findById(Integer.parseInt(form_data.get("tag_id")[0]), Utils.getOrg(request));
 
         list.save();
         list.refresh();
@@ -155,10 +154,10 @@ public class Settings extends Controller {
 
     public Result editTask(Integer id, Http.Request request) {
         Form<Task> task_form = mFormFactory.form(Task.class);
-        Form<Task> filled_form = task_form.fill(Task.findById(id, Organization.getByHost(request)));
+        Form<Task> filled_form = task_form.fill(Task.findById(id, Utils.getOrg(request)));
 
         return ok(edit_task.render(filled_form,
-            TaskList.allForOrg(Organization.getByHost(request)), request, mMessagesApi.preferred(request)));
+            TaskList.allForOrg(Utils.getOrg(request)), request, mMessagesApi.preferred(request)));
     }
 
     public Result saveTask(Http.Request request) {
@@ -180,7 +179,7 @@ public class Settings extends Controller {
 
         Map<String, String[]> form_data = request.body().asFormUrlEncoded();
         if (form_data.containsKey("tag_id")) {
-            list.tag = Tag.findById(Integer.parseInt(form_data.get("tag_id")[0]), Organization.getByHost(request));
+            list.tag = Tag.findById(Integer.parseInt(form_data.get("tag_id")[0]), Utils.getOrg(request));
         }
 
         list.update();
@@ -189,7 +188,7 @@ public class Settings extends Controller {
     }
 
     public Result viewAccess(Http.Request request) {
-        Organization org = Organization.getByHost(request);
+        Organization org = Utils.getOrg(request);
         List<User> users =
             User.find.query().where().eq("organization", org)
             .order("name ASC")
@@ -198,7 +197,7 @@ public class Settings extends Controller {
         List<User> users_to_show = new ArrayList<>();
         for (User user : users) {
             // Hide dummy users and the check-in app user
-            if (!user.name.equals(MyUserService.DUMMY_USERNAME) &&
+            if (!user.name.equals(User.DUMMY_USERNAME) &&
                 !user.email.equals(org.short_name)) {
                 users_to_show.add(user);
             }
@@ -219,7 +218,7 @@ public class Settings extends Controller {
 
     public Result saveAccess(Http.Request request) {
         Map<String, String[]> form_data = request.body().asFormUrlEncoded();
-        Organization org = Organization.getByHost(request);
+        Organization org = Utils.getOrg(request);
 
         if (form_data.containsKey("allowed_ip")) {
             String sql = "DELETE from allowed_ips where organization_id=:org_id";
@@ -238,7 +237,7 @@ public class Settings extends Controller {
     }
 
     public Result editUser(Integer id, Http.Request request) {
-        User u = User.findById(id, Organization.getByHost(request));
+        User u = User.findById(id, Utils.getOrg(request));
 
         Form<User> user_form = mFormFactory.form(User.class);
         return ok(edit_user.render(u, user_form.fill(u), request, mMessagesApi.preferred(request)));
@@ -250,7 +249,7 @@ public class Settings extends Controller {
         User u = filled_form.get();
         Map<String, String[]> form_data = request.body().asFormUrlEncoded();
 
-        User orig_user = User.findById(u.id, Organization.getByHost(request));
+        User orig_user = User.findById(u.id, Utils.getOrg(request));
 
         for (UserRole r : orig_user.roles) {
             r.delete();
@@ -279,7 +278,7 @@ public class Settings extends Controller {
     public Result newUser(Http.Request request) {
         Map<String, String[]> form_data = request.body().asFormUrlEncoded();
 
-        Organization org = Organization.getByHost(request);
+        Organization org = Utils.getOrg(request);
         final String email = form_data.get("email")[0].trim();
         final String name = form_data.get("name")[0].trim();
 
@@ -288,7 +287,7 @@ public class Settings extends Controller {
 
         if (existing_user != null) {
             if (existing_user.organization.id.equals(org.id)) {
-                if (existing_user.name.equals(MyUserService.DUMMY_USERNAME)) {
+                if (existing_user.name.equals(User.DUMMY_USERNAME)) {
                     new_user = existing_user;
                     new_user.name = name;
                     new_user.save();

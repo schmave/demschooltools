@@ -1,7 +1,6 @@
 package models;
 
 import io.ebean.*;
-import controllers.Utils;
 import play.data.Form;
 
 import javax.persistence.*;
@@ -74,11 +73,11 @@ public class Tag extends Model {
 
     public void updateFromForm(Form<Tag> form) {
         title = form.field("title").value().get();
-        use_student_display = Utils.getBooleanFromFormValue(form.field("use_student_display"));
-        show_in_jc = Utils.getBooleanFromFormValue(form.field("show_in_jc"));
-        show_in_attendance = Utils.getBooleanFromFormValue(form.field("show_in_attendance"));
-        show_in_menu = Utils.getBooleanFromFormValue(form.field("show_in_menu"));
-        show_in_account_balances = Utils.getBooleanFromFormValue(form.field("show_in_account_balances"));
+        use_student_display = ModelUtils.getBooleanFromFormValue(form.field("use_student_display"));
+        show_in_jc = ModelUtils.getBooleanFromFormValue(form.field("show_in_jc"));
+        show_in_attendance = ModelUtils.getBooleanFromFormValue(form.field("show_in_attendance"));
+        show_in_menu = ModelUtils.getBooleanFromFormValue(form.field("show_in_menu"));
+        show_in_account_balances = ModelUtils.getBooleanFromFormValue(form.field("show_in_account_balances"));
         save();
     }
 

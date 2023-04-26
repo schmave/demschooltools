@@ -180,10 +180,10 @@ public class Charge extends Model implements Comparable<Charge> {
 
     public String getDayOfWeek() {
         if (sm_decision_date != null) {
-            return Application.formatDayOfWeek(sm_decision_date) + "&mdash;SM";
+            return ModelUtils.formatDayOfWeek(sm_decision_date) + "&mdash;SM";
         } else {
             if (the_case != null && the_case.meeting != null) {
-                return Application.formatDayOfWeek(the_case.meeting.date);
+                return ModelUtils.formatDayOfWeek(the_case.meeting.date);
             } else {
                 return null;
             }

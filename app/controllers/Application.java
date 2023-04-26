@@ -49,6 +49,213 @@ public class Application extends Controller {
         mMessagesApi = messagesApi;
     }
 
+    static Set<String> names;
+
+    public static void loadNames(Organization org) {
+        if (names != null) {
+            return;
+        }
+
+        names = new HashSet<>();
+
+        try {
+            BufferedReader r = new BufferedReader(new InputStreamReader(
+                    Public.sEnvironment.resourceAsStream("names.txt")));
+            while (true) {
+                String line = r.readLine();
+                if (line == null) {
+                    break;
+                }
+
+                String n = line.trim().toLowerCase();
+                if (n.length() > 2) {
+                    // don't add 2-letter names
+                    names.add(n);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("ERROR loading names file");
+            e.printStackTrace();
+        }
+
+        // Add first and display names of all people in JC db
+        for(Person p : jcPeople(org)) {
+            names.add(p.first_name.trim().toLowerCase());
+            names.add(p.getDisplayName().trim().toLowerCase());
+        }
+    }
+
+    public static String getRedactedFindings(Case the_case, Person keep_this_persons_name) {
+        loadNames(the_case.meeting.organization);
+
+        String composite_findings = generateCompositeFindingsFromChargeReferences(the_case);
+
+        String keep_first_name = keep_this_persons_name.first_name.trim().toLowerCase();
+        String keep_display_name = keep_this_persons_name.getDisplayName().trim().toLowerCase();
+
+        String[] words = composite_findings.split("\\b");
+        Map<String, String> replacement_names = new HashMap<>();
+        char next_replacement = 'A';
+
+        for (String w : words) {
+            w = w.toLowerCase();
+            if (!w.equals(keep_first_name) && !w.equals(keep_display_name) &&
+                names.contains(w) && replacement_names.get(w) == null) {
+                replacement_names.put(w, next_replacement + "___");
+
+                next_replacement++;
+            }
+        }
+
+        String new_findings = composite_findings;
+        for (String name : replacement_names.keySet()) {
+            new_findings = new_findings.replaceAll("(?i)" + name, replacement_names.get(name));
+        }
+
+        return new_findings;
+    }
+
+    // We use this method while editing minutes. At this time the user has picked case references, but is still working
+    // on picking charge references, so we don't know which charges will be needed. As a result, we will include
+    // information on all charges from the referenced cases.
+    public static String generateCompositeFindingsFromCaseReferences(Case the_case) {
+        if (!the_case.meeting.organization.enable_case_references) {
+            return the_case.findings;
+        }
+        return generateCompositeFindings(the_case, null, null);
+    }
+
+    // We use this method everywhere besides the edit minutes page. At this point the minutes have been finalized and the
+    // charge references have been selected. We don't need to include information about charges that weren't referenced.
+    public static String generateCompositeFindingsFromChargeReferences(Case the_case) {
+        if (!the_case.meeting.organization.enable_case_references) {
+            return the_case.findings;
+        }
+        ArrayList<Charge> relevant_charges = new ArrayList<>();
+        for (Charge charge : the_case.charges) {
+            charge.buildChargeReferenceChain(relevant_charges);
+        }
+        return generateCompositeFindings(the_case, relevant_charges, null);
+    }
+
+    private static String generateCompositeFindings(Case the_case, List<Charge> relevant_charges, List<Case> used_cases) {
+
+        if (used_cases == null) {
+            used_cases = new ArrayList<>();
+        }
+        used_cases.add(the_case);
+        String result = "";
+
+        the_case.referenced_cases.sort(Comparator.comparing(a -> a.case_number));
+
+        for (Case c : the_case.referenced_cases) {
+            if (used_cases.contains(c)) {
+                continue;
+            }
+            if (!isCaseRelevant(c, relevant_charges)) {
+                continue;
+            }
+            ArrayList<Case> _used_cases = new ArrayList<>(used_cases);
+            boolean hasRelevantReferences = c.referenced_cases.stream()
+                .anyMatch(rc -> isCaseRelevant(rc, relevant_charges) && !_used_cases.contains(rc));
+            if (!hasRelevantReferences) {
+                if (result.isEmpty()) {
+                    result += "Per case ";
+                } else {
+                    result += " Then per case ";
+                }
+                result += c.case_number + ",";
+            }
+            if (!result.isEmpty()) {
+                result += " ";
+            }
+            result += generateCompositeFindings(c, relevant_charges, used_cases);
+            if (!result.endsWith(".")) {
+                result += ".";
+            }
+            Map<String, List<Charge>> groups = groupChargesByRuleAndResolutionPlan(findRelevantCharges(c, relevant_charges));
+            for (Map.Entry<String, List<Charge>> entry : groups.entrySet()) {
+                List<Charge> group = entry.getValue();
+                result += " " + group.get(0).person.getDisplayName();
+                if (group.size() == 1) {
+                    result += " was ";
+                } else {
+                    if (group.size() > 2) {
+                        for (Charge ch : group.subList(1, group.size() - 1)) {
+                            result += ", " + ch.person.getDisplayName();
+                        }
+                        result += ",";
+                    }
+                    result += " and " + group.get(group.size() - 1).person.getDisplayName() + " were ";
+                }
+                result += "charged with " + group.get(0).getRuleTitle();
+                String resolution_plan = getResolutionPlanForCompositeFindings(group.get(0));
+                if (resolution_plan.isEmpty()) {
+                    result += ".";
+                } else {
+                    if (group.get(0).sm_decision != null && !group.get(0).sm_decision.isEmpty()) {
+                        result += " and School Meeting decided on";
+                    }
+                    else if (group.size() == 1) {
+                        result += " and was assigned";
+                    }
+                    else {
+                        result += " and were each assigned";
+                    }
+                    result += " the " + Utils.getOrgConfig(the_case.meeting.organization).str_res_plan + " \"" + resolution_plan;
+                    if (!result.endsWith(".")) {
+                        result += ".";
+                    }
+                    result += "\"";
+                }
+            }
+        }
+        if (!result.isEmpty()) {
+            result += " Then per case " + the_case.case_number + ", ";
+        }
+        if (the_case.findings.isEmpty()) {
+            the_case.findings = "the " + Utils.getOrgConfig(the_case.meeting.organization).str_res_plan + " was not completed.";
+        }
+        result += the_case.findings;
+        return result;
+    }
+
+    private static List<Charge> findRelevantCharges(Case c, List<Charge> relevant_charges) {
+
+        List<Charge> charges =
+            Charge.find.query()
+                .fetch("person")
+                .fetch("rule")
+                .fetch("rule.section")
+                .fetch("rule.section.chapter")
+                .where()
+                .eq("case_id", c.id)
+                .ne("person", null)
+                .findList();
+
+        return charges.stream()
+            .filter(ch -> relevant_charges == null || relevant_charges.contains(ch))
+            .collect(Collectors.toList());
+    }
+
+    private static Map<String, List<Charge>> groupChargesByRuleAndResolutionPlan(List<Charge> charges) {
+        return charges.stream().collect(Collectors.groupingBy(ch -> ch.getRuleTitle() + getResolutionPlanForCompositeFindings(ch)));
+    }
+
+    private static boolean isCaseRelevant(Case c, List<Charge> relevant_charges) {
+        return c.charges.stream().anyMatch(ch -> relevant_charges == null || relevant_charges.contains(ch));
+    }
+
+    private static String getResolutionPlanForCompositeFindings(Charge charge) {
+        if (charge.sm_decision != null && !charge.sm_decision.isEmpty()) {
+            return charge.sm_decision;
+        }
+        if (charge.referred_to_sm && charge.resolution_plan.isEmpty()) {
+            return "[Referred to School Meeting]";
+        }
+        return charge.resolution_plan;
+    }
+
     public Result viewPassword(Http.Request request) {
         return ok(view_password.render(request.flash().get("notice").orElse(null), request, mMessagesApi.preferred(request)));
     }
@@ -74,7 +281,7 @@ public class Application extends Controller {
             mail.addTo(u.email);
             mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
             mail.setBodyText("Hi " + u.name + ",\n\nYour DemSchoolTools password was changed today (" +
-                Application.formatDateTimeLong(OrgConfig.get(Organization.getByHost(request))) +
+                Application.formatDateTimeLong(Utils.getOrgConfig(Utils.getOrg(request))) +
                 "). \n\nIf it was not you who changed it, please investigate what is going on! " +
                 "Feel free to contact Evan (schmave@gmail.com) for help.");
             mMailer.send(mail);
@@ -106,7 +313,7 @@ public class Application extends Controller {
     }
 
     public Result viewSchoolMeetingReferrals(Http.Request request) {
-        return ok(view_sm_referrals.render(getActiveSchoolMeetingReferrals(Organization.getByHost(request)), request, mMessagesApi.preferred(request)));
+        return ok(view_sm_referrals.render(getActiveSchoolMeetingReferrals(Utils.getOrg(request)), request, mMessagesApi.preferred(request)));
     }
 
     public Result viewSchoolMeetingDecisions(Http.Request request) {
@@ -119,8 +326,8 @@ public class Application extends Controller {
                 .fetch("the_case")
                 .where()
                 .eq("referred_to_sm", true)
-                .eq("person.organization", Organization.getByHost(request))
-                .gt("sm_decision_date", Application.getStartOfYear())
+                .eq("person.organization", Utils.getOrg(request))
+                .gt("sm_decision_date", ModelUtils.getStartOfYear())
                 .isNotNull("sm_decision")
                 .orderBy("id DESC").findList();
         return ok(view_sm_decisions.render(the_charges, request, mMessagesApi.preferred(request)));
@@ -163,17 +370,17 @@ public class Application extends Controller {
         return ok(cached_page.render(new CachedPage(CachedPage.JC_INDEX,
                 "JC database",
                 "jc",
-                "jc_home", Organization.getByHost(request)) {
+                "jc_home", Utils.getOrg(request)) {
                 @Override
                 String render() {
         List<Meeting> meetings = Meeting.find.query()
             .fetch("cases")
-            .where().eq("organization", Organization.getByHost(request))
+            .where().eq("organization", Utils.getOrg(request))
             .orderBy("date DESC").findList();
 
         List<Tag> tags = Tag.find.query().where()
             .eq("show_in_jc", true)
-            .eq("organization", Organization.getByHost(request))
+            .eq("organization", Utils.getOrg(request))
             .findList();
 
         Set<Person> peopleSet = Person.find.query()
@@ -196,7 +403,7 @@ public class Application extends Controller {
             .fetch("charges.the_case.meeting")
             .fetch("section")
             .fetch("section.chapter")
-            .where().eq("section.chapter.organization", Organization.getByHost(request))
+            .where().eq("section.chapter.organization", Utils.getOrg(request))
             .eq("section.chapter.deleted", false)
             .eq("section.deleted", false)
             .eq("deleted", false)
@@ -220,8 +427,8 @@ public class Application extends Controller {
         Charset charset = StandardCharsets.UTF_8;
         CsvWriter writer = new CsvWriter(baos, ',', charset);
 
-        final Organization org = Organization.getByHost(request);
-        final OrgConfig org_config = OrgConfig.get(org);
+        final Organization org = Utils.getOrg(request);
+        final OrgConfig org_config = Utils.getOrgConfig(org);
 
         writer.write("Name");
         writer.write("Age");
@@ -253,7 +460,7 @@ public class Application extends Controller {
             .fetch("rule")
             .fetch("the_case.meeting", FetchConfig.ofQuery())
             .where().eq("person.organization", org)
-                .ge("the_case.meeting.date", getStartOfYear())
+                .ge("the_case.meeting.date", ModelUtils.getStartOfYear())
             .findList();
         for (Charge c : charges) {
             if (c.person != null) {
@@ -263,7 +470,7 @@ public class Application extends Controller {
             }
 
             if (c.person.dob != null) {
-                writer.write("" + CRM.calcAge(c.person));
+                writer.write("" + c.person.calcAge());
             } else {
                 writer.write("");
             }
@@ -278,7 +485,7 @@ public class Application extends Controller {
             // Adding a space to the front of the case number prevents MS Excel
             // from misinterpreting it as a date.
             writer.write(" " + c.the_case.case_number, true);
-            writer.write(c.the_case.generateCompositeFindingsFromChargeReferences());
+            writer.write(generateCompositeFindingsFromChargeReferences(c.the_case));
 
             if (c.rule != null) {
                 writer.write(c.rule.getNumber() + " " + c.rule.title);
@@ -322,16 +529,16 @@ public class Application extends Controller {
     }
 
     public Result viewMeeting(int meeting_id, Http.Request request) {
-        return ok(view_meeting.render(Meeting.findById(meeting_id, Organization.getByHost(request)), request, mMessagesApi.preferred(request)));
+        return ok(view_meeting.render(Meeting.findById(meeting_id, Utils.getOrg(request)), request, mMessagesApi.preferred(request)));
     }
 
     public Result printMeeting(int meeting_id, Http.Request request) throws Exception {
         return renderToPDF(
-                view_meeting.render(Meeting.findById(meeting_id, Organization.getByHost(request)), request, mMessagesApi.preferred(request)).toString());
+                view_meeting.render(Meeting.findById(meeting_id, Utils.getOrg(request)), request, mMessagesApi.preferred(request)).toString());
     }
 
     public Result editResolutionPlanList(Http.Request request) {
-        final Organization org = Organization.getByHost(request);
+        final Organization org = Utils.getOrg(request);
         List<Integer> referenced_charge_ids = getReferencedChargeIds(org);
         List<Charge> active_rps = getActiveResolutionPlans(referenced_charge_ids, org);
 
@@ -344,7 +551,7 @@ public class Application extends Controller {
                 .fetch("rule.section")
                 .fetch("rule.section.chapter")
                 .where()
-                .eq("person.organization", Organization.getByHost(request))
+                .eq("person.organization", Utils.getOrg(request))
                 .isNotNull("person")
                 .eq("rp_complete", true)
                 .not(Expr.in("id", referenced_charge_ids))
@@ -360,7 +567,7 @@ public class Application extends Controller {
                 .fetch("rule.section")
                 .fetch("rule.section.chapter")
                 .where()
-                .eq("person.organization", Organization.getByHost(request))
+                .eq("person.organization", Utils.getOrg(request))
                 .isNotNull("person")
                 .in("id", referenced_charge_ids)
                 .orderBy("id DESC")
@@ -373,7 +580,7 @@ public class Application extends Controller {
         for (Charge charge : all) {
             Case c = charge.the_case;
             if (c.composite_findings == null) {
-                c.composite_findings = c.generateCompositeFindingsFromChargeReferences();
+                c.composite_findings = generateCompositeFindingsFromChargeReferences(c);
             }
         }
 
@@ -414,7 +621,7 @@ public class Application extends Controller {
     }
 
     public Result viewSimpleResolutionPlans(Http.Request request) throws Exception {
-        final Organization org = Organization.getByHost(request);
+        final Organization org = Utils.getOrg(request);
         List<Integer> referenced_charge_ids = getReferencedChargeIds(org);
         List<Charge> charges = getActiveResolutionPlans(referenced_charge_ids, org);
 
@@ -439,7 +646,7 @@ public class Application extends Controller {
 
     public Result viewMeetingResolutionPlans(int meeting_id, Http.Request request) {
         return ok(view_meeting_resolution_plans.render(Meeting.findById(meeting_id,
-                Organization.getByHost(request)), request, mMessagesApi.preferred(request)));
+                Utils.getOrg(request)), request, mMessagesApi.preferred(request)));
     }
 
     public Result downloadMeetingResolutionPlans(int meeting_id, Http.Request request) throws IOException {
@@ -447,11 +654,11 @@ public class Application extends Controller {
         Charset charset = StandardCharsets.UTF_8;
         CsvWriter writer = new CsvWriter(baos, ',', charset);
 
-        Organization org = Organization.getByHost(request);
+        Organization org = Utils.getOrg(request);
         writer.write("Person");
         writer.write("Case #");
         writer.write("Rule");
-        writer.write(OrgConfig.get(org).str_res_plan_cap);
+        writer.write(Utils.getOrgConfig(org).str_res_plan_cap);
         writer.endRecord();
 
         Meeting m = Meeting.findById(meeting_id, org);
@@ -485,12 +692,12 @@ public class Application extends Controller {
         return ok("\ufeff" + new String(baos.toByteArray(), charset))
                 .as("text/csv; charset=utf-8")
                 .withHeader("Content-Disposition", "attachment; filename=" +
-                        OrgConfig.get(org).str_res_plans + ".csv");
+                        Utils.getOrgConfig(org).str_res_plans + ".csv");
 
     }
 
     public Result viewManual(Http.Request request) {
-        return ok(renderManualTOC(Organization.getByHost(request), request));
+        return ok(renderManualTOC(Utils.getOrg(request), request));
     }
 
     public Result viewManualChanges(String begin_date_string, Http.Request request) {
@@ -507,7 +714,7 @@ public class Application extends Controller {
         List<ManualChange> changes =
             ManualChange.find.query().where()
                 .gt("date_entered", begin_date)
-                .eq("entry.section.chapter.organization", Organization.getByHost(request))
+                .eq("entry.section.chapter.organization", Utils.getOrg(request))
                 .findList();
 
         changes.sort(ManualChange.SORT_NUM_DATE);
@@ -517,7 +724,7 @@ public class Application extends Controller {
     }
 
     public Result printManual(Http.Request request) {
-        return ok(print_manual.render(Chapter.all(Organization.getByHost(request)), request, mMessagesApi.preferred(request)));
+        return ok(print_manual.render(Chapter.all(Utils.getOrg(request)), request, mMessagesApi.preferred(request)));
     }
 
     static Path print_temp_dir;
@@ -630,7 +837,7 @@ public class Application extends Controller {
 
     play.twirl.api.Html renderManualTOC(Organization org, Http.Request request) {
         return cached_page.render(new CachedPage(CachedPage.MANUAL_INDEX,
-                OrgConfig.get(org).str_manual_title,
+                Utils.getOrgConfig(org).str_manual_title,
                 "manual",
                 "toc", org) {
                 @Override
@@ -642,7 +849,7 @@ public class Application extends Controller {
 
     public Result printManualChapter(Integer id, Http.Request request) throws Exception {
 
-        Organization org = Organization.getByHost(request);
+        Organization org = Utils.getOrg(request);
         if (id == -1) {
             ArrayList<String> documents = new ArrayList<>();
             // render TOC
@@ -669,7 +876,7 @@ public class Application extends Controller {
         Chapter c = Chapter.find.query()
             .fetch("sections", FetchConfig.ofQuery())
             .fetch("sections.entries", FetchConfig.ofQuery())
-            .where().eq("organization", Organization.getByHost(request))
+            .where().eq("organization", Utils.getOrg(request))
             .eq("id", id).findOne();
 
         return ok(view_chapter.render(c, request, mMessagesApi.preferred(request)));
@@ -686,7 +893,7 @@ public class Application extends Controller {
             "and ei.organization_id=:orgId " +
             "ORDER BY ts_rank(ei.document, plainto_tsquery(:searchString), 0) DESC";
 
-        OrgConfig orgConfig = OrgConfig.get(Organization.getByHost(request));
+        OrgConfig orgConfig = Utils.getOrgConfig(Utils.getOrg(request));
         SqlQuery sqlQuery = DB.sqlQuery(sql);
         sqlQuery.setParameter("orgId", orgConfig.org.id);
         sqlQuery.setParameter("searchString", searchString);
@@ -771,10 +978,10 @@ public class Application extends Controller {
     }
 
     public Result getPersonRuleHistory(Integer personId, Integer ruleId, Http.Request request) {
-        Person p = Person.findByIdWithJCData(personId, Organization.getByHost(request));
-        Entry r = Entry.findById(ruleId, Organization.getByHost(request));
+        Person p = Person.findByIdWithJCData(personId, Utils.getOrg(request));
+        Entry r = Entry.findById(ruleId, Utils.getOrg(request));
 
-        PersonHistory history = new PersonHistory(p, false, getStartOfYear(), null);
+        PersonHistory history = new PersonHistory(p, false, ModelUtils.getStartOfYear(), null);
         PersonHistory.Record rule_record = null;
         for (PersonHistory.Record record : history.rule_records) {
             if (record.rule != null && record.rule.equals(r)) {
@@ -787,16 +994,16 @@ public class Application extends Controller {
     }
 
     public Result getPersonHistory(Integer id, Http.Request request) {
-        Person p = Person.findByIdWithJCData(id, Organization.getByHost(request));
+        Person p = Person.findByIdWithJCData(id, Utils.getOrg(request));
         return ok(person_history.render(p,
-            new PersonHistory(p, false, getStartOfYear(), null),
+            new PersonHistory(p, false, ModelUtils.getStartOfYear(), null),
             getLastWeekCharges(p),
             false, request, mMessagesApi.preferred(request)));
     }
 
 
     private static Date restrictStartDate(Date d, User current_user) {
-        Date soy = getStartOfYear();
+        Date soy = ModelUtils.getStartOfYear();
         long soy_millis = soy.getTime();
         long d_millis = d.getTime();
         if ((soy_millis - d_millis > 1000 * 60) && current_user == null) {
@@ -809,13 +1016,13 @@ public class Application extends Controller {
         return result.flashing("notice", "You must be logged in to view info prior to " +
                 Application.yymmddDate(
                         orgConfig,
-                        Application.getStartOfYear()) + ".");
+                        ModelUtils.getStartOfYear()) + ".");
     }
 
     public Result viewPersonHistory(Integer id, Boolean redact_names,
                                     String start_date_str, String end_date_str,
                                     Http.Request request) {
-        Date start_date = getStartOfYear();
+        Date start_date = ModelUtils.getStartOfYear();
         Date end_date = null;
 
         try {
@@ -825,7 +1032,7 @@ public class Application extends Controller {
         }
 
         Date restricted_start_date = restrictStartDate(start_date, getCurrentUser(request));
-        Person p = Person.findByIdWithJCData(id, Organization.getByHost(request));
+        Person p = Person.findByIdWithJCData(id, Utils.getOrg(request));
         Result result = ok(view_person_history.render(p,
             new PersonHistory(p, true, start_date, end_date),
             getLastWeekCharges(p),
@@ -833,22 +1040,22 @@ public class Application extends Controller {
 
         if (restricted_start_date != start_date) {
             result = addRestrictStartDateMessage(result,
-                    OrgConfig.get(Organization.getByHost(request)));
+                    Utils.getOrgConfig(Utils.getOrg(request)));
 
         }
         return result;
     }
 
     public Result getRuleHistory(Integer id, Http.Request request) {
-        Entry r = Entry.findByIdWithJCData(id, Organization.getByHost(request));
+        Entry r = Entry.findByIdWithJCData(id, Utils.getOrg(request));
         return ok(rule_history.render(r,
-            new RuleHistory(r, false, getStartOfYear(), null),
+            new RuleHistory(r, false, ModelUtils.getStartOfYear(), null),
             getRecentResolutionPlans(r), request, mMessagesApi.preferred(request)));
     }
 
     public Result viewRuleHistory(Integer id, String start_date_str, String end_date_str,
                                   Http.Request request) {
-        Date start_date = getStartOfYear();
+        Date start_date = ModelUtils.getStartOfYear();
         Date end_date = null;
 
         try {
@@ -859,21 +1066,21 @@ public class Application extends Controller {
 
         Date restricted_start_date = restrictStartDate(start_date, getCurrentUser(request));
 
-        Entry r = Entry.findByIdWithJCData(id, Organization.getByHost(request));
+        Entry r = Entry.findByIdWithJCData(id, Utils.getOrg(request));
         Result result = ok(view_rule_history.render(r,
             new RuleHistory(r, true, start_date, end_date),
             getRecentResolutionPlans(r), request, mMessagesApi.preferred(request)));
 
         if (restricted_start_date != start_date) {
             result = addRestrictStartDateMessage(result,
-                    OrgConfig.get(Organization.getByHost(request)));
+                    Utils.getOrgConfig(Utils.getOrg(request)));
 
         }
         return result;
     }
 
     public Result viewPersonsWriteups(Integer id, Http.Request request) {
-        Person p = Person.findByIdWithJCData(id, Organization.getByHost(request));
+        Person p = Person.findByIdWithJCData(id, Utils.getOrg(request));
 
         List<Case> cases_written_up = new ArrayList<>(p.getThisYearCasesWrittenUp());
 
@@ -902,7 +1109,7 @@ public class Application extends Controller {
         end_date.add(GregorianCalendar.DATE, 6);
 
         List<Meeting> meetings = Meeting.find.query().where()
-            .eq("organization", Organization.getByHost(request))
+            .eq("organization", Utils.getOrg(request))
             .le("date", end_date.getTime())
             .ge("date", start_date.getTime()).findList();
 
@@ -911,7 +1118,7 @@ public class Application extends Controller {
 
     public Result viewWeeklyReport(String date_string, Http.Request request) {
         Calendar start_date = Utils.parseDateOrNow(date_string);
-        Organization org = Organization.getByHost(request);
+        Organization org = Utils.getOrg(request);
         Utils.adjustToPreviousDay(start_date, org.jc_reset_day + 1);
 
         Calendar end_date = (Calendar)start_date.clone();
@@ -923,7 +1130,7 @@ public class Application extends Controller {
             .fetch("rule")
             .fetch("the_case.meeting", FetchConfig.ofQuery())
             .where().eq("person.organization", org)
-                .ge("the_case.meeting.date", getStartOfYear(start_date.getTime()))
+                .ge("the_case.meeting.date", ModelUtils.getStartOfYear(start_date.getTime()))
             .findList();
         WeeklyStats result = new WeeklyStats();
         result.rule_counts = new TreeMap<>();
@@ -1036,7 +1243,7 @@ public class Application extends Controller {
 
         List<Case> cases = Case.find.query().where()
             .eq("meeting.organization", org)
-            .ge("meeting.date", Application.getStartOfYear())
+            .ge("meeting.date", ModelUtils.getStartOfYear())
             .like("case_number", term + "%")
             .orderBy("case_number ASC").findList();
 
@@ -1060,11 +1267,11 @@ public class Application extends Controller {
 
         // Look up person using findById to guarantee that the current user
         // has access to that organization.
-        Person p = Person.findById(personId, Organization.getByHost(request));
+        Person p = Person.findById(personId, Utils.getOrg(request));
         List<Charge> charges = Charge.find.query().where().eq("person", p)
                 .eq("rule_id", ruleId)
                 .lt("the_case.meeting.date", now)
-                .ge("the_case.meeting.date", Application.getStartOfYear())
+                .ge("the_case.meeting.date", ModelUtils.getStartOfYear())
                 .orderBy("the_case.meeting.date DESC")
                 .findList();
 
@@ -1078,26 +1285,6 @@ public class Application extends Controller {
 
     public static Date addWeek(Date d, int numWeeks) {
         return new Date(d.getTime() + numWeeks * 7 * 24 * 60 * 60 * 1000);
-    }
-
-    public static Date getStartOfYear() {
-        return getStartOfYear(new Date());
-    }
-
-    public static Date getStartOfYear(Date d) {
-        Date result = (Date)d.clone();
-
-        if (result.getMonth() < 7) { // july or earlier
-            result.setYear(result.getYear() - 1);
-        }
-        result.setMonth(Calendar.AUGUST);
-        result.setDate(1);
-
-        result.setHours(0);
-        result.setMinutes(0);
-        result.setSeconds(0);
-
-        return result;
     }
 
     public static String formatDayOfWeek(Date d) {
@@ -1206,14 +1393,14 @@ public class Application extends Controller {
         Map<String, Object> scopes = new HashMap<>();
 
         ArrayList<String> existingFiles = new ArrayList<>();
-        File[] files = getSharedFileDirectory(Organization.getByHost(request)).listFiles();
+        File[] files = getSharedFileDirectory(Utils.getOrg(request)).listFiles();
         for (File f : files) {
             existingFiles.add(f.getName());
         }
 
         scopes.put("existing_files", existingFiles);
 
-        scopes.put("printer_email", Organization.getByHost(request).printer_email);
+        scopes.put("printer_email", Utils.getOrg(request).printer_email);
         return ok(main_with_mustache.render("File Sharing config",
             "misc",
             "file_sharing",
@@ -1226,7 +1413,7 @@ public class Application extends Controller {
         final Map<String, String[]> values = request.body().asFormUrlEncoded();
 
         if (values.containsKey("printer_email")) {
-            Organization.getByHost(request).setPrinterEmail(values.get("printer_email")[0]);
+            Utils.getOrg(request).setPrinterEmail(values.get("printer_email")[0]);
         }
 
         return redirect(routes.Application.fileSharing());
@@ -1239,7 +1426,7 @@ public class Application extends Controller {
         if (pdf != null) {
             String fileName = pdf.getFilename();
             if (!fileName.equals("")) {
-                File outputFile = new File(getSharedFileDirectory(Organization.getByHost(request)), fileName);
+                File outputFile = new File(getSharedFileDirectory(Utils.getOrg(request)), fileName);
                 copyFileUsingStream(pdf.getRef().getAbsoluteFile(), outputFile);
             }
         }
@@ -1259,7 +1446,7 @@ public class Application extends Controller {
         final Map<String, String[]> values = request.body().asFormUrlEncoded();
 
         if (values.containsKey("filename")) {
-            File the_file = new File(getSharedFileDirectory(Organization.getByHost(request)), values.get("filename")[0]);
+            File the_file = new File(getSharedFileDirectory(Utils.getOrg(request)), values.get("filename")[0]);
             if (the_file.exists()) {
                 the_file.delete();
             }
@@ -1272,7 +1459,7 @@ public class Application extends Controller {
         Map<String, Object> scopes = new HashMap<>();
 
         ArrayList<String> existingFiles = new ArrayList<>();
-        final Organization org = Organization.getByHost(request);
+        final Organization org = Utils.getOrg(request);
         File[] files = getSharedFileDirectory(org).listFiles();
         for (File f : files) {
             existingFiles.add(f.getName());
@@ -1292,11 +1479,11 @@ public class Application extends Controller {
         final Map<String, String[]> values = request.body().asFormUrlEncoded();
 
         if (values.containsKey("filename")) {
-            File the_file = new File(getSharedFileDirectory(Organization.getByHost(request)), values.get("filename")[0]);
+            File the_file = new File(getSharedFileDirectory(Utils.getOrg(request)), values.get("filename")[0]);
             if (the_file.exists()) {
                 play.libs.mailer.Email mail = new play.libs.mailer.Email();
                 mail.setSubject("Print from DemSchoolTools");
-                mail.addTo(Organization.getByHost(request).printer_email);
+                mail.addTo(Utils.getOrg(request).printer_email);
                 mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
                 mail.addAttachment(the_file.getName(), the_file);
                 mMailer.send(mail);

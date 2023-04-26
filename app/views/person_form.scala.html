@@ -85,7 +85,7 @@
 		@inputText(personForm("grade"), Symbol("_label") -> "Current Grade", Symbol("class") -> "form-control")
 		@inputDate(personForm("dob"), Symbol("_label") -> "Date of Birth", Symbol("class") -> "form-control")
 
-		@if(OrgConfig.get(request).org.show_electronic_signin) {
+		@if(Utils.getOrgConfig(request).org.show_electronic_signin) {
 			@inputText(personForm("pin"), Symbol("_label") -> "Attendance PIN", Symbol("class") -> "form-control")
 		}
 

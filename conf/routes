@@ -173,12 +173,6 @@ POST    /undoTagChanges          controllers.CRM.undoTagChanges(request: Request
 
 GET     /viewTaskList/:id         controllers.CRM.viewTaskList(id: Integer, request: Request)
 
-POST	/postEmail				  controllers.Public.postEmail()
-GET 	/viewPendingEmail		  controllers.CRM.viewPendingEmail(request: Request)
-POST	/sendTestEmail				  controllers.CRM.sendTestEmail(request: Request)
-POST	/deleteEmail				  controllers.CRM.deleteEmail(request: Request)
-POST	/sendEmail				  controllers.CRM.sendEmail(request: Request)
-
 POST      /sendFeedbackEmail          controllers.Application.sendFeedbackEmail(request: Request)
 
 GET     /mailchimpSettings	controllers.CRM.viewMailchimpSettings(request: Request)

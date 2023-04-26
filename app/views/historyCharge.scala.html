@@ -12,17 +12,18 @@
 	(@c.severity)
 }
 
-<i>@OrgConfig.get(request).str_findings</i>:
-@if( redact_findings ) { @c.the_case.getRedactedFindings(c.person) } else { @c.the_case.generateCompositeFindingsFromChargeReferences() }
+<i>@Utils.getOrgConfig(request).str_findings</i>:
+@if( redact_findings ) { @Application.getRedactedFindings(c.the_case, c.person) } else {
+	@Application.generateCompositeFindingsFromChargeReferences(c.the_case) }
 
 @if( !c.plea.equals("Guilty") ) {
-	Plead <b>@OrgConfig.get(request).translatePlea(c.plea)</b>.
+	Plead <b>@Utils.getOrgConfig(request).translatePlea(c.plea)</b>.
 }
 
-<u>@OrgConfig.get(request).str_res_plan_short: @c.resolution_plan</u>
+<u>@Utils.getOrgConfig(request).str_res_plan_short: @c.resolution_plan</u>
 
 @if( c.sm_decision != null) {
 	<span class="sm-decision"><i>School Meeting ruled@if(
-		c.sm_decision_date != null) { on @Application.yymmddDate(OrgConfig.get(request), c.sm_decision_date)}</i>:
+		c.sm_decision_date != null) { on @Application.yymmddDate(Utils.getOrgConfig(request), c.sm_decision_date)}</i>:
 		@c.sm_decision</span>
 }
