@@ -6,7 +6,6 @@ import java.math.BigDecimal;
 import java.sql.Time;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.*;
@@ -18,15 +17,7 @@ public class Organization extends Model {
     public Integer id;
 
     public String name;
-
-    // Don't serialize this one by default because it is private.
-    @JsonIgnore
-    public String mailchimp_api_key;
-
-    public Date mailchimp_last_sync_person_changes;
-
-    public String mailchimp_updates_email;
-
+    
     public String printer_email;
 
     public Integer jc_reset_day;
@@ -63,26 +54,6 @@ public class Organization extends Model {
             Organization.class
     );
 
-    public void setMailChimpApiKey(String key) {
-        this.mailchimp_api_key = key;
-        this.save();
-    }
-
-    public void setMailChimpUpdatesEmail(String email) {
-        this.mailchimp_updates_email = email;
-        this.save();
-    }
-
-    public void setLastMailChimpSyncTime(Date d) {
-        this.mailchimp_last_sync_person_changes = d;
-        this.save();
-    }
-
-    public void setPrinterEmail(String email) {
-        this.printer_email = email;
-        this.save();
-    }
-
     public String formatAttendanceLatestStartTime() {
         if (attendance_day_latest_start_time == null) {
             return "";
@@ -97,11 +68,6 @@ public class Organization extends Model {
         }
         DateFormat format = new SimpleDateFormat("h:mm a");
         return format.format(attendance_report_latest_departure_time.getTime());
-    }
-
-    public void setAttendanceAdminPIN(String pin) {
-        this.attendance_admin_pin = pin;
-        this.save();
     }
 
     public void updateFromForm(Map<String, String[]> values, Organization org) {

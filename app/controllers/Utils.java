@@ -1,23 +1,20 @@
 package controllers;
 
-import java.io.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import javax.annotation.Nonnull;
-import javax.inject.Singleton;
-
 import com.fasterxml.jackson.databind.*;
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.MustacheFactory;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import com.typesafe.config.Config;
 import io.ebean.DB;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
+import java.io.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import javax.annotation.Nonnull;
+import javax.inject.Singleton;
 import models.*;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;

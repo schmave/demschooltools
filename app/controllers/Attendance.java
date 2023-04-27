@@ -866,7 +866,9 @@ public class Attendance extends Controller {
         for (Map.Entry<String, String[]> entry : entries) {
             Integer person_id = Integer.parseInt(entry.getKey());
             if (person_id == -1) {
-                Utils.getOrg(request).setAttendanceAdminPIN(entry.getValue()[0]);
+                Organization organization = Utils.getOrg(request);
+                organization.attendance_admin_pin = entry.getValue()[0];
+                organization.save();
             }
             else {
                 Person person = people_by_id.get(person_id);

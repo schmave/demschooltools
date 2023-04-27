@@ -45,7 +45,6 @@ libraryDependencies ++= Seq(
   "org.postgresql" % "postgresql" % "42.5.4",
   "com.typesafe.play" %% "play-mailer" % "8.0.1",
   "com.typesafe.play" %% "play-mailer-guice" % "8.0.1",
-  "com.ecwid" % "ecwid-mailchimp" % "2.0.1.0",
   "org.xhtmlrenderer" % "flying-saucer-pdf-itext5" % "9.1.22",
   "com.github.spullara.mustache.java" % "compiler" % "0.9.10",
   "org.apache.poi" % "poi-ooxml" % "5.2.2",

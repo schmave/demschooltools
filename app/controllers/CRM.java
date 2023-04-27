@@ -1,14 +1,11 @@
 package controllers;
 
-import com.ecwid.mailchimp.*;
-import com.ecwid.mailchimp.method.v2_0.lists.ListMethodResult;
 import io.ebean.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.inject.Inject;
-
 import models.*;
 import models.Comment;
 import org.apache.poi.ss.usermodel.*;
@@ -771,47 +768,5 @@ public class CRM extends Controller {
         List<Person> people = list.tag.people;
 
         return ok(task_list.render(list, people, request, mMessagesApi.preferred(request)));
-    }
-
-    public Result viewMailchimpSettings(Http.Request request) {
-        MailChimpClient mailChimpClient = new MailChimpClient();
-        Organization org = Utils.getOrg(request);
-
-        Map<String, ListMethodResult.Data> mc_list_map =
-            Public.getMailChimpLists(mailChimpClient, org.mailchimp_api_key);
-
-        return ok(view_mailchimp_settings.render(mFormFactory.form(Organization.class), org,
-            MailchimpSync.find.query().where().eq("tag.organization", Utils.getOrg(request)).findList(),
-            mc_list_map, request, mMessagesApi.preferred(request)));
-    }
-
-    public Result saveMailchimpSettings(Http.Request request) {
-        final Map<String, String[]> values = request.body().asFormUrlEncoded();
-
-        if (values.containsKey("mailchimp_api_key")) {
-            Utils.getOrg(request).setMailChimpApiKey(values.get("mailchimp_api_key")[0]);
-        }
-
-        if (values.containsKey("mailchimp_updates_email")) {
-            Utils.getOrg(request).setMailChimpUpdatesEmail(values.get("mailchimp_updates_email")[0]);
-        }
-
-        if (values.containsKey("sync_type")) {
-            for (String tag_id : values.get("tag_id")) {
-                Tag t = Tag.findById(Integer.parseInt(tag_id), Utils.getOrg(request));
-                MailchimpSync.create(t,
-                    values.get("mailchimp_list_id")[0],
-                    values.get("sync_type")[0].equals("local_add"),
-                    values.get("sync_type")[0].equals("local_remove"));
-            }
-        }
-
-        if (values.containsKey("remove_sync_id")) {
-            MailchimpSync sync = MailchimpSync.find.byId(Integer.parseInt(
-                values.get("remove_sync_id")[0]));
-            sync.delete();
-        }
-
-        return redirect(routes.CRM.viewMailchimpSettings());
     }
 }

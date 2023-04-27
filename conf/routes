@@ -175,11 +175,6 @@ GET     /viewTaskList/:id         controllers.CRM.viewTaskList(id: Integer, requ
 
 POST      /sendFeedbackEmail          controllers.Application.sendFeedbackEmail(request: Request)
 
-GET     /mailchimpSettings	controllers.CRM.viewMailchimpSettings(request: Request)
-POST	/mailchimpSettings	controllers.CRM.saveMailchimpSettings(request: Request)
-GET	/syncMailchimp		controllers.Public.syncMailchimp(request: Request)
-
-
 GET     /settings               controllers.Settings.viewSettings(request: Request)
 GET     /settings/notifications controllers.Settings.viewSettings(request: Request)
 POST    /settings               controllers.Settings.editSettings(request: Request)

@@ -4,18 +4,6 @@ import com.csvreader.CsvWriter;
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.typesafe.config.Config;
 import io.ebean.*;
-import models.*;
-import org.markdown4j.Markdown4jProcessor;
-import org.mindrot.jbcrypt.BCrypt;
-import org.xhtmlrenderer.pdf.ITextRenderer;
-import play.api.libs.mailer.MailerClient;
-import play.i18n.MessagesApi;
-import play.libs.Json;
-import play.mvc.*;
-import views.html.*;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -26,6 +14,17 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import models.*;
+import org.markdown4j.Markdown4jProcessor;
+import org.mindrot.jbcrypt.BCrypt;
+import org.xhtmlrenderer.pdf.ITextRenderer;
+import play.api.libs.mailer.MailerClient;
+import play.i18n.MessagesApi;
+import play.libs.Json;
+import play.mvc.*;
+import views.html.*;
 
 @Singleton
 @With(DumpOnError.class)
@@ -1413,7 +1412,10 @@ public class Application extends Controller {
         final Map<String, String[]> values = request.body().asFormUrlEncoded();
 
         if (values.containsKey("printer_email")) {
-            Utils.getOrg(request).setPrinterEmail(values.get("printer_email")[0]);
+            Organization organization = Utils.getOrg(request);
+            String email = values.get("printer_email")[0];
+            organization.printer_email = email;
+            organization.save();
         }
 
         return redirect(routes.Application.fileSharing());
