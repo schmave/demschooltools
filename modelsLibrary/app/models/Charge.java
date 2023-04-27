@@ -1,16 +1,13 @@
 package models;
 
-import controllers.*;
-
+import com.fasterxml.jackson.annotation.*;
+import io.ebean.*;
 import java.util.*;
 import java.util.Date;
 import java.util.Map;
-
 import javax.persistence.*;
-
-import com.fasterxml.jackson.annotation.*;
-
-import io.ebean.*;
+import lombok.AccessLevel;
+import lombok.Setter;
 
 @Entity
 @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
@@ -56,7 +53,9 @@ public class Charge extends Model implements Comparable<Charge> {
     public Date sm_decision_date;
 
     public boolean rp_complete = false;
-    public Date rp_complete_date = null;
+
+    @Setter(AccessLevel.NONE)
+    private Date rpCompleteDate = null;
 
     public String severity = "";
 
@@ -135,7 +134,7 @@ public class Charge extends Model implements Comparable<Charge> {
         decision = decision.trim();
         if (!decision.equals(this.sm_decision)) {
             this.rp_complete = false;
-            this.rp_complete_date = null;
+            this.rpCompleteDate = null;
         }
 
         this.sm_decision_date = date;
@@ -155,9 +154,9 @@ public class Charge extends Model implements Comparable<Charge> {
     public void setRPComplete(boolean complete) {
         this.rp_complete = complete;
         if (complete) {
-            this.rp_complete_date = new Date();
+            this.rpCompleteDate = new Date();
         } else {
-            this.rp_complete_date = null;
+            this.rpCompleteDate = null;
         }
         this.save();
     }
