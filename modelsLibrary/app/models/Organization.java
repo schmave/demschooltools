@@ -10,41 +10,46 @@ import java.util.List;
 import java.util.Map;
 import javax.persistence.*;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 @Entity
 public class Organization extends Model {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "organization_id_seq")
-    public Integer id;
+    private Integer id;
 
-    public String name;
+    private String name;
     
-    public String printer_email;
+    private String printerEmail;
 
-    public Integer jc_reset_day;
-    public Boolean show_last_modified_in_print;
-    public Boolean show_history_in_print;
+    private Integer jcResetDay;
+    private Boolean showLastModifiedInPrint;
+    private Boolean showHistoryInPrint;
 
-    public String short_name;
-    public String custodia_password;
-    public Boolean show_custodia;
-    public Boolean show_attendance;
-    public Boolean show_electronic_signin;
-    public Boolean show_accounting;
+    private String shortName;
+    private String custodiaPassword;
+    private Boolean showCustodia;
+    private Boolean showAttendance;
+    private Boolean showElectronicSignin;
+    private Boolean showAccounting;
 
-    public Boolean enable_case_references;
+    private Boolean enableCaseReferences;
 
-    public Boolean attendance_enable_off_campus;
-    public Boolean attendance_show_reports;
-    public Time attendance_report_latest_departure_time;
-    public Integer attendance_report_late_fee;
-    public Integer attendance_report_late_fee_interval;
-    public Boolean attendance_show_percent;
-    public Boolean attendance_show_weighted_percent;
-    public Boolean attendance_enable_partial_days;
-    public Time attendance_day_latest_start_time;
-    public Double attendance_day_min_hours;
-    public BigDecimal attendance_partial_day_value;
-    public String attendance_admin_pin;
+    private Boolean attendanceEnableOffCampus;
+    private Boolean attendanceShowReports;
+    private Time attendanceReportLatestDepartureTime;
+    private Integer attendanceReportLateFee;
+    private Integer attendanceReportLateFeeInterval;
+    private Boolean attendanceShowPercent;
+    private Boolean attendanceShowWeightedPercent;
+    private Boolean attendanceEnablePartialDays;
+    private Time attendanceDayLatestStartTime;
+    private Double attendanceDayMinHours;
+    private BigDecimal attendancePartialDayValue;
+    private String attendanceAdminPin;
 
     @OneToMany(mappedBy="organization")
     @JsonIgnore
@@ -55,30 +60,30 @@ public class Organization extends Model {
     );
 
     public String formatAttendanceLatestStartTime() {
-        if (attendance_day_latest_start_time == null) {
+        if (attendanceDayLatestStartTime == null) {
             return "";
         }
         DateFormat format = new SimpleDateFormat("h:mm a");
-        return format.format(attendance_day_latest_start_time.getTime());
+        return format.format(attendanceDayLatestStartTime.getTime());
     }
 
     public String formatAttendanceReportLatestDepartureTime() {
-        if (attendance_report_latest_departure_time == null) {
+        if (attendanceReportLatestDepartureTime == null) {
             return "";
         }
         DateFormat format = new SimpleDateFormat("h:mm a");
-        return format.format(attendance_report_latest_departure_time.getTime());
+        return format.format(attendanceReportLatestDepartureTime.getTime());
     }
 
     public void updateFromForm(Map<String, String[]> values, Organization org) {
-        if (values.containsKey("jc_reset_day")) {
-            this.jc_reset_day = Integer.parseInt(values.get("jc_reset_day")[0]);
+        if (values.containsKey("jcResetDay")) {
+            this.jcResetDay = Integer.parseInt(values.get("jcResetDay")[0]);
         }
         if (values.containsKey("case_reference_settings")) {
-            if (values.containsKey("enable_case_references")) {
-                this.enable_case_references = ModelUtils.getBooleanFromFormValue(values.get("enable_case_references")[0]);
+            if (values.containsKey("enableCaseReferences")) {
+                this.enableCaseReferences = ModelUtils.getBooleanFromFormValue(values.get("enableCaseReferences")[0]);
             } else {
-                this.enable_case_references = false;
+                this.enableCaseReferences = false;
             }
             if (values.containsKey("breaking_res_plan_entry_id")) {
                 Entry.unassignBreakingResPlanEntry(this);
@@ -91,101 +96,100 @@ public class Organization extends Model {
             }
         }
         if (values.containsKey("manual_settings")) {
-            if (values.containsKey("show_last_modified_in_print")) {
-                this.show_last_modified_in_print = ModelUtils.getBooleanFromFormValue(values.get("show_last_modified_in_print")[0]);
+            if (values.containsKey("showLastModifiedInPrint")) {
+                this.showLastModifiedInPrint = ModelUtils.getBooleanFromFormValue(values.get("showLastModifiedInPrint")[0]);
             } else {
-                this.show_last_modified_in_print = false;
+                this.showLastModifiedInPrint = false;
             }
-            if (values.containsKey("show_history_in_print")) {
-                this.show_history_in_print = ModelUtils.getBooleanFromFormValue(values.get("show_history_in_print")[0]);
+            if (values.containsKey("showHistoryInPrint")) {
+                this.showHistoryInPrint = ModelUtils.getBooleanFromFormValue(values.get("showHistoryInPrint")[0]);
             } else {
-                this.show_history_in_print = false;
+                this.showHistoryInPrint = false;
             }
         }
         if (values.containsKey("attendance_settings")) {
-            if (values.containsKey("show_attendance")) {
-                this.show_attendance = ModelUtils.getBooleanFromFormValue(values.get("show_attendance")[0]);
+            if (values.containsKey("showAttendance")) {
+                this.showAttendance = ModelUtils.getBooleanFromFormValue(values.get("showAttendance")[0]);
             } else {
-                this.show_attendance = false;
+                this.showAttendance = false;
             }
-            if (values.containsKey("show_electronic_signin")) {
-                this.show_electronic_signin = ModelUtils.getBooleanFromFormValue(values.get("show_electronic_signin")[0]);
+            if (values.containsKey("showElectronicSignin")) {
+                this.showElectronicSignin = ModelUtils.getBooleanFromFormValue(values.get("showElectronicSignin")[0]);
             } else {
-                this.show_electronic_signin = false;
+                this.showElectronicSignin = false;
             }
-            if (values.containsKey("attendance_enable_off_campus")) {
-                this.attendance_enable_off_campus = ModelUtils.getBooleanFromFormValue(values.get("attendance_enable_off_campus")[0]);
+            if (values.containsKey("attendanceEnableOffCampus")) {
+                this.attendanceEnableOffCampus = ModelUtils.getBooleanFromFormValue(values.get("attendanceEnableOffCampus")[0]);
             } else {
-                this.attendance_enable_off_campus = false;
+                this.attendanceEnableOffCampus = false;
             }
-            if (values.containsKey("attendance_show_reports")) {
-                this.attendance_show_reports = ModelUtils.getBooleanFromFormValue(values.get("attendance_show_reports")[0]);
+            if (values.containsKey("attendanceShowReports")) {
+                this.attendanceShowReports = ModelUtils.getBooleanFromFormValue(values.get("attendanceShowReports")[0]);
             } else {
-                this.attendance_show_reports = false;
+                this.attendanceShowReports = false;
             }
-            if (values.containsKey("attendance_show_percent")) {
-                this.attendance_show_percent = ModelUtils.getBooleanFromFormValue(values.get("attendance_show_percent")[0]);
+            if (values.containsKey("attendanceShowPercent")) {
+                this.attendanceShowPercent = ModelUtils.getBooleanFromFormValue(values.get("attendanceShowPercent")[0]);
             } else {
-                this.attendance_show_percent = false;
+                this.attendanceShowPercent = false;
             }
-            if (values.containsKey("attendance_show_weighted_percent")) {
-                this.attendance_show_weighted_percent = ModelUtils.getBooleanFromFormValue(values.get("attendance_show_weighted_percent")[0]);
+            if (values.containsKey("attendanceShowWeightedPercent")) {
+                this.attendanceShowWeightedPercent = ModelUtils.getBooleanFromFormValue(values.get("attendanceShowWeightedPercent")[0]);
             } else {
-                this.attendance_show_weighted_percent = false;
+                this.attendanceShowWeightedPercent = false;
             }
-            if (values.containsKey("attendance_enable_partial_days")) {
-                this.attendance_enable_partial_days = ModelUtils.getBooleanFromFormValue(values.get("attendance_enable_partial_days")[0]);
+            if (values.containsKey("attendanceEnablePartialDays")) {
+                this.attendanceEnablePartialDays = ModelUtils.getBooleanFromFormValue(values.get("attendanceEnablePartialDays")[0]);
             } else {
-                this.attendance_enable_partial_days = false;
+                this.attendanceEnablePartialDays = false;
             }
-            if (values.containsKey("show_custodia")) {
-                this.show_custodia = ModelUtils.getBooleanFromFormValue(values.get("show_custodia")[0]);
+            if (values.containsKey("showCustodia")) {
+                this.showCustodia = ModelUtils.getBooleanFromFormValue(values.get("showCustodia")[0]);
             } else {
-                this.show_custodia = false;
+                this.showCustodia = false;
             }
-            if (!values.containsKey("attendance_day_min_hours") || values.get("attendance_day_min_hours")[0].isEmpty()) {
-                this.attendance_day_min_hours = null;
+            if (!values.containsKey("attendanceDayMinHours") || values.get("attendanceDayMinHours")[0].isEmpty()) {
+                this.attendanceDayMinHours = null;
             } else {
-                this.attendance_day_min_hours = Double.parseDouble(values.get("attendance_day_min_hours")[0]);
+                this.attendanceDayMinHours = Double.parseDouble(values.get("attendanceDayMinHours")[0]);
             }
-            if (!values.containsKey("attendance_partial_day_value") || values.get("attendance_partial_day_value")[0].isEmpty()) {
-                this.attendance_partial_day_value = null;
+            if (!values.containsKey("attendancePartialDayValue") || values.get("attendancePartialDayValue")[0].isEmpty()) {
+                this.attendancePartialDayValue = null;
             } else {
-                this.attendance_partial_day_value = new BigDecimal(values.get("attendance_partial_day_value")[0]);
+                this.attendancePartialDayValue = new BigDecimal(values.get("attendancePartialDayValue")[0]);
             }
-            if (values.containsKey("attendance_day_latest_start_time")) {
-                this.attendance_day_latest_start_time = AttendanceDay.parseTime(values.get("attendance_day_latest_start_time")[0]);
+            if (values.containsKey("attendanceDayLatestStartTime")) {
+                this.attendanceDayLatestStartTime = AttendanceDay.parseTime(values.get("attendanceDayLatestStartTime")[0]);
             } else {
-                this.attendance_day_latest_start_time = null;
+                this.attendanceDayLatestStartTime = null;
             }
-            if (values.containsKey("attendance_report_latest_departure_time")) {
-                this.attendance_report_latest_departure_time = AttendanceDay.parseTime(values.get("attendance_report_latest_departure_time")[0]);
+            if (values.containsKey("attendanceReportLatestDepartureTime")) {
+                this.attendanceReportLatestDepartureTime = AttendanceDay.parseTime(values.get("attendanceReportLatestDepartureTime")[0]);
             } else {
-                this.attendance_report_latest_departure_time = null;
+                this.attendanceReportLatestDepartureTime = null;
             }
-            if (!values.containsKey("attendance_report_late_fee") || values.get("attendance_report_late_fee")[0].isEmpty()) {
-                this.attendance_report_late_fee = null;
+            if (!values.containsKey("attendanceReportLateFee") || values.get("attendanceReportLateFee")[0].isEmpty()) {
+                this.attendanceReportLateFee = null;
             } else {
-                this.attendance_report_late_fee = Integer.parseInt(values.get("attendance_report_late_fee")[0]);
+                this.attendanceReportLateFee = Integer.parseInt(values.get("attendanceReportLateFee")[0]);
             }
-            if (!values.containsKey("attendance_report_late_fee_interval") || values.get("attendance_report_late_fee_interval")[0].isEmpty()) {
-                this.attendance_report_late_fee_interval = null;
+            if (!values.containsKey("attendanceReportLateFeeInterval") || values.get("attendanceReportLateFeeInterval")[0].isEmpty()) {
+                this.attendanceReportLateFeeInterval = null;
             } else {
-                this.attendance_report_late_fee_interval = Integer.parseInt(values.get("attendance_report_late_fee_interval")[0]);
+                this.attendanceReportLateFeeInterval = Integer.parseInt(values.get("attendanceReportLateFeeInterval")[0]);
             }
         }
         if (values.containsKey("accounting_settings")) {
-            if (values.containsKey("show_accounting")) {
-                this.show_accounting = ModelUtils.getBooleanFromFormValue(values.get("show_accounting")[0]);
-                if (this.show_accounting) {
+            if (values.containsKey("showAccounting")) {
+                this.showAccounting = ModelUtils.getBooleanFromFormValue(values.get("showAccounting")[0]);
+                if (this.showAccounting) {
                     Account.createPersonalAccounts(org);
                 }
             } else {
-                this.show_accounting = false;
+                this.showAccounting = false;
             }
         }
         this.save();
     }
 
 }
-

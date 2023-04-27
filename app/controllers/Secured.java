@@ -12,7 +12,6 @@ import java.lang.annotation.Target;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import javax.inject.Inject;
-
 import models.User;
 import models.UserRole;
 import play.Logger;
@@ -119,7 +118,7 @@ public class Secured {
                 SqlQuery sqlQuery = DB.sqlQuery(sql);
                 String address = Application.getRemoteIp(request);
                 sqlQuery.setParameter("ip", address);
-                sqlQuery.setParameter("org_id", Utils.getOrg(request).id);
+                sqlQuery.setParameter("org_id", Utils.getOrg(request).getId());
 
                 // execute the query returning a List of MapBean objects
                 SqlRow result = sqlQuery.findOne();

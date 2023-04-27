@@ -92,81 +92,81 @@ the other way around.</p>
 
 <p>
     <label>
-        <input type="checkbox" name="show_attendance" id="show-attendance" @if(org.show_attendance){ checked }
+        <input type="checkbox" name="showAttendance" id="show-attendance" @if(org.getShowAttendance()){ checked }
                class="has-dependents" data-dependent-class="depends-on-attendance">
         Enable the "Attendance" tab
     </label>
 </p>
 <div class="depends-on-attendance">
     <label>
-        <input type="checkbox" name="show_electronic_signin"
-            @if(org.show_electronic_signin){ checked }
+        <input type="checkbox" name="showElectronicSignin"
+            @if(org.getShowElectronicSignin()){ checked }
             class="has-dependents" data-dependent-class="depends-on-electronic-signin">
         Enable the experimental electronic check-in app (new in Fall 2019)
     </label>
 
     <p class="depends-on-electronic-signin">The <a target="_blank" href="@routes.Public.checkin()">electronic check-in app</a> username is
-        "@Utils.getOrgConfig(request).org.short_name" (case-sensitive). To reset the password, enter a new one here:
+        "@Utils.getOrgConfig(request).org.getShortName()" (case-sensitive). To reset the password, enter a new one here:
         <br>
         <input type="text" size="30" placeholder="New password" name="electronic_signin_password" />
     </p>
 
     <label>
-        <input type="checkbox" name="attendance_enable_off_campus" @if(org.attendance_enable_off_campus){ checked }>
+        <input type="checkbox" name="attendanceEnableOffCampus" @if(org.getAttendanceEnableOffCampus()){ checked }>
         Enable logging Off Campus Time
     </label>
 
     <br/>
     <label>
-        <input type="checkbox" name="attendance_show_reports"
+        <input type="checkbox" name="attendanceShowReports"
             class="has-dependents" data-dependent-class="depends-on-attendance-reports"
-            @if(org.attendance_show_reports){ checked }>
+            @if(org.getAttendanceShowReports()){ checked }>
         Show the "Reports" tab
     </label>
 
     <div class="depends-on-attendance-reports">
         Charge a late fee of&nbsp;
-        $ <input type="number" min="0" max="999" name="attendance_report_late_fee"
-            value="@org.attendance_report_late_fee"
-            @if(!org.show_attendance || !org.attendance_show_reports){ disabled }>
+        $ <input type="number" min="0" max="999" name="attendanceReportLateFee"
+            value="@org.getAttendanceReportLateFee()"
+            @if(!org.getShowAttendance() || !org.getAttendanceShowReports()){ disabled }>
          &nbsp;per&nbsp;
-        <input type="number" min="0" max="999" name="attendance_report_late_fee_interval"
-            value="@org.attendance_report_late_fee_interval"
-            @if(!org.show_attendance || !org.attendance_show_reports){ disabled }>
+        <input type="number" min="0" max="999" name="attendanceReportLateFeeInterval"
+            value="@org.getAttendanceReportLateFeeInterval()"
+            @if(!org.getShowAttendance() || !org.getAttendanceShowReports()){ disabled }>
          &nbsp;minutes after&nbsp;
-        <input type="text" size="7" name="attendance_report_latest_departure_time"
+        <input type="text" size="7" name="attendanceReportLatestDepartureTime"
             value="@org.formatAttendanceReportLatestDepartureTime()"
-            @if(!org.show_attendance || !org.attendance_show_reports){ disabled }>
+            @if(!org.getShowAttendance() || !org.getAttendanceShowReports()){ disabled }>
     </div>
 
     <label>
-        <input type="checkbox" name="attendance_show_percent" id="attendance-show-percent"
-               @if(org.attendance_show_percent){ checked }>
+        <input type="checkbox" name="attendanceShowPercent" id="attendance-show-percent"
+               @if(org.getAttendanceShowPercent()){ checked }>
         Show the "Attendance Rate" column
     </label>
     &nbsp;<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip"
         title="This allows you to see a person's attendance rate as a percentage of days present vs. total school days."></span>
     <br>
     <label>
-        <input type="checkbox" name="attendance_show_weighted_percent" id="attendance-show-weighted-percent"
-               @if(org.attendance_show_weighted_percent){ checked }>
+        <input type="checkbox" name="attendanceShowWeightedPercent" id="attendance-show-weighted-percent"
+               @if(org.getAttendanceShowWeightedPercent()){ checked }>
         Show the "Weighted Attendance Rate" column
     </label>
     &nbsp;<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip"
         title="Like the Attendance Rate column, except recent days are worth more while distant past days are worth less, with a smooth transition in between. If you are using the check-in app, this value will be shown to the student when they check in each day."></span>
     <br>
     <label>
-        <input type="checkbox" name="attendance_enable_partial_days" id="attendance-enable-partial-days"
+        <input type="checkbox" name="attendanceEnablePartialDays" id="attendance-enable-partial-days"
                class="has-dependents" data-dependent-class="depends-on-partial-days"
-               @if(org.attendance_enable_partial_days){ checked }>
+               @if(org.getAttendanceEnablePartialDays()){ checked }>
         Count partial days separately from full days
     </label>
     <div class="depends-on-partial-days"><table><tbody>
         <tr>
             <td>Latest arrival time allowed for a full day</td>
             <td>
-                <input type="text" size="7" name="attendance_day_latest_start_time" value="@org.formatAttendanceLatestStartTime()"
-                       @if(!org.show_attendance || !org.attendance_enable_partial_days){ disabled }>
+                <input type="text" size="7" name="attendanceDayLatestStartTime" value="@org.formatAttendanceLatestStartTime()"
+                       @if(!org.getShowAttendance() || !org.getAttendanceEnablePartialDays()){ disabled }>
                 &nbsp;<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip"
                     title="If a person arrives later than this time (e.g. 11:00), the day counts as a partial day regardless of how many hours the person was at school."></span>
             </td>
@@ -174,8 +174,8 @@ the other way around.</p>
         <tr>
             <td>Minimum hours for a full day</td>
             <td>
-                <input type="number" min="0" max="9" step="0.01" name="attendance_day_min_hours" value="@org.attendance_day_min_hours"
-                       @if(!org.show_attendance || !org.attendance_enable_partial_days){ disabled }>
+                <input type="number" min="0" max="9" step="0.01" name="attendanceDayMinHours" value="@org.getAttendanceDayMinHours()"
+                       @if(!org.getShowAttendance() || !org.getAttendanceEnablePartialDays()){ disabled }>
                 &nbsp;<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip"
                     title="If a person is present for fewer than this number of hours (e.g. 5) in a day, it counts as a partial day."></span>
             </td>
@@ -183,9 +183,9 @@ the other way around.</p>
         <tr>
             <td>Value of a partial day for attendance rate</td>
             <td>
-                <input type="number" min="0" max="1" step="0.05" name="attendance_partial_day_value"
-                       value="@org.attendance_partial_day_value"
-                       @if(!org.show_attendance || !org.attendance_enable_partial_days){ disabled }>
+                <input type="number" min="0" max="1" step="0.05" name="attendancePartialDayValue"
+                       value="@org.getAttendancePartialDayValue()"
+                       @if(!org.getShowAttendance() || !org.getAttendanceEnablePartialDays()){ disabled }>
                 &nbsp;<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip"
                     title="If the Attendance Rate column is enabled, you can decide how much value a partial day has in the percentage calculation. For example, if the value is 0.5, a partial day counts as half of a full day."></span>
             </td>
@@ -195,14 +195,14 @@ the other way around.</p>
 <h4>Custodia</h4>
 <p>
     <label>
-        <input type="checkbox" name="show_custodia" @if(org.show_custodia){ checked }
+        <input type="checkbox" name="showCustodia" @if(org.getShowCustodia()){ checked }
             class="has-dependents" data-dependent-class="depends-on-custodia">
         Enable the "Custodia" tab
     </label>
 </p>
 <div class="depends-on-custodia">
     <p>The Custodia <a target="_blank" href="@play_config.getString("custodia_url")">electronic sign-in sheet</a> username is
-        "@Utils.getOrgConfig(request).org.short_name" (case-sensitive). To reset the password, enter a new one here:
+        "@Utils.getOrgConfig(request).org.getShortName()" (case-sensitive). To reset the password, enter a new one here:
         <br>
         <input type="text" size="30" placeholder="New password" name="custodia_student_password" />
     </p>
@@ -222,7 +222,7 @@ the "Current Student" and "Staff" tags). Accounts can be created manually for gr
 
     <p>
         <label>
-            <input type="checkbox" name="show_accounting" @if(org.show_accounting){ checked }>
+            <input type="checkbox" name="showAccounting" @if(org.getShowAccounting()){ checked }>
             Enable the "Accounting" tab
         </label>
     </p>
@@ -237,12 +237,12 @@ the "Current Student" and "Staff" tags). Accounts can be created manually for gr
 @helper.form(routes.Settings.editSettings()) {
 
     <p>The @Utils.getOrgConfig(request).str_jc_name_short Weekly Report includes five full school days.</p>
-    <p>Reset the report every <select name="jc_reset_day">
-        <option value="1" @if(org.jc_reset_day == 1){selected}>Monday</option>
-        <option value="2" @if(org.jc_reset_day == 2){selected}>Tuesday</option>
-        <option value="3" @if(org.jc_reset_day == 3){selected}>Wednesday</option>
-        <option value="4" @if(org.jc_reset_day == 4){selected}>Thursday</option>
-        <option value="5" @if(org.jc_reset_day == 5){selected}>Friday</option>
+    <p>Reset the report every <select name="jcResetDay">
+        <option value="1" @if(org.getJcResetDay() == 1){selected}>Monday</option>
+        <option value="2" @if(org.getJcResetDay() == 2){selected}>Tuesday</option>
+        <option value="3" @if(org.getJcResetDay() == 3){selected}>Wednesday</option>
+        <option value="4" @if(org.getJcResetDay() == 4){selected}>Thursday</option>
+        <option value="5" @if(org.getJcResetDay() == 5){selected}>Friday</option>
     </select> morning. <input type="submit" value="Save"/></p>
 }
 
@@ -260,7 +260,7 @@ the "Current Student" and "Staff" tags). Accounts can be created manually for gr
     </p>
     <p>
         <label>
-            <input type="checkbox" name="enable_case_references" @if(org.enable_case_references){ checked }>
+            <input type="checkbox" name="enableCaseReferences" @if(org.getEnableCaseReferences()){ checked }>
             Enable case references
         </label>
     </p>
@@ -300,12 +300,12 @@ the "Current Student" and "Staff" tags). Accounts can be created manually for gr
 @helper.form(routes.Settings.editSettings()) {
 
 <h4>Printing options</h4>
-<p><label><input type="checkbox" name="show_last_modified_in_print"
-        @if(org.show_last_modified_in_print){ checked }>
+<p><label><input type="checkbox" name="showLastModifiedInPrint"
+        @if(org.getShowLastModifiedInPrint()){ checked }>
     Include the date of the last change for each rule, e.g. "changed 2017-3-4"</label>
 <br/>
-<label><input type="checkbox" name="show_history_in_print"
-        @if(org.show_history_in_print){ checked }>
+<label><input type="checkbox" name="showHistoryInPrint"
+        @if(org.getShowHistoryInPrint()){ checked }>
     Include the date of each change for each rule, e.g. "Adopted 2016-1-2; Amended 2016-3-25"</label>
 </p>
 <input type="hidden" name="manual_settings" value="true"/>

@@ -273,7 +273,7 @@ public class Person extends Model implements Comparable<Person> {
 		person.trimSpaces();
         person.save();
 
-        if (org.show_accounting) {
+        if (org.getShowAccounting()) {
             Account.create(AccountType.PersonalChecking, "", person, org);
         }
 

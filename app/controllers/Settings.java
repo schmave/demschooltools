@@ -1,20 +1,14 @@
 package controllers;
 
-import java.util.*;
-
 import io.ebean.*;
-
-import org.mindrot.jbcrypt.BCrypt;
-
+import java.util.*;
+import javax.inject.Inject;
 import models.*;
-
-import play.i18n.MessagesApi;
-
+import org.mindrot.jbcrypt.BCrypt;
 import play.data.*;
+import play.i18n.MessagesApi;
 import play.mvc.*;
 import views.html.*;
-
-import javax.inject.Inject;
 
 @With(DumpOnError.class)
 @Secured.Auth(UserRole.ROLE_ALL_ACCESS)
@@ -62,7 +56,7 @@ public class Settings extends Controller {
                 new_password = values.get("electronic_signin_password")[0];
             }
             if (new_password != null && !new_password.trim().isEmpty()) {
-                String username = org.short_name;
+                String username = org.getShortName();
                 User user = User.findByEmail(username);
                 if (user == null) {
                     user = User.create(username, "Check-in app user", org);
@@ -198,7 +192,7 @@ public class Settings extends Controller {
         for (User user : users) {
             // Hide dummy users and the check-in app user
             if (!user.name.equals(User.DUMMY_USERNAME) &&
-                !user.email.equals(org.short_name)) {
+                !user.email.equals(org.getShortName())) {
                 users_to_show.add(user);
             }
         }
@@ -206,7 +200,7 @@ public class Settings extends Controller {
         String allowed_ip = "";
         String sql = "select ip from allowed_ips where organization_id=:org_id";
         SqlQuery sqlQuery = DB.sqlQuery(sql);
-        sqlQuery.setParameter("org_id", org.id);
+        sqlQuery.setParameter("org_id", org.getId());
         List<SqlRow> result = sqlQuery.findList();
         if (result.size() > 0) {
             allowed_ip = result.get(0).getString("ip");
@@ -223,12 +217,12 @@ public class Settings extends Controller {
         if (form_data.containsKey("allowed_ip")) {
             String sql = "DELETE from allowed_ips where organization_id=:org_id";
             SqlUpdate update = DB.sqlUpdate(sql);
-            update.setParameter("org_id", org.id);
+            update.setParameter("org_id", org.getId());
             update.execute();
 
             sql = "INSERT into allowed_ips (ip, organization_id) VALUES(:ip, :org_id)";
             update = DB.sqlUpdate(sql);
-            update.setParameter("org_id", org.id);
+            update.setParameter("org_id", org.getId());
             update.setParameter("ip", form_data.get("allowed_ip")[0]);
             update.execute();
         }
@@ -286,7 +280,7 @@ public class Settings extends Controller {
         User new_user = null;
 
         if (existing_user != null) {
-            if (existing_user.organization.id.equals(org.id)) {
+            if (existing_user.organization.getId().equals(org.getId())) {
                 if (existing_user.name.equals(User.DUMMY_USERNAME)) {
                     new_user = existing_user;
                     new_user.name = name;

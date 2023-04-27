@@ -28,7 +28,7 @@ public class Checkin extends Controller {
         Organization organization = Utils.getOrg(request);
         Map<Person, AttendanceStats> person_to_stats = Attendance.mapPeopleToStats(start_date, end_date, organization);
 
-        boolean show_weighted_percent = organization.attendance_show_weighted_percent;
+        boolean show_weighted_percent = organization.getAttendanceShowWeightedPercent();
 
         List<CheckinPerson> people = Application.attendancePeople(organization).stream()
             .sorted(Comparator.comparing(Person::getDisplayName))
@@ -40,7 +40,7 @@ public class Checkin extends Controller {
         Person admin = new Person();
         admin.person_id = -1;
         admin.first_name = "Admin";
-        admin.pin = organization.attendance_admin_pin;
+        admin.pin = organization.getAttendanceAdminPin();
         people.add(0, new CheckinPerson(admin, null, null, show_weighted_percent));
 
         List<String> absence_codes = AttendanceCode.all(organization).stream()

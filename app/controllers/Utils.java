@@ -140,7 +140,7 @@ public class Utils
         nvps.add(new BasicNameValuePair("username", "admin"));
         nvps.add(new BasicNameValuePair("password",
                 school_crm_config.getString(
-                        "custodia_password")));
+                        "custodiaPassword")));
         makeCustodiaPost(client, school_crm_config.getString("custodia_url") + "/users/login", nvps);
     }
 
@@ -152,7 +152,7 @@ public class Utils
                 loginToCustodia(httpclient, Public.sConfig);
 
                 List<NameValuePair> nvps = new ArrayList<>();
-                nvps.add(new BasicNameValuePair("username", config.org.short_name));
+                nvps.add(new BasicNameValuePair("username", config.org.getShortName()));
                 nvps.add(new BasicNameValuePair("password", new_password));
                 makeCustodiaPost(httpclient,
                         Public.sConfig.getString("custodia_url") + "/users/password",
@@ -210,7 +210,7 @@ public class Utils
     }
 
     public static OrgConfig getOrgConfig(Organization org) {
-        OrgConfig result = OrgConfigs.configs.get(org.name);
+        OrgConfig result = OrgConfigs.configs.get(org.getName());
         result.org = org;
         return result;
     }

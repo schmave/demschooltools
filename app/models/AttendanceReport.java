@@ -27,7 +27,7 @@ public class AttendanceReport {
     public static AttendanceReport createFromForm(Form<AttendanceReport> form, Organization org) {
         AttendanceReport model = form.get();
 
-        model.latest_departure_time = org.attendance_report_latest_departure_time;
+        model.latest_departure_time = org.getAttendanceReportLatestDepartureTime();
 
         List<AttendanceDay> events = AttendanceDay.find.query().where()
             .eq("person.organization", org)

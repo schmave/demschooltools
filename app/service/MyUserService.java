@@ -6,13 +6,12 @@ import com.feth.play.module.pa.user.AuthUser;
 import com.feth.play.module.pa.user.AuthUserIdentity;
 import com.feth.play.module.pa.user.EmailIdentity;
 import controllers.Utils;
+import javax.inject.Inject;
 import models.LinkedAccount;
 import models.Organization;
 import models.User;
 import play.Logger;
 import play.mvc.Http;
-
-import javax.inject.Inject;
 
 public class MyUserService extends AbstractUserService {
 
@@ -39,7 +38,7 @@ public class MyUserService extends AbstractUserService {
                 } else {
                 	sLogger.debug("    creating new account");
                 	Organization org = Utils.getOrg(request);
-                	sLogger.error("New login from unknown user: " + identity.getEmail() + ", org: " + org.name);
+                	sLogger.error("New login from unknown user: " + identity.getEmail() + ", org: " + org.getName());
                 	u = User.create(identity.getEmail(), User.DUMMY_USERNAME, org);
                 }
                 u.linkedAccounts.add(LinkedAccount.create(authUser));

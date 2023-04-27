@@ -1,17 +1,15 @@
 package controllers;
 
-import models.*;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-
+import models.*;
 
 public abstract class CachedPage {
     public static final String ATTENDANCE_INDEX = "Attendance-index-";
@@ -25,7 +23,7 @@ public abstract class CachedPage {
     public String cache_key;
 
     static String getKey(String key_base, Organization org) {
-        return key_base + "-" + org.id;
+        return key_base + "-" + org.getId();
     }
 
     public static void remove(String key_base, Organization org) {

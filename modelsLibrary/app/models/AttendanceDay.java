@@ -111,9 +111,9 @@ public class AttendanceDay extends Model {
 
     @JsonIgnore
     public boolean isPartial(Organization org) {
-        if (org.attendance_enable_partial_days) {
-            Double min_hours = org.attendance_day_min_hours;
-            Time latest_start_time = org.attendance_day_latest_start_time;
+        if (org.getAttendanceEnablePartialDays()) {
+            Double min_hours = org.getAttendanceDayMinHours();
+            Time latest_start_time = org.getAttendanceDayLatestStartTime();
 
             if (min_hours != null && getHours() < min_hours) {
                 return true;

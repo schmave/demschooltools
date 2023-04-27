@@ -118,7 +118,7 @@ public class Application extends Controller {
     // on picking charge references, so we don't know which charges will be needed. As a result, we will include
     // information on all charges from the referenced cases.
     public static String generateCompositeFindingsFromCaseReferences(Case the_case) {
-        if (!the_case.meeting.organization.enable_case_references) {
+        if (!the_case.meeting.organization.getEnableCaseReferences()) {
             return the_case.findings;
         }
         return generateCompositeFindings(the_case, null, null);
@@ -127,7 +127,7 @@ public class Application extends Controller {
     // We use this method everywhere besides the edit minutes page. At this point the minutes have been finalized and the
     // charge references have been selected. We don't need to include information about charges that weren't referenced.
     public static String generateCompositeFindingsFromChargeReferences(Case the_case) {
-        if (!the_case.meeting.organization.enable_case_references) {
+        if (!the_case.meeting.organization.getEnableCaseReferences()) {
             return the_case.findings;
         }
         ArrayList<Charge> relevant_charges = new ArrayList<>();
@@ -894,7 +894,7 @@ public class Application extends Controller {
 
         OrgConfig orgConfig = Utils.getOrgConfig(Utils.getOrg(request));
         SqlQuery sqlQuery = DB.sqlQuery(sql);
-        sqlQuery.setParameter("orgId", orgConfig.org.id);
+        sqlQuery.setParameter("orgId", orgConfig.org.getId());
         sqlQuery.setParameter("searchString", searchString);
 
         List<SqlRow> result = sqlQuery.findList();
@@ -1118,7 +1118,7 @@ public class Application extends Controller {
     public Result viewWeeklyReport(String date_string, Http.Request request) {
         Calendar start_date = Utils.parseDateOrNow(date_string);
         Organization org = Utils.getOrg(request);
-        Utils.adjustToPreviousDay(start_date, org.jc_reset_day + 1);
+        Utils.adjustToPreviousDay(start_date, org.getJcResetDay() + 1);
 
         Calendar end_date = (Calendar)start_date.clone();
         end_date.add(GregorianCalendar.DATE, 6);
@@ -1399,7 +1399,7 @@ public class Application extends Controller {
 
         scopes.put("existing_files", existingFiles);
 
-        scopes.put("printer_email", Utils.getOrg(request).printer_email);
+        scopes.put("printerEmail", Utils.getOrg(request).getPrinterEmail());
         return ok(main_with_mustache.render("File Sharing config",
             "misc",
             "file_sharing",
@@ -1411,10 +1411,10 @@ public class Application extends Controller {
     public Result saveFileSharingSettings(Http.Request request) {
         final Map<String, String[]> values = request.body().asFormUrlEncoded();
 
-        if (values.containsKey("printer_email")) {
+        if (values.containsKey("printerEmail")) {
             Organization organization = Utils.getOrg(request);
-            String email = values.get("printer_email")[0];
-            organization.printer_email = email;
+            String email = values.get("printerEmail")[0];
+            organization.setPrinterEmail(email);
             organization.save();
         }
 
@@ -1436,7 +1436,7 @@ public class Application extends Controller {
     }
 
     private static File getSharedFileDirectory(Organization org) {
-        File result = new File("/www-dst", "" + org.id);
+        File result = new File("/www-dst", "" + org.getId());
         if (!result.exists()) {
             result.mkdir();
         }
@@ -1469,7 +1469,7 @@ public class Application extends Controller {
 
         scopes.put("existing_files", existingFiles);
 
-        scopes.put("printer_email", org.printer_email);
+        scopes.put("printerEmail", org.getPrinterEmail());
         return ok(main_with_mustache.render("DemSchoolTools shared files",
             "misc",
             "view_files",
@@ -1485,7 +1485,7 @@ public class Application extends Controller {
             if (the_file.exists()) {
                 play.libs.mailer.Email mail = new play.libs.mailer.Email();
                 mail.setSubject("Print from DemSchoolTools");
-                mail.addTo(Utils.getOrg(request).printer_email);
+                mail.addTo(Utils.getOrg(request).getPrinterEmail());
                 mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
                 mail.addAttachment(the_file.getName(), the_file);
                 mMailer.send(mail);

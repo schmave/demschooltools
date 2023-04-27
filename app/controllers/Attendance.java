@@ -760,8 +760,8 @@ public class Attendance extends Controller {
         Map<String, Object> scopes = new HashMap<>();
         Config conf = Public.sConfig.getConfig("school_crm");
         scopes.put("custodiaUrl", conf.getString("custodia_url"));
-        scopes.put("custodiaUsername", Utils.getOrg(request).short_name + "-admin");
-        scopes.put("custodiaPassword", conf.getString("custodia_password"));
+        scopes.put("custodiaUsername", Utils.getOrg(request).getShortName() + "-admin");
+        scopes.put("custodiaPassword", conf.getString("custodiaPassword"));
         return ok(main_with_mustache.render("Sign in system",
                 "custodia",
                 "",
@@ -851,7 +851,7 @@ public class Attendance extends Controller {
         Person admin = new Person();
         admin.person_id = -1;
         admin.first_name = "Admin";
-        admin.pin = org.attendance_admin_pin;
+        admin.pin = org.getAttendanceAdminPin();
         people.add(0, admin);
         return ok(attendance_pins.render(people, request, mMessagesApi.preferred(request)));
     }
@@ -867,7 +867,7 @@ public class Attendance extends Controller {
             Integer person_id = Integer.parseInt(entry.getKey());
             if (person_id == -1) {
                 Organization organization = Utils.getOrg(request);
-                organization.attendance_admin_pin = entry.getValue()[0];
+                organization.setAttendanceAdminPin(entry.getValue()[0]);
                 organization.save();
             }
             else {
