@@ -30,7 +30,7 @@ def generate_migration(table_name: str, replacements: dict[str, str]):
         ups.append(f'alter table {table_name} rename column {old_name} to {new_name};')
         downs.append(f'alter table {table_name} rename column {new_name} to {old_name};')
 
-    with open(f'{ev_path}/{file_count+1}.sql', 'w') as f:
+    with open(f'{ev_path}/{file_count + 1}.sql', 'w') as f:
         f.write('# --- !Ups     \n\n')
         f.write('\n'.join(ups))
         f.write('\n\n# --- !Downs     \n\n')
@@ -43,6 +43,7 @@ def encapsulate_fields(files: dict[str, str], path_to_model):
     assert '@Entity' in content
 
     replacements = {}
+    types = {}
 
     out_lines = []
     for line in content.splitlines():
@@ -50,23 +51,21 @@ def encapsulate_fields(files: dict[str, str], path_to_model):
         if not match:
             if line.strip() == '@Entity':
                 out_lines.append('''\
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter''')
+@Data''')
             out_lines.append(line)
             continue
 
         old_var_name = match.group(3)
         new_var_name = to_camel_case(old_var_name)
         replacements[old_var_name] = new_var_name
+        types[old_var_name] = match.group(2)
 
         out_lines.append(f'    private {match.group(2)} {new_var_name}{match.group(4) or ""};')
 
     files[path_to_model] = '\n'.join(out_lines)
     # generate_migration(get_table_name_from_path(path_to_model), replacements)
-
 
     for path, content in files.items():
         new_content = content
@@ -78,20 +77,22 @@ import lombok.Setter;
                 continue
 
             capital_name = new_var_name[0].upper() + new_var_name[1:]
-            getter = 'get' + capital_name
+            getter = (new_var_name if
+                      (new_var_name.startswith('is') and 'bool' in types[old_var_name].lower()) else (
+                        'get' + capital_name))
             setter = 'set' + capital_name
 
-            if path != path_to_model and (path.endswith('.java') or path.endswith('.scala.html')):
+            if 'modelsLibrary' not in path and (path.endswith('.java') or path.endswith('.scala.html')):
                 new_lines = []
                 for line in new_content.splitlines():
-                    ignores = ['.fetch(', '.eq(', '.ne(', 'parse(', 'SELECT', '@Where']
+                    ignores = ['.fetch(', '.eq(', '.ne(', 'parse(', 'SELECT', '@Where', 'import', 'filename=']
                     if not any(x in line for x in ignores):
                         # .foo_bar = value; --> .setFooBar(value);
                         line = re.sub(rf'\.{old_var_name} ?= ?(.*);',
-                                             rf'.{setter}(\1);', line)
+                                      rf'.{setter}(\1);', line)
                         # .foo_bar --> .getFooBar();
                         line = re.sub(rf'\.{old_var_name}\b',
-                                             f'.{getter}()', line)
+                                      f'.{getter}()', line)
                     new_lines.append(line)
                 new_content = '\n'.join(new_lines) + '\n'
 
@@ -102,7 +103,6 @@ import lombok.Setter;
         files[path] = new_content
 
 
-
 def get_table_name_from_path(path_to_model):
     return os.path.basename(path_to_model).split('.')[0].lower()
 
@@ -110,7 +110,9 @@ def get_table_name_from_path(path_to_model):
 def load_files_one_path(result, path):
     for root, unused_dirs, files in os.walk(path):
         for filename in files:
-            if os.path.splitext(filename)[1] in {'.java', '.html', '.js', '.conf'}:
+            if (filename not in {'app-compiled.js'} and
+                    (filename in {'routes'} or
+                     os.path.splitext(filename)[1] in {'.java', '.html', '.js', '.conf'})):
                 path = os.path.join(root, filename)
                 with open(path) as f:
                     result[path] = f.read()
