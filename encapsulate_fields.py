@@ -46,7 +46,7 @@ def encapsulate_fields(files: dict[str, str], path_to_model):
 
     out_lines = []
     for line in content.splitlines():
-        match = re.match(r'    public (\w+) (\w+)( ?= ?.*)?;', line)
+        match = re.match(r'(\t|    )public (\w+) (\w+)( ?= ?.*)?;', line)
         if not match:
             if line.strip() == '@Entity':
                 out_lines.append('''\
@@ -58,11 +58,11 @@ import lombok.Setter;
             out_lines.append(line)
             continue
 
-        old_var_name = match.group(2)
+        old_var_name = match.group(3)
         new_var_name = to_camel_case(old_var_name)
         replacements[old_var_name] = new_var_name
 
-        out_lines.append(f'    private {match.group(1)} {new_var_name}{match.group(3) or ""};')
+        out_lines.append(f'    private {match.group(2)} {new_var_name}{match.group(4) or ""};')
 
     files[path_to_model] = '\n'.join(out_lines)
     # generate_migration(get_table_name_from_path(path_to_model), replacements)
@@ -82,12 +82,18 @@ import lombok.Setter;
             setter = 'set' + capital_name
 
             if path != path_to_model and (path.endswith('.java') or path.endswith('.scala.html')):
-                # .foo_bar = value; --> .setFooBar(value);
-                new_content = re.sub(rf'\.{old_var_name} ?= ?(.*);',
-                                     rf'.{setter}(\1);', new_content)
-                # .foo_bar --> .getFooBar();
-                new_content = re.sub(rf'\.{old_var_name}\b',
-                                     f'.{getter}()', new_content)
+                new_lines = []
+                for line in new_content.splitlines():
+                    ignores = ['.fetch(', '.eq(', '.ne(', 'parse(', 'SELECT', '@Where']
+                    if not any(x in line for x in ignores):
+                        # .foo_bar = value; --> .setFooBar(value);
+                        line = re.sub(rf'\.{old_var_name} ?= ?(.*);',
+                                             rf'.{setter}(\1);', line)
+                        # .foo_bar --> .getFooBar();
+                        line = re.sub(rf'\.{old_var_name}\b',
+                                             f'.{getter}()', line)
+                    new_lines.append(line)
+                new_content = '\n'.join(new_lines) + '\n'
 
             if old_var_name != new_var_name:
                 # "foo_bar" --> "fooBar"
@@ -120,8 +126,13 @@ def load_files() -> dict[str, str]:
 
 def write_files(files):
     for path, content in files.items():
-        with open(path, 'w') as f:
-            f.write(content)
+        old_content = None
+        with open(path) as f:
+            old_content = f.read()
+
+        if content.strip() != old_content.strip():
+            with open(path, 'w') as f:
+                f.write(content)
 
 
 def main():
