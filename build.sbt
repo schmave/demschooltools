@@ -23,6 +23,7 @@ lazy val modelsLibrary = (project in file("modelsLibrary")).enablePlugins(PlayJa
 .settings(
   libraryDependencies ++= Seq(
     "com.typesafe.play" %% "play-mailer" % "8.0.1",
+    "org.projectlombok" % "lombok" % "1.18.26",
   )
 ).aggregate(authLibrary)
   .dependsOn(authLibrary)
