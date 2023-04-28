@@ -12,13 +12,13 @@ Printed on @Application.yymmddDate(Utils.getOrgConfig(request)).
 
 <ul>
 @for( c <- chapters ) {
-	<li><a href="@routes.Application.viewChapter(c.id)">@c.getNum() @c.getTitle()</a></li>
+	<li><a href="@routes.Application.viewChapter(c.getId())">@c.getNum() @c.getTitle()</a></li>
 	<ul>
 	@for(section <- c.sections) {
-		<li><a href="@routes.Application.viewChapter(c.id)#section_@section.id">@c.getNum()@section.getNum() @section.getTitle()</a></li>
+		<li><a href="@routes.Application.viewChapter(c.getId())#section_@section.getId()">@c.getNum()@section.getNum() @section.getTitle()</a></li>
 		<ul>
 		@for(entry <- section.entries) {
-			<li><a href="@routes.Application.viewChapter(c.id)#entry_@entry.id">@c.getNum()@(section.getNum()).@entry.getNum() @entry.getTitle()</a></li>
+			<li><a href="@routes.Application.viewChapter(c.getId())#entry_@entry.getId()">@c.getNum()@(section.getNum()).@entry.getNum() @entry.getTitle()</a></li>
 		}
 		</ul>
 	}

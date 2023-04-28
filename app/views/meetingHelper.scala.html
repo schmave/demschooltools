@@ -3,14 +3,14 @@
 @import helper._
 
 <h3>@Utils.getOrgConfig(request).str_jc_name_short minutes from @Application.formatMeetingDate(m.getDate())</h3>
-<p><a href="@routes.Application.printMeeting(m.id)" class="btn btn-success no-print">
+<p><a href="@routes.Application.printMeeting(m.getId())" class="btn btn-success no-print">
 1. Print minutes</a>
-<a href="@routes.Application.viewMeetingResolutionPlans(m.id)"
+<a href="@routes.Application.viewMeetingResolutionPlans(m.getId())"
 class="btn btn-success no-print" style="margin-left: 75px">
 2. Print @Utils.getOrgConfig(request).str_res_plans</a>
-<span class="no-print">or <a href="@routes.Application.downloadMeetingResolutionPlans(m.id)">
+<span class="no-print">or <a href="@routes.Application.downloadMeetingResolutionPlans(m.getId())">
 Download @Utils.getOrgConfig(request).str_res_plans</a></span></p>
-<p><a href="@routes.ApplicationEditing.editMeeting(m.id)" class="btn btn-warning no-print">
+<p><a href="@routes.ApplicationEditing.editMeeting(m.getId())" class="btn btn-warning no-print">
 Edit minutes</a></p>
 
 
@@ -42,7 +42,7 @@ Edit minutes</a></p>
 	<tr>
 	<td><h5>#@c.getCaseNumber()	@if( c.getDateClosed() == null ) { (OPEN) }</h5></td>
 	<td>Case discussed today, but kept open for further investigation. Latest notes available
-		in meeting held on <a href="@routes.Application.viewMeeting(c.getMeeting().id)">
+		in meeting held on <a href="@routes.Application.viewMeeting(c.getMeeting().getId())">
 			@Application.yymmddDate(Utils.getOrgConfig(request), c.getMeeting().getDate())</a></td>
 	</tr>
 

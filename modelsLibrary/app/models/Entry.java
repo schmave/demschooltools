@@ -76,14 +76,6 @@ public class Entry extends Model implements Comparable<Entry> {
         return entry != null ? entry.id : null;
     }
 
-    public static void unassignBreakingResPlanEntry(Organization org) {
-        Entry entry = findBreakingResPlanEntry(org);
-        if (entry != null) {
-            entry.isBreakingResPlan = false;
-            entry.save();
-        }
-    }
-
     @JsonIgnore
     public List<Charge> getThisYearCharges() {
         Date beginning_of_year = ModelUtils.getStartOfYear();

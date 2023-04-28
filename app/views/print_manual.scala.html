@@ -12,7 +12,7 @@
 <ul>
 <li><a href="@routes.Application.printManualChapter(-2)">Table of Contents</a>
 @for( c <- chapters ) {
-	<li><a href="@routes.Application.printManualChapter(c.id)">@c.getNum() @c.getTitle()</a>
+	<li><a href="@routes.Application.printManualChapter(c.getId())">@c.getNum() @c.getTitle()</a>
 }
 </ul>
 

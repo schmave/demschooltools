@@ -1,8 +1,8 @@
 package models;
 
+import java.math.*;
 import java.text.*;
 import java.util.*;
-import java.math.*;
 import play.data.*;
 
 public class AccountingReport {
@@ -21,7 +21,7 @@ public class AccountingReport {
 
     public static AccountingReport create(Form<AccountingReport> form, Organization org) {
         AccountingReport report = form.get();
-        if (report.getType() == AccountingReportType.TotalPersonalAccountsBalance) {
+        if (report.type == AccountingReportType.TotalPersonalAccountsBalance) {
         	runTotalPersonalAccountsBalanceReport(report, org);
         }
         return report;
@@ -31,7 +31,7 @@ public class AccountingReport {
     	List<Account> accounts = Account.allPersonalChecking(org);
 
     	BigDecimal total = accounts.stream()
-            .map(t -> t.getBalanceAsOf(report.getDate()))
+            .map(t -> t.getBalanceAsOf(report.date))
             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
     	report.resultLabel = "Total Personal Accounts Balance as of " + report.getFormattedDate() + ": ";

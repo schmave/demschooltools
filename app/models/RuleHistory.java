@@ -44,7 +44,7 @@ public class RuleHistory {
                 r = new Record();
                 r.most_recent_charge = c.getTheCase().getMeeting().getDate();
                 r.count = 1;
-                r.setPerson(c.getPerson());
+                r.person = c.getPerson();
                 records.put(c.getPerson(), r);
             } else {
                 r.count++;

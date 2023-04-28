@@ -7,7 +7,7 @@ rules : List[ Entry ])(implicit request: play.mvc.Http.Request, messages: play.i
 $(function() {
     var meeting_info = [ @Html(
         meetings.map( m => "{ date: \"" + Application.yymmddDate(Utils.getOrgConfig(request), (m.getDate())) +
-                "\", link: \"" + routes.Application.viewMeeting(m.id) +
+                "\", link: \"" + routes.Application.viewMeeting(m.getId()) +
                 "\", case_count: " + m.cases.size() + "}").mkString(",")) ];
 
     function hasMeeting(date)
@@ -76,7 +76,7 @@ $(function() {
 <table class="table table-hover table-condensed">
 <thead><th height=50 width=250>Entry<th align=right width=50>Charge count</thead>
 @for( r <- rules ) {
-	<tr><td width=250><a href="@routes.Application.viewRuleHistory(r.id)">@r.getNumber() @r.getTitle()</a>
+	<tr><td width=250><a href="@routes.Application.viewRuleHistory(r.getId())">@r.getNumber() @r.getTitle()</a>
 	<td align=right width=50>@r.getThisYearCharges().size()
 }
 </table>

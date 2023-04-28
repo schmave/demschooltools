@@ -228,7 +228,7 @@ public class Application extends Controller {
                 .fetch("rule.section")
                 .fetch("rule.section.chapter")
                 .where()
-                .eq("case_id", c.id)
+                .eq("case_id", c.getId())
                 .ne("person", null)
                 .findList();
 
@@ -249,7 +249,7 @@ public class Application extends Controller {
         if (charge.getSmDecision() != null && !charge.getSmDecision().isEmpty()) {
             return charge.getSmDecision();
         }
-        if (charge.getReferredToSm() && charge.getResolutionPlan().isEmpty()) {
+        if (charge.isReferredToSm() && charge.getResolutionPlan().isEmpty()) {
             return "[Referred to School Meeting]";
         }
         return charge.getResolutionPlan();
@@ -279,7 +279,7 @@ public class Application extends Controller {
             mail.setSubject("DemSchoolTools password changed");
             mail.addTo(u.getEmail());
             mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
-            mail.setBodyText("Hi " + u.name + ",\n\nYour DemSchoolTools password was changed today (" +
+            mail.setBodyText("Hi " + u.getName() + ",\n\nYour DemSchoolTools password was changed today (" +
                 Application.formatDateTimeLong(Utils.getOrgConfig(Utils.getOrg(request))) +
                 "). \n\nIf it was not you who changed it, please investigate what is going on! " +
                 "Feel free to contact Evan (schmave@gmail.com) for help.");
@@ -493,7 +493,7 @@ public class Application extends Controller {
             }
             writer.write(org_config.translatePlea(c.getPlea()));
             writer.write(c.getResolutionPlan());
-            writer.write("" + c.getRpComplete());
+            writer.write("" + c.isRpComplete());
             if (org_config.show_severity) {
                 writer.write(c.getSeverity());
             }
@@ -501,7 +501,7 @@ public class Application extends Controller {
             if (org_config.use_minor_referrals) {
                 writer.write(c.getMinorReferralDestination());
             }
-            writer.write("" + c.getReferredToSm());
+            writer.write("" + c.isReferredToSm());
             if (c.getSmDecision() != null) {
                 writer.write(c.getSmDecision());
             } else {
@@ -597,7 +597,7 @@ public class Application extends Controller {
             .select("referencedCharge")
             .findList()
             .stream()
-            .map(c -> c.getReferencedCharge().id)
+            .map(c -> c.getReferencedCharge().getId())
             .collect(Collectors.toList());
     }
 
@@ -663,7 +663,7 @@ public class Application extends Controller {
         Meeting m = Meeting.findById(meeting_id, org);
         for (Case c : m.cases) {
             for (Charge charge : c.charges) {
-                if (charge.displayInResolutionPlanList() && !charge.getReferredToSm()) {
+                if (charge.displayInResolutionPlanList() && !charge.isReferredToSm()) {
                     writer.write(charge.getPerson().getDisplayName());
 
                     // In case it's needed in the future, adding a space to
@@ -983,7 +983,7 @@ public class Application extends Controller {
         PersonHistory history = new PersonHistory(p, false, ModelUtils.getStartOfYear(), null);
         PersonHistory.Record rule_record = null;
         for (PersonHistory.Record record : history.rule_records) {
-            if (record.getRule() != null && record.getRule().equals(r)) {
+            if (record.rule != null && record.rule.equals(r)) {
                 rule_record = record;
                 break;
             }
@@ -1230,7 +1230,7 @@ public class Application extends Controller {
         for (Entry r : rules) {
             HashMap<String, String> values = new HashMap<>();
             values.put("label", r.getNumber() + " " + r.getTitle());
-            values.put("id", "" + r.id);
+            values.put("id", "" + r.getId());
             result.add(values);
         }
 
@@ -1250,7 +1250,7 @@ public class Application extends Controller {
         for (Case c : cases) {
             HashMap<String, String> values = new HashMap<>();
             values.put("label", c.getCaseNumber());
-            values.put("id", "" + c.id);
+            values.put("id", "" + c.getId());
             result.add(values);
         }
 

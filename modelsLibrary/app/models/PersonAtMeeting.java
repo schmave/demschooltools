@@ -1,9 +1,7 @@
 package models;
 
-import javax.persistence.*;
-
 import io.ebean.*;
-
+import javax.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,7 +18,7 @@ public class PersonAtMeeting extends Model {
     private Meeting meeting;
 
     @ManyToOne
-    @JoinColumn(name="personId")
+    @JoinColumn(name="person_id")
     private Person person;
 
     public final static int ROLE_JC_CHAIR = 0;

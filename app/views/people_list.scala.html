@@ -9,7 +9,7 @@
     @if( show_checkboxes ) {
         <td><input type="checkbox" class="person" name="person-@p.getPersonId()"></td>
     }
-    <td><a href="@routes.CRM.getPerson()(p.getPersonId())">@p.nonEmptyName()</a>
+    <td><a href="@routes.CRM.person(p.getPersonId())">@p.nonEmptyName()</a>
 	<td>@p.getEmail()
 	<td>
 	        @for(num <- p.phone_numbers) {

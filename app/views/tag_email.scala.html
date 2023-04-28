@@ -6,16 +6,16 @@
 
 <p><b>@actor_name</b>
 @if( wasAdd ) { added } else { removed }
-<a href="@{Utils.getOrgConfig(request).people_url}@routes.CRM.getPerson()(p.getPersonId())">
+<a href="@{Utils.getOrgConfig(request).people_url}@routes.CRM.person(p.getPersonId())">
 @p.getFirstName() @p.getLastName()</a>
 @if( wasAdd ) { to } else { from }
 tag
-<a href="@{Utils.getOrgConfig(request).people_url}@routes.CRM.viewTag(t.id)">
+<a href="@{Utils.getOrgConfig(request).people_url}@routes.CRM.viewTag(t.getId())">
 @t.getTitle()</a>
 </p>
 
 <p>You can also view the
-<a href="@{Utils.getOrgConfig(request).people_url}@routes.CRM.viewTag(t.id)#!history">full history</a>
+<a href="@{Utils.getOrgConfig(request).people_url}@routes.CRM.viewTag(t.getId())#!history">full history</a>
  of that tag.</p>
 
 </body>

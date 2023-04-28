@@ -14,7 +14,7 @@ import lombok.Setter;
 @Entity
 public class PersonChange extends Model {
     @OneToOne()
-    @JoinColumn(name="personId")
+    @JoinColumn(name="person_id")
     private Person person;
 
     private String oldEmail="";

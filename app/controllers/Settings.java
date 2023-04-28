@@ -121,7 +121,7 @@ public class Settings extends Controller {
         t.setEnabled(true);
         t.save();
 
-        return redirect(routes.Settings.viewTaskList(t.getTaskList().id));
+        return redirect(routes.Settings.viewTaskList(t.getTaskList().getId()));
     }
 
     public Result newTaskList(Http.Request request) {
@@ -143,7 +143,7 @@ public class Settings extends Controller {
         list.save();
         list.refresh();
 
-        return redirect(routes.Settings.viewTaskList(list.id));
+        return redirect(routes.Settings.viewTaskList(list.getId()));
     }
 
     public Result editTask(Integer id, Http.Request request) {
@@ -163,7 +163,7 @@ public class Settings extends Controller {
         }
         t.update();
 
-        return redirect(routes.Settings.viewTaskList(t.getTaskList().id));
+        return redirect(routes.Settings.viewTaskList(t.getTaskList().getId()));
     }
 
     public Result saveTaskList(Http.Request request) {
@@ -178,7 +178,7 @@ public class Settings extends Controller {
 
         list.update();
 
-        return redirect(routes.Settings.viewTaskList(list.id));
+        return redirect(routes.Settings.viewTaskList(list.getId()));
     }
 
     public Result viewAccess(Http.Request request) {
@@ -191,7 +191,7 @@ public class Settings extends Controller {
         List<User> users_to_show = new ArrayList<>();
         for (User user : users) {
             // Hide dummy users and the check-in app user
-            if (!user.name.equals(User.DUMMY_USERNAME) &&
+            if (!user.getName().equals(User.DUMMY_USERNAME) &&
                 !user.getEmail().equals(org.getShortName())) {
                 users_to_show.add(user);
             }
@@ -243,7 +243,7 @@ public class Settings extends Controller {
         User u = filled_form.get();
         Map<String, String[]> form_data = request.body().asFormUrlEncoded();
 
-        User orig_user = User.findById(u.id, Utils.getOrg(request));
+        User orig_user = User.findById(u.getId(), Utils.getOrg(request));
 
         for (UserRole r : orig_user.roles) {
             r.delete();
@@ -281,9 +281,9 @@ public class Settings extends Controller {
 
         if (existing_user != null) {
             if (existing_user.getOrganization().getId().equals(org.getId())) {
-                if (existing_user.name.equals(User.DUMMY_USERNAME)) {
+                if (existing_user.getName().equals(User.DUMMY_USERNAME)) {
                     new_user = existing_user;
-                    new_user.name = name;
+                    new_user.setName(name);
                     new_user.save();
                 } else {
                     return redirect(routes.Settings.viewAccess()).flashing("error", "That email address (" + email + ") already has an account.");

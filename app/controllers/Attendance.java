@@ -600,7 +600,7 @@ public class Attendance extends Controller {
             for (Date date : allDates) {
                 AttendanceDay day = personDateAttendance.get(name).get(date);
                 if (day == null || day.getStartTime() == null || day.getEndTime() == null) {
-                    writer.write(day == null || day.setCode(= null ? "" : day.getCode()));
+                    writer.write(day == null || day.getCode() == null ? "" : day.getCode());
                 } else {
                     writer.write(String.format("%.2f", day.getHours()));
                 }
@@ -630,7 +630,7 @@ public class Attendance extends Controller {
                 for (Date date : allDates) {
                     AttendanceDay day = personDateAttendance.get(name).get(date);
                     if (day == null || day.getStartTime() == null || day.getEndTime() == null) {
-                        writer.write(day == null || day.setCode(= null ? "" : day.getCode()));
+                        writer.write(day == null || day.getCode() == null ? "" : day.getCode());
                     } else {
                         writer.write(dateFormat.format(x == 0 ? day.getStartTime() : day.getEndTime()));
                     }

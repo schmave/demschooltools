@@ -14,7 +14,7 @@ body
 <script type="text/javascript">
 app = {}
 app.cases = []
-app.meeting_id = @meeting.id;
+app.meeting_id = @meeting.getId();
 app.ROLE_JC_CHAIR = @PersonAtMeeting.ROLE_JC_CHAIR
 app.ROLE_JC_MEMBER = @PersonAtMeeting.ROLE_JC_MEMBER
 app.ROLE_NOTE_TAKER = @PersonAtMeeting.ROLE_NOTE_TAKER
@@ -61,7 +61,7 @@ $(function () {
 <script id="meeting-template" type="text/x-handlebars-template">
 <h2>@Utils.getOrgConfig(request).str_jc_name minutes<br>@Application.formatMeetingDate(meeting.getDate())</h2>
 <p>
-    <a href="@routes.Application.viewMeeting(meeting.id)" class="btn btn-warning">
+    <a href="@routes.Application.viewMeeting(meeting.getId())" class="btn btn-warning">
         View printable minutes</a>
 </p>
 <table class="edit-minutes-members">
@@ -263,7 +263,7 @@ $(function () {
             <ul class="continue-cases">
                 @for( c <- open_cases) {
                 @if( c.getMeeting() != meeting) {
-                <li id="continue-case-@c.id">@c.getCaseNumber() | @c.getLocation() | @c.getFindings().substring(0, scala.math.min(c.getFindings().length(), 80))...
+                <li id="continue-case-@c.getId()">@c.getCaseNumber() | @c.getLocation() | @c.getFindings().substring(0, scala.math.min(c.getFindings().length(), 80))...
                     <button class="btn btn-xs btn-success">Continue</button>
                 </li>
                 }

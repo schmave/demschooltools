@@ -1,11 +1,9 @@
 package models;
 
 import io.ebean.*;
-
-import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
-
+import javax.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,7 +16,7 @@ public class Comment extends Model {
     private Integer id;
 
     @ManyToOne()
-    @JoinColumn(name="personId")
+    @JoinColumn(name="person_id")
     private Person person;
 
     @ManyToOne()

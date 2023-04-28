@@ -14,8 +14,8 @@
 		<th class="center">@UserRole.getDescription(Utils.getOrgConfig(request), role)</th>
 	}
 <th></th></thead>
-@for( u <- users ) { @if( u.getActive() ) {
-<tr><td>@u.name</td><td>@u.getEmail()</td>
+@for( u <- users ) { @if( u.isActive() ) {
+<tr><td>@u.getName()</td><td>@u.getEmail()</td>
 @for( role <- UserRole.ALL_ROLES ) {
 	<td class="center">@if( u.hasRole(role) ) {
 	<img height=18 src="@routes.Assets.versioned("images/check.png")"/>
@@ -23,7 +23,7 @@
 	<img height=18 src="@routes.Assets.versioned("images/x-check.png")"/>
 		}</td>
 }
-<td><a class="edit-link" href="@routes.Settings.editUser(u.id)">Edit</a></td>
+<td><a class="edit-link" href="@routes.Settings.editUser(u.getId())">Edit</a></td>
 </tr>
 }}
 </table>
@@ -58,9 +58,9 @@ through your school's internet connection. Enter an IP address to allow below to
 <table class="table" style="width: 400px">
 <thead><th>Name</th><th>Email</th><th></th></thead>
 
-@for( u <- users ) { @if( !u.getActive() ) {
-<tr><td>@u.name</td><td>@u.getEmail()</td>
-<td><a class="edit-link" href="@routes.Settings.editUser(u.id)">Edit</a></td>
+@for( u <- users ) { @if( !u.isActive() ) {
+<tr><td>@u.getName()</td><td>@u.getEmail()</td>
+<td><a class="edit-link" href="@routes.Settings.editUser(u.getId())">Edit</a></td>
 </tr>
 }}
 

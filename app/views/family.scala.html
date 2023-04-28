@@ -35,18 +35,18 @@
 @for( tag <- p.tags ) {
 	@for( taskList <- tag.task_lists ) {
 		<div class="col-xs-4">
-		<h4><a href="@routes.CRM.viewTaskList(taskList.id)">@taskList.getTitle()</a></h4>
+		<h4><a href="@routes.CRM.viewTaskList(taskList.getId())">@taskList.getTitle()</a></h4>
 		@for( task <- taskList.tasks ) {
-			@if( task.getEnabled() ) {
+			@if( task.isEnabled() ) {
 			@defining( p.completedTask(task) ) { ct =>
 				@if( ct != null ) {
-					<input type="checkbox" class="task_checkbox" id="task_checkbox_@task.id" disabled checked/>
+					<input type="checkbox" class="task_checkbox" id="task_checkbox_@task.getId()" disabled checked/>
 				} else {
-					<input type="checkbox" class="task_checkbox" id="task_checkbox_@task.id"/>
+					<input type="checkbox" class="task_checkbox" id="task_checkbox_@task.getId()"/>
 				}
-				<label for="task_checkbox_@task.id" style="display:inline">@task.getTitle()</label>
+				<label for="task_checkbox_@task.getId()" style="display:inline">@task.getTitle()</label>
 				@if( ct != null ) {
-					<i>(@ct.getComment().getUser().name, @CRM.formatDate(ct.getComment().getCreated(), Utils.getOrgConfig(request)))</i>
+					<i>(@ct.getComment().getUser().getName(), @CRM.formatDate(ct.getComment().getCreated(), Utils.getOrgConfig(request)))</i>
 					@if(ct.getComment().getMessage().length() > 0) {
 						-- @ct.getComment().getMessage()
 					}

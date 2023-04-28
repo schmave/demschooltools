@@ -7,7 +7,7 @@
 @for( p <- people ) {
        <tr>
        <td><input type="checkbox" class="person" name="person-@p.getPersonId()"></td>
-       <td><a href="@routes.CRM.getPerson()(p.getPersonId())">@p.getFirstName() @p.getLastName()</a>
+       <td><a href="@routes.CRM.person(p.getPersonId())">@p.getFirstName() @p.getLastName()</a>
        <td>@p.getSchoolDistrict()
        <td>@CRM.formatDob(p.getDob(), Utils.getOrgConfig(request))
        <td>@CRM.calcAgeAtBeginningOfSchool(p)

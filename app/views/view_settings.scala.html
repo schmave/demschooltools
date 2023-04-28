@@ -28,7 +28,7 @@ $(function () {
     }
     @helper.form(routes.Settings.editNotifications(), Symbol("style") -> "display: inline") {
 
-        <input type="hidden" name="remove_notification_id" value=@n.id>
+        <input type="hidden" name="remove_notification_id" value=@n.getId()>
         <input type="submit" value="Remove">
     }
     </li>
@@ -69,7 +69,7 @@ $(function () {
         false,
         2,
         @Html(Application.jsonRules(true, Utils.getOrgConfig(request).org)),
-        function(json) { return json.getTitle(); },
+        function(json) { return json.title; },
         null,
         null,
         function(id) { $('#breaking-res-plan-entry').val(id); },

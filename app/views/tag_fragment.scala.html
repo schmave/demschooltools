@@ -2,7 +2,7 @@
 
 
 <span style="white-space: nowrap;"><a
-	href="@routes.CRM.viewTag(t.id)"><span
+	href="@routes.CRM.viewTag(t.getId())"><span
 		class="label label-success">@t.getTitle()</span></a><a class="tag_x"
-		href="#" onclick="removeTag($('#@{p.getPersonId()}_@t.id'),@p.getPersonId(), @t.id); return false;"
-id="@{p.getPersonId()}_@t.id"><img src="/assets/images/x.png"></a></span>
+		href="#" onclick="removeTag($('#@{p.getPersonId()}_@t.getId()'),@p.getPersonId(), @t.getId()); return false;"
+id="@{p.getPersonId()}_@t.getId()"><img src="/assets/images/x.png"></a></span>

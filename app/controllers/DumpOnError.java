@@ -2,10 +2,8 @@ package controllers;
 
 import java.util.*;
 import java.util.concurrent.CompletionStage;
-
 import play.*;
 import play.mvc.*;
-
 
 public class DumpOnError extends Action.Simple {
     static Logger.ALogger sLogger = Logger.of("application");
@@ -17,7 +15,7 @@ public class DumpOnError extends Action.Simple {
 
                 sb.append("Error for request at ").append(request.host()).append(" ").append(request.uri()).append("\n");
                 sb.append("Headers: \n");
-                Map<String, List<String>> headers = request.getHeaders().toMap();
+                Map<String, List<String>> headers = request.getHeaders().asMap();
                 for (String key : headers.keySet()) {
                     sb.append("  ").append(key).append(" --> ");
                     for (String val : headers.get(key)) {

@@ -1,11 +1,8 @@
 package models;
 
 import io.ebean.*;
-
-import javax.persistence.*;
 import java.util.Date;
-
-
+import javax.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,7 +19,7 @@ public class PersonTagChange extends Model {
     private Tag tag;
 
     @ManyToOne()
-    @JoinColumn(name="personId")
+    @JoinColumn(name="person_id")
     private Person person;
 
     @ManyToOne()

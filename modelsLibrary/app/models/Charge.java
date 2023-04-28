@@ -19,7 +19,7 @@ public class Charge extends Model implements Comparable<Charge> {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name="personId")
+    @JoinColumn(name="person_id")
     private Person person;
 
     @ManyToOne

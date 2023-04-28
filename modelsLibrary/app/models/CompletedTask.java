@@ -18,7 +18,7 @@ public class CompletedTask extends Model {
     private Task task;
 
     @ManyToOne
-    @JoinColumn(name="personId")
+    @JoinColumn(name="person_id")
     private Person person;
 
     @ManyToOne

@@ -17,7 +17,7 @@
 	<input type="hidden" name="id" value="@form("id").value().get()"/>
 }
 		@helper.select(form("chapter.id"), options = chapter_options.map (
-        c => ("" + c.id, c.getNum() + " " + c.getTitle())).to(Seq), Symbol("_label") -> "Chapter", Symbol("class") -> "form-control")
+        c => ("" + c.getId(), c.getNum() + " " + c.getTitle())).to(Seq), Symbol("_label") -> "Chapter", Symbol("class") -> "form-control")
 <div class="form-group" id="num_field">
     <label for="num" class="col-sm-3 control-label">Number</label>
     <div class="col-sm-6">

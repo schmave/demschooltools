@@ -1,16 +1,14 @@
 package models;
 
-import io.ebean.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import javax.persistence.*;
+import io.ebean.*;
 import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-
+import javax.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,7 +23,7 @@ public class AttendanceDay extends Model {
     private Date day;
 
     @ManyToOne()
-    @JoinColumn(name="personId")
+    @JoinColumn(name="person_id")
     private Person person;
 
     private String code;

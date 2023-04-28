@@ -3,13 +3,13 @@
 
 
 
-@main("Edit user " + u.name, "settings") {
+@main("Edit user " + u.getName(), "settings") {
 
 <h3>Edit user</h3>
 
 @form(routes.Settings.saveUser(), Symbol("class") -> "form-horizontal", Symbol("role") -> "form") {
 
-	<input type="hidden" name="id" value="@u.id"/>
+	<input type="hidden" name="id" value="@u.getId()"/>
 	@inputText(userForm("name"), Symbol("_label") -> "Name", Symbol("class") -> "form-control")
 	@inputText(userForm("email"), Symbol("_label") -> "Email", Symbol("class") -> "form-control")
 	@checkbox(userForm("active"), Symbol("_label") -> "Active")

@@ -2,9 +2,9 @@
 
 
 <div class="comment">
-<b>@c.getUser().name</b> and 
+<b>@c.getUser().getName()</b> and
 @if( show_last_name ) {
-	<a href="@routes.CRM.getPerson()(c.getPerson().getPersonId())">
+	<a href="@routes.CRM.person(c.getPerson().getPersonId())">
 }
 <b>@c.getPerson().getFirstName() @if( show_last_name ) { @c.getPerson().getLastName() }</b>
 @if( show_last_name ) {
@@ -15,7 +15,7 @@
 </div>
 <div class="comment_tasks">
 @for( ct <- c.completed_tasks ) {
-	<a href="@routes.CRM.viewTaskList(ct.getTask().getTaskList().id)"><span class="label label-primary">@ct.getTask().getTitle()</span></a>
+	<a href="@routes.CRM.viewTaskList(ct.getTask().getTaskList().getId())"><span class="label label-primary">@ct.getTask().getTitle()</span></a>
 }
 </div>
 <div class="comment_time">@CRM.formatDate(c.getCreated(), Utils.getOrgConfig(request))</div>

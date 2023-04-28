@@ -1,12 +1,10 @@
 package models;
 
 import io.ebean.*;
-
-import javax.persistence.*;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-
+import javax.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,7 +19,7 @@ public class AttendanceWeek extends Model {
     private Date monday;
 
     @ManyToOne()
-    @JoinColumn(name="personId")
+    @JoinColumn(name="person_id")
     private Person person;
 
     private double extraHours = 0;

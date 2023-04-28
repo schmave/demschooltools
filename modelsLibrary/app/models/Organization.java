@@ -85,7 +85,11 @@ public class Organization extends Model {
                 this.enableCaseReferences = false;
             }
             if (values.containsKey("breaking_res_plan_entry_id")) {
-                Entry.unassignBreakingResPlanEntry(this);
+                Entry entry1 = Entry.findBreakingResPlanEntry(this);
+                if (entry1 != null) {
+                    entry1.setBreakingResPlan(false);
+                    entry1.save();
+                }
                 String idString = values.get("breaking_res_plan_entry_id")[0];
                 if (!idString.isEmpty()) {
                     Entry entry = Entry.findById(Integer.parseInt(idString), this);

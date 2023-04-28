@@ -2,11 +2,11 @@
 
 <p>
 
-<a nosidebar href="@routes.Application.viewMeeting(c.getTheCase().getMeeting().id)">
+<a nosidebar href="@routes.Application.viewMeeting(c.getTheCase().getMeeting().getId())">
 <b>@c.getTheCase().getCaseNumber()</a>@if( show_chargee && c.getPerson() != null ){,
 <a nosidebar href="@routes.Application.viewPersonHistory(c.getPerson().getPersonId())">
 @c.getPerson().getDisplayName()}</a>@if( show_rule && c.getRule() != null ){,
-<a nosidebar href="@routes.Application.viewRuleHistory(c.getRule().id)">@c.getRule().getNumber() @c.getRule().getTitle()</a>}</b>.
+<a nosidebar href="@routes.Application.viewRuleHistory(c.getRule().getId())">@c.getRule().getNumber() @c.getRule().getTitle()</a>}</b>.
 
 @if( c.getSeverity() != "" ){
 	(@c.getSeverity())

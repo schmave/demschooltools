@@ -23,12 +23,12 @@
 			<tr class="@(if(transaction.getArchived()) "js-archivable js-archived accounting-archived" else "js-archivable")">
 				<td><input type="checkbox"
 						class="js-archive"
-						data-id="@transaction.id"
+						data-id="@transaction.getId()"
 						name="archived"
 						value="@transaction.getArchived()"
 						@if(transaction.getArchived()){checked="checked"}
 						/></td>
-				<td><a href="@routes.Accounting.transaction(transaction.id)">@transaction.id</a></td>
+				<td><a href="@routes.Accounting.transaction(transaction.getId())">@transaction.getId()</a></td>
 				<td>@transaction.getFormattedDate()</td>
 				<td>@transaction.getCreatedByUserName()</td>
 				<td>@transaction.getDescription()</td>

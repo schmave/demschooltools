@@ -2,6 +2,11 @@ package controllers;
 
 import io.ebean.DB;
 import io.ebean.SqlUpdate;
+import java.sql.Connection;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import javax.inject.Inject;
 import models.*;
 import play.api.libs.mailer.MailerClient;
 import play.data.Form;
@@ -13,12 +18,6 @@ import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.With;
 import views.html.*;
-
-import javax.inject.Inject;
-import java.sql.Connection;
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @With(DumpOnError.class)
 public class ApplicationEditing extends Controller {
@@ -109,7 +108,7 @@ public class ApplicationEditing extends Controller {
         String case_num = Utils.getOrgConfig(org).getCaseNumberPrefix(m) + next_num;
 
         Case new_case = Case.create(case_num, m);
-        return ok("[" + new_case.id + ", \"" + new_case.getCaseNumber() + "\"]");
+        return ok("[" + new_case.getId() + ", \"" + new_case.getCaseNumber() + "\"]");
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
@@ -245,7 +244,7 @@ public class ApplicationEditing extends Controller {
     public Result addCharge(Integer case_id)
     {
         Charge c = Charge.create(Case.find.ref(case_id));
-        return ok("" + c.id);
+        return ok("" + c.getId());
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
@@ -265,18 +264,18 @@ public class ApplicationEditing extends Controller {
             return notFound();
         }
 
-        boolean was_referred_to_sm = c.getReferredToSm();
+        boolean was_referred_to_sm = c.isReferredToSm();
         c.edit(request.queryString());
-        if (!was_referred_to_sm && c.getReferredToSm() &&
-                !sAlreadyEmailedCharges.contains(c.id) &&
+        if (!was_referred_to_sm && c.isReferredToSm() &&
+                !sAlreadyEmailedCharges.contains(c.getId()) &&
                 !NotificationRule.findByType(NotificationRule.TYPE_SCHOOL_MEETING, org).isEmpty()) {
             final OrgConfig org_config = Utils.getOrgConfig(org);
             sExecutor.submit(() -> {
                 try {
                     Thread.sleep(1000 * 60 * 5);
                     Charge c1 = Charge.find.byId(id);
-                    if (c1.getReferredToSm() && !sAlreadyEmailedCharges.contains(c1.id)) {
-                        sAlreadyEmailedCharges.add(c1.id);
+                    if (c1.isReferredToSm() && !sAlreadyEmailedCharges.contains(c1.getId())) {
+                        sAlreadyEmailedCharges.add(c1.getId());
                         List<NotificationRule> rules = NotificationRule.findByType(
                                 NotificationRule.TYPE_SCHOOL_MEETING, org);
                         for (NotificationRule rule : rules) {
@@ -290,7 +289,7 @@ public class ApplicationEditing extends Controller {
                                 + " was charged with " + c1.getRuleTitle()
                                 + " and the charge was referred to School Meeting in case #" + c1.getTheCase().getCaseNumber() + ".\n\n"
                                 + "For more information, view today's minutes:\n\n"
-                                + org_config.people_url + routes.Application.viewMeeting(c1.getTheCase().getMeeting().id).toString()
+                                + org_config.people_url + routes.Application.viewMeeting(c1.getTheCase().getMeeting().getId()).toString()
                                 + "\n\n"
                             );
                             mMailer.send(mail);
@@ -394,7 +393,7 @@ public class ApplicationEditing extends Controller {
         }
 
         onManualChange(Utils.getOrg(request));
-        return redirect(routes.Application.viewChapter(c.id));
+        return redirect(routes.Application.viewChapter(c.getId()));
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
@@ -426,7 +425,7 @@ public class ApplicationEditing extends Controller {
         }
 
         onManualChange(Utils.getOrg(request));
-        return redirect(routes.Application.viewChapter(s.getChapter().id).url() + "#section_" + s.id);
+        return redirect(routes.Application.viewChapter(s.getChapter().getId()).url() + "#section_" + s.getId());
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
@@ -458,7 +457,7 @@ public class ApplicationEditing extends Controller {
         }
 
         onManualChange(Utils.getOrg(request));
-        return redirect(routes.Application.viewChapter(e.getSection().getChapter().id).url() + "#entry_" + e.id);
+        return redirect(routes.Application.viewChapter(e.getSection().getChapter().getId()).url() + "#entry_" + e.getId());
     }
 
 }

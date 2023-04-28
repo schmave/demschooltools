@@ -1,6 +1,13 @@
 package controllers;
 
 import com.csvreader.CsvWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.stream.Collectors;
+import javax.inject.Inject;
 import models.*;
 import play.data.Form;
 import play.data.FormFactory;
@@ -11,14 +18,6 @@ import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.With;
 import views.html.*;
-
-import javax.inject.Inject;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @With(DumpOnError.class)
 @Secured.Auth(UserRole.ROLE_VIEW_JC)
@@ -58,7 +57,7 @@ public class Accounting extends Controller {
             try {
                 Transaction transaction = Transaction.create(filledForm,
                         Utils.getOrg(request), Application.getCurrentUser(request));
-                return redirect(routes.Accounting.transaction(transaction.id));
+                return redirect(routes.Accounting.transaction(transaction.getId()));
             }
             catch (Exception ex) {
                 return badRequest(ex.toString());
@@ -72,7 +71,7 @@ public class Accounting extends Controller {
             Form<Transaction> form = mFormFactory.form(Transaction.class).bindFromRequest(request);
             Transaction transaction = Transaction.findById(Integer.parseInt(form.field("id").value().get()), Utils.getOrg(request));
             transaction.updateFromForm(form);
-            return redirect(routes.Accounting.transaction(transaction.id));
+            return redirect(routes.Accounting.transaction(transaction.getId()));
         }
         catch (Exception ex) {
             return badRequest(ex.toString());
@@ -141,7 +140,7 @@ public class Accounting extends Controller {
 
         for (Transaction t : report.transactions) {
             writer.write(t.getArchived() ? "yes" : "no");
-            writer.write(t.id.toString());
+            writer.write(t.getId().toString());
             writer.write(t.getFormattedDate());
             writer.write(t.getCreatedByUserName());
             writer.write(t.getTypeName());
@@ -222,7 +221,7 @@ public class Accounting extends Controller {
             String name = filledForm.field("name").value().get();
             AccountType type = AccountType.valueOf(filledForm.field("type").value().get());
             Account account = Account.create(type, name, null, Utils.getOrg(request));
-            return redirect(routes.Accounting.account(account.id));
+            return redirect(routes.Accounting.account(account.getId()));
         }
     }
 
@@ -238,7 +237,7 @@ public class Accounting extends Controller {
         Form<Account> form = mFormFactory.form(Account.class).bindFromRequest(request);
         Account account = Account.findById(Integer.parseInt(form.field("id").value().get()), Utils.getOrg(request));
         account.updateFromForm(form);
-        return redirect(routes.Accounting.account(account.id));
+        return redirect(routes.Accounting.account(account.getId()));
     }
 
     public static String accountsJson(Organization org) {
@@ -249,7 +248,7 @@ public class Accounting extends Controller {
         for (Account a : accounts) {
             HashMap<String, String> values = new HashMap<>();
             values.put("label", a.getName());
-            values.put("id", "" + a.id);
+            values.put("id", "" + a.getId());
             values.put("balance", a.getFormattedBalance());
             result.add(values);
         }

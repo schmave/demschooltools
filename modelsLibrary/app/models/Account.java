@@ -23,7 +23,7 @@ public class Account extends Model {
     private Organization organization;
 
     @ManyToOne()
-    @JoinColumn(name="personId")
+    @JoinColumn(name="person_id")
     private Person person;
 
     @OneToMany(mappedBy = "fromAccount")

@@ -58,7 +58,7 @@ public class MyUserService extends AbstractUserService {
 		final User u = User.findByAuthUserIdentity(identity);
 		if(u != null) {
             sLogger.debug("    found user by auth identity");
-			return u.id;
+			return u.getId();
 		} else {
 			return null;
 		}

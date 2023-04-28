@@ -103,14 +103,14 @@
                             <a tabindex="-1" href="#">@kv._1</a>
                             <ul class="dropdown-menu">
                             @for( t <- kv._2 ) {
-                                <li><a href="@routes.CRM.viewTag(t.id)">@t.getTitle()</a></li>
+                                <li><a href="@routes.CRM.viewTag(t.getId())">@t.getTitle()</a></li>
                             }
                             </ul></li>
                         } else {
                             @* There is only one tag, but the for loop is a nice way to bind
                                 the variable *@
                             @for( t <- kv._2 ) {
-                                <li><a href="@routes.CRM.viewTag(t.id)">@t.getTitle()</a></li>
+                                <li><a href="@routes.CRM.viewTag(t.getId())">@t.getTitle()</a></li>
                             }
                         }
                     }
@@ -125,7 +125,7 @@
             <span class="dropdown">
                 <ul class="dropdown-menu">
                     @for( l <- TaskList.find.query().where().eq("organization", Utils.getOrgConfig(request).org).findList() ) {
-                        <li><a href="@routes.CRM.viewTaskList(l.id)">@l.getTitle()</a></li>
+                        <li><a href="@routes.CRM.viewTaskList(l.getId())">@l.getTitle()</a></li>
                         }
                 </ul>
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">

@@ -1,10 +1,8 @@
 package models;
 
-import io.ebean.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
+import io.ebean.*;
 import javax.persistence.*;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,7 +15,7 @@ public class PersonAtCase extends Model {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name="personId")
+    @JoinColumn(name="person_id")
     private Person person;
 
     @ManyToOne

@@ -1,9 +1,7 @@
 package models;
 
 import io.ebean.*;
-
 import javax.persistence.*;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,7 +17,7 @@ public class PhoneNumber extends Model {
     private String comment;
 
     @ManyToOne()
-    @JoinColumn(name="personId")
+    @JoinColumn(name="person_id")
     private Person owner;
 
     public static Finder<Integer, PhoneNumber> find = new Finder<>(

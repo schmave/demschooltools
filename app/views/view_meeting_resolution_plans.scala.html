@@ -13,8 +13,8 @@ $(function() {
 <table class="table printable-res-plans">
 	@for(c <- m.cases) {
 		@for(charge <- c.charges) {
-			@if(charge.displayInResolutionPlanList() && !charge.getReferredToSm()) {
-				@resolutionPlan(charge)
+			@if(charge.displayInResolutionPlanList() && !charge.isReferredToSm()) {
+				@resolution_plan(charge)
 			}
 		}
 	}

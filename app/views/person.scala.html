@@ -15,7 +15,7 @@
 @if(person.isStudent()) {
 	<div class="student"></div>
 }
-<h4><a href="@routes.CRM.getPerson()(person.getPersonId())">
+<h4><a href="@routes.CRM.person(person.getPersonId())">
 @person.getFirstName() @person.getLastName() @if(person.getDisplayName()) { ("@person.getDisplayName()") } </a></h4>
 @if( person.getNotes() ) {
 	<p>@person.getNotes()</p>

@@ -42,8 +42,8 @@ public class AttendanceStats {
         if (code == null) {
             return;
         }
-        if (!code.getNotCounted()) {
-            if (code.getCountsTowardAttendance()) {
+        if (!code.isNotCounted()) {
+            if (code.isCountsTowardAttendance()) {
                 approved_absences++;
                 values.put(index, 1d);
             } else {

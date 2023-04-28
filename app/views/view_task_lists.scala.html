@@ -11,8 +11,8 @@
 
 <ul>
 @for( list <- lists ) {
-	<li><a href="@routes.Settings.viewTaskList(list.id)">@list.getTitle()</a>
-		<a href="@routes.CRM.viewTag(list.getTag().id)">
+	<li><a href="@routes.Settings.viewTaskList(list.getId())">@list.getTitle()</a>
+		<a href="@routes.CRM.viewTag(list.getTag().getId())">
 		<label class="label label-success">@list.getTag().getTitle()</label></a></li>
 }
 </ul>

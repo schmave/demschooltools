@@ -61,7 +61,7 @@ public class CRM extends Controller {
         Person the_person = Person.findById(id, Utils.getOrg(request));
 
         List<Person> family_members =
-            Person.find.query().where().isNotNull("family").eq("family", the_person.family).
+            Person.find.query().where().isNotNull("family").eq("family", the_person.getFamily()).
                 ne("personId", the_person.getPersonId()).findList();
 
         Set<Integer> family_ids = new HashSet<>();
@@ -183,7 +183,7 @@ public class CRM extends Controller {
             if (existing_tags == null || !existing_tags.contains(t)) {
                 HashMap<String, String> values = new HashMap<>();
                 values.put("label", t.getTitle());
-                values.put("id", "" + t.id);
+                values.put("id", "" + t.getId());
                 result.add(values);
             }
         }
@@ -295,7 +295,7 @@ public class CRM extends Controller {
         }
         DB.execute(() -> {
             if (DB.sqlUpdate("DELETE from person_tag where personId=" + person.getPersonId() +
-                    " AND tag_id=" + tag.id).execute() == 1) {
+                    " AND tag_id=" + tag.getId()).execute() == 1) {
                 PersonTagChange.create(
                         tag,
                         person,
@@ -317,7 +317,7 @@ public class CRM extends Controller {
             mail.addTo(rule.getEmail());
             mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
             mail.setBodyHtml(tag_email.render(t,
-                    Application.getCurrentUser(request).name,
+                    Application.getCurrentUser(request).getName(),
                     p, wasAdd, request, mMessagesApi.preferred(request)).toString());
             sMailer.send(mail);
         }
@@ -361,7 +361,7 @@ public class CRM extends Controller {
 
             CachedPage.onPeopleChanged(Utils.getOrg(request));
 
-            return redirect(routes.CRM.viewTag(t.id));
+            return redirect(routes.CRM.viewTag(t.getId()));
         }
         return redirect(routes.CRM.recentComments());
     }
@@ -376,7 +376,7 @@ public class CRM extends Controller {
         }
 
         CachedPage.onPeopleChanged(Utils.getOrg(request));
-        return redirect(routes.CRM.viewTag(dest_tag.id));
+        return redirect(routes.CRM.viewTag(dest_tag.getId()));
     }
 
     public Result addPeopleToTag(Http.Request request) {
@@ -389,7 +389,7 @@ public class CRM extends Controller {
         }
 
         CachedPage.onPeopleChanged(Utils.getOrg(request));
-        return redirect(routes.CRM.viewTag(dest_tag.id));
+        return redirect(routes.CRM.viewTag(dest_tag.getId()));
     }
 
     public Result removePeopleFromTag(Http.Request request) {
@@ -405,7 +405,7 @@ public class CRM extends Controller {
         }
 
         CachedPage.onPeopleChanged(Utils.getOrg(request));
-        return redirect(routes.CRM.viewTag(tag.id));
+        return redirect(routes.CRM.viewTag(tag.getId()));
     }
 
     public Result undoTagChanges(Http.Request request) {
@@ -418,7 +418,7 @@ public class CRM extends Controller {
                 PersonTagChange change =
                     PersonTagChange.find.byId(Integer.parseInt(key_name.substring(prefix.length())));
                 DB.execute(() -> {
-                    if (change.getWasAdd()) {
+                    if (change.isWasAdd()) {
                         tag.people.remove(change.getPerson());
                     } else {
                         if (!tag.people.contains(change.getPerson())) {
@@ -427,13 +427,13 @@ public class CRM extends Controller {
                     }
                     tag.save();
                     change.delete();
-                    notifyAboutTag(tag, change.getPerson(), !change.getWasAdd(), request);
+                    notifyAboutTag(tag, change.getPerson(), !change.isWasAdd(), request);
                 });
             }
         }
 
         CachedPage.onPeopleChanged(Utils.getOrg(request));
-        return redirect(routes.CRM.viewTag(tag.id).url() + "#!history");
+        return redirect(routes.CRM.viewTag(tag.getId()).url() + "#!history");
     }
 
     public Result viewTag(Integer id, Http.Request request) {
@@ -454,7 +454,7 @@ public class CRM extends Controller {
             }
         }
 
-        return ok(tag.render(the_tag, people, people_with_family, the_tag.getUseStudentDisplay(), true, request, mMessagesApi.preferred(request)));
+        return ok(tag.render(the_tag, people, people_with_family, the_tag.isUseStudentDisplay(), true, request, mMessagesApi.preferred(request)));
     }
 
     private static void createCell(Row row, int j, Object value, CellStyle style) {
@@ -647,7 +647,7 @@ public class CRM extends Controller {
             );
         } else {
             Person new_person = Person.create(filledForm, Utils.getOrg(request));
-            return redirect(routes.CRM.getPerson()(new_person.getPersonId()));
+            return redirect(routes.CRM.person(new_person.getPersonId()));
         }
     }
 
@@ -669,7 +669,7 @@ public class CRM extends Controller {
         if(filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
             for (ValidationError error : filledForm.errors()) {
-                System.out.println(error.key() + ", " + error.getMessage()());
+                System.out.println(error.key() + ", " + error.message());
             }
             return badRequest(
                 edit_person.render(filledForm, request, mMessagesApi.preferred(request))
@@ -677,7 +677,7 @@ public class CRM extends Controller {
         }
 
         Person updatedPerson = Person.updateFromForm(filledForm, Utils.getOrg(request));
-        return redirect(routes.CRM.getPerson()(
+        return redirect(routes.CRM.person(
                 (updatedPerson.isFamily() ? updatedPerson.family_members.get(0) : updatedPerson).getPersonId()));
     }
 
@@ -709,15 +709,15 @@ public class CRM extends Controller {
                 for (NotificationRule rule :
                         NotificationRule.findByType(NotificationRule.TYPE_COMMENT, Utils.getOrg(request))) {
                     play.libs.mailer.Email mail = new play.libs.mailer.Email();
-                    mail.setSubject("DemSchoolTools comment: " + new_comment.getUser().name + " & " + new_comment.getPerson().getInitials());
+                    mail.setSubject("DemSchoolTools comment: " + new_comment.getUser().getName() + " & " + new_comment.getPerson().getInitials());
                     mail.addTo(rule.getEmail());
                     mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
-                    mail.setBodyHtml(comment_email.render(Comment.find.byId(new_comment.id), request, mMessagesApi.preferred(request)).toString());
+                    mail.setBodyHtml(comment_email.render(Comment.find.byId(new_comment.getId()), request, mMessagesApi.preferred(request)).toString());
                     sMailer.send(mail);
                 }
             }
 
-            return ok(comment_fragment.render(Comment.find.byId(new_comment.id), false, request, mMessagesApi.preferred(request)));
+            return ok(comment_fragment.render(Comment.find.byId(new_comment.getId()), false, request, mMessagesApi.preferred(request)));
         } else {
             return ok();
         }
@@ -767,6 +767,6 @@ public class CRM extends Controller {
         TaskList list = TaskList.findById(id, Utils.getOrg(request));
         List<Person> people = list.getTag().people;
 
-        return ok(taskList.render(list, people, request, mMessagesApi.preferred(request)));
+        return ok(task_list.render(list, people, request, mMessagesApi.preferred(request)));
     }
 }

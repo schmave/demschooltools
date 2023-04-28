@@ -25,7 +25,7 @@
 <thead><tr><th width=50% class="sorttable_alpha">Entry<th width=25% class="sorttable_school_mmdd">Most Recent Violation<th class="sorttable_numeric"># of violations</tr></thead>
 <tbody>
 @for( r <- history.rule_records ) {
-	<tr><td width=50%>@if(r.getRule() != null) { @r.getRule().getNumber() @r.getRule().getTitle() } else { <i>unknown</i> }
+	<tr><td width=50%>@if(r.rule != null) { @r.rule.getNumber() @r.rule.getTitle() } else { <i>unknown</i> }
 		<td>
 		@if( r.most_recent_charge != null ) {
 			@Application.formatDateShort(Utils.getOrgConfig(request), r.most_recent_charge)

@@ -3,7 +3,7 @@
 @import helper._
 
 	<tr valign="top">
-	<td valign="top"><h5>@if(show_links) {<a href="@routes.Application.viewMeeting(c.getMeeting().id)">}
+	<td valign="top"><h5>@if(show_links) {<a href="@routes.Application.viewMeeting(c.getMeeting().getId())">}
 		#@c.getCaseNumber() @if(show_links) {</a>} @if( c.getDateClosed() == null ) { (OPEN) }</h5>
 	<p>@if( c.getDate() != null ) { @Application.formatDateShort(Utils.getOrgConfig(request), c.getDate())@if( !c.getTime().equals("") ){, @c.getTime()}. }
 	@if(Utils.getOrgConfig(request).track_writer) {
@@ -56,7 +56,7 @@
 	</td></tr>
 
 	@for( charge <- c.charges ) {
-		@if( charge.getReferredToSm() && charge.getSmDecision() == null) {
+		@if( charge.isReferredToSm() && charge.getSmDecision() == null) {
 			<tr><td colspan="3" class="smDecision">*** Awaiting @Utils.getOrgConfig(request).getReferralDestination(charge) decision on charging
 			@if(charge.getPerson() != null) { @charge.getPerson().getDisplayName() } else { ??? } with
 			@charge.getRuleTitle().

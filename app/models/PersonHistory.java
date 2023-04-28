@@ -52,7 +52,7 @@ public class PersonHistory {
                 r = new Record();
                 r.most_recent_charge = c.getTheCase().getMeeting().getDate();
                 r.count = 1;
-                r.setRule(c.getRule());
+                r.rule = c.getRule();
                 records.put(c.getRule(), r);
             } else {
                 r.count++;

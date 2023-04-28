@@ -32,7 +32,7 @@ public abstract class CachedPage {
 
     public CachedPage(String key_base, String title, String menu,
                       String selected_button, Organization org) {
-        this.setTitle(title);
+        this.title = title;
         this.cache_key = getKey(key_base, org);
         this.menu = menu;
         this.selected_button = selected_button;

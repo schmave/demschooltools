@@ -1,7 +1,6 @@
 package models;
 
 import controllers.Application;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,37 +17,37 @@ public class CaseReference {
 		for (Case referenced_case : referencing_case.referenced_cases) {
 			
 			CaseReference result = new CaseReference();
-			result.id = referenced_case.id;
-			result.setCaseNumber(referenced_case.getCaseNumber());
-			result.setFindings(Application.generateCompositeFindingsFromCaseReferences(referenced_case));
+			result.id = referenced_case.getId();
+			result.caseNumber = referenced_case.getCaseNumber();
+			result.findings = Application.generateCompositeFindingsFromCaseReferences(referenced_case);
 			result.charges = new ArrayList<>();
 
 			for (Charge charge : referenced_case.charges) {
 
-				if (charge.setPerson(= null) continue);
+				if (charge.getPerson() == null) continue;
 
 				ChargeReference cr = new ChargeReference();
 				
-				cr.charge_id = charge.id;
-				cr.setPerson(charge.getPerson().getDisplayName());
-				cr.setRule(charge.getRuleTitle());
-				cr.setResolutionPlan(charge.getResolutionPlan());
-				cr.setIsReferenced(referencing_case.referenced_charges.contains(charge));
+				cr.charge_id = charge.getId();
+				cr.person = charge.getPerson().getDisplayName();
+				cr.rule = charge.getRuleTitle();
+				cr.resolutionPlan = charge.getResolutionPlan();
+				cr.isReferenced = referencing_case.referenced_charges.contains(charge);
 
 				if (charge.getSmDecision() != null && !charge.getSmDecision().isEmpty()) {
 					cr.is_sm_decision = true;
-					cr.setResolutionPlan(charge.getSmDecision());
+					cr.resolutionPlan = charge.getSmDecision();
 				}
 
-				if (charge.getReferredToSm() && cr.getResolutionPlan().isEmpty()) {
-					cr.setResolutionPlan("[Referred to School Meeting]");
+				if (charge.isReferredToSm() && cr.resolutionPlan.isEmpty()) {
+					cr.resolutionPlan = "[Referred to School Meeting]";
 				}
 
 				for (Charge new_charge : referencing_case.charges) {
 					if (new_charge.getReferencedCharge() == charge) {
 						cr.has_generated = true;
-						cr.generated_charge_id = new_charge.id;
-						cr.has_default_rule = new_charge.getRule() != null && new_charge.getRule().id.equals(
+						cr.generated_charge_id = new_charge.getId();
+						cr.has_default_rule = new_charge.getRule() != null && new_charge.getRule().getId().equals(
 								Entry.findBreakingResPlanEntryId(org));
 					}
 				}

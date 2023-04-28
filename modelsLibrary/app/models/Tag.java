@@ -1,14 +1,12 @@
 package models;
 
 import io.ebean.*;
-import play.data.Form;
-
+import java.util.*;
 import javax.persistence.*;
 import javax.persistence.OrderBy;
-import java.util.*;
-
 import lombok.Getter;
 import lombok.Setter;
+import play.data.Form;
 
 @Getter
 @Setter
@@ -28,7 +26,7 @@ public class Tag extends Model {
     @ManyToMany(cascade=CascadeType.ALL)
     @JoinTable(name="person_tag",
         joinColumns=@JoinColumn(name="tag_id",referencedColumnName = "id"),
-        inverseJoinColumns = @JoinColumn(name="personId", referencedColumnName="personId"))
+        inverseJoinColumns = @JoinColumn(name="person_id", referencedColumnName="person_id"))
     public List<Person> people;
 
     @ManyToOne()

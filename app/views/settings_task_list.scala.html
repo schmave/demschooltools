@@ -7,8 +7,8 @@
 
 <h3>@list.getTitle() settings</h3>
 
-<p>You can view <a href="@routes.CRM.viewTaskList(list.id)">the checklist</a>
- or its associated tag <a href="@routes.CRM.viewTag(list.getTag().id)">
+<p>You can view <a href="@routes.CRM.viewTaskList(list.getId())">the checklist</a>
+ or its associated tag <a href="@routes.CRM.viewTag(list.getTag().getId())">
 		<label class="label label-success">@list.getTag().getTitle()</label></a>.</p>
 
 <table class="table" style="width: 400px;">
@@ -16,15 +16,15 @@
 <tbody>
 @for( task <- list.tasks ) {
 	<tr><td>
-		@if(!task.getEnabled()) {<strike>}
+		@if(!task.isEnabled()) {<strike>}
 		@task.getTitle()
-		@if(!task.getEnabled()) {</strike>}
+		@if(!task.isEnabled()) {</strike>}
 	</td><td>
-		@if(!task.getEnabled()) {<strike>}
+		@if(!task.isEnabled()) {<strike>}
 		@task.getSortOrder()
-		@if(!task.getEnabled()) {</strike>}
+		@if(!task.isEnabled()) {</strike>}
 	</td>
-	<td><a class="edit-link" href="@routes.Settings.editTask(task.id)">Edit</a></td>
+	<td><a class="edit-link" href="@routes.Settings.editTask(task.getId())">Edit</a></td>
 	</tr>
 }
 </tbody>
@@ -42,7 +42,7 @@
 
 	@inputText(taskForm("title"), Symbol("_label") -> "Title", Symbol("class") -> "form-control")
 	@inputText(taskForm("sortOrder"), Symbol("_label") -> "Sort order", Symbol("class") -> "form-control")
-	<input type="hidden" name="taskList.id" value="@list.id"/>
+	<input type="hidden" name="taskList.id" value="@list.getId()"/>
 
 	<input type="submit" value="New task">
 }

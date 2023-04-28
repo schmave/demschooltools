@@ -19,7 +19,7 @@
 			</tr>
 			@for(account <- personalAccounts) {
 				<tr>
-					<td><a href="@routes.Accounting.account(account.id)">@account.getName()</a></td>
+					<td><a href="@routes.Accounting.account(account.getId())">@account.getName()</a></td>
 					<td class="balance">@account.getFormattedBalance()</td>
 				</tr>
 			}
@@ -35,7 +35,7 @@
 			</tr>
 			@for(account <- nonPersonalAccounts) {
 				<tr>
-					<td><a href="@routes.Accounting.account(account.id)">@account.getName()</a></td>
+					<td><a href="@routes.Accounting.account(account.getId())">@account.getName()</a></td>
 					<td class="balance">@account.getFormattedBalance()</td>
 				</tr>
 			}

@@ -7,7 +7,7 @@
 <ul>
 @for( c <- codes ) {
 	<li><span style="background:@c.getColor();">&nbsp;@c.getCode()&mdash;@c.getDescription()</span>
-		<a class="edit-link" href="@routes.Attendance.editCode(c.id)">Edit</a></li>
+		<a class="edit-link" href="@routes.Attendance.editCode(c.getId())">Edit</a></li>
 }
 </ul>
 

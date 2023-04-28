@@ -5,19 +5,19 @@
 @main("All people tagged " + tag.getTitle(), "crm") {
 <h1>@tag.getTitle()
 @if( allow_edit ) {
-    <a class="man-edit no-print" href="@routes.CRM.editTag(tag.id)">Edit Tag</a>
+    <a class="man-edit no-print" href="@routes.CRM.editTag(tag.getId())">Edit Tag</a>
 }
 @if( tag.task_lists.size() > 0 ) {
    <span class="view-task-list">Also see task list:
    @for( taskList <- tag.task_lists ) {
-    <a href="@routes.CRM.viewTaskList(taskList.id)">@taskList.getTitle()</a>
+    <a href="@routes.CRM.viewTaskList(taskList.getId())">@taskList.getTitle()</a>
    }
    </span>
 }
 
 </h1>
 <p>@people.size() people.
-    <a href="@routes.CRM.downloadTag(tag.id)">
+    <a href="@routes.CRM.downloadTag(tag.getId())">
         <span class="glyphicon glyphicon-download-alt"></span> Download all as spreadsheet
 	</a>
 </p>
@@ -33,7 +33,7 @@
     <div class="tab-pane active" id="tag-people">
         @helper.form(routes.CRM.removePeopleFromTag()) {
 
-        <input type="hidden" name="tag_id" value="@tag.id">
+        <input type="hidden" name="tag_id" value="@tag.getId()">
             <p style="margin-top: 15px; margin-left: 15px">
                 <input id="remove-people" class="btn btn-warning" disabled="disabled"
                        type="submit" value="Remove selected people"/>
@@ -55,22 +55,22 @@
                        type="submit" value="Undo selected changes"/>
                 Changes made in the last 7 days can be undone.
             </p>
-            <input type="hidden" name="tag_id" value="@tag.id">
+            <input type="hidden" name="tag_id" value="@tag.getId()">
             @for( c <- tag.changes ) {
                 <tr>
-                <td><input type="checkbox" class="tag-change" name="tag-change-@c.id"
+                <td><input type="checkbox" class="tag-change" name="tag-change-@c.getId()"
                         @if( ! Utils.lessThanDaysOld(c.getTime(), 7) ) { disabled="disabled" }></td>
                 <td>
-                @if( c.getWasAdd() ) {
+                @if( c.isWasAdd() ) {
                     <img height=18 src="@routes.Assets.versioned("images/plus.png")"/>
                 } else {
                     <img height=18 src="@routes.Assets.versioned("images/minus.png")"/>
                 }
-                <a href="@routes.CRM.getPerson()(c.getPerson().getPersonId())">
+                <a href="@routes.CRM.person(c.getPerson().getPersonId())">
                     @c.getPerson().getFirstName() @c.getPerson().getLastName()
                 </a></td>
                 <td>@Application.yymmddDate(Utils.getOrgConfig(request), c.getTime())</td>
-                <td>@c.getCreator().name</td>
+                <td>@c.getCreator().getName()</td>
                 </tr>
             }
         }
@@ -80,7 +80,7 @@
         <h3>Add people by name</h3>
         @helper.form(routes.CRM.addPeopleToTag()) {
 
-            <input type="hidden" name="dest_id" value="@tag.id">
+            <input type="hidden" name="dest_id" value="@tag.getId()">
             <div class="row">
                 <div class="col-sm-2">
                     Enter names to add:
@@ -103,7 +103,7 @@
         <h3>Add people by tag</h3>
         @helper.form(routes.CRM.addPeopleFromTag()) {
 
-            <input type="hidden" name="dest_id" value="@tag.id">
+            <input type="hidden" name="dest_id" value="@tag.getId()">
             Add everyone who is already tagged
             <span id="tags-entered"></span>
             <input type="text" id="tag-entry">

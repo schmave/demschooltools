@@ -9,7 +9,7 @@
     <ul>
         @for(person <- people) {
             <li>
-                <a href="@routes.CRM.getPerson()(person.getPersonId())">@person.getFirstName() @person.getLastName()</a>
+                <a href="@routes.CRM.person(person.getPersonId())">@person.getFirstName() @person.getLastName()</a>
             </li>
         }
     </ul>

@@ -9,13 +9,13 @@
 @for( c <- charges ) {
 	@if( c.getSmDecisionDate() != null &&
 		c.getSmDecisionDate().equals(charges.head.getSmDecisionDate()) ) {
-		@resolutionPlan(c)
+		@resolution_plan(c)
 	}
 }
 </table>
 @for( c <- charges) {
 	@historyCharge(c, true, true, false)
-	<a href="@routes.ApplicationEditing.editSchoolMeetingDecision(c.id)" class="man-edit">Edit</a>
+	<a href="@routes.ApplicationEditing.editSchoolMeetingDecision(c.getId())" class="man-edit">Edit</a>
 }
 
 }
