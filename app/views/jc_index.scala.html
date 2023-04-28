@@ -14,7 +14,7 @@ $(function() {
     {
         var str_date = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
         for (i in meeting_info) {
-            if (meeting_info[i].getDate() == str_date) {
+            if (meeting_info[i].date == str_date) {
                 return [true, "", "" + meeting_info[i].case_count + " cases"];
             }
         }
@@ -24,7 +24,7 @@ $(function() {
 
     function meetingSelected(str_date, datepicker) {
         for (i in meeting_info) {
-            if (meeting_info[i].getDate() == str_date) {
+            if (meeting_info[i].date == str_date) {
                 location.href = meeting_info[i].link;
             }
         }
