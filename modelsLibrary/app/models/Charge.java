@@ -6,8 +6,6 @@ import java.util.*;
 import java.util.Date;
 import java.util.Map;
 import javax.persistence.*;
-import lombok.AccessLevel;
-import lombok.Setter;
 
 @Entity
 @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
@@ -54,7 +52,6 @@ public class Charge extends Model implements Comparable<Charge> {
 
     public boolean rp_complete = false;
 
-    @Setter(AccessLevel.NONE)
     private Date rpCompleteDate = null;
 
     public String severity = "";

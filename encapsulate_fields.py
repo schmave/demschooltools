@@ -40,7 +40,12 @@ def generate_migration(table_name: str, replacements: dict[str, str]):
 def encapsulate_fields(files: dict[str, str], path_to_model):
     assert path_to_model.endswith('.java')
     content = files[path_to_model]
-    assert '@Entity' in content
+    if '@Entity' not in content:
+        print('Skipping', path_to_model, 'because there is no @Entity')
+        return
+    if '@Getter' in content:
+        print('Skipping', path_to_model, 'because there is already @Getter')
+        return
 
     replacements = {}
     types = {}
@@ -51,9 +56,11 @@ def encapsulate_fields(files: dict[str, str], path_to_model):
         if not match:
             if line.strip() == '@Entity':
                 out_lines.append('''\
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data''')
+@Getter
+@Setter''')
             out_lines.append(line)
             continue
 
@@ -79,13 +86,14 @@ import lombok.Data;
             capital_name = new_var_name[0].upper() + new_var_name[1:]
             getter = (new_var_name if
                       (new_var_name.startswith('is') and 'bool' in types[old_var_name].lower()) else (
-                        'get' + capital_name))
+                    'get' + capital_name))
             setter = 'set' + capital_name
 
             if 'modelsLibrary' not in path and (path.endswith('.java') or path.endswith('.scala.html')):
                 new_lines = []
                 for line in new_content.splitlines():
-                    ignores = ['.fetch(', '.eq(', '.ne(', 'parse(', 'SELECT', '@Where', 'import', 'filename=']
+                    ignores = ['.fetch(', '.eq(', '.ne(', 'parse(', 'SELECT', '@Where', 'import', 'filename=',
+                               '.lt(', '.ge(', '.orderBy(', ]
                     if not any(x in line for x in ignores):
                         # .foo_bar = value; --> .setFooBar(value);
                         line = re.sub(rf'\.{old_var_name} ?= ?(.*);',
