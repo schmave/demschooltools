@@ -84,9 +84,12 @@ import lombok.Setter;
                 continue
 
             capital_name = new_var_name[0].upper() + new_var_name[1:]
-            getter = (new_var_name if
-                      (new_var_name.startswith('is') and 'bool' in types[old_var_name].lower()) else (
-                    'get' + capital_name))
+            getter = 'get' + capital_name
+            if 'boolean' == types[old_var_name]:
+                if new_var_name.startswith('is') and new_var_name[2].isupper():
+                    getter = new_var_name
+                else:
+                    getter = 'is' + capital_name
             setter = 'set' + capital_name
 
             if 'modelsLibrary' not in path and (path.endswith('.java') or path.endswith('.scala.html')):
@@ -96,7 +99,7 @@ import lombok.Setter;
                                '.lt(', '.ge(', '.orderBy(', ]
                     if not any(x in line for x in ignores):
                         # .foo_bar = value; --> .setFooBar(value);
-                        line = re.sub(rf'\.{old_var_name} ?= ?(.*);',
+                        line = re.sub(rf'\.{old_var_name} ?=[^=](.*);',
                                       rf'.{setter}(\1);', line)
                         # .foo_bar --> .getFooBar();
                         line = re.sub(rf'\.{old_var_name}\b',
