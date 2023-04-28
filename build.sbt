@@ -50,6 +50,7 @@ libraryDependencies ++= Seq(
   "com.github.spullara.mustache.java" % "compiler" % "0.9.10",
   "org.apache.poi" % "poi-ooxml" % "5.2.2",
   "org.mindrot" % "jbcrypt" % "0.4",
+  "com.rollbar" % "rollbar-java" % "1.10.0",
 )
 
 // Run webpack

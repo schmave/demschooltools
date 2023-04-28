@@ -14,6 +14,8 @@
 
   <logger name="application" level="DEBUG"/>
 
+<!--  <logger name="com.rollbar" level="TRACE"/>-->
+
   <logger name="io.ebean.SQL" level="TRACE"/>
   <logger name="io.ebean.SUM" level="TRACE"/>
   <logger name="io.ebean.TXN" level="TRACE"/>
