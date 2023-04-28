@@ -56,7 +56,7 @@ public class Case extends Model implements Comparable<Case> {
     @ManyToMany
     @JoinTable(name="charge_reference",
         joinColumns=@JoinColumn(name="referencing_case", referencedColumnName="id"),
-        inverseJoinColumns=@JoinColumn(name="referencedCharge", referencedColumnName="id"))
+        inverseJoinColumns=@JoinColumn(name="referenced_charge", referencedColumnName="id"))
     @JsonIgnore
     public List<Charge> referenced_charges;
 
