@@ -5,16 +5,16 @@
 
 @import helper._
 
-@main(person.first_name + " " + person.last_name + " attendance", "attendance", "person") {
+@main(person.getFirstName() + " " + person.getLastName() + " attendance", "attendance", "person") {
 
-<h2>@person.first_name @person.last_name attendance</h2>
+<h2>@person.getFirstName() @person.getLastName() attendance</h2>
 
 @if( min_date != null && max_date != null ) {
-    <p>@person.first_name's first recorded day at school was @Application.formatDateMdy(Utils.getOrgConfig(request), min_date), and
+    <p>@person.getFirstName()'s first recorded day at school was @Application.formatDateMdy(Utils.getOrgConfig(request), min_date), and
     last recorded day at school was @Application.formatDateMdy(Utils.getOrgConfig(request), max_date).</p>
 }
 <form method="GET">
-	<p>Show @person.first_name's attendance from
+	<p>Show @person.getFirstName()'s attendance from
 		<input type="date" name="start_date" value="@Application.forDateInput(start_date)"> to
 		<input type="date" name="end_date" value="@Application.forDateInput(end_date)">
 		<input class="btn btn-xs btn-primary" type="submit">
@@ -29,8 +29,8 @@
 <table class="attendance-view table">
 <thead>
     @for( code <- codes ) {
-    <th width=100 class="attendance-code" style="background-color:@codes_map.get(code).color">
-        <label>@codes_map.get(code).description<br/>
+    <th width=100 class="attendance-code" style="background-color:@codes_map.get(code).getColor()">
+        <label>@codes_map.get(code).getDescription()<br/>
             <input type="checkbox" checked data-code="@code"/></label>
     </th>
     }
@@ -55,7 +55,7 @@
 
 @for( code <- codes ) {
     @if( stats.absence_counts.containsKey(codes_map.get(code)) ) {
-        <td align="center" style="background-color:@codes_map.get(code).color">@stats.absence_counts.get(codes_map.get(code))</td>
+        <td align="center" style="background-color:@codes_map.get(code).getColor()">@stats.absence_counts.get(codes_map.get(code))</td>
     } else {
         <td align="center" class="empty">0</td>
     }
@@ -93,14 +93,14 @@
 
 @for( d <- days ) {
 <tr class="
-	@if(d.code != null) {
-		@if(codes_map.contains(d.code)) {
-			code-@d.code
+	@if(d.getCode() != null) {
+		@if(codes_map.contains(d.getCode())) {
+			code-@d.getCode()
 		} else {
 			code-__null
 		}
 	} else {
-        @if(d.start_time == null || d.end_time == null) {
+        @if(d.getStartTime() == null || d.getEndTime() == null) {
         	code-__null
         } else {
         	@if(d.isPartial(Utils.getOrgConfig(request).org)) {
@@ -110,40 +110,40 @@
         	}
         }
     }
-    @if( d.day.getDay() == 5 ) {
+    @if( d.getDay().getDay() == 5 ) {
     	friday-row
     }">
-    <td width="25">@Application.formatDayOfWeek(d.day)
-    <td width="75">@Application.formatDateMdy(Utils.getOrgConfig(request), d.day)</td>
-	<td>@if(d.start_time != null && d.end_time != null) {
+    <td width="25">@Application.formatDayOfWeek(d.getDay())
+    <td width="75">@Application.formatDateMdy(Utils.getOrgConfig(request), d.getDay())</td>
+	<td>@if(d.getStartTime() != null && d.getEndTime() != null) {
 			@Attendance.format(d.getHours())
 		} else {
 			--
 		}
 	</td>
-	<td>@Attendance.formatTime(d.start_time)</td>
-	<td>@Attendance.formatTime(d.end_time)</td>
+	<td>@Attendance.formatTime(d.getStartTime())</td>
+	<td>@Attendance.formatTime(d.getEndTime())</td>
 	@if( has_off_campus_time ) {
-		<td>@Attendance.formatTime(d.off_campus_departure_time)</td>
-		<td>@Attendance.formatTime(d.off_campus_return_time)</td>
-		<td>@d.off_campus_minutes_exempted</td>
+		<td>@Attendance.formatTime(d.getOffCampusDepartureTime())</td>
+		<td>@Attendance.formatTime(d.getOffCampusReturnTime())</td>
+		<td>@d.getOffCampusMinutesExempted()</td>
 	}
-	@if(d.code != null) {
-		@if(codes_map.contains(d.code)) {
-			<td class="attendance-code" style="background-color:@codes_map.get(d.code).color">
-				@codes_map.get(d.code).description
+	@if(d.getCode() != null) {
+		@if(codes_map.contains(d.getCode())) {
+			<td class="attendance-code" style="background-color:@codes_map.get(d.getCode()).getColor()">
+				@codes_map.get(d.getCode()).getDescription()
 			</td>
 		} else {
-			<td>Unknown code "@d.code"</td>
+			<td>Unknown code "@d.getCode()"</td>
 		}
 	} else {
 		<td>
-			@if(d.start_time == null || d.end_time == null) { -- }
+			@if(d.getStartTime() == null || d.getEndTime() == null) { -- }
 		</td>
 	}
 	<td>
-		@if( weeks.contains(d.day) ) {
-			@Attendance.format(weeks.get(d.day).extra_hours)
+		@if( weeks.contains(d.getDay()) ) {
+			@Attendance.format(weeks.get(d.getDay()).getExtraHours())
 		}
 	</td>
 }

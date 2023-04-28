@@ -89,7 +89,7 @@ public class Organization extends Model {
                 String idString = values.get("breaking_res_plan_entry_id")[0];
                 if (!idString.isEmpty()) {
                     Entry entry = Entry.findById(Integer.parseInt(idString), this);
-                    entry.is_breaking_res_plan = true;
+                    entry.setBreakingResPlan(true);
                     entry.save();
                 }
             }

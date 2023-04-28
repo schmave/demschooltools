@@ -2,7 +2,7 @@
 
 @import helper._
 
-<h3>@Utils.getOrgConfig(request).str_jc_name_short minutes from @Application.formatMeetingDate(m.date)</h3>
+<h3>@Utils.getOrgConfig(request).str_jc_name_short minutes from @Application.formatMeetingDate(m.getDate())</h3>
 <p><a href="@routes.Application.printMeeting(m.id)" class="btn btn-success no-print">
 1. Print minutes</a>
 <a href="@routes.Application.viewMeetingResolutionPlans(m.id)"
@@ -40,10 +40,10 @@ Edit minutes</a></p>
 
 @for(c <- m.additional_cases) {
 	<tr>
-	<td><h5>#@c.case_number	@if( c.date_closed == null ) { (OPEN) }</h5></td>
+	<td><h5>#@c.getCaseNumber()	@if( c.getDateClosed() == null ) { (OPEN) }</h5></td>
 	<td>Case discussed today, but kept open for further investigation. Latest notes available
-		in meeting held on <a href="@routes.Application.viewMeeting(c.meeting.id)">
-			@Application.yymmddDate(Utils.getOrgConfig(request), c.meeting.date)</a></td>
+		in meeting held on <a href="@routes.Application.viewMeeting(c.getMeeting().id)">
+			@Application.yymmddDate(Utils.getOrgConfig(request), c.getMeeting().getDate())</a></td>
 	</tr>
 
 }

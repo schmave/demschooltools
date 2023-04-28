@@ -6,13 +6,13 @@
 
 @for( p <- people ) {
        <tr>
-       <td><input type="checkbox" class="person" name="person-@p.person_id"></td>
-       <td><a href="@routes.CRM.person(p.person_id)">@p.first_name @p.last_name</a>
-       <td>@p.school_district
-       <td>@CRM.formatDob(p.dob, Utils.getOrgConfig(request))
+       <td><input type="checkbox" class="person" name="person-@p.getPersonId()"></td>
+       <td><a href="@routes.CRM.getPerson()(p.getPersonId())">@p.getFirstName() @p.getLastName()</a>
+       <td>@p.getSchoolDistrict()
+       <td>@CRM.formatDob(p.getDob(), Utils.getOrgConfig(request))
        <td>@CRM.calcAgeAtBeginningOfSchool(p)
-       <td>@p.grade
-       <td>@p.gender
+       <td>@p.getGrade()
+       <td>@p.getGender()
        <td>@p.numSiblings()
        <td>@Html(p.familyAddresses().mkString("<br/>"))
        <td>@Html(p.familyPhoneNumbers.mkString("<br/>"))

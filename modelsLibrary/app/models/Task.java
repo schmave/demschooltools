@@ -5,20 +5,25 @@ import io.ebean.*;
 import javax.persistence.*;
 import java.util.List;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 @Entity
 public class Task extends Model {
     @Id
-    public Integer id;
+    private Integer id;
 
     @ManyToOne()
     @JoinColumn(name="task_list_id")
-    public TaskList task_list;
+    private TaskList taskList;
 
-    public String title;
+    private String title;
 
-    public Integer sort_order;
+    private Integer sortOrder;
 
-	public boolean enabled;
+    private boolean enabled;
 
     @OneToMany(mappedBy="task")
     public List<CompletedTask> completed_tasks;
@@ -28,7 +33,7 @@ public class Task extends Model {
     );
 
     public static Task findById(int id, Organization org) {
-        return find.query().where().eq("task_list.organization", org)
+        return find.query().where().eq("taskList.organization", org)
             .eq("id", id).findOne();
     }
 }

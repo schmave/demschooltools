@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat;
 
 public class CheckinPerson {
     
-    public int person_id;
+    public int personId;
     public String pin;
     public String name;
     public String current_day_code;
@@ -13,8 +13,8 @@ public class CheckinPerson {
     public String attendance_rate;
 
     public CheckinPerson(Person person, AttendanceDay current_day, AttendanceStats stats, boolean show_weighted_percent) {
-        person_id = person.person_id;
-        pin = person.pin;
+        personId = person.getPersonId();
+        pin = person.getPin();
         name = person.getDisplayName();
 
         if (stats != null && show_weighted_percent) {
@@ -26,12 +26,12 @@ public class CheckinPerson {
 
         if (current_day != null) {
             SimpleDateFormat format = new SimpleDateFormat("h:mm aa");
-        	current_day_code = current_day.code;
-            if (current_day.start_time != null) {
-                current_day_start_time = format.format(current_day.start_time.getTime());
+        	current_day_code = current_day.getCode();
+            if (current_day.getStartTime() != null) {
+                current_day_start_time = format.format(current_day.getStartTime().getTime());
             }
-            if (current_day.end_time != null) {
-        	   current_day_end_time = format.format(current_day.end_time.getTime());
+            if (current_day.getEndTime() != null) {
+        	   current_day_end_time = format.format(current_day.getEndTime().getTime());
             }
         }
     }

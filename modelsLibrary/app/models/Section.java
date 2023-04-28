@@ -1,22 +1,25 @@
 package models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.ebean.*;
 import io.ebean.annotation.Where;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import play.data.Form;
-
+import java.util.List;
 import javax.persistence.*;
 import javax.persistence.OrderBy;
-import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
+import play.data.Form;
 
+@Getter
+@Setter
 @Entity
 public class Section extends Model {
     @Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "section_id_seq")
-    public Integer id;
+    private Integer id;
 
-    public String title = "";
-	public String num = "";
+    private String title = "";
+    private String num = "";
 
     @OneToMany(mappedBy="section")
     @OrderBy("num ASC")
@@ -25,9 +28,9 @@ public class Section extends Model {
     public List<Entry> entries;
 
     @ManyToOne()
-    public Chapter chapter;
+    private Chapter chapter;
 
-	public Boolean deleted;
+    private Boolean deleted;
 
     public static Finder<Integer,Section> find = new Finder<>(
 			Section.class
@@ -39,7 +42,7 @@ public class Section extends Model {
     }
 
     public String getNumber() {
-        return chapter.num + num;
+        return chapter.getNum() + num;
     }
 
 	public void updateFromForm(Form<Section> form) {

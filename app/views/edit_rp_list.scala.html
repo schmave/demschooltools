@@ -49,17 +49,17 @@ $(function() {
 <script id="rp-template" type="text/x-handlebars-template">
 <tr>
 	<td class="name col-xs-1">{{name}}
-	<td class="col-xs-3">{{case_number}}
+	<td class="col-xs-3">{{caseNumber}}
 	{{#if closed_date}}<br/>Closed on {{closed_date}} ({{closed_day_of_week}}) {{/if}}
 	{{#if sm_date}}<br/>SM ruled on {{sm_date}} ({{sm_day_of_week}}) {{/if}}
 	<br/>{{rule_title}}
     @if( Utils.getOrgConfig(request).show_findings_in_rp_list ) {
 	   <td class="col-xs-4">@Utils.getOrgConfig(request).str_findings: {{findings}}</td>
     }
-	<td class="col-xs-3">{{resolution_plan}}
-    {{#if referred_to_sm}}
-        {{#if sm_decision}}
-            <b>[Sch. Mtg. decided:</b> {{sm_decision}}<b>]</b>
+	<td class="col-xs-3">{{resolutionPlan}}
+    {{#if referredToSm}}
+        {{#if smDecision}}
+            <b>[Sch. Mtg. decided:</b> {{smDecision}}<b>]</b>
         {{else}}
             <br/><b>[Referred to Sch. Mtg.]</b>
         {{/if}}

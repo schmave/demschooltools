@@ -1,4 +1,4 @@
-@(accountForm: Form[Account], is_active: Boolean)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
+@(accountForm: Form[Account], isActive: Boolean)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
 
@@ -16,8 +16,8 @@
 				Symbol("_default") -> "",
 				Symbol("class") -> "form-control"
 			)
-			@inputText(accountForm("monthly_credit"), Symbol("type") -> "number", Symbol("_label") -> "Monthly Credit", Symbol("class") -> "form-control")
-			<input type="checkbox" id="is_active" name="is_active" @if(is_active) { value="true" checked="checked" }> Is Active
+			@inputText(accountForm("monthlyCredit"), Symbol("type") -> "number", Symbol("_label") -> "Monthly Credit", Symbol("class") -> "form-control")
+			<input type="checkbox" id="isActive" name="isActive" @if(isActive) { value="true" checked="checked" }> Is Active
 			<br><br>
 			<input type="submit" value="Save"/>
 		</div>

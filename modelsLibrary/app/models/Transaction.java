@@ -11,61 +11,65 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import play.data.Form;
 
+@Getter
+@Setter
 @Entity
 @Table(name="transactions")
 public class Transaction extends Model {
 
     @Id
-    public Integer id;
+    private Integer id;
 
     @ManyToOne()
-    public Organization organization;
+    private Organization organization;
 
     @ManyToOne()
     @JoinColumn(name = "from_account_id", referencedColumnName = "id")
-    public Account from_account;
+    private Account fromAccount;
 
     @ManyToOne()
     @JoinColumn(name = "to_account_id", referencedColumnName = "id")
-    public Account to_account;
+    private Account toAccount;
 
     @ManyToOne()
     @JoinColumn(name = "created_by_user_id", referencedColumnName = "id")
-    public User created_by_user;
+    private User createdByUser;
 
-    public String from_name = "";
-    public String to_name = "";
-    public String description = "";
+    private String fromName = "";
+    private String toName = "";
+    private String description = "";
 
-    public BigDecimal amount;
+    private BigDecimal amount;
 
     @play.data.format.Formats.DateTime(pattern="MM/dd/yyyy")
-    public Date date_created = new Date();
+    private Date dateCreated = new Date();
 
-    public TransactionType type;
+    private TransactionType type;
 
-    public Boolean archived = false;
+    private Boolean archived = false;
 
     public String getTypeName() {
         return type.toString();
     }
 
     public String getCreatedByUserName() {
-        return created_by_user == null ? "guest" : created_by_user.name;
+        return createdByUser == null ? "guest" : createdByUser.getName();
     }    
 
     public String getFormattedDate() {
         SimpleDateFormat sdf = new SimpleDateFormat("M/d/yy");
         // we don't need to worry about time zones because the transaction date is set in js on the client.
         //sdf.setTimeZone(TimeZone.getTimeZone("EST"));
-        return sdf.format(date_created);
+        return sdf.format(dateCreated);
     }
 
     public String getFormattedDate2() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        return sdf.format(date_created);
+        return sdf.format(dateCreated);
     }
 
     public String getFormattedAmount(boolean includePlusSign) {
@@ -79,8 +83,8 @@ public class Transaction extends Model {
     }
 
     private Boolean isPersonal() {
-        return (to_account != null && to_account.type == AccountType.PersonalChecking)
-            || (from_account != null && from_account.type == AccountType.PersonalChecking);
+        return (toAccount != null && toAccount.getType() == AccountType.PersonalChecking)
+            || (fromAccount != null && fromAccount.getType() == AccountType.PersonalChecking);
     }
 
     public String getCssClass() {
@@ -109,8 +113,8 @@ public class Transaction extends Model {
             Boolean include_archived, Organization org) {
         
         return find.query()
-            .fetch("to_account", FetchConfig.ofQuery())
-            .fetch("from_account", FetchConfig.ofQuery())
+            .fetch("toAccount", FetchConfig.ofQuery())
+            .fetch("fromAccount", FetchConfig.ofQuery())
             .where()
             .eq("organization", org)
             .findList()
@@ -144,14 +148,14 @@ public class Transaction extends Model {
         Transaction transaction = form.get();
 
 //        transaction.type = TransactionType.valueOf(form.field("type").value().get());
-        transaction.from_account = findAccountById(form.field("from_account_id").value().get(), org);
-        transaction.to_account = findAccountById(form.field("to_account_id").value().get(), org);
+        transaction.fromAccount = findAccountById(form.field("from_account_id").value().get(), org);
+        transaction.toAccount = findAccountById(form.field("to_account_id").value().get(), org);
 
         DateFormat format = new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
-        transaction.date_created = format.parse(form.field("date_created").value().get());
+        transaction.dateCreated = format.parse(form.field("dateCreated").value().get());
 
         transaction.organization = org;
-        transaction.created_by_user = current_user;
+        transaction.createdByUser = current_user;
 
         transaction.save();
         return transaction;
@@ -159,11 +163,11 @@ public class Transaction extends Model {
 
     public static Transaction createMonthlyCreditTransaction(Account account, Date date, Organization org) {
         Transaction transaction = new Transaction();
-        transaction.to_account = account;
-        transaction.amount = account.monthly_credit;
+        transaction.toAccount = account;
+        transaction.amount = account.getMonthlyCredit();
         transaction.type = TransactionType.DigitalTransaction;
         transaction.description = new SimpleDateFormat("MMMM").format(date) + " monthly credit";
-        transaction.date_created = date;
+        transaction.dateCreated = date;
         transaction.organization = org;
         transaction.save();
         return transaction;
@@ -183,7 +187,7 @@ public class Transaction extends Model {
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
         description = form.field("description").value().get();
         amount = new BigDecimal(form.field("amount").value().get());
-        date_created = format.parse(form.field("date_created").value().get());
+        dateCreated = format.parse(form.field("dateCreated").value().get());
         save();
     }
 }

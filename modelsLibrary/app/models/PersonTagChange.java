@@ -6,39 +6,44 @@ import javax.persistence.*;
 import java.util.Date;
 
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 @Entity
 public class PersonTagChange extends Model {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "person_tag_change_id_seq")
-    public int id;
+    private int id;
 
     @ManyToOne()
     @JoinColumn(name="tag_id")
-    public Tag tag;
+    private Tag tag;
 
     @ManyToOne()
-    @JoinColumn(name="person_id")
-    public Person person;
+    @JoinColumn(name="personId")
+    private Person person;
 
     @ManyToOne()
     @JoinColumn(name="creator_id")
-    public User creator;
+    private User creator;
 
     @Column(insertable = false, updatable = false)
-    public Date time;
+    private Date time;
 
-    public boolean was_add;
+    private boolean wasAdd;
 
     public static Finder<Integer, PersonTagChange> find = new Finder<>(
             PersonTagChange.class
     );
 
-    public static PersonTagChange create(Tag t, Person p, User u, boolean was_add) {
+    public static PersonTagChange create(Tag t, Person p, User u, boolean wasAdd) {
         PersonTagChange result = new PersonTagChange();
         result.tag = t;
         result.person = p;
         result.creator = u;
-        result.was_add = was_add;
+        result.wasAdd = wasAdd;
 
         result.save();
         return result;

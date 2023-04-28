@@ -33,27 +33,27 @@ public class PersonHistory {
         Collections.reverse(p.charges);
 
         for (Charge c : p.charges) {
-            Date d = c.the_case.meeting.date;
+            Date d = c.getTheCase().getMeeting().getDate();
             if (d.before(start_date) || d.after(end_date) ||
                 (!include_today && d.getDate() == today.getDate() &&
                  d.getMonth() == today.getMonth() && d.getYear() == today.getYear())) {
                 continue;
             }
 
-			if (c.rule != null) {
-                List<Charge> cur_list = charges_by_rule.computeIfAbsent(c.rule, k -> new ArrayList<>());
+			if (c.getRule() != null) {
+                List<Charge> cur_list = charges_by_rule.computeIfAbsent(c.getRule(), k -> new ArrayList<>());
                 cur_list.add(c);
 			}
 			
 			charges_by_date.add(c);
 
-            Record r = records.get(c.rule);
+            Record r = records.get(c.getRule());
 			if (r == null) {
                 r = new Record();
-                r.most_recent_charge = c.the_case.meeting.date;
+                r.most_recent_charge = c.getTheCase().getMeeting().getDate();
                 r.count = 1;
-                r.rule = c.rule;
-                records.put(c.rule, r);
+                r.setRule(c.getRule());
+                records.put(c.getRule(), r);
             } else {
                 r.count++;
             }

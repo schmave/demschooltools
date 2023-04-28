@@ -3,15 +3,15 @@
 
 @import helper._
 
-@main(p.first_name + " " + p.last_name, "crm") {
+@main(p.getFirstName() + " " + p.getLastName(), "crm") {
 
-@if(p.family != null) {
+@if(p.getFamily() != null) {
 	<p class="center">
-    <span class="family-id">Family ID #@p.family.person_id</span>
-	@if(!p.family.first_name.equals("")) {
-		<span class="family-name">@p.family.first_name</span>
+    <span class="family-id">Family ID #@p.getFamily().getPersonId()</span>
+	@if(!p.getFamily().getFirstName().equals("")) {
+		<span class="family-name">@p.getFamily().getFirstName()</span>
 	}
-    <span class="edit"><a href="@routes.CRM.editPerson(p.family.person_id)">Edit</a></span>
+    <span class="edit"><a href="@routes.CRM.editPerson(p.getFamily().getPersonId())">Edit</a></span>
 	</p>
 }
 
@@ -33,22 +33,22 @@
 
 <div class="row">
 @for( tag <- p.tags ) {
-	@for( task_list <- tag.task_lists ) {
+	@for( taskList <- tag.task_lists ) {
 		<div class="col-xs-4">
-		<h4><a href="@routes.CRM.viewTaskList(task_list.id)">@task_list.title</a></h4>
-		@for( task <- task_list.tasks ) {
-			@if( task.enabled ) {
+		<h4><a href="@routes.CRM.viewTaskList(taskList.id)">@taskList.getTitle()</a></h4>
+		@for( task <- taskList.tasks ) {
+			@if( task.getEnabled() ) {
 			@defining( p.completedTask(task) ) { ct =>
 				@if( ct != null ) {
 					<input type="checkbox" class="task_checkbox" id="task_checkbox_@task.id" disabled checked/>
 				} else {
 					<input type="checkbox" class="task_checkbox" id="task_checkbox_@task.id"/>
 				}
-				<label for="task_checkbox_@task.id" style="display:inline">@task.title</label>
+				<label for="task_checkbox_@task.id" style="display:inline">@task.getTitle()</label>
 				@if( ct != null ) {
-					<i>(@ct.comment.user.name, @CRM.formatDate(ct.comment.created, Utils.getOrgConfig(request)))</i>
-					@if(ct.comment.message.length() > 0) {
-						-- @ct.comment.message
+					<i>(@ct.getComment().getUser().name, @CRM.formatDate(ct.getComment().getCreated(), Utils.getOrgConfig(request)))</i>
+					@if(ct.getComment().getMessage().length() > 0) {
+						-- @ct.getComment().getMessage()
 					}
 				}
 				<br>
@@ -66,7 +66,7 @@
 <p id="add_comment_p"><a href="#" onclick="javascript:$('#new_comment').show();$('#add_comment_p').hide();return false;">Add a comment</a>
 <div id="new_comment" style="display: none;">
 	<div style="float:left">I talked with
-	<input type=hidden name="person" value="@p.person_id" />@p.first_name @p.last_name
+	<input type=hidden name="person" value="@p.getPersonId()" />@p.getFirstName() @p.getLastName()
 	about:<br>
 	<textarea name="message" style="width: 400px;" rows=5 ></textarea>
 	<div id="comment_tasks" style="float:right;"></div>
@@ -95,7 +95,7 @@
 <div class="col-md-9" id="comments">
 @for( c <- comments ) {
 	@if( c.completed_tasks.size() == 0 ||
-		c.message.length() > 80) {
+		c.getMessage().length() > 80) {
 		@comment_fragment(c, false)
 	}
 }

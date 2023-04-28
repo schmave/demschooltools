@@ -6,24 +6,28 @@ import io.ebean.FetchConfig;
 import java.util.*;
 import javax.persistence.*;
 import javax.persistence.OrderBy;
+import lombok.Getter;
+import lombok.Setter;
 import play.data.*;
 
+@Getter
+@Setter
 @Entity
 public class Entry extends Model implements Comparable<Entry> {
     @Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "entry_id_seq")
-    public Integer id;
+    private Integer id;
 
-    public String title = "";
-	public String num = "";
+    private String title = "";
+    private String num = "";
 
     @Column(columnDefinition = "TEXT")
-    public String content = "";
+    private String content = "";
 
     @ManyToOne()
-    public Section section;
+    private Section section;
 
-	public boolean deleted;
+    private boolean deleted;
 
 	@OneToMany(mappedBy="rule")
     @JsonIgnore
@@ -32,10 +36,10 @@ public class Entry extends Model implements Comparable<Entry> {
 
     @JsonIgnore
     @OneToMany(mappedBy="entry")
-    @OrderBy("date_entered ASC")
+    @OrderBy("dateEntered ASC")
     public List<ManualChange> changes;
 
-    public boolean is_breaking_res_plan;
+    private boolean isBreakingResPlan;
 
     public static Finder<Integer,Entry> find = new Finder<>(
             Entry.class
@@ -49,13 +53,13 @@ public class Entry extends Model implements Comparable<Entry> {
     public static Entry findByIdWithJCData(int id, Organization org) {
         return find.query()
             .fetch("charges", FetchConfig.ofQuery())
-            .fetch("charges.the_case", FetchConfig.ofQuery())
-            .fetch("charges.the_case.meeting", FetchConfig.ofQuery())
-            .fetch("charges.the_case.charges", FetchConfig.ofQuery())
-            .fetch("charges.the_case.charges.person", FetchConfig.ofQuery())
-            .fetch("charges.the_case.charges.rule", FetchConfig.ofQuery())
-            .fetch("charges.the_case.charges.rule.section", FetchConfig.ofQuery())
-            .fetch("charges.the_case.charges.rule.section.chapter", FetchConfig.ofQuery())
+            .fetch("charges.theCase", FetchConfig.ofQuery())
+            .fetch("charges.theCase.meeting", FetchConfig.ofQuery())
+            .fetch("charges.theCase.charges", FetchConfig.ofQuery())
+            .fetch("charges.theCase.charges.person", FetchConfig.ofQuery())
+            .fetch("charges.theCase.charges.rule", FetchConfig.ofQuery())
+            .fetch("charges.theCase.charges.rule.section", FetchConfig.ofQuery())
+            .fetch("charges.theCase.charges.rule.section.chapter", FetchConfig.ofQuery())
             .where().eq("section.chapter.organization", org)
             .eq("id", id).findOne();
     }
@@ -63,7 +67,7 @@ public class Entry extends Model implements Comparable<Entry> {
     public static Entry findBreakingResPlanEntry(Organization org) {
         return find.query().where()
             .eq("section.chapter.organization", org)
-            .eq("is_breaking_res_plan", true)
+            .eq("isBreakingResPlan", true)
             .findOne();
     }
 
@@ -75,7 +79,7 @@ public class Entry extends Model implements Comparable<Entry> {
     public static void unassignBreakingResPlanEntry(Organization org) {
         Entry entry = findBreakingResPlanEntry(org);
         if (entry != null) {
-            entry.is_breaking_res_plan = false;
+            entry.isBreakingResPlan = false;
             entry.save();
         }
     }
@@ -86,7 +90,7 @@ public class Entry extends Model implements Comparable<Entry> {
 
         List<Charge> result = new ArrayList<>();
         for (Charge c : charges) {
-            if (c.the_case.meeting.date.after(beginning_of_year)) {
+            if (c.getTheCase().getMeeting().getDate().after(beginning_of_year)) {
                 result.add(c);
             }
         }
@@ -99,9 +103,9 @@ public class Entry extends Model implements Comparable<Entry> {
     }
 
     void updateFromForm(Form<Entry> form, boolean make_change_record) {
-        String old_num = (make_change_record ? getNumber() : "");
-        String old_title = title;
-        String old_content = content;
+        String oldNum = (make_change_record ? getNumber() : "");
+        String oldTitle = title;
+        String oldContent = content;
 
         title = form.field("title").value().get();
         content = form.field("content").value().get();
@@ -119,7 +123,7 @@ public class Entry extends Model implements Comparable<Entry> {
             } else if (previous_deleted && !deleted) {
                 ManualChange.recordEntryCreate(this);
             } else {
-                ManualChange.recordEntryChange(this, old_num, old_title, old_content);
+                ManualChange.recordEntryChange(this, oldNum, oldTitle, oldContent);
             }
         }
 

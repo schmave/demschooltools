@@ -78,8 +78,8 @@ $(function() {
     <th class="sorttable_sorted_reverse">First<br/>Name<span id="sorttable_sortrevind">&nbsp;▴</span></th>
     <th>Last<br/>Name</th>
 	@for( code <- codes ) {
-		<th width=100 class="attendance-code" style="background-color:@codes_map.get(code).color">
-		@codes_map.get(code).description
+		<th width=100 class="attendance-code" style="background-color:@codes_map.get(code).getColor()">
+		@codes_map.get(code).getDescription()
 		</th>
 	}
 	<th width=100 class="attendance-code">Unknown/missing code</th>
@@ -113,14 +113,14 @@ $(function() {
 }
 ><td>
     @if( next_date == null ) {
-        <a href="@routes.Attendance.viewPersonReport(p.person_id)">
+        <a href="@routes.Attendance.viewPersonReport(p.getPersonId())">
     } else {
         <a href="@routes.Attendance.viewPersonReport(
-            p.person_id, Application.forDateInput(start_date), Application.forDateInput(next_date))">
+            p.getPersonId(), Application.forDateInput(start_date), Application.forDateInput(next_date))">
     }
-    @p.first_name</a>
+    @p.getFirstName()</a>
 </td>
-	<td>@p.last_name</td>
+	<td>@p.getLastName()</td>
 	@for( code <- codes ) {
 		@if( person_to_stats.get(p).absence_counts.containsKey(codes_map.get(code)) ) {
 			<td align="center">@person_to_stats.get(p).absence_counts.get(codes_map.get(code))</td>

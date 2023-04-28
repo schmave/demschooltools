@@ -2,7 +2,7 @@
 
 @import helper._
 
-@main(Utils.getOrgConfig(request).str_jc_name_short + " " + Utils.getOrgConfig(request).str_res_plans + " from " + Application.formatMeetingDate(m.date), "jc") {
+@main(Utils.getOrgConfig(request).str_jc_name_short + " " + Utils.getOrgConfig(request).str_res_plans + " from " + Application.formatMeetingDate(m.getDate()), "jc") {
 
 <script>
 $(function() {
@@ -13,8 +13,8 @@ $(function() {
 <table class="table printable-res-plans">
 	@for(c <- m.cases) {
 		@for(charge <- c.charges) {
-			@if(charge.displayInResolutionPlanList() && !charge.referred_to_sm) {
-				@resolution_plan(charge)
+			@if(charge.displayInResolutionPlanList() && !charge.getReferredToSm()) {
+				@resolutionPlan(charge)
 			}
 		}
 	}

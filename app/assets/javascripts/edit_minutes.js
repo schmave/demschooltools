@@ -54,8 +54,8 @@ function Charge(charge_id, el) {
         }
     };
 
-    this.loadData = function(json, referenced_charge) {
-        el.find(".resolution_plan").val(json.resolution_plan);
+    this.loadData = function(json, referencedCharge) {
+        el.find(".resolutionPlan").val(json.resolutionPlan);
 
         if (json.plea == "Guilty") {
             el.find(".plea-guilty").prop("checked", true);
@@ -70,7 +70,7 @@ function Charge(charge_id, el) {
         // rule, person
         if (json.person) {
             self.people_chooser.addPerson(
-                json.person.person_id,
+                json.person.personId,
                 utils.displayName(json.person));
         }
 
@@ -78,7 +78,7 @@ function Charge(charge_id, el) {
             self.rule_chooser.loadData(json.rule);
         }
 
-        if (json.referred_to_sm) {
+        if (json.referredToSm) {
             el.find(".refer-to-sm").prop("checked", true);
         }
 
@@ -88,31 +88,31 @@ function Charge(charge_id, el) {
             }
         }
 
-        el.find(".minor-referral-destination").val(json.minor_referral_destination);
+        el.find(".minor-referral-destination").val(json.minorReferralDestination);
         self.checkReferralLabelHighlight();
 
-        if (referenced_charge) {
-            self.referenced_charge = referenced_charge;
-            if (referenced_charge.has_default_rule) {
+        if (referencedCharge) {
+            self.referencedCharge = referencedCharge;
+            if (referencedCharge.has_default_rule) {
                 el.addClass("breaking-res-plan");
             }
             el.find(".rp-followups").show();
             el.find(".original-res-plan").show();
-            el.find(".original-res-plan-text").html(referenced_charge.resolution_plan);
+            el.find(".original-res-plan-text").html(referencedCharge.resolutionPlan);
 
-            if (json.resolution_plan === time_served_string) {
+            if (json.resolutionPlan === time_served_string) {
                 el.find(".rp-followup-time-served").prop("checked", true);
-                el.find(".resolution_plan").hide();
+                el.find(".resolutionPlan").hide();
                 el.find(".original-res-plan-text").addClass("deleted");
-            } else if (json.resolution_plan) {
+            } else if (json.resolutionPlan) {
                 el.find(".rp-followup-new-rp").prop("checked", true);
                 el.find(".original-res-plan-text").addClass("deleted");
             } else {
-                el.find(".resolution_plan").hide();
+                el.find(".resolutionPlan").hide();
             }
         }
 
-        if (json.is_referenced) {
+        if (json.isReferenced) {
             el.find(".remove-charge").addClass("disabled");
             el.find(".remove-charge-disabled-text").show();
         }
@@ -127,14 +127,14 @@ function Charge(charge_id, el) {
         var url = "/saveCharge?id=" + charge_id;
 
         if (self.people_chooser.people.length > 0) {
-            url += "&person_id=" + self.people_chooser.people[0].id;
+            url += "&personId=" + self.people_chooser.people[0].id;
         }
 
-        var resolution_plan = el.find(".resolution_plan").val();
+        var resolutionPlan = el.find(".resolutionPlan").val();
         if (el.find(".rp-followups").is(":visible") && el.find(".rp-followup-time-served").prop("checked")) {
-            resolution_plan = time_served_string;
+            resolutionPlan = time_served_string;
         }
-        url += "&resolution_plan=" + encodeURIComponent(resolution_plan);
+        url += "&resolutionPlan=" + encodeURIComponent(resolutionPlan);
 
         for (var key in SEVERITIES) {
             if (el.find(".severity-" + key).prop("checked")) {
@@ -163,12 +163,12 @@ function Charge(charge_id, el) {
         }
 
         var refer = el.find(".refer-to-sm");
-        url += "&referred_to_sm=" + refer.prop("checked");
+        url += "&referredToSm=" + refer.prop("checked");
 
-        var minor_referral_destination = el.find(".minor-referral-destination");
-        if (minor_referral_destination.length > 0) {
-            url += "&minor_referral_destination=" +
-                encodeURIComponent(minor_referral_destination.val());
+        var minorReferralDestination = el.find(".minor-referral-destination");
+        if (minorReferralDestination.length > 0) {
+            url += "&minorReferralDestination=" +
+                encodeURIComponent(minorReferralDestination.val());
         }
 
         if (self.rule_chooser.results[0]) {
@@ -181,8 +181,8 @@ function Charge(charge_id, el) {
     };
 
     this.removeCharge = function() {
-        if (self.referenced_charge) {
-            self.el.parents('.case').find('.case-charge-reference-generate[data-id=' + self.referenced_charge.id + ']')
+        if (self.referencedCharge) {
+            self.el.parents('.case').find('.case-charge-reference-generate[data-id=' + self.referencedCharge.id + ']')
                 .show().parent().find('.case-charge-reference-already-generated').hide();
         }
         $.post("/removeCharge?id=" + charge_id, function() {
@@ -221,9 +221,9 @@ function Charge(charge_id, el) {
 
     this.old_rp = null;
     this.checkText = function() {
-        if (el.find(".resolution_plan").val() !== self.old_rp) {
+        if (el.find(".resolutionPlan").val() !== self.old_rp) {
             self.markAsModified();
-            self.old_rp = el.find(".resolution_plan").val();
+            self.old_rp = el.find(".resolutionPlan").val();
         }
     };
 
@@ -234,8 +234,8 @@ function Charge(charge_id, el) {
     self.remove_button = el.find("button");
     self.remove_button.click(self.removeCharge);
 
-    el.find(".resolution_plan").change(self.markAsModified);
-    el.find(".resolution_plan").on(utils.TEXT_AREA_EVENTS, self.checkText);
+    el.find(".resolutionPlan").change(self.markAsModified);
+    el.find(".resolutionPlan").on(utils.TEXT_AREA_EVENTS, self.checkText);
     el.find(".plea-guilty").change(self.markAsModified);
     el.find(".plea-no-contest").change(self.markAsModified);
     el.find(".plea-na").change(self.markAsModified);
@@ -249,9 +249,9 @@ function Charge(charge_id, el) {
 
     el.find(".rp-followup").change(function() {
         if ($(this).hasClass("rp-followup-new-rp")) {
-            el.find(".resolution_plan").show();
+            el.find(".resolutionPlan").show();
         } else {
-            el.find(".resolution_plan").hide().val("");
+            el.find(".resolutionPlan").hide().val("");
         }
         el.find(".original-res-plan-text").addClass("deleted");
         self.markAsModified();
@@ -318,17 +318,17 @@ function Case (id, el) {
         el.find(DATE_SELECTOR).val(data.date);
         el.find(".time").val(data.time);
         el.find(".findings").val(data.findings);
-        el.find("input.continued").prop("checked", data.date_closed === null);
+        el.find("input.continued").prop("checked", data.dateClosed === null);
 
         for (var i in data.people_at_case) {
             var pac = data.people_at_case[i];
             if (pac.role == app.ROLE_TESTIFIER) {
                 self.testifier_chooser.addPerson(
-                    pac.person.person_id,
+                    pac.person.personId,
                     utils.displayName(pac.person));
             } else if (pac.role == app.ROLE_WRITER) {
                 self.writer_chooser.addPerson(
-                    pac.person.person_id,
+                    pac.person.personId,
                     utils.displayName(pac.person));
             }
         }
@@ -351,7 +351,7 @@ function Case (id, el) {
                     if (ch.generated_charge_id == charge_id) {
                         return {
                             id: ch.charge_id,
-                            resolution_plan: ch.resolution_plan,
+                            resolutionPlan: ch.resolutionPlan,
                             has_default_rule: ch.has_default_rule
                         };
                     }
@@ -436,12 +436,12 @@ function Case (id, el) {
         this.writer_chooser = new people_chooser.PeopleChooser(el.find(".writer"),
             function(person) {
                 $.post("/addPersonAtCase?case_id=" + id +
-                       "&person_id=" + person.id +
+                       "&personId=" + person.id +
                        "&role=" + app.ROLE_WRITER);
             },
             function(person) {
                 $.post("/removePersonAtCase?case_id=" + id +
-                       "&person_id=" + person.id +
+                       "&personId=" + person.id +
                        "&role=" + app.ROLE_WRITER);
             },
             app.people, showPersonHistoryInSidebar);
@@ -451,12 +451,12 @@ function Case (id, el) {
         el.find(".testifier"),
         function(person) {
             $.post("/addPersonAtCase?case_id=" + id +
-                   "&person_id=" + person.id +
+                   "&personId=" + person.id +
                    "&role=" + app.ROLE_TESTIFIER);
         },
         function(person) {
             $.post("/removePersonAtCase?case_id=" + id +
-                   "&person_id=" + person.id +
+                   "&personId=" + person.id +
                    "&role=" + app.ROLE_TESTIFIER);
         },
         app.people, showPersonHistoryInSidebar);
@@ -483,24 +483,24 @@ function Case (id, el) {
         });
         el.find('.case-charge-reference-generate').click(function() {
             $(this).hide().parent().find('.case-charge-reference-already-generated').show();
-            var referenced_charge = {
+            var referencedCharge = {
                 id: $(this).data('id'),
-                resolution_plan: $(this).data('resolution-plan')
+                resolutionPlan: $(this).data('resolution-plan')
             };
             var url = "/generateChargeFromReference?case_id=" + id + "&referenced_charge_id=" + $(this).data('id');
             $.post(url, function(response) {
                 var new_charge_json = $.parseJSON(response);
                 if (new_charge_json.rule) {
-                    referenced_charge.has_default_rule = true;
+                    referencedCharge.has_default_rule = true;
                 }
                 var new_charge = self.addChargeNoServer(new_charge_json.id);
-                new_charge.loadData(new_charge_json, referenced_charge);
+                new_charge.loadData(new_charge_json, referencedCharge);
             });
         });
     }
 
     function getLabel(json) {
-        return json.case_number;
+        return json.caseNumber;
     }
 
     self.case_chooser = new chooser.Chooser(el.find(".case_chooser"), true, 5, app.cases, getLabel, null, null,
@@ -528,13 +528,13 @@ function Case (id, el) {
 
 function addPersonAtMeeting(person, role) {
     $.post("/addPersonAtMeeting?meeting_id=" + app.meeting_id +
-           "&person_id=" + person.id +
+           "&personId=" + person.id +
            "&role=" + role );
 }
 
 function removePersonAtMeeting(person, role) {
     $.post("/removePersonAtMeeting?meeting_id=" + app.meeting_id +
-           "&person_id=" + person.id +
+           "&personId=" + person.id +
            "&role=" + role );
 }
 
@@ -555,7 +555,7 @@ function loadInitialData() {
 
     for (var i in app.initial_data.cases) {
         var data = app.initial_data.cases[i];
-        var new_case = addCaseNoServer(data.id, data.case_number);
+        var new_case = addCaseNoServer(data.id, data.caseNumber);
         new_case.loadData(data);
     }
 }
@@ -596,7 +596,7 @@ function continueCase(event) {
            "&case_id=" + case_id, "",
            function(data, textStatus, jqXHR) {
         var case_data = $.parseJSON(data);
-        var new_case = addCaseNoServer(case_data.id, case_data.case_number);
+        var new_case = addCaseNoServer(case_data.id, case_data.caseNumber);
         new_case.loadData(case_data);
         $('body').animate({'scrollTop': new_case.el.offset().top + 500}, 'slow');
         list_item.remove();

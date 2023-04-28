@@ -1,29 +1,31 @@
 package models;
 
 import io.ebean.*;
-import play.libs.Json;
-
+import java.util.*;
 import javax.persistence.*;
 import javax.persistence.OrderBy;
-import java.util.*;
+import lombok.Getter;
+import lombok.Setter;
+import play.libs.Json;
 
-
+@Getter
+@Setter
 @Entity
 public class Meeting extends Model {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "meeting_id_seq")
-    public Integer id;
+    private Integer id;
 
-    public Date date;
+    private Date date;
 
     @ManyToOne()
-    public Organization organization;
+    private Organization organization;
 
     @OneToMany(mappedBy="meeting")
     public List<PersonAtMeeting> people_at_meeting;
 
     @OneToMany(mappedBy="meeting")
-    @OrderBy("case_number ASC")
+    @OrderBy("caseNumber ASC")
     public List<Case> cases;
 
     @ManyToMany
@@ -45,10 +47,10 @@ public class Meeting extends Model {
         List<Map<String, String> > result = new ArrayList<>();
 
         for (PersonAtMeeting p : people_at_meeting) {
-            if (p.role == role) {
+            if (p.getRole() == role) {
                 HashMap<String, String> map = new HashMap<>();
-				map.put("name", p.person.getDisplayName());
-                map.put("id", "" + p.person.person_id);
+				map.put("name", p.getPerson().getDisplayName());
+                map.put("id", "" + p.getPerson().getPersonId());
                 result.add(map);
             }
         }
@@ -68,7 +70,7 @@ public class Meeting extends Model {
         if (org.getEnableCaseReferences()) {
             for (Case c : cases) {
                 for (Charge charge : c.charges) {
-                    charge.is_referenced = charge.referencing_charges.size() > 0 || charge.referencing_cases.size() > 0;
+                    charge.setReferenced(charge.referencing_charges.size() > 0 || charge.referencing_cases.size() > 0);
                 }
             }
         }

@@ -4,13 +4,18 @@ import javax.persistence.*;
 
 import io.ebean.*;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 @Entity
 public class UserRole extends Model {
 	@Id
-	public int id;
+    private int id;
 
     @ManyToOne()
-    public User user;
+    private User user;
 
     public static final String ROLE_ACCOUNTING = "accounting";
     public static final String ROLE_ATTENDANCE = "attendance";
@@ -35,7 +40,7 @@ public class UserRole extends Model {
         ROLE_ALL_ACCESS,
     };
 
-    public String role;
+    private String role;
 
 	public static final Finder<Integer, UserRole> find = new Finder<>(
             UserRole.class);
@@ -97,4 +102,3 @@ public class UserRole extends Model {
         throw new RuntimeException("unknown role: " + role);
     }
 }
-

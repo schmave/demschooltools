@@ -73,8 +73,8 @@ function Day(data, start_input, end_input) {
         if (self.code_mode) {
             url += "&code=" + self.start_input.val();
         } else {
-            url += "&start_time=" + self.start_input.val() +
-                "&end_time=" + self.end_input.val();
+            url += "&startTime=" + self.start_input.val() +
+                "&endTime=" + self.end_input.val();
         }
         $.post(url);
     };
@@ -90,8 +90,8 @@ function Day(data, start_input, end_input) {
         self.start_input.val(data.code);
         self.checkForCode();
     } else {
-        self.start_input.val(dbTimeToUserTime(data.start_time));
-        self.end_input.val(dbTimeToUserTime(data.end_time));
+        self.start_input.val(dbTimeToUserTime(data.startTime));
+        self.end_input.val(dbTimeToUserTime(data.endTime));
     }
 
     self.start_input.blur(self.onBlur);
@@ -108,7 +108,7 @@ function PersonRow(person, days, week, el) {
     self.setDirty = function() { self.dirty = true; }
 
     this.removePerson = function() {
-        $.post("/attendance/deletePersonWeek?person_id=" + person.person_id +
+        $.post("/attendance/deletePersonWeek?personId=" + person.personId +
                "&monday=" + app.monday).done(function(data) {
             self.el.remove();
             app.person_rows.splice(app.person_rows.indexOf(self), 1);
@@ -119,7 +119,7 @@ function PersonRow(person, days, week, el) {
     this.save = function() {
         self.dirty = false;
         $.post("/attendance/saveWeek?week_id=" + self.week.id +
-               "&extra_hours=" + self.week_el.val());
+               "&extraHours=" + self.week_el.val());
     };
 
     self.person = person;
@@ -136,7 +136,7 @@ function PersonRow(person, days, week, el) {
     }
 
     self.week_el = $(inputs[10]);
-    self.week_el.val(week.extra_hours);
+    self.week_el.val(week.extraHours);
 
     self.week_el.on(utils.TEXT_AREA_EVENTS, self.setDirty);
 
@@ -146,10 +146,10 @@ function PersonRow(person, days, week, el) {
 function addNewPersonRow(people) {
     var ids = [];
     for (var i = 0; i < people.length; i++) {
-        ids.push(people[i].person_id);
+        ids.push(people[i].personId);
     }
     $.post("/attendance/createPersonWeek", {
-            'person_id[]': ids,
+            'personId[]': ids,
             monday: app.monday
         }).done(function(data) {
             var results = $.parseJSON(data);
@@ -163,7 +163,7 @@ function addNewPersonRow(people) {
 function addAdditionalPerson(person) {
     var new_el = $("#additional-people").append(
         app.additional_person_template({
-            "name": person.first_name + " " + person.last_name
+            "name": person.firstName + " " + person.lastName
         })).children(":last-child");
 
     new_el.find("a").click(function () {
@@ -181,16 +181,16 @@ function loadRow(person, days, week, dest_el) {
     var insert_before_i;
     for (var i = 0; i < app.person_rows.length; i++) {
         var p2 = app.person_rows[i].person;
-        if ((p2.first_name + ' ' + p2.last_name) >
-            (person.first_name + ' ' + person.last_name)) {
+        if ((p2.firstName + ' ' + p2.lastName) >
+            (person.firstName + ' ' + person.lastName)) {
             insert_before_i = i;
             break;
         }
     }
     var new_row_el = $($.parseHTML(
         app.person_row_template({
-            "first_name": person.first_name,
-            "last_name": person.last_name,
+            "firstName": person.firstName,
+            "lastName": person.lastName,
         })));
     if (insert_before_i !== undefined) {
         app.person_rows[insert_before_i].el.before(new_row_el);
@@ -261,8 +261,8 @@ window.initAttendanceWeek = function() {
     for (i in app.initial_data.active_people) {
         var person = app.initial_data.active_people[i];
         loadRow(person,
-                app.initial_data.days[person.person_id],
-                app.initial_data.weeks[person.person_id],
+                app.initial_data.days[person.personId],
+                app.initial_data.weeks[person.personId],
                 $('.attendance-view tbody'));
     }
 

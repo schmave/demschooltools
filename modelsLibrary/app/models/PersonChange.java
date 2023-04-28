@@ -1,36 +1,38 @@
 package models;
 
 import io.ebean.*;
-
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
-import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
 
-
+@Getter
+@Setter
 @Entity
 public class PersonChange extends Model {
     @OneToOne()
-    @JoinColumn(name="person_id")
-    public Person person;
+    @JoinColumn(name="personId")
+    private Person person;
 
-    public String old_email="";
+    private String oldEmail="";
 
-    public String new_email="";
+    private String newEmail="";
 
     @Column(insertable = false, updatable = false)
-    public Date time;
+    private Date time;
 
     public static Finder<Integer, PersonChange> find = new Finder<>(
             PersonChange.class
     );
 
-    public static PersonChange create(Person p, String new_email) {
+    public static PersonChange create(Person p, String newEmail) {
         PersonChange result = new PersonChange();
         result.person = p;
-        result.old_email = p.email;
-        result.new_email = new_email;
+        result.oldEmail = p.getEmail();
+        result.newEmail = newEmail;
 
         result.save();
         return result;

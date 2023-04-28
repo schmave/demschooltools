@@ -28,7 +28,7 @@ public class Settings extends Controller {
     public Result viewSettings(Http.Request request) {
         List<NotificationRule> rules = NotificationRule.find.query().where()
             .eq("organization", Utils.getOrg(request))
-            .order("the_type DESC, tag.id")
+            .order("theType DESC, tag.id")
             .findList();
 
         return ok(view_settings.render(rules, Utils.getOrg(request), Public.sConfig.getConfig("school_crm"), request, mMessagesApi.preferred(request)));
@@ -61,7 +61,7 @@ public class Settings extends Controller {
                 if (user == null) {
                     user = User.create(username, "Check-in app user", org);
                 }
-                user.hashed_password = BCrypt.hashpw(new_password, BCrypt.gensalt());
+                user.setHashedPassword(BCrypt.hashpw(new_password, BCrypt.gensalt()));
                 user.save();
                 for (UserRole r : user.roles) {
                     r.delete();
@@ -118,27 +118,27 @@ public class Settings extends Controller {
     public Result newTask(Http.Request request) {
         Form<Task> task_form = mFormFactory.form(Task.class);
         Task t = task_form.bindFromRequest(request).get();
-        t.enabled = true;
+        t.setEnabled(true);
         t.save();
 
-        return redirect(routes.Settings.viewTaskList(t.task_list.id));
+        return redirect(routes.Settings.viewTaskList(t.getTaskList().id));
     }
 
     public Result newTaskList(Http.Request request) {
         Form<TaskList> list_form = mFormFactory.form(TaskList.class);
         TaskList list = list_form.bindFromRequest(request).get();
-        list.organization = Utils.getOrg(request);
+        list.setOrganization(Utils.getOrg(request));
 
-        list.title = list.title.trim();
-        if (list.title.equals("")) {
-            list.title = "Untitled checklist";
+        list.setTitle(list.getTitle().trim());
+        if (list.getTitle().equals("")) {
+            list.setTitle("Untitled checklist");
         }
 
         Map<String, String[]> form_data = request.body().asFormUrlEncoded();
         if (form_data.get("tag_id") == null) {
             return redirect(routes.Settings.viewTaskLists()).flashing("error", "No tag specified for checklist. No checklist was created.");
         }
-        list.tag = Tag.findById(Integer.parseInt(form_data.get("tag_id")[0]), Utils.getOrg(request));
+        list.setTag(Tag.findById(Integer.parseInt(form_data.get("tag_id")[0]), Utils.getOrg(request)));
 
         list.save();
         list.refresh();
@@ -159,11 +159,11 @@ public class Settings extends Controller {
         Form<Task> filled_form = task_form.bindFromRequest(request);
         Task t = filled_form.get();
         if (filled_form.apply("enabled").value().get().equals("false")) {
-            t.enabled = false;
+            t.setEnabled(false);
         }
         t.update();
 
-        return redirect(routes.Settings.viewTaskList(t.task_list.id));
+        return redirect(routes.Settings.viewTaskList(t.getTaskList().id));
     }
 
     public Result saveTaskList(Http.Request request) {
@@ -173,7 +173,7 @@ public class Settings extends Controller {
 
         Map<String, String[]> form_data = request.body().asFormUrlEncoded();
         if (form_data.containsKey("tag_id")) {
-            list.tag = Tag.findById(Integer.parseInt(form_data.get("tag_id")[0]), Utils.getOrg(request));
+            list.setTag(Tag.findById(Integer.parseInt(form_data.get("tag_id")[0]), Utils.getOrg(request)));
         }
 
         list.update();
@@ -192,7 +192,7 @@ public class Settings extends Controller {
         for (User user : users) {
             // Hide dummy users and the check-in app user
             if (!user.name.equals(User.DUMMY_USERNAME) &&
-                !user.email.equals(org.getShortName())) {
+                !user.getEmail().equals(org.getShortName())) {
                 users_to_show.add(user);
             }
         }
@@ -256,11 +256,11 @@ public class Settings extends Controller {
         }
 
         if (filled_form.apply("active").value().get().equals("false")) {
-            u.active = false;
+            u.setActive(false);
             DB.deleteAll(orig_user.linkedAccounts);
         }
 
-        if (!orig_user.email.equals(u.email)) {
+        if (!orig_user.getEmail().equals(u.getEmail())) {
             DB.deleteAll(orig_user.linkedAccounts);
         }
 
@@ -280,7 +280,7 @@ public class Settings extends Controller {
         User new_user = null;
 
         if (existing_user != null) {
-            if (existing_user.organization.getId().equals(org.getId())) {
+            if (existing_user.getOrganization().getId().equals(org.getId())) {
                 if (existing_user.name.equals(User.DUMMY_USERNAME)) {
                     new_user = existing_user;
                     new_user.name = name;

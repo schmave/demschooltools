@@ -1,17 +1,17 @@
-@(t : Tag, actor_name: String, p : Person, was_add : Boolean)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
+@(t : Tag, actor_name: String, p : Person, wasAdd : Boolean)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 <html>
 <body>
 <h3>An update from DemSchoolTools</h3>
 
 <p><b>@actor_name</b>
-@if( was_add ) { added } else { removed }
-<a href="@{Utils.getOrgConfig(request).people_url}@routes.CRM.person(p.person_id)">
-@p.first_name @p.last_name</a>
-@if( was_add ) { to } else { from }
+@if( wasAdd ) { added } else { removed }
+<a href="@{Utils.getOrgConfig(request).people_url}@routes.CRM.getPerson()(p.getPersonId())">
+@p.getFirstName() @p.getLastName()</a>
+@if( wasAdd ) { to } else { from }
 tag
 <a href="@{Utils.getOrgConfig(request).people_url}@routes.CRM.viewTag(t.id)">
-@t.title</a>
+@t.getTitle()</a>
 </p>
 
 <p>You can also view the

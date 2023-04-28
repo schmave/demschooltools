@@ -9,7 +9,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "users")
 public class User extends Model {
@@ -17,17 +21,18 @@ public class User extends Model {
 	private static final long serialVersionUID = 1L;
 
     @ManyToOne()
-    public Organization organization;
+    private Organization organization;
 
 	@Id
-	public Integer id;
+    private Integer id;
 
-	public String email;
-	public String name;
-	public String hashed_password = "";
+    private String email;
+    private String name;
+    private String hashedPassword = "";
 
-	public boolean active;
-	public boolean emailValidated;
+    private boolean active;
+
+    private boolean emailValidated;
 
     @OneToMany(mappedBy="user")
     public List<UserRole> roles;
@@ -63,8 +68,8 @@ public class User extends Model {
     		return false;
     	}
         for (UserRole r : roles) {
-            if (r.role.equals(role) ||
-                UserRole.includes(r.role, role)) {
+            if (r.getRole().equals(role) ||
+                UserRole.includes(r.getRole(), role)) {
                 return true;
             }
         }
@@ -135,7 +140,7 @@ public class User extends Model {
 		final Set<String> providerKeys = new HashSet<>(
 				linkedAccounts.size());
 		for (final LinkedAccount acc : linkedAccounts) {
-			providerKeys.add(acc.providerKey);
+			providerKeys.add(acc.getProviderKey());
 		}
 		return providerKeys;
 	}

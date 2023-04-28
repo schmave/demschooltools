@@ -79,8 +79,8 @@ public class Public extends Controller {
 
         String password = values.get("password")[0];
 
-        if (u != null && u.hashed_password.length() > 0) {
-            if (BCrypt.checkpw(password, u.hashed_password)) {
+        if (u != null && u.getHashedPassword().length() > 0) {
+            if (BCrypt.checkpw(password, u.getHashedPassword())) {
                 return mPlayAuth.handleAuthentication("evan-auth-provider", request, u);
             }
         }
@@ -92,7 +92,7 @@ public class Public extends Controller {
             result = redirect(routes.Public.index());
         }
 
-        if (u != null && u.hashed_password.length() == 0) {
+        if (u != null && u.getHashedPassword().length() == 0) {
             result = result.flashing("notice", "Failed to login: password login is not enabled for your account");
         } else {
             result = result.flashing("notice", "Failed to login: wrong email address or password");

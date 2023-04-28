@@ -7,28 +7,33 @@ import javax.persistence.*;
 import io.ebean.*;
 
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 @Entity
 public class NotificationRule extends Model {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "notification_rule_id_seq")
-    public int id;
+    private int id;
 
     @ManyToOne()
     @JoinColumn(name="tag_id")
-    public Tag tag;
+    private Tag tag;
 
     public static final int TYPE_TAG = 0;
     // public static final int TYPE_DONATION = 1;
     public static final int TYPE_COMMENT = 2;
     public static final int TYPE_SCHOOL_MEETING = 3;
 
-    public int the_type;
+    private int theType;
 
-    public String email;
+    private String email;
 
     @ManyToOne()
     @JoinColumn(name="organization_id")
-    public Organization organization;
+    private Organization organization;
 
     public static Finder<Integer, NotificationRule> find = new Finder<>(
             NotificationRule.class
@@ -41,7 +46,7 @@ public class NotificationRule extends Model {
 
     public static List<NotificationRule> findByType(int type, Organization org) {
         return find.query().where().eq("organization", org)
-            .eq("the_type", type).findList();
+            .eq("theType", type).findList();
     }
 
     public static NotificationRule create(int type, Tag tag, String email, Organization org) {
@@ -49,7 +54,7 @@ public class NotificationRule extends Model {
 
         result.organization = org;
 
-        result.the_type = type;
+        result.theType = type;
         if (type == TYPE_TAG) {
             result.tag = tag;
         } else {

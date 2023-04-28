@@ -4,18 +4,23 @@ import io.ebean.*;
 
 import javax.persistence.*;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 @Entity
 @Table(name="phone_numbers")
 public class PhoneNumber extends Model {
     @Id
-    public Integer id;
+    private Integer id;
 
-    public String number;
-    public String comment;
+    private String number;
+    private String comment;
 
     @ManyToOne()
-    @JoinColumn(name="person_id")
-    public Person owner;
+    @JoinColumn(name="personId")
+    private Person owner;
 
     public static Finder<Integer, PhoneNumber> find = new Finder<>(
             PhoneNumber.class

@@ -76,7 +76,7 @@ public class ApplicationEditing extends Controller {
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
     public Result editMinutes(Meeting meeting, Http.Request request) {
-        if (!authToEdit(meeting.date, request)) {
+        if (!authToEdit(meeting.getDate(), request)) {
             return tooOldToEdit();
         }
         meeting.prepareForEditing(Utils.getOrg(request));
@@ -109,7 +109,7 @@ public class ApplicationEditing extends Controller {
         String case_num = Utils.getOrgConfig(org).getCaseNumberPrefix(m) + next_num;
 
         Case new_case = Case.create(case_num, m);
-        return ok("[" + new_case.id + ", \"" + new_case.case_number + "\"]");
+        return ok("[" + new_case.id + ", \"" + new_case.getCaseNumber() + "\"]");
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
@@ -117,7 +117,7 @@ public class ApplicationEditing extends Controller {
         Meeting m = Meeting.findById(meeting_id, Utils.getOrg(request));
         Case c = Case.findById(case_id, Utils.getOrg(request));
 
-        if (m == null || c == null || c.date_closed != null || c.meeting == m) {
+        if (m == null || c == null || c.getDateClosed() != null || c.getMeeting() == m) {
             System.out.println("Error in continueCase -- illegal access");
             return unauthorized();
         }
@@ -138,23 +138,23 @@ public class ApplicationEditing extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
-    public Result addPersonAtMeeting(Integer meeting_id, Integer person_id,
+    public Result addPersonAtMeeting(Integer meeting_id, Integer personId,
         Integer role) {
         Meeting m = Meeting.find.byId(meeting_id);
 
-        PersonAtMeeting.create(m, Person.find.ref(person_id), role);
+        PersonAtMeeting.create(m, Person.find.ref(personId), role);
 
         return ok();
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
-    public Result removePersonAtMeeting(Integer meeting_id, Integer person_id,
+    public Result removePersonAtMeeting(Integer meeting_id, Integer personId,
         Integer role) {
         SqlUpdate update = DB.sqlUpdate(
             "DELETE from person_at_meeting where meeting_id = :meeting_id"+
-            " and person_id = :person_id and role = :role");
+            " and personId = :personId and role = :role");
         update.setParameter("meeting_id", meeting_id);
-        update.setParameter("person_id", person_id);
+        update.setParameter("personId", personId);
         update.setParameter("role", role);
 
         update.executeNow();
@@ -163,22 +163,22 @@ public class ApplicationEditing extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
-    public Result addPersonAtCase(Integer case_id, Integer person_id, Integer role, Http.Request request)
+    public Result addPersonAtCase(Integer case_id, Integer personId, Integer role, Http.Request request)
     {
         CachedPage.remove(CachedPage.JC_INDEX, Utils.getOrg(request));
-        PersonAtCase.create(Case.find.ref(case_id), Person.find.ref(person_id), role);
+        PersonAtCase.create(Case.find.ref(case_id), Person.find.ref(personId), role);
         return ok();
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
-    public Result removePersonAtCase(Integer case_id, Integer person_id, Integer role)
+    public Result removePersonAtCase(Integer case_id, Integer personId, Integer role)
     {
         DB.sqlUpdate(
                         "DELETE from person_at_case where case_id = :case_id " +
-                                "and person_id = :person_id " +
+                                "and personId = :personId " +
                                 "and role = :role")
                 .setParameter("case_id", case_id)
-                .setParameter("person_id", person_id)
+                .setParameter("personId", personId)
                 .setParameter("role", role)
                 .executeNow();
         return ok();
@@ -265,9 +265,9 @@ public class ApplicationEditing extends Controller {
             return notFound();
         }
 
-        boolean was_referred_to_sm = c.referred_to_sm;
+        boolean was_referred_to_sm = c.getReferredToSm();
         c.edit(request.queryString());
-        if (!was_referred_to_sm && c.referred_to_sm &&
+        if (!was_referred_to_sm && c.getReferredToSm() &&
                 !sAlreadyEmailedCharges.contains(c.id) &&
                 !NotificationRule.findByType(NotificationRule.TYPE_SCHOOL_MEETING, org).isEmpty()) {
             final OrgConfig org_config = Utils.getOrgConfig(org);
@@ -275,22 +275,22 @@ public class ApplicationEditing extends Controller {
                 try {
                     Thread.sleep(1000 * 60 * 5);
                     Charge c1 = Charge.find.byId(id);
-                    if (c1.referred_to_sm && !sAlreadyEmailedCharges.contains(c1.id)) {
+                    if (c1.getReferredToSm() && !sAlreadyEmailedCharges.contains(c1.id)) {
                         sAlreadyEmailedCharges.add(c1.id);
                         List<NotificationRule> rules = NotificationRule.findByType(
                                 NotificationRule.TYPE_SCHOOL_MEETING, org);
                         for (NotificationRule rule : rules) {
                             play.libs.mailer.Email mail = new play.libs.mailer.Email();
-                            mail.addTo(rule.email);
-                            mail.setSubject(c1.person.getInitials() + "'s charge"
-                                    + " referred to School Meeting in case #" + c1.the_case.case_number);
+                            mail.addTo(rule.getEmail());
+                            mail.setSubject(c1.getPerson().getInitials() + "'s charge"
+                                    + " referred to School Meeting in case #" + c1.getTheCase().getCaseNumber());
                             mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
                             mail.setBodyText(
-                                "" + c1.person.getDisplayName()
+                                "" + c1.getPerson().getDisplayName()
                                 + " was charged with " + c1.getRuleTitle()
-                                + " and the charge was referred to School Meeting in case #" + c1.the_case.case_number + ".\n\n"
+                                + " and the charge was referred to School Meeting in case #" + c1.getTheCase().getCaseNumber() + ".\n\n"
                                 + "For more information, view today's minutes:\n\n"
-                                + org_config.people_url + routes.Application.viewMeeting(c1.the_case.meeting.id).toString()
+                                + org_config.people_url + routes.Application.viewMeeting(c1.getTheCase().getMeeting().id).toString()
                                 + "\n\n"
                             );
                             mMailer.send(mail);
@@ -335,7 +335,7 @@ public class ApplicationEditing extends Controller {
     public Result editSchoolMeetingDecision(Integer charge_id, Http.Request request) {
         Charge c = Charge.findById(charge_id, Utils.getOrg(request));
 
-        if (!authToEdit(c.sm_decision_date, request)) {
+        if (!authToEdit(c.getSmDecisionDate(), request)) {
             return tooOldToEdit();
         }
 
@@ -348,7 +348,7 @@ public class ApplicationEditing extends Controller {
         Map<String, String[]> form_data = request.body().asFormUrlEncoded();
 
         int charge_id = Integer.parseInt(form_data.get("charge_id")[0]);
-        String decision = form_data.get("sm_decision")[0];
+        String decision = form_data.get("smDecision")[0];
         Date date = Application.getDateFromString(form_data.get("date")[0]);
 
         Charge c = Charge.findById(charge_id, Utils.getOrg(request));
@@ -401,7 +401,7 @@ public class ApplicationEditing extends Controller {
     public Result addSection(Integer chapterId, Http.Request request) {
         Form<Section> form = mFormFactory.form(Section.class);
         Section section = new Section();
-        section.chapter = Chapter.findById(chapterId, Utils.getOrg(request));
+        section.setChapter(Chapter.findById(chapterId, Utils.getOrg(request)));
         form = form.fill(section);
         return ok(edit_section.render(form, Chapter.findById(chapterId, Utils.getOrg(request)), true, Chapter.all(Utils.getOrg(request)), request, mMessagesApi.preferred(request)));
     }
@@ -410,7 +410,7 @@ public class ApplicationEditing extends Controller {
     public Result editSection(Integer id, Http.Request request) {
         Section existing_section = Section.findById(id, Utils.getOrg(request));
         Form<Section> filled_form = mFormFactory.form(Section.class).fill(existing_section);
-        return ok(edit_section.render(filled_form, existing_section.chapter, false, Chapter.all(Utils.getOrg(request)), request, mMessagesApi.preferred(request)));
+        return ok(edit_section.render(filled_form, existing_section.getChapter(), false, Chapter.all(Utils.getOrg(request)), request, mMessagesApi.preferred(request)));
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
@@ -426,14 +426,14 @@ public class ApplicationEditing extends Controller {
         }
 
         onManualChange(Utils.getOrg(request));
-        return redirect(routes.Application.viewChapter(s.chapter.id).url() + "#section_" + s.id);
+        return redirect(routes.Application.viewChapter(s.getChapter().id).url() + "#section_" + s.id);
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
     public Result addEntry(Integer sectionId, Http.Request request) {
         Form<Entry> form = mFormFactory.form(Entry.class);
         Entry entry = new Entry();
-        entry.section = Section.findById(sectionId, Utils.getOrg(request));
+        entry.setSection(Section.findById(sectionId, Utils.getOrg(request)));
         form = form.fill(entry);
         return ok(edit_entry.render(form, Section.findById(sectionId, Utils.getOrg(request)), true, Chapter.all(Utils.getOrg(request)), request, mMessagesApi.preferred(request)));
     }
@@ -442,7 +442,7 @@ public class ApplicationEditing extends Controller {
     public Result editEntry(Integer id, Http.Request request) {
         Entry e = Entry.findById(id, Utils.getOrg(request));
         Form<Entry> filled_form = mFormFactory.form(Entry.class).fill(e);
-        return ok(edit_entry.render(filled_form, e.section, false, Chapter.all(Utils.getOrg(request)), request, mMessagesApi.preferred(request)));
+        return ok(edit_entry.render(filled_form, e.getSection(), false, Chapter.all(Utils.getOrg(request)), request, mMessagesApi.preferred(request)));
     }
 
     @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
@@ -458,7 +458,7 @@ public class ApplicationEditing extends Controller {
         }
 
         onManualChange(Utils.getOrg(request));
-        return redirect(routes.Application.viewChapter(e.section.chapter.id).url() + "#entry_" + e.id);
+        return redirect(routes.Application.viewChapter(e.getSection().getChapter().id).url() + "#entry_" + e.id);
     }
 
 }

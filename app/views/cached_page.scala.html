@@ -1,6 +1,6 @@
 @(page : CachedPage)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
-@main(page.title, page.menu, page.selected_button) {
+@main(page.getTitle(), page.menu, page.selected_button) {
 
 @Html(page.getPage())
 

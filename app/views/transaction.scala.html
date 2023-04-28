@@ -20,33 +20,33 @@
 				</tr>
 				<tr>
 					<th>From</th>
-					@if(transaction.from_account != null) {
-						<td><a href="@routes.Accounting.account(transaction.from_account.id)">@transaction.from_name</a></td>
+					@if(transaction.getFromAccount() != null) {
+						<td><a href="@routes.Accounting.account(transaction.getFromAccount().id)">@transaction.getFromName()</a></td>
 					} else {
-						<td>@transaction.from_name</td>
+						<td>@transaction.getFromName()</td>
 					}
 				</tr>
 				@if(transaction.getTypeName() != "Cash Withdrawal") {
 					<tr>
 						<th>To</th>
-						@if(transaction.to_account != null) {
-							<td><a href="@routes.Accounting.account(transaction.to_account.id)">@transaction.to_name</a></td>
+						@if(transaction.getToAccount() != null) {
+							<td><a href="@routes.Accounting.account(transaction.getToAccount().id)">@transaction.getToName()</a></td>
 						} else {
-							<td>@transaction.to_name</td>
+							<td>@transaction.getToName()</td>
 						}
 					</tr>
 				}
 				<tr>
 					<th>Reason</th>
-					<td><input type="text" id="description" name="description" value="@transaction.description"></td>
+					<td><input type="text" id="description" name="description" value="@transaction.getDescription()"></td>
 				</tr>
 				<tr>
 					<th>Amount</th>
-					<td>$ <input id="amount" type="number" name="amount" value="@transaction.amount" min="0" step="0.01" required autocomplete="off" /></td>
+					<td>$ <input id="amount" type="number" name="amount" value="@transaction.getAmount()" min="0" step="0.01" required autocomplete="off" /></td>
 				</tr>
 				<tr>
 					<th>Date</th>
-					<td><input type="date" name="date_created" value="@transaction.getFormattedDate2()" autocomplete="off"></input></td>
+					<td><input type="date" name="dateCreated" value="@transaction.getFormattedDate2()" autocomplete="off"></input></td>
 				</tr>
 			</table>
 			<input type="submit" value="Update" class="create-transaction-submit js-update-transaction-submit btn btn-primary">

@@ -79,20 +79,20 @@ public class Application extends Controller {
 
         // Add first and display names of all people in JC db
         for(Person p : jcPeople(org)) {
-            names.add(p.first_name.trim().toLowerCase());
+            names.add(p.getFirstName().trim().toLowerCase());
             names.add(p.getDisplayName().trim().toLowerCase());
         }
     }
 
-    public static String getRedactedFindings(Case the_case, Person keep_this_persons_name) {
-        loadNames(the_case.meeting.organization);
+    public static String getRedactedFindings(Case theCase, Person keep_this_persons_name) {
+        loadNames(theCase.getMeeting().getOrganization());
 
-        String composite_findings = generateCompositeFindingsFromChargeReferences(the_case);
+        String compositeFindings = generateCompositeFindingsFromChargeReferences(theCase);
 
-        String keep_first_name = keep_this_persons_name.first_name.trim().toLowerCase();
+        String keep_first_name = keep_this_persons_name.getFirstName().trim().toLowerCase();
         String keep_display_name = keep_this_persons_name.getDisplayName().trim().toLowerCase();
 
-        String[] words = composite_findings.split("\\b");
+        String[] words = compositeFindings.split("\\b");
         Map<String, String> replacement_names = new HashMap<>();
         char next_replacement = 'A';
 
@@ -106,7 +106,7 @@ public class Application extends Controller {
             }
         }
 
-        String new_findings = composite_findings;
+        String new_findings = compositeFindings;
         for (String name : replacement_names.keySet()) {
             new_findings = new_findings.replaceAll("(?i)" + name, replacement_names.get(name));
         }
@@ -117,37 +117,37 @@ public class Application extends Controller {
     // We use this method while editing minutes. At this time the user has picked case references, but is still working
     // on picking charge references, so we don't know which charges will be needed. As a result, we will include
     // information on all charges from the referenced cases.
-    public static String generateCompositeFindingsFromCaseReferences(Case the_case) {
-        if (!the_case.meeting.organization.getEnableCaseReferences()) {
-            return the_case.findings;
+    public static String generateCompositeFindingsFromCaseReferences(Case theCase) {
+        if (!theCase.getMeeting().getOrganization().getEnableCaseReferences()) {
+            return theCase.getFindings();
         }
-        return generateCompositeFindings(the_case, null, null);
+        return generateCompositeFindings(theCase, null, null);
     }
 
     // We use this method everywhere besides the edit minutes page. At this point the minutes have been finalized and the
     // charge references have been selected. We don't need to include information about charges that weren't referenced.
-    public static String generateCompositeFindingsFromChargeReferences(Case the_case) {
-        if (!the_case.meeting.organization.getEnableCaseReferences()) {
-            return the_case.findings;
+    public static String generateCompositeFindingsFromChargeReferences(Case theCase) {
+        if (!theCase.getMeeting().getOrganization().getEnableCaseReferences()) {
+            return theCase.getFindings();
         }
         ArrayList<Charge> relevant_charges = new ArrayList<>();
-        for (Charge charge : the_case.charges) {
+        for (Charge charge : theCase.charges) {
             charge.buildChargeReferenceChain(relevant_charges);
         }
-        return generateCompositeFindings(the_case, relevant_charges, null);
+        return generateCompositeFindings(theCase, relevant_charges, null);
     }
 
-    private static String generateCompositeFindings(Case the_case, List<Charge> relevant_charges, List<Case> used_cases) {
+    private static String generateCompositeFindings(Case theCase, List<Charge> relevant_charges, List<Case> used_cases) {
 
         if (used_cases == null) {
             used_cases = new ArrayList<>();
         }
-        used_cases.add(the_case);
+        used_cases.add(theCase);
         String result = "";
 
-        the_case.referenced_cases.sort(Comparator.comparing(a -> a.case_number));
+        theCase.referenced_cases.sort(Comparator.comparing(a -> a.getCaseNumber()));
 
-        for (Case c : the_case.referenced_cases) {
+        for (Case c : theCase.referenced_cases) {
             if (used_cases.contains(c)) {
                 continue;
             }
@@ -163,7 +163,7 @@ public class Application extends Controller {
                 } else {
                     result += " Then per case ";
                 }
-                result += c.case_number + ",";
+                result += c.getCaseNumber() + ",";
             }
             if (!result.isEmpty()) {
                 result += " ";
@@ -175,24 +175,24 @@ public class Application extends Controller {
             Map<String, List<Charge>> groups = groupChargesByRuleAndResolutionPlan(findRelevantCharges(c, relevant_charges));
             for (Map.Entry<String, List<Charge>> entry : groups.entrySet()) {
                 List<Charge> group = entry.getValue();
-                result += " " + group.get(0).person.getDisplayName();
+                result += " " + group.get(0).getPerson().getDisplayName();
                 if (group.size() == 1) {
                     result += " was ";
                 } else {
                     if (group.size() > 2) {
                         for (Charge ch : group.subList(1, group.size() - 1)) {
-                            result += ", " + ch.person.getDisplayName();
+                            result += ", " + ch.getPerson().getDisplayName();
                         }
                         result += ",";
                     }
-                    result += " and " + group.get(group.size() - 1).person.getDisplayName() + " were ";
+                    result += " and " + group.get(group.size() - 1).getPerson().getDisplayName() + " were ";
                 }
                 result += "charged with " + group.get(0).getRuleTitle();
-                String resolution_plan = getResolutionPlanForCompositeFindings(group.get(0));
-                if (resolution_plan.isEmpty()) {
+                String resolutionPlan = getResolutionPlanForCompositeFindings(group.get(0));
+                if (resolutionPlan.isEmpty()) {
                     result += ".";
                 } else {
-                    if (group.get(0).sm_decision != null && !group.get(0).sm_decision.isEmpty()) {
+                    if (group.get(0).getSmDecision() != null && !group.get(0).getSmDecision().isEmpty()) {
                         result += " and School Meeting decided on";
                     }
                     else if (group.size() == 1) {
@@ -201,7 +201,7 @@ public class Application extends Controller {
                     else {
                         result += " and were each assigned";
                     }
-                    result += " the " + Utils.getOrgConfig(the_case.meeting.organization).str_res_plan + " \"" + resolution_plan;
+                    result += " the " + Utils.getOrgConfig(theCase.getMeeting().getOrganization()).str_res_plan + " \"" + resolutionPlan;
                     if (!result.endsWith(".")) {
                         result += ".";
                     }
@@ -210,12 +210,12 @@ public class Application extends Controller {
             }
         }
         if (!result.isEmpty()) {
-            result += " Then per case " + the_case.case_number + ", ";
+            result += " Then per case " + theCase.getCaseNumber() + ", ";
         }
-        if (the_case.findings.isEmpty()) {
-            the_case.findings = "the " + Utils.getOrgConfig(the_case.meeting.organization).str_res_plan + " was not completed.";
+        if (theCase.getFindings().isEmpty()) {
+            theCase.setFindings("the " + Utils.getOrgConfig(theCase.getMeeting().getOrganization()).str_res_plan + " was not completed.");
         }
-        result += the_case.findings;
+        result += theCase.getFindings();
         return result;
     }
 
@@ -246,13 +246,13 @@ public class Application extends Controller {
     }
 
     private static String getResolutionPlanForCompositeFindings(Charge charge) {
-        if (charge.sm_decision != null && !charge.sm_decision.isEmpty()) {
-            return charge.sm_decision;
+        if (charge.getSmDecision() != null && !charge.getSmDecision().isEmpty()) {
+            return charge.getSmDecision();
         }
-        if (charge.referred_to_sm && charge.resolution_plan.isEmpty()) {
+        if (charge.getReferredToSm() && charge.getResolutionPlan().isEmpty()) {
             return "[Referred to School Meeting]";
         }
-        return charge.resolution_plan;
+        return charge.getResolutionPlan();
     }
 
     public Result viewPassword(Http.Request request) {
@@ -273,11 +273,11 @@ public class Application extends Controller {
             result.flashing("notice", "Please choose a password that is at least 8 characters");
         } else {
             User u = Application.getCurrentUser(request);
-            u.hashed_password = BCrypt.hashpw(password, BCrypt.gensalt());
+            u.setHashedPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
             u.save();
             play.libs.mailer.Email mail = new play.libs.mailer.Email();
             mail.setSubject("DemSchoolTools password changed");
-            mail.addTo(u.email);
+            mail.addTo(u.getEmail());
             mail.setFrom("DemSchoolTools <noreply@demschooltools.com>");
             mail.setBodyText("Hi " + u.name + ",\n\nYour DemSchoolTools password was changed today (" +
                 Application.formatDateTimeLong(Utils.getOrgConfig(Utils.getOrg(request))) +
@@ -305,8 +305,8 @@ public class Application extends Controller {
 
     public static List<Charge> getActiveSchoolMeetingReferrals(Organization org) {
         return Charge.find.query().where()
-            .eq("referred_to_sm", true)
-            .isNull("sm_decision")
+            .eq("referredToSm", true)
+            .isNull("smDecision")
             .eq("person.organization", org)
             .orderBy("id DESC").findList();
     }
@@ -322,22 +322,22 @@ public class Application extends Controller {
                 .fetch("rule.section")
                 .fetch("rule.section.chapter")
                 .fetch("person")
-                .fetch("the_case")
+                .fetch("theCase")
                 .where()
-                .eq("referred_to_sm", true)
+                .eq("referredToSm", true)
                 .eq("person.organization", Utils.getOrg(request))
-                .gt("sm_decision_date", ModelUtils.getStartOfYear())
-                .isNotNull("sm_decision")
+                .gt("smDecisionDate", ModelUtils.getStartOfYear())
+                .isNotNull("smDecision")
                 .orderBy("id DESC").findList();
         return ok(view_sm_decisions.render(the_charges, request, mMessagesApi.preferred(request)));
     }
 
     public static List<Person> jcPeople(Organization org) {
-        return peopleByTagType("show_in_jc", org);
+        return peopleByTagType("showInJc", org);
     }
 
     public static List<Person> attendancePeople(Organization org) {
-        return peopleByTagType("show_in_attendance", org);
+        return peopleByTagType("showInAttendance", org);
     }
 
     public static String attendancePeopleJson(Organization org) {
@@ -346,7 +346,7 @@ public class Application extends Controller {
         for (Person p : people) {
             HashMap<String, String> values = new HashMap<>();
             values.put("label", p.getDisplayName());
-            values.put("id", "" + p.person_id);
+            values.put("id", "" + p.getPersonId());
             result.add(values);
         }
         return Json.stringify(Json.toJson(result));
@@ -378,17 +378,17 @@ public class Application extends Controller {
             .orderBy("date DESC").findList();
 
         List<Tag> tags = Tag.find.query().where()
-            .eq("show_in_jc", true)
+            .eq("showInJc", true)
             .eq("organization", Utils.getOrg(request))
             .findList();
 
         Set<Person> peopleSet = Person.find.query()
             .fetch("charges")
-            .fetch("charges.the_case")
-            .fetch("charges.the_case.meeting")
+            .fetch("charges.theCase")
+            .fetch("charges.theCase.meeting")
             .fetch("cases_involved_in", FetchConfig.ofQuery())
-            .fetch("cases_involved_in.the_case", FetchConfig.ofQuery())
-            .fetch("cases_involved_in.the_case.meeting", FetchConfig.ofQuery())
+            .fetch("cases_involved_in.theCase", FetchConfig.ofQuery())
+            .fetch("cases_involved_in.theCase.meeting", FetchConfig.ofQuery())
             .where()
             .in("tags", tags)
             .findSet();
@@ -398,8 +398,8 @@ public class Application extends Controller {
 
         List<Entry> entries = Entry.find.query()
             .fetch("charges")
-            .fetch("charges.the_case")
-            .fetch("charges.the_case.meeting")
+            .fetch("charges.theCase")
+            .fetch("charges.theCase.meeting")
             .fetch("section")
             .fetch("section.chapter")
             .where().eq("section.chapter.organization", Utils.getOrg(request))
@@ -454,61 +454,61 @@ public class Application extends Controller {
         writer.endRecord();
 
         List<Charge> charges = Charge.find.query()
-            .fetch("the_case")
+            .fetch("theCase")
             .fetch("person")
             .fetch("rule")
-            .fetch("the_case.meeting", FetchConfig.ofQuery())
+            .fetch("theCase.meeting", FetchConfig.ofQuery())
             .where().eq("person.organization", org)
-                .ge("the_case.meeting.date", ModelUtils.getStartOfYear())
+                .ge("theCase.meeting.date", ModelUtils.getStartOfYear())
             .findList();
         for (Charge c : charges) {
-            if (c.person != null) {
-                writer.write(c.person.getDisplayName());
+            if (c.getPerson() != null) {
+                writer.write(c.getPerson().getDisplayName());
             } else {
                 writer.write("");
             }
 
-            if (c.person.dob != null) {
-                writer.write("" + c.person.calcAge());
+            if (c.getPerson().getDob() != null) {
+                writer.write("" + c.getPerson().calcAge());
             } else {
                 writer.write("");
             }
 
-            writer.write(c.person.gender);
+            writer.write(c.getPerson().getGender());
             writer.write(yymmddDate(org_config,
-                c.the_case.date != null ? c.the_case.date : c.the_case.meeting.date));
-            writer.write(c.the_case.time);
-            writer.write(c.the_case.location);
-            writer.write(yymmddDate(org_config,c.the_case.meeting.date));
+                c.getTheCase().getDate() != null ? c.getTheCase().getDate() : c.getTheCase().getMeeting().getDate()));
+            writer.write(c.getTheCase().getTime());
+            writer.write(c.getTheCase().getLocation());
+            writer.write(yymmddDate(org_config,c.getTheCase().getMeeting().getDate()));
 
             // Adding a space to the front of the case number prevents MS Excel
             // from misinterpreting it as a date.
-            writer.write(" " + c.the_case.case_number, true);
-            writer.write(generateCompositeFindingsFromChargeReferences(c.the_case));
+            writer.write(" " + c.getTheCase().getCaseNumber(), true);
+            writer.write(generateCompositeFindingsFromChargeReferences(c.getTheCase()));
 
-            if (c.rule != null) {
-                writer.write(c.rule.getNumber() + " " + c.rule.title);
+            if (c.getRule() != null) {
+                writer.write(c.getRule().getNumber() + " " + c.getRule().getTitle());
             } else {
                 writer.write("");
             }
-            writer.write(org_config.translatePlea(c.plea));
-            writer.write(c.resolution_plan);
-            writer.write("" + c.rp_complete);
+            writer.write(org_config.translatePlea(c.getPlea()));
+            writer.write(c.getResolutionPlan());
+            writer.write("" + c.getRpComplete());
             if (org_config.show_severity) {
-                writer.write(c.severity);
+                writer.write(c.getSeverity());
             }
 
             if (org_config.use_minor_referrals) {
-                writer.write(c.minor_referral_destination);
+                writer.write(c.getMinorReferralDestination());
             }
-            writer.write("" + c.referred_to_sm);
-            if (c.sm_decision != null) {
-                writer.write(c.sm_decision);
+            writer.write("" + c.getReferredToSm());
+            if (c.getSmDecision() != null) {
+                writer.write(c.getSmDecision());
             } else {
                 writer.write("");
             }
-            if (c.sm_decision_date != null) {
-                writer.write(Application.yymmddDate(org_config,c.sm_decision_date));
+            if (c.getSmDecisionDate() != null) {
+                writer.write(Application.yymmddDate(org_config,c.getSmDecisionDate()));
             } else {
                 writer.write("");
             }
@@ -543,8 +543,8 @@ public class Application extends Controller {
 
         List<Charge> completed_rps =
             Charge.find.query()
-                .fetch("the_case")
-                .fetch("the_case.meeting")
+                .fetch("theCase")
+                .fetch("theCase.meeting")
                 .fetch("person")
                 .fetch("rule")
                 .fetch("rule.section")
@@ -552,15 +552,15 @@ public class Application extends Controller {
                 .where()
                 .eq("person.organization", Utils.getOrg(request))
                 .isNotNull("person")
-                .eq("rp_complete", true)
+                .eq("rpComplete", true)
                 .not(Expr.in("id", referenced_charge_ids))
                 .orderBy("rp_complete_date DESC")
                 .setMaxRows(25).findList();
 
         List<Charge> nullified_rps =
             Charge.find.query()
-                .fetch("the_case")
-                .fetch("the_case.meeting")
+                .fetch("theCase")
+                .fetch("theCase.meeting")
                 .fetch("person")
                 .fetch("rule")
                 .fetch("rule.section")
@@ -577,9 +577,9 @@ public class Application extends Controller {
         all.addAll(nullified_rps);
 
         for (Charge charge : all) {
-            Case c = charge.the_case;
-            if (c.composite_findings == null) {
-                c.composite_findings = generateCompositeFindingsFromChargeReferences(c);
+            Case c = charge.getTheCase();
+            if (c.getCompositeFindings() == null) {
+                c.setCompositeFindings(generateCompositeFindingsFromChargeReferences(c));
             }
         }
 
@@ -594,17 +594,17 @@ public class Application extends Controller {
             .where()
             .eq("person.organization", org)
             .isNotNull("referenced_charge_id")
-            .select("referenced_charge")
+            .select("referencedCharge")
             .findList()
             .stream()
-            .map(c -> c.referenced_charge.id)
+            .map(c -> c.getReferencedCharge().id)
             .collect(Collectors.toList());
     }
 
     private List<Charge> getActiveResolutionPlans(List<Integer> referenced_charge_ids, Organization org) {
         return Charge.find.query()
-            .fetch("the_case")
-            .fetch("the_case.meeting")
+            .fetch("theCase")
+            .fetch("theCase.meeting")
             .fetch("person")
             .fetch("rule")
             .fetch("rule.section")
@@ -612,9 +612,9 @@ public class Application extends Controller {
             .where()
             .eq("person.organization", org)
             .or(Expr.ne("plea", "Not Guilty"),
-                Expr.isNotNull("sm_decision"))
+                Expr.isNotNull("smDecision"))
             .isNotNull("person")
-            .eq("rp_complete", false)
+            .eq("rpComplete", false)
             .not(Expr.in("id", referenced_charge_ids))
             .orderBy("id DESC").findList();
     }
@@ -627,8 +627,8 @@ public class Application extends Controller {
         HashMap<String, List<Charge>> groups = new HashMap<>();
 
         for (Charge charge : charges) {
-            if (charge.person != null) {
-                String name = charge.person.getDisplayName();
+            if (charge.getPerson() != null) {
+                String name = charge.getPerson().getDisplayName();
                 if (!groups.containsKey(name)) {
                     List<Charge> list = new ArrayList<>();
                     list.add(charge);
@@ -663,23 +663,23 @@ public class Application extends Controller {
         Meeting m = Meeting.findById(meeting_id, org);
         for (Case c : m.cases) {
             for (Charge charge : c.charges) {
-                if (charge.displayInResolutionPlanList() && !charge.referred_to_sm) {
-                    writer.write(charge.person.getDisplayName());
+                if (charge.displayInResolutionPlanList() && !charge.getReferredToSm()) {
+                    writer.write(charge.getPerson().getDisplayName());
 
                     // In case it's needed in the future, adding a space to
                     // the front of the case number prevents MS Excel from
                     // misinterpreting it as a date.
                     //
-                    // writer.write(" " + charge.the_case.case_number,
+                    // writer.write(" " + charge.getTheCase().getCaseNumber(),
                     // true);
 
-                    writer.write(charge.the_case.case_number + " (" +
-                        (charge.sm_decision_date != null
-                            ? Application.formatDayOfWeek(charge.sm_decision_date) + "--SM"
-                            : Application.formatDayOfWeek(charge.the_case.meeting.date))
+                    writer.write(charge.getTheCase().getCaseNumber() + " (" +
+                        (charge.getSmDecisionDate() != null
+                            ? Application.formatDayOfWeek(charge.getSmDecisionDate()) + "--SM"
+                            : Application.formatDayOfWeek(charge.getTheCase().getMeeting().getDate()))
                         + ")");
-                    writer.write(charge.rule.title);
-                    writer.write(charge.resolution_plan);
+                    writer.write(charge.getRule().getTitle());
+                    writer.write(charge.getResolutionPlan());
                     writer.endRecord();
                 }
             }
@@ -712,7 +712,7 @@ public class Application extends Controller {
 
         List<ManualChange> changes =
             ManualChange.find.query().where()
-                .gt("date_entered", begin_date)
+                .gt("dateEntered", begin_date)
                 .eq("entry.section.chapter.organization", Utils.getOrg(request))
                 .findList();
 
@@ -948,7 +948,7 @@ public class Application extends Controller {
         Collections.reverse(p.charges);
         for (Charge c : p.charges) {
             // Include if <= 7 days ago
-            if (now.getTime() - c.the_case.meeting.date.getTime() <
+            if (now.getTime() - c.getTheCase().getMeeting().getDate().getTime() <
                 1000 * 60 * 60 * 24 * 7.5) {
                 last_week_charges.add(c);
             }
@@ -964,9 +964,9 @@ public class Application extends Controller {
         Collections.reverse(r.charges);
 
         for (Charge c : r.charges) {
-            if (!c.resolution_plan.equalsIgnoreCase("warning") &&
-                !c.resolution_plan.equals("")) {
-                rps.add(c.resolution_plan);
+            if (!c.getResolutionPlan().equalsIgnoreCase("warning") &&
+                !c.getResolutionPlan().equals("")) {
+                rps.add(c.getResolutionPlan());
             }
             if (rps.size() > 9) {
                 break;
@@ -983,7 +983,7 @@ public class Application extends Controller {
         PersonHistory history = new PersonHistory(p, false, ModelUtils.getStartOfYear(), null);
         PersonHistory.Record rule_record = null;
         for (PersonHistory.Record record : history.rule_records) {
-            if (record.rule != null && record.rule.equals(r)) {
+            if (record.getRule() != null && record.getRule().equals(r)) {
                 rule_record = record;
                 break;
             }
@@ -1124,34 +1124,34 @@ public class Application extends Controller {
         end_date.add(GregorianCalendar.DATE, 6);
 
         List<Charge> all_charges = Charge.find.query()
-            .fetch("the_case")
+            .fetch("theCase")
             .fetch("person")
             .fetch("rule")
-            .fetch("the_case.meeting", FetchConfig.ofQuery())
+            .fetch("theCase.meeting", FetchConfig.ofQuery())
             .where().eq("person.organization", org)
-                .ge("the_case.meeting.date", ModelUtils.getStartOfYear(start_date.getTime()))
+                .ge("theCase.meeting.date", ModelUtils.getStartOfYear(start_date.getTime()))
             .findList();
         WeeklyStats result = new WeeklyStats();
         result.rule_counts = new TreeMap<>();
         result.person_counts = new TreeMap<>();
 
         for (Charge c : all_charges) {
-            long case_millis = c.the_case.meeting.date.getTime();
+            long case_millis = c.getTheCase().getMeeting().getDate().getTime();
             long diff = end_date.getTime().getTime() - case_millis;
 
-            if (c.rule != null && c.person != null) {
+            if (c.getRule() != null && c.getPerson() != null) {
                 if (diff >= 0 &&
                     diff < 6.5 * 24 * 60 * 60 * 1000) {
-                    result.rule_counts.put(c.rule, 1 + result.rule_counts.getOrDefault(c.rule, 0));
-                    result.person_counts.put(c.person, result.person_counts.getOrDefault(c.person, new WeeklyStats.PersonCounts()).addThisPeriod());
+                    result.rule_counts.put(c.getRule(), 1 + result.rule_counts.getOrDefault(c.getRule(), 0));
+                    result.person_counts.put(c.getPerson(), result.person_counts.getOrDefault(c.getPerson(), new WeeklyStats.PersonCounts()).addThisPeriod());
                     result.num_charges++;
                 }
                 if (diff >= 0 &&
                     diff < 27.5 * 24 * 60 * 60 * 1000) {
-                    result.person_counts.put(c.person, result.person_counts.getOrDefault(c.person, new WeeklyStats.PersonCounts()).addLast28Days());
+                    result.person_counts.put(c.getPerson(), result.person_counts.getOrDefault(c.getPerson(), new WeeklyStats.PersonCounts()).addLast28Days());
                 }
                 if (diff >= 0) {
-                    result.person_counts.put(c.person, result.person_counts.getOrDefault(c.person, new WeeklyStats.PersonCounts()).addAllTime());
+                    result.person_counts.put(c.getPerson(), result.person_counts.getOrDefault(c.getPerson(), new WeeklyStats.PersonCounts()).addAllTime());
                 }
             }
         }
@@ -1181,9 +1181,9 @@ public class Application extends Controller {
         ArrayList<String> referral_destinations = new ArrayList<>();
         for (Case c : all_cases) {
             for (Charge ch : c.charges) {
-                if (!ch.minor_referral_destination.equals("") &&
-                    !referral_destinations.contains(ch.minor_referral_destination)) {
-                    referral_destinations.add(ch.minor_referral_destination);
+                if (!ch.getMinorReferralDestination().equals("") &&
+                    !referral_destinations.contains(ch.getMinorReferralDestination())) {
+                    referral_destinations.add(ch.getMinorReferralDestination());
                 }
             }
         }
@@ -1206,7 +1206,7 @@ public class Application extends Controller {
             if (p.searchStringMatches(term)) {
                 HashMap<String, String> values = new HashMap<>();
                 values.put("label", p.getDisplayName());
-                values.put("id", "" + p.person_id);
+                values.put("id", "" + p.getPersonId());
                 result.add(values);
             }
         }
@@ -1218,7 +1218,7 @@ public class Application extends Controller {
         ExpressionList<Entry> expr = Entry.find.query().where().eq("section.chapter.organization",
                 org);
         if (!includeBreakingResPlan) {
-            expr = expr.eq("is_breaking_res_plan", false);
+            expr = expr.eq("isBreakingResPlan", false);
         }
         List<Entry> rules = expr
             .eq("deleted", false)
@@ -1229,7 +1229,7 @@ public class Application extends Controller {
         List<Map<String, String> > result = new ArrayList<>();
         for (Entry r : rules) {
             HashMap<String, String> values = new HashMap<>();
-            values.put("label", r.getNumber() + " " + r.title);
+            values.put("label", r.getNumber() + " " + r.getTitle());
             values.put("id", "" + r.id);
             result.add(values);
         }
@@ -1243,13 +1243,13 @@ public class Application extends Controller {
         List<Case> cases = Case.find.query().where()
             .eq("meeting.organization", org)
             .ge("meeting.date", ModelUtils.getStartOfYear())
-            .like("case_number", term + "%")
-            .orderBy("case_number ASC").findList();
+            .like("caseNumber", term + "%")
+            .orderBy("caseNumber ASC").findList();
 
         List<Map<String, String>> result = new ArrayList<>();
         for (Case c : cases) {
             HashMap<String, String> values = new HashMap<>();
-            values.put("label", c.case_number);
+            values.put("label", c.getCaseNumber());
             values.put("id", "" + c.id);
             result.add(values);
         }
@@ -1269,9 +1269,9 @@ public class Application extends Controller {
         Person p = Person.findById(personId, Utils.getOrg(request));
         List<Charge> charges = Charge.find.query().where().eq("person", p)
                 .eq("rule_id", ruleId)
-                .lt("the_case.meeting.date", now)
-                .ge("the_case.meeting.date", ModelUtils.getStartOfYear())
-                .orderBy("the_case.meeting.date DESC")
+                .lt("theCase.meeting.date", now)
+                .ge("theCase.meeting.date", ModelUtils.getStartOfYear())
+                .orderBy("theCase.meeting.date DESC")
                 .findList();
 
         if (charges.size() > 0) {

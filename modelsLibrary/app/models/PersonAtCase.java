@@ -5,29 +5,34 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 @Entity
 public class PersonAtCase extends Model {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "testify_record_id_seq")
-    public Integer id;
+    private Integer id;
 
     @ManyToOne
-    @JoinColumn(name="person_id")
-    public Person person;
+    @JoinColumn(name="personId")
+    private Person person;
 
     @ManyToOne
     @JoinColumn(name="case_id")
     @JsonIgnore
-    public Case the_case;
+    private Case theCase;
 
     public final static int ROLE_TESTIFIER = 0;
     public final static int ROLE_WRITER = 1;
-    public Integer role;
+    private Integer role;
 
     public static PersonAtCase create(Case c, Person p, Integer r)
     {
         PersonAtCase result = new PersonAtCase();
-        result.the_case = c;
+        result.theCase = c;
         result.person = p;
         result.role = r;
         result.save();

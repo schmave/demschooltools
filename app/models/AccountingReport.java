@@ -21,7 +21,7 @@ public class AccountingReport {
 
     public static AccountingReport create(Form<AccountingReport> form, Organization org) {
         AccountingReport report = form.get();
-        if (report.type == AccountingReportType.TotalPersonalAccountsBalance) {
+        if (report.getType() == AccountingReportType.TotalPersonalAccountsBalance) {
         	runTotalPersonalAccountsBalanceReport(report, org);
         }
         return report;
@@ -31,7 +31,7 @@ public class AccountingReport {
     	List<Account> accounts = Account.allPersonalChecking(org);
 
     	BigDecimal total = accounts.stream()
-            .map(t -> t.getBalanceAsOf(report.date))
+            .map(t -> t.getBalanceAsOf(report.getDate()))
             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
     	report.resultLabel = "Total Personal Accounts Balance as of " + report.getFormattedDate() + ": ";

@@ -90,8 +90,8 @@ public class Secured {
                     request.path().equals(routes.Application.viewPassword().path())) {
                     return username;
                 }
-            } else if (u.active && u.hasRole(role) &&
-                       (u.organization == null || u.organization.equals(Utils.getOrg(request)))) {
+            } else if (u.getActive() && u.hasRole(role) &&
+                       (u.getOrganization() == null || u.getOrganization().equals(Utils.getOrg(request)))) {
                 // Allow access if this user belongs to this organization or is a
                 // multi-domain admin (null organization). Also, the user must
                 // have the required role.
@@ -108,7 +108,7 @@ public class Secured {
             if (u != null) {
                 User the_user = User.findByAuthUserIdentity(u);
                 if (the_user != null) {
-                    return the_user.email;
+                    return the_user.getEmail();
                 }
             }
 
@@ -142,9 +142,9 @@ public class Secured {
                             " DemSchoolTools account for you yet. Please contact him for help:" +
                             " schmave@gmail.com");
                     }
-                    if (!the_user.active) {
+                    if (!the_user.getActive()) {
                         return unauthorized("Your account with email address " +
-                            the_user.email + " is inactive.");
+                            the_user.getEmail() + " is inactive.");
                     }
                 }
             }

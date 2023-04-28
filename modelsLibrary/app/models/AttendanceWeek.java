@@ -7,19 +7,24 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 @Entity
 public class AttendanceWeek extends Model {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "attendance_week_id_seq")
-    public Integer id;
+    private Integer id;
 
-    public Date monday;
+    private Date monday;
 
     @ManyToOne()
-    @JoinColumn(name="person_id")
-    public Person person;
+    @JoinColumn(name="personId")
+    private Person person;
 
-    public double extra_hours = 0;
+    private double extraHours = 0;
 
     public static Finder<Integer, AttendanceWeek> find = new Finder<>(
             AttendanceWeek.class
@@ -61,8 +66,8 @@ public class AttendanceWeek extends Model {
         return attendance_week;
     }
 
-    public void edit(double extra_hours) {
-        this.extra_hours = extra_hours;
+    public void edit(double extraHours) {
+        this.extraHours = extraHours;
         this.update();
     }
 }

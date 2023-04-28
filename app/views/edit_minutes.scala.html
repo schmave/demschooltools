@@ -2,7 +2,7 @@
 
 @import helper._
 
-@main("Edit meeting minutes for date " + meeting.date, "jc") {
+@main("Edit meeting minutes for date " + meeting.getDate(), "jc") {
 
 <style>
 body
@@ -59,7 +59,7 @@ $(function () {
 </div>
 
 <script id="meeting-template" type="text/x-handlebars-template">
-<h2>@Utils.getOrgConfig(request).str_jc_name minutes<br>@Application.formatMeetingDate(meeting.date)</h2>
+<h2>@Utils.getOrgConfig(request).str_jc_name minutes<br>@Application.formatMeetingDate(meeting.getDate())</h2>
 <p>
     <a href="@routes.Application.viewMeeting(meeting.id)" class="btn btn-warning">
         View printable minutes</a>
@@ -110,17 +110,17 @@ $(function () {
 
 <script id="case-reference-template" type="text/x-handlebars-template">
     <div class="case-reference">
-        <strong>{{case_number}}</strong>: {{findings}}
+        <strong>{{caseNumber}}</strong>: {{findings}}
         {{#each charges}}{{#with this}}
-            <div class="case-charge-reference {{#if is_referenced}}referenced{{/if}}">
-                <input type="checkbox" value="{{is_referenced}}" data-id="{{charge_id}}" {{#if is_referenced}}checked{{/if}}>
+            <div class="case-charge-reference {{#if isReferenced}}referenced{{/if}}">
+                <input type="checkbox" value="{{isReferenced}}" data-id="{{charge_id}}" {{#if isReferenced}}checked{{/if}}>
                 {{person}} was charged with {{rule}}
                 {{#if is_sm_decision}}and School Meeting decided on{{else}}and was assigned{{/if}}
-                the @Utils.getOrgConfig(request).str_res_plan "{{resolution_plan}}"
+                the @Utils.getOrgConfig(request).str_res_plan "{{resolutionPlan}}"
                 {{#if previously_referenced_in_case}}
                     (Previously referenced in case {{previously_referenced_in_case}})
                 {{else}}
-                    <span class="case-charge-reference-generate" data-id="{{charge_id}}" data-resolution-plan="{{resolution_plan}}"
+                    <span class="case-charge-reference-generate" data-id="{{charge_id}}" data-resolution-plan="{{resolutionPlan}}"
                     {{#if has_generated}}hidden{{/if}}>Generate charge</span>
                     <span class="case-charge-reference-already-generated"
                     {{#unless has_generated}}hidden{{/unless}}>Charge generated</span>
@@ -192,7 +192,7 @@ $(function () {
             </div>
         </div>
         <div class="rp-row">
-            <textarea class="resolution_plan"></textarea>
+            <textarea class="resolutionPlan"></textarea>
             <div class="last-rp"></div>
         </div>
     </td>
@@ -262,8 +262,8 @@ $(function () {
                 click the "continue" button next to the case you would like to edit.</p>
             <ul class="continue-cases">
                 @for( c <- open_cases) {
-                @if( c.meeting != meeting) {
-                <li id="continue-case-@c.id">@c.case_number | @c.location | @c.findings.substring(0, scala.math.min(c.findings.length(), 80))...
+                @if( c.getMeeting() != meeting) {
+                <li id="continue-case-@c.id">@c.getCaseNumber() | @c.getLocation() | @c.getFindings().substring(0, scala.math.min(c.getFindings().length(), 80))...
                     <button class="btn btn-xs btn-success">Continue</button>
                 </li>
                 }

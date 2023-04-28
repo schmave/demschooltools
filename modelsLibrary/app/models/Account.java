@@ -1,49 +1,51 @@
 package models;
 
+import com.fasterxml.jackson.annotation.*;
+import io.ebean.*;
+import io.ebean.Query;
+import java.math.*;
 import java.text.*;
 import java.util.*;
-import java.math.*;
 import javax.persistence.*;
-
-import com.fasterxml.jackson.annotation.*;
-import io.ebean.Query;
+import lombok.Getter;
+import lombok.Setter;
 import play.data.*;
-import io.ebean.*;
 
-
+@Getter
+@Setter
 @Entity
 public class Account extends Model {
 
     @Id
-    public Integer id;
+    private Integer id;
 
     @ManyToOne()
-    public Organization organization;
+    private Organization organization;
 
     @ManyToOne()
-    @JoinColumn(name="person_id")
-    public Person person;
+    @JoinColumn(name="personId")
+    private Person person;
 
-    @OneToMany(mappedBy = "from_account")
+    @OneToMany(mappedBy = "fromAccount")
     @JsonIgnore
     public List<Transaction> payment_transactions;
 
-    @OneToMany(mappedBy = "to_account")
+    @OneToMany(mappedBy = "toAccount")
     @JsonIgnore
     public List<Transaction> credit_transactions;
 
-    public AccountType type;
+    private AccountType type;
 
-    public String name = "";
+    private String name = "";
 
-    public BigDecimal initial_balance = new BigDecimal(0);
+    private BigDecimal initialBalance = new BigDecimal(0);
 
-    public BigDecimal monthly_credit = new BigDecimal(0);
+    private BigDecimal monthlyCredit = new BigDecimal(0);
 
-    public boolean is_active;
+    private boolean isActive;
 
     @play.data.format.Formats.DateTime(pattern="MM/dd/yyyy")
-    public Date date_last_monthly_credit;
+    private Date dateLastMonthlyCredit;
 
     public static void createPersonalAccounts(Organization org) {
         for (Person person : allPeople(org)) {
@@ -85,20 +87,20 @@ public class Account extends Model {
     }
 
     public BigDecimal getBalance() {
-        return initial_balance
-            .add(credit_transactions.stream().map(t -> t.amount).reduce(BigDecimal.ZERO, BigDecimal::add))
-            .subtract(payment_transactions.stream().map(t -> t.amount).reduce(BigDecimal.ZERO, BigDecimal::add));
+        return initialBalance
+            .add(credit_transactions.stream().map(t -> t.getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add))
+            .subtract(payment_transactions.stream().map(t -> t.getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add));
     }
 
     public BigDecimal getBalanceAsOf(Date date) {
-        return initial_balance
+        return initialBalance
             .add(credit_transactions.stream()
-                .filter(t -> !t.date_created.after(date))
-                .map(t -> t.amount)
+                .filter(t -> !t.getDateCreated().after(date))
+                .map(t -> t.getAmount())
                 .reduce(BigDecimal.ZERO, BigDecimal::add))
             .subtract(payment_transactions.stream()
-                .filter(t -> !t.date_created.after(date))
-                .map(t -> t.amount)
+                .filter(t -> !t.getDateCreated().after(date))
+                .map(t -> t.getAmount())
                 .reduce(BigDecimal.ZERO, BigDecimal::add));
     }
 
@@ -107,29 +109,14 @@ public class Account extends Model {
     }
 
     public String getFormattedInitialBalance() {
-        return new DecimalFormat("0.00").format(initial_balance);
+        return new DecimalFormat("0.00").format(initialBalance);
     }
 
     public String getFormattedMonthlyCredit() {
-        return new DecimalFormat("0.00").format(monthly_credit);
+        return new DecimalFormat("0.00").format(monthlyCredit);
     }
 
-    public List<Transaction> getTransactionsViewModel() {
-        List<Transaction> result = new ArrayList<>();
-        for (Transaction t : credit_transactions) {
-            t.description = getFormattedDescription("from", t.from_name, t.description);
-            result.add(t);
-        }
-        for (Transaction t : payment_transactions) {
-            t.description = getFormattedDescription("to", t.to_name, t.description);
-            t.amount = BigDecimal.ZERO.subtract(t.amount);
-            result.add(t);
-        }
-        TransactionList.sortTransactions(result);
-        return result;
-    }
-
-    private String getFormattedDescription(String toFromPrefix, String toFromName, String description) {
+    public String getFormattedDescription(String toFromPrefix, String toFromName, String description) {
         if (toFromName.trim().isEmpty()) return description;
         String toFrom = toFromPrefix + " " + toFromName;
         if (description.trim().isEmpty()) return toFrom;
@@ -154,7 +141,7 @@ public class Account extends Model {
     public static List<Account> allNonPersonalChecking(Organization org) {
         return baseQuery().where()
             .eq("organization", org)
-            .eq("is_active", true)
+            .eq("isActive", true)
             .ne("type", AccountType.Cash)
             .ne("type", AccountType.PersonalChecking)
             .findList();
@@ -163,8 +150,8 @@ public class Account extends Model {
     public static List<Account> allWithMonthlyCredits(Organization org) {
         return baseQuery().where()
                 .eq("organization", org)
-                .eq("is_active", true)
-                .ne("monthly_credit", BigDecimal.ZERO)
+                .eq("isActive", true)
+                .ne("monthlyCredit", BigDecimal.ZERO)
                 .findList();
     }
 
@@ -177,7 +164,7 @@ public class Account extends Model {
 
     private static List<Person> allPeople(Organization org) {
         List<Tag> tags = Tag.find.query().where()
-            .eq("show_in_account_balances", true)
+            .eq("showInAccountBalances", true)
             .eq("organization", org)
             .findList();
 
@@ -200,27 +187,27 @@ public class Account extends Model {
         account.person = person;
         account.name = name;
         account.type = type;
-        account.is_active = true;
+        account.isActive = true;
         account.organization = org;
         account.save();
         return account;
     }
 
     public void updateFromForm(Form<Account> form) {
-        is_active = ModelUtils.getBooleanFromFormValue(form.field("is_active"));
+        isActive = ModelUtils.getBooleanFromFormValue(form.field("isActive"));
         name = form.field("name").value().get();
         type = AccountType.valueOf(form.field("type").value().get());
-        monthly_credit = new BigDecimal(form.field("monthly_credit").value().get());
+        monthlyCredit = new BigDecimal(form.field("monthlyCredit").value().get());
         // if we are changing the monthly credit, set the date last applied to today
-        if (monthly_credit.compareTo(BigDecimal.ZERO) != 0) {
-            date_last_monthly_credit = new Date();
+        if (monthlyCredit.compareTo(BigDecimal.ZERO) != 0) {
+            dateLastMonthlyCredit = new Date();
         }
         save();
     }
 
     public void createMonthlyCreditTransaction(Date date, Organization org) {
         Transaction.createMonthlyCreditTransaction(this, date, org);
-        date_last_monthly_credit = date;
+        dateLastMonthlyCredit = date;
         save();
     }
 

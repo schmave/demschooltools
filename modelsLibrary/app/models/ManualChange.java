@@ -1,81 +1,84 @@
 package models;
 
 import io.ebean.*;
-
-import javax.persistence.*;
 import java.util.Comparator;
 import java.util.Date;
+import javax.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 public class ManualChange extends Model {
     @Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "manual_change_id_seq")
-    public Integer id;
+    private Integer id;
 
     @ManyToOne()
-    public Chapter chapter;
+    private Chapter chapter;
     @ManyToOne()
-    public Section section;
+    private Section section;
     @ManyToOne()
-    public Entry entry;
+    private Entry entry;
 
-    public Boolean was_deleted = false;
-    public Boolean was_created = false;
+    private Boolean wasDeleted = false;
+    private Boolean wasCreated = false;
 
     @Column(columnDefinition = "TEXT")
-    public String old_content;
+    private String oldContent;
     @Column(columnDefinition = "TEXT")
-    public String new_content;
+    private String newContent;
 
-    public String old_title;
-    public String new_title;
+    private String oldTitle;
+    private String newTitle;
 
-    public String old_num;
-    public String new_num;
+    private String oldNum;
+    private String newNum;
 
-    public Date date_entered = new Date();
+    private Date dateEntered = new Date();
 
     public static Finder<Integer,ManualChange> find = new Finder<>(
             ManualChange.class
     );
 
     void initCreate(String num, String title, String content) {
-        was_created = true;
-        new_num = num;
-        new_title = title;
-        new_content = content;
+        wasCreated = true;
+        newNum = num;
+        newTitle = title;
+        newContent = content;
     }
 
     void initDelete(String num, String title, String content) {
-        was_deleted = true;
-        old_num = num;
-        old_title = title;
-        old_content = content;
+        wasDeleted = true;
+        oldNum = num;
+        oldTitle = title;
+        oldContent = content;
     }
 
-    boolean initChange(String new_num, String old_num, String new_title, String old_title,
-        String new_content, String old_content) {
+    boolean initChange(String newNum, String oldNum, String newTitle, String oldTitle,
+        String newContent, String oldContent) {
 
-        //System.out.println("initChange " + new_num + " " + old_num + " T " + new_title + " " + old_title + " C " + new_content + " " + old_content);
+        //System.out.println("initChange " + newNum + " " + oldNum + " T " + newTitle + " " + oldTitle + " C " + newContent + " " + oldContent);
 
-        this.new_num = new_num;
-        this.old_num = old_num;
+        this.newNum = newNum;
+        this.oldNum = oldNum;
 
-        this.new_title = new_title;
-        this.old_title = old_title;
+        this.newTitle = newTitle;
+        this.oldTitle = oldTitle;
 
-        this.new_content = new_content;
-        this.old_content = old_content;
+        this.newContent = newContent;
+        this.oldContent = oldContent;
 
-        return (!this.new_num.equals(old_num) ||
-            !this.new_title.equals(old_title) ||
-            !this.new_content.equals(old_content));
+        return (!this.newNum.equals(oldNum) ||
+            !this.newTitle.equals(oldTitle) ||
+            !this.newContent.equals(oldContent));
     }
 
     public static ManualChange recordEntryCreate(Entry e) {
         ManualChange result = new ManualChange();
         result.entry = e;
-        result.initCreate(e.getNumber(), e.title, e.content);
+        result.initCreate(e.getNumber(), e.getTitle(), e.getContent());
         result.save();
         return result;
     }
@@ -84,15 +87,15 @@ public class ManualChange extends Model {
     public static ManualChange recordEntryDelete(Entry e) {
         ManualChange result = new ManualChange();
         result.entry = e;
-        result.initDelete(e.getNumber(), e.title, e.content);
+        result.initDelete(e.getNumber(), e.getTitle(), e.getContent());
         result.save();
         return result;
     }
 
-    public static ManualChange recordEntryChange(Entry e, String old_num, String old_title, String old_content) {
+    public static ManualChange recordEntryChange(Entry e, String oldNum, String oldTitle, String oldContent) {
         ManualChange result = new ManualChange();
         result.entry = e;
-        if (result.initChange(e.getNumber(), old_num, e.title, old_title, e.content, old_content)) {
+        if (result.initChange(e.getNumber(), oldNum, e.getTitle(), oldTitle, e.getContent(), oldContent)) {
             result.save();
             return result;
         }
@@ -101,14 +104,14 @@ public class ManualChange extends Model {
 
     public static Comparator<ManualChange> SORT_NUM_DATE = (c1, c2) -> {
         // I want to order the change records by the user visible num.
-        // However, when entries are created or deleted, the new_num
-        // or old_num, respectively, is null. Use the new_num if it
-        // is available, or old_num otherwise.
-        String num1 = (c1.new_num == null ? c1.old_num : c1.new_num);
-        String num2 = (c2.new_num == null ? c2.old_num : c2.new_num);
+        // However, when entries are created or deleted, the newNum
+        // or oldNum, respectively, is null. Use the newNum if it
+        // is available, or oldNum otherwise.
+        String num1 = (c1.newNum == null ? c1.oldNum : c1.newNum);
+        String num2 = (c2.newNum == null ? c2.oldNum : c2.newNum);
 
         if (num1.equals(num2)) {
-            return c1.date_entered.compareTo(c2.date_entered);
+            return c1.dateEntered.compareTo(c2.dateEntered);
         } else {
             return num1.compareTo(num2);
         }

@@ -162,7 +162,7 @@ async function showRoster(editable) {
 	container.innerHTML = loading_template.innerHTML;
 	// if the admin PIN has been entered, load the roster in editable mode
 	let person = await getPerson(code_entered);
-	if (person && person.person_id === -1) {
+	if (person && person.personId === -1) {
 		editable = true;
 	}
 	let data = await downloadRoster();
@@ -183,7 +183,7 @@ async function showRoster(editable) {
 		let roster = document.getElementById('roster');
 		for (let i = 0; i < people.length; i++) {
 			let person = people[i];
-			if (person.person_id === -1) continue;
+			if (person.personId === -1) continue;
 			let person_row = document.createElement('tr');
 			if (editable) {
 				buildEditableRosterRow(person, person_row);
@@ -344,7 +344,7 @@ async function downloadData() {
 	for (let i = 0; i < people.length; i++) {
 		let person = people[i];
 		// don't save admin if there is no admin code
-		if (person.person_id === -1 && !person.pin) continue;
+		if (person.personId === -1 && !person.pin) continue;
 		pins.push(person.pin);
 		await savePerson(person);
 	}
@@ -407,7 +407,7 @@ async function submitCode(is_arriving) {
 	overlay.classList.remove('disabled');
 	if (person) {
 		// if this is the admin PIN, show the roster in editable mode
-		if (person.person_id === -1) {
+		if (person.personId === -1) {
 			showRoster(true);
 		} else {
 			setAuthorized(person, is_arriving);
@@ -488,7 +488,7 @@ async function createMessage(person, is_arriving) {
 		time: Date.now(),
 		// we need this string to be in a specific format so the server can parse it correctly
 		time_string: roundedTimestamp.toLocaleString('en-US'),
-		person_id: person.person_id,
+		personId: person.personId,
 		is_arriving: is_arriving
 	}
 	await saveMessage(message);
@@ -497,7 +497,7 @@ async function createMessage(person, is_arriving) {
 
 async function createAdminMessage(person, in_time, out_time, absence_code) {
 	let message = {
-		person_id: person.person_id,
+		personId: person.personId,
 		in_time: in_time,
 		out_time: out_time,
 		absence_code: absence_code,
@@ -514,9 +514,9 @@ async function saveMessage(message) {
 }
 
 async function saveAdminMessage(message) {
-	// Use person_id as the unique key for messages, that way if the same person's data is edited
+	// Use personId as the unique key for messages, that way if the same person's data is edited
 	// multiple times, later edits will overwrite earlier edits.
-	return localforage.setItem(ADMIN_MESSAGE_KEY_PREFIX + message.person_id, message).catch(function(err) {
+	return localforage.setItem(ADMIN_MESSAGE_KEY_PREFIX + message.personId, message).catch(function(err) {
 	    console.error(err);
 	});
 }
@@ -533,10 +533,10 @@ function trySendMessages() {
 	    	// try sending the message
 	    	let query_string, url;
 	    	if (key.startsWith(MESSAGE_KEY_PREFIX)) {
-	    		query_string = `?time_string=${message.time_string}&person_id=${message.person_id}&is_arriving=${message.is_arriving}`;
+	    		query_string = `?time_string=${message.time_string}&personId=${message.personId}&is_arriving=${message.is_arriving}`;
 	    		url = '/attendance/checkin/message' + query_string;
 	    	} else {
-	    		query_string = `?person_id=${message.person_id}&in_time=${message.in_time}&out_time=${message.out_time}&absence_code=${message.absence_code}&time_string=${message.time_string}`;
+	    		query_string = `?personId=${message.personId}&in_time=${message.in_time}&out_time=${message.out_time}&absence_code=${message.absence_code}&time_string=${message.time_string}`;
 	    		url = '/attendance/checkin/adminmessage' + query_string;
 	    	}
 	    	fetch(url, { method: 'POST' }).then(response => {

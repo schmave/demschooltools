@@ -54,7 +54,7 @@ public class OrgConfig {
         } else {
             format = euro_dates ? "dd-MM-" : "MM-dd-";
         }
-        return new SimpleDateFormat(format).format(m.date);
+        return new SimpleDateFormat(format).format(m.getDate());
     }
 
     public String translatePlea(String plea) {

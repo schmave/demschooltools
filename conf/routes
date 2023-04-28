@@ -43,12 +43,12 @@ POST /newCase	controllers.ApplicationEditing.createCase(meeting_id : Integer, re
 POST /saveCase   controllers.ApplicationEditing.saveCase(id : Integer, request: Request)
 POST /continueCase	controllers.ApplicationEditing.continueCase(meeting_id : Integer, case_id : Integer, request: Request)
 
-POST /addPersonAtMeeting    controllers.ApplicationEditing.addPersonAtMeeting(meeting_id : Integer, person_id : Integer, role : Integer)
-POST /removePersonAtMeeting    controllers.ApplicationEditing.removePersonAtMeeting(meeting_id : Integer, person_id : Integer, role : Integer)
+POST /addPersonAtMeeting    controllers.ApplicationEditing.addPersonAtMeeting(meeting_id : Integer, personId : Integer, role : Integer)
+POST /removePersonAtMeeting    controllers.ApplicationEditing.removePersonAtMeeting(meeting_id : Integer, personId : Integer, role : Integer)
 
 
-POST /addPersonAtCase controllers.ApplicationEditing.addPersonAtCase(case_id : Integer, person_id : Integer, role : Integer, request: Request)
-POST /removePersonAtCase controllers.ApplicationEditing.removePersonAtCase(case_id : Integer, person_id : Integer, role : Integer)
+POST /addPersonAtCase controllers.ApplicationEditing.addPersonAtCase(case_id : Integer, personId : Integer, role : Integer, request: Request)
+POST /removePersonAtCase controllers.ApplicationEditing.removePersonAtCase(case_id : Integer, personId : Integer, role : Integer)
 
 GET /getCaseReferencesJson controllers.ApplicationEditing.getCaseReferencesJson(case_id : Integer, request: Request)
 POST /addReferencedCase controllers.ApplicationEditing.addReferencedCase(case_id : Integer, referenced_case_id : Integer, request: Request)
@@ -107,8 +107,8 @@ GET     /attendance/editWeek      controllers.Attendance.editWeek(date : String 
 
 GET  	/attendance/checkin				controllers.Public.checkin()
 GET     /attendance/checkin/data 		controllers.Checkin.checkinData(time: String, request: Request)
-POST    /attendance/checkin/message 	controllers.Checkin.checkinMessage(time_string: String, person_id: Integer, is_arriving: Boolean, request: Request)
-POST    /attendance/checkin/adminmessage 	controllers.Checkin.adminMessage(person_id: Integer, in_time: String, out_time: String, absence_code: String, time_string: String ?= "", request: Request)
+POST    /attendance/checkin/message 	controllers.Checkin.checkinMessage(time_string: String, personId: Integer, is_arriving: Boolean, request: Request)
+POST    /attendance/checkin/adminmessage 	controllers.Checkin.adminMessage(personId: Integer, in_time: String, out_time: String, absence_code: String, time_string: String ?= "", request: Request)
 GET     /attendance/pins         controllers.Attendance.assignPINs(request: Request)
 GET     /attendance/savepins       controllers.Attendance.savePINs(request: Request)
 GET     /attendance/offCampusTime         controllers.Attendance.offCampusTime(request: Request)
@@ -125,9 +125,9 @@ GET     /attendance/download      controllers.Attendance.download(start_of_year 
 GET     /attendance/forPerson/:id controllers.Attendance.viewPersonReport(id : Integer, start_date : String ?= "", end_date : String ?= "", request: Request)
 
 POST    /attendance/createPersonWeek  controllers.Attendance.createPersonWeek(request: Request)
-POST    /attendance/deletePersonWeek  controllers.Attendance.deletePersonWeek(person_id : Integer, monday : String, request: Request)
-POST    /attendance/saveWeek          controllers.Attendance.saveWeek(week_id : Integer, extra_hours : Double, request: Request)
-POST    /attendance/saveDay           controllers.Attendance.saveDay(day_id : Integer, code ?= "", start_time ?= "", end_time ?= "", request: Request)
+POST    /attendance/deletePersonWeek  controllers.Attendance.deletePersonWeek(personId : Integer, monday : String, request: Request)
+POST    /attendance/saveWeek          controllers.Attendance.saveWeek(week_id : Integer, extraHours : Double, request: Request)
+POST    /attendance/saveDay           controllers.Attendance.saveDay(day_id : Integer, code ?= "", startTime ?= "", endTime ?= "", request: Request)
 
 POST    /attendance/importFromCustodia     controllers.Attendance.importFromCustodia(request: Request)
 

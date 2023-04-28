@@ -6,23 +6,28 @@ import javax.persistence.*;
 import javax.persistence.OrderBy;
 import java.util.List;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 @Entity
 public class TaskList extends Model {
     @Id
-    public Integer id;
+    private Integer id;
 
-    public String title;
+    private String title;
 
     @ManyToOne()
-    public Organization organization;
+    private Organization organization;
 
-    @OneToMany(mappedBy="task_list")
-    @OrderBy("sort_order")
+    @OneToMany(mappedBy="taskList")
+    @OrderBy("sortOrder")
     public List<Task> tasks;
 
     @OneToOne()
     @JoinColumn(name="tag_id")
-    public Tag tag;
+    private Tag tag;
 
     public static Finder<Integer, TaskList> find = new Finder<>(
             TaskList.class
@@ -40,4 +45,3 @@ public class TaskList extends Model {
             .findList();
     }
 }
-

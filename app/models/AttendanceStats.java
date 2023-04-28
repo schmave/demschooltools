@@ -30,8 +30,8 @@ public class AttendanceStats {
         if (day == null) {
             return;
         }
-        if (day.code != null || day.start_time == null || day.end_time == null) {
-            incrementCodeCount(codes_map.get(day.code), index);
+        if (day.getCode() != null || day.getStartTime() == null || day.getEndTime() == null) {
+            incrementCodeCount(codes_map.get(day.getCode()), index);
         }
         else {
             incrementAttendance(day, index, org);
@@ -42,8 +42,8 @@ public class AttendanceStats {
         if (code == null) {
             return;
         }
-        if (!code.not_counted) {
-            if (code.counts_toward_attendance) {
+        if (!code.getNotCounted()) {
+            if (code.getCountsTowardAttendance()) {
                 approved_absences++;
                 values.put(index, 1d);
             } else {

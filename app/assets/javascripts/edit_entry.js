@@ -4,9 +4,9 @@ var last_content = $("#content").val();
 var needs_render = true;
 
 function contentChanged() {
-    var new_content = $("#content").val();
-    if (new_content != last_content) {
-        last_content = new_content;
+    var newContent = $("#content").val();
+    if (newContent != last_content) {
+        last_content = newContent;
         needs_render = true;
     }
 }

@@ -7,9 +7,9 @@
 <h3>Past School Meeting decisions</h3>
 <table class="table printable-res-plans">
 @for( c <- charges ) {
-	@if( c.sm_decision_date != null &&
-		c.sm_decision_date.equals(charges.head.sm_decision_date) ) {
-		@resolution_plan(c)
+	@if( c.getSmDecisionDate() != null &&
+		c.getSmDecisionDate().equals(charges.head.getSmDecisionDate()) ) {
+		@resolutionPlan(c)
 	}
 }
 </table>

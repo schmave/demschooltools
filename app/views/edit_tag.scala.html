@@ -12,13 +12,13 @@
         	<input type="hidden" name="id" value="@form("id").value().get()"/>
         }
         @helper.inputText(form("title"), Symbol("_label") -> "Title", Symbol("class") -> "form-control")
-    	@helper.checkbox(form("use_student_display"), Symbol("_label") -> "This is a list of students")
-        @helper.checkbox(form("show_in_jc"), Symbol("_label") -> "Include tag members in JC")
-        @helper.checkbox(form("show_in_attendance"), Symbol("_label") -> "Include tag members in Attendance")
+    	@helper.checkbox(form("useStudentDisplay"), Symbol("_label") -> "This is a list of students")
+        @helper.checkbox(form("showInJc"), Symbol("_label") -> "Include tag members in JC")
+        @helper.checkbox(form("showInAttendance"), Symbol("_label") -> "Include tag members in Attendance")
         @if(Utils.getOrgConfig(request).org.getShowAccounting()) {
-            @helper.checkbox(form("show_in_account_balances"), Symbol("_label") -> "Include tag members in Account Balances list")
+            @helper.checkbox(form("showInAccountBalances"), Symbol("_label") -> "Include tag members in Account Balances list")
         }
-        @helper.checkbox(form("show_in_menu"), Symbol("_label") -> "Include this tag in the Tags menu")
+        @helper.checkbox(form("showInMenu"), Symbol("_label") -> "Include this tag in the Tags menu")
         @save_button("Save")
     }
 

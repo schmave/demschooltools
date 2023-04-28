@@ -6,7 +6,7 @@ rules : List[ Entry ])(implicit request: play.mvc.Http.Request, messages: play.i
 <script type="text/javascript">
 $(function() {
     var meeting_info = [ @Html(
-        meetings.map( m => "{ date: \"" + Application.yymmddDate(Utils.getOrgConfig(request), (m.date)) +
+        meetings.map( m => "{ date: \"" + Application.yymmddDate(Utils.getOrgConfig(request), (m.getDate())) +
                 "\", link: \"" + routes.Application.viewMeeting(m.id) +
                 "\", case_count: " + m.cases.size() + "}").mkString(",")) ];
 
@@ -14,7 +14,7 @@ $(function() {
     {
         var str_date = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
         for (i in meeting_info) {
-            if (meeting_info[i].date == str_date) {
+            if (meeting_info[i].getDate() == str_date) {
                 return [true, "", "" + meeting_info[i].case_count + " cases"];
             }
         }
@@ -24,7 +24,7 @@ $(function() {
 
     function meetingSelected(str_date, datepicker) {
         for (i in meeting_info) {
-            if (meeting_info[i].date == str_date) {
+            if (meeting_info[i].getDate() == str_date) {
                 location.href = meeting_info[i].link;
             }
         }
@@ -58,13 +58,13 @@ $(function() {
 		<th align=right width=50>Charge count</thead>
 @for( p <- people ) {
 	<tr><td width=@if(Utils.getOrgConfig(request).track_writer){200}else{250}>
-		<a href="@routes.Application.viewPersonHistory(p.person_id)">
+		<a href="@routes.Application.viewPersonHistory(p.getPersonId())">
 		@p.getDisplayName()
 	@if(Utils.getOrgConfig(request).track_writer){
-		<td align=right width=50><a class="cases-written-link" href="@routes.Application.viewPersonsWriteups(p.person_id)">@p.getThisYearCasesWrittenUp().size()</a>
+		<td align=right width=50><a class="cases-written-link" href="@routes.Application.viewPersonsWriteups(p.getPersonId())">@p.getThisYearCasesWrittenUp().size()</a>
 	}
 	<td align=right width=50><a @if(Utils.getOrgConfig(request).track_writer){class="charges-link"}
-		 href="@routes.Application.viewPersonHistory(p.person_id)">@p.getThisYearCharges().size()</a>
+		 href="@routes.Application.viewPersonHistory(p.getPersonId())">@p.getThisYearCharges().size()</a>
 }
 </table>
 </div>
@@ -76,7 +76,7 @@ $(function() {
 <table class="table table-hover table-condensed">
 <thead><th height=50 width=250>Entry<th align=right width=50>Charge count</thead>
 @for( r <- rules ) {
-	<tr><td width=250><a href="@routes.Application.viewRuleHistory(r.id)">@r.getNumber() @r.title</a>
+	<tr><td width=250><a href="@routes.Application.viewRuleHistory(r.id)">@r.getNumber() @r.getTitle()</a>
 	<td align=right width=50>@r.getThisYearCharges().size()
 }
 </table>

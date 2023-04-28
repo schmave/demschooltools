@@ -1,16 +1,16 @@
-@(tag: Tag, people: List[Person], people_with_family: Collection[Person], use_student_display: Boolean, allow_edit: Boolean)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
+@(tag: Tag, people: List[Person], people_with_family: Collection[Person], useStudentDisplay: Boolean, allow_edit: Boolean)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
 
-@main("All people tagged " + tag.title, "crm") {
-<h1>@tag.title
+@main("All people tagged " + tag.getTitle(), "crm") {
+<h1>@tag.getTitle()
 @if( allow_edit ) {
     <a class="man-edit no-print" href="@routes.CRM.editTag(tag.id)">Edit Tag</a>
 }
 @if( tag.task_lists.size() > 0 ) {
    <span class="view-task-list">Also see task list:
-   @for( task_list <- tag.task_lists ) {
-    <a href="@routes.CRM.viewTaskList(task_list.id)">@task_list.title</a>
+   @for( taskList <- tag.task_lists ) {
+    <a href="@routes.CRM.viewTaskList(taskList.id)">@taskList.getTitle()</a>
    }
    </span>
 }
@@ -38,7 +38,7 @@
                 <input id="remove-people" class="btn btn-warning" disabled="disabled"
                        type="submit" value="Remove selected people"/>
             </p>
-            @if(use_student_display) {
+            @if(useStudentDisplay) {
                 @student_list(people)
             } else {
                 @people_list(people, true)
@@ -59,18 +59,18 @@
             @for( c <- tag.changes ) {
                 <tr>
                 <td><input type="checkbox" class="tag-change" name="tag-change-@c.id"
-                        @if( ! Utils.lessThanDaysOld(c.time, 7) ) { disabled="disabled" }></td>
+                        @if( ! Utils.lessThanDaysOld(c.getTime(), 7) ) { disabled="disabled" }></td>
                 <td>
-                @if( c.was_add ) {
+                @if( c.getWasAdd() ) {
                     <img height=18 src="@routes.Assets.versioned("images/plus.png")"/>
                 } else {
                     <img height=18 src="@routes.Assets.versioned("images/minus.png")"/>
                 }
-                <a href="@routes.CRM.person(c.person.person_id)">
-                    @c.person.first_name @c.person.last_name
+                <a href="@routes.CRM.getPerson()(c.getPerson().getPersonId())">
+                    @c.getPerson().getFirstName() @c.getPerson().getLastName()
                 </a></td>
-                <td>@Application.yymmddDate(Utils.getOrgConfig(request), c.time)</td>
-                <td>@c.creator.name</td>
+                <td>@Application.yymmddDate(Utils.getOrgConfig(request), c.getTime())</td>
+                <td>@c.getCreator().name</td>
                 </tr>
             }
         }
@@ -121,7 +121,7 @@
         function(person) {
             var existing = $('.people_chooser [value="' + person.id + '"]');
             if (existing.length == 0) {
-                $('.people_chooser').append('<input type="hidden" name="person_id" value="'
+                $('.people_chooser').append('<input type="hidden" name="personId" value="'
                     + person.id + '">');
             }
         },

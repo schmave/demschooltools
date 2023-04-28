@@ -7,16 +7,16 @@
 @for( p <- people ) {
 	<tr>
     @if( show_checkboxes ) {
-        <td><input type="checkbox" class="person" name="person-@p.person_id"></td>
+        <td><input type="checkbox" class="person" name="person-@p.getPersonId()"></td>
     }
-    <td><a href="@routes.CRM.person(p.person_id)">@p.nonEmptyName()</a>
-	<td>@p.email
+    <td><a href="@routes.CRM.getPerson()(p.getPersonId())">@p.nonEmptyName()</a>
+	<td>@p.getEmail()
 	<td>
 	        @for(num <- p.phone_numbers) {
-				@num.number
-				@if(num.comment.length() > 0) { (@num.comment) }
+				@num.getNumber()
+				@if(num.getComment().length() > 0) { (@num.getComment()) }
             }
-	<td>@p.notes
+	<td>@p.getNotes()
 	</tr>
 }
 

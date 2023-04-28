@@ -9,19 +9,19 @@
 
 <div class="col-sm-6">
 
-@if(personForm("person_id").value().isPresent()) {
-	<input type="hidden" name="person_id" value="@personForm("person_id").value().get()"/>
-    <input type="hidden" name="is_family" value="@personForm("is_family").value().get()"/>
+@if(personForm("personId").value().isPresent()) {
+	<input type="hidden" name="personId" value="@personForm("personId").value().get()"/>
+    <input type="hidden" name="isFamily" value="@personForm("isFamily").value().get()"/>
 } else {
-    <input type="hidden" name="is_family" value="false"/>
+    <input type="hidden" name="isFamily" value="false"/>
 }
 
-@if( Utils.getBooleanFromFormValue(personForm("is_family")) ) {
+@if( Utils.getBooleanFromFormValue(personForm("isFamily")) ) {
     <h3>Editing family</h3>
-    @inputText(personForm("first_name"), Symbol("_label") -> "Family Name", Symbol("class") -> "form-control")
+    @inputText(personForm("firstName"), Symbol("_label") -> "Family Name", Symbol("class") -> "form-control")
 } else {
-        @inputText(personForm("first_name"), Symbol("_label") -> "First Name", Symbol("class") -> "form-control")
-        @inputText(personForm("last_name"), Symbol("_label") -> "Last Name", Symbol("class") -> "form-control")
+        @inputText(personForm("firstName"), Symbol("_label") -> "First Name", Symbol("class") -> "form-control")
+        @inputText(personForm("lastName"), Symbol("_label") -> "Last Name", Symbol("class") -> "form-control")
 		@select(personForm("gender"), options = options(Seq("Unknown", "Female", "Male", "Other")), Symbol("_label") -> "Gender", Symbol("class") -> "form-control")
 		@inputText(personForm("email"), Symbol("_label") -> "Email", Symbol("class") -> "form-control")
 		@textarea(personForm("notes"), Symbol("_label") -> "Notes", Symbol("rows") ->6, Symbol("class") -> "form-control")
@@ -73,14 +73,14 @@
         <input type="submit" value="@submit_title">
 
 </div>
-@if( ! Utils.getBooleanFromFormValue(personForm("is_family")) ) {
+@if( ! Utils.getBooleanFromFormValue(personForm("isFamily")) ) {
 <div class="col-sm-6">
 
 <p><h4>Student Info</h4>
-		@inputText(personForm("display_name"), Symbol("_label") -> "Short Name", Symbol("class") -> "form-control")
+		@inputText(personForm("displayName"), Symbol("_label") -> "Short Name", Symbol("class") -> "form-control")
 		<hr/>
-		@inputText(personForm("previous_school"), Symbol("_label") -> "Previous School", Symbol("class") -> "form-control")
-		@inputText(personForm("school_district"), Symbol("_label") -> "School District", Symbol("class") -> "form-control")
+		@inputText(personForm("previousSchool"), Symbol("_label") -> "Previous School", Symbol("class") -> "form-control")
+		@inputText(personForm("schoolDistrict"), Symbol("_label") -> "School District", Symbol("class") -> "form-control")
 		<hr/>
 		@inputText(personForm("grade"), Symbol("_label") -> "Current Grade", Symbol("class") -> "form-control")
 		@inputDate(personForm("dob"), Symbol("_label") -> "Date of Birth", Symbol("class") -> "form-control")

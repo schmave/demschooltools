@@ -7,27 +7,32 @@ import javax.persistence.*;
 import javax.persistence.OrderBy;
 import java.util.*;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 @Entity
 public class Tag extends Model {
     @Id
-    public Integer id;
+    private Integer id;
 
-    public String title;
+    private String title;
 
-    public boolean use_student_display;
-    public boolean show_in_menu;
-    public boolean show_in_jc;
-    public boolean show_in_attendance;
-    public boolean show_in_account_balances;
+    private boolean useStudentDisplay;
+    private boolean showInMenu;
+    private boolean showInJc;
+    private boolean showInAttendance;
+    private boolean showInAccountBalances;
 
     @ManyToMany(cascade=CascadeType.ALL)
     @JoinTable(name="person_tag",
         joinColumns=@JoinColumn(name="tag_id",referencedColumnName = "id"),
-        inverseJoinColumns = @JoinColumn(name="person_id", referencedColumnName="person_id"))
+        inverseJoinColumns = @JoinColumn(name="personId", referencedColumnName="personId"))
     public List<Person> people;
 
     @ManyToOne()
-    public Organization organization;
+    private Organization organization;
 
     @OneToMany(mappedBy="tag")
     public List<TaskList> task_lists;
@@ -55,7 +60,7 @@ public class Tag extends Model {
         Tag result = new Tag();
         result.title = title;
         result.organization = org;
-        result.show_in_menu = true;
+        result.showInMenu = true;
 
         result.save();
         return result;
@@ -65,19 +70,19 @@ public class Tag extends Model {
         Map<String, Object> t = new HashMap<>();
         t.put("id", id);
         t.put("title", title);
-        t.put("show_in_menu", show_in_menu);
-        t.put("show_in_jc", show_in_jc);
-        t.put("show_in_attendance", show_in_attendance);
+        t.put("showInMenu", showInMenu);
+        t.put("showInJc", showInJc);
+        t.put("showInAttendance", showInAttendance);
         return t;
     }
 
     public void updateFromForm(Form<Tag> form) {
         title = form.field("title").value().get();
-        use_student_display = ModelUtils.getBooleanFromFormValue(form.field("use_student_display"));
-        show_in_jc = ModelUtils.getBooleanFromFormValue(form.field("show_in_jc"));
-        show_in_attendance = ModelUtils.getBooleanFromFormValue(form.field("show_in_attendance"));
-        show_in_menu = ModelUtils.getBooleanFromFormValue(form.field("show_in_menu"));
-        show_in_account_balances = ModelUtils.getBooleanFromFormValue(form.field("show_in_account_balances"));
+        useStudentDisplay = ModelUtils.getBooleanFromFormValue(form.field("useStudentDisplay"));
+        showInJc = ModelUtils.getBooleanFromFormValue(form.field("showInJc"));
+        showInAttendance = ModelUtils.getBooleanFromFormValue(form.field("showInAttendance"));
+        showInMenu = ModelUtils.getBooleanFromFormValue(form.field("showInMenu"));
+        showInAccountBalances = ModelUtils.getBooleanFromFormValue(form.field("showInAccountBalances"));
         save();
     }
 
@@ -86,7 +91,7 @@ public class Tag extends Model {
 
         for (Tag t : find.query().where()
                 .eq("organization", org)
-                .eq("show_in_menu", true)
+                .eq("showInMenu", true)
                 .order("title ASC").findList()) {
             String[] splits = t.title.split(":");
 

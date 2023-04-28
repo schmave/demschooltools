@@ -25,7 +25,7 @@ Period from
 		<table class="table sortable">
 			<tr><th>Rule<th width=100># Charges</tr>
 			@for( (rule, count) <- data.rule_counts ) {
-				<tr><td>@rule.getNumber() @rule.title<td>@count</tr>
+				<tr><td>@rule.getNumber() @rule.getTitle()<td>@count</tr>
 			}
 		</table>
 	</div>
@@ -70,7 +70,7 @@ Period from
 	<h4>&nbsp;<br>Charges referred to @dest</h4>
 	@for(c <- cases) {
 	  @for(ch <- c.charges) {
-		@if( ch.minor_referral_destination.equals(dest) ) {
+		@if( ch.getMinorReferralDestination().equals(dest) ) {
 		  @historyCharge(ch, true, true, false)
 		}
 	  }

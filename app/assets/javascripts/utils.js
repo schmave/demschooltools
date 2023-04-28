@@ -15,9 +15,9 @@ var limitHeight = function(selector) {
     });
 };
 
-window.enableTagBox = function(input_box, destination_div, person_id) {
+window.enableTagBox = function(input_box, destination_div, personId) {
     $(input_box).autocomplete({
-            source: "/jsonTags/" + person_id,
+            source: "/jsonTags/" + personId,
     });
 
     $(input_box).bind("autocompleteselect", function(event, ui) {
@@ -28,7 +28,7 @@ window.enableTagBox = function(input_box, destination_div, person_id) {
             var title = $(input_box).val().replace('Create new tag: ', '');
             args = "?title=" + title;
         }
-        $.post("/addTag/" + person_id + args, "", function(data, textStatus, jqXHR) {
+        $.post("/addTag/" + personId + args, "", function(data, textStatus, jqXHR) {
             $(destination_div).append(jqXHR.responseText);
             $(input_box).val("");
         });
@@ -84,7 +84,7 @@ var displayName = function(person) {
     if (person.displayName) {
         return person.displayName;
     } else {
-        return person.first_name;
+        return person.firstName;
     }
 };
 

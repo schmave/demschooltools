@@ -13,11 +13,11 @@
     <h3>@key</h3>
     @for(charge <- groups.get(key)) {
         <p>
-            <strong>@(charge.the_case.case_number).</strong>
-            @if(charge.sm_decision != null && charge.sm_decision != "") {
-                @charge.sm_decision
+            <strong>@(charge.getTheCase().getCaseNumber()).</strong>
+            @if(charge.getSmDecision() != null && charge.getSmDecision() != "") {
+                @charge.getSmDecision()
             } else {
-                @charge.resolution_plan
+                @charge.getResolutionPlan()
             }
         </p>
     }

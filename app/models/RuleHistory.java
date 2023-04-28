@@ -30,7 +30,7 @@ public class RuleHistory {
         Collections.reverse(rule.charges);
 
         for (Charge c : rule.charges) {
-            Date d = c.the_case.meeting.date;
+            Date d = c.getTheCase().getMeeting().getDate();
             if (d.before(start_date) || d.after(end_date) || 
                 (!include_today && d.getDate() == today.getDate() &&
                  d.getMonth() == today.getMonth() && d.getYear() == today.getYear())) {
@@ -39,13 +39,13 @@ public class RuleHistory {
 			
 			charges.add(c);
 
-            Record r = records.get(c.person);
+            Record r = records.get(c.getPerson());
             if (r == null) {
                 r = new Record();
-                r.most_recent_charge = c.the_case.meeting.date;
+                r.most_recent_charge = c.getTheCase().getMeeting().getDate();
                 r.count = 1;
-                r.person = c.person;
-                records.put(c.person, r);
+                r.setPerson(c.getPerson());
+                records.put(c.getPerson(), r);
             } else {
                 r.count++;
             }

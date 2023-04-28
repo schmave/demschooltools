@@ -3,30 +3,30 @@
 @import helper._
 
 	<tr valign="top">
-	<td valign="top"><h5>@if(show_links) {<a href="@routes.Application.viewMeeting(c.meeting.id)">}
-		#@c.case_number @if(show_links) {</a>} @if( c.date_closed == null ) { (OPEN) }</h5>
-	<p>@if( c.date != null ) { @Application.formatDateShort(Utils.getOrgConfig(request), c.date)@if( !c.time.equals("") ){, @c.time}. }
+	<td valign="top"><h5>@if(show_links) {<a href="@routes.Application.viewMeeting(c.getMeeting().id)">}
+		#@c.getCaseNumber() @if(show_links) {</a>} @if( c.getDateClosed() == null ) { (OPEN) }</h5>
+	<p>@if( c.getDate() != null ) { @Application.formatDateShort(Utils.getOrgConfig(request), c.getDate())@if( !c.getTime().equals("") ){, @c.getTime()}. }
 	@if(Utils.getOrgConfig(request).track_writer) {
 		<i>Writers</i>: @c.people_at_case.filter((p: PersonAtCase) =>
-			p.role == PersonAtCase.ROLE_WRITER).map { tr =>
-				@tr.person.getDisplayName()}.mkString(", ").
+			p.getRole() == PersonAtCase.ROLE_WRITER).map { tr =>
+				@tr.getPerson().getDisplayName()}.mkString(", ").
 	}
     <span class=@if( Utils.getOrgConfig(request).hide_location_for_print ) { "no-print" } else { "" }>
-        <i>Location</i>: @if(!c.location.equals("")) {@c.location} else {unknown}.
+        <i>Location</i>: @if(!c.getLocation().equals("")) {@c.getLocation()} else {unknown}.
     </span>
     </p></td>
 	<td valign="top"><p>
 		<i>Testifiers</i>:
 		@if( c.charges.size() == 0 && Utils.getOrgConfig(request).filter_no_charge_cases ) {
-			@defining( c.people_at_case.filter(_.role == PersonAtCase.ROLE_TESTIFIER).size() ) { num =>
+			@defining( c.people_at_case.filter(_.getRole() == PersonAtCase.ROLE_TESTIFIER).size() ) { num =>
 				@num @if(num==1) { person } else { people } testified.
 			}
 		} else {
-			@c.people_at_case.filter(_.role == PersonAtCase.ROLE_TESTIFIER).map {tr =>@tr.person.getDisplayName()}.mkString(", ")
+			@c.people_at_case.filter(_.getRole() == PersonAtCase.ROLE_TESTIFIER).map {tr =>@tr.getPerson().getDisplayName()}.mkString(", ")
 		}
 		</p>
 		<p>
-		@if( Utils.getOrgConfig(request).filter_no_charge_cases && c.date_closed == null &&	c.charges.size() == 0 ) {
+		@if( Utils.getOrgConfig(request).filter_no_charge_cases && c.getDateClosed() == null &&	c.charges.size() == 0 ) {
 			<i>The findings are not shown here because this case has no charges and is not closed.</i>
 		} else {
 			@Utils.newlineToBr(Application.generateCompositeFindingsFromChargeReferences(c))
@@ -38,15 +38,15 @@
 			<ol>
 			@for( charge <- c.charges ) {
 				<li>
-				@if( charge.person != null) {
-					<b>@charge.person.getDisplayName()</b>:
+				@if( charge.getPerson() != null) {
+					<b>@charge.getPerson().getDisplayName()</b>:
 				}
-				@if( charge.rule != null) {
-					@charge.rule.getNumber() @charge.rule.title.
-					@if( !charge.severity.equals("")){(@charge.severity)}
-					@if( !charge.plea.equals("Guilty") ) { <b>@Utils.getOrgConfig(request).translatePlea(charge.plea).</b> }
+				@if( charge.getRule() != null) {
+					@charge.getRule().getNumber() @charge.getRule().getTitle().
+					@if( !charge.getSeverity().equals("")){(@charge.getSeverity())}
+					@if( !charge.getPlea().equals("Guilty") ) { <b>@Utils.getOrgConfig(request).translatePlea(charge.getPlea()).</b> }
 				}
-				<u>@Utils.getOrgConfig(request).str_res_plan_short: @charge.resolution_plan</u>
+				<u>@Utils.getOrgConfig(request).str_res_plan_short: @charge.getResolutionPlan()</u>
 				</li>
 			}
 			</ol>
@@ -56,23 +56,23 @@
 	</td></tr>
 
 	@for( charge <- c.charges ) {
-		@if( charge.referred_to_sm && charge.sm_decision == null) {
-			<tr><td colspan="3" class="sm_decision">*** Awaiting @Utils.getOrgConfig(request).getReferralDestination(charge) decision on charging
-			@if(charge.person != null) { @charge.person.getDisplayName() } else { ??? } with
+		@if( charge.getReferredToSm() && charge.getSmDecision() == null) {
+			<tr><td colspan="3" class="smDecision">*** Awaiting @Utils.getOrgConfig(request).getReferralDestination(charge) decision on charging
+			@if(charge.getPerson() != null) { @charge.getPerson().getDisplayName() } else { ??? } with
 			@charge.getRuleTitle().
 			</td></tr>
 		}
-		@if( !charge.minor_referral_destination.equals("")) {
-			<tr><td colspan="3" class="sm_decision">Charge against
-			@if(charge.person != null) { @charge.person.getDisplayName() } else { ??? } with
+		@if( !charge.getMinorReferralDestination().equals("")) {
+			<tr><td colspan="3" class="smDecision">Charge against
+			@if(charge.getPerson() != null) { @charge.getPerson().getDisplayName() } else { ??? } with
 			@charge.getRuleTitle() referred to
-				@{charge.minor_referral_destination}.
+				@{charge.getMinorReferralDestination()}.
 			</td></tr>
 		}
-		@if( charge.sm_decision != null ) {
-			<tr><td colspan="3" class="sm_decision">School meeting decision on charging
-				@if(charge.person != null) { @charge.person.getDisplayName() } else { ??? } with
-					@charge.getRuleTitle(): @charge.sm_decision
+		@if( charge.getSmDecision() != null ) {
+			<tr><td colspan="3" class="smDecision">School meeting decision on charging
+				@if(charge.getPerson() != null) { @charge.getPerson().getDisplayName() } else { ??? } with
+					@charge.getRuleTitle(): @charge.getSmDecision()
 			</td></tr>
 		}
 	}

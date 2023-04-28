@@ -331,7 +331,7 @@ class TheCircleSchool extends OrgConfig {
 
     @Override
     public String getReferralDestination(Charge c) {
-        if (c.plea.equals("Not Guilty")) {
+        if (c.getPlea().equals("Not Guilty")) {
             return "trial";
         } else {
             return "School Meeting";
@@ -340,7 +340,7 @@ class TheCircleSchool extends OrgConfig {
 
     @Override
     public String getCaseNumberPrefix(Meeting m) {
-        return new SimpleDateFormat("yyyyMMdd").format(m.date);
+        return new SimpleDateFormat("yyyyMMdd").format(m.getDate());
     }
 }
 

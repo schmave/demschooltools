@@ -2,46 +2,46 @@
 
 @import helper._
 
-@main("" + chapter.num + " " + chapter.title, "manual") {
+@main("" + chapter.getNum() + " " + chapter.getTitle(), "manual") {
 
 <div id="footer">
 Printed on @Application.yymmddDate(Utils.getOrgConfig(request)).
 </div>
 
-<div class="man-chapter">@chapter.num @chapter.title <a class="man-edit no-print" href="@routes.ApplicationEditing.editChapter(chapter.id)">Edit</a></div>
-<p><a class="no-print" href="@routes.ApplicationEditing.addSection(chapter.id)">Add section in @chapter.num @chapter.title</a></p>
+<div class="man-chapter">@chapter.getNum() @chapter.getTitle() <a class="man-edit no-print" href="@routes.ApplicationEditing.editChapter(chapter.id)">Edit</a></div>
+<p><a class="no-print" href="@routes.ApplicationEditing.addSection(chapter.id)">Add section in @chapter.getNum() @chapter.getTitle()</a></p>
 
 @for(section <- chapter.sections) {
 <div class="man-section">
 	<div class="man-section-header">
-	  <a name="section_@section.id"></a>@section.getNumber() @section.title <a class="no-print man-edit" href="@routes.ApplicationEditing.editSection(section.id)">Edit</a>
+	  <a name="section_@section.id"></a>@section.getNumber() @section.getTitle() <a class="no-print man-edit" href="@routes.ApplicationEditing.editSection(section.id)">Edit</a>
 	</div>
-	<p><a class="no-print" href="@routes.ApplicationEditing.addEntry(section.id)">Add entry in @chapter.num@section.num @section.title</a></p>
+	<p><a class="no-print" href="@routes.ApplicationEditing.addEntry(section.id)">Add entry in @chapter.getNum()@section.getNum() @section.getTitle()</a></p>
 	@for(entry <- section.entries) {
 	<div class="man-entry">
 		<a name="entry_@entry.id"></a>
-		<p class="man-entry-num">@entry.getNumber() @entry.title <a class="no-print man-edit" href="@routes.ApplicationEditing.editEntry(entry.id)">Edit</a>
+		<p class="man-entry-num">@entry.getNumber() @entry.getTitle() <a class="no-print man-edit" href="@routes.ApplicationEditing.editEntry(entry.id)">Edit</a>
 			@if( entry.changes.size() > 0 ) {
 				<span class="man-last-modify-date @if(!Utils.getOrgConfig(request).org.getShowLastModifiedInPrint()){no-print}">
-                    changed @Application.yymmddDate(Utils.getOrgConfig(request), entry.changes.get(entry.changes.size()-1).date_entered)
+                    changed @Application.yymmddDate(Utils.getOrgConfig(request), entry.changes.get(entry.changes.size()-1).getDateEntered())
                 </span>
 			}
 									</p>
-		<div class="man-entry-content">@Html(Application.markdown(entry.content))
+		<div class="man-entry-content">@Html(Application.markdown(entry.getContent()))
 
 			@defining(entry.changes) { changes =>
 			@if( changes.size() > 1) {
 			<p class="man-entry-change-history @if(!Utils.getOrgConfig(request).org.getShowHistoryInPrint()){no-print}">
 				@for( i <- 0 to changes.size() - 1) {
                     @if( (i == 0) ||
-                        (changes.get(i).date_entered.getDate() != changes.get(i-1).date_entered.getDate() ||
-                         changes.get(i).date_entered.getMonth() != changes.get(i-1).date_entered.getMonth() ||
-                         changes.get(i).date_entered.getYear() != changes.get(i-1).date_entered.getYear())) {
+                        (changes.get(i).getDateEntered().getDate() != changes.get(i-1).getDateEntered().getDate() ||
+                         changes.get(i).getDateEntered().getMonth() != changes.get(i-1).getDateEntered().getMonth() ||
+                         changes.get(i).getDateEntered().getYear() != changes.get(i-1).getDateEntered().getYear())) {
                         @defining(changes.get(i)) { change =>
-                            @if( change.was_created ) { Adopted
-                            } else { @if( change.was_deleted ) { Repealed
+                            @if( change.getWasCreated() ) { Adopted
+                            } else { @if( change.getWasDeleted() ) { Repealed
                             } else { Amended } }
-                            @Application.yymmddDate(Utils.getOrgConfig(request), change.date_entered);
+                            @Application.yymmddDate(Utils.getOrgConfig(request), change.getDateEntered());
                         }
                     }
                 }

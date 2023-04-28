@@ -65,8 +65,8 @@
 						<td></td>
 						<td></td>
 						<td>@event.getFormattedDate()</td>
-						<td>@Attendance.formatTime(event.end_time)</td>
-						<td>$@event.late_fee</td>
+						<td>@Attendance.formatTime(event.getEndTime())</td>
+						<td>$@event.getLateFee()</td>
 					</tr>
 				}
 			}

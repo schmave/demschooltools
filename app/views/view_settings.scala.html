@@ -16,15 +16,15 @@ $(function () {
     <p><i>There are no existing notification rules. You can add some below.</i></p>
 }
 @for( n <- notifications ) {
-    @if( n.the_type == NotificationRule.TYPE_TAG) {
+    @if( n.getTheType() == NotificationRule.TYPE_TAG) {
     <li>When people are added to or removed from tag
-        <label class="label label-success">@n.tag.title</label>, email <u>@n.email</u>
+        <label class="label label-success">@n.getTag().getTitle()</label>, email <u>@n.getEmail()</u>
     }
-    @if( n.the_type == NotificationRule.TYPE_COMMENT) {
-        <li>When a comment about a person is added, optionally email <u>@n.email</u>
+    @if( n.getTheType() == NotificationRule.TYPE_COMMENT) {
+        <li>When a comment about a person is added, optionally email <u>@n.getEmail()</u>
     }
-    @if( n.the_type == NotificationRule.TYPE_SCHOOL_MEETING) {
-    <li>When a JC charge is referred to School Meeting, email <u>@n.email</u>
+    @if( n.getTheType() == NotificationRule.TYPE_SCHOOL_MEETING) {
+    <li>When a JC charge is referred to School Meeting, email <u>@n.getEmail()</u>
     }
     @helper.form(routes.Settings.editNotifications(), Symbol("style") -> "display: inline") {
 
@@ -69,7 +69,7 @@ $(function () {
         false,
         2,
         @Html(Application.jsonRules(true, Utils.getOrgConfig(request).org)),
-        function(json) { return json.title; },
+        function(json) { return json.getTitle(); },
         null,
         null,
         function(id) { $('#breaking-res-plan-entry').val(id); },

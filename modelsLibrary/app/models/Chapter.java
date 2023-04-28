@@ -9,14 +9,19 @@ import javax.persistence.*;
 import javax.persistence.OrderBy;
 import java.util.List;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 @Entity
 public class Chapter extends Model {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "chapter_id_seq")
-    public Integer id;
+    private Integer id;
 
-    public String title = "";
-    public String num = "";
+    private String title = "";
+    private String num = "";
 
     @OneToMany(mappedBy="chapter")
     @OrderBy("num ASC")
@@ -25,9 +30,9 @@ public class Chapter extends Model {
     public List<Section> sections;
 
     @ManyToOne()
-    public Organization organization;
+    private Organization organization;
 
-    public Boolean deleted;
+    private Boolean deleted;
 
     public static Finder<Integer,Chapter> find = new Finder<>(
             Chapter.class

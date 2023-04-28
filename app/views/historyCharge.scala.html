@@ -2,28 +2,28 @@
 
 <p>
 
-<a nosidebar href="@routes.Application.viewMeeting(c.the_case.meeting.id)">
-<b>@c.the_case.case_number</a>@if( show_chargee && c.person != null ){,
-<a nosidebar href="@routes.Application.viewPersonHistory(c.person.person_id)">
-@c.person.getDisplayName()}</a>@if( show_rule && c.rule != null ){,
-<a nosidebar href="@routes.Application.viewRuleHistory(c.rule.id)">@c.rule.getNumber() @c.rule.title</a>}</b>.
+<a nosidebar href="@routes.Application.viewMeeting(c.getTheCase().getMeeting().id)">
+<b>@c.getTheCase().getCaseNumber()</a>@if( show_chargee && c.getPerson() != null ){,
+<a nosidebar href="@routes.Application.viewPersonHistory(c.getPerson().getPersonId())">
+@c.getPerson().getDisplayName()}</a>@if( show_rule && c.getRule() != null ){,
+<a nosidebar href="@routes.Application.viewRuleHistory(c.getRule().id)">@c.getRule().getNumber() @c.getRule().getTitle()</a>}</b>.
 
-@if( c.severity != "" ){
-	(@c.severity)
+@if( c.getSeverity() != "" ){
+	(@c.getSeverity())
 }
 
 <i>@Utils.getOrgConfig(request).str_findings</i>:
-@if( redact_findings ) { @Application.getRedactedFindings(c.the_case, c.person) } else {
-	@Application.generateCompositeFindingsFromChargeReferences(c.the_case) }
+@if( redact_findings ) { @Application.getRedactedFindings(c.getTheCase(), c.getPerson()) } else {
+	@Application.generateCompositeFindingsFromChargeReferences(c.getTheCase()) }
 
-@if( !c.plea.equals("Guilty") ) {
-	Plead <b>@Utils.getOrgConfig(request).translatePlea(c.plea)</b>.
+@if( !c.getPlea().equals("Guilty") ) {
+	Plead <b>@Utils.getOrgConfig(request).translatePlea(c.getPlea())</b>.
 }
 
-<u>@Utils.getOrgConfig(request).str_res_plan_short: @c.resolution_plan</u>
+<u>@Utils.getOrgConfig(request).str_res_plan_short: @c.getResolutionPlan()</u>
 
-@if( c.sm_decision != null) {
+@if( c.getSmDecision() != null) {
 	<span class="sm-decision"><i>School Meeting ruled@if(
-		c.sm_decision_date != null) { on @Application.yymmddDate(Utils.getOrgConfig(request), c.sm_decision_date)}</i>:
-		@c.sm_decision</span>
+		c.getSmDecisionDate() != null) { on @Application.yymmddDate(Utils.getOrgConfig(request), c.getSmDecisionDate())}</i>:
+		@c.getSmDecision()</span>
 }

@@ -1,47 +1,50 @@
 package models;
 
-import io.ebean.*;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
+import io.ebean.*;
+import java.util.*;
 import javax.persistence.*;
 import javax.persistence.OrderBy;
-import java.util.*;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @Table(name="`case`")
 @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
 public class Case extends Model implements Comparable<Case> {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "case_id_seq")
-    public Integer id;
+    private Integer id;
 
-    public String case_number;
+    private String caseNumber;
 
-    public String location = "";
-    public String findings = "";
+    private String location = "";
+    private String findings = "";
 
-    public Date date;
-    public String time = "";
+    private Date date;
+    private String time = "";
 
     @ManyToOne
     @JoinColumn(name="meeting_id")
     @JsonIgnore
-    public Meeting meeting;
+    private Meeting meeting;
 
     @JsonIgnore
     @ManyToMany(mappedBy = "additional_cases")
     public List<Meeting> additional_meetings;
 
-    @OneToMany(mappedBy="the_case")
+    @OneToMany(mappedBy="theCase")
     public List<PersonAtCase> people_at_case;
 
-    @OneToMany(mappedBy="the_case")
+    @OneToMany(mappedBy="theCase")
     @OrderBy("id ASC")
     public List<Charge> charges;
 
-    public Date date_closed;
+    private Date dateClosed;
 
     @ManyToMany
     @JoinTable(name="case_reference",
@@ -53,12 +56,12 @@ public class Case extends Model implements Comparable<Case> {
     @ManyToMany
     @JoinTable(name="charge_reference",
         joinColumns=@JoinColumn(name="referencing_case", referencedColumnName="id"),
-        inverseJoinColumns=@JoinColumn(name="referenced_charge", referencedColumnName="id"))
+        inverseJoinColumns=@JoinColumn(name="referencedCharge", referencedColumnName="id"))
     @JsonIgnore
     public List<Charge> referenced_charges;
 
     @Transient
-    public String composite_findings;
+    private String compositeFindings;
 
     public static Finder<Integer, Case> find = new Finder<>(
             Case.class
@@ -72,17 +75,17 @@ public class Case extends Model implements Comparable<Case> {
     public static List<Case> getOpenCases(Organization org) {
         return find.query().where()
             .eq("meeting.organization", org)
-            .eq("date_closed", null)
-            .order("case_number ASC")
+            .eq("dateClosed", null)
+            .order("caseNumber ASC")
             .findList();
     }
 
     public static Case create(String number, Meeting m)
     {
         Case result = new Case();
-        result.case_number = number;
+        result.caseNumber = number;
         result.meeting = m;
-        result.date_closed = m.date; // closed by default
+        result.dateClosed = m.getDate(); // closed by default
         result.save();
 
         return result;
@@ -115,9 +118,9 @@ public class Case extends Model implements Comparable<Case> {
 
         System.out.println("closed: " + query_string.get("closed")[0]);
         if (query_string.get("closed")[0].equals("true")) {
-            date_closed = meeting.date;
+            dateClosed = meeting.getDate();
         } else {
-            date_closed = null;
+            dateClosed = null;
         }
         this.update();
     }
@@ -132,7 +135,7 @@ public class Case extends Model implements Comparable<Case> {
     }
 
     public int compareTo(Case other) {
-        return meeting.date.compareTo(other.meeting.date);
+        return meeting.getDate().compareTo(other.meeting.getDate());
     }
 
     public void addReferencedCase(Case referenced_case) {
@@ -148,8 +151,8 @@ public class Case extends Model implements Comparable<Case> {
             referenced_charges.remove(charge);
         }
         for (Charge charge : charges) {
-            if (charge.referenced_charge != null && charge.referenced_charge.the_case == referenced_case) {
-                charge.referenced_charge = null;
+            if (charge.getReferencedCharge() != null && charge.getReferencedCharge().getTheCase() == referenced_case) {
+                charge.setReferencedCharge(null);
             }
         }
         save();

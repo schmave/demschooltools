@@ -27,7 +27,7 @@ public class EvanAuthProvider extends AuthProvider {
 
             @Override
             public String getId() {
-                return user.email;
+                return user.getEmail();
             }
 
             @Override

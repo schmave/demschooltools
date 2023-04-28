@@ -40,8 +40,8 @@ $(function() {
 @inputText(code_form("color"), Symbol("_label") -> "Color", Symbol("class") -> "colorpicker")
 
 @if( Utils.getOrgConfig(request).org.getAttendanceShowPercent() || Utils.getOrgConfig(request).org.getAttendanceShowWeightedPercent() ) {
-	@checkbox(code_form("counts_toward_attendance"), Symbol("_label") -> "Counts toward attendance rate", Symbol("class") -> "absence-checkbox")
-	@checkbox(code_form("not_counted"), Symbol("_label") -> "Neither counts toward nor against attendance rate", Symbol("class") -> "absence-checkbox")
+	@checkbox(code_form("countsTowardAttendance"), Symbol("_label") -> "Counts toward attendance rate", Symbol("class") -> "absence-checkbox")
+	@checkbox(code_form("notCounted"), Symbol("_label") -> "Neither counts toward nor against attendance rate", Symbol("class") -> "absence-checkbox")
 }
 
 @if(is_editing) {

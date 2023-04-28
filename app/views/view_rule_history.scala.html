@@ -2,7 +2,7 @@
 
 @import helper._
 
-@main("History of " + r.getNumber() + " " + r.title, "jc") {
+@main("History of " + r.getNumber() + " " + r.getTitle(), "jc") {
 
 @if(request.flash.get("notice").isPresent()) {
     <div class="flash-error">@request.flash.get("notice").get()</div>

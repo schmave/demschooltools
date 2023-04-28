@@ -1,26 +1,29 @@
 package models;
 
 import io.ebean.*;
-
 import javax.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 public class CompletedTask extends Model {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "completed_task_id_seq")
-    public Integer id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name="task_id")
-    public Task task;
+    private Task task;
 
     @ManyToOne
-    @JoinColumn(name="person_id")
-    public Person person;
+    @JoinColumn(name="personId")
+    private Person person;
 
     @ManyToOne
     @JoinColumn(name="comment_id")
-    public Comment comment;
+    private Comment comment;
 
     public static Finder<Integer, CompletedTask> find = new Finder<>(
             CompletedTask.class
@@ -31,10 +34,9 @@ public class CompletedTask extends Model {
         CompletedTask result = new CompletedTask();
         result.task = t;
         result.comment = c;
-        result.person = c.person;
+        result.person = c.getPerson();
         result.save();
 
         return result;
     }
 }
-

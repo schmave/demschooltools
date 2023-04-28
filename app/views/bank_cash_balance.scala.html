@@ -20,18 +20,18 @@
 			<th class="balance">New Balance</th>
 		</tr>
 		@for(transaction <- model.transactions) {
-			<tr class="@(if(transaction.archived) "js-archivable js-archived accounting-archived" else "js-archivable")">
+			<tr class="@(if(transaction.getArchived()) "js-archivable js-archived accounting-archived" else "js-archivable")">
 				<td><input type="checkbox"
 						class="js-archive"
 						data-id="@transaction.id"
 						name="archived"
-						value="@transaction.archived"
-						@if(transaction.archived){checked="checked"}
+						value="@transaction.getArchived()"
+						@if(transaction.getArchived()){checked="checked"}
 						/></td>
 				<td><a href="@routes.Accounting.transaction(transaction.id)">@transaction.id</a></td>
 				<td>@transaction.getFormattedDate()</td>
 				<td>@transaction.getCreatedByUserName()</td>
-				<td>@transaction.description</td>
+				<td>@transaction.getDescription()</td>
 				<td class="balance">@transaction.getFormattedAmount(true)</td>
 				<td class="balance">@model.getFormattedBalanceAsOfTransaction(transaction)</td>
 			</tr>

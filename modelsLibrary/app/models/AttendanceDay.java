@@ -11,29 +11,34 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 @Entity
 public class AttendanceDay extends Model {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "attendance_day_id_seq")
-    public Integer id;
+    private Integer id;
 
-    public Date day;
+    private Date day;
 
     @ManyToOne()
-    @JoinColumn(name="person_id")
-    public Person person;
+    @JoinColumn(name="personId")
+    private Person person;
 
-    public String code;
+    private String code;
 
-    public Time start_time;
-    public Time end_time;
+    private Time startTime;
+    private Time endTime;
 
-    public Time off_campus_departure_time;
-    public Time off_campus_return_time;
-    public Integer off_campus_minutes_exempted;
+    private Time offCampusDepartureTime;
+    private Time offCampusReturnTime;
+    private Integer offCampusMinutesExempted;
 
     @Transient
-    public Integer late_fee;
+    private Integer lateFee;
 
     public static Finder<Integer, AttendanceDay> find = new Finder<>(
             AttendanceDay.class
@@ -81,15 +86,15 @@ public class AttendanceDay extends Model {
         return Integer.parseInt(str);
     }
 
-    public void edit(String code, String start_time, String end_time) throws Exception {
+    public void edit(String code, String startTime, String endTime) throws Exception {
         if (code.equals("")) {
             this.code = null;
         } else {
             this.code = code;
         }
 
-        this.start_time = parseTime(start_time);
-        this.end_time = parseTime(end_time);
+        this.startTime = parseTime(startTime);
+        this.endTime = parseTime(endTime);
 
         this.update();
     }
@@ -97,16 +102,16 @@ public class AttendanceDay extends Model {
     @JsonIgnore
     public double getHours() {
         long off_campus_time = 0;
-        if (off_campus_return_time != null && off_campus_departure_time != null) {
-            off_campus_time = off_campus_return_time.getTime() - off_campus_departure_time.getTime();
-            if (off_campus_minutes_exempted != null) {
-                off_campus_time -= off_campus_minutes_exempted * 60 * 1000;
+        if (offCampusReturnTime != null && offCampusDepartureTime != null) {
+            off_campus_time = offCampusReturnTime.getTime() - offCampusDepartureTime.getTime();
+            if (offCampusMinutesExempted != null) {
+                off_campus_time -= offCampusMinutesExempted * 60 * 1000;
                 if (off_campus_time < 0) {
                     off_campus_time = 0;
                 }
             }
         }
-        return (end_time.getTime() - start_time.getTime() - off_campus_time) / (1000.0 * 60 * 60);
+        return (endTime.getTime() - startTime.getTime() - off_campus_time) / (1000.0 * 60 * 60);
     }
 
     @JsonIgnore
@@ -118,7 +123,7 @@ public class AttendanceDay extends Model {
             if (min_hours != null && getHours() < min_hours) {
                 return true;
             }
-            if (latest_start_time != null && start_time.getTime() > latest_start_time.getTime()) {
+            if (latest_start_time != null && startTime.getTime() > latest_start_time.getTime()) {
                 return true;
             }
         }
@@ -131,7 +136,7 @@ public class AttendanceDay extends Model {
         return sdf.format(day);
     }
 
-    public static AttendanceDay findCurrentDay(Date day, int person_id, Organization org) {
+    public static AttendanceDay findCurrentDay(Date day, int personId, Organization org) {
         // if the day is Saturday or Sunday, there can't be an attendance day
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(day);
@@ -140,7 +145,7 @@ public class AttendanceDay extends Model {
             return null;
         }
         // find or create AttendanceWeek and AttendanceDay objects
-        Person person = Person.findById(person_id, org);
+        Person person = Person.findById(personId, org);
         AttendanceWeek.findOrCreate(day, person);
         return AttendanceDay.find.query().where()
             .eq("person", person)

@@ -33,12 +33,12 @@ public class AttendanceReport {
             .eq("person.organization", org)
             .ge("day", model.start_date)
             .le("day", model.end_date)
-            .gt("end_time", model.latest_departure_time)
-            .order("person.first_name ASC, day ASC")
+            .gt("endTime", model.latest_departure_time)
+            .order("person.getFirstName() ASC, day ASC")
             .findList();
 
         for (AttendanceDay event : events) {
-            String name = event.person.getDisplayName();
+            String name = event.getPerson().getDisplayName();
             LateDepartureGroup group = model.late_departures.stream()
                 .filter(g -> name.equals(g.name))
                 .findAny().orElse(null);

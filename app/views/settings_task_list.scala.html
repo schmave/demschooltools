@@ -3,26 +3,26 @@
 @import helper._
 
 
-@main("Settings for " + list.title, "settings") {
+@main("Settings for " + list.getTitle(), "settings") {
 
-<h3>@list.title settings</h3>
+<h3>@list.getTitle() settings</h3>
 
 <p>You can view <a href="@routes.CRM.viewTaskList(list.id)">the checklist</a>
- or its associated tag <a href="@routes.CRM.viewTag(list.tag.id)">
-		<label class="label label-success">@list.tag.title</label></a>.</p>
+ or its associated tag <a href="@routes.CRM.viewTag(list.getTag().id)">
+		<label class="label label-success">@list.getTag().getTitle()</label></a>.</p>
 
 <table class="table" style="width: 400px;">
 <thead><th>Task</th><th>Sort order</th><th></th></thead>
 <tbody>
 @for( task <- list.tasks ) {
 	<tr><td>
-		@if(!task.enabled) {<strike>}
-		@task.title
-		@if(!task.enabled) {</strike>}
+		@if(!task.getEnabled()) {<strike>}
+		@task.getTitle()
+		@if(!task.getEnabled()) {</strike>}
 	</td><td>
-		@if(!task.enabled) {<strike>}
-		@task.sort_order
-		@if(!task.enabled) {</strike>}
+		@if(!task.getEnabled()) {<strike>}
+		@task.getSortOrder()
+		@if(!task.getEnabled()) {</strike>}
 	</td>
 	<td><a class="edit-link" href="@routes.Settings.editTask(task.id)">Edit</a></td>
 	</tr>
@@ -41,8 +41,8 @@
 
 
 	@inputText(taskForm("title"), Symbol("_label") -> "Title", Symbol("class") -> "form-control")
-	@inputText(taskForm("sort_order"), Symbol("_label") -> "Sort order", Symbol("class") -> "form-control")
-	<input type="hidden" name="task_list.id" value="@list.id"/>
+	@inputText(taskForm("sortOrder"), Symbol("_label") -> "Sort order", Symbol("class") -> "form-control")
+	<input type="hidden" name="taskList.id" value="@list.id"/>
 
 	<input type="submit" value="New task">
 }

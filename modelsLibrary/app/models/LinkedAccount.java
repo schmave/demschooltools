@@ -8,6 +8,11 @@ import io.ebean.*;
 
 import com.feth.play.module.pa.user.AuthUser;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 @Entity
 public class LinkedAccount extends Model {
 
@@ -17,13 +22,13 @@ public class LinkedAccount extends Model {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	public Long id;
+    private Long id;
 
 	@ManyToOne
-	public User user;
+    private User user;
 
-	public String providerUserId;
-	public String providerKey;
+    private String providerUserId;
+    private String providerKey;
 
 	public static final Finder<Long, LinkedAccount> find = new Finder<>(
 			LinkedAccount.class);

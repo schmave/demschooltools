@@ -140,12 +140,12 @@ public class Accounting extends Controller {
         writer.endRecord();
 
         for (Transaction t : report.transactions) {
-            writer.write(t.archived ? "yes" : "no");
+            writer.write(t.getArchived() ? "yes" : "no");
             writer.write(t.id.toString());
             writer.write(t.getFormattedDate());
             writer.write(t.getCreatedByUserName());
             writer.write(t.getTypeName());
-            writer.write(t.description);
+            writer.write(t.getDescription());
             writer.write(t.getFormattedAmount(false));
             writer.endRecord();
         }
@@ -159,7 +159,7 @@ public class Accounting extends Controller {
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result toggleTransactionArchived(int id, Http.Request request) {
         Transaction transaction = Transaction.findById(id, Utils.getOrg(request));
-        transaction.archived = !transaction.archived;
+        transaction.setArchived(!transaction.getArchived());
         transaction.save();
         return ok();
     }
@@ -230,7 +230,7 @@ public class Accounting extends Controller {
     public Result editAccount(Integer id, Http.Request request) {
         Account account = Account.findById(id, Utils.getOrg(request));
         Form<Account> form = mFormFactory.form(Account.class).fill(account);
-        return ok(edit_account.render(form, account.is_active, request, mMessagesApi.preferred(request)));
+        return ok(edit_account.render(form, account.isActive(), request, mMessagesApi.preferred(request)));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
@@ -270,7 +270,7 @@ public class Accounting extends Controller {
         if (month == 7 || month == 8) return;
 
         List<Account> accounts = Account.allWithMonthlyCredits(org).stream()
-            .filter(a -> a.date_last_monthly_credit == null || a.date_last_monthly_credit.before(monthStartDate))
+            .filter(a -> a.getDateLastMonthlyCredit() == null || a.getDateLastMonthlyCredit().before(monthStartDate))
             .collect(Collectors.toList());
 
         for (Account a : accounts) {

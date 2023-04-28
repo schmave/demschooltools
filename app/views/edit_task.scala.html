@@ -12,11 +12,11 @@
 
 		<input type="hidden" name="id" value="@taskForm("id").value().get()"/>
 
-		@helper.select(taskForm("task_list.id"), options =
-			list_options.map (l => ("" + l.id, l.title)).to(Seq), Symbol("_label") -> "Checklist",
+		@helper.select(taskForm("taskList.id"), options =
+			list_options.map (l => ("" + l.id, l.getTitle())).to(Seq), Symbol("_label") -> "Checklist",
 			Symbol("class") -> "form-control")
 		@inputText(taskForm("title"), Symbol("_label") -> "Title", Symbol("class") -> "form-control")
-		@inputText(taskForm("sort_order"), Symbol("_label") -> "Sort order", Symbol("class") -> "form-control")
+		@inputText(taskForm("sortOrder"), Symbol("_label") -> "Sort order", Symbol("class") -> "form-control")
 		@checkbox(taskForm("enabled"), Symbol("_label") -> "Enabled")
 
 		<input type="submit" value="Save">

@@ -2,8 +2,8 @@
 
 @import helper._
 
-@main("List: " + list.title, "crm") {
-<h1>@list.title <a class="edit-link" href="@routes.Settings.viewTaskList(list.id)">Edit</a></h1>
+@main("List: " + list.getTitle(), "crm") {
+<h1>@list.getTitle() <a class="edit-link" href="@routes.Settings.viewTaskList(list.id)">Edit</a></h1>
 
 @defining(new HashSet[Person]()) { people_with_uncompleted_task =>
 
@@ -11,14 +11,14 @@
 <tr><th>Task<th>People who have completed it<th>People who have not completed it. The
 	first time someone appears in this column, their name is <span class="first_uncompleted">highlighted</span>.
 @for( t <- list.tasks ) {
-@if( t.enabled ) {
+@if( t.getEnabled() ) {
 <tr>
-<td>@t.title
+<td>@t.getTitle()
 <td>
 	@defining(people.filter(p => p.completedTask(t) != null)) { completed_people =>
 		(@completed_people.size):
 		@for( p <- completed_people) {
-			<a href="@routes.CRM.person(p.person_id)">@p.first_name @p.last_name,</a>
+			<a href="@routes.CRM.getPerson()(p.getPersonId())">@p.getFirstName() @p.getLastName(),</a>
 		}
 	}
 <td>
@@ -26,7 +26,7 @@
 		(@uncompleted_people.size):
 		@for( p <- uncompleted_people) {
 			<a @if( people_with_uncompleted_task.add(p) ) { class="first_uncompleted" }
-				href="@routes.CRM.person(p.person_id)">@p.first_name @p.last_name,</a>
+				href="@routes.CRM.getPerson()(p.getPersonId())">@p.getFirstName() @p.getLastName(),</a>
 		}
 	}
 } }
