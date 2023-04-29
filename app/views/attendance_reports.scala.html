@@ -46,26 +46,38 @@
 		<table class="table attendance-report-late-departures-table">
 			<tr>
 				<th>Person</th>
-				<th>Total Owed</th>
+				@if(model.hasAnyFees()) {
+					<th>Total Owed</th>
+				}
 				<th>Date</th>
 				<th>Departure Time</th>
-				<th>Fee</th>
+				@if(model.hasAnyFees()) {
+					<th>Fee</th>
+				}
 			</tr>
 			@for(group <- model.late_departures) {
 				<tr class="attendance-report-late-departure-group">
 					<td>@group.name</td>
-					<td>$@group.getTotalOwed()</td>
+					@if(model.hasAnyFees()) {
+						<td>$@group.getTotalOwed()</td>
+					}
 					<td></td>
 					<td></td>
-					<td></td>
+					@if(model.hasAnyFees()) {
+						<td></td>
+					}
 				</tr>
 				@for(event <- group.events) {
 					<tr>
 						<td></td>
-						<td></td>
+						@if(model.hasAnyFees()) {
+							<td></td>
+						}
 						<td>@event.getFormattedDate()</td>
 						<td>@Attendance.formatTime(event.end_time)</td>
-						<td>$@event.late_fee</td>
+						@if(model.hasAnyFees()) {
+							<td>$@event.late_fee</td>
+						}
 					</tr>
 				}
 			}

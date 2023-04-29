@@ -21,6 +21,8 @@ public class AttendanceReport {
 
     public Time latest_departure_time;
 
+    private Boolean has_any_fees;
+
     public AttendanceReport() {
         late_departures = new ArrayList<LateDepartureGroup>();
 
@@ -59,5 +61,20 @@ public class AttendanceReport {
         if (date == null) return "";
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
         return sdf.format(date);
+    }
+
+    public Boolean hasAnyFees() {
+        if (has_any_fees != null) {
+            return has_any_fees;
+        }
+        for (LateDepartureGroup group : late_departures) {
+            int fee = group.getTotalOwed();
+            if (fee > 0) {
+                has_any_fees = true;
+                return true;
+            }
+        }
+        has_any_fees = false;
+        return false;
     }
 }
