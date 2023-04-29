@@ -1,0 +1,33 @@
+{
+    "env": {
+      "browser": true,
+      "commonjs": true,
+      "jquery": true
+    },
+    "extends": "standard",
+    "globals": {
+      "app": true,
+      "sorttable": true
+    },
+    "parserOptions": {
+      "sourceType": "module"
+    },
+    "rules": {
+      "camelcase": 0,
+      "comma-dangle": 0,
+      "comma-spacing": 0,
+      "eqeqeq": 0,
+      "quotes": 0,
+      "indent": 0,
+      "no-unused-vars": [
+        "error"
+      ],
+      "semi": 0,
+      "space-before-function-paren": 0,
+      "space-in-parens": 0,
+      "space-infix-ops": 0
+    },
+  "ignorePatterns":[
+    "sorttable.js"
+  ]
+}

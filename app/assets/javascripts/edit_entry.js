@@ -1,10 +1,10 @@
-var utils = require('./utils');
+const utils = require('./utils');
 
-var last_content = $("#content").val();
-var needs_render = true;
+let last_content = $("#content").val();
+let needs_render = true;
 
 function contentChanged() {
-    var newContent = $("#content").val();
+    const newContent = $("#content").val();
     if (newContent != last_content) {
         last_content = newContent;
         needs_render = true;
@@ -20,7 +20,7 @@ function renderContent() {
     needs_render = false;
 
     $.post("/renderMarkdown",
-           {markdown: last_content},
+           { markdown: last_content },
            function(data) {
         $("#markdown_preview").html(data);
     });

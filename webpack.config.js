@@ -1,42 +1,72 @@
-const path = require('path');
-const webpack = require('webpack');
+const path = require("path");
+const webpack = require("webpack");
 
-module.exports = function(env) {
-    const isDebug = env && (env.debug == 'true');
+const ESLintPlugin = require("eslint-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const { EsbuildPlugin } = require("esbuild-loader");
 
-    return {
-        context: path.join(__dirname, '/app/assets/javascripts'),
-        entry: './main.js',
-        output: {
-            filename: './app/assets/javascripts/gen/bundle.js',
-        },
-        resolve: {
-            alias: {
-                handlebars: "handlebars/dist/handlebars",
-                jquery: "jquery/src/jquery"
-            }
-        },
-         module: {
-            rules: [
-              {
-                test: /\.js$/,
-                exclude: /node_modules/,
-                loader: "eslint-loader",
-              },
-            ],
+const ESBUILD_TARGET = ["chrome58", "edge16", "firefox57", "safari11"];
+
+module.exports = function (env, argv) {
+  return {
+    devtool: "source-map",
+    context: path.join(__dirname, "/app/assets"),
+    entry: {
+      bundle: "./javascripts/main.js",
+      checkin: "./checkin/app.js",
+    },
+    module: {
+      rules: [
+        {
+          test: /\.(?:js|mjs|cjs)$/,
+          exclude: /node_modules/,
+          use: {
+            loader: "esbuild-loader",
+            options: {
+              target: ESBUILD_TARGET,
+            },
           },
-          plugins: [
-            new webpack.ProvidePlugin({
-                $: "jquery",
-                jQuery: "jquery"
-            }),
-            // Production-only plugins go below this line
-        ].concat(isDebug ? [] : [
-            new webpack.optimize.UglifyJsPlugin({
-                compress: {
-                    warnings: false,
-                }
-            })
-        ])
-    }
+        },
+      ],
+    },
+    output: {
+      path: path.resolve(__dirname, "app/assets/javascripts/gen"),
+      filename: "[name].js",
+      sourceMapFilename: "[file].[chunkhash].map[query]",
+    },
+    resolve: {
+      alias: {
+        handlebars: "handlebars/dist/handlebars",
+        jquery: "jquery/src/jquery",
+      },
+    },
+    optimization: {
+      minimize: true,
+      minimizer: [
+        new EsbuildPlugin({
+          target: ESBUILD_TARGET,
+        }),
+      ],
+    },
+
+    plugins: [
+      new ESLintPlugin({
+        fix: true,
+        useEslintrc: true,
+      }),
+      new webpack.ProvidePlugin({
+        $: "jquery",
+        jQuery: "jquery",
+      }),
+      new HtmlWebpackPlugin({
+        filename: "../../checkin/app.html",
+        template: "checkin/template.html",
+        hash: true,
+        chunks: ["checkin"],
+        templateParameters: {
+          rollbarEnvironment: argv.mode == "production" ? "production" : "dev",
+        },
+      }),
+    ],
+  };
 };

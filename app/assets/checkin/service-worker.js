@@ -5,11 +5,10 @@ const CACHE_NAME = 'static-cache-v255';
 
 const FILES_TO_CACHE = [
 	'/assets/checkin/app.html',
-	'/assets/checkin/app-compiled.js',
+	'/assets/javascripts/gen/checkin.js',
 	'/assets/checkin/icon-192.png',
 	'/assets/checkin/icon-512.png',
 	'/assets/checkin/manifest.json',
-	'/assets/checkin/localforage.js',
 	'/assets/checkin/style.css'
 ];
 

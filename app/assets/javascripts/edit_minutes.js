@@ -1,8 +1,8 @@
-var Handlebars = require('handlebars');
+const Handlebars = require('handlebars');
 
-var utils = require('./utils');
-var chooser = require('./chooser');
-var people_chooser = require('./people_chooser');
+const utils = require('./utils');
+const chooser = require('./chooser');
+const people_chooser = require('./people_chooser');
 
 const time_served_string = "Time served";
 
@@ -15,7 +15,7 @@ function showSomethingInSidebar(url) {
           null,
            function(data, status, jqXHR) {
             // Remove a href links from data to avoid inadvertent clicks
-            var patt = /<a nosidebar href="[^"]+"/gi;
+            const patt = /<a nosidebar href="[^"]+"/gi;
 
             data = data.replace(patt, "<a ");
 
@@ -37,13 +37,13 @@ function showRuleHistoryInSidebar(rule_id) {
 }
 
 function Charge(charge_id, el) {
-    var self = this;
+    const self = this;
 
-    var SEVERITIES = {
-        "mild": "Mild",
-        "moderate": "Moderate",
-        "serious": "Serious",
-        "severe": "Severe"
+    const SEVERITIES = {
+        mild: "Mild",
+        moderate: "Moderate",
+        serious: "Serious",
+        severe: "Severe"
     };
 
     this.checkReferralLabelHighlight = function() {
@@ -82,7 +82,7 @@ function Charge(charge_id, el) {
             el.find(".refer-to-sm").prop("checked", true);
         }
 
-        for (var key in SEVERITIES) {
+        for (const key in SEVERITIES) {
             if (json.severity == SEVERITIES[key]) {
                 el.find(".severity-" + key).prop("checked", true);
             }
@@ -124,25 +124,25 @@ function Charge(charge_id, el) {
             return;
         }
 
-        var url = "/saveCharge?id=" + charge_id;
+        let url = "/saveCharge?id=" + charge_id;
 
         if (self.people_chooser.people.length > 0) {
             url += "&personId=" + self.people_chooser.people[0].id;
         }
 
-        var resolutionPlan = el.find(".resolutionPlan").val();
+        let resolutionPlan = el.find(".resolutionPlan").val();
         if (el.find(".rp-followups").is(":visible") && el.find(".rp-followup-time-served").prop("checked")) {
             resolutionPlan = time_served_string;
         }
         url += "&resolutionPlan=" + encodeURIComponent(resolutionPlan);
 
-        for (var key in SEVERITIES) {
+        for (const key in SEVERITIES) {
             if (el.find(".severity-" + key).prop("checked")) {
                 url += "&severity=" + SEVERITIES[key];
             }
         }
 
-        var plea = el.find(".plea-guilty");
+        let plea = el.find(".plea-guilty");
         if (plea.prop("checked")) {
             url += "&plea=Guilty";
         }
@@ -162,10 +162,10 @@ function Charge(charge_id, el) {
             url += "&plea=N/A";
         }
 
-        var refer = el.find(".refer-to-sm");
+        const refer = el.find(".refer-to-sm");
         url += "&referredToSm=" + refer.prop("checked");
 
-        var minorReferralDestination = el.find(".minor-referral-destination");
+        const minorReferralDestination = el.find(".minor-referral-destination");
         if (minorReferralDestination.length > 0) {
             url += "&minorReferralDestination=" +
                 encodeURIComponent(minorReferralDestination.val());
@@ -202,7 +202,7 @@ function Charge(charge_id, el) {
         }
 
         if (self.people_chooser.people.length == 1 && self.rule_chooser.results[0]) {
-            var url = "/getLastRp";
+            let url = "/getLastRp";
             url += "/" + self.people_chooser.people[0].id;
             url += "/" + self.rule_chooser.results[0];
             $.get(url, function (data) {
@@ -279,7 +279,7 @@ function Charge(charge_id, el) {
 
     // el.mouseleave(function() { self.remove_button.hide(); } );
     // el.mouseenter(function() { self.remove_button.show(); } );
-    for (var key in SEVERITIES) {
+    for (const key in SEVERITIES) {
         el.find(".severity-" + key).change(self.markAsModified);
     }
     el.find(".severity[type=radio]").prop("name", "severity-" + charge_id);
@@ -290,7 +290,7 @@ function Charge(charge_id, el) {
 }
 
 function Case (id, el) {
-    var self = this;
+    const self = this;
 
     this.saveIfNeeded = function() {
         window.setTimeout(self.saveIfNeeded, SAVE_TIMEOUT);
@@ -321,7 +321,7 @@ function Case (id, el) {
         el.find("input.continued").prop("checked", data.dateClosed === null);
 
         for (var i in data.people_at_case) {
-            var pac = data.people_at_case[i];
+            const pac = data.people_at_case[i];
             if (pac.role == app.ROLE_TESTIFIER) {
                 self.testifier_chooser.addPerson(
                     pac.person.personId,
@@ -335,19 +335,19 @@ function Case (id, el) {
 
         $.get("/getCaseReferencesJson?case_id=" + self.id, function(case_references) {
             setCaseReferences(case_references);
-            var case_references_json = $.parseJSON(case_references);
+            const case_references_json = $.parseJSON(case_references);
             for (i in data.charges) {
-                var ch = data.charges[i];
-                var new_charge = self.addChargeNoServer(ch.id);
+                const ch = data.charges[i];
+                const new_charge = self.addChargeNoServer(ch.id);
                 new_charge.loadData(ch, findReferencedCharge(ch.id, case_references_json));
             }
         });
 
         function findReferencedCharge(charge_id, case_references) {
-            for (var i in case_references) {
-                var c = case_references[i];
-                for (var j in c.charges) {
-                    var ch = c.charges[j];
+            for (const i in case_references) {
+                const c = case_references[i];
+                for (const j in c.charges) {
+                    const ch = c.charges[j];
                     if (ch.generated_charge_id == charge_id) {
                         return {
                             id: ch.charge_id,
@@ -362,7 +362,7 @@ function Case (id, el) {
     };
 
     this.addCharge = function() {
-        $('body').animate({'scrollTop': $('body').scrollTop() + 100}, 'slow');
+        $('body').animate({ scrollTop: $('body').scrollTop() + 100 }, 'slow');
         $.post("/addCharge?case_id=" + id,
                function(data, textStatus, jqXHR) {
             self.addChargeNoServer(parseInt(data));
@@ -370,9 +370,9 @@ function Case (id, el) {
     };
 
     this.addChargeNoServer = function(charge_id) {
-        var new_charge_el = self.el.find(".charges").append(
+        const new_charge_el = self.el.find(".charges").append(
             app.charge_template()).children(":last-child");
-        var new_charge = new Charge(charge_id, new_charge_el);
+        const new_charge = new Charge(charge_id, new_charge_el);
         self.charges.push(new_charge);
         return new_charge;
     };
@@ -394,7 +394,7 @@ function Case (id, el) {
                     self.clearCaseNoConfirm();
                     $( this ).dialog( "close" );
                 },
-                "Cancel": function() {
+                Cancel: function() {
                      $( this ).dialog( "close" );
                 }
               }
@@ -418,10 +418,10 @@ function Case (id, el) {
           self.case_chooser.clear();
         }
 
-        var url = "/clearAllReferencedCases?case_id=" + self.id;
+        const url = "/clearAllReferencedCases?case_id=" + self.id;
         $.post(url, setCaseReferences);
 
-        for (var i = 0; i < self.charges.length; i++) {
+        for (let i = 0; i < self.charges.length; i++) {
             self.charges[i].removeCharge();
         }
         self.charges = [];
@@ -464,15 +464,15 @@ function Case (id, el) {
     this.charges = [];
 
     function setCaseReferences(data) {
-        var json = $.parseJSON(data);
+        const json = $.parseJSON(data);
         self.case_chooser.loadData(json);
-        var el = self.el.find('.case-references');
+        const el = self.el.find('.case-references');
         el.html('');
-        for (var i in json) {
+        for (const i in json) {
             el.append(app.case_reference_template(json[i]));
         }
         el.find('input').click(function() {
-            var parent = $(this).parents('.case-charge-reference');
+            const parent = $(this).parents('.case-charge-reference');
             if (this.checked) {
                 $.post("/addChargeReferenceToCase?case_id=" + self.id + "&charge_id=" + $(this).data('id'));
                 parent.addClass('referenced');
@@ -483,17 +483,17 @@ function Case (id, el) {
         });
         el.find('.case-charge-reference-generate').click(function() {
             $(this).hide().parent().find('.case-charge-reference-already-generated').show();
-            var referencedCharge = {
+            const referencedCharge = {
                 id: $(this).data('id'),
                 resolutionPlan: $(this).data('resolution-plan')
             };
-            var url = "/generateChargeFromReference?case_id=" + id + "&referenced_charge_id=" + $(this).data('id');
+            const url = "/generateChargeFromReference?case_id=" + id + "&referenced_charge_id=" + $(this).data('id');
             $.post(url, function(response) {
-                var new_charge_json = $.parseJSON(response);
+                const new_charge_json = $.parseJSON(response);
                 if (new_charge_json.rule) {
                     referencedCharge.has_default_rule = true;
                 }
-                var new_charge = self.addChargeNoServer(new_charge_json.id);
+                const new_charge = self.addChargeNoServer(new_charge_json.id);
                 new_charge.loadData(new_charge_json, referencedCharge);
             });
         });
@@ -505,11 +505,11 @@ function Case (id, el) {
 
     self.case_chooser = new chooser.Chooser(el.find(".case_chooser"), true, 5, app.cases, getLabel, null, null,
         function(id) {
-            var url = "/addReferencedCase?case_id=" + self.id + "&referenced_case_id=" + id;
+            const url = "/addReferencedCase?case_id=" + self.id + "&referenced_case_id=" + id;
             $.post(url, setCaseReferences);
         },
         function(id) {
-            var url = "/removeReferencedCase?case_id=" + self.id + "&referenced_case_id=" + id;
+            const url = "/removeReferencedCase?case_id=" + self.id + "&referenced_case_id=" + id;
             $.post(url, setCaseReferences);
         });
 
@@ -553,23 +553,23 @@ function loadInitialData() {
     app.sub_chooser.loadPeople(app.initial_data.sub);
     app.runner_chooser.loadPeople(app.initial_data.runners);
 
-    for (var i in app.initial_data.cases) {
-        var data = app.initial_data.cases[i];
-        var new_case = addCaseNoServer(data.id, data.caseNumber);
+    for (const i in app.initial_data.cases) {
+        const data = app.initial_data.cases[i];
+        const new_case = addCaseNoServer(data.id, data.caseNumber);
         new_case.loadData(data);
     }
 }
 
 function checkDirties() {
-    var num_dirty = 0;
+    let num_dirty = 0;
 
-    for (var i in app.cases) {
-        var c = app.cases[i];
+    for (const i in app.cases) {
+        const c = app.cases[i];
         if (c.is_modified) {
             num_dirty++;
         }
-        for (var j in c.charges) {
-            var ch = c.charges[j];
+        for (const j in c.charges) {
+            const ch = c.charges[j];
             if (ch.is_modified) {
                 num_dirty++;
             }
@@ -587,27 +587,27 @@ function checkDirties() {
 }
 
 function continueCase(event) {
-    var list_item = $(event.target).parent();
-    var id = list_item.prop("id");
-    var splits = id.split("-");
-    var case_id = splits[splits.length-1];
+    const list_item = $(event.target).parent();
+    const id = list_item.prop("id");
+    const splits = id.split("-");
+    const case_id = splits[splits.length-1];
 
     $.post("/continueCase?meeting_id=" + app.meeting_id +
            "&case_id=" + case_id, "",
            function(data, textStatus, jqXHR) {
-        var case_data = $.parseJSON(data);
-        var new_case = addCaseNoServer(case_data.id, case_data.caseNumber);
+        const case_data = $.parseJSON(data);
+        const new_case = addCaseNoServer(case_data.id, case_data.caseNumber);
         new_case.loadData(case_data);
-        $('body').animate({'scrollTop': new_case.el.offset().top + 500}, 'slow');
+        $('body').animate({ scrollTop: new_case.el.offset().top + 500 }, 'slow');
         list_item.remove();
     });
 }
 
 window.initMinutesPage = function() {
     Handlebars.registerHelper('render', function(partialId, options) {
-      var selector = 'script[type="text/x-handlebars-template"]#' + partialId;
-      var source = $(selector).html();
-      var html = Handlebars.compile(source)(options.hash);
+      const selector = 'script[type="text/x-handlebars-template"]#' + partialId;
+      const source = $(selector).html();
+      const html = Handlebars.compile(source)(options.hash);
 
       return new Handlebars.SafeString(html);
     });
@@ -642,14 +642,14 @@ window.initMinutesPage = function() {
     $("button.add-case").click(addCase);
 
     window.onbeforeunload = function(e) {
-        var dirty = false;
-        for (var i in app.cases) {
-            var c = app.cases[i];
+        let dirty = false;
+        for (const i in app.cases) {
+            const c = app.cases[i];
             if (c.is_modified) {
                 dirty = true;
             }
-            for (var j in c.charges) {
-                var ch = c.charges[j];
+            for (const j in c.charges) {
+                const ch = c.charges[j];
                 if (ch.is_modified) {
                     dirty = true;
                 }
@@ -666,17 +666,18 @@ window.initMinutesPage = function() {
 };
 
 function addCaseNoServer(id, number) {
-    var new_case = $("#meeting-cases")
-        .append(app.case_template({"num": number}))
+    const new_case = $("#meeting-cases")
+        .append(app.case_template({ num: number }))
         .children(":last-child");
 
-    var case_obj = new Case(id, new_case);
+    const case_obj = new Case(id, new_case);
     app.cases.push(case_obj);
 
     $("#meeting-cases").append(case_obj.el);
     case_obj.el.find(DATE_SELECTOR).datepicker({
         showOtherMonths: true,
-        selectOtherMonths: true});
+        selectOtherMonths: true
+});
     case_obj.el.find(DATE_SELECTOR).datepicker("option", "dateFormat", "yy-mm-dd");
 
     return case_obj;
@@ -685,8 +686,8 @@ function addCaseNoServer(id, number) {
 function addCase() {
     $.post("/newCase?meeting_id=" + app.meeting_id, "",
            function(data, textStatus, jqXHR) {
-        var id_num_pair = $.parseJSON(data);
-        var new_case = addCaseNoServer(id_num_pair[0], id_num_pair[1]);
-        $('body').animate({'scrollTop': new_case.el.offset().top + 500}, 'slow');
+        const id_num_pair = $.parseJSON(data);
+        const new_case = addCaseNoServer(id_num_pair[0], id_num_pair[1]);
+        $('body').animate({ scrollTop: new_case.el.offset().top + 500 }, 'slow');
     });
 }

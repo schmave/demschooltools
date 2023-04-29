@@ -12,6 +12,7 @@ dist
 # JS stuff
 node_modules/
 app/assets/javascripts/gen
+app/assets/checkin/app.html
 .eslintcache
 npm-debug.log
 

@@ -1,6 +1,6 @@
 export function init() {
   $('.has-dependents').each(function(i, el) {
-    var checkboxWithDependents = $(el);
+    const checkboxWithDependents = $(el);
     manageDependents(checkboxWithDependents);
     checkboxWithDependents.click(function() {
       manageDependents(checkboxWithDependents);
@@ -16,7 +16,7 @@ export function init() {
   }
 
   function cascadingEnable(checkboxWithDependents) {
-    var dependentElements = findDependentElements(checkboxWithDependents);
+    const dependentElements = findDependentElements(checkboxWithDependents);
     dependentElements.removeClass('dependents-disabled');
     dependentElements.find('input').prop('disabled', false);
     dependentElements.find('.has-dependents').each(function(i, el) {
@@ -27,7 +27,7 @@ export function init() {
   }
 
   function cascadingDisable(checkboxWithDependents) {
-    var dependentElements = findDependentElements(checkboxWithDependents);
+    const dependentElements = findDependentElements(checkboxWithDependents);
     dependentElements.addClass('dependents-disabled');
     dependentElements.find('input').prop('disabled', true);
     dependentElements.find('.has-dependents').each(function(i, el) {

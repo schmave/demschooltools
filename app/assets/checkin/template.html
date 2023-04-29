@@ -7,7 +7,7 @@ var _rollbarConfig = {
     captureUncaught: true,
     captureUnhandledRejections: true,
     payload: {
-        environment: "production",
+        environment: "<%= rollbarEnvironment %>",
     }
 };
 // Rollbar Snippet
@@ -19,7 +19,6 @@ var _rollbarConfig = {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="manifest" href="/assets/checkin/manifest.json">
     <link rel="stylesheet" type="text/css" href="style.css">
-    <script src="/assets/checkin/localforage.js"></script>
     <!-- for iOS -->
     <meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -138,6 +137,4 @@ var _rollbarConfig = {
 
 	<div id="overlay"></div>
 	<div id="container"></div>
-
-	<script src="/assets/checkin/app-compiled.js"></script>
 </body>

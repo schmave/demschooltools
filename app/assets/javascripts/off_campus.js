@@ -1,4 +1,4 @@
-var utils = require('./utils');
+const utils = require('./utils');
 
 export function init(people) {
   $('.js-date').val($.datepicker.formatDate('mm/dd/yy', new Date())).datepicker();
@@ -8,16 +8,16 @@ export function init(people) {
   });
 
   $('.js-time').blur(function() {
-    var time = utils.formatTime($(this).val());
+    const time = utils.formatTime($(this).val());
     $(this).val(time);
   });
 }
 
 function registerAutocomplete(row, people) {
-  var selected = row.find('.js-person-name-selected');
-    var selectedText = row.find('.js-person-name-selected-text');
-  var textInput = row.find('.js-person-name');
-    var idInput = row.find('.js-person-id');
+  const selected = row.find('.js-person-name-selected');
+    const selectedText = row.find('.js-person-name-selected-text');
+  const textInput = row.find('.js-person-name');
+    const idInput = row.find('.js-person-id');
 
   textInput.autocomplete({
         source: people,

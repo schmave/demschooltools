@@ -1,17 +1,17 @@
-var Handlebars = require('handlebars');
+const Handlebars = require('handlebars');
 
-var utils = require('./utils');
+const utils = require('./utils');
 
 function dbTimeToUserTime(str) {
     if (str === null || str.length == 0) {
         return;
     }
 
-    var splits = str.split(":");
-    var hours = parseInt(splits[0]);
-    var minutes = parseInt(splits[1]);
+    const splits = str.split(":");
+    let hours = parseInt(splits[0]);
+    const minutes = parseInt(splits[1]);
 
-    var ampm = "AM";
+    let ampm = "AM";
 
     if (hours >= 12) {
         ampm = "PM";
@@ -25,10 +25,10 @@ function dbTimeToUserTime(str) {
 }
 
 function Day(data, start_input, end_input) {
-    var self = this;
+    const self = this;
 
     self.activateCode = function() {
-        var the_code = self.start_input.val();
+        const the_code = self.start_input.val();
 
         self.end_input.val("");
         self.end_input.hide();
@@ -48,7 +48,7 @@ function Day(data, start_input, end_input) {
     };
 
     self.checkForCode = function() {
-        var the_code = self.start_input.val();
+        const the_code = self.start_input.val();
 
         if (the_code.length > 0 && !the_code.match(/[0-9]/)) {
             self.activateCode();
@@ -69,7 +69,7 @@ function Day(data, start_input, end_input) {
 
     this.save = function() {
         self.dirty = false;
-        var url = "/attendance/saveDay?day_id=" + self.id;
+        let url = "/attendance/saveDay?day_id=" + self.id;
         if (self.code_mode) {
             url += "&code=" + self.start_input.val();
         } else {
@@ -103,7 +103,7 @@ function Day(data, start_input, end_input) {
 }
 
 function PersonRow(person, days, week, el) {
-    var self = this;
+    const self = this;
 
     self.setDirty = function() { self.dirty = true; }
 
@@ -128,10 +128,10 @@ function PersonRow(person, days, week, el) {
     self.el = el;
     self.dirty = false;
 
-    var inputs = el.find("input");
+    const inputs = el.find("input");
     self.el.find("img").click(self.removePerson);
 
-    for (var i = 0; i < 5; i++) {
+    for (let i = 0; i < 5; i++) {
         self.days.push(new Day(days[i], inputs[i*2], inputs[i*2+1]));
     }
 
@@ -144,26 +144,26 @@ function PersonRow(person, days, week, el) {
 }
 
 function addNewPersonRow(people) {
-    var ids = [];
-    for (var i = 0; i < people.length; i++) {
+    const ids = [];
+    for (let i = 0; i < people.length; i++) {
         ids.push(people[i].personId);
     }
     $.post("/attendance/createPersonWeek", {
             'personId[]': ids,
             monday: app.monday
         }).done(function(data) {
-            var results = $.parseJSON(data);
-            for (var i = 0; i < results.length; i++) {
-                var result = results[i];
+            const results = $.parseJSON(data);
+            for (let i = 0; i < results.length; i++) {
+                const result = results[i];
                 loadRow(result.week.person, result.days, result.week, $(".table"));
             }
         });
 }
 
 function addAdditionalPerson(person) {
-    var new_el = $("#additional-people").append(
+    const new_el = $("#additional-people").append(
         app.additional_person_template({
-            "name": person.firstName + " " + person.lastName
+            name: person.firstName + " " + person.lastName
         })).children(":last-child");
 
     new_el.find("a").click(function () {
@@ -178,19 +178,19 @@ function addAllAdditionalPeople() {
 }
 
 function loadRow(person, days, week, dest_el) {
-    var insert_before_i;
-    for (var i = 0; i < app.person_rows.length; i++) {
-        var p2 = app.person_rows[i].person;
+    let insert_before_i;
+    for (let i = 0; i < app.person_rows.length; i++) {
+        const p2 = app.person_rows[i].person;
         if ((p2.firstName + ' ' + p2.lastName) >
             (person.firstName + ' ' + person.lastName)) {
             insert_before_i = i;
             break;
         }
     }
-    var new_row_el = $($.parseHTML(
+    const new_row_el = $($.parseHTML(
         app.person_row_template({
-            "firstName": person.firstName,
-            "lastName": person.lastName,
+            firstName: person.firstName,
+            lastName: person.lastName,
         })));
     if (insert_before_i !== undefined) {
         app.person_rows[insert_before_i].el.before(new_row_el);
@@ -198,7 +198,7 @@ function loadRow(person, days, week, dest_el) {
         dest_el.append(new_row_el);
     }
 
-    var new_row = new PersonRow(person, days, week, new_row_el);
+    const new_row = new PersonRow(person, days, week, new_row_el);
     if (insert_before_i !== undefined) {
         app.person_rows.splice(insert_before_i, 0, new_row);
     } else {
@@ -207,7 +207,7 @@ function loadRow(person, days, week, dest_el) {
 }
 
 function setNoSchool(day_num) {
-    for (var i in app.person_rows) {
+    for (const i in app.person_rows) {
         app.person_rows[i].days[day_num].start_input.val("_NS_");
         app.person_rows[i].days[day_num].onChange();
     }
@@ -233,11 +233,11 @@ function handleNoSchoolButton(day_num) {
 }
 
 function saveIfNeeded() {
-    for (var i in app.person_rows) {
+    for (const i in app.person_rows) {
         if (app.person_rows[i].dirty) {
             app.person_rows[i].save();
         }
-        for (var j in app.person_rows[i].days) {
+        for (const j in app.person_rows[i].days) {
             if (app.person_rows[i].days[j].dirty) {
                 app.person_rows[i].days[j].save();
             }
@@ -252,9 +252,9 @@ window.initAttendanceWeek = function() {
     app.additional_person_template =
         Handlebars.compile($("#additional-person-template").html());
 
-    var no_school_buttons = $("button.no-school");
+    const no_school_buttons = $("button.no-school");
     for (var i = 0; i < 5; i++) {
-        var button = no_school_buttons[i];
+        const button = no_school_buttons[i];
         $(button).click(handleNoSchoolButton(i));
     }
 

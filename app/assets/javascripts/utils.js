@@ -1,7 +1,7 @@
 require('jquery');
-var Handlebars = require('handlebars');
+const Handlebars = require('handlebars');
 
-var limitHeight = function(selector) {
+const limitHeight = function(selector) {
     $(selector).each(function() {
         if (this.offsetHeight > 80) {
             $(this).addClass("limit_height");
@@ -21,11 +21,11 @@ window.enableTagBox = function(input_box, destination_div, personId) {
     });
 
     $(input_box).bind("autocompleteselect", function(event, ui) {
-        var args = "";
+        let args = "";
         if (ui.item.id > 0) {
             args = "?tagId=" + ui.item.id;
         } else {
-            var title = $(input_box).val().replace('Create new tag: ', '');
+            const title = $(input_box).val().replace('Create new tag: ', '');
             args = "?title=" + title;
         }
         $.post("/addTag/" + personId + args, "", function(data, textStatus, jqXHR) {
@@ -35,20 +35,20 @@ window.enableTagBox = function(input_box, destination_div, personId) {
     });
 };
 
-var tag_template = Handlebars.compile(
+const tag_template = Handlebars.compile(
     '<span id="tag-{{num}}" style="white-space: nowrap;"><input type=hidden name=tag_id value={{tag_id}}>' +
     '<span class="label label-success">{{name}} ' +
     '</span><a class="tag_x"><img src="/assets/images/x.png"></a></span>');
 
 window.enableNoPersonTagBox = function(input_box, destination_div, limit_one) {
-    var self = this;
+    const self = this;
     self.tag_count = 0;
 
     $(input_box).autocomplete({
             source: "/jsonTags/-1",
     });
 
-    var removeTag = function(tag_i) {
+    const removeTag = function(tag_i) {
         return function() {
             $(destination_div).find("#tag-" + tag_i).empty();
 
@@ -59,11 +59,13 @@ window.enableNoPersonTagBox = function(input_box, destination_div, limit_one) {
     };
 
     $(input_box).bind( "autocompleteselect", function(event, ui) {
-        var new_tag_html =
+        const new_tag_html =
             $(destination_div).append(
-                tag_template({"name": ui.item.label,
-                    "num": self.tag_count++,
-                    "tag_id": ui.item.id}))
+                tag_template({
+name: ui.item.label,
+                    num: self.tag_count++,
+                    tag_id: ui.item.id
+}))
                 .children(":last-child");
 
         new_tag_html.find(".tag_x").click(removeTag(self.tag_count - 1));
@@ -77,7 +79,7 @@ window.enableNoPersonTagBox = function(input_box, destination_div, limit_one) {
     });
 };
 
-var displayName = function(person) {
+const displayName = function(person) {
     if (!person) {
         return "<No name>";
     }
@@ -89,46 +91,46 @@ var displayName = function(person) {
 };
 
 // reformat a YYYY-MM-DD date string using the given format specifier
-var reformatDate = function(format, date_str) {
+const reformatDate = function(format, date_str) {
     if (!date_str) {
         return undefined;
     }
 
-    var date = parseDate(date_str);
+    const date = parseDate(date_str);
     return $.datepicker.formatDate(format, date);
 };
 
 // parse a date in YYYY-MM-DD format
 var parseDate = function(date_str) {
-    var parts = date_str.split('-');
+    const parts = date_str.split('-');
     // new Date(year, month [, day [, hours[, minutes[, seconds[, ms]]]]])
     return new Date(parts[0], parts[1]-1, parts[2]); // Note: months are 0-based
 };
 
-var selectNextInput = function(cur_input) {
+const selectNextInput = function(cur_input) {
     getNextInput(cur_input).focus();
 
     function getNextInput(input) {
-        var next = $(":input:eq(" + ($(":input").index(input) + 1) + ")");
+        const next = $(":input:eq(" + ($(":input").index(input) + 1) + ")");
         if (next.is(":visible")) return next;
         return getNextInput(next);
     }
 };
 
-var formatTime = function(s) {
+const formatTime = function(s) {
     if (!s.match(/^[0-9]+$/)) {
         return s;
     }
     if (s.length < 3) {
         s = s + "00";
     }
-    var num = parseInt(s);
-    var hours = Math.floor(num / 100);
-    var minutes = num % 100;
+    const num = parseInt(s);
+    const hours = Math.floor(num / 100);
+    const minutes = num % 100;
     if (hours < 0 || hours > 12 || minutes < 0 || minutes > 59) {
         return "";
     }
-    var ampm = "AM";
+    let ampm = "AM";
     if (hours == 12 || hours <= 6) {
         ampm = "PM";
     }
@@ -144,13 +146,13 @@ var zeroPad = function(minutes) {
 }
 
 module.exports = {
-    displayName: displayName,
-    limitHeight: limitHeight,
-    parseDate: parseDate,
-    reformatDate: reformatDate,
-    selectNextInput: selectNextInput,
-    formatTime: formatTime,
-    zeroPad: zeroPad,
+    displayName,
+    limitHeight,
+    parseDate,
+    reformatDate,
+    selectNextInput,
+    formatTime,
+    zeroPad,
     // These events should capture all possible ways to change the text
     // in a textfield.
     TEXT_AREA_EVENTS: "change keyup paste cut",
