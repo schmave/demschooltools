@@ -70,7 +70,7 @@ public class Meeting extends Model {
         if (org.getEnableCaseReferences()) {
             for (Case c : cases) {
                 for (Charge charge : c.charges) {
-                    charge.setReferenced(charge.referencing_charges.size() > 0 || charge.referencing_cases.size() > 0);
+                    charge.setIsReferenced(charge.referencing_charges.size() > 0 || charge.referencing_cases.size() > 0);
                 }
             }
         }

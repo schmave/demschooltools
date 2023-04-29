@@ -1,7 +1,7 @@
 @(code_form : Form[AttendanceCode], destination : play.api.mvc.Call, is_editing: Boolean)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
-
+@implicitField = @{ FieldConstructor(myConstructor.f) }
 
 
 <script type="text/javascript">

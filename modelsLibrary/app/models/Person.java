@@ -111,7 +111,7 @@ public class Person extends Model implements Comparable<Person> {
 
     public static Person findById(int id, Organization org) {
         return find.query().where().eq("organization", org)
-            .eq("personId", id).findOne();
+            .eq("person_id", id).findOne();
     }
 
     public static Person findByIdWithJCData(int id, Organization org) {
@@ -134,7 +134,7 @@ public class Person extends Model implements Comparable<Person> {
             .fetch("cases_involved_in.theCase.charges.rule.section", FetchConfig.ofQuery())
             .fetch("cases_involved_in.theCase.charges.rule.section.chapter", FetchConfig.ofQuery())
             .where().eq("organization", org)
-            .eq("personId", id).findOne();
+            .eq("person_id", id).findOne();
     }
 
     public int calcAge() {
@@ -291,7 +291,7 @@ public class Person extends Model implements Comparable<Person> {
         if (!p.isFamily) {
             // Remove all existing phone numbers -- they are not loaded
             // into the object, so we have to go direct to the DB to get them.
-            List<PhoneNumber> numbers = PhoneNumber.find.query().where().eq("personId", p.personId).findList();
+            List<PhoneNumber> numbers = PhoneNumber.find.query().where().eq("person_id", p.personId).findList();
             for (PhoneNumber number : numbers) {
                 number.delete();
             }
@@ -330,7 +330,7 @@ public class Person extends Model implements Comparable<Person> {
     public boolean isStudent()
     {
         for (Tag t : tags) {
-            if (t.isUseStudentDisplay()) {
+            if (t.getUseStudentDisplay()) {
                 return true;
             }
         }

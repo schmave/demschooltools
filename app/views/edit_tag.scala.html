@@ -1,6 +1,6 @@
 @(form: Form[Tag])(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
-
+@implicitField = @{ helper.FieldConstructor(myConstructor.f) }
 
 @main("Edit tag " + form("title").value().get(), "crm") {
     <h3 class="big-margin-top">Edit tag "@form("title").value().get()"</h3>

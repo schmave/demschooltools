@@ -61,7 +61,7 @@
                 <td><input type="checkbox" class="tag-change" name="tag-change-@c.getId()"
                         @if( ! Utils.lessThanDaysOld(c.getTime(), 7) ) { disabled="disabled" }></td>
                 <td>
-                @if( c.isWasAdd() ) {
+                @if( c.getWasAdd() ) {
                     <img height=18 src="@routes.Assets.versioned("images/plus.png")"/>
                 } else {
                     <img height=18 src="@routes.Assets.versioned("images/minus.png")"/>

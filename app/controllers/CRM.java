@@ -62,7 +62,7 @@ public class CRM extends Controller {
 
         List<Person> family_members =
             Person.find.query().where().isNotNull("family").eq("family", the_person.getFamily()).
-                ne("personId", the_person.getPersonId()).findList();
+                ne("person_id", the_person.getPersonId()).findList();
 
         Set<Integer> family_ids = new HashSet<>();
         family_ids.add(the_person.getPersonId());
@@ -70,7 +70,7 @@ public class CRM extends Controller {
             family_ids.add(family.getPersonId());
         }
 
-        List<Comment> all_comments = Comment.find.query().where().in("personId", family_ids).
+        List<Comment> all_comments = Comment.find.query().where().in("person_id", family_ids).
             order("created DESC").findList();
 
         String comment_destination = "<No email set>";
@@ -418,7 +418,7 @@ public class CRM extends Controller {
                 PersonTagChange change =
                     PersonTagChange.find.byId(Integer.parseInt(key_name.substring(prefix.length())));
                 DB.execute(() -> {
-                    if (change.isWasAdd()) {
+                    if (change.getWasAdd()) {
                         tag.people.remove(change.getPerson());
                     } else {
                         if (!tag.people.contains(change.getPerson())) {
@@ -427,7 +427,7 @@ public class CRM extends Controller {
                     }
                     tag.save();
                     change.delete();
-                    notifyAboutTag(tag, change.getPerson(), !change.isWasAdd(), request);
+                    notifyAboutTag(tag, change.getPerson(), !change.getWasAdd(), request);
                 });
             }
         }
@@ -454,7 +454,7 @@ public class CRM extends Controller {
             }
         }
 
-        return ok(tag.render(the_tag, people, people_with_family, the_tag.isUseStudentDisplay(), true, request, mMessagesApi.preferred(request)));
+        return ok(tag.render(the_tag, people, people_with_family, the_tag.getUseStudentDisplay(), true, request, mMessagesApi.preferred(request)));
     }
 
     private static void createCell(Row row, int j, Object value, CellStyle style) {
@@ -678,7 +678,7 @@ public class CRM extends Controller {
 
         Person updatedPerson = Person.updateFromForm(filledForm, Utils.getOrg(request));
         return redirect(routes.CRM.person(
-                (updatedPerson.isFamily() ? updatedPerson.family_members.get(0) : updatedPerson).getPersonId()));
+                (updatedPerson.getIsFamily() ? updatedPerson.family_members.get(0) : updatedPerson).getPersonId()));
     }
 
     public Result addComment(Http.Request request) {

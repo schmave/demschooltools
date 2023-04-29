@@ -39,7 +39,7 @@ public class CaseReference {
 					cr.resolutionPlan = charge.getSmDecision();
 				}
 
-				if (charge.isReferredToSm() && cr.resolutionPlan.isEmpty()) {
+				if (charge.getReferredToSm() && cr.resolutionPlan.isEmpty()) {
 					cr.resolutionPlan = "[Referred to School Meeting]";
 				}
 

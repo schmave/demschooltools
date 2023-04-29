@@ -26,15 +26,13 @@ public class DumpOnError extends Action.Simple {
 
     public CompletionStage<Result> call(Http.Request request) {
         User currentUser = Application.getCurrentUser(request);
-        Person.Builder personBuilder =
+        final Person.Builder personBuilder =
             new Person.Builder().username(Application.currentUsername(request).orElse(null));
         if (currentUser != null) {
-          personBuilder = personBuilder.id(String.valueOf(currentUser.getId()));
+          personBuilder.id(String.valueOf(currentUser.getId()));
         }
 
-        final Person currentPerson = personBuilder.build();
-
-        Rollbar rollbar = Rollbar.init(mRollbarConfig.person(() -> currentPerson).build());
+        Rollbar rollbar = Rollbar.init(mRollbarConfig.person(personBuilder::build).build());
         return delegate.call(request).whenComplete((result, e) -> {
             if (e != null) {
                 e.printStackTrace();

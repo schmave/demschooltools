@@ -37,7 +37,7 @@
 		<div class="col-xs-4">
 		<h4><a href="@routes.CRM.viewTaskList(taskList.getId())">@taskList.getTitle()</a></h4>
 		@for( task <- taskList.tasks ) {
-			@if( task.isEnabled() ) {
+			@if( task.getEnabled() ) {
 			@defining( p.completedTask(task) ) { ct =>
 				@if( ct != null ) {
 					<input type="checkbox" class="task_checkbox" id="task_checkbox_@task.getId()" disabled checked/>

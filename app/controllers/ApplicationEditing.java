@@ -153,7 +153,7 @@ public class ApplicationEditing extends Controller {
             "DELETE from person_at_meeting where meeting_id = :meeting_id"+
             " and personId = :personId and role = :role");
         update.setParameter("meeting_id", meeting_id);
-        update.setParameter("personId", personId);
+        update.setParameter("person_id", personId);
         update.setParameter("role", role);
 
         update.executeNow();
@@ -177,7 +177,7 @@ public class ApplicationEditing extends Controller {
                                 "and personId = :personId " +
                                 "and role = :role")
                 .setParameter("case_id", case_id)
-                .setParameter("personId", personId)
+                .setParameter("person_id", personId)
                 .setParameter("role", role)
                 .executeNow();
         return ok();
@@ -264,9 +264,9 @@ public class ApplicationEditing extends Controller {
             return notFound();
         }
 
-        boolean was_referred_to_sm = c.isReferredToSm();
+        boolean was_referred_to_sm = c.getReferredToSm();
         c.edit(request.queryString());
-        if (!was_referred_to_sm && c.isReferredToSm() &&
+        if (!was_referred_to_sm && c.getReferredToSm() &&
                 !sAlreadyEmailedCharges.contains(c.getId()) &&
                 !NotificationRule.findByType(NotificationRule.TYPE_SCHOOL_MEETING, org).isEmpty()) {
             final OrgConfig org_config = Utils.getOrgConfig(org);
@@ -274,7 +274,7 @@ public class ApplicationEditing extends Controller {
                 try {
                     Thread.sleep(1000 * 60 * 5);
                     Charge c1 = Charge.find.byId(id);
-                    if (c1.isReferredToSm() && !sAlreadyEmailedCharges.contains(c1.getId())) {
+                    if (c1.getReferredToSm() && !sAlreadyEmailedCharges.contains(c1.getId())) {
                         sAlreadyEmailedCharges.add(c1.getId());
                         List<NotificationRule> rules = NotificationRule.findByType(
                                 NotificationRule.TYPE_SCHOOL_MEETING, org);

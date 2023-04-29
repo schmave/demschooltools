@@ -246,7 +246,7 @@ public class Attendance extends Controller {
                 "(startTime is not null and endTime is not null)) " +
                 "group by personId";
         SqlRow row = DB.sqlQuery(sql)
-                .setParameter("personId", p.getPersonId())
+                .setParameter("person_id", p.getPersonId())
                 .findOne();
 
         List<AttendanceDay> days =

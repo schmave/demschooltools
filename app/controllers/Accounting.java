@@ -229,7 +229,7 @@ public class Accounting extends Controller {
     public Result editAccount(Integer id, Http.Request request) {
         Account account = Account.findById(id, Utils.getOrg(request));
         Form<Account> form = mFormFactory.form(Account.class).fill(account);
-        return ok(edit_account.render(form, account.isActive(), request, mMessagesApi.preferred(request)));
+        return ok(edit_account.render(form, account.getIsActive(), request, mMessagesApi.preferred(request)));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)

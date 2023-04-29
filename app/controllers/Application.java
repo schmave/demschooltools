@@ -249,7 +249,7 @@ public class Application extends Controller {
         if (charge.getSmDecision() != null && !charge.getSmDecision().isEmpty()) {
             return charge.getSmDecision();
         }
-        if (charge.isReferredToSm() && charge.getResolutionPlan().isEmpty()) {
+        if (charge.getReferredToSm() && charge.getResolutionPlan().isEmpty()) {
             return "[Referred to School Meeting]";
         }
         return charge.getResolutionPlan();
@@ -493,7 +493,7 @@ public class Application extends Controller {
             }
             writer.write(org_config.translatePlea(c.getPlea()));
             writer.write(c.getResolutionPlan());
-            writer.write("" + c.isRpComplete());
+            writer.write("" + c.getRpComplete());
             if (org_config.show_severity) {
                 writer.write(c.getSeverity());
             }
@@ -501,7 +501,7 @@ public class Application extends Controller {
             if (org_config.use_minor_referrals) {
                 writer.write(c.getMinorReferralDestination());
             }
-            writer.write("" + c.isReferredToSm());
+            writer.write("" + c.getReferredToSm());
             if (c.getSmDecision() != null) {
                 writer.write(c.getSmDecision());
             } else {
@@ -663,7 +663,7 @@ public class Application extends Controller {
         Meeting m = Meeting.findById(meeting_id, org);
         for (Case c : m.cases) {
             for (Charge charge : c.charges) {
-                if (charge.displayInResolutionPlanList() && !charge.isReferredToSm()) {
+                if (charge.displayInResolutionPlanList() && !charge.getReferredToSm()) {
                     writer.write(charge.getPerson().getDisplayName());
 
                     // In case it's needed in the future, adding a space to

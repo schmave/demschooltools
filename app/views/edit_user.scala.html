@@ -1,6 +1,6 @@
 @(u : User, userForm : Form[User])(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 @import helper._
-
+@implicitField = @{ FieldConstructor(myConstructor.f) }
 
 
 @main("Edit user " + u.getName(), "settings") {

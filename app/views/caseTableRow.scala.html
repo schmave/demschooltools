@@ -56,7 +56,7 @@
 	</td></tr>
 
 	@for( charge <- c.charges ) {
-		@if( charge.isReferredToSm() && charge.getSmDecision() == null) {
+		@if( charge.getReferredToSm() && charge.getSmDecision() == null) {
 			<tr><td colspan="3" class="smDecision">*** Awaiting @Utils.getOrgConfig(request).getReferralDestination(charge) decision on charging
 			@if(charge.getPerson() != null) { @charge.getPerson().getDisplayName() } else { ??? } with
 			@charge.getRuleTitle().

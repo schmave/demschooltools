@@ -1,7 +1,7 @@
 @(users : List[User], allowed_ip : String, userForm : Form[User])(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
-
+@implicitField = @{ FieldConstructor(myConstructor.f) }
 
 
 @main("Users & Access", "settings", "settings_access") {
@@ -14,7 +14,7 @@
 		<th class="center">@UserRole.getDescription(Utils.getOrgConfig(request), role)</th>
 	}
 <th></th></thead>
-@for( u <- users ) { @if( u.isActive() ) {
+@for( u <- users ) { @if( u.getActive() ) {
 <tr><td>@u.getName()</td><td>@u.getEmail()</td>
 @for( role <- UserRole.ALL_ROLES ) {
 	<td class="center">@if( u.hasRole(role) ) {
@@ -58,7 +58,7 @@ through your school's internet connection. Enter an IP address to allow below to
 <table class="table" style="width: 400px">
 <thead><th>Name</th><th>Email</th><th></th></thead>
 
-@for( u <- users ) { @if( !u.isActive() ) {
+@for( u <- users ) { @if( !u.getActive() ) {
 <tr><td>@u.getName()</td><td>@u.getEmail()</td>
 <td><a class="edit-link" href="@routes.Settings.editUser(u.getId())">Edit</a></td>
 </tr>

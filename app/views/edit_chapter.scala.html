@@ -1,5 +1,5 @@
 @(form: Form[Chapter], is_new : Boolean)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
-
+@implicitField = @{ helper.FieldConstructor(myConstructor.f) }
 @main("Edit a chapter", "manual") {
 
 @if( is_new ) {

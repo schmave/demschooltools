@@ -4,7 +4,7 @@ import java.util.*;
 
 public class RuleHistory {
 
-    public class Record {
+    public static class Record {
         public Date most_recent_charge;
         public Person person;
         public int count;

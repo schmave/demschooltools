@@ -1,7 +1,7 @@
 @(list: TaskList, listForm : Form[TaskList], taskForm : Form[Task])(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
-
+@implicitField = @{ FieldConstructor(myConstructor.f) }
 
 @main("Settings for " + list.getTitle(), "settings") {
 
@@ -16,13 +16,13 @@
 <tbody>
 @for( task <- list.tasks ) {
 	<tr><td>
-		@if(!task.isEnabled()) {<strike>}
+		@if(!task.getEnabled()) {<strike>}
 		@task.getTitle()
-		@if(!task.isEnabled()) {</strike>}
+		@if(!task.getEnabled()) {</strike>}
 	</td><td>
-		@if(!task.isEnabled()) {<strike>}
+		@if(!task.getEnabled()) {<strike>}
 		@task.getSortOrder()
-		@if(!task.isEnabled()) {</strike>}
+		@if(!task.getEnabled()) {</strike>}
 	</td>
 	<td><a class="edit-link" href="@routes.Settings.editTask(task.getId())">Edit</a></td>
 	</tr>

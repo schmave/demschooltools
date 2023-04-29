@@ -1,7 +1,7 @@
 @(taskForm:Form[Task], list_options : List[TaskList])(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
-
+@implicitField = @{ helper.FieldConstructor(myConstructor.f) }
 
 @main("Edit task", "settings") {
 

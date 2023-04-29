@@ -85,11 +85,11 @@ import lombok.Setter;
 
             capital_name = new_var_name[0].upper() + new_var_name[1:]
             getter = 'get' + capital_name
-            if 'boolean' == types[old_var_name]:
-                if new_var_name.startswith('is') and new_var_name[2].isupper():
-                    getter = new_var_name
-                else:
-                    getter = 'is' + capital_name
+            # if 'boolean' == types[old_var_name]:
+            #     if new_var_name.startswith('is') and new_var_name[2].isupper():
+            #         getter = new_var_name
+            #     else:
+            #         getter = 'is' + capital_name
             setter = 'set' + capital_name
 
             if 'modelsLibrary' not in path and (path.endswith('.java') or path.endswith('.scala.html')):
