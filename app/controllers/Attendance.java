@@ -783,27 +783,25 @@ public class Attendance extends Controller {
     }
 
     public Result newRule() {
+        return rule(null);
+    }
+
+    public Result rule(Integer id) {
         Organization org = OrgConfig.get().org;
-        AttendanceRule rule = new AttendanceRule();
-        Form<AttendanceRule> form = Form.form(AttendanceRule.class);
         String people_json = Application.attendancePeopleJson();
+        AttendanceRule rule = id == null ? new AttendanceRule() : AttendanceRule.findById(id);
         return ok(views.html.attendance_edit_rule.render(
             rule,
-            form,
             people_json,
             org.attendance_enable_partial_days,
             org.attendance_show_reports
         ));
     }
 
-    public Result rule(Integer id) {
-        return redirect(routes.Attendance.rules());
-    }
-
     public Result saveRule() throws Exception {
         Form<AttendanceRule> form = Form.form(AttendanceRule.class);
         Form<AttendanceRule> filledForm = form.bindFromRequest();
-        AttendanceRule rule = AttendanceRule.create(filledForm);
+        AttendanceRule.save(filledForm);
         return redirect(routes.Attendance.rules());
     }
 

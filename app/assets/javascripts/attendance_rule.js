@@ -9,9 +9,5 @@ export function init(selectedPersonId, people) {
     $(this).val(time);
   });
 
-  utils.registerAutocomplete($('.js-person'), people);
-
-  if (selectedPersonId) {
-
-  }
+  utils.registerAutocomplete($('.js-person'), people, false, selectedPersonId);
 }

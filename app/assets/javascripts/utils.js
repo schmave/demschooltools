@@ -143,7 +143,7 @@ var zeroPad = function(minutes) {
     }
 }
 
-var registerAutocomplete = function(row, people, autoAdvance) {
+var registerAutocomplete = function(row, people, autoAdvance, startingId) {
     var selected = row.find('.js-person-name-selected');
     var selectedText = row.find('.js-person-name-selected-text');
     var textInput = row.find('.js-person-name');
@@ -158,6 +158,13 @@ var registerAutocomplete = function(row, people, autoAdvance) {
     textInput.bind("autocompleteselect", function(event, ui) {
         select(ui.item);
     });
+
+    if (startingId) {
+        var item = people.filter(p => p.id == startingId)[0];
+        if (item) {
+            select(item);
+        }
+    }
 
     function select(item) {
         idInput.val(item.id);

@@ -60,12 +60,20 @@ public class AttendanceRule extends Model {
         return find.where().eq("organization", Organization.getByHost()).findList();
     }
 
-    public static AttendanceRule create(Form<AttendanceRule> form) throws Exception {
-        AttendanceRule rule = form.get();
+    public static void save(Form<AttendanceRule> form) throws Exception {
+        AttendanceRule rule_from_form = form.get();
+
+        AttendanceRule rule = rule_from_form.id == null 
+            ? rule_from_form 
+            : AttendanceRule.findById(rule_from_form.id);
+
+        rule.organization = Organization.getByHost();
 
         String person_id = form.field("person_id").value();
         if (!person_id.isEmpty()) {
             rule.person = Person.findById(Integer.valueOf(person_id));
+        } else {
+            rule.person = null;
         }
 
         String _latest_start_time = form.field("_latest_start_time").value();
@@ -73,19 +81,24 @@ public class AttendanceRule extends Model {
             rule.latest_start_time = AttendanceDay.parseTime(_latest_start_time);
         }
 
-        rule.organization = Organization.getByHost();
+        rule.start_date = rule_from_form.start_date;
+        rule.end_date = rule_from_form.end_date;
+        rule.notification_email = rule_from_form.notification_email;
+        rule.monday = rule_from_form.monday;
+        rule.tuesday = rule_from_form.tuesday;
+        rule.wednesday = rule_from_form.wednesday;
+        rule.thursday = rule_from_form.thursday;
+        rule.friday = rule_from_form.friday;
+        rule.absence_code = rule_from_form.absence_code;
+        rule.min_hours = rule_from_form.min_hours;
+        rule.exempt_from_fees = rule_from_form.exempt_from_fees;
 
         rule.save();
-        return rule;
     }
 
     public static void delete(Integer id) {
         AttendanceRule rule = find.ref(id);
         rule.delete();
-    }
-
-    public void updateFromForm(Form<AttendanceRule> form) throws Exception {
-        save();
     }
 
     public String getFormattedPerson() {
@@ -95,9 +108,9 @@ public class AttendanceRule extends Model {
         return "Everyone";
     }
 
-    public String getFormattedDate(Date d) {
+    public String getFormattedDate(Date d, boolean forDisplay) {
         if (d == null) {
-            return "-";
+            return forDisplay ? "-" : "";
         }
         return Application.formatDateMdy(d);
     }
@@ -134,7 +147,7 @@ public class AttendanceRule extends Model {
         if (b) {
             return "Yes";
         }
-        return "No";
+        return "";
     }
 
     public String getCodeColor(Map<String, AttendanceCode> codes_map) {
