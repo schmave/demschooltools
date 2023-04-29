@@ -16,10 +16,8 @@ import play.i18n.MessagesApi;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
-import play.mvc.With;
 import views.html.*;
 
-@With(DumpOnError.class)
 public class ApplicationEditing extends Controller {
 
     private final Database mDatabase;

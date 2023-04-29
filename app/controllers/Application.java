@@ -22,12 +22,12 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 import play.api.libs.mailer.MailerClient;
 import play.i18n.MessagesApi;
+import play.libs.Files.TemporaryFile;
 import play.libs.Json;
 import play.mvc.*;
 import views.html.*;
 
 @Singleton
-@With(DumpOnError.class)
 @Secured.Auth(UserRole.ROLE_VIEW_JC)
 public class Application extends Controller {
 
@@ -1327,7 +1327,7 @@ public class Application extends Controller {
         return new SimpleDateFormat("EEEE, MMMM d, h:mm a").format(Utils.localNow(orgConfig));
     }
 
-    public static Optional<String> currentUsername(Http.Request request) {
+    public static Optional<String> currentUsername(Http.RequestHeader request) {
         return request.attrs().getOptional(Security.USERNAME);
     }
 
@@ -1356,7 +1356,7 @@ public class Application extends Controller {
         }
     }
 
-    public static User getCurrentUser(Http.Request request) {
+    public static User getCurrentUser(Http.RequestHeader request) {
         return User.findByAuthUserIdentity(
             sInstance.mAuth.getUser(request.session()));
     }
@@ -1419,20 +1419,21 @@ public class Application extends Controller {
 
     @Secured.Auth(UserRole.ROLE_ALL_ACCESS)
     public Result uploadFileShare(Http.Request request) throws IOException {
-        Http.MultipartFormData<File> body = request.body().asMultipartFormData();
-        Http.MultipartFormData.FilePart<File> pdf = body.getFile("pdf_upload");
+        Http.MultipartFormData<TemporaryFile> body = request.body().asMultipartFormData();
+        Http.MultipartFormData.FilePart<TemporaryFile> pdf = body.getFile("pdf_upload");
         if (pdf != null) {
             String fileName = pdf.getFilename();
             if (!fileName.equals("")) {
                 File outputFile = new File(getSharedFileDirectory(Utils.getOrg(request)), fileName);
-                copyFileUsingStream(pdf.getRef().getAbsoluteFile(), outputFile);
+                pdf.getRef().copyTo(outputFile);
             }
         }
         return redirect(routes.Application.fileSharing());
     }
 
     private static File getSharedFileDirectory(Organization org) {
-        File result = new File("/www-dst", "" + org.getId());
+        File result = new File(Public.sConfig.getConfig("school_crm").getString("shared_files_path"),
+                "" + org.getId());
         if (!result.exists()) {
             result.mkdir();
         }

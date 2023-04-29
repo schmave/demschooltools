@@ -18,7 +18,6 @@ import play.libs.Json;
 import play.mvc.*;
 import views.html.*;
 
-@With(DumpOnError.class)
 @Secured.Auth(UserRole.ROLE_ALL_ACCESS)
 public class CRM extends Controller {
 

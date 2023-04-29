@@ -10,7 +10,6 @@ import play.i18n.MessagesApi;
 import play.mvc.*;
 import views.html.*;
 
-@With(DumpOnError.class)
 @Secured.Auth(UserRole.ROLE_ALL_ACCESS)
 public class Settings extends Controller {
 

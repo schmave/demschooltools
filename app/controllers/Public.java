@@ -15,12 +15,10 @@ import play.i18n.MessagesApi;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
-import play.mvc.With;
 import views.html.logged_out;
 import views.html.login;
 
 @Singleton
-@With(DumpOnError.class)
 public class Public extends Controller {
 
     PlayAuthenticate mPlayAuth;

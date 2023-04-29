@@ -1,18 +1,14 @@
 package controllers;
 
 import java.sql.Time;
-import java.util.*;
-import java.util.stream.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-
+import java.util.*;
+import java.util.stream.*;
 import models.*;
-
 import play.libs.Json;
 import play.mvc.*;
 
-
-@With(DumpOnError.class)
 @Secured.Auth(UserRole.ROLE_CHECKIN_APP)
 public class Checkin extends Controller {
 

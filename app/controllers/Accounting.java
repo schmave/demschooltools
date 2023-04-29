@@ -16,10 +16,8 @@ import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
-import play.mvc.With;
 import views.html.*;
 
-@With(DumpOnError.class)
 @Secured.Auth(UserRole.ROLE_VIEW_JC)
 public class Accounting extends Controller {
 
