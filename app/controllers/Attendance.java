@@ -241,12 +241,12 @@ public class Attendance extends Controller {
         }
 
         String sql = "select min(day) as min_date, max(day) as max_date from attendance_day where " +
-                "personId=:personId and " +
+                "person_id=:personId and " +
                 "((code is not null and code != '_NS_') or " +
-                "(startTime is not null and endTime is not null)) " +
-                "group by personId";
+                "(start_time is not null and end_time is not null)) " +
+                "group by person_id";
         SqlRow row = DB.sqlQuery(sql)
-                .setParameter("person_id", p.getPersonId())
+                .setParameter("personId", p.getPersonId())
                 .findOne();
 
         List<AttendanceDay> days =
@@ -833,7 +833,7 @@ public class Attendance extends Controller {
     }
 
     public Result runReport(Http.Request request) {
-        Form<AttendanceReport> form = mFormFactory.form(AttendanceReport.class);
+        Form<AttendanceReport> form = mFormFactory.form(AttendanceReport.class).withDirectFieldAccess(true);
         Form<AttendanceReport> filledForm = form.bindFromRequest(request);
         if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());

@@ -108,7 +108,7 @@ public class Accounting extends Controller {
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result runTransactionsReport(Http.Request request) throws IOException {
-        Form<TransactionList> form = mFormFactory.form(TransactionList.class);
+        Form<TransactionList> form = mFormFactory.form(TransactionList.class).withDirectFieldAccess(true);
         Form<TransactionList> filledForm = form.bindFromRequest(request);
         if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
@@ -171,7 +171,7 @@ public class Accounting extends Controller {
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
     public Result runReport(Http.Request request) {
-        Form<AccountingReport> form = mFormFactory.form(AccountingReport.class);
+        Form<AccountingReport> form = mFormFactory.form(AccountingReport.class).withDirectFieldAccess(true);
         Form<AccountingReport> filledForm = form.bindFromRequest(request);
         if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());

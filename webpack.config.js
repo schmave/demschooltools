@@ -64,7 +64,7 @@ module.exports = function (env, argv) {
         hash: true,
         chunks: ["checkin"],
         templateParameters: {
-          rollbarEnvironment: argv.mode == "production" ? "production" : "dev",
+          rollbarEnvironment: argv.mode == "production" ? "production" : "development",
         },
       }),
     ],

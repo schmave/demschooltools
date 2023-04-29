@@ -1,12 +1,11 @@
 package models;
 
-import play.data.Form;
-
 import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import play.data.Form;
 
 public class AttendanceReport {
 
@@ -34,7 +33,7 @@ public class AttendanceReport {
             .ge("day", model.start_date)
             .le("day", model.end_date)
             .gt("endTime", model.latest_departure_time)
-            .order("person.getFirstName() ASC, day ASC")
+            .order("person.firstName ASC, day ASC")
             .findList();
 
         for (AttendanceDay event : events) {
