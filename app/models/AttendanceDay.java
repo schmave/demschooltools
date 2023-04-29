@@ -56,8 +56,15 @@ public class AttendanceDay extends Model {
         AttendanceDay result = new AttendanceDay();
         result.person = p;
         result.day = day;
-        result.save();
 
+        List<AttendanceRule> rules = AttendanceRule.currentRules(day, p.person_id);
+        for (AttendanceRule rule : rules) {
+            if (rule.doesMatchDaysOfWeek(day)) {
+                result.code = rule.absence_code;
+            }
+        }
+
+        result.save();
         return result;
     }
 

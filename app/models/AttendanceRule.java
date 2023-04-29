@@ -62,34 +62,41 @@ public class AttendanceRule extends Model {
         return find.where().eq("organization", Organization.getByHost()).findList();
     }
 
-    public static List<AttendanceRule> currentRules() {
-        return find
-            .where()
+    public static List<AttendanceRule> currentRules(Date date, Integer person_id) {
+        com.avaje.ebean.ExpressionList<models.AttendanceRule> result = find.where()
             .eq("organization", Organization.getByHost())
             .or(
                 com.avaje.ebean.Expr.eq("start_date", null),
-                com.avaje.ebean.Expr.le("start_date", new Date())
+                com.avaje.ebean.Expr.le("start_date", date)
             )
             .or(
                 com.avaje.ebean.Expr.eq("end_date", null),
-                com.avaje.ebean.Expr.ge("end_date", new Date())
-            )
-            .findList();
+                com.avaje.ebean.Expr.ge("end_date", date)
+            );
+
+        if (person_id != null) {
+            result = result.or(
+                com.avaje.ebean.Expr.eq("person_id", null),
+                com.avaje.ebean.Expr.eq("person_id", person_id)
+            );
+        }
+
+        return result.findList();
     }
 
-    public static List<AttendanceRule> futureRules() {
+    public static List<AttendanceRule> futureRules(Date date) {
         return find
             .where()
             .eq("organization", Organization.getByHost())
-            .gt("start_date", new Date())
+            .gt("start_date", date)
             .findList();
     }
 
-    public static List<AttendanceRule> expiredRules() {
+    public static List<AttendanceRule> pastRules(Date date) {
         return find
             .where()
             .eq("organization", Organization.getByHost())
-            .lt("end_date", new Date())
+            .lt("end_date", date)
             .findList();
     }
 
@@ -108,14 +115,17 @@ public class AttendanceRule extends Model {
                     return 1;
                 }
                 if (r1.person != null && r2.person != null) {
-                    return r1.person.getDisplayName().compareTo(r2.person.getDisplayName());
+                    int nameComparison = r1.person.getDisplayName().compareTo(r2.person.getDisplayName());
+                    if (nameComparison != 0) {
+                        return nameComparison;
+                    }
                 }
                 return r1.id.compareTo(r2.id);
             }
         });
     }
 
-    public static void sortExpiredRules(List<AttendanceRule> rules) {
+    public static void sortPastRules(List<AttendanceRule> rules) {
         rules.sort(new Comparator<AttendanceRule>() {
             @Override
             public int compare(AttendanceRule r1, AttendanceRule r2) {
@@ -143,6 +153,8 @@ public class AttendanceRule extends Model {
         String _latest_start_time = form.field("_latest_start_time").value();
         if (!_latest_start_time.isEmpty()) {
             rule.latest_start_time = AttendanceDay.parseTime(_latest_start_time);
+        } else {
+            rule.latest_start_time = null;
         }
 
         rule.category = rule_from_form.category;
@@ -224,5 +236,18 @@ public class AttendanceRule extends Model {
             return code.color;
         }
         return "transparent";
+    }
+
+    public boolean doesMatchDaysOfWeek(Date date) {
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+
+        if (dayOfWeek == 2) return monday;
+        if (dayOfWeek == 3) return tuesday;
+        if (dayOfWeek == 4) return wednesday;
+        if (dayOfWeek == 5) return thursday;
+        if (dayOfWeek == 6) return friday;
+        return false;
     }
 }
