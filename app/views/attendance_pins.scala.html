@@ -26,7 +26,7 @@
 <script>
 	document.getElementById('save').addEventListener('click', function() {
 		const pins = [];
-		document.querySelectorAll('.getPin()').forEach(function(el) {
+		document.querySelectorAll('.pin').forEach(function(el) {
 			let pin = el.value;
 			if (pins.includes(pin)) {
 				el.setCustomValidity('This PIN is used more than once.');
@@ -38,7 +38,7 @@
 			}
 		});
 	});
-	document.querySelectorAll('.getPin()').forEach(function(el) {
+	document.querySelectorAll('.pin').forEach(function(el) {
 		el.addEventListener('input', function() {
 			this.setCustomValidity('');
 		});
