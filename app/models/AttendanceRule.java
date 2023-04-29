@@ -20,6 +20,8 @@ public class AttendanceRule extends Model {
     @ManyToOne()
     public Organization organization;
 
+    public String category;
+
     @ManyToOne()
     @JoinColumn(name="person_id")
     public Person person;
@@ -60,6 +62,68 @@ public class AttendanceRule extends Model {
         return find.where().eq("organization", Organization.getByHost()).findList();
     }
 
+    public static List<AttendanceRule> currentRules() {
+        return find
+            .where()
+            .eq("organization", Organization.getByHost())
+            .or(
+                com.avaje.ebean.Expr.eq("start_date", null),
+                com.avaje.ebean.Expr.le("start_date", new Date())
+            )
+            .or(
+                com.avaje.ebean.Expr.eq("end_date", null),
+                com.avaje.ebean.Expr.ge("end_date", new Date())
+            )
+            .findList();
+    }
+
+    public static List<AttendanceRule> futureRules() {
+        return find
+            .where()
+            .eq("organization", Organization.getByHost())
+            .gt("start_date", new Date())
+            .findList();
+    }
+
+    public static List<AttendanceRule> expiredRules() {
+        return find
+            .where()
+            .eq("organization", Organization.getByHost())
+            .lt("end_date", new Date())
+            .findList();
+    }
+
+    public static void sortCurrentRules(List<AttendanceRule> rules) {
+        rules.sort(new Comparator<AttendanceRule>() {
+            @Override
+            public int compare(AttendanceRule r1, AttendanceRule r2) {
+                int categoryComparison = r1.category.compareTo(r2.category);
+                if (categoryComparison != 0) {
+                    return categoryComparison;
+                }
+                if (r1.person == null && r2.person != null) {
+                    return -1;
+                }
+                if (r1.person != null && r2.person == null) {
+                    return 1;
+                }
+                if (r1.person != null && r2.person != null) {
+                    return r1.person.getDisplayName().compareTo(r2.person.getDisplayName());
+                }
+                return r1.id.compareTo(r2.id);
+            }
+        });
+    }
+
+    public static void sortExpiredRules(List<AttendanceRule> rules) {
+        rules.sort(new Comparator<AttendanceRule>() {
+            @Override
+            public int compare(AttendanceRule r1, AttendanceRule r2) {
+                return r2.end_date.compareTo(r1.end_date);
+            }
+        });
+    }
+
     public static void save(Form<AttendanceRule> form) throws Exception {
         AttendanceRule rule_from_form = form.get();
 
@@ -81,6 +145,7 @@ public class AttendanceRule extends Model {
             rule.latest_start_time = AttendanceDay.parseTime(_latest_start_time);
         }
 
+        rule.category = rule_from_form.category;
         rule.start_date = rule_from_form.start_date;
         rule.end_date = rule_from_form.end_date;
         rule.notification_email = rule_from_form.notification_email;
@@ -132,7 +197,10 @@ public class AttendanceRule extends Model {
         if (friday) {
             result.add("F");
         }
-        return String.join(",", result);
+        if (result.size() > 0) {
+            return String.join(",", result);
+        }
+        return "None";
     }
 
     public String getFormattedTime(Time time) {

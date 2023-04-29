@@ -770,12 +770,17 @@ public class Attendance extends Controller {
     public Result rules() {
         Organization org = OrgConfig.get().org;
         Map<String, AttendanceCode> codes_map = getCodesMap(false);
-        List<AttendanceRule> current_rules = AttendanceRule.all();
-        List<AttendanceRule> past_rules = AttendanceRule.all();
+        List<AttendanceRule> current_rules = AttendanceRule.currentRules();
+        List<AttendanceRule> future_rules = AttendanceRule.futureRules();
+        List<AttendanceRule> expired_rules = AttendanceRule.expiredRules();
+        AttendanceRule.sortCurrentRules(current_rules);
+        AttendanceRule.sortCurrentRules(future_rules);
+        AttendanceRule.sortExpiredRules(expired_rules);
 
         return ok(views.html.attendance_rules.render(
             current_rules,
-            past_rules,
+            future_rules,
+            expired_rules,
             codes_map,
             org.attendance_enable_partial_days,
             org.attendance_show_reports
@@ -806,6 +811,7 @@ public class Attendance extends Controller {
     }
 
     public Result deleteRule(Integer id) {
+        AttendanceRule.delete(id);
         return redirect(routes.Attendance.rules());
     }
 

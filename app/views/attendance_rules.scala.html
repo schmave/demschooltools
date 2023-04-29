@@ -1,6 +1,7 @@
 @(
 current_rules : List[AttendanceRule],
-past_rules : List[AttendanceRule],
+future_rules : List[AttendanceRule],
+expired_rules : List[AttendanceRule],
 codes_map : Map[String, AttendanceCode],
 enable_partial_days : Boolean,
 enable_late_fees : Boolean
@@ -10,48 +11,19 @@ enable_late_fees : Boolean
 
 @main("Rules", "attendance", "rules") {
 
-<h3>Attendance Rules</h3>
+	<h3>Attendance Rules</h3>
 
-<a href="@routes.Attendance.newRule()">New Rule</a>
+	<a href="@routes.Attendance.newRule()" class="btn btn-primary">New Rule</a>
 
-<h4>Current Rules</h4>
+	<h4 class="attendance-rules-category">Current Rules</h4>
+	@attendance_rules_table(current_rules, codes_map, enable_partial_days, enable_late_fees)
 
-<table class="table sortable">
-	<tr>
-		<th>Rule #</th>
-		<th>Person</th>
-		<th>Start Date</th>
-		<th>End Date</th>
-		<th>Notification Email</th>
-		<th>Days of Week</th>
-		<th>Default Code</th>
-		@if(enable_partial_days) {
-			<th>Min Hours</th>
-			<th>Latest Arrival Time</th>
-		}
-		@if(enable_late_fees) {
-			<th>Exempt from Fees</th>
-		}
-	</tr>
-	@for( rule <- current_rules ) {
-		<tr>
-			<td><a href="@routes.Attendance.rule(rule.id)">@rule.id</a></td>
-			<td>@rule.getFormattedPerson()</td>
-			<td>@rule.getFormattedDate(rule.start_date, true)</td>
-			<td>@rule.getFormattedDate(rule.end_date, true)</td>
-			<td>@rule.notification_email</td>
-			<td>@rule.getFormattedDaysOfWeek()</td>
-			<td style="background: @rule.getCodeColor(codes_map)">@rule.absence_code</td>
-			@if(enable_partial_days) {
-				<td>@rule.min_hours</td>
-				<td>@rule.getFormattedTime(rule.latest_start_time)</td>
-			}
-			@if(enable_late_fees) {
-				<td>@rule.getFormattedBoolean(rule.exempt_from_fees)</td>
-			}
-		</tr>
-	}
-</table>
-<br><br><br><br>
+	<h4 class="attendance-rules-category">Future Rules</h4>
+	@attendance_rules_table(future_rules, codes_map, enable_partial_days, enable_late_fees)
+
+	<h4 class="attendance-rules-category">Expired Rules</h4>
+	@attendance_rules_table(expired_rules, codes_map, enable_partial_days, enable_late_fees)
+
+	<br><br><br><br>
 
 }

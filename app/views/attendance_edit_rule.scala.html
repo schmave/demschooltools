@@ -22,6 +22,13 @@ enable_late_fees : Boolean
 	<table class="attendance-edit-rule-table">
 		<tr>
 			<th>
+				Category
+				<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="Setting a category helps you keep the list of rules organized."></span>
+			</th>
+			<td><input type="text" size="15" name="category" value="@rule.category"></td>
+		</tr>
+		<tr>
+			<th>
 				Person
 				<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="The person this rule applies to. Leave blank to apply the rule to everyone."></span>
 			</th>
@@ -53,7 +60,7 @@ enable_late_fees : Boolean
 				Notification Email
 				<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="If set, an email will automatically be sent when the rule expires."></span>
 			</th>
-			<td><input type="text" size="36" name="notification_email" value="@rule.notification_email"></td>
+			<td><input type="text" size="35" name="notification_email" value="@rule.notification_email"></td>
 		</tr>
 		<tr>
 			<th>

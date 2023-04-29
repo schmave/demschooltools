@@ -3,6 +3,7 @@
 CREATE TABLE attendance_rule (
    id serial,
    organization_id integer NOT NULL,
+   category text,
    person_id integer,
    start_date date,
    end_date date,
