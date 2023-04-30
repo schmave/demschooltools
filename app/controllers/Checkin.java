@@ -12,11 +12,17 @@ import play.mvc.*;
 @Secured.Auth(UserRole.ROLE_CHECKIN_APP)
 public class Checkin extends Controller {
 
-    public Result checkinData(String time, Http.Request request) throws ParseException {
+
+    public String cleanTimeString(String time) {
         // As of April 2023, some browsers are including non-breaking spaces in
         // their localized time strings, so we need to replace them with regular
         // spaces before trying to parse.
-        time = time.replace('\u00A0',' ').replace('\u2007',' ').replace('\u202F',' ');
+        return time.replace('\u00A0',' ').replace('\u2007',' ').replace('\u202F',' ');
+    }
+
+
+    public Result checkinData(String time, Http.Request request) throws ParseException {
+        time = cleanTimeString(time);
         Date date = new SimpleDateFormat("M/d/yyyy, h:mm:ss a").parse(time);
 
         Date start_date = ModelUtils.getStartOfYear();
@@ -48,6 +54,7 @@ public class Checkin extends Controller {
 
     public Result checkinMessage(String time_string, int personId, boolean is_arriving,
                                  Http.Request request) throws ParseException {
+        time_string = cleanTimeString(time_string);
         Date date = new SimpleDateFormat("M/d/yyyy, h:mm:ss a").parse(time_string);
         Time time = new Time(date.getTime());
         AttendanceDay attendance_day = AttendanceDay.findCurrentDay(date, personId, Utils.getOrg(request));
@@ -76,6 +83,7 @@ public class Checkin extends Controller {
         Date date = new Date();
         // We use time_string to determine which day it is according to the client. This could be different
         // from the current day according to the server, depending on the client's time zone.
+        time_string = cleanTimeString(time_string);
         if (!time_string.isEmpty()) {
             date = new SimpleDateFormat("M/d/yyyy, h:mm:ss a").parse(time_string);
         }
