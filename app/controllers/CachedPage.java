@@ -12,97 +12,102 @@ import java.util.zip.GZIPOutputStream;
 import models.*;
 
 public abstract class CachedPage {
-    public static final String ATTENDANCE_INDEX = "Attendance-index-";
-    public static final String JC_INDEX = "Application-index-";
-    public static final String MANUAL_INDEX = "Application-viewManual-";
-    public static final String RECENT_COMMENTS = "CRM-recentComments-";
+  public static final String ATTENDANCE_INDEX = "Attendance-index-";
+  public static final String JC_INDEX = "Application-index-";
+  public static final String MANUAL_INDEX = "Application-viewManual-";
+  public static final String RECENT_COMMENTS = "CRM-recentComments-";
 
-    public String title;
-    public String menu;
-    public String selected_button;
-    public String cache_key;
+  public String title;
+  public String menu;
+  public String selected_button;
+  public String cache_key;
 
-    static String getKey(String key_base, Organization org) {
-        return key_base + "-" + org.getId();
-    }
+  static String getKey(String key_base, Organization org) {
+    return key_base + "-" + org.getId();
+  }
 
-    public static void remove(String key_base, Organization org) {
-        Public.sCache.remove(getKey(key_base, org));
-    }
+  public static void remove(String key_base, Organization org) {
+    Public.sCache.remove(getKey(key_base, org));
+  }
 
-    public CachedPage(String key_base, String title, String menu,
-                      String selected_button, Organization org) {
-        this.title = title;
-        this.cache_key = getKey(key_base, org);
-        this.menu = menu;
-        this.selected_button = selected_button;
-    }
+  public CachedPage(
+      String key_base, String title, String menu, String selected_button, Organization org) {
+    this.title = title;
+    this.cache_key = getKey(key_base, org);
+    this.menu = menu;
+    this.selected_button = selected_button;
+  }
 
-    public String getPage() {
-        Optional<byte[]> cached_bytes = Public.sCache.get(cache_key);
-        if (cached_bytes.isPresent()) {
-            try {
-                ByteArrayInputStream bais = new ByteArrayInputStream(cached_bytes.get());
-                GZIPInputStream gzis = new GZIPInputStream(bais);
-                BufferedReader reader = new BufferedReader(new InputStreamReader(gzis));
+  public String getPage() {
+    Optional<byte[]> cached_bytes = Public.sCache.get(cache_key);
+    if (cached_bytes.isPresent()) {
+      try {
+        ByteArrayInputStream bais = new ByteArrayInputStream(cached_bytes.get());
+        GZIPInputStream gzis = new GZIPInputStream(bais);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(gzis));
 
-                StringBuilder sb = new StringBuilder();
-                while (true) {
-                    String line = reader.readLine();
-                    if (line == null) {
-                        break;
-                    }
-                    sb.append(line);
-                }
-                return sb.toString();
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.out.println("Exception reading cached bytes");
-            }
+        StringBuilder sb = new StringBuilder();
+        while (true) {
+          String line = reader.readLine();
+          if (line == null) {
+            break;
+          }
+          sb.append(line);
         }
-
-        String result;
-        // Only render one cached page at a time (per server process)
-        synchronized(JC_INDEX) {
-            result = render();
-        }
-
-        try {
-            byte[] bytes_to_compress = result.getBytes(StandardCharsets.UTF_8);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(result.length());
-            GZIPOutputStream gzos = new GZIPOutputStream(baos);
-            gzos.write(bytes_to_compress);
-            gzos.finish();
-
-            byte[] compressed_bytes = baos.toByteArray();
-
-            System.out.println("Cache " + cache_key + ": orig size " + bytes_to_compress.length
-                + "; compressed: " + compressed_bytes.length);
-
-            // cache it for 12 hours
-            Public.sCache.set(cache_key, compressed_bytes, 60 * 60 * 12);
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Exception writing cached bytes");
-        }
-
-        return result;
+        return sb.toString();
+      } catch (IOException e) {
+        e.printStackTrace();
+        System.out.println("Exception reading cached bytes");
+      }
     }
 
-    abstract String render();
-
-    public static void clearAll(Organization org) {
-        remove(ATTENDANCE_INDEX, org);
-        remove(JC_INDEX, org);
-        remove(MANUAL_INDEX, org);
-        remove(RECENT_COMMENTS, org);
-        Utils.updateCustodia();
+    String result;
+    // Only render one cached page at a time (per server process)
+    synchronized (JC_INDEX) {
+      result = render();
     }
 
-    public static void onPeopleChanged(Organization org) {
-        remove(ATTENDANCE_INDEX, org);
-        remove(JC_INDEX, org);
-        remove(RECENT_COMMENTS, org);
-        Utils.updateCustodia();
+    try {
+      byte[] bytes_to_compress = result.getBytes(StandardCharsets.UTF_8);
+      ByteArrayOutputStream baos = new ByteArrayOutputStream(result.length());
+      GZIPOutputStream gzos = new GZIPOutputStream(baos);
+      gzos.write(bytes_to_compress);
+      gzos.finish();
+
+      byte[] compressed_bytes = baos.toByteArray();
+
+      System.out.println(
+          "Cache "
+              + cache_key
+              + ": orig size "
+              + bytes_to_compress.length
+              + "; compressed: "
+              + compressed_bytes.length);
+
+      // cache it for 12 hours
+      Public.sCache.set(cache_key, compressed_bytes, 60 * 60 * 12);
+    } catch (IOException e) {
+      e.printStackTrace();
+      System.out.println("Exception writing cached bytes");
     }
+
+    return result;
+  }
+
+  abstract String render();
+
+  public static void clearAll(Organization org) {
+    remove(ATTENDANCE_INDEX, org);
+    remove(JC_INDEX, org);
+    remove(MANUAL_INDEX, org);
+    remove(RECENT_COMMENTS, org);
+    Utils.updateCustodia();
+  }
+
+  public static void onPeopleChanged(Organization org) {
+    remove(ATTENDANCE_INDEX, org);
+    remove(JC_INDEX, org);
+    remove(RECENT_COMMENTS, org);
+    Utils.updateCustodia();
+  }
 }
