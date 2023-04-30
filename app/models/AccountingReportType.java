@@ -1,6 +1,5 @@
 package models;
 
-public enum AccountingReportType
-{
-	TotalPersonalAccountsBalance;
+public enum AccountingReportType {
+  TotalPersonalAccountsBalance;
 }
