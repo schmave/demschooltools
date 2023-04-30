@@ -5,109 +5,108 @@ import java.util.Map;
 
 public class AttendanceStats {
 
-    public int days_present;
-    public int partial_days_present;
-    public int approved_absences;
-    public int unapproved_absences;
-    public double total_hours;
+  public int days_present;
+  public int partial_days_present;
+  public int approved_absences;
+  public int unapproved_absences;
+  public double total_hours;
 
-    public Map<AttendanceCode, Integer> absence_counts =
-            new HashMap<>();
+  public Map<AttendanceCode, Integer> absence_counts = new HashMap<>();
 
-    private final Map<Integer, Double> values;
+  private final Map<Integer, Double> values;
 
-    private double partial_day_value;
+  private double partial_day_value;
 
-    public AttendanceStats(Organization org) {
-        values = new HashMap<>();
-        partial_day_value = 0;
-        if (org.getAttendancePartialDayValue() != null) {
-            partial_day_value = org.getAttendancePartialDayValue().doubleValue();
-        }
+  public AttendanceStats(Organization org) {
+    values = new HashMap<>();
+    partial_day_value = 0;
+    if (org.getAttendancePartialDayValue() != null) {
+      partial_day_value = org.getAttendancePartialDayValue().doubleValue();
     }
+  }
 
-    public void processDay(AttendanceDay day, int index, Map<String, AttendanceCode> codes_map, Organization org) {
-        if (day == null) {
-            return;
-        }
-        if (day.getCode() != null || day.getStartTime() == null || day.getEndTime() == null) {
-            incrementCodeCount(codes_map.get(day.getCode()), index);
-        }
-        else {
-            incrementAttendance(day, index, org);
-        }
+  public void processDay(
+      AttendanceDay day, int index, Map<String, AttendanceCode> codes_map, Organization org) {
+    if (day == null) {
+      return;
     }
-
-    private void incrementCodeCount(AttendanceCode code, int index) {
-        if (code == null) {
-            return;
-        }
-        if (!code.getNotCounted()) {
-            if (code.getCountsTowardAttendance()) {
-                approved_absences++;
-                values.put(index, 1d);
-            } else {
-                unapproved_absences++;
-                values.put(index, 0d);
-            }
-        }
-        if (!absence_counts.containsKey(code)) {
-            absence_counts.put(code, 0);
-        }
-        absence_counts.put(code, absence_counts.get(code) + 1);
+    if (day.getCode() != null || day.getStartTime() == null || day.getEndTime() == null) {
+      incrementCodeCount(codes_map.get(day.getCode()), index);
+    } else {
+      incrementAttendance(day, index, org);
     }
+  }
 
-    private void incrementAttendance(AttendanceDay day, int index, Organization org) {
-        double hours = day.getHours();
-        total_hours += hours;
-
-        if (day.isPartial(org)) {
-            partial_days_present++;
-            values.put(index, partial_day_value);
-        } else {
-            days_present++;
-            values.put(index, 1d);
-        }
+  private void incrementCodeCount(AttendanceCode code, int index) {
+    if (code == null) {
+      return;
     }
-
-    public double averageHoursPerDay() {
-        return total_hours / (days_present + partial_days_present);
+    if (!code.getNotCounted()) {
+      if (code.getCountsTowardAttendance()) {
+        approved_absences++;
+        values.put(index, 1d);
+      } else {
+        unapproved_absences++;
+        values.put(index, 0d);
+      }
     }
-
-    public double attendanceRate() {
-        double total = 0d;
-        for (Map.Entry<Integer, Double> v : values.entrySet()) {
-            total += v.getValue();
-        }
-        return total / values.size();
+    if (!absence_counts.containsKey(code)) {
+      absence_counts.put(code, 0);
     }
+    absence_counts.put(code, absence_counts.get(code) + 1);
+  }
 
-    public double weightedAttendanceRate() {
-        double total = 0d;
-        double reference_total = 0d;
-        for (Map.Entry<Integer, Double> v : values.entrySet()) {
-            Integer index = v.getKey();
-            Double value = v.getValue();
-            total += weightFunction(index, value);
-            reference_total += weightFunction(index, 1d);
-        }
-        return total / reference_total;
-    }
+  private void incrementAttendance(AttendanceDay day, int index, Organization org) {
+    double hours = day.getHours();
+    total_hours += hours;
 
-    private double weightFunction(Integer index, Double value) {
-        // The way the weighted attendance rate works is that the present day is worth 100%,
-        // and a long time in the past (i.e. several months ago) is worth close to 0%,
-        // with a smooth transition in between.
-        // reference_days is the number of school days in the past when the weight reaches 20%,
-        // so you can adjust this to stretch or compress the curve. I've chosen 60 because
-        // this is equivalent to 3 months. You could change it to e.g. 45 to make recent
-        // days weighted more as compared to older days.
-        double reference_days = 60d;
-        double curve_constant = Math.pow(5d/(4d * reference_days), 2);
-        // The curve is a Gaussian function, i.e. a bell curve, so near present day (index = 0)
-        // the weight decreases slowly at first, then faster, then reaches an inflection point
-        // and starts slowing down again, and finally has a long tail that goes out to infinity.
-        // Try graphing this function with a graphing app so you can visualize it.
-        return value * Math.exp(-curve_constant * Math.pow(index, 2));
+    if (day.isPartial(org)) {
+      partial_days_present++;
+      values.put(index, partial_day_value);
+    } else {
+      days_present++;
+      values.put(index, 1d);
     }
+  }
+
+  public double averageHoursPerDay() {
+    return total_hours / (days_present + partial_days_present);
+  }
+
+  public double attendanceRate() {
+    double total = 0d;
+    for (Map.Entry<Integer, Double> v : values.entrySet()) {
+      total += v.getValue();
+    }
+    return total / values.size();
+  }
+
+  public double weightedAttendanceRate() {
+    double total = 0d;
+    double reference_total = 0d;
+    for (Map.Entry<Integer, Double> v : values.entrySet()) {
+      Integer index = v.getKey();
+      Double value = v.getValue();
+      total += weightFunction(index, value);
+      reference_total += weightFunction(index, 1d);
+    }
+    return total / reference_total;
+  }
+
+  private double weightFunction(Integer index, Double value) {
+    // The way the weighted attendance rate works is that the present day is worth 100%,
+    // and a long time in the past (i.e. several months ago) is worth close to 0%,
+    // with a smooth transition in between.
+    // reference_days is the number of school days in the past when the weight reaches 20%,
+    // so you can adjust this to stretch or compress the curve. I've chosen 60 because
+    // this is equivalent to 3 months. You could change it to e.g. 45 to make recent
+    // days weighted more as compared to older days.
+    double reference_days = 60d;
+    double curve_constant = Math.pow(5d / (4d * reference_days), 2);
+    // The curve is a Gaussian function, i.e. a bell curve, so near present day (index = 0)
+    // the weight decreases slowly at first, then faster, then reaches an inflection point
+    // and starts slowing down again, and finally has a long tail that goes out to infinity.
+    // Try graphing this function with a graphing app so you can visualize it.
+    return value * Math.exp(-curve_constant * Math.pow(index, 2));
+  }
 }

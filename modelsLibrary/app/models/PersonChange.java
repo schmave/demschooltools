@@ -13,28 +13,26 @@ import lombok.Setter;
 @Setter
 @Entity
 public class PersonChange extends Model {
-    @OneToOne()
-    @JoinColumn(name="person_id")
-    private Person person;
+  @OneToOne()
+  @JoinColumn(name = "person_id")
+  private Person person;
 
-    private String oldEmail="";
+  private String oldEmail = "";
 
-    private String newEmail="";
+  private String newEmail = "";
 
-    @Column(insertable = false, updatable = false)
-    private Date time;
+  @Column(insertable = false, updatable = false)
+  private Date time;
 
-    public static Finder<Integer, PersonChange> find = new Finder<>(
-            PersonChange.class
-    );
+  public static Finder<Integer, PersonChange> find = new Finder<>(PersonChange.class);
 
-    public static PersonChange create(Person p, String newEmail) {
-        PersonChange result = new PersonChange();
-        result.person = p;
-        result.oldEmail = p.getEmail();
-        result.newEmail = newEmail;
+  public static PersonChange create(Person p, String newEmail) {
+    PersonChange result = new PersonChange();
+    result.person = p;
+    result.oldEmail = p.getEmail();
+    result.newEmail = newEmail;
 
-        result.save();
-        return result;
-    }
+    result.save();
+    return result;
+  }
 }

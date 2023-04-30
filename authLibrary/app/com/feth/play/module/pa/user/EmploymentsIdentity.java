@@ -14,12 +14,17 @@ public interface EmploymentsIdentity {
     protected int endDateYear;
     protected boolean isCurrent;
     protected String companyName;
-    
-    public EmploymentInfo(String id, 
-        String title, String summary, 
-        int startDateMonth, int startDateYear, 
-        int endDateMonth, int endDateYear, 
-        boolean isCurrent, String companyName) {
+
+    public EmploymentInfo(
+        String id,
+        String title,
+        String summary,
+        int startDateMonth,
+        int startDateYear,
+        int endDateMonth,
+        int endDateYear,
+        boolean isCurrent,
+        String companyName) {
       this.id = id;
       this.title = title;
       this.summary = summary;
@@ -30,45 +35,43 @@ public interface EmploymentsIdentity {
       this.isCurrent = isCurrent;
       this.companyName = companyName;
     }
-    
+
     public String getId() {
       return id;
     }
-    
+
     public String getTitle() {
       return title;
     }
-    
+
     public String getSummary() {
       return summary;
     }
-    
+
     public int getStartDateMonth() {
       return startDateMonth;
     }
-    
+
     public int getStartDateYear() {
       return startDateYear;
     }
-    
+
     public int getEndDateMonth() {
       return endDateMonth;
     }
-    
+
     public int getEndDateYear() {
       return endDateYear;
     }
-    
+
     public boolean isCurrent() {
       return isCurrent;
     }
-    
+
     public String getCompanyName() {
       return companyName;
     }
-    
   }
-  
+
   public Collection<EmploymentInfo> getEmployments();
-  
 }

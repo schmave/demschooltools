@@ -9,29 +9,32 @@ import com.feth.play.module.pa.providers.oauth2.OAuth2AuthProvider.Constants;
 
 public class GoogleAuthInfo extends OAuth2AuthInfo {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
-	private static final String ID_TOKEN = "id_token";
-	private String bearer;
-	private String idToken;
+  /** */
+  private static final long serialVersionUID = 1L;
 
-	public GoogleAuthInfo(final JsonNode node) {
-		super(	node.get(Constants.ACCESS_TOKEN) != null ? node.get(Constants.ACCESS_TOKEN).asText() : null,
-				node.get(Constants.EXPIRES_IN) != null ? new Date().getTime() + node.get(Constants.EXPIRES_IN).asLong() * 1000 : -1,
-				node.get(Constants.REFRESH_TOKEN) != null ? node.get(Constants.REFRESH_TOKEN).asText() : null);
+  private static final String ID_TOKEN = "id_token";
+  private String bearer;
+  private String idToken;
 
-		bearer = node.get(Constants.TOKEN_TYPE).asText();
-		idToken = node.get(ID_TOKEN).asText();
-	}
+  public GoogleAuthInfo(final JsonNode node) {
+    super(
+        node.get(Constants.ACCESS_TOKEN) != null ? node.get(Constants.ACCESS_TOKEN).asText() : null,
+        node.get(Constants.EXPIRES_IN) != null
+            ? new Date().getTime() + node.get(Constants.EXPIRES_IN).asLong() * 1000
+            : -1,
+        node.get(Constants.REFRESH_TOKEN) != null
+            ? node.get(Constants.REFRESH_TOKEN).asText()
+            : null);
 
-	public String getBearer() {
-		return bearer;
-	}
+    bearer = node.get(Constants.TOKEN_TYPE).asText();
+    idToken = node.get(ID_TOKEN).asText();
+  }
 
-	public String getIdToken() {
-		return idToken;
-	}
+  public String getBearer() {
+    return bearer;
+  }
+
+  public String getIdToken() {
+    return idToken;
+  }
 }

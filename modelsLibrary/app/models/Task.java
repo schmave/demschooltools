@@ -12,28 +12,24 @@ import lombok.Setter;
 @Setter
 @Entity
 public class Task extends Model {
-    @Id
-    private Integer id;
+  @Id private Integer id;
 
-    @ManyToOne()
-    @JoinColumn(name="task_list_id")
-    private TaskList taskList;
+  @ManyToOne()
+  @JoinColumn(name = "task_list_id")
+  private TaskList taskList;
 
-    private String title;
+  private String title;
 
-    private Integer sortOrder;
+  private Integer sortOrder;
 
-    private boolean enabled;
+  private boolean enabled;
 
-    @OneToMany(mappedBy="task")
-    public List<CompletedTask> completed_tasks;
+  @OneToMany(mappedBy = "task")
+  public List<CompletedTask> completed_tasks;
 
-    public static Finder<Integer, Task> find = new Finder<>(
-            Task.class
-    );
+  public static Finder<Integer, Task> find = new Finder<>(Task.class);
 
-    public static Task findById(int id, Organization org) {
-        return find.query().where().eq("taskList.organization", org)
-            .eq("id", id).findOne();
-    }
+  public static Task findById(int id, Organization org) {
+    return find.query().where().eq("taskList.organization", org).eq("id", id).findOne();
+  }
 }
