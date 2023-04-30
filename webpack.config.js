@@ -61,7 +61,7 @@ module.exports = function (env, argv) {
       new HtmlWebpackPlugin({
         filename: "../../checkin/app.html",
         template: "checkin/template.html",
-        hash: true,
+        hash: argv.mode != "production",
         chunks: ["checkin"],
         templateParameters: {
           rollbarEnvironment: argv.mode == "production" ? "production" : "development",
