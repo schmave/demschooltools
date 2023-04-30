@@ -102,7 +102,7 @@ public class Secured {
         }
 
         public String getUsernameOrIP(final Http.Request request, boolean allow_ip) {
-            sLogger.debug("Authenticator::getUsername " + request + ", " + allow_ip);
+            sLogger.debug("Authenticator::getUsername " + request.host() + " " + request + ", " + allow_ip);
             final AuthUser u = mAuth.getUser(request.session());
 
             if (u != null) {
