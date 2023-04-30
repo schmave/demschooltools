@@ -1,43 +1,61 @@
 package controllers;
 
-import java.io.*;
-import java.util.*;
-import java.util.stream.*;
-import models.*;
-import play.mvc.*;
-import play.data.*;
-import play.libs.*;
 import com.csvreader.CsvWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.stream.Collectors;
+import javax.inject.Inject;
+import models.*;
+import play.data.Form;
+import play.data.FormFactory;
+import play.i18n.MessagesApi;
+import play.libs.Json;
+import play.mvc.Controller;
+import play.mvc.Http;
+import play.mvc.Result;
+import views.html.*;
 
-@With(DumpOnError.class)
 @Secured.Auth(UserRole.ROLE_VIEW_JC)
 public class Accounting extends Controller {
 
-    public Result transaction(Integer id) {
-        Transaction transaction = Transaction.findById(id);
-        Form<Transaction> form = Form.form(Transaction.class).fill(transaction);
-        return ok(views.html.transaction.render(transaction, form));
+    FormFactory mFormFactory;
+    final MessagesApi mMessagesApi;
+
+    @Inject
+    public Accounting(FormFactory formFactory,
+                      MessagesApi messagesApi) {
+        mFormFactory = formFactory;
+        mMessagesApi = messagesApi;
+    }
+
+    public Result transaction(Integer id, Http.Request request) {
+        Transaction transaction = Transaction.findById(id, Utils.getOrg(request));
+        Form<Transaction> form = mFormFactory.form(Transaction.class).fill(transaction);
+        return ok(views.html.transaction.render(transaction, form, request, mMessagesApi.preferred(request)));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result newTransaction() {
-        applyMonthlyCredits();
-        Form<Transaction> form = Form.form(Transaction.class);
-        return ok(views.html.create_transaction.render(form));
+    public Result newTransaction(Http.Request request) {
+        applyMonthlyCredits(Utils.getOrg(request));
+        Form<Transaction> form = mFormFactory.form(Transaction.class);
+        return ok(create_transaction.render(form, request, mMessagesApi.preferred(request)));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result makeNewTransaction() {
-        Form<Transaction> form = Form.form(Transaction.class);
-        Form<Transaction> filledForm = form.bindFromRequest();
+    public Result makeNewTransaction(Http.Request request) {
+        Form<Transaction> form = mFormFactory.form(Transaction.class);
+        Form<Transaction> filledForm = form.bindFromRequest(request);
         if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
-            return badRequest(views.html.create_transaction.render(filledForm));
+            return badRequest(create_transaction.render(filledForm, request, mMessagesApi.preferred(request)));
         } else {
             try {
-                Transaction transaction = Transaction.create(filledForm);
-                return redirect(routes.Accounting.transaction(transaction.id));
+                Transaction transaction = Transaction.create(filledForm,
+                        Utils.getOrg(request), Application.getCurrentUser(request));
+                return redirect(routes.Accounting.transaction(transaction.getId()));
             }
             catch (Exception ex) {
                 return badRequest(ex.toString());
@@ -46,12 +64,12 @@ public class Accounting extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result saveTransaction() {
+    public Result saveTransaction(Http.Request request) {
         try {
-            Form<Transaction> form = Form.form(Transaction.class).bindFromRequest();
-            Transaction transaction = Transaction.findById(Integer.parseInt(form.field("id").value()));
+            Form<Transaction> form = mFormFactory.form(Transaction.class).bindFromRequest(request);
+            Transaction transaction = Transaction.findById(Integer.parseInt(form.field("id").value().get()), Utils.getOrg(request));
             transaction.updateFromForm(form);
-            return redirect(routes.Accounting.transaction(transaction.id));
+            return redirect(routes.Accounting.transaction(transaction.getId()));
         }
         catch (Exception ex) {
             return badRequest(ex.toString());
@@ -64,48 +82,49 @@ public class Accounting extends Controller {
         return redirect(routes.Accounting.balances());
     }
 
-    public Result balances() {
-        applyMonthlyCredits();
-        List<Account> personalAccounts = Account.allPersonalChecking();
-        List<Account> nonPersonalAccounts = Account.allNonPersonalChecking();
-        Collections.sort(personalAccounts, (a, b) -> a.getName().compareTo(b.getName()));
-        Collections.sort(nonPersonalAccounts, (a, b) -> a.getName().compareTo(b.getName()));
-        return ok(views.html.balances.render(personalAccounts, nonPersonalAccounts));
+    public Result balances(Http.Request request) {
+        Organization org = Utils.getOrg(request);
+        applyMonthlyCredits(org);
+        List<Account> personalAccounts = Account.allPersonalChecking(org);
+        List<Account> nonPersonalAccounts = Account.allNonPersonalChecking(org);
+        personalAccounts.sort(Comparator.comparing(Account::getName));
+        nonPersonalAccounts.sort(Comparator.comparing(Account::getName));
+        return ok(balances.render(personalAccounts, nonPersonalAccounts, request, mMessagesApi.preferred(request)));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result bankCashBalance() {
-        applyMonthlyCredits();
-        return ok(views.html.bank_cash_balance.render(TransactionList.allCash()));
+    public Result bankCashBalance(Http.Request request) {
+        applyMonthlyCredits(Utils.getOrg(request));
+        return ok(bank_cash_balance.render(TransactionList.allCash(Utils.getOrg(request)), request, mMessagesApi.preferred(request)));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result transactionsReport() {
-        applyMonthlyCredits();
-        return ok(views.html.transactions_report.render(TransactionList.blank()));
+    public Result transactionsReport(Http.Request request) {
+        applyMonthlyCredits(Utils.getOrg(request));
+        return ok(transactions_report.render(TransactionList.blank(), request, mMessagesApi.preferred(request)));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result runTransactionsReport() throws IOException {
-        Form<TransactionList> form = Form.form(TransactionList.class);
-        Form<TransactionList> filledForm = form.bindFromRequest();
+    public Result runTransactionsReport(Http.Request request) throws IOException {
+        Form<TransactionList> form = mFormFactory.form(TransactionList.class).withDirectFieldAccess(true);
+        Form<TransactionList> filledForm = form.bindFromRequest(request);
         if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
-            return badRequest(views.html.transactions_report.render(TransactionList.blank()));
+            return badRequest(transactions_report.render(TransactionList.blank(), request, mMessagesApi.preferred(request)));
         }
-        TransactionList report = TransactionList.createFromForm(filledForm);
-        String action = request().body().asFormUrlEncoded().get("action")[0];
+        TransactionList report = TransactionList.createFromForm(filledForm, Utils.getOrg(request));
+        String action = request.body().asFormUrlEncoded().get("action")[0];
         if (action.equals("download")) {
-            return ok(downloadTransactionReport(report));  
+            return downloadTransactionReport(report);
         }
         else {
-            return ok(views.html.transactions_report.render(report));
+            return ok(transactions_report.render(report, request, mMessagesApi.preferred(request)));
         }
     }
 
-    private byte[] downloadTransactionReport(TransactionList report) throws IOException {
+    private Result downloadTransactionReport(TransactionList report) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Charset charset = Charset.forName("UTF-8");
+        Charset charset = StandardCharsets.UTF_8;
         CsvWriter writer = new CsvWriter(baos, ',', charset);
 
         writer.write("Archived");
@@ -118,54 +137,53 @@ public class Accounting extends Controller {
         writer.endRecord();
 
         for (Transaction t : report.transactions) {
-            writer.write(t.archived ? "yes" : "no");
-            writer.write(t.id.toString());
+            writer.write(t.getArchived() ? "yes" : "no");
+            writer.write(t.getId().toString());
             writer.write(t.getFormattedDate());
             writer.write(t.getCreatedByUserName());
             writer.write(t.getTypeName());
-            writer.write(t.description);
+            writer.write(t.getDescription());
             writer.write(t.getFormattedAmount(false));
             writer.endRecord();
         }
 
         writer.close();
 
-        response().setHeader("Content-Type", "application/csv");
-        response().setHeader("Content-Disposition", "attachment; filename=transactions.csv");
-
-        return baos.toByteArray();
+        return ok(baos.toByteArray()).as("application/csv")
+                .withHeader("Content-Disposition", "attachment; filename=transactions.csv");
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result toggleTransactionArchived(int id) {
-        Transaction transaction = Transaction.findById(id);
-        transaction.archived = !transaction.archived;
+    public Result toggleTransactionArchived(int id, Http.Request request) {
+        Transaction transaction = Transaction.findById(id, Utils.getOrg(request));
+        transaction.setArchived(!transaction.getArchived());
         transaction.save();
         return ok();
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result report() {
-        applyMonthlyCredits();
-        return ok(views.html.accounting_report.render(new AccountingReport()));
+    public Result report(Http.Request request) {
+        applyMonthlyCredits(Utils.getOrg(request));
+        return ok(accounting_report.render(new AccountingReport(), request, mMessagesApi.preferred(request)));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result runReport() {
-        Form<AccountingReport> form = Form.form(AccountingReport.class);
-        Form<AccountingReport> filledForm = form.bindFromRequest();
+    public Result runReport(Http.Request request) {
+        Form<AccountingReport> form = mFormFactory.form(AccountingReport.class).withDirectFieldAccess(true);
+        Form<AccountingReport> filledForm = form.bindFromRequest(request);
         if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
-            return badRequest(views.html.accounting_report.render(new AccountingReport()));
+            return badRequest(accounting_report.render(new AccountingReport(), request, mMessagesApi.preferred(request)));
         }
-        AccountingReport report = AccountingReport.create(filledForm);
-        return ok(views.html.accounting_report.render(report));
+        AccountingReport report = AccountingReport.create(filledForm, Utils.getOrg(request));
+        return ok(accounting_report.render(report, request, mMessagesApi.preferred(request)));
     }
 
-    public Result account(Integer id) {
-        applyMonthlyCredits();
-        Account account = Account.findById(id);
-        return ok(views.html.account.render(account));
+    public Result account(Integer id, Http.Request request) {
+        Organization org = Utils.getOrg(request);
+        applyMonthlyCredits(org);
+        Account account = Account.findById(id, org);
+        return ok(views.html.account.render(account, request, mMessagesApi.preferred(request)));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
@@ -175,66 +193,67 @@ public class Accounting extends Controller {
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result accounts() {
-        applyMonthlyCredits();
-        List<Account> accounts = Account.all();
-        Collections.sort(accounts, (a, b) -> a.getName().compareTo(b.getName()));
-        return ok(views.html.accounts.render(accounts));
+    public Result accounts(Http.Request request) {
+        Organization org = Utils.getOrg(request);
+        applyMonthlyCredits(org);
+        List<Account> accounts = Account.all(org);
+        accounts.sort(Comparator.comparing(Account::getName));
+        return ok(views.html.accounts.render(accounts, request, mMessagesApi.preferred(request)));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result newAccount() {
-        Form<Account> form = Form.form(Account.class);
-        return ok(views.html.new_account.render(form));
+    public Result newAccount(Http.Request request) {
+        Form<Account> form = mFormFactory.form(Account.class);
+        return ok(new_account.render(form, request, mMessagesApi.preferred(request)));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result makeNewAccount() {
-        Form<Account> form = Form.form(Account.class);
-        Form<Account> filledForm = form.bindFromRequest();
+    public Result makeNewAccount(Http.Request request) {
+        Form<Account> form = mFormFactory.form(Account.class);
+        Form<Account> filledForm = form.bindFromRequest(request);
         if (filledForm.hasErrors()) {
             System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
-            return badRequest(views.html.new_account.render(filledForm));
+            return badRequest(new_account.render(filledForm, request, mMessagesApi.preferred(request)));
         }
         else {
-            String name = filledForm.field("name").value();
-            AccountType type = AccountType.valueOf(filledForm.field("type").value());
-            Account account = Account.create(type, name, null);
-            return redirect(routes.Accounting.account(account.id));
+            String name = filledForm.field("name").value().get();
+            AccountType type = AccountType.valueOf(filledForm.field("type").value().get());
+            Account account = Account.create(type, name, null, Utils.getOrg(request));
+            return redirect(routes.Accounting.account(account.getId()));
         }
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result editAccount(Integer id) {
-        Account account = Account.findById(id);
-        Form<Account> form = Form.form(Account.class).fill(account);
-        return ok(views.html.edit_account.render(form, account.is_active));
+    public Result editAccount(Integer id, Http.Request request) {
+        Account account = Account.findById(id, Utils.getOrg(request));
+        Form<Account> form = mFormFactory.form(Account.class).fill(account);
+        return ok(edit_account.render(form, account.getIsActive(), request, mMessagesApi.preferred(request)));
     }
 
     @Secured.Auth(UserRole.ROLE_ACCOUNTING)
-    public Result saveAccount() {
-        Form<Account> form = Form.form(Account.class).bindFromRequest();
-        Account account = Account.findById(Integer.parseInt(form.field("id").value()));
+    public Result saveAccount(Http.Request request) {
+        Form<Account> form = mFormFactory.form(Account.class).bindFromRequest(request);
+        Account account = Account.findById(Integer.parseInt(form.field("id").value().get()), Utils.getOrg(request));
         account.updateFromForm(form);
-        return redirect(routes.Accounting.account(account.id));
+        return redirect(routes.Accounting.account(account.getId()));
     }
 
-    public static String accountsJson() {
-        List<Map<String, String>> result = new ArrayList<Map<String, String>>();
-        List<Account> accounts = new ArrayList<Account>();
-        accounts.addAll(Account.allPersonalChecking());
-        accounts.addAll(Account.allNonPersonalChecking());
+    public static String accountsJson(Organization org) {
+        List<Map<String, String>> result = new ArrayList<>();
+        List<Account> accounts = new ArrayList<>();
+        accounts.addAll(Account.allPersonalChecking(org));
+        accounts.addAll(Account.allNonPersonalChecking(org));
         for (Account a : accounts) {
-            HashMap<String, String> values = new HashMap<String, String>();
+            HashMap<String, String> values = new HashMap<>();
             values.put("label", a.getName());
-            values.put("id", "" + a.id);
+            values.put("id", "" + a.getId());
             values.put("balance", a.getFormattedBalance());
             result.add(values);
         }
         return Json.stringify(Json.toJson(result));
     }
 
-    static void applyMonthlyCredits() {
+    static void applyMonthlyCredits(Organization org) {
         Calendar c = Calendar.getInstance();
         c.set(Calendar.DAY_OF_MONTH, 1);
         c.set(Calendar.HOUR_OF_DAY, 0);
@@ -247,12 +266,12 @@ public class Accounting extends Controller {
         // no credits in the months of July and August
         if (month == 7 || month == 8) return;
 
-        List<Account> accounts = Account.allWithMonthlyCredits().stream()
-            .filter(a -> a.date_last_monthly_credit == null || a.date_last_monthly_credit.before(monthStartDate))
+        List<Account> accounts = Account.allWithMonthlyCredits(org).stream()
+            .filter(a -> a.getDateLastMonthlyCredit() == null || a.getDateLastMonthlyCredit().before(monthStartDate))
             .collect(Collectors.toList());
 
         for (Account a : accounts) {
-            a.createMonthlyCreditTransaction(monthStartDate);
+            a.createMonthlyCreditTransaction(monthStartDate, org);
         }
     }
 }

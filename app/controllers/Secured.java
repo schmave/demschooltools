@@ -1,36 +1,26 @@
 package controllers;
 
-import java.lang.annotation.*;
-
-import java.util.concurrent.CompletionStage;
-import java.util.concurrent.CompletableFuture;
-
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.SqlQuery;
-import com.avaje.ebean.SqlRow;
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.user.AuthUser;
-import com.google.inject.Inject;
-
-import models.OrgConfig;
-import models.Organization;
+import io.ebean.DB;
+import io.ebean.SqlQuery;
+import io.ebean.SqlRow;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
+import javax.inject.Inject;
 import models.User;
 import models.UserRole;
-
-import service.MyUserService;
-
 import play.Logger;
-import play.mvc.Action;
-import play.mvc.Http.Context;
-import play.mvc.Http.Session;
-import play.mvc.Result;
-import play.mvc.Results;
-import play.mvc.With;
-
+import play.mvc.*;
 
 // Lifted from play.mvc.Security
 
 public class Secured {
+    static Logger.ALogger sLogger = Logger.of("application");
 
     /**
      * Wraps the annotated action in an <code>AuthenticatedAction</code>.
@@ -45,7 +35,7 @@ public class Secured {
     /**
      * Wraps another action, allowing only authenticated HTTP requests.
      * <p>
-     * The user name is retrieved from the session cookie, and added to the HTTP request's
+     * The username is retrieved from the session cookie, and added to the HTTP request's
      * <code>username</code> attribute.
      */
     public static class AuthenticatedAction extends Action<Auth> {
@@ -58,25 +48,17 @@ public class Secured {
         }
 
         @Override
-        public CompletionStage<Result> call(final Context ctx) {
+        public CompletionStage<Result> call(final Http.Request request) {
             try {
                 Authenticator authenticator = new Authenticator(mAuth);
-                String username = authenticator.getUsername(ctx, configuration.value());
+                String username = authenticator.getUsername(request, configuration.value());
                 if (username == null) {
-                    Result unauthorized = authenticator.onUnauthorized(ctx);
+                    Result unauthorized = authenticator.onUnauthorized(request);
                     return CompletableFuture.completedFuture(unauthorized);
                 } else {
-                    try {
-                        ctx.request().setUsername(username);
-                        return delegate.call(ctx).whenComplete(
-                            (result, throwable) -> {
-                                ctx.request().setUsername(null);
-                            }
-                        );
-                    } catch(Exception e) {
-                        ctx.request().setUsername(null);
-                        throw e;
-                    }
+                    Http.Request childRequest = request.withAttrs(
+                            request.attrs().put(Security.USERNAME, username));
+                    return delegate.call(childRequest);
                 }
             } catch(RuntimeException e) {
                 throw e;
@@ -96,8 +78,8 @@ public class Secured {
             mAuth = auth;
         }
 
-    	public String getUsername(final Context ctx, String role) {
-            String username = getUsernameOrIP(ctx, true);
+        public String getUsername(final Http.Request request, String role) {
+            String username = getUsernameOrIP(request, true);
             User u = User.findByEmail(username);
 
             if (u == null) {
@@ -105,11 +87,11 @@ public class Secured {
                 // may be null if not from a valid IP, which will deny access.
                 if (role.equals(UserRole.ROLE_VIEW_JC) &&
                     // Don't let IP address users change their password
-                    !ctx.request().path().equals(routes.Application.viewPassword().path())) {
+                    request.path().equals(routes.Application.viewPassword().path())) {
                     return username;
                 }
-            } else if (u.active && u.hasRole(role) &&
-                       (u.organization == null || u.organization.equals(OrgConfig.get().org))) {
+            } else if (u.getActive() && u.hasRole(role) &&
+                       (u.getOrganization() == null || u.getOrganization().equals(Utils.getOrg(request)))) {
                 // Allow access if this user belongs to this organization or is a
                 // multi-domain admin (null organization). Also, the user must
                 // have the required role.
@@ -117,29 +99,29 @@ public class Secured {
             }
 
             return null;
-    	}
+        }
 
-        public String getUsernameOrIP(final Context ctx, boolean allow_ip) {
-            Logger.debug("Authenticator::getUsername " + ctx + ", " + allow_ip);
-            final AuthUser u = mAuth.getUser(ctx.session());
+        public String getUsernameOrIP(final Http.Request request, boolean allow_ip) {
+            sLogger.debug("Authenticator::getUsername " + request.host() + " " + request + ", " + allow_ip);
+            final AuthUser u = mAuth.getUser(request.session());
 
             if (u != null) {
                 User the_user = User.findByAuthUserIdentity(u);
                 if (the_user != null) {
-					return the_user.email;
-				}
+                    return the_user.getEmail();
+                }
             }
 
             // If we don't have a logged-in user, try going by IP address.
-            if (allow_ip && Organization.getByHost() != null) {
+            if (allow_ip && Utils.getOrg(request) != null) {
                 String sql = "select ip from allowed_ips where ip like :ip and organization_id=:org_id";
-                SqlQuery sqlQuery = Ebean.createSqlQuery(sql);
-                String address = Application.getRemoteIp();
+                SqlQuery sqlQuery = DB.sqlQuery(sql);
+                String address = Application.getRemoteIp(request);
                 sqlQuery.setParameter("ip", address);
-                sqlQuery.setParameter("org_id", Organization.getByHost().id);
+                sqlQuery.setParameter("org_id", Utils.getOrg(request).getId());
 
                 // execute the query returning a List of MapBean objects
-                SqlRow result = sqlQuery.findUnique();
+                SqlRow result = sqlQuery.findOne();
 
                 if (result != null) {
                     return address;
@@ -149,37 +131,36 @@ public class Secured {
             return null;
         }
 
-    	public Result onUnauthorized(final Context ctx) {
-            final AuthUser u = mAuth.getUser(ctx.session());
+        public Result onUnauthorized(final Http.Request request) {
+            final AuthUser u = mAuth.getUser(request.session());
             if (u != null) {
                 User the_user = User.findByAuthUserIdentity(u);
                 if (the_user != null) {
-                    if (the_user.name.equals(MyUserService.DUMMY_USERNAME)) {
+                    if (the_user.getName().equals(User.DUMMY_USERNAME)) {
                         return ok(
                             "You logged in with Facebook or Google, but Evan hasn't made a" +
                             " DemSchoolTools account for you yet. Please contact him for help:" +
                             " schmave@gmail.com");
                     }
-                    if (!the_user.active) {
+                    if (!the_user.getActive()) {
                         return unauthorized("Your account with email address " +
-                            the_user.email + " is inactive.");
+                            the_user.getEmail() + " is inactive.");
                     }
                 }
             }
 
-            if (getUsernameOrIP(ctx, false) == null) {
+            if (getUsernameOrIP(request, false) == null) {
                 // Only redirect to the login screen if there
                 // is no user logged in.
                 //
-                // If a user is logged in but they don't have the proper role
+                // If a user is logged in, but they don't have the proper role
                 // for the page they are trying to access, logging in again
                 // isn't going to help them.
-                mAuth.storeOriginalUrl(ctx);
-                return redirect(routes.Public.index());
+                return redirect(routes.Public.index()).withSession(mAuth.storeOriginalUrl(request));
             } else {
                 return unauthorized("You can't access this page.");
             }
-    	}
+        }
 
     }
 }

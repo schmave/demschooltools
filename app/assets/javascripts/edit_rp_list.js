@@ -1,9 +1,9 @@
-var utils = require('./utils');
-var Handlebars = require('handlebars');
+const utils = require('./utils');
+const Handlebars = require('handlebars');
 
-var login_message_shown = false;
+let login_message_shown = false;
 
-var insertIntoSortedList = function(charge, list, parent_el) {
+const insertIntoSortedList = function(charge, list, parent_el) {
     if (list.length === 0) {
         parent_el.append(charge.el);
         list.push(charge);
@@ -11,7 +11,7 @@ var insertIntoSortedList = function(charge, list, parent_el) {
     }
 
     // Find first element in list that should appear after charge.
-    var i = 0;
+    let i = 0;
     for ( ; i<list.length; i++) {
         if (charge.name < list[i].name) {
             break;
@@ -27,8 +27,8 @@ var insertIntoSortedList = function(charge, list, parent_el) {
     }
 };
 
-var indexOfCharge = function(list, charge) {
-    for (var i = 0; i < list.length; i++) {
+const indexOfCharge = function(list, charge) {
+    for (let i = 0; i < list.length; i++) {
         if (list[i].id == charge.id) {
             return i;
         }
@@ -37,11 +37,11 @@ var indexOfCharge = function(list, charge) {
     return -1;
 };
 
-var checkboxChanged = function(charge) {
+const checkboxChanged = function(charge) {
     charge.checkbox.prop("disabled", true);
-    var i = indexOfCharge(app.active_rps, charge);
+    let i = indexOfCharge(app.active_rps, charge);
 
-    var url = "/setResolutionPlanComplete?id=" + charge.id +
+    const url = "/setResolutionPlanComplete?id=" + charge.id +
         "&complete=" + (i >= 0);
     $.post(url)
         .done(function(data) {
@@ -79,8 +79,8 @@ var checkboxChanged = function(charge) {
         });
 };
 
-var Charge = function(data, el) {
-    var self = this;
+const Charge = function(data, el) {
+    const self = this;
 
     this.removeCharge = function() {
         self.el.remove();
@@ -92,41 +92,41 @@ var Charge = function(data, el) {
     self.name = utils.displayName(data.person).toLowerCase();
 
     self.checkbox = el.find("input");
-    self.checkbox.prop("checked", data.rp_complete);
+    self.checkbox.prop("checked", data.rpComplete);
 
     self.checkbox.change(function() {
         checkboxChanged(self);
     });
 };
 
-var addCharge = function(data, parent_el) {
-    var template_data = {
-        "name": utils.displayName(data.person),
-        "case_number": data.the_case.case_number,
-        "closed_date": utils.reformatDate('m/dd', data.the_case.date_closed),
-        "closed_day_of_week": utils.reformatDate('D', data.the_case.date_closed),
-        "sm_date": utils.reformatDate('m/dd', data.sm_decision_date),
-        "sm_day_of_week": utils.reformatDate('D', data.sm_decision_date),
-        "rule_title": data.rule ? data.ruleTitle : "<No rule>",
-        "resolution_plan": data.resolution_plan,
-        "sm_decision": data.sm_decision,
-        "findings": data.the_case.composite_findings,
-        "sm_decision_date": data.sm_decision_date,
-        "referred_to_sm": data.referred_to_sm
+const addCharge = function(data, parent_el) {
+    const template_data = {
+        name: utils.displayName(data.person),
+        caseNumber: data.theCase.caseNumber,
+        closed_date: utils.reformatDate('m/dd', data.theCase.dateClosed),
+        closed_day_of_week: utils.reformatDate('D', data.theCase.dateClosed),
+        sm_date: utils.reformatDate('m/dd', data.smDecisionDate),
+        sm_day_of_week: utils.reformatDate('D', data.smDecisionDate),
+        rule_title: data.rule ? data.ruleTitle : "<No rule>",
+        resolutionPlan: data.resolutionPlan,
+        smDecision: data.smDecision,
+        findings: data.theCase.compositeFindings,
+        smDecisionDate: data.smDecisionDate,
+        referredToSm: data.referredToSm
         };
 
-    if (data.date_closed) {
-        template_data['date_closed'] = data.date_closed;
+    if (data.dateClosed) {
+        template_data.dateClosed = data.dateClosed;
     }
 
-    var new_charge_el = parent_el.append(
+    const new_charge_el = parent_el.append(
         app.rp_template(template_data)).children(":last-child");
 
     return new Charge(data, new_charge_el);
 };
 
-var id_to_charge = {};
-var id_to_case = {};
+const id_to_charge = {};
+const id_to_case = {};
 
 function loadCharge(charge_data, list, parent_el) {
     // If there are multiple charges in the same case, a charge will be
@@ -137,17 +137,17 @@ function loadCharge(charge_data, list, parent_el) {
         charge_data = id_to_charge[charge_data];
     }
 
-    if (typeof charge_data.the_case === 'object') {
-        id_to_case[charge_data.the_case.id] = charge_data.the_case;
+    if (typeof charge_data.theCase === 'object') {
+        id_to_case[charge_data.theCase.id] = charge_data.theCase;
 
-        for (var i in charge_data.the_case.charges) {
-            var c2_data = charge_data.the_case.charges[i];
+        for (const i in charge_data.theCase.charges) {
+            const c2_data = charge_data.theCase.charges[i];
             if (typeof c2_data === 'object') {
                 id_to_charge[c2_data.id] = c2_data;
             }
         }
     } else {
-        charge_data.the_case = id_to_case[charge_data.the_case];
+        charge_data.theCase = id_to_case[charge_data.theCase];
     }
 
     insertIntoSortedList(

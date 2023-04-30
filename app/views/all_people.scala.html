@@ -1,4 +1,4 @@
-@(people: List[Person])
+@(people: List[Person])(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
 
@@ -9,4 +9,3 @@
 @people_list(people, false)
 
 }
-

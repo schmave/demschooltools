@@ -1,8 +1,8 @@
 package models;
 
+import java.math.*;
 import java.text.*;
 import java.util.*;
-import java.math.*;
 import play.data.*;
 
 public class AccountingReport {
@@ -19,16 +19,16 @@ public class AccountingReport {
         return new SimpleDateFormat("M/d/yy").format(date);
     }
 
-    public static AccountingReport create(Form<AccountingReport> form) {
+    public static AccountingReport create(Form<AccountingReport> form, Organization org) {
         AccountingReport report = form.get();
         if (report.type == AccountingReportType.TotalPersonalAccountsBalance) {
-        	runTotalPersonalAccountsBalanceReport(report);
+        	runTotalPersonalAccountsBalanceReport(report, org);
         }
         return report;
     }
 
-    public static void runTotalPersonalAccountsBalanceReport(AccountingReport report) {
-    	List<Account> accounts = Account.allPersonalChecking();
+    public static void runTotalPersonalAccountsBalanceReport(AccountingReport report, Organization org) {
+    	List<Account> accounts = Account.allPersonalChecking(org);
 
     	BigDecimal total = accounts.stream()
             .map(t -> t.getBalanceAsOf(report.date))

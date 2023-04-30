@@ -1,9 +1,8 @@
-@(playAuth: com.feth.play.module.pa.PlayAuthenticate, notice : String)
+@(playAuth: com.feth.play.module.pa.PlayAuthenticate, notice : String, remote_ip: String)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
-@import com.feth.play.module.pa.views.html._
 
-@main("DemSchoolTools login (" + OrgConfig.get().org.short_name + ")", "none") {
+@main("DemSchoolTools login (" + Utils.getOrgConfig(request).org.getShortName() + ")", "none") {
 
 	@if( notice != null ) { <div class="alert alert-warning">@notice</div> }
 	<a href="@routes.Application.index()" class="btn btn-large btn-primary" style="color:white;">
@@ -12,6 +11,7 @@
 	<hr>
 
 	<form method="POST" action="/login">
+
 	<h3>Login with a password</h3>
 	Email address: <input type="text" size=40 name="email" />
 	Password: <input type="password" name="password" />
@@ -32,7 +32,7 @@
 		<a href="https://support.google.com/chrome/answer/95464?hl=en">Chrome</a>.
 	</p>
 
-	<a href="@{OrgConfig.get().people_url}/authenticate/facebook" class="btn btn-large btn-primary"
+	<a href="/authenticate/facebook" class="btn btn-large btn-primary"
 	style="color:white;background-color:#4267b2;border-color:#4267b2;">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 216 216" class="_5h0m" color="#FFFFFF"
      style="width: 18px;margin-right: 5px;vertical-align: middle;">
@@ -44,11 +44,11 @@
           11.9-11.9V11.9C216 5.3 210.7 0 204.1 0z"></path></svg>
       	Log in With Facebook</a>
 
-	<a href="@{OrgConfig.get().people_url}/authenticate/google" style="margin-left: 30px;">
+	<a href="/authenticate/google" style="margin-left: 30px;">
 	<img src="/assets/images/google_signin.png" /></a>
 
 	</div>
 
-	<p style="padding-top: 100px; font-size:0.8em">Your IP address is: @Application.getRemoteIp()</p>
-	<hr/><p align=right>@Organization.getByHost().name</p>
+	<p style="padding-top: 100px; font-size:0.8em">Your IP address is: @remote_ip</p>
+	<hr/><p align=right>@Utils.getOrgConfig(request).org.getName()</p>
 }

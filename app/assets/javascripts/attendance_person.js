@@ -9,8 +9,8 @@ function uncheckAll() {
 }
 
 function checkboxChange() {
-    var checked = $(this).prop('checked');
-    var code = $(this).data('code');
+    const checked = $(this).prop('checked');
+    const code = $(this).data('code');
     if (checked) {
         $('tr.code-' + code).show();
     } else {

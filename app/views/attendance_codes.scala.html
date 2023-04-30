@@ -1,4 +1,4 @@
-@(codes : List[AttendanceCode], form : Form[AttendanceCode])
+@(codes : List[AttendanceCode], form : Form[AttendanceCode])(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @main("Attendance codes", "attendance", "attendance_codes") {
 
@@ -6,14 +6,13 @@
 
 <ul>
 @for( c <- codes ) {
-	<li><span style="background:@c.color;">&nbsp;@c.code&mdash;@c.description</span>
-		<a class="edit-link" href="@routes.Attendance.editCode(c.id)">Edit</a></li>
+	<li><span style="background:@c.getColor();">&nbsp;@c.getCode()&mdash;@c.getDescription()</span>
+		<a class="edit-link" href="@routes.Attendance.editCode(c.getId())">Edit</a></li>
 }
 </ul>
 
 <hr/>
 <h4>Create a new code</h4>
-@attendance_code_form(form, routes.Attendance.newCode, false)
+@attendance_code_form(form, routes.Attendance.newCode(), false)
 
 }
-

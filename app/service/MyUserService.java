@@ -5,18 +5,17 @@ import com.feth.play.module.pa.service.AbstractUserService;
 import com.feth.play.module.pa.user.AuthUser;
 import com.feth.play.module.pa.user.AuthUserIdentity;
 import com.feth.play.module.pa.user.EmailIdentity;
-import com.google.inject.Inject;
-
+import controllers.Utils;
+import javax.inject.Inject;
 import models.LinkedAccount;
 import models.Organization;
-import models.OrgConfig;
 import models.User;
-
 import play.Logger;
+import play.mvc.Http;
 
 public class MyUserService extends AbstractUserService {
 
-	public final static String DUMMY_USERNAME = "__DUMMY_USERNAME__";
+	static Logger.ALogger sLogger = Logger.of("application");
 
     @Inject
     public MyUserService(final PlayAuthenticate auth) {
@@ -26,21 +25,21 @@ public class MyUserService extends AbstractUserService {
     // We do not create new user accounts. If you aren't already approved,
     // you can't log in.
 	@Override
-	public Object save(final AuthUser authUser) {
-        Logger.debug("MyUserService::save " + authUser);
+	public Object save(final AuthUser authUser, final Http.Request request) {
+        sLogger.debug("MyUserService::save " + authUser);
 		final boolean isLinked = User.existsByAuthUserIdentity(authUser);
 		if (!isLinked) {
             if (authUser instanceof EmailIdentity) {
                 final EmailIdentity identity = (EmailIdentity) authUser;
-                Logger.debug("    is email identity, email='" + identity.getEmail() + "'");
-                User u = User.find.where().ieq("email", identity.getEmail()).findUnique();
+                sLogger.debug("    is email identity, email='" + identity.getEmail() + "'");
+                User u = User.find.query().where().ieq("email", identity.getEmail()).findOne();
                 if (u != null) {
-                    Logger.debug("    found user by email");
+                    sLogger.debug("    found user by email");
                 } else {
-                	Logger.debug("    creating new account");
-                	Organization org = OrgConfig.get().org;
-                	Logger.error("New login from unknown user: " + identity.getEmail() + ", org: " + org.name);
-                	u = User.create(identity.getEmail(), DUMMY_USERNAME, org);
+                	sLogger.debug("    creating new account");
+                	Organization org = Utils.getOrg(request);
+                	sLogger.error("New login from unknown user: " + identity.getEmail() + ", org: " + org.getName());
+                	u = User.create(identity.getEmail(), User.DUMMY_USERNAME, org);
                 }
                 u.linkedAccounts.add(LinkedAccount.create(authUser));
                 u.save();
@@ -53,13 +52,13 @@ public class MyUserService extends AbstractUserService {
 
 	@Override
 	public Object getLocalIdentity(final AuthUserIdentity identity) {
-        Logger.debug("MyUserService::getLocalIdentity " + identity);
+        sLogger.debug("MyUserService::getLocalIdentity " + identity);
 		// For production: Caching might be a good idea here...
 		// ...and dont forget to sync the cache when users get deactivated/deleted
 		final User u = User.findByAuthUserIdentity(identity);
 		if(u != null) {
-            Logger.debug("    found user by auth identity");
-			return u.id;
+            sLogger.debug("    found user by auth identity");
+			return u.getId();
 		} else {
 			return null;
 		}

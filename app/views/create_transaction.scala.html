@@ -1,11 +1,12 @@
-@(transactionForm: Form[Transaction])
+@(transactionForm: Form[Transaction])(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
 
 @main("New Transaction", "accounting", "new_transaction") {
 
 	@helper.form(routes.Accounting.makeNewTransaction()) {
-		<h2>New Transaction</h2>
+
+<h2>New Transaction</h2>
 		<div class="create-transaction">
 			<div id="create-transaction-options">
 				<div data-type="DigitalTransaction" class="create-transaction-option">
@@ -42,7 +43,7 @@
 					<span class="js-account-name-selected-text label label-primary"></span>
 					<img src="/assets/images/x.png">
 				</div>
-				<input type="text" class="js-account-name" name="from_name" autocomplete="off" />
+				<input type="text" class="js-account-name" name="fromName" autocomplete="off" />
 				<input type="hidden" class="js-account-id" name="from_account_id"/>
 			</td>
 		</tr>
@@ -53,7 +54,7 @@
 					<span class="js-account-name-selected-text label label-primary"></span>
 					<img src="/assets/images/x.png">
 				</div>
-				<input type="text" class="js-account-name" name="to_name" autocomplete="off"/>
+				<input type="text" class="js-account-name" name="toName" autocomplete="off"/>
 				<input type="hidden" class="js-account-id" name="to_account_id"/>
 			</td>
 		</tr>
@@ -67,7 +68,7 @@
 		</tr>
 		<tr>
 			<th>Date</th>
-			<td><input id="create-transaction-date" name="date_created" class="date" type="textfield"></input></td>
+			<td><input id="create-transaction-date" name="dateCreated" class="date" type="textfield"></input></td>
 		</tr>
 	</table>
 	<div id="balance" class="create-transaction-balance"></div>
@@ -76,6 +77,6 @@
 </script>
 
 <script type="text/javascript">
-	var accounts = @Html(Accounting.accountsJson());
+	var accounts = @Html(Accounting.accountsJson(Utils.getOrgConfig(request).org));
 	initCreateTransaction(accounts);
 </script>

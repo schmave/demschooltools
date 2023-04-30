@@ -1,23 +1,24 @@
-@(form: Form[Tag])
+@(form: Form[Tag])(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @implicitField = @{ helper.FieldConstructor(myConstructor.f) }
 
-@main("Edit tag " + form("title").value(), "crm") {
-    <h3 class="big-margin-top">Edit tag "@form("title").value()"</h3>
+@main("Edit tag " + form("title").value().get(), "crm") {
+    <h3 class="big-margin-top">Edit tag "@form("title").value().get()"</h3>
 
-    @helper.form(routes.CRM.saveTag(), 'class -> "form-horizontal") {
+    @helper.form(routes.CRM.saveTag(), Symbol("class") -> "form-horizontal") {
 
-        @if(form("id").value()) {
-        	<input type="hidden" name="id" value="@form("id").value()"/>
+
+        @if(form("id").value().isPresent()) {
+        	<input type="hidden" name="id" value="@form("id").value().get()"/>
         }
-        @helper.inputText(form("title"), '_label -> "Title", 'class-> "form-control")
-    	@helper.checkbox(form("use_student_display"), '_label -> "This is a list of students")
-        @helper.checkbox(form("show_in_jc"), '_label -> "Include tag members in JC")
-        @helper.checkbox(form("show_in_attendance"), '_label -> "Include tag members in Attendance")
-        @if(OrgConfig.get().org.show_accounting) {
-            @helper.checkbox(form("show_in_account_balances"), '_label -> "Include tag members in Account Balances list")
+        @helper.inputText(form("title"), Symbol("_label") -> "Title", Symbol("class") -> "form-control")
+    	@helper.checkbox(form("useStudentDisplay"), Symbol("_label") -> "This is a list of students")
+        @helper.checkbox(form("showInJc"), Symbol("_label") -> "Include tag members in JC")
+        @helper.checkbox(form("showInAttendance"), Symbol("_label") -> "Include tag members in Attendance")
+        @if(Utils.getOrgConfig(request).org.getShowAccounting()) {
+            @helper.checkbox(form("showInAccountBalances"), Symbol("_label") -> "Include tag members in Account Balances list")
         }
-        @helper.checkbox(form("show_in_menu"), '_label -> "Include this tag in the Tags menu")
+        @helper.checkbox(form("showInMenu"), Symbol("_label") -> "Include this tag in the Tags menu")
         @save_button("Save")
     }
 

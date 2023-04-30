@@ -1,10 +1,10 @@
 export function init() {
-    var login_message_shown = false;
+    let login_message_shown = false;
 
     $('.js-archive').click(function() {
-        var checkbox = $(this);
-        var id = Number(checkbox.data('id'));
-        var row = checkbox.parents('.js-archivable');
+        const checkbox = $(this);
+        const id = Number(checkbox.data('id'));
+        const row = checkbox.parents('.js-archivable');
 
         checkbox.prop("disabled", true);
 

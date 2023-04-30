@@ -13,25 +13,25 @@ See [the wiki](https://github.com/schmave/demschooltools/wiki/) for more informa
 the source code, or clone the git repository. `cd` into the root level
 of the source code.
 
-1. [Download](https://playframework.com/documentation/2.5.x/Installing) 
-and install sbt and the Play Framework. You will also need Java 8 if 
+1. [Download](https://www.playframework.com/documentation/2.8.x/Requirements) 
+and install sbt and the Play Framework. You will also need Java 11 if 
 you don't have it installed already.
 
 1. [Download](http://www.postgresql.org/download/) and install PostgreSQL, 
-including pgAdmin III, their graphical administration tool.
+including pgAdmin, their graphical administration tool.
 
 1. [Download](https://nodejs.org/en/download/releases/) and install npm and NodeJS.
-  Some versions of npm may not work. NodeJS v4.8.3 and npm v2.15.11 work.
+  Some versions of npm may not work. NodeJS v18 and npm v8 work.
   
 1. Run `npm install` to install the Javascript libraries. 
 
 1. Start PostgreSQL and create a database named "school_crm".
 
 1. Set the environment variables APPLICATION_SECRET, GOOGLE_CLIENT_SECRET, 
-FACEBOOK_CLIENT_SECRET, and SES_PASSWORD to empty values. You can run the 
+FACEBOOK_CLIENT_SECRET, ROLLBAR_TOKEN, and SES_PASSWORD to empty values. You can run the 
 "set_keys_blank.sh" script to do this on Mac/Linux.
 
-1. Run sbt "activator" (see [Play documentation](https://playframework.com/documentation/2.5.x/PlayConsole) 
+1. Run sbt (see [Play documentation](https://playframework.com/documentation/2.8.x/PlayConsole) 
 for more info) and execute the "run" command at the activator console.
 
 1. Navigate to [http://localhost:9000](http://localhost:9000) in your browser 

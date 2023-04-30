@@ -7,9 +7,9 @@
 
 {{#tags}}
 <p>
-    <a href="/viewTag/{{id}}">{{^show_in_menu}}[{{/show_in_menu}}{{title}}{{^show_in_menu}}]{{/show_in_menu}}</a>
-    {{#show_in_jc}}<b>(JC)</b>{{/show_in_jc}}
-    {{#show_in_attendance}}<b>(Attendance)</b>{{/show_in_attendance}}
+    <a href="/viewTag/{{id}}">{{^showInMenu}}[{{/showInMenu}}{{title}}{{^showInMenu}}]{{/showInMenu}}</a>
+    {{#showInJc}}<b>(JC)</b>{{/showInJc}}
+    {{#showInAttendance}}<b>(Attendance)</b>{{/showInAttendance}}
     <span class="man-edit"><a href="/editTag/{{id}}">Edit</a></span>
 </p>
 {{/tags}}

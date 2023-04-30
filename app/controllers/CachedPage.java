@@ -1,17 +1,15 @@
 package controllers;
 
-import models.*;
-
-import play.cache.Cache;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-
+import models.*;
 
 public abstract class CachedPage {
     public static final String ATTENDANCE_INDEX = "Attendance-index-";
@@ -24,27 +22,27 @@ public abstract class CachedPage {
     public String selected_button;
     public String cache_key;
 
-    static String getKey(String key_base) {
-        return key_base + "-" + OrgConfig.get().org.id;
+    static String getKey(String key_base, Organization org) {
+        return key_base + "-" + org.getId();
     }
 
-    public static void remove(String key_base) {
-        Cache.remove(getKey(key_base));
+    public static void remove(String key_base, Organization org) {
+        Public.sCache.remove(getKey(key_base, org));
     }
 
     public CachedPage(String key_base, String title, String menu,
-        String selected_button) {
+                      String selected_button, Organization org) {
         this.title = title;
-        this.cache_key = getKey(key_base);
+        this.cache_key = getKey(key_base, org);
         this.menu = menu;
         this.selected_button = selected_button;
     }
 
     public String getPage() {
-        byte[] cached_bytes = (byte[])Cache.get(cache_key);
-        if (cached_bytes != null) {
+        Optional<byte[]> cached_bytes = Public.sCache.get(cache_key);
+        if (cached_bytes.isPresent()) {
             try {
-                ByteArrayInputStream bais = new ByteArrayInputStream(cached_bytes);
+                ByteArrayInputStream bais = new ByteArrayInputStream(cached_bytes.get());
                 GZIPInputStream gzis = new GZIPInputStream(bais);
                 BufferedReader reader = new BufferedReader(new InputStreamReader(gzis));
 
@@ -63,14 +61,14 @@ public abstract class CachedPage {
             }
         }
 
-        String result = null;
+        String result;
         // Only render one cached page at a time (per server process)
         synchronized(JC_INDEX) {
             result = render();
         }
 
         try {
-            byte[] bytes_to_compress = result.getBytes("UTF-8");
+            byte[] bytes_to_compress = result.getBytes(StandardCharsets.UTF_8);
             ByteArrayOutputStream baos = new ByteArrayOutputStream(result.length());
             GZIPOutputStream gzos = new GZIPOutputStream(baos);
             gzos.write(bytes_to_compress);
@@ -82,7 +80,7 @@ public abstract class CachedPage {
                 + "; compressed: " + compressed_bytes.length);
 
             // cache it for 12 hours
-            Cache.set(cache_key, compressed_bytes, 60 * 60 * 12);
+            Public.sCache.set(cache_key, compressed_bytes, 60 * 60 * 12);
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Exception writing cached bytes");
@@ -93,18 +91,18 @@ public abstract class CachedPage {
 
     abstract String render();
 
-    public static void clearAll() {
-        remove(ATTENDANCE_INDEX);
-        remove(JC_INDEX);
-        remove(MANUAL_INDEX);
-        remove(RECENT_COMMENTS);
+    public static void clearAll(Organization org) {
+        remove(ATTENDANCE_INDEX, org);
+        remove(JC_INDEX, org);
+        remove(MANUAL_INDEX, org);
+        remove(RECENT_COMMENTS, org);
         Utils.updateCustodia();
     }
 
-    public static void onPeopleChanged() {
-        remove(ATTENDANCE_INDEX);
-        remove(JC_INDEX);
-        remove(RECENT_COMMENTS);
+    public static void onPeopleChanged(Organization org) {
+        remove(ATTENDANCE_INDEX, org);
+        remove(JC_INDEX, org);
+        remove(RECENT_COMMENTS, org);
         Utils.updateCustodia();
     }
 }

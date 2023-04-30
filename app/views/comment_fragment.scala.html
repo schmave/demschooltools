@@ -1,22 +1,22 @@
-@(c : Comment, show_last_name: Boolean)
+@(c : Comment, show_last_name: Boolean)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 
 <div class="comment">
-<b>@c.user.name</b> and 
+<b>@c.getUser().getName()</b> and
 @if( show_last_name ) {
-	<a href="@routes.CRM.person(c.person.person_id)">
+	<a href="@routes.CRM.person(c.getPerson().getPersonId())">
 }
-<b>@c.person.first_name @if( show_last_name ) { @c.person.last_name }</b>
+<b>@c.getPerson().getFirstName() @if( show_last_name ) { @c.getPerson().getLastName() }</b>
 @if( show_last_name ) {
 </a>
 }
 <div class="comment_text">
-@Html(c.message.replace("\n", "<br>"))
+@Html(c.getMessage().replace("\n", "<br>"))
 </div>
 <div class="comment_tasks">
 @for( ct <- c.completed_tasks ) {
-	<a href="@routes.CRM.viewTaskList(ct.task.task_list.id)"><span class="label label-primary">@ct.task.title</span></a>
+	<a href="@routes.CRM.viewTaskList(ct.getTask().getTaskList().getId())"><span class="label label-primary">@ct.getTask().getTitle()</span></a>
 }
 </div>
-<div class="comment_time">@CRM.formatDate(c.created)</div>
+<div class="comment_time">@CRM.formatDate(c.getCreated(), Utils.getOrgConfig(request))</div>
 </div>

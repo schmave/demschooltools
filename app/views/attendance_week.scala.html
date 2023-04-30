@@ -2,17 +2,17 @@
   codes : Map[String, AttendanceCode],
   people : List[Person],
   days : Map[Person, List[AttendanceDay]],
-  weeks : Map[Person, AttendanceWeek])
+  weeks : Map[Person, AttendanceWeek])(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
 
 @main("Attendance data", "attendance", "week") {
 
-<h3>Attendance weekly report @Application.yymmddDate(monday)
+<h3>Attendance weekly report @Application.yymmddDate(Utils.getOrgConfig(request), monday)
 <a class="edit-link" href="@routes.Attendance.editWeek()?date=@Application.forDateInput(monday)">Edit</a>
 </h3>
 <p><a href="@routes.Attendance.viewWeek()?date=@Application.forDateInput(Application.addWeek(monday, -1))">&lt;&lt; Prev week</a>
- @Application.yymmddDate(monday) <a href="@routes.Attendance.viewWeek()?date=@Application.forDateInput(Application.addWeek(monday, 1))">Next week &gt;&gt;</a>
+ @Application.yymmddDate(Utils.getOrgConfig(request), monday) <a href="@routes.Attendance.viewWeek()?date=@Application.forDateInput(Application.addWeek(monday, 1))">Next week &gt;&gt;</a>
 </p>
 
 <table class="attendance-view table sortable">
@@ -31,23 +31,23 @@
 	</tr>
 
 @for( p <- people ) {
-	<tr><td>@p.first_name</td><td>@p.last_name</td>
+	<tr><td>@p.getFirstName()</td><td>@p.getLastName()</td>
 	@if( days.containsKey(p)) {
 		@for( day <- days.get(p) ) {
-			@if( day.code != null ) {
-				@if( codes.containsKey(day.code)) {
-					<td colspan=2 class="attendance-code" style="background-color:@codes.get(day.code).color">
-					@codes.get(day.code).description
+			@if( day.getCode() != null ) {
+				@if( codes.containsKey(day.getCode())) {
+					<td colspan=2 class="attendance-code" style="background-color:@codes.get(day.getCode()).getColor()">
+					@codes.get(day.getCode()).getDescription()
 					</td>
 				} else {
-					<td colspan=2>@day.code</td>
+					<td colspan=2>@day.getCode()</td>
 				}
 			} else {
-				@if( day.start_time == null || day.end_time == null ) {
+				@if( day.getStartTime() == null || day.getEndTime() == null ) {
 					<td colspan=2 class="attendance-error">???</td>
 				} else {
-					<td>@Attendance.formatTime(day.start_time)</td>
-					<td>@Attendance.formatTime(day.end_time)</td>
+					<td>@Attendance.formatTime(day.getStartTime())</td>
+					<td>@Attendance.formatTime(day.getEndTime())</td>
 				}
 			}
 		}
@@ -56,7 +56,7 @@
 	}
 
 	@if(weeks.containsKey(p)) {
-		<td>@weeks.get(p).extra_hours</td>
+		<td>@weeks.get(p).getExtraHours()</td>
 	} else {
 		<td>--</td>
 	}

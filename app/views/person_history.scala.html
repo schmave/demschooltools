@@ -1,20 +1,20 @@
-@(p : Person, history : PersonHistory, recent_rps : List[ Charge ], redact_names: Boolean)
+@(p : Person, history : PersonHistory, recent_rps : List[ Charge ], redact_names: Boolean)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
 
-<h3>@p.getDisplayName()'s @OrgConfig.get().str_jc_name_short history, @Application.yymmddDate(history.start_date) to @Application.yymmddDate(history.end_date)</h3>
-<h4>Recent @OrgConfig.get().str_res_plans</h4>
+<h3>@p.getDisplayName()'s @Utils.getOrgConfig(request).str_jc_name_short history, @Application.yymmddDate(Utils.getOrgConfig(request), history.start_date) to @Application.yymmddDate(Utils.getOrgConfig(request), history.end_date)</h3>
+<h4>Recent @Utils.getOrgConfig(request).str_res_plans</h4>
 
 @if( recent_rps.size() == 0 ) {
 <p>None. Go @p.getDisplayName()!
 } else {
 <table class="table">
-<thead><tr><th>Day<th width=45%>Entry<th width=45%>@OrgConfig.get().str_res_plan_cap</tr></thead>
+<thead><tr><th>Day<th width=45%>Entry<th width=45%>@Utils.getOrgConfig(request).str_res_plan_cap</tr></thead>
 <tbody>
 @for( c <- recent_rps ) {
-<tr><td>@Application.formatDayOfWeek(c.the_case.meeting.date)
+<tr><td>@Application.formatDayOfWeek(c.getTheCase().getMeeting().getDate())
 <td>@c.getRuleTitle()
-<td>@c.resolution_plan
+<td>@c.getResolutionPlan()
 }
 </tbody>
 </table>
@@ -25,10 +25,10 @@
 <thead><tr><th width=50% class="sorttable_alpha">Entry<th width=25% class="sorttable_school_mmdd">Most Recent Violation<th class="sorttable_numeric"># of violations</tr></thead>
 <tbody>
 @for( r <- history.rule_records ) {
-	<tr><td width=50%>@if(r.rule != null) { @r.rule.getNumber() @r.rule.title } else { <i>unknown</i> }
+	<tr><td width=50%>@if(r.rule != null) { @r.rule.getNumber() @r.rule.getTitle() } else { <i>unknown</i> }
 		<td>
 		@if( r.most_recent_charge != null ) {
-			@Application.formatDateShort(r.most_recent_charge)
+			@Application.formatDateShort(Utils.getOrgConfig(request), r.most_recent_charge)
 		}
 		<td align=right>@r.count</tr>
 }
@@ -38,13 +38,13 @@
 <h4>Case Details...</h4>
 @if(redact_names) {
 <p>Names have been removed. <a nosidebar href="@routes.Application.viewPersonHistory(
-	p.person_id,
+	p.getPersonId(),
 	false,
 	Application.forDateInput(history.start_date),
 	Application.forDateInput(history.end_date))">View with names.</a>
 } else {
 <p>Names are intact. <a nosidebar href="@routes.Application.viewPersonHistory(
-	p.person_id,
+	p.getPersonId(),
 	true,
 	Application.forDateInput(history.start_date),
 	Application.forDateInput(history.end_date))">Remove names.</a>
@@ -59,7 +59,7 @@
   <div class="tab-pane active" id="byrule">
 	@for( (rule, charges) <- history.charges_by_rule ) {
 		@if( rule != null ) {
-			<h4 style="margin-top: 2em;">@rule.getNumber() @rule.title</h4>
+			<h4 style="margin-top: 2em;">@rule.getNumber() @rule.getTitle()</h4>
 		}
 		@for( c <- charges) {
 			@historyCharge(c, false, false, redact_names)
@@ -74,4 +74,3 @@
 	}
 	</div>
 </div>
-

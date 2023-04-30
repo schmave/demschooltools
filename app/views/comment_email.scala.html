@@ -1,22 +1,22 @@
-@(c : Comment)
+@(c : Comment)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 <html>
 <body>
 <h3>An update from DemSchoolTools</h3>
 
-<p><b>@c.user.name</b> communicated with
-<a href="@{OrgConfig.get().people_url}@routes.CRM.person(c.person.person_id)">
-<b>@c.person.first_name @c.person.last_name</b>
+<p><b>@c.getUser().getName()</b> communicated with
+<a href="@{Utils.getOrgConfig(request).people_url}@routes.CRM.person(c.getPerson().getPersonId())">
+<b>@c.getPerson().getFirstName() @c.getPerson().getLastName()</b>
 </a>
 
 <p><i>Notes</i><br>
-@Html(c.message.replace("\n", "<br>"))
+@Html(c.getMessage().replace("\n", "<br>"))
 
 @if( c.completed_tasks.size() > 0) {
 <p>The following tasks were marked complete:
 <ul>
 @for( ct <- c.completed_tasks ) {
-	<li><a href="@{OrgConfig.get().people_url}@routes.CRM.viewTaskList(ct.task.task_list.id)" class="label label-info">@ct.task.title</a>
+	<li><a href="@{Utils.getOrgConfig(request).people_url}@routes.CRM.viewTaskList(ct.getTask().getTaskList().getId())" class="label label-info">@ct.getTask().getTitle()</a>
 }
 </ul>
 }

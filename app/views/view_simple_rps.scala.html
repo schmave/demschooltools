@@ -1,23 +1,23 @@
-@(groups : HashMap[String, List[Charge]])
+@(groups : HashMap[String, List[Charge]])(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @sorted_keys = @{ new ArrayList(groups.keySet()) }
 @{ Collections.sort(sorted_keys) }
 
 @import helper._
 
-@main("Print simple " + OrgConfig.get().str_res_plans, "jc", "rps") {
+@main("Print simple " + Utils.getOrgConfig(request).str_res_plans, "jc", "rps") {
 
-<h2>Active @OrgConfig.get().str_res_plans <span class="comment_time">as of @Application.formatDateTimeLong()</span></h2>
+<h2>Active @Utils.getOrgConfig(request).str_res_plans <span class="comment_time">as of @Application.formatDateTimeLong(Utils.getOrgConfig(request))</span></h2>
 
 @for(key <- sorted_keys) {
     <h3>@key</h3>
     @for(charge <- groups.get(key)) {
         <p>
-            <strong>@(charge.the_case.case_number).</strong>
-            @if(charge.sm_decision != null && charge.sm_decision != "") {
-                @charge.sm_decision
+            <strong>@(charge.getTheCase().getCaseNumber()).</strong>
+            @if(charge.getSmDecision() != null && charge.getSmDecision() != "") {
+                @charge.getSmDecision()
             } else {
-                @charge.resolution_plan
+                @charge.getResolutionPlan()
             }
         </p>
     }

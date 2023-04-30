@@ -1,12 +1,10 @@
 package models;
 
-import java.text.*;
-import java.util.*;
-import java.math.*;
-import javax.persistence.*;
-import com.fasterxml.jackson.annotation.*;
-import play.data.*;
-import com.avaje.ebean.*;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
+import play.data.Form;
 
 public class TransactionList {
 
@@ -19,9 +17,24 @@ public class TransactionList {
     public Boolean include_digital = false;
     public Boolean include_archived = false;
 
+    public static List<Transaction> getTransactionsViewModel(Account account) {
+        List<Transaction> result = new ArrayList<>();
+        for (Transaction t : account.credit_transactions) {
+            t.setDescription(account.getFormattedDescription("from", t.getFromName(), t.getDescription()));
+            result.add(t);
+        }
+        for (Transaction t : account.payment_transactions) {
+            t.setDescription(account.getFormattedDescription("to", t.getToName(), t.getDescription()));
+            t.setAmount(BigDecimal.ZERO.subtract(t.getAmount()));
+            result.add(t);
+        }
+        sortTransactions(result);
+        return result;
+    }
+
     private BigDecimal getBalance() {
         return transactions.stream()
-            .map(t -> t.amount)
+            .map(t -> t.getAmount())
             .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
@@ -31,8 +44,8 @@ public class TransactionList {
 
     private BigDecimal getBalanceAsOfTransaction(Transaction transaction) {
         return transactions.stream()
-            .filter(t -> t.id <= transaction.id)
-            .map(t -> t.amount)
+            .filter(t -> t.getId() <= transaction.getId())
+            .map(t -> t.getAmount())
             .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
@@ -61,18 +74,18 @@ public class TransactionList {
         return result;
     }
 
-    public static TransactionList allCash() {
+    public static TransactionList allCash(Organization org) {
         TransactionList model = new TransactionList();
-        model.transactions = new ArrayList<Transaction>();
-        List<Transaction> deposit_transactions = Transaction.allCashDeposits();
-        List<Transaction> withdrawal_transactions = Transaction.allCashWithdrawals();
+        model.transactions = new ArrayList<>();
+        List<Transaction> deposit_transactions = Transaction.allCashDeposits(org);
+        List<Transaction> withdrawal_transactions = Transaction.allCashWithdrawals(org);
         for (Transaction t : deposit_transactions) {
-            t.description = getFormattedDescription(t.type, t.from_name, t.to_name, t.description);
+            t.setDescription(getFormattedDescription(t.getType(), t.getFromName(), t.getToName(), t.getDescription()));
             model.transactions.add(t);
         }
         for (Transaction t : withdrawal_transactions) {
-            t.description = getFormattedDescription(t.type, t.from_name, t.to_name, t.description);
-            t.amount = BigDecimal.ZERO.subtract(t.amount);
+            t.setDescription(getFormattedDescription(t.getType(), t.getFromName(), t.getToName(), t.getDescription()));
+            t.setAmount(BigDecimal.ZERO.subtract(t.getAmount()));
             model.transactions.add(t);
         }
         sortTransactions(model.transactions);
@@ -90,7 +103,7 @@ public class TransactionList {
         return model;
     }
 
-    public static TransactionList createFromForm(Form<TransactionList> form) {
+    public static TransactionList createFromForm(Form<TransactionList> form, Organization org) {
         TransactionList model = form.get();
 
         model.transactions = Transaction.allWithConditions(
@@ -99,25 +112,25 @@ public class TransactionList {
             model.include_cash_deposits,
             model.include_cash_withdrawals,
             model.include_digital,
-            model.include_archived);
+            model.include_archived, org);
 
         for (Transaction t : model.transactions) {
-            t.description = getFormattedDescription(t.type, t.from_name, t.to_name, t.description);
+            t.setDescription(getFormattedDescription(t.getType(), t.getFromName(), t.getToName(), t.getDescription()));
         }
         sortTransactions(model.transactions);
         return model;
     }
 
     public static void sortTransactions(List<Transaction> transactions) {
-        Collections.sort(transactions, (a, b) -> (getTransactionSortValue(b)).compareTo(getTransactionSortValue(a)));
+        transactions.sort((a, b) -> (getTransactionSortValue(b)).compareTo(getTransactionSortValue(a)));
     }
 
     private static Integer getTransactionSortValue(Transaction transaction) {
         // Convert milliseconds to minutes so we can fit into an Integer
-        int minutes = (int) (transaction.date_created.getTime() / 60000);
+        int minutes = (int) (transaction.getDateCreated().getTime() / 60000);
         // The goal is to sort by date, then by ID.
         // This will work as long as the difference in minutes between two differently-dated transactions is always
         // greater than the difference in ID numbers between them, which will practically always be the case.
-        return minutes + transaction.id;
+        return minutes + transaction.getId();
     }
 }

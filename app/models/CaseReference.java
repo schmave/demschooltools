@@ -1,57 +1,59 @@
 package models;
 
-import models.*;
-import java.util.*;
+import controllers.Application;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CaseReference {
 
 	public Integer id;
-	public String case_number;
+	public String caseNumber;
 	public String findings;
 	public List<ChargeReference> charges;
 
-	public static List<CaseReference> create(Case referencing_case) {
-		List<CaseReference> results = new ArrayList<CaseReference>();
+	public static List<CaseReference> create(Case referencing_case, Organization org) {
+		List<CaseReference> results = new ArrayList<>();
 		
 		for (Case referenced_case : referencing_case.referenced_cases) {
 			
 			CaseReference result = new CaseReference();
-			result.id = referenced_case.id;
-			result.case_number = referenced_case.case_number;
-			result.findings = referenced_case.generateCompositeFindingsFromCaseReferences();
-			result.charges = new ArrayList<ChargeReference>();
+			result.id = referenced_case.getId();
+			result.caseNumber = referenced_case.getCaseNumber();
+			result.findings = Application.generateCompositeFindingsFromCaseReferences(referenced_case);
+			result.charges = new ArrayList<>();
 
 			for (Charge charge : referenced_case.charges) {
 
-				if (charge.person == null) continue;
+				if (charge.getPerson() == null) continue;
 
 				ChargeReference cr = new ChargeReference();
 				
-				cr.charge_id = charge.id;
-				cr.person = charge.person.getDisplayName();
+				cr.charge_id = charge.getId();
+				cr.person = charge.getPerson().getDisplayName();
 				cr.rule = charge.getRuleTitle();
-				cr.resolution_plan = charge.resolution_plan;
-				cr.is_referenced = referencing_case.referenced_charges.contains(charge);
+				cr.resolutionPlan = charge.getResolutionPlan();
+				cr.isReferenced = referencing_case.referenced_charges.contains(charge);
 
-				if (charge.sm_decision != null && !charge.sm_decision.isEmpty()) {
+				if (charge.getSmDecision() != null && !charge.getSmDecision().isEmpty()) {
 					cr.is_sm_decision = true;
-					cr.resolution_plan = charge.sm_decision;
+					cr.resolutionPlan = charge.getSmDecision();
 				}
 
-				if (charge.referred_to_sm && cr.resolution_plan.isEmpty()) {
-					cr.resolution_plan = "[Referred to School Meeting]";
+				if (charge.getReferredToSm() && cr.resolutionPlan.isEmpty()) {
+					cr.resolutionPlan = "[Referred to School Meeting]";
 				}
 
 				for (Charge new_charge : referencing_case.charges) {
-					if (new_charge.referenced_charge == charge) {
+					if (new_charge.getReferencedCharge() == charge) {
 						cr.has_generated = true;
-						cr.generated_charge_id = new_charge.id;
-						cr.has_default_rule = new_charge.rule != null && new_charge.rule.id == Entry.findBreakingResPlanEntryId();
+						cr.generated_charge_id = new_charge.getId();
+						cr.has_default_rule = new_charge.getRule() != null && new_charge.getRule().getId().equals(
+								Entry.findBreakingResPlanEntryId(org));
 					}
 				}
 
 				if (!cr.has_generated && charge.referencing_charges.size() > 0) {
-					cr.previously_referenced_in_case = charge.referencing_charges.get(0).the_case.case_number;
+					cr.previously_referenced_in_case = charge.referencing_charges.get(0).getTheCase().getCaseNumber();
 				}
 
 				result.charges.add(cr);

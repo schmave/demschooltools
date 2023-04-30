@@ -1,24 +1,22 @@
-@(form: Form[Chapter], is_new : Boolean)
-
+@(form: Form[Chapter], is_new : Boolean)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 @implicitField = @{ helper.FieldConstructor(myConstructor.f) }
-
 @main("Edit a chapter", "manual") {
 
 @if( is_new ) {
     <h2>New chapter</h2>
 } else {
-    <h2>Edit chapter "@form("title").value()"</h2>
+    <h2>Edit chapter "@form("title").value().get()"</h2>
 }
 
-@helper.form(routes.ApplicationEditing.saveChapter(), 'class -> "form-horizontal") {
+@helper.form(routes.ApplicationEditing.saveChapter(), Symbol("class") -> "form-horizontal") {
 
 
-@if(form("id").value()) {
-	<input type="hidden" name="id" value="@form("id").value()"/>
+@if(form("id").value().isPresent()) {
+	<input type="hidden" name="id" value="@form("id").value().get()"/>
 }
-        @helper.inputText(form("num"), '_label -> "Number")
-        @helper.inputText(form("title"), '_label -> "Title", 'class-> "form-control")
-		@helper.checkbox(form("deleted"), '_label -> "Check this to delete")
+        @helper.inputText(form("num"), Symbol("_label") -> "Number")
+        @helper.inputText(form("title"), Symbol("_label") -> "Title", Symbol("class") -> "form-control")
+		@helper.checkbox(form("deleted"), Symbol("_label") -> "Check this to delete")
         @save_button("Save")
 }
 }

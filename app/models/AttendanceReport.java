@@ -1,13 +1,11 @@
 package models;
 
-import java.text.*;
-import java.util.*;
-import java.math.*;
-import javax.persistence.*;
-import com.fasterxml.jackson.annotation.*;
-import play.data.*;
-import com.avaje.ebean.*;
 import java.sql.Time;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import play.data.Form;
 
 public class AttendanceReport {
 
@@ -22,31 +20,30 @@ public class AttendanceReport {
     public Time latest_departure_time;
 
     public AttendanceReport() {
-        late_departures = new ArrayList<LateDepartureGroup>();
-
-        Organization org = OrgConfig.get().org;
-        latest_departure_time = org.attendance_report_latest_departure_time;
+        late_departures = new ArrayList<>();
     }
 
-    public static AttendanceReport createFromForm(Form<AttendanceReport> form) {
+    public static AttendanceReport createFromForm(Form<AttendanceReport> form, Organization org) {
         AttendanceReport model = form.get();
 
-        List<AttendanceDay> events = AttendanceDay.find.where()
-            .eq("person.organization", OrgConfig.get().org)
+        model.latest_departure_time = org.getAttendanceReportLatestDepartureTime();
+
+        List<AttendanceDay> events = AttendanceDay.find.query().where()
+            .eq("person.organization", org)
             .ge("day", model.start_date)
             .le("day", model.end_date)
-            .gt("end_time", model.latest_departure_time)
-            .order("person.first_name ASC, day ASC")
+            .gt("endTime", model.latest_departure_time)
+            .order("person.firstName ASC, day ASC")
             .findList();
 
         for (AttendanceDay event : events) {
-            String name = event.person.getDisplayName();
+            String name = event.getPerson().getDisplayName();
             LateDepartureGroup group = model.late_departures.stream()
                 .filter(g -> name.equals(g.name))
                 .findAny().orElse(null);
 
             if (group == null) {
-                group = new LateDepartureGroup(name);
+                group = new LateDepartureGroup(name, org);
                 model.late_departures.add(group);
             }
             group.events.add(event);

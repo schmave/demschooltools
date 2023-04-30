@@ -1,8 +1,7 @@
 package models;
 
-import java.util.*;
-import java.math.*;
-import java.sql.Time;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AttendanceStats {
 
@@ -13,29 +12,29 @@ public class AttendanceStats {
     public double total_hours;
 
     public Map<AttendanceCode, Integer> absence_counts =
-        new HashMap<AttendanceCode, Integer>();
+            new HashMap<>();
 
-    private Map<Integer, Double> values;
+    private final Map<Integer, Double> values;
 
     private double partial_day_value;
 
-    public AttendanceStats() {
+    public AttendanceStats(Organization org) {
         values = new HashMap<>();
         partial_day_value = 0;
-        if (OrgConfig.get().org.attendance_partial_day_value != null) {
-            partial_day_value = OrgConfig.get().org.attendance_partial_day_value.doubleValue();
+        if (org.getAttendancePartialDayValue() != null) {
+            partial_day_value = org.getAttendancePartialDayValue().doubleValue();
         }
     }
 
-    public void processDay(AttendanceDay day, int index, Map<String, AttendanceCode> codes_map) {
+    public void processDay(AttendanceDay day, int index, Map<String, AttendanceCode> codes_map, Organization org) {
         if (day == null) {
             return;
         }
-        if (day.code != null || day.start_time == null || day.end_time == null) {
-            incrementCodeCount(codes_map.get(day.code), index);
+        if (day.getCode() != null || day.getStartTime() == null || day.getEndTime() == null) {
+            incrementCodeCount(codes_map.get(day.getCode()), index);
         }
         else {
-            incrementAttendance(day, index);
+            incrementAttendance(day, index, org);
         }
     }
 
@@ -43,8 +42,8 @@ public class AttendanceStats {
         if (code == null) {
             return;
         }
-        if (!code.not_counted) {
-            if (code.counts_toward_attendance) {
+        if (!code.getNotCounted()) {
+            if (code.getCountsTowardAttendance()) {
                 approved_absences++;
                 values.put(index, 1d);
             } else {
@@ -58,11 +57,11 @@ public class AttendanceStats {
         absence_counts.put(code, absence_counts.get(code) + 1);
     }
 
-    private void incrementAttendance(AttendanceDay day, int index) {
+    private void incrementAttendance(AttendanceDay day, int index, Organization org) {
         double hours = day.getHours();
         total_hours += hours;
 
-        if (day.isPartial()) {
+        if (day.isPartial(org)) {
             partial_days_present++;
             values.put(index, partial_day_value);
         } else {

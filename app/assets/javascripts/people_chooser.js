@@ -1,20 +1,20 @@
-var Handlebars = require('handlebars');
+const Handlebars = require('handlebars');
 
-var utils = require('./utils');
+const utils = require('./utils');
 
-var person_template_str =
+const person_template_str =
     '<div class="name"><span class="label label-primary">{{name}}</span>' +
     '<img src="/assets/images/x.png"></div>';
 
-var person_template = Handlebars.compile(person_template_str);
+const person_template = Handlebars.compile(person_template_str);
 
-var Person = function(id, name, onClickPerson) {
+const Person = function(id, name, onClickPerson) {
     this.name = name;
     this.id = id;
-    var self = this;
+    const self = this;
 
     this.render = function() {
-        return person_template({"name": name});
+        return person_template({ name });
     };
 
     // called by PeopleChooser after self.el has been
@@ -30,10 +30,10 @@ var Person = function(id, name, onClickPerson) {
     };
 };
 
-var PeopleChooser = function(el, on_add, on_remove, autocomplete_source, onClickPerson) {
+const PeopleChooser = function(el, on_add, on_remove, autocomplete_source, onClickPerson) {
     this.el = el;
     this.people = [];
-    var self = this;
+    const self = this;
 
     this.search_box = el.find(".person_search");
     this.search_box.autocomplete({
@@ -51,7 +51,7 @@ var PeopleChooser = function(el, on_add, on_remove, autocomplete_source, onClick
 //  el.mouseenter(function() { self.search_box.fadeIn(); } );
 //
     this.search_box.bind( "autocompleteselect", function(event, ui) {
-        var new_person = self.addPerson(ui.item.id, ui.item.label);
+        const new_person = self.addPerson(ui.item.id, ui.item.label);
 
         if (on_add && new_person) {
             on_add(new_person);
@@ -63,7 +63,7 @@ var PeopleChooser = function(el, on_add, on_remove, autocomplete_source, onClick
 
     this.addPerson = function(id, name) {
         // Don't add people who have already been added.
-        for (var i in self.people) {
+        for (const i in self.people) {
             if (id == self.people[i].id) {
                 return;
             }
@@ -75,7 +75,7 @@ var PeopleChooser = function(el, on_add, on_remove, autocomplete_source, onClick
             utils.selectNextInput(self.search_box);
         }
 
-        var p = new Person(id, name, onClickPerson);
+        const p = new Person(id, name, onClickPerson);
         self.people.push(p);
         p.el = self.el.find(".people").append(p.render()).children(":last-child");
         p.activateClick();
@@ -94,7 +94,7 @@ var PeopleChooser = function(el, on_add, on_remove, autocomplete_source, onClick
     this.removePerson = function(person) {
         $(person.el).remove();
 
-        for (var i in self.people) {
+        for (const i in self.people) {
             if (self.people[i] == person) {
                 self.people.splice(i, 1);
             }
@@ -111,7 +111,7 @@ var PeopleChooser = function(el, on_add, on_remove, autocomplete_source, onClick
     };
 
     this.loadPeople = function(people) {
-        for (var i in people) {
+        for (const i in people) {
             self.addPerson(people[i].id, people[i].name);
         }
     };
@@ -123,6 +123,6 @@ var PeopleChooser = function(el, on_add, on_remove, autocomplete_source, onClick
 };
 
 module.exports = {
-    PeopleChooser: PeopleChooser,
-    Person: Person,
+    PeopleChooser,
+    Person,
 }

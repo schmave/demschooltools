@@ -1,4 +1,4 @@
-@(people: List[Person], recent_comments: List[Comment])
+@(people: List[Person], recent_comments: List[Comment])(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
 
@@ -9,7 +9,7 @@
     <ul>
         @for(person <- people) {
             <li>
-                <a href="@routes.CRM.person(person.person_id)">@person.first_name @person.last_name</a>
+                <a href="@routes.CRM.person(person.getPersonId())">@person.getFirstName() @person.getLastName()</a>
             </li>
         }
     </ul>

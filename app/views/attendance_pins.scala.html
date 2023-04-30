@@ -1,4 +1,4 @@
-@(people : List[Person])
+@(people : List[Person])(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
 
@@ -6,13 +6,14 @@
 
 <h3>Assign PINs</h3>
 
-@form(routes.Attendance.savePINs, 'class -> "form-horizontal", 'role -> "form") {
+@form(routes.Attendance.savePINs(), Symbol("class") -> "form-horizontal", Symbol("role") -> "form") {
+
 
 <table class="attendance-pins-table">
 	@for( p <- people ) {
 		<tr>
 			<td><label class="control-label">@p.getDisplayName()</label></td>
-			<td><input class="form-control pin" type="number" max="9999999999" step="1" name="@p.person_id" value="@p.pin"></td>
+			<td><input class="form-control pin" type="number" max="9999999999" step="1" name="@p.getPersonId()" value="@p.getPin()"></td>
 		</tr>
 	}
 </table>

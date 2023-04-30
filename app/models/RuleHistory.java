@@ -2,11 +2,9 @@ package models;
 
 import java.util.*;
 
-import controllers.Application;
-
 public class RuleHistory {
 
-    public class Record {
+    public static class Record {
         public Date most_recent_charge;
         public Person person;
         public int count;
@@ -18,8 +16,8 @@ public class RuleHistory {
 	public List<Charge> charges;
 
     public RuleHistory(Entry rule, boolean include_today, Date start_date, Date end_date) {
-		charges = new ArrayList<Charge>();
-        HashMap<Person, Record> records = new HashMap<Person, Record>();
+		charges = new ArrayList<>();
+        HashMap<Person, Record> records = new HashMap<>();
 
         Date today = new Date();
 		if (end_date == null) {
@@ -32,7 +30,7 @@ public class RuleHistory {
         Collections.reverse(rule.charges);
 
         for (Charge c : rule.charges) {
-            Date d = c.the_case.meeting.date;
+            Date d = c.getTheCase().getMeeting().getDate();
             if (d.before(start_date) || d.after(end_date) || 
                 (!include_today && d.getDate() == today.getDate() &&
                  d.getMonth() == today.getMonth() && d.getYear() == today.getYear())) {
@@ -41,19 +39,19 @@ public class RuleHistory {
 			
 			charges.add(c);
 
-            Record r = records.get(c.person);
+            Record r = records.get(c.getPerson());
             if (r == null) {
                 r = new Record();
-                r.most_recent_charge = c.the_case.meeting.date;
+                r.most_recent_charge = c.getTheCase().getMeeting().getDate();
                 r.count = 1;
-                r.person = c.person;
-                records.put(c.person, r);
+                r.person = c.getPerson();
+                records.put(c.getPerson(), r);
             } else {
                 r.count++;
             }
         }
 
-        rule_records = new ArrayList<Record>(records.values());
+        rule_records = new ArrayList<>(records.values());
     }
 
 

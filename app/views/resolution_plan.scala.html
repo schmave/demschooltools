@@ -1,13 +1,13 @@
-@(charge : Charge)
+@(charge : Charge)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
 
 
 			<tr>
-				<td class="name col-xs-1">@charge.person.getDisplayName()
-				<td class="col-xs-3">@charge.the_case.case_number (@Html(charge.getDayOfWeek()))<br>
+				<td class="name col-xs-1">@charge.getPerson().getDisplayName()
+				<td class="col-xs-3">@charge.getTheCase().getCaseNumber() (@Html(charge.getDayOfWeek()))<br>
 					@charge.getRuleTitle()
-				<td class="col-xs-7">@charge.resolution_plan
-				@if(charge.sm_decision != null) { <b>[Sch. Mtg. decided:</b> @charge.sm_decision<b>]</b> }
-				<td class="col-xs-1" style="vertical-align:middle;">@if( OrgConfig.get().show_checkbox_for_res_plan ) {<div class="checkbox"></div>}
+				<td class="col-xs-7">@charge.getResolutionPlan()
+				@if(charge.getSmDecision() != null) { <b>[Sch. Mtg. decided:</b> @charge.getSmDecision()<b>]</b> }
+				<td class="col-xs-1" style="vertical-align:middle;">@if( Utils.getOrgConfig(request).show_checkbox_for_res_plan ) {<div class="checkbox"></div>}
 			</tr>

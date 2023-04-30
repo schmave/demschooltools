@@ -1,11 +1,10 @@
-@(form : Form[AttendanceCode])
+@(form : Form[AttendanceCode])(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @main("Edit Attendance code", "attendance") {
 
 
 <h3>Edit Attendance Code</h3>
 
-@attendance_code_form(form, routes.Attendance.saveCode, true)
+@attendance_code_form(form, routes.Attendance.saveCode(), true)
 
 }
-

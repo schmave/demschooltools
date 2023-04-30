@@ -1,88 +1,88 @@
-@(person: Person, is_primary: Boolean)
+@(person: Person, is_primary: Boolean)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
 
 <div class="person @if(is_primary) { primary } else { }">
-@if(person.gender.equals("Male")) {
+@if(person.getGender().equals("Male")) {
 	<div class="male">M</div>
 }
-@if(person.gender.equals("Female")) {
+@if(person.getGender().equals("Female")) {
 	<div class="female">F</div>
 }
-@if(person.gender.equals("Other")) {
+@if(person.getGender().equals("Other")) {
 	<div class="other_gender">O</div>
 }
 @if(person.isStudent()) {
 	<div class="student"></div>
 }
-<h4><a href="@routes.CRM.person(person.person_id)">
-@person.first_name @person.last_name @if(person.display_name) { ("@person.display_name") } </a></h4>
-@if( person.notes ) {
-	<p>@person.notes</p>
+<h4><a href="@routes.CRM.person(person.getPersonId())">
+@person.getFirstName() @person.getLastName() @if(person.getDisplayName()) { ("@person.getDisplayName()") } </a></h4>
+@if( person.getNotes() ) {
+	<p>@person.getNotes()</p>
 }
-<div id="person_tags_@person.person_id">
+<div id="person_tags_@person.getPersonId()">
  @for( t <- person.tags ) {
 	 @tag_fragment(t, person)
   }
   @if( person.tags.size() > 0 ) { <br> }
-<a id="add_tag_a_@person.person_id"
-	href="#" onclick="$('#add_tag_@person.person_id').show();$('#add_tag_@person.person_id input').focus();$('#add_tag_a_@person.person_id').hide();return false;">Add tag</a>
+<a id="add_tag_a_@person.getPersonId()"
+	href="#" onclick="$('#add_tag_@person.getPersonId()').show();$('#add_tag_@person.getPersonId() input').focus();$('#add_tag_a_@person.getPersonId()').hide();return false;">Add tag</a>
 </div>
 <br>
-<span id="add_tag_@person.person_id" style="display:none;">
-Add tag:<input type="text" id="person_tag_entry_@person.person_id"/><br></span>
+<span id="add_tag_@person.getPersonId()" style="display:none;">
+Add tag:<input type="text" id="person_tag_entry_@person.getPersonId()"/><br></span>
 
 <script type="text/javascript">
 /* HACK CITY -- do this so that we don't have to refactor tag_fragment and
   person.scala.html to use Handlebars to generate tag labels. */
-function removeTag(el, person_id, tag_id)
+function removeTag(el, personId, tag_id)
 {
     el.prev().empty();
     el.empty();
-    $.post("/removeTag/" + person_id + "/" + tag_id,
+    $.post("/removeTag/" + personId + "/" + tag_id,
            function(data, textStatus, jqXHR) {}
     );
 };
 
 $(function() {
-enableTagBox("#person_tag_entry_@person.person_id",
-  			 "#person_tags_@person.person_id",
-             @person.person_id);
+enableTagBox("#person_tag_entry_@person.getPersonId()",
+  			 "#person_tags_@person.getPersonId()",
+             @person.getPersonId());
 });
 </script>
 
-@if( person.email ) {
-	<a href="mailto:@person.email">@person.email</a><br>
+@if( person.getEmail() ) {
+	<a href="mailto:@person.getEmail()">@person.getEmail()</a><br>
 }
 @for( number <- person.phone_numbers ) {
-    @number.number
-	@if( number.comment ) {
-	    (@number.comment)
+    @number.getNumber()
+	@if( number.getComment() ) {
+	    (@number.getComment())
 	}
 	<br/>
 }
-@if( person.address ) {
-	@person.address<br>
-	@person.city, @person.state @person.zip<br>
-} else { @if( person.neighborhood ) {
-	'hood: @person.neighborhood<br>
+@if( person.getAddress() ) {
+	@person.getAddress()<br>
+	@person.getCity(), @person.getState() @person.getZip()<br>
+} else { @if( person.getNeighborhood() ) {
+	'hood: @person.getNeighborhood()<br>
 } }
 
-@if( person.previous_school || person.school_district) {
+@if( person.getPreviousSchool() || person.getSchoolDistrict()) {
 	<br>
 }
-@if( person.previous_school ) {
-  <b>Previous School:</b> @person.previous_school<br/>
+@if( person.getPreviousSchool() ) {
+  <b>Previous School:</b> @person.getPreviousSchool()<br/>
 }
-@if( person.school_district) {
-  <b>District:</b> @person.school_district<br/>
+@if( person.getSchoolDistrict()) {
+  <b>District:</b> @person.getSchoolDistrict()<br/>
 }
 
-@if(person.dob != null) {
-	<br>Age @CRM.calcAge(person) (born @CRM.formatDob(person.dob))
+@if(person.getDob() != null) {
+	<br>Age @person.calcAge() (born @CRM.formatDob(person.getDob(), Utils.getOrgConfig(request)))
 }
-@if(!person.grade.equals("")) {
-	<br>Grade @person.grade<br>
+@if(!person.getGrade().equals("")) {
+	<br>Grade @person.getGrade()<br>
 }
-<a href="@routes.CRM.editPerson(person.person_id)">Edit</a>
+<a href="@routes.CRM.editPerson(person.getPersonId())">Edit</a>
 </div>
