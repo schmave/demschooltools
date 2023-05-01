@@ -390,7 +390,7 @@ public class Application extends Controller {
 
     Set<Person> people = new HashSet<>();
     for (Tag tag : tags) {
-      people.addAll(tag.people);
+      people.addAll(tag.getPeople());
     }
     return new ArrayList<>(people);
   }

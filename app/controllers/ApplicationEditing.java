@@ -153,7 +153,7 @@ public class ApplicationEditing extends Controller {
     SqlUpdate update =
         DB.sqlUpdate(
             "DELETE from person_at_meeting where meeting_id = :meeting_id"
-                + " and personId = :personId and role = :role");
+                + " and person_id = :person_id and role = :role");
     update.setParameter("meeting_id", meeting_id);
     update.setParameter("person_id", personId);
     update.setParameter("role", role);
@@ -175,7 +175,7 @@ public class ApplicationEditing extends Controller {
   public Result removePersonAtCase(Integer case_id, Integer personId, Integer role) {
     DB.sqlUpdate(
             "DELETE from person_at_case where case_id = :case_id "
-                + "and personId = :personId "
+                + "and person_id = :person_id "
                 + "and role = :role")
         .setParameter("case_id", case_id)
         .setParameter("person_id", personId)
