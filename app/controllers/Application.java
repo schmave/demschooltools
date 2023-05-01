@@ -1475,9 +1475,9 @@ public class Application extends Controller {
 
   public static String yymmddDate(OrgConfig orgConfig, Date d) {
     if (orgConfig.euro_dates) {
-      return new SimpleDateFormat("dd-M-yyyy").format(d);
+      return new SimpleDateFormat("dd-MM-yyyy").format(d);
     }
-    return new SimpleDateFormat("yyyy-M-dd").format(d);
+    return new SimpleDateFormat("yyyy-MM-dd").format(d);
   }
 
   public static String yymmddDate(OrgConfig orgConfig) {
