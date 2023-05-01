@@ -855,6 +855,8 @@ public class Application extends Controller {
     orig_html = orig_html.replaceAll("&mdash;", "\u2014");
     orig_html = orig_html.replaceAll("&nbsp;", " ");
     orig_html = orig_html.replaceAll("&hellip;", "\u2026");
+    // Remove the Rollbar snippet because it contains some & characters that confuse the renderer
+    orig_html = orig_html.replaceAll("!function.*", "");
     writer.write(orig_html);
     writer.close();
 
