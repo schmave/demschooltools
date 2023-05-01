@@ -471,9 +471,9 @@ public class Person extends Model implements Comparable<Person> {
 
   public static Comparator<Person> SORT_FIRST_NAME =
       (o1, o2) -> {
-        int first_name_compare = o1.firstName.compareTo(o2.firstName);
+        int first_name_compare = o1.getFirstName().compareTo(o2.getFirstName());
         if (first_name_compare == 0) {
-          return o1.lastName.compareTo(o2.firstName);
+          return o1.getLastName().compareTo(o2.getLastName());
         }
         return first_name_compare;
       };
