@@ -21,18 +21,18 @@ public class Meeting extends Model {
   @ManyToOne() private Organization organization;
 
   @OneToMany(mappedBy = "meeting")
-  public List<PersonAtMeeting> people_at_meeting;
+    private List<PersonAtMeeting> peopleAtMeeting;
 
   @OneToMany(mappedBy = "meeting")
   @OrderBy("caseNumber ASC")
-  public List<Case> cases;
+    private List<Case> cases;
 
   @ManyToMany
   @JoinTable(
       name = "case_meeting",
       inverseJoinColumns = @JoinColumn(name = "case_id", referencedColumnName = "id"),
       joinColumns = @JoinColumn(name = "meeting_id", referencedColumnName = "id"))
-  public List<Case> additional_cases;
+    private List<Case> additionalCases;
 
   public static Finder<Integer, Meeting> find = new Finder<>(Meeting.class);
 
@@ -43,7 +43,7 @@ public class Meeting extends Model {
   public String getJsonPeople(int role) {
     List<Map<String, String>> result = new ArrayList<>();
 
-    for (PersonAtMeeting p : people_at_meeting) {
+    for (PersonAtMeeting p : peopleAtMeeting) {
       if (p.getRole() == role) {
         HashMap<String, String> map = new HashMap<>();
         map.put("name", p.getPerson().getDisplayName());

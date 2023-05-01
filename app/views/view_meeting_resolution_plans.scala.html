@@ -11,7 +11,7 @@ $(function() {
 </script>
 
 <table class="table printable-res-plans">
-	@for(c <- m.cases) {
+	@for(c <- m.getCases()) {
 		@for(charge <- c.charges) {
 			@if(charge.displayInResolutionPlanList() && !charge.getReferredToSm()) {
 				@resolution_plan(charge)

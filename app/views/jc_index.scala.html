@@ -8,7 +8,7 @@ $(function() {
     var meeting_info = [ @Html(
         meetings.map( m => "{ date: \"" + Application.yymmddDate(Utils.getOrgConfig(request), (m.getDate())) +
                 "\", link: \"" + routes.Application.viewMeeting(m.getId()) +
-                "\", case_count: " + m.cases.size() + "}").mkString(",")) ];
+                "\", case_count: " + m.getCases().size() + "}").mkString(",")) ];
 
     function hasMeeting(date)
     {

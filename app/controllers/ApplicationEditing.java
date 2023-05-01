@@ -104,7 +104,7 @@ public class ApplicationEditing extends Controller {
     Organization org = Utils.getOrg(request);
     Meeting m = Meeting.findById(meeting_id, org);
 
-    String next_num = "" + (m.cases.size() + 1);
+    String next_num = "" + (m.getCases().size() + 1);
     if (next_num.length() == 1) {
       next_num = "0" + next_num;
     }

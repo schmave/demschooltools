@@ -735,7 +735,7 @@ public class Application extends Controller {
     writer.endRecord();
 
     Meeting m = Meeting.findById(meeting_id, org);
-    for (Case c : m.cases) {
+    for (Case c : m.getCases()) {
       for (Charge charge : c.charges) {
         if (charge.displayInResolutionPlanList() && !charge.getReferredToSm()) {
           writer.write(charge.getPerson().getDisplayName());
@@ -1311,7 +1311,7 @@ public class Application extends Controller {
             .findList();
 
     for (Meeting m : meetings) {
-      for (Case c : m.cases) {
+      for (Case c : m.getCases()) {
         result.num_cases++;
 
         all_cases.add(c);
