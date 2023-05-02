@@ -4,15 +4,14 @@ import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.Resolver;
 import com.feth.play.module.pa.exceptions.ResolverMissingException;
 import com.feth.play.module.pa.providers.AuthProvider;
+import java.util.Collections;
+import java.util.List;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URLEncodedUtils;
 import play.inject.ApplicationLifecycle;
 import play.mvc.Call;
 import play.mvc.Http.Request;
-
-import java.util.Collections;
-import java.util.List;
 
 public abstract class ExternalAuthProvider extends AuthProvider {
 

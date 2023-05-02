@@ -2,7 +2,6 @@ package com.feth.play.module.pa.user;
 
 import java.io.Serializable;
 import java.util.Locale;
-
 import org.apache.commons.lang3.LocaleUtils;
 
 public abstract class AuthUser implements AuthUserIdentity, Serializable {

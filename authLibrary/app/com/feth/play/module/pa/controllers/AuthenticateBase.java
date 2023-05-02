@@ -1,7 +1,6 @@
 package com.feth.play.module.pa.controllers;
 
 import play.mvc.Controller;
-
 import play.mvc.Result;
 
 public class AuthenticateBase extends Controller {

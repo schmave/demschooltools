@@ -3,7 +3,6 @@ package com.feth.play.module.pa.providers.oauth2.facebook;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.feth.play.module.pa.providers.oauth2.BasicOAuth2AuthUser;
 import com.feth.play.module.pa.user.*;
-
 import java.util.Locale;
 
 public class FacebookAuthUser extends BasicOAuth2AuthUser

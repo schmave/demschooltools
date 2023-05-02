@@ -3,12 +3,11 @@ package providers;
 import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.providers.AuthProvider;
 import com.feth.play.module.pa.user.AuthUser;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import models.User;
 import play.inject.ApplicationLifecycle;
 import play.mvc.Http;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 @Singleton
 public class EvanAuthProvider extends AuthProvider {
