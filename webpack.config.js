@@ -31,6 +31,7 @@ module.exports = function (env, argv) {
     },
     output: {
       path: path.resolve(__dirname, "app/assets/javascripts/gen"),
+      clean: true,
       filename: "[name].js",
       sourceMapFilename: "[file].[chunkhash].map[query]",
     },
