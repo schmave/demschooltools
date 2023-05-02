@@ -1119,14 +1119,6 @@ public class Application extends Controller {
     return d;
   }
 
-  Result addRestrictStartDateMessage(Result result, OrgConfig orgConfig) {
-    return result.flashing(
-        "notice",
-        "You must be logged in to view info prior to "
-            + Application.yymmddDate(orgConfig, ModelUtils.getStartOfYear())
-            + ".");
-  }
-
   public Result viewPersonHistory(
       Integer id,
       Boolean redact_names,
@@ -1144,20 +1136,15 @@ public class Application extends Controller {
 
     Date restricted_start_date = restrictStartDate(start_date, getCurrentUser(request));
     Person p = Person.findByIdWithJCData(id, Utils.getOrg(request));
-    Result result =
-        ok(
-            view_person_history.render(
-                p,
-                new PersonHistory(p, true, start_date, end_date),
-                getLastWeekCharges(p),
-                redact_names,
-                request,
-                mMessagesApi.preferred(request)));
-
-    if (restricted_start_date != start_date) {
-      result = addRestrictStartDateMessage(result, Utils.getOrgConfig(Utils.getOrg(request)));
-    }
-    return result;
+    return ok(
+        view_person_history.render(
+            p,
+            new PersonHistory(p, true, restricted_start_date, end_date),
+            getLastWeekCharges(p),
+            redact_names,
+            restricted_start_date != start_date,
+            request,
+            mMessagesApi.preferred(request)));
   }
 
   public Result getRuleHistory(Integer id, Http.Request request) {
@@ -1185,19 +1172,14 @@ public class Application extends Controller {
     Date restricted_start_date = restrictStartDate(start_date, getCurrentUser(request));
 
     Entry r = Entry.findByIdWithJCData(id, Utils.getOrg(request));
-    Result result =
-        ok(
-            view_rule_history.render(
-                r,
-                new RuleHistory(r, true, start_date, end_date),
-                getRecentResolutionPlans(r),
-                request,
-                mMessagesApi.preferred(request)));
-
-    if (restricted_start_date != start_date) {
-      result = addRestrictStartDateMessage(result, Utils.getOrgConfig(Utils.getOrg(request)));
-    }
-    return result;
+    return ok(
+        view_rule_history.render(
+            r,
+            new RuleHistory(r, true, restricted_start_date, end_date),
+            getRecentResolutionPlans(r),
+            restricted_start_date != start_date,
+            request,
+            mMessagesApi.preferred(request)));
   }
 
   public Result viewPersonsWriteups(Integer id, Http.Request request) {
