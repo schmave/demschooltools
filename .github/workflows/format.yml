@@ -1,7 +1,9 @@
 name: Format
 
 on: [pull_request]
-
+with:
+  ref: ${{ github.event.pull_request.head.ref }}
+  
 jobs:
   formatting:
     runs-on: ubuntu-latest
