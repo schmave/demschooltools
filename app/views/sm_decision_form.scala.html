@@ -1,32 +1,31 @@
-@(c : Charge)
+@(c : Charge)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
 
 <div class="panel panel-info">
-<div class="panel-heading"><h4>#@c.the_case.case_number &bull;
-	@if(c.person != null) { @c.person.getDisplayName() } &bull;
+<div class="panel-heading"><h4>#@c.getTheCase().getCaseNumber() &bull;
+	@if(c.getPerson() != null) { @c.getPerson().getDisplayName() } &bull;
 	@c.getRuleTitle()</div>
 <div class="panel-body">
 @caseTableOpen()
-@caseTableRow(c.the_case, false)
+@caseTableRow(c.getTheCase(), false)
 </table>
 
-<p>The recommended @OrgConfig.get().str_res_plan was:
-	<p style="padding-left:1in">@c.resolution_plan
-<p>The plea was @OrgConfig.get().translatePlea(c.plea).
+<p>The recommended @Utils.getOrgConfig(request).str_res_plan was:
+	<p style="padding-left:1in">@c.getResolutionPlan()
+<p>The plea was @Utils.getOrgConfig(request).translatePlea(c.getPlea()).
 
 <form class="form-horizontal" method=POST action="@routes.ApplicationEditing.saveSchoolMeetingDecisions()">
-<input type="hidden" name="charge_id" value="@c.id">
+
+<input type="hidden" name="charge_id" value="@c.getId()">
 <div class="form-group">
 	<label class="col-sm-1">School Meeting decision: </label>
-	<div class="col-sm-6"><textarea rows="12" cols="90" name="sm_decision">@if(c.sm_decision != null){ @c.sm_decision }</textarea></div>
+	<div class="col-sm-6"><textarea rows="12" cols="90" name="smDecision">@if(c.getSmDecision() != null){ @c.getSmDecision() }</textarea></div>
 </div>
 <div class="form-group">
 	<label class="col-sm-1">On date:</label>
-		<div class="col-sm-2"><input name="date" type="date" @if( c.sm_decision_date != null ){ value="@Application.forDateInput(c.sm_decision_date)" }></div>
+		<div class="col-sm-2"><input name="date" type="date" @if( c.getSmDecisionDate() != null ){ value="@Application.forDateInput(c.getSmDecisionDate())" }></div>
 </div>
 <br><input style="margin-left: 200px" type="submit" class="btn btn-primary" value="Submit and mark as closed">
 </form>
 </div></div>
-
-

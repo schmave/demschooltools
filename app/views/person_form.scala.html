@@ -1,56 +1,56 @@
-@(personForm: Form[Person], destination : play.api.mvc.Call, submit_title : String)
+@(personForm: Form[Person], destination : play.api.mvc.Call, submit_title : String)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
-
 @implicitField = @{ FieldConstructor(myConstructor.f) }
 
+
 <div class="row">
-@form(destination, 'class -> "form-horizontal", 'role -> "form") {
+@form(destination, Symbol("class") -> "form-horizontal", Symbol("role") -> "form") {
 
 <div class="col-sm-6">
 
-@if(personForm("person_id").value()) {
-	<input type="hidden" name="person_id" value="@personForm("person_id").value()"/>
-    <input type="hidden" name="is_family" value="@personForm("is_family").value()"/>
+@if(personForm("personId").value().isPresent()) {
+	<input type="hidden" name="personId" value="@personForm("personId").value().get()"/>
+    <input type="hidden" name="isFamily" value="@personForm("isFamily").value().get()"/>
 } else {
-    <input type="hidden" name="is_family" value="false"/>
+    <input type="hidden" name="isFamily" value="false"/>
 }
 
-@if( Utils.getBooleanFromFormValue(personForm("is_family")) ) {
+@if( Utils.getBooleanFromFormValue(personForm("isFamily")) ) {
     <h3>Editing family</h3>
-    @inputText(personForm("first_name"), '_label -> "Family Name", 'class -> "form-control")
+    @inputText(personForm("firstName"), Symbol("_label") -> "Family Name", Symbol("class") -> "form-control")
 } else {
-        @inputText(personForm("first_name"), '_label -> "First Name", 'class -> "form-control")
-        @inputText(personForm("last_name"), '_label -> "Last Name", 'class -> "form-control")
-		@select(personForm("gender"), options = options(Seq("Unknown", "Female", "Male", "Other")), '_label -> "Gender", 'class -> "form-control")
-		@inputText(personForm("email"), '_label -> "Email", 'class -> "form-control")
-		@textarea(personForm("notes"), '_label -> "Notes", 'rows->6, 'class -> "form-control")
+        @inputText(personForm("firstName"), Symbol("_label") -> "First Name", Symbol("class") -> "form-control")
+        @inputText(personForm("lastName"), Symbol("_label") -> "Last Name", Symbol("class") -> "form-control")
+		@select(personForm("gender"), options = options(Seq("Unknown", "Female", "Male", "Other")), Symbol("_label") -> "Gender", Symbol("class") -> "form-control")
+		@inputText(personForm("email"), Symbol("_label") -> "Email", Symbol("class") -> "form-control")
+		@textarea(personForm("notes"), Symbol("_label") -> "Notes", Symbol("rows") ->6, Symbol("class") -> "form-control")
 		<hr/>
 
-		@defining(personForm("address").value() ||
-			personForm("city").value() ||
-			personForm("state").value() ||
-			personForm("zip").value()) { has_address =>
+		@defining(personForm("address").value().isPresent() ||
+			personForm("city").value().isPresent() ||
+			personForm("state").value().isPresent() ||
+			personForm("zip").value().isPresent()) { has_address =>
 			@if( !has_address ) {
 				<a id="address_controller" href="#" onclick="$('#address_stuff').show();$('#address_controller').hide();return false;">
 					  Add address
 				</a>
 				<div id="address_stuff" style="display:none">
 			}
-		@inputText(personForm("address"), '_label -> "Address", 'class -> "form-control")
-		@inputText(personForm("city"), '_label -> "City", 'class -> "form-control")
-		@inputText(personForm("state"), '_label -> "State", 'class -> "form-control")
-		@inputText(personForm("zip"), '_label -> "Zip", 'class -> "form-control")
+		@inputText(personForm("address"), Symbol("_label") -> "Address", Symbol("class") -> "form-control")
+		@inputText(personForm("city"), Symbol("_label") -> "City", Symbol("class") -> "form-control")
+		@inputText(personForm("state"), Symbol("_label") -> "State", Symbol("class") -> "form-control")
+		@inputText(personForm("zip"), Symbol("_label") -> "Zip", Symbol("class") -> "form-control")
 			@if( !has_address ) {
 				</div>
 			}
 		}
 
-		@inputText(personForm("neighborhood"), '_label -> "Neighborhood", 'class -> "form-control")
+		@inputText(personForm("neighborhood"), Symbol("_label") -> "Neighborhood", Symbol("class") -> "form-control")
 		<hr/>
 
-		@defining(personForm("number_2").value() ||
-			personForm("number_3").value()) { has_phones =>
+		@defining(personForm("number_2").value().isPresent() ||
+			personForm("number_3").value().isPresent()) { has_phones =>
 		@for( i <- 1 to 3 ) {
 			@if( i == 2 && !has_phones ) {
 				<a id="phone_controller" href="#" onclick="$('#phone_stuff').show();$('#phone_controller').hide();return false;">
@@ -58,8 +58,8 @@
 				</a>
 				<div id="phone_stuff" style="display:none">
 			}
-		    @inputText(personForm("number_" + i), '_label -> ("Phone " + i), 'class -> "form-control")
-		    @inputText(personForm("number_" + i + "_comment"), '_label -> ("Phone " + i + " comment"), 'class -> "form-control")
+		    @inputText(personForm("number_" + i), Symbol("_label") -> ("Phone " + i), Symbol("class") -> "form-control")
+		    @inputText(personForm("number_" + i + "_comment"), Symbol("_label") -> ("Phone " + i + " comment"), Symbol("class") -> "form-control")
 		}
 		@if( !has_phones ) {
 			</div>
@@ -67,26 +67,26 @@
 		}
 
 		<hr/>
-		@inputText(personForm("same_family_name"), '_label -> "Same family as: ", 'class -> "form-control")
+		@inputText(personForm("same_family_name"), Symbol("_label") -> "Same family as: ", Symbol("class") -> "form-control")
 		<input type="hidden" id = "same_family_id" name="same_family_id"/>
 }
         <input type="submit" value="@submit_title">
 
 </div>
-@if( ! Utils.getBooleanFromFormValue(personForm("is_family")) ) {
+@if( ! Utils.getBooleanFromFormValue(personForm("isFamily")) ) {
 <div class="col-sm-6">
 
 <p><h4>Student Info</h4>
-		@inputText(personForm("display_name"), '_label -> "Short Name", 'class -> "form-control")
+		@inputText(personForm("displayName"), Symbol("_label") -> "Short Name", Symbol("class") -> "form-control")
 		<hr/>
-		@inputText(personForm("previous_school"), '_label -> "Previous School", 'class -> "form-control")
-		@inputText(personForm("school_district"), '_label -> "School District", 'class -> "form-control")
+		@inputText(personForm("previousSchool"), Symbol("_label") -> "Previous School", Symbol("class") -> "form-control")
+		@inputText(personForm("schoolDistrict"), Symbol("_label") -> "School District", Symbol("class") -> "form-control")
 		<hr/>
-		@inputText(personForm("grade"), '_label -> "Current Grade", 'class -> "form-control")
-		@inputDate(personForm("dob"), '_label -> "Date of Birth", 'class -> "form-control")
+		@inputText(personForm("grade"), Symbol("_label") -> "Current Grade", Symbol("class") -> "form-control")
+		@inputDate(personForm("dob"), Symbol("_label") -> "Date of Birth", Symbol("class") -> "form-control")
 
-		@if(OrgConfig.get().org.show_electronic_signin) {
-			@inputText(personForm("pin"), '_label -> "Attendance PIN", 'class -> "form-control")
+		@if(Utils.getOrgConfig(request).org.getShowElectronicSignin()) {
+			@inputText(personForm("pin"), Symbol("_label") -> "Attendance PIN", Symbol("class") -> "form-control")
 		}
 
 

@@ -1,13 +1,13 @@
 @(meetings : List [ Meeting ], people : List[ Person ],
-rules : List[ Entry ])
+rules : List[ Entry ])(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
 
 <script type="text/javascript">
 $(function() {
     var meeting_info = [ @Html(
-        meetings.map( m => "{ date: \"" + Application.yymdDate(m.date) +
-                "\", link: \"" + routes.Application.viewMeeting(m.id) +
+        meetings.map( m => "{ date: \"" + Application.yymmddDate(Utils.getOrgConfig(request), (m.getDate())) +
+                "\", link: \"" + routes.Application.viewMeeting(m.getId()) +
                 "\", case_count: " + m.cases.size() + "}").mkString(",")) ];
 
     function hasMeeting(date)
@@ -53,18 +53,18 @@ $(function() {
 <h4>People</h4>
 <div class="scroll-table">
 <table class="table table-hover table-condensed">
-<thead><th height=50 width=@if(OrgConfig.get().track_writer){200}else{250}>Person
-	@if(OrgConfig.get().track_writer){<th align=right width=50>Complaint count}
+<thead><th height=50 width=@if(Utils.getOrgConfig(request).track_writer){200}else{250}>Person
+	@if(Utils.getOrgConfig(request).track_writer){<th align=right width=50>Complaint count}
 		<th align=right width=50>Charge count</thead>
 @for( p <- people ) {
-	<tr><td width=@if(OrgConfig.get().track_writer){200}else{250}>
-		<a href="@routes.Application.viewPersonHistory(p.person_id)">
+	<tr><td width=@if(Utils.getOrgConfig(request).track_writer){200}else{250}>
+		<a href="@routes.Application.viewPersonHistory(p.getPersonId())">
 		@p.getDisplayName()
-	@if(OrgConfig.get().track_writer){
-		<td align=right width=50><a class="cases-written-link" href="@routes.Application.viewPersonsWriteups(p.person_id)">@p.getThisYearCasesWrittenUp().size()</a>
+	@if(Utils.getOrgConfig(request).track_writer){
+		<td align=right width=50><a class="cases-written-link" href="@routes.Application.viewPersonsWriteups(p.getPersonId())">@p.getThisYearCasesWrittenUp().size()</a>
 	}
-	<td align=right width=50><a @if(OrgConfig.get().track_writer){class="charges-link"}
-		 href="@routes.Application.viewPersonHistory(p.person_id)">@p.getThisYearCharges().size()</a>
+	<td align=right width=50><a @if(Utils.getOrgConfig(request).track_writer){class="charges-link"}
+		 href="@routes.Application.viewPersonHistory(p.getPersonId())">@p.getThisYearCharges().size()</a>
 }
 </table>
 </div>
@@ -76,7 +76,7 @@ $(function() {
 <table class="table table-hover table-condensed">
 <thead><th height=50 width=250>Entry<th align=right width=50>Charge count</thead>
 @for( r <- rules ) {
-	<tr><td width=250><a href="@routes.Application.viewRuleHistory(r.id)">@r.getNumber() @r.title</a>
+	<tr><td width=250><a href="@routes.Application.viewRuleHistory(r.getId())">@r.getNumber() @r.getTitle()</a>
 	<td align=right width=50>@r.getThisYearCharges().size()
 }
 </table>

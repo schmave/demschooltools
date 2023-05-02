@@ -1,18 +1,18 @@
-@(title : String, people: Collection[Person])
+@(title : String, people: Collection[Person])(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 <h4>Tag "@title"</h4>
 
 <p><b>People:</b>
 	@for( p <- people ) {
-		@if( !p.email ) { <font color="#999"> }
-		@p.first_name @p.last_name,
-		@if( ! p.email ) { </font> }
+		@if( !p.getEmail() ) { <font color="#999"> }
+		@p.getFirstName() @p.getLastName(),
+		@if( ! p.getEmail() ) { </font> }
 	}
 
 <p><b>Emails:</b>
 	@for( p <- people ) {
-		@if( p.email ) {
-			@p.email,
+		@if( p.getEmail() ) {
+			@p.getEmail(),
 		}
 	}
 

@@ -1,4 +1,4 @@
-@(name : String, label : String, checked : Boolean)
+@(name : String, label : String, checked : Boolean)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 <div class="form-group">
     <label class="col-sm-3 control-label">@label</label>
@@ -6,4 +6,3 @@
 		<input type="checkbox" value="true" name="@name" @if( checked ) { checked }/>
 	</div>
  </div>
-

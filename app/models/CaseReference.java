@@ -1,64 +1,68 @@
 package models;
 
-import models.*;
-import java.util.*;
+import controllers.Application;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CaseReference {
 
-	public Integer id;
-	public String case_number;
-	public String findings;
-	public List<ChargeReference> charges;
+  public Integer id;
+  public String caseNumber;
+  public String findings;
+  public List<ChargeReference> charges;
 
-	public static List<CaseReference> create(Case referencing_case) {
-		List<CaseReference> results = new ArrayList<CaseReference>();
-		
-		for (Case referenced_case : referencing_case.referenced_cases) {
-			
-			CaseReference result = new CaseReference();
-			result.id = referenced_case.id;
-			result.case_number = referenced_case.case_number;
-			result.findings = referenced_case.generateCompositeFindingsFromCaseReferences();
-			result.charges = new ArrayList<ChargeReference>();
+  public static List<CaseReference> create(Case referencing_case, Organization org) {
+    List<CaseReference> results = new ArrayList<>();
 
-			for (Charge charge : referenced_case.charges) {
+    for (Case referenced_case : referencing_case.referenced_cases) {
 
-				if (charge.person == null) continue;
+      CaseReference result = new CaseReference();
+      result.id = referenced_case.getId();
+      result.caseNumber = referenced_case.getCaseNumber();
+      result.findings = Application.generateCompositeFindingsFromCaseReferences(referenced_case);
+      result.charges = new ArrayList<>();
 
-				ChargeReference cr = new ChargeReference();
-				
-				cr.charge_id = charge.id;
-				cr.person = charge.person.getDisplayName();
-				cr.rule = charge.getRuleTitle();
-				cr.resolution_plan = charge.resolution_plan;
-				cr.is_referenced = referencing_case.referenced_charges.contains(charge);
+      for (Charge charge : referenced_case.charges) {
 
-				if (charge.sm_decision != null && !charge.sm_decision.isEmpty()) {
-					cr.is_sm_decision = true;
-					cr.resolution_plan = charge.sm_decision;
-				}
+        if (charge.getPerson() == null) continue;
 
-				if (charge.referred_to_sm && cr.resolution_plan.isEmpty()) {
-					cr.resolution_plan = "[Referred to School Meeting]";
-				}
+        ChargeReference cr = new ChargeReference();
 
-				for (Charge new_charge : referencing_case.charges) {
-					if (new_charge.referenced_charge == charge) {
-						cr.has_generated = true;
-						cr.generated_charge_id = new_charge.id;
-						cr.has_default_rule = new_charge.rule != null && new_charge.rule.id == Entry.findBreakingResPlanEntryId();
-					}
-				}
+        cr.charge_id = charge.getId();
+        cr.person = charge.getPerson().getDisplayName();
+        cr.rule = charge.getRuleTitle();
+        cr.resolutionPlan = charge.getResolutionPlan();
+        cr.isReferenced = referencing_case.referenced_charges.contains(charge);
 
-				if (!cr.has_generated && charge.referencing_charges.size() > 0) {
-					cr.previously_referenced_in_case = charge.referencing_charges.get(0).the_case.case_number;
-				}
+        if (charge.getSmDecision() != null && !charge.getSmDecision().isEmpty()) {
+          cr.is_sm_decision = true;
+          cr.resolutionPlan = charge.getSmDecision();
+        }
 
-				result.charges.add(cr);
-			}
+        if (charge.getReferredToSm() && cr.resolutionPlan.isEmpty()) {
+          cr.resolutionPlan = "[Referred to School Meeting]";
+        }
 
-			results.add(result);
-		}
-		return results;
-	}
+        for (Charge new_charge : referencing_case.charges) {
+          if (new_charge.getReferencedCharge() == charge) {
+            cr.has_generated = true;
+            cr.generated_charge_id = new_charge.getId();
+            cr.has_default_rule =
+                new_charge.getRule() != null
+                    && new_charge.getRule().getId().equals(Entry.findBreakingResPlanEntryId(org));
+          }
+        }
+
+        if (!cr.has_generated && charge.referencing_charges.size() > 0) {
+          cr.previously_referenced_in_case =
+              charge.referencing_charges.get(0).getTheCase().getCaseNumber();
+        }
+
+        result.charges.add(cr);
+      }
+
+      results.add(result);
+    }
+    return results;
+  }
 }

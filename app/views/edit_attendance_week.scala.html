@@ -3,11 +3,11 @@
   people : List[Person],
   additional_people : List[Person],
   days : Map[Person, List[AttendanceDay]],
-  weeks : Map[Person, AttendanceWeek])
+  weeks : Map[Person, AttendanceWeek])(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
 
-@main("Edit attendance for week of " + Application.yymmddDate(monday), "attendance") {
+@main("Edit attendance for week of " + Application.yymmddDate(Utils.getOrgConfig(request), monday), "attendance") {
 
 <script type="text/javascript">
 app = {};
@@ -24,23 +24,24 @@ app.initial_data = {
 }
 
 @for( day_list <- days.values() ) {
-	app.initial_data.days[@day_list.get(0).person.person_id] = @Html(Utils.toJson(day_list));
+	app.initial_data.days[@day_list.get(0).getPerson().getPersonId()] = @Html(Utils.toJson(day_list));
 }
 
 @for( week <- weeks.values() ) {
-	app.initial_data.weeks[@week.person.person_id] = @Html(Utils.toJson(week));
+	app.initial_data.weeks[@week.getPerson().getPersonId()] = @Html(Utils.toJson(week));
 }
 
-config = @Html(Utils.toJson(OrgConfig.get()));
+config = @Html(Utils.toJson(Utils.getOrgConfig(request)));
 $(function() {
     initAttendanceWeek();
 });
 </script>
 
-<h3>Editing week of @Application.yymmddDate(monday)</h3>
+<h3>Editing week of @Application.yymmddDate(Utils.getOrgConfig(request), monday)</h3>
 <form method="POST" action="@routes.Attendance.importFromCustodia()">
+
 <p><a class="btn btn-success" href="@routes.Attendance.viewWeek()?date=@Application.forDateInput(monday)">Done editing; return to viewing</a>
-@if( OrgConfig.get().org.show_custodia ) {
+@if( Utils.getOrgConfig(request).org.getShowCustodia() ) {
   <input type="hidden" name="monday" value="@Application.forDateInput(monday)">
   <button class="btn btn-primary">Import from Custodia</button>
 }
@@ -72,8 +73,8 @@ $(function() {
 
 <script id="person-row-template" type="text/x-handlebars-template">
 <tr>
-	<td>{{first_name}}<img class="x" title="click to remove this person" src="/assets/images/x.png"/></td>
-	<td>{{last_name}}</td>
+	<td>{{firstName}}<img class="x" title="click to remove this person" src="/assets/images/x.png"/></td>
+	<td>{{lastName}}</td>
     <td><input type="text" class="attendance-time-cell"></td>
     <td><input type="text" class="attendance-time-cell"><div class="color-bar">&nbsp;</div></td>
     <td><input type="text" class="attendance-time-cell"></td>

@@ -14,11 +14,12 @@
 
   <logger name="application" level="DEBUG"/>
 
-  <!-- provides some info about fetching of objects
-    <logger name="org.avaje.ebean.SUM" level="DEBUG"/>
-  -->
+<!--  <logger name="com.rollbar" level="TRACE"/>-->
 
-  <logger name="org.jdbcdslog.StatementLogger" level="info"/>
+  <logger name="io.ebean.SQL" level="TRACE"/>
+  <logger name="io.ebean.SUM" level="TRACE"/>
+  <logger name="io.ebean.TXN" level="TRACE"/>
+
   <logger name="org.jdbcdslog.SlowQueryLogger" level="error"/>
   <logger name="org.jdbcdslog.ResultSetLogger" level="off"/>
 </configuration>

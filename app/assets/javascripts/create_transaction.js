@@ -1,10 +1,10 @@
-var Handlebars = require('handlebars');
-var utils = require('./utils');
+const Handlebars = require('handlebars');
+const utils = require('./utils');
 
 export function init(accounts) {
-    var createTransactionTemplate = Handlebars.compile($("#create-transaction-template").html());
+    const createTransactionTemplate = Handlebars.compile($("#create-transaction-template").html());
 
-    var modeSelectingOption = true;
+    let modeSelectingOption = true;
     $('.create-transaction-option').click(function() {
         if (modeSelectingOption) {
             modeSelectingOption = false;
@@ -27,11 +27,11 @@ export function init(accounts) {
     });
 
     function renderTransactionCreator(transactionType) {
-        var table = $(createTransactionTemplate({transactionType: transactionType}));
-        var from = table.find('#create-transaction-from');
-        var to = table.find('#create-transaction-to');
-        var toRow = table.find('#create-transaction-to-row');
-        var date = table.find('#create-transaction-date');
+        const table = $(createTransactionTemplate({ transactionType }));
+        const from = table.find('#create-transaction-from');
+        const to = table.find('#create-transaction-to');
+        const toRow = table.find('#create-transaction-to-row');
+        const date = table.find('#create-transaction-date');
 
         if (transactionType === 'CashDeposit') {
             registerAutocomplete(to, accounts);
@@ -51,10 +51,10 @@ export function init(accounts) {
     }
 
     function registerAutocomplete(row, accounts, isFromDigitalAccount) {
-        var selected = row.find('.js-account-name-selected');
-        var selectedText = row.find('.js-account-name-selected-text');
-        var textInput = row.find('.js-account-name');
-        var idInput = row.find('.js-account-id');
+        const selected = row.find('.js-account-name-selected');
+        const selectedText = row.find('.js-account-name-selected-text');
+        const textInput = row.find('.js-account-name');
+        const idInput = row.find('.js-account-id');
 
         textInput.autocomplete({
             source: accounts,

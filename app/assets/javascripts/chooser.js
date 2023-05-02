@@ -1,18 +1,18 @@
-var Handlebars = require('handlebars');
+const Handlebars = require('handlebars');
 
-var utils = require('./utils');
+const utils = require('./utils');
 
-var result_template_str =
+const result_template_str =
     '<div class="result" data-id="{{id}}">' +
         '<span class="label label-success">{{name}}</span>' +
         '<img src="/assets/images/x.png">' +
     '</div>';
 
-var result_template = Handlebars.compile(result_template_str);
+const result_template = Handlebars.compile(result_template_str);
 
-var Chooser = function(el, allowMultiple, minLength, source, getLabel, onClick, onChange, onAdd, onRemove) {
+const Chooser = function(el, allowMultiple, minLength, source, getLabel, onClick, onChange, onAdd, onRemove) {
     this.el = el;
-    var self = this;
+    const self = this;
 
     this.results = [];
 
@@ -20,12 +20,12 @@ var Chooser = function(el, allowMultiple, minLength, source, getLabel, onClick, 
     this.search_box.autocomplete({
         autoFocus: true,
         delay: 0,
-        minLength: minLength,
-        source: source,
+        minLength,
+        source,
     });
 
     this.search_box.bind( "autocompleteselect", function(event, ui) {
-        var success = self.addResult(ui.item.id, ui.item.label);
+        const success = self.addResult(ui.item.id, ui.item.label);
 
         if (success) {
             if (onAdd) {
@@ -45,7 +45,7 @@ var Chooser = function(el, allowMultiple, minLength, source, getLabel, onClick, 
           select_next = true;
         }
         // Don't add results that have already been added.
-        for (var i in self.results) {
+        for (const i in self.results) {
             if (id == self.results[i]) {
                 return false;
             }
@@ -60,7 +60,7 @@ var Chooser = function(el, allowMultiple, minLength, source, getLabel, onClick, 
 
         self.results.push(id);
 
-        var result_el = $(result_template({name: title, id: id}));
+        const result_el = $(result_template({ name: title, id }));
         self.el.find(".results").append(result_el);
 
         if (onClick) {
@@ -77,7 +77,7 @@ var Chooser = function(el, allowMultiple, minLength, source, getLabel, onClick, 
     this.removeResult = function(result_el) {
         $(result_el).remove();
 
-        for (var i in self.results) {
+        for (const i in self.results) {
             if (self.results[i] == result_el.data('id')) {
                 self.results.splice(i, 1);
             }
@@ -103,7 +103,7 @@ var Chooser = function(el, allowMultiple, minLength, source, getLabel, onClick, 
         self.clear();
         self.el.find(".results").html("");
         if (allowMultiple) {
-            for (var i in json) {
+            for (const i in json) {
                 self.addResult(json[i].id, getLabel(json[i]), false);
             }
         } else if (json) {
@@ -113,5 +113,5 @@ var Chooser = function(el, allowMultiple, minLength, source, getLabel, onClick, 
 }
 
 module.exports = {
-    Chooser: Chooser
+    Chooser
 }

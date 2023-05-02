@@ -1,29 +1,29 @@
-@(c : Charge, show_chargee : Boolean, show_rule : Boolean, redact_findings: Boolean)
+@(c : Charge, show_chargee : Boolean, show_rule : Boolean, redact_findings: Boolean)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 <p>
 
-<a nosidebar href="@routes.Application.viewMeeting(c.the_case.meeting.id)">
-<b>@c.the_case.case_number</a>@if( show_chargee && c.person != null ){,
-<a nosidebar href="@routes.Application.viewPersonHistory(c.person.person_id)">
-@c.person.getDisplayName()}</a>@if( show_rule && c.rule != null ){,
-<a nosidebar href="@routes.Application.viewRuleHistory(c.rule.id)">@c.rule.getNumber() @c.rule.title</a>}</b>.
+<a nosidebar href="@routes.Application.viewMeeting(c.getTheCase().getMeeting().getId())">
+<b>@c.getTheCase().getCaseNumber()</a>@if( show_chargee && c.getPerson() != null ){,
+<a nosidebar href="@routes.Application.viewPersonHistory(c.getPerson().getPersonId())">
+@c.getPerson().getDisplayName()}</a>@if( show_rule && c.getRule() != null ){,
+<a nosidebar href="@routes.Application.viewRuleHistory(c.getRule().getId())">@c.getRule().getNumber() @c.getRule().getTitle()</a>}</b>.
 
-@if( c.severity != "" ){
-	(@c.severity)
+@if( c.getSeverity() != "" ){
+	(@c.getSeverity())
 }
 
-<i>@OrgConfig.get().str_findings</i>:
-@if( redact_findings ) { @c.the_case.getRedactedFindings(c.person) } else { @c.the_case.generateCompositeFindingsFromChargeReferences() }
+<i>@Utils.getOrgConfig(request).str_findings</i>:
+@if( redact_findings ) { @Application.getRedactedFindings(c.getTheCase(), c.getPerson()) } else {
+	@Application.generateCompositeFindingsFromChargeReferences(c.getTheCase()) }
 
-@if( !c.plea.equals("Guilty") ) {
-	Plead <b>@OrgConfig.get().translatePlea(c.plea)</b>.
+@if( !c.getPlea().equals("Guilty") ) {
+	Plead <b>@Utils.getOrgConfig(request).translatePlea(c.getPlea())</b>.
 }
 
-<u>@OrgConfig.get().str_res_plan_short: @c.resolution_plan</u>
+<u>@Utils.getOrgConfig(request).str_res_plan_short: @c.getResolutionPlan()</u>
 
-@if( c.sm_decision != null) {
+@if( c.getSmDecision() != null) {
 	<span class="sm-decision"><i>School Meeting ruled@if(
-		c.sm_decision_date != null) { on @Application.yymmddDate(c.sm_decision_date)}</i>:
-		@c.sm_decision</span>
+		c.getSmDecisionDate() != null) { on @Application.yymmddDate(Utils.getOrgConfig(request), c.getSmDecisionDate())}</i>:
+		@c.getSmDecision()</span>
 }
-

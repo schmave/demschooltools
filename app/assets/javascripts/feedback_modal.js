@@ -1,13 +1,13 @@
 // Original JavaScript code by Chirp Internet: www.chirp.com.au
 // Please acknowledge use of this code by including this header.
 
-var init = function() {
-  var modalWrapper = document.getElementById("modal_wrapper");
-  var modalWindow = document.getElementById("modal_window");
+const init = function() {
+  const modalWrapper = document.getElementById("modal_wrapper");
+  const modalWindow = document.getElementById("modal_window");
 
-  var openModal = function(e) {
+  const openModal = function(e) {
     modalWrapper.className = "overlay";
-    var overflow = modalWindow.offsetHeight - document.documentElement.clientHeight;
+    const overflow = modalWindow.offsetHeight - document.documentElement.clientHeight;
     if (overflow > 0) {
       modalWindow.style.maxHeight = (parseInt(window.getComputedStyle(modalWindow).height) - overflow) + "px";
     }
@@ -17,26 +17,28 @@ var init = function() {
     if (e.stopPropagation) e.stopPropagation();
   };
 
-  var closeModal = function(e) {
+  const closeModal = function(e) {
     modalWrapper.className = "";
     e.preventDefault ? e.preventDefault() : e.returnValue = false;
     return false;
   };
 
-  var clickHandler = function(e) {
+  const clickHandler = function(e) {
     if (!e.target) e.target = e.srcElement;
     if (e.target.tagName == "DIV") {
       if (e.target.id != "modal_window") closeModal(e);
     }
   };
 
-  var keyHandler = function(e) {
+  const keyHandler = function(e) {
     if (e.keyCode == 27) closeModal(e);
   };
 
-  $('#modal_feedback').ajaxForm({ "success": function(response, status) {
+  $('#modal_feedback').ajaxForm({
+ success: function(response, status) {
         $('#modal_feedback').append('<p>Your message has been sent. Thank you!</p>');
-       }});
+       }
+});
 
   $('.feedback_open').click(openModal);
 
@@ -52,5 +54,5 @@ var init = function() {
 };
 
 module.exports = {
-    init: init,
+    init,
 };

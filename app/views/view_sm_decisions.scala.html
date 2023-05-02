@@ -1,4 +1,4 @@
-@(charges : List [ Charge ])
+@(charges : List [ Charge ])(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
 
@@ -7,15 +7,15 @@
 <h3>Past School Meeting decisions</h3>
 <table class="table printable-res-plans">
 @for( c <- charges ) {
-	@if( c.sm_decision_date != null &&
-		c.sm_decision_date.equals(charges.head.sm_decision_date) ) {
+	@if( c.getSmDecisionDate() != null &&
+		c.getSmDecisionDate().equals(charges.head.getSmDecisionDate()) ) {
 		@resolution_plan(c)
 	}
 }
 </table>
 @for( c <- charges) {
 	@historyCharge(c, true, true, false)
-	<a href="@routes.ApplicationEditing.editSchoolMeetingDecision(c.id)" class="man-edit">Edit</a>
+	<a href="@routes.ApplicationEditing.editSchoolMeetingDecision(c.getId())" class="man-edit">Edit</a>
 }
 
 }

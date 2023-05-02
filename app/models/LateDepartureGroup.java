@@ -1,13 +1,8 @@
 package models;
 
-import java.text.*;
-import java.util.*;
-import java.math.*;
-import javax.persistence.*;
-import com.fasterxml.jackson.annotation.*;
-import play.data.*;
-import com.avaje.ebean.*;
 import java.sql.Time;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LateDepartureGroup {
     
@@ -21,17 +16,16 @@ public class LateDepartureGroup {
     public Time latest_departure_time;
     public Time latest_departure_time_2;
 
-    public LateDepartureGroup(String person_name) {
+    public LateDepartureGroup(String person_name, Organization org) {
         name = person_name;
         events = new ArrayList<AttendanceDay>();
 
-        Organization org = OrgConfig.get().org;
-        late_fee = org.attendance_report_late_fee;
-        late_fee_2 = org.attendance_report_late_fee_2;
-        late_fee_interval = org.attendance_report_late_fee_interval;
-        late_fee_interval_2 = org.attendance_report_late_fee_interval_2;
-        latest_departure_time = org.attendance_report_latest_departure_time;
-        latest_departure_time_2 = org.attendance_report_latest_departure_time_2;
+        lateFee = org.getAttendanceReportLateFee();
+        late_fee_2 = org.getAttendanceReportLateFee2();
+        late_fee_interval = org.getAttendanceReportLateFeeInterval();
+        late_fee_interval_2 = org.getAttendanceReportLateFeeInterval2();
+        latest_departure_time = org.getAttendanceReportLatestDepartureTime();
+        latest_departure_time_2 = org.getAttendanceReportLatestDepartureTime2();
     }
 
     public int getTotalOwed() {

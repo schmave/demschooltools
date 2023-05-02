@@ -1,4 +1,4 @@
-var utils = require('./utils');
+const utils = require('./utils');
 
 export function init(people) {
   $('.js-date').val($.datepicker.formatDate('mm/dd/yy', new Date())).datepicker();
@@ -8,7 +8,7 @@ export function init(people) {
   });
 
   $('.js-time').blur(function() {
-    var time = utils.formatTime($(this).val());
+    const time = utils.formatTime($(this).val());
     $(this).val(time);
   });
 }

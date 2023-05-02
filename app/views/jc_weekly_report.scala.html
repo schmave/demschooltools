@@ -1,16 +1,16 @@
 @(start_date : Date, end_date: Date, data : WeeklyStats, cases: List[ Case ],
-minor_referral_destinations : List[ String ])
+minor_referral_destinations : List[ String ])(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
 
-@main("Weekly report starting on " + Application.formatDateShort(start_date), "jc", "weekly_report") {
+@main("Weekly report starting on " + Application.formatDateShort(Utils.getOrgConfig(request), start_date), "jc", "weekly_report") {
 
 <h3> Weekly report </h3>
 <p><a href="@routes.Application.viewWeeklyReport(Application.forDateInput(Application.addWeek(end_date, -1)))">&lt;&lt; Prev week</a>
 &nbsp;&nbsp;&nbsp;&nbsp;
 Period from
-@Application.formatDayOfWeek(start_date) @Application.formatDateShort(start_date) to
-@Application.formatDayOfWeek(end_date) @Application.formatDateShort(end_date), inclusive.
+@Application.formatDayOfWeek(start_date) @Application.formatDateShort(Utils.getOrgConfig(request), start_date) to
+@Application.formatDayOfWeek(end_date) @Application.formatDateShort(Utils.getOrgConfig(request), end_date), inclusive.
 &nbsp;&nbsp;&nbsp;&nbsp;
 <a href="@routes.Application.viewWeeklyReport(Application.forDateInput(Application.addWeek(end_date, 1)))">Next week &gt;&gt;</a>
 <p>
@@ -25,7 +25,7 @@ Period from
 		<table class="table sortable">
 			<tr><th>Rule<th width=100># Charges</tr>
 			@for( (rule, count) <- data.rule_counts ) {
-				<tr><td>@rule.getNumber() @rule.title<td>@count</tr>
+				<tr><td>@rule.getNumber() @rule.getTitle()<td>@count</tr>
 			}
 		</table>
 	</div>
@@ -65,12 +65,12 @@ Period from
 }
 </table>
 
-@if( OrgConfig.get().use_minor_referrals ) {
+@if( Utils.getOrgConfig(request).use_minor_referrals ) {
   @for( dest <- minor_referral_destinations ) {
 	<h4>&nbsp;<br>Charges referred to @dest</h4>
 	@for(c <- cases) {
 	  @for(ch <- c.charges) {
-		@if( ch.minor_referral_destination.equals(dest) ) {
+		@if( ch.getMinorReferralDestination().equals(dest) ) {
 		  @historyCharge(ch, true, true, false)
 		}
 	  }

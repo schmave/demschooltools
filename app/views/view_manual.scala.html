@@ -1,28 +1,27 @@
-@(chapters : List [ Chapter ] )
+@(chapters : List [ Chapter ] )(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
 
 <div id="footer">
-Printed on @Application.yymmddDate().
+Printed on @Application.yymmddDate(Utils.getOrgConfig(request)).
 </div>
 
-<h1>@OrgConfig.get().org.short_name @OrgConfig.get().str_manual_title</h1>
+<h1>@Utils.getOrgConfig(request).org.getShortName() @Utils.getOrgConfig(request).str_manual_title</h1>
 
 <p class="no-print"><a class="btn btn-primary" href="@routes.ApplicationEditing.addChapter()">Add new chapter</a></p>
 
 <ul>
 @for( c <- chapters ) {
-	<li><a href="@routes.Application.viewChapter(c.id)">@c.num @c.title</a></li>
+	<li><a href="@routes.Application.viewChapter(c.getId())">@c.getNum() @c.getTitle()</a></li>
 	<ul>
 	@for(section <- c.sections) {
-		<li><a href="@routes.Application.viewChapter(c.id)#section_@section.id">@c.num@section.num @section.title</a></li>
+		<li><a href="@routes.Application.viewChapter(c.getId())#section_@section.getId()">@c.getNum()@section.getNum() @section.getTitle()</a></li>
 		<ul>
 		@for(entry <- section.entries) {
-			<li><a href="@routes.Application.viewChapter(c.id)#entry_@entry.id">@c.num@(section.num).@entry.num @entry.title</a></li>
+			<li><a href="@routes.Application.viewChapter(c.getId())#entry_@entry.getId()">@c.getNum()@(section.getNum()).@entry.getNum() @entry.getTitle()</a></li>
 		}
 		</ul>
 	}
 	</ul>
 }
 </ul>
-

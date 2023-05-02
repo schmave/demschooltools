@@ -1,14 +1,14 @@
 @(p : Person, e: Entry, record : PersonHistory.Record, charges: List[Charge],
-history: PersonHistory)
+history: PersonHistory)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
 
 <h4>@p.getDisplayName()</h4>
-<p>@e.getNumber() @e.title</p>
+<p>@e.getNumber() @e.getTitle()</p>
 
-<div class="should-limit"><b>Rule text:</b> @Html(Application.markdown(e.content))</div>
+<div class="should-limit"><b>Rule text:</b> @Html(Application.markdown(e.getContent()))</div>
 
-<p><b>Most recent charge</b>: @Application.formatDateShort(record.most_recent_charge)</p>
+<p><b>Most recent charge</b>: @Application.formatDateShort(Utils.getOrgConfig(request), record.most_recent_charge)</p>
 <p><b>Total charges</b>: @record.count</p>
 
 <h5 style="margin-top: 30px;">Case Details</h5>

@@ -1,18 +1,19 @@
-@(accountForm: Form[Account])
+@(accountForm: Form[Account])(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
 
 @main("New Account", "accounting") {
 	@form(routes.Accounting.makeNewAccount()) {
+
 		<h2>New Account</h2>
 		<div class="col-sm-6">
-			@inputText(accountForm("name"), '_label -> "Name", 'class -> "form-control")
+			@inputText(accountForm("name"), Symbol("_label") -> "Name", Symbol("class") -> "form-control")
 			@select(
 				accountForm("type"),
-				options(AccountType.options()),
-				'_label -> "Type",
-				'_default -> "",
-				'class -> "form-control"
+				options(AccountType.options(Utils.getOrgConfig(request))),
+				Symbol("_label") -> "Type",
+				Symbol("_default") -> "",
+				Symbol("class") -> "form-control"
 			)
 			<input type="submit" value="Create"/>
 		</div>

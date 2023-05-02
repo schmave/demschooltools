@@ -1,4 +1,4 @@
-@(users : List[User], allowed_ip : String, userForm : Form[User])
+@(users : List[User], allowed_ip : String, userForm : Form[User])(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
 @implicitField = @{ FieldConstructor(myConstructor.f) }
@@ -11,11 +11,11 @@
 <table class="table" style="width: 400px">
 <thead><th>Name</th><th>Email</th>
 	@for( role <- UserRole.ALL_ROLES ) {
-		<th class="center">@UserRole.getDescription(role)</th>
+		<th class="center">@UserRole.getDescription(Utils.getOrgConfig(request), role)</th>
 	}
 <th></th></thead>
-@for( u <- users ) { @if( u.active ) {
-<tr><td>@u.name</td><td>@u.email</td>
+@for( u <- users ) { @if( u.getActive() ) {
+<tr><td>@u.getName()</td><td>@u.getEmail()</td>
 @for( role <- UserRole.ALL_ROLES ) {
 	<td class="center">@if( u.hasRole(role) ) {
 	<img height=18 src="@routes.Assets.versioned("images/check.png")"/>
@@ -23,18 +23,19 @@
 	<img height=18 src="@routes.Assets.versioned("images/x-check.png")"/>
 		}</td>
 }
-<td><a class="edit-link" href="@routes.Settings.editUser(u.id)">Edit</a></td>
+<td><a class="edit-link" href="@routes.Settings.editUser(u.getId())">Edit</a></td>
 </tr>
 }}
 </table>
 
-<p class=>Access at the "@UserRole.getDescription(UserRole.ROLE_VIEW_JC)" level is available
+<p class=>Access at the "@UserRole.getDescription(Utils.getOrgConfig(request), UserRole.ROLE_VIEW_JC)" level is available
 for all traffic from a particular IP address. This can be used to give read-only
-access to @OrgConfig.get().str_jc_name_short records and the @OrgConfig.get().str_manual_title to anyone connecting
+access to @Utils.getOrgConfig(request).str_jc_name_short records and the @Utils.getOrgConfig(request).str_manual_title to anyone connecting
 through your school's internet connection. Enter an IP address to allow below to enable this feature.
 (To see your current IP address, visit <a href="http://whatismyipaddress.com/">whatismyipaddress.com</a>).</p>
 
 @form(routes.Settings.saveAccess()) {
+
 <p>Allow read-only access, as described above, from this IP address:
 <input type="textfield" name="allowed_ip" value="@allowed_ip"/>
 <input type="submit" value="Save"/>
@@ -43,9 +44,10 @@ through your school's internet connection. Enter an IP address to allow below to
 <hr/>
 <h3>Add a new user</h3>
 
-@form(routes.Settings.newUser(), 'class -> "form-horizontal", 'role -> "form") {
-	@inputText(userForm("name"), '_label -> "Name", 'class -> "form-control")
-	@inputText(userForm("email"), '_label -> "Email", 'class -> "form-control")
+@form(routes.Settings.newUser(), Symbol("class") -> "form-horizontal", Symbol("role") -> "form") {
+
+	@inputText(userForm("name"), Symbol("_label") -> "Name", Symbol("class") -> "form-control")
+	@inputText(userForm("email"), Symbol("_label") -> "Email", Symbol("class") -> "form-control")
 <input type="submit" value="Add new user"/>
 }
 
@@ -56,11 +58,10 @@ through your school's internet connection. Enter an IP address to allow below to
 <table class="table" style="width: 400px">
 <thead><th>Name</th><th>Email</th><th></th></thead>
 
-@for( u <- users ) { @if( !u.active ) {
-<tr><td>@u.name</td><td>@u.email</td>
-<td><a class="edit-link" href="@routes.Settings.editUser(u.id)">Edit</a></td>
+@for( u <- users ) { @if( !u.getActive() ) {
+<tr><td>@u.getName()</td><td>@u.getEmail()</td>
+<td><a class="edit-link" href="@routes.Settings.editUser(u.getId())">Edit</a></td>
 </tr>
 }}
 
 }
-

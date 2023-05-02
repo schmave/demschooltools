@@ -1,10 +1,11 @@
-@(model : TransactionList)
+@(model : TransactionList)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @main("Transactions", "accounting", "accounting_transactions") {
 
 	<h2>Transactions</h2>
 
 	@helper.form(routes.Accounting.runTransactionsReport()) {
+
 		<label class="transactions-report-condition">
 			<input type="checkbox" name="include_personal" @if(model.include_personal){checked="checked"}>
 			Include personal
@@ -50,16 +51,16 @@
 				<tr class="@transaction.getCssClass()">
 					<td><input type="checkbox"
 							class="js-archive"
-							data-id="@transaction.id"
+							data-id="@transaction.getId()"
 							name="archived"
-							value="@transaction.archived"
-							@if(transaction.archived){checked="checked"}
+							value="@transaction.getArchived()"
+							@if(transaction.getArchived()){checked="checked"}
 							/></td>
-					<td><a href="@routes.Accounting.transaction(transaction.id)">@transaction.id</a></td>
+					<td><a href="@routes.Accounting.transaction(transaction.getId())">@transaction.getId()</a></td>
 					<td>@transaction.getFormattedDate()</td>
 					<td>@transaction.getCreatedByUserName()</td>
 					<td>@transaction.getTypeName()</td>
-					<td>@transaction.description</td>
+					<td>@transaction.getDescription()</td>
 					<td class="balance">@transaction.getFormattedAmount(false)</td>
 				</tr>
 			}

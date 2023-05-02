@@ -1,7 +1,7 @@
-@(m : Meeting)
+@(m : Meeting)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
 
-@main(OrgConfig.get().str_jc_name_short + " minutes from " + Application.formatMeetingDate(m.date), "jc") {
+@main(Utils.getOrgConfig(request).str_jc_name_short + " minutes from " + Application.formatMeetingDate(m.getDate()), "jc") {
     @meetingHelper(m)
 }

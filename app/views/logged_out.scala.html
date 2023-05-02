@@ -1,7 +1,8 @@
-@import helper._
-@import com.feth.play.module.pa.views.html._
+@()(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
-@main("DemSchoolTools login (" + OrgConfig.get().org.short_name + ")", "none") {
+@import helper._
+
+@main("DemSchoolTools login (" + Utils.getOrgConfig(request).org.getShortName() + ")", "none") {
 
 	<h3>You are logged out of DemSchoolTools</h3>
 

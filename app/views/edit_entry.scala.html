@@ -1,32 +1,30 @@
-@(form: Form[Entry], section : Section, is_new : Boolean, chapters : List[Chapter])
-
+@(form: Form[Entry], section : Section, is_new : Boolean, chapters : List[Chapter])(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 @implicitField = @{ helper.FieldConstructor(myConstructor.f) }
-
 @main("Edit an entry", "manual") {
-
 @if( is_new ) {
     <h2>New entry</h2>
 } else {
-    <h2>Edit entry "@form("title").value()"</h2>
+    <h2>Edit entry "@form("title").value().get()"</h2>
 }
 
-@helper.form(routes.ApplicationEditing.saveEntry(), 'class -> "form-horizontal", 'role -> "form") {
+@helper.form(routes.ApplicationEditing.saveEntry(), Symbol("class") -> "form-horizontal", Symbol("role") -> "form") {
 
 
-@if(form("id").value()) {
-	<input type="hidden" name="id" value="@form("id").value()"/>
+@if(form("id").value().isPresent()) {
+	<input type="hidden" name="id" value="@form("id").value().get()"/>
 }
-	@helper.select(form("section.id"), options = chapters.flatMap (c => c.sections.map(s => ("" + s.id, s.chapter.num + "" + s.num + " " + s.title))),
-		'_label -> "Section", 'class -> "form-control")
+	@helper.select(form("section.id"), options = chapters.flatMap (
+			c => c.sections.map(s => ("" + s.getId(), s.getChapter().getNum() + "" + s.getNum() + " " + s.getTitle()))).to(Seq),
+		Symbol("_label") -> "Section", Symbol("class") -> "form-control")
 <div class="form-group" id="num_field">
     <label for="num" class="col-sm-3 control-label">Number</label>
     <div class="col-sm-6">
-    @{section.getNumber()}.<input type="text" id="num" name="num" value="@form("num").value()" size="10">
+    @{section.getNumber()}.<input type="text" id="num" name="num" value="@form("num").value().get()" size="10">
 	</div>
 </div>
-	@helper.inputText(form("title"), '_label -> "Title", 'class -> "form-control")
+	@helper.inputText(form("title"), Symbol("_label") -> "Title", Symbol("class") -> "form-control")
 
-	@helper.checkbox(form("deleted"), '_label -> "Check this to delete")
+	@helper.checkbox(form("deleted"), Symbol("_label") -> "Check this to delete")
 
 	<div class="markdown-guidelines">
 		<h4>Formatting help</h4>
@@ -50,7 +48,7 @@
 	</div>
 
 	<div class="entry-content-edit">
-	@helper.textarea(form("content"), '_label -> "Content (see preview below)", 'rows->12, 'class -> "form-control")
+	@helper.textarea(form("content"), Symbol("_label") -> "Content (see preview below)", Symbol("rows") ->12, Symbol("class") -> "form-control")
 	</div>
 
 	@save_button("Save")

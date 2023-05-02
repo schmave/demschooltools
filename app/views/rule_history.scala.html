@@ -1,13 +1,13 @@
-@(r : Entry, history : RuleHistory, recent_rps : Collection[ String ])
+@(r : Entry, history : RuleHistory, recent_rps : Collection[ String ])(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
 
-<h3>@r.getNumber() @r.title</h3>
-<p>@Application.yymmddDate(history.start_date) to @Application.yymmddDate(history.end_date)</p>
+<h3>@r.getNumber() @r.getTitle()</h3>
+<p>@Application.yymmddDate(Utils.getOrgConfig(request), history.start_date) to @Application.yymmddDate(Utils.getOrgConfig(request), history.end_date)</p>
 
-<div class="should-limit"><b>Rule text:</b> @Html(Application.markdown(r.content))</div>
+<div class="should-limit"><b>Rule text:</b> @Html(Application.markdown(r.getContent()))</div>
 
-<h4>Recent @OrgConfig.get().str_res_plans</h4>
+<h4>Recent @Utils.getOrgConfig(request).str_res_plans</h4>
 
 @if( recent_rps.size() == 0 ) {
 <p>None.
@@ -26,7 +26,7 @@
 	<tr><td>@if(r.person != null) { @r.person.getDisplayName() } else { <i>unknown</i> }
 		<td>
 		@if( r.most_recent_charge != null ) {
-			@Application.formatDateShort(r.most_recent_charge)
+			@Application.formatDateShort(Utils.getOrgConfig(request), r.most_recent_charge)
 		}
 		<td align=right>@r.count</tr>
 }
@@ -38,4 +38,3 @@
 @for( c <- history.charges) {
 	@historyCharge(c, true, false, false)
 }
-

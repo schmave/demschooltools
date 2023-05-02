@@ -1,8 +1,8 @@
-@(m : Meeting)
+@(m : Meeting)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
 
-@main(OrgConfig.get().str_jc_name_short + " " + OrgConfig.get().str_res_plans + " from " + Application.formatMeetingDate(m.date), "jc") {
+@main(Utils.getOrgConfig(request).str_jc_name_short + " " + Utils.getOrgConfig(request).str_res_plans + " from " + Application.formatMeetingDate(m.getDate()), "jc") {
 
 <script>
 $(function() {
@@ -13,7 +13,7 @@ $(function() {
 <table class="table printable-res-plans">
 	@for(c <- m.cases) {
 		@for(charge <- c.charges) {
-			@if(charge.displayInResolutionPlanList() && !charge.referred_to_sm) {
+			@if(charge.displayInResolutionPlanList() && !charge.getReferredToSm()) {
 				@resolution_plan(charge)
 			}
 		}
@@ -21,4 +21,3 @@ $(function() {
 </table>
 
 }
-
