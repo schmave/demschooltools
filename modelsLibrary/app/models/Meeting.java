@@ -21,18 +21,18 @@ public class Meeting extends Model {
   @ManyToOne() private Organization organization;
 
   @OneToMany(mappedBy = "meeting")
-    private List<PersonAtMeeting> peopleAtMeeting;
+  private List<PersonAtMeeting> peopleAtMeeting;
 
   @OneToMany(mappedBy = "meeting")
   @OrderBy("caseNumber ASC")
-    private List<Case> cases;
+  private List<Case> cases;
 
   @ManyToMany
   @JoinTable(
       name = "case_meeting",
       inverseJoinColumns = @JoinColumn(name = "case_id", referencedColumnName = "id"),
       joinColumns = @JoinColumn(name = "meeting_id", referencedColumnName = "id"))
-    private List<Case> additionalCases;
+  private List<Case> additionalCases;
 
   public static Finder<Integer, Meeting> find = new Finder<>(Meeting.class);
 
