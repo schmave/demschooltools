@@ -5,16 +5,35 @@
 @import helper._
 
 <script type="text/javascript">
+var fixHighlights = function() {
+	var els = $('.attendance-view tr');
+	els.removeClass('shade');
+	var even = false;
+	for (var i = 0; i < els.length; i++) {
+		if ($(els[i]).css('display') !== 'none') {
+			if (even) {
+				$(els[i]).addClass('shade');
+			}
+			even = !even;
+		}
+	}
+};
+
 $(function() {
 	if ($('input[value=current]').prop('checked')) {
 		$('.attendance-view tr.inactive').hide();
 	}
+	fixHighlights();
+
+	$('.sortable thead').click(fixHighlights);
 
 	$('input[value=current]').click(function() {
 		$('.attendance-view tr.inactive').hide();
+		fixHighlights();
 	});
 	$('input[value=all]').click(function() {
 		$('.attendance-view tr').show();
+		fixHighlights();
 	});
 });
 </script>
@@ -52,7 +71,7 @@ $(function() {
 	</div>
 }
 <p style="margin-bottom: 30px;">Click on a column title to sort by that column. Click again to sort in the opposite direction.
-<table class="attendance-view table sortable striped">
+<table class="attendance-view table sortable">
 <thead>
     <th class="sorttable_sorted_reverse">First<br/>Name<span id="sorttable_sortrevind">&nbsp;▴</span></th>
     <th>Last<br/>Name</th>
