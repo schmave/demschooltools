@@ -1,10 +1,15 @@
 package com.feth.play.module.pa;
 
+import static play.libs.F.Tuple;
+
 import com.feth.play.module.pa.exceptions.AuthException;
 import com.feth.play.module.pa.providers.AuthProvider;
 import com.feth.play.module.pa.service.UserService;
 import com.feth.play.module.pa.user.AuthUser;
 import com.typesafe.config.Config;
+import java.util.*;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import play.Logger;
 import play.cache.SyncCacheApi;
 import play.i18n.Lang;
@@ -14,12 +19,6 @@ import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Http.Session;
 import play.mvc.Result;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.*;
-
-import static play.libs.F.Tuple;
 
 @Singleton
 public class PlayAuthenticate {

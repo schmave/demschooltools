@@ -1,10 +1,8 @@
 package models;
 
 import io.ebean.*;
-
-import javax.persistence.*;
 import java.util.Date;
-
+import javax.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 

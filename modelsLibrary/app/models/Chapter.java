@@ -1,16 +1,14 @@
 package models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.ebean.*;
 import io.ebean.annotation.Where;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import play.data.Form;
-
+import java.util.List;
 import javax.persistence.*;
 import javax.persistence.OrderBy;
-import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
+import play.data.Form;
 
 @Getter
 @Setter

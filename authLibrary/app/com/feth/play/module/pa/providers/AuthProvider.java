@@ -5,16 +5,15 @@ import com.feth.play.module.pa.exceptions.AuthException;
 import com.feth.play.module.pa.user.AuthUser;
 import com.feth.play.module.pa.user.SessionAuthUser;
 import com.typesafe.config.Config;
-import play.Logger;
-import play.inject.ApplicationLifecycle;
-import play.mvc.Http.Request;
-import play.mvc.Http.Session;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import play.Logger;
+import play.inject.ApplicationLifecycle;
+import play.mvc.Http.Request;
+import play.mvc.Http.Session;
 
 public abstract class AuthProvider {
   static Logger.ALogger sLogger = Logger.of("application");

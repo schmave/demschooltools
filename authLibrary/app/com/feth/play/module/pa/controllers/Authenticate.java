@@ -1,10 +1,9 @@
 package com.feth.play.module.pa.controllers;
 
 import com.feth.play.module.pa.PlayAuthenticate;
+import javax.inject.Inject;
 import play.mvc.Http;
 import play.mvc.Result;
-
-import javax.inject.Inject;
 
 public class Authenticate extends AuthenticateBase {
 

@@ -5,14 +5,13 @@ import com.feth.play.module.pa.PlayAuthenticate;
 import com.feth.play.module.pa.exceptions.AccessTokenException;
 import com.feth.play.module.pa.exceptions.AuthException;
 import com.feth.play.module.pa.providers.oauth2.OAuth2AuthProvider;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import play.Logger;
 import play.i18n.MessagesApi;
 import play.inject.ApplicationLifecycle;
 import play.libs.ws.WSClient;
 import play.libs.ws.WSResponse;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 @Singleton
 public class GoogleAuthProvider extends OAuth2AuthProvider<GoogleAuthUser, GoogleAuthInfo> {

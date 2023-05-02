@@ -1,14 +1,13 @@
 package models;
 
-import play.data.Form;
-
-import javax.persistence.PersistenceException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import javax.persistence.PersistenceException;
+import play.data.Form;
 
 public class ModelUtils {
   public static boolean getBooleanFromFormValue(String value) {
