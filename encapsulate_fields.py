@@ -43,18 +43,17 @@ def encapsulate_fields(files: dict[str, str], path_to_model):
     if '@Entity' not in content:
         print('Skipping', path_to_model, 'because there is no @Entity')
         return
-    if '@Getter' in content:
-        print('Skipping', path_to_model, 'because there is already @Getter')
-        return
 
     replacements = {}
     types = {}
 
     out_lines = []
     for line in content.splitlines():
-        match = re.match(r'(\t|    )public (\w+) (\w+)( ?= ?.*)?;', line)
+        match = re.match(r'(\t|  )public ([a-zA-Z_.<>]+) (\w+)( ?= ?.*)?;', line)
+        # if 'public' in line:
+        #     print(line)
         if not match:
-            if line.strip() == '@Entity':
+            if line.strip() == '@Entity' and '@Getter' not in content:
                 out_lines.append('''\
 import lombok.Getter;
 import lombok.Setter;
@@ -70,6 +69,9 @@ import lombok.Setter;
         types[old_var_name] = match.group(2)
 
         out_lines.append(f'    private {match.group(2)} {new_var_name}{match.group(4) or ""};')
+
+    if not replacements:
+        print('No changes to be made based on', path_to_model)
 
     files[path_to_model] = '\n'.join(out_lines)
     # generate_migration(get_table_name_from_path(path_to_model), replacements)

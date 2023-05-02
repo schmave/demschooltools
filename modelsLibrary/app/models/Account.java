@@ -181,7 +181,7 @@ public class Account extends Model {
 
     Set<Person> people = new HashSet<>();
     for (Tag tag : tags) {
-      people.addAll(tag.people);
+      people.addAll(tag.getPeople());
     }
     return new ArrayList<>(people);
   }

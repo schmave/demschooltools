@@ -1,12 +1,13 @@
 @(p : Person, history : PersonHistory, recent_rps : List[ Charge ],
- redact_names : Boolean)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
+ redact_names : Boolean, was_date_restricted : Boolean)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
 
 @main(p.getDisplayName() + "'s " + Utils.getOrgConfig(request).str_jc_name_short + " history", "jc") {
 
-@if(request.flash.get("notice").isPresent()) {
-    <div class="flash-error">@request.flash.get("notice").get()</div>
+@if(was_date_restricted) {
+    <div class="flash-error">You must be logged in to view info prior to
+        @{Application.yymmddDate(Utils.getOrgConfig(request), ModelUtils.getStartOfYear())}.</div>
 }
 
 

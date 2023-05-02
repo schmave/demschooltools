@@ -355,17 +355,6 @@ public class Person extends Model implements Comparable<Person> {
         null, Person.class, data, new ArrayList<>(), Optional.of(this), null, null, null, null);
   }
 
-  // called by PersonController
-  public void loadTags() {
-    RawSql rawSql =
-        RawSqlBuilder.parse(
-                "SELECT tag.id, tag.title from person join person_tag pt on person.personId ="
-                    + " pt.personId join tag on pt.tag_id=tag.id")
-            .create();
-
-    tags = DB.find(Tag.class).setRawSql(rawSql).where().eq("person.personId", personId).findList();
-  }
-
   public String getDisplayName() {
     if (displayName.equals("")) {
       return firstName;
