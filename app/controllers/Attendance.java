@@ -837,79 +837,6 @@ public class Attendance extends Controller {
           school_days.add(group);
           break;
         }
-<<<<<<< HEAD
-        return school_days;
-    }
-
-    public Result viewCustodiaAdmin() {
-        Map<String, Object> scopes = new HashMap<>();
-        Configuration conf = getConfiguration();
-        scopes.put("custodiaUrl", conf.getString("custodia_url"));
-        scopes.put("custodiaUsername", OrgConfig.get().org.short_name + "-admin");
-        scopes.put("custodiaPassword", conf.getString("custodia_password"));
-        Result result = ok(views.html.main_with_mustache.render(
-                "Sign in system",
-                "custodia",
-                "",
-                "custodia_admin.html",
-                scopes));
-        return result;
-    }
-
-    public Result rules() {
-        Organization org = OrgConfig.get().org;
-        Map<String, AttendanceCode> codes_map = getCodesMap(false);
-        List<AttendanceRule> current_rules = AttendanceRule.currentRules(new Date(), null);
-        List<AttendanceRule> future_rules = AttendanceRule.futureRules(new Date());
-        List<AttendanceRule> past_rules = AttendanceRule.pastRules(new Date());
-        AttendanceRule.sortCurrentRules(current_rules);
-        AttendanceRule.sortCurrentRules(future_rules);
-        AttendanceRule.sortPastRules(past_rules);
-
-        return ok(views.html.attendance_rules.render(
-            current_rules,
-            future_rules,
-            past_rules,
-            codes_map,
-            org.attendance_enable_partial_days,
-            org.attendance_show_reports
-        ));
-    }
-
-    public Result newRule() {
-        return rule(null);
-    }
-
-    public Result rule(Integer id) {
-        Organization org = OrgConfig.get().org;
-        String people_json = Application.attendancePeopleJson();
-        AttendanceRule rule = id == null ? new AttendanceRule() : AttendanceRule.findById(id);
-        return ok(views.html.attendance_edit_rule.render(
-            rule,
-            people_json,
-            org.attendance_enable_partial_days,
-            org.attendance_show_reports
-        ));
-    }
-
-    public Result saveRule() throws Exception {
-        Form<AttendanceRule> form = Form.form(AttendanceRule.class);
-        Form<AttendanceRule> filledForm = form.bindFromRequest();
-        AttendanceRule.save(filledForm);
-        return redirect(routes.Attendance.rules());
-    }
-
-    public Result deleteRule(Integer id) {
-        AttendanceRule.delete(id);
-        return redirect(routes.Attendance.rules());
-    }
-
-    public Result offCampusTime() {
-        List<AttendanceDay> events = AttendanceDay.find.where()
-            .eq("person.organization", OrgConfig.get().org)
-            .gt("day", Application.getStartOfYear())
-            .ne("off_campus_departure_time", null)
-=======
       }
     }
     return school_days;
@@ -932,17 +859,63 @@ public class Attendance extends Controller {
             mMessagesApi.preferred(request)));
   }
 
+  public Result rules(Http.Request request) {
+      Organization org = Utils.getOrg(request);
+      Map<String, AttendanceCode> codes_map = getCodesMap(false);
+      List<AttendanceRule> current_rules = AttendanceRule.currentRules(new Date(), null, org);
+      List<AttendanceRule> future_rules = AttendanceRule.futureRules(new Date(), org);
+      List<AttendanceRule> past_rules = AttendanceRule.pastRules(new Date(), org);
+      AttendanceRule.sortCurrentRules(current_rules);
+      AttendanceRule.sortCurrentRules(future_rules);
+      AttendanceRule.sortPastRules(past_rules);
+
+      return ok(attendance_rules.render(
+          current_rules,
+          future_rules,
+          past_rules,
+          codes_map,
+          org.getAttendanceEnablePartialDays(),
+          org.getAttendanceShowReports()
+      ));
+  }
+
+  public Result newRule() {
+      return rule(null);
+  }
+
+  public Result rule(Integer id) {
+      Organization org = Utils.getOrg(request);
+      String people_json = Application.attendancePeopleJson();
+      AttendanceRule rule = id == null ? new AttendanceRule() : AttendanceRule.findById(id, org);
+      return ok(attendance_edit_rule.render(
+          rule,
+          people_json,
+          org.getAttendanceEnablePartialDays(),
+          org.getAttendanceShowReports()
+      ));
+  }
+
+  public Result saveRule() throws Exception {
+      Form<AttendanceRule> form = Form.form(AttendanceRule.class);
+      Form<AttendanceRule> filledForm = form.bindFromRequest();
+      AttendanceRule.save(filledForm, Utils.getOrg(request));
+      return redirect(routes.Attendance.rules());
+  }
+
+  public Result deleteRule(Integer id) {
+      AttendanceRule.delete(id);
+      return redirect(routes.Attendance.rules());
+  }
+
   public Result offCampusTime(Http.Request request) {
-    List<AttendanceDay> events =
-        AttendanceDay.find
-            .query()
-            .where()
-            .eq("person.organization", Utils.getOrg(request))
-            .gt("day", ModelUtils.getStartOfYear())
-            .ne("offCampusDepartureTime", null)
->>>>>>> master
-            .order("day ASC")
-            .findList();
+    List<AttendanceDay> events = AttendanceDay.find
+      .query()
+      .where()
+      .eq("person.organization", Utils.getOrg(request))
+      .gt("day", ModelUtils.getStartOfYear())
+      .ne("offCampusDepartureTime", null)
+      .order("day ASC")
+      .findList();
 
     return ok(attendance_off_campus.render(events, request, mMessagesApi.preferred(request)));
   }

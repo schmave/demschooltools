@@ -5,6 +5,7 @@ import io.ebean.*;
 import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -47,8 +48,15 @@ public class AttendanceDay extends Model {
     AttendanceDay result = new AttendanceDay();
     result.person = p;
     result.day = day;
-    result.save();
 
+    List<AttendanceRule> rules = AttendanceRule.currentRules(day, p.getPersonId(), p.getOrganization());
+    for (AttendanceRule rule : rules) {
+        if (rule.doesMatchDaysOfWeek(day)) {
+            result.code = rule.getAbsenceCode();
+        }
+    }
+
+    result.save();
     return result;
   }
 

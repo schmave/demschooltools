@@ -29,20 +29,20 @@ enable_late_fees : Boolean
 		</tr>
 		@for( rule <- rules ) {
 			<tr>
-				<td><a href="@routes.Attendance.rule(rule.id)">@rule.id</a></td>
-				<td>@rule.category</td>
+				<td><a href="@routes.Attendance.rule(rule.id)">@rule.getId()</a></td>
+				<td>@rule.getCategory()</td>
 				<td>@rule.getFormattedPerson()</td>
-				<td>@rule.getFormattedDate(rule.start_date, true)</td>
-				<td>@rule.getFormattedDate(rule.end_date, true)</td>
-				<td>@rule.notification_email</td>
+				<td>@rule.getFormattedDate(rule.getStartDate(), true)</td>
+				<td>@rule.getFormattedDate(rule.getEndDate(), true)</td>
+				<td>@rule.notificationEmail</td>
 				<td>@rule.getFormattedDaysOfWeek()</td>
-				<td style="background: @rule.getCodeColor(codes_map)">@rule.absence_code</td>
+				<td style="background: @rule.getCodeColor(codes_map)">@rule.getAbsenceCode()</td>
 				@if(enable_partial_days) {
-					<td>@rule.min_hours</td>
-					<td>@rule.getFormattedTime(rule.latest_start_time)</td>
+					<td>@rule.getMinHours()</td>
+					<td>@rule.getFormattedTime(rule.getLatestStartTime())</td>
 				}
 				@if(enable_late_fees) {
-					<td>@rule.getFormattedBoolean(rule.exempt_from_fees)</td>
+					<td>@rule.getFormattedBoolean(rule.getExemptFromFees())</td>
 				}
 			</tr>
 		}

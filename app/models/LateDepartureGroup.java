@@ -20,7 +20,7 @@ public class LateDepartureGroup {
         name = person_name;
         events = new ArrayList<AttendanceDay>();
 
-        lateFee = org.getAttendanceReportLateFee();
+        late_fee = org.getAttendanceReportLateFee();
         late_fee_2 = org.getAttendanceReportLateFee2();
         late_fee_interval = org.getAttendanceReportLateFeeInterval();
         late_fee_interval_2 = org.getAttendanceReportLateFeeInterval2();
@@ -31,8 +31,8 @@ public class LateDepartureGroup {
     public int getTotalOwed() {
         int total_owed = 0;
         for (AttendanceDay event : events) {
-            event.late_fee = calculateFee(event);
-            total_owed += event.late_fee;
+            event.setLateFee(calculateFee(event));
+            total_owed += event.getLateFee();
         }
         return total_owed;
     }

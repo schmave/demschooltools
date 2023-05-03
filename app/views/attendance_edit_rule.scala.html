@@ -7,25 +7,25 @@ enable_late_fees : Boolean
 
 @import helper._
 
-@main(if(rule.id == null) "New Attendance Rule" else "Attendance Rule #" + rule.id, "attendance") {
+@main(if(rule.getId() == null) "New Attendance Rule" else "Attendance Rule #" + rule.getId(), "attendance") {
 
 @if(rule.id == null) {
 	<h2>New Attendance Rule</h2>
 } else {
-	<h2>Attendance Rule #@rule.id</h2>
+	<h2>Attendance Rule #@rule.getId()</h2>
 }
 
 <div class="attendance-edit-rule">
 
 @helper.form(routes.Attendance.saveRule()) {
-	<input type="hidden" name="id" value="@rule.id"/>
+	<input type="hidden" name="id" value="@rule.getId()"/>
 	<table class="attendance-edit-rule-table">
 		<tr>
 			<th>
 				Category
 				<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="Setting a category helps you keep the list of rules organized."></span>
 			</th>
-			<td><input type="text" size="15" name="category" value="@rule.category"></td>
+			<td><input type="text" size="15" name="category" value="@rule.getCategory()"></td>
 		</tr>
 		<tr>
 			<th>
@@ -46,21 +46,21 @@ enable_late_fees : Boolean
 				Start Date
 				<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="The date when this rule starts to take effect. Leave blank to start at the beginning of time."></span>
 			</th>
-			<td><input type="textfield" size="10" name="start_date" class="js-date" autocomplete="off" value="@rule.getFormattedDate(rule.start_date, false)"></td>
+			<td><input type="textfield" size="10" name="start_date" class="js-date" autocomplete="off" value="@rule.getFormattedDate(rule.getStartDate(), false)"></td>
 		</tr>
 		<tr>
 			<th>
 				End Date
 				<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="The date when this rule expires. Leave blank to never expire."></span>
 			</th>
-			<td><input type="textfield" size="10" name="end_date" class="js-date" autocomplete="off" value="@rule.getFormattedDate(rule.end_date, false)"></td>
+			<td><input type="textfield" size="10" name="end_date" class="js-date" autocomplete="off" value="@rule.getFormattedDate(rule.getEndDate(), false)"></td>
 		</tr>
 		<tr>
 			<th>
 				Notification Email
 				<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="If set, an email will automatically be sent when the rule expires."></span>
 			</th>
-			<td><input type="text" size="35" name="notification_email" value="@rule.notification_email"></td>
+			<td><input type="text" size="35" name="notification_email" value="@rule.getNotificationEmail()"></td>
 		</tr>
 		<tr>
 			<th>
@@ -68,11 +68,11 @@ enable_late_fees : Boolean
 				<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="Which days of the week the rule applies to."></span>
 			</th>
 			<td>
-				<label><input type="checkbox" name="monday" @Html(if (rule.monday) "checked" else "")>M</label>&nbsp;
-				<label><input type="checkbox" name="tuesday" @Html(if (rule.tuesday) "checked" else "")>T</label>&nbsp;
-				<label><input type="checkbox" name="wednesday" @Html(if (rule.wednesday) "checked" else "")>W</label>&nbsp;
-				<label><input type="checkbox" name="thursday" @Html(if (rule.thursday) "checked" else "")>Th</label>&nbsp;
-				<label><input type="checkbox" name="friday" @Html(if (rule.friday) "checked" else "")>F</label>
+				<label><input type="checkbox" name="monday" @Html(if (rule.getMonday()) "checked" else "")>M</label>&nbsp;
+				<label><input type="checkbox" name="tuesday" @Html(if (rule.getTuesday()) "checked" else "")>T</label>&nbsp;
+				<label><input type="checkbox" name="wednesday" @Html(if (rule.getWednesday()) "checked" else "")>W</label>&nbsp;
+				<label><input type="checkbox" name="thursday" @Html(if (rule.getThursday()) "checked" else "")>Th</label>&nbsp;
+				<label><input type="checkbox" name="friday" @Html(if (rule.getFriday()) "checked" else "")>F</label>
 			</td>
 		</tr>
 		<tr>
@@ -80,7 +80,7 @@ enable_late_fees : Boolean
 				Default Code
 				<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="If set, this absence code will be applied automatically when a day is initialized."></span>
 			</th>
-			<td><input type="text" size="10" name="absence_code" value="@rule.absence_code"></td>
+			<td><input type="text" size="10" name="absence_code" value="@rule.getAbsenceCode()"></td>
 		</tr>
 		@if(enable_partial_days) {
 			<tr>
@@ -88,14 +88,14 @@ enable_late_fees : Boolean
 					Min Hours
 					<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="If set, this will be used as the minimum hours required for a full day instead of the default hours configured in Settings."></span>
 				</th>
-				<td><input type="number" min="0" max="9" step="0.01" name="min_hours" value="@rule.min_hours"></td>
+				<td><input type="number" min="0" max="9" step="0.01" name="min_hours" value="@rule.getMinHours()"></td>
 			</tr>
 			<tr>
 				<th>
 					Latest Arrival Time
 					<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="If set, this will be used as the latest arrival time allowed for a full day instead of the default time configured in Settings."></span>
 				</th>
-				<td><input type="text" size="10" name="_latest_start_time" value="@rule.getFormattedTime(rule.latest_start_time)"></td>
+				<td><input type="text" size="10" name="_latest_start_time" value="@rule.getFormattedTime(rule.getLatestStartTime())"></td>
 			</tr>
 		}
 		@if(enable_late_fees) {
@@ -105,7 +105,7 @@ enable_late_fees : Boolean
 					<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="If checked, the person will be exempt from late departure fees."></span>
 				</th>
 				<td>
-					<input type="checkbox" name="exempt_from_fees" @Html(if (rule.exempt_from_fees) "checked" else "")>
+					<input type="checkbox" name="exempt_from_fees" @Html(if (rule.getExemptFromFees()) "checked" else "")>
 				</td>
 			</tr>
 		}
@@ -114,7 +114,7 @@ enable_late_fees : Boolean
 }
 
 @if(rule.id != null) {
-	<form action="@routes.Attendance.deleteRule(rule.id)" method="post">
+	<form action="@routes.Attendance.deleteRule(rule.getId())" method="post">
 		<button type="submit" class="btn btn-danger"
 			onclick="return confirm('Are you sure you want to delete this rule? This cannot be undone.');">
 			Delete
@@ -126,6 +126,6 @@ enable_late_fees : Boolean
 
 <script type="text/javascript">
 	var people = @Html(people_json);
-	var selectedPersonId = @Html(if (rule.person != null) Integer.toString(rule.person.person_id) else "null");
+	var selectedPersonId = @Html(if (rule.getPerson() != null) Integer.toString(rule.getPerson().getPersonId()) else "null");
 	initAttendanceRule(selectedPersonId, people);
 </script>
