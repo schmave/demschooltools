@@ -5,7 +5,7 @@ past_rules : List[AttendanceRule],
 codes_map : Map[String, AttendanceCode],
 enable_partial_days : Boolean,
 enable_late_fees : Boolean
-)
+)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
 

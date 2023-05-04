@@ -138,16 +138,16 @@ the other way around.</p>
             value="@org.formatAttendanceReportLatestDepartureTime()"
             @if(!org.getShowAttendance() || !org.getAttendanceShowReports()){ disabled }>
         <br>Then charge&nbsp;
-        $ <input type="number" min="0" max="999" name="attendanceReportLateFee2"
-            value="@org.getAttendanceReportLateFee2()"
+        $ <input type="number" min="0" max="999" name="attendanceReportLateFee_2"
+            value="@org.getAttendanceReportLateFee_2()"
             @if(!org.getShowAttendance() || !org.getAttendanceShowReports()){ disabled }>
          &nbsp;per&nbsp;
-        <input type="number" min="0" max="999" name="attendanceReportLateFeeInterval2"
-            value="@org.getAttendanceReportLateFeeInterval2()"
+        <input type="number" min="0" max="999" name="attendanceReportLateFeeInterval_2"
+            value="@org.getAttendanceReportLateFeeInterval_2()"
             @if(!org.getShowAttendance() || !org.getAttendanceShowReports()){ disabled }>
          &nbsp;minutes after&nbsp;
-        <input type="text" size="7" name="attendanceReportLatestDepartureTime2"
-            value="@org.formatAttendanceReportLatestDepartureTime2()"
+        <input type="text" size="7" name="attendanceReportLatestDepartureTime_2"
+            value="@org.formatAttendanceReportLatestDepartureTime_2()"
             @if(!org.getShowAttendance() || !org.getAttendanceShowReports()){ disabled }>
     </div>
 

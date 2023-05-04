@@ -861,7 +861,7 @@ public class Attendance extends Controller {
 
   public Result rules(Http.Request request) {
       Organization org = Utils.getOrg(request);
-      Map<String, AttendanceCode> codes_map = getCodesMap(false);
+      Map<String, AttendanceCode> codes_map = getCodesMap(false, org);
       List<AttendanceRule> current_rules = AttendanceRule.currentRules(new Date(), null, org);
       List<AttendanceRule> future_rules = AttendanceRule.futureRules(new Date(), org);
       List<AttendanceRule> past_rules = AttendanceRule.pastRules(new Date(), org);
@@ -875,34 +875,38 @@ public class Attendance extends Controller {
           past_rules,
           codes_map,
           org.getAttendanceEnablePartialDays(),
-          org.getAttendanceShowReports()
+          org.getAttendanceShowReports(),
+          request,
+          mMessagesApi.preferred(request)
       ));
   }
 
-  public Result newRule() {
-      return rule(null);
+  public Result newRule(Http.Request request) {
+      return rule(null, request);
   }
 
-  public Result rule(Integer id) {
+  public Result rule(Integer id, Http.Request request) {
       Organization org = Utils.getOrg(request);
-      String people_json = Application.attendancePeopleJson();
+      String people_json = Application.attendancePeopleJson(org);
       AttendanceRule rule = id == null ? new AttendanceRule() : AttendanceRule.findById(id, org);
       return ok(attendance_edit_rule.render(
           rule,
           people_json,
           org.getAttendanceEnablePartialDays(),
-          org.getAttendanceShowReports()
+          org.getAttendanceShowReports(),
+          request,
+          mMessagesApi.preferred(request)
       ));
   }
 
-  public Result saveRule() throws Exception {
-      Form<AttendanceRule> form = Form.form(AttendanceRule.class);
-      Form<AttendanceRule> filledForm = form.bindFromRequest();
+  public Result saveRule(Http.Request request) throws Exception {
+      Form<AttendanceRule> form = mFormFactory.form(AttendanceRule.class);
+      Form<AttendanceRule> filledForm = form.bindFromRequest(request);
       AttendanceRule.save(filledForm, Utils.getOrg(request));
       return redirect(routes.Attendance.rules());
   }
 
-  public Result deleteRule(Integer id) {
+  public Result deleteRule(Integer id, Http.Request request) {
       AttendanceRule.delete(id);
       return redirect(routes.Attendance.rules());
   }

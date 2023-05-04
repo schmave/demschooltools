@@ -51,6 +51,8 @@ public class AttendanceReport {
             }
             group.events.add(event);
         }
+
+        return model;
     }
 
     public static String formatDate(Date date) {

@@ -3,13 +3,13 @@ rule : AttendanceRule,
 people_json : String,
 enable_partial_days : Boolean,
 enable_late_fees : Boolean
-)
+)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
 
 @main(if(rule.getId() == null) "New Attendance Rule" else "Attendance Rule #" + rule.getId(), "attendance") {
 
-@if(rule.id == null) {
+@if(rule.getId() == null) {
 	<h2>New Attendance Rule</h2>
 } else {
 	<h2>Attendance Rule #@rule.getId()</h2>
@@ -46,14 +46,14 @@ enable_late_fees : Boolean
 				Start Date
 				<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="The date when this rule starts to take effect. Leave blank to start at the beginning of time."></span>
 			</th>
-			<td><input type="textfield" size="10" name="start_date" class="js-date" autocomplete="off" value="@rule.getFormattedDate(rule.getStartDate(), false)"></td>
+			<td><input type="textfield" size="10" name="start_date" class="js-date" autocomplete="off" value="@rule.getFormattedDate(rule.getStartDate(), false, Utils.getOrgConfig(request))"></td>
 		</tr>
 		<tr>
 			<th>
 				End Date
 				<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="The date when this rule expires. Leave blank to never expire."></span>
 			</th>
-			<td><input type="textfield" size="10" name="end_date" class="js-date" autocomplete="off" value="@rule.getFormattedDate(rule.getEndDate(), false)"></td>
+			<td><input type="textfield" size="10" name="end_date" class="js-date" autocomplete="off" value="@rule.getFormattedDate(rule.getEndDate(), false, Utils.getOrgConfig(request))"></td>
 		</tr>
 		<tr>
 			<th>
@@ -113,7 +113,7 @@ enable_late_fees : Boolean
 	<input type="submit" value="Save" class="btn btn-primary">
 }
 
-@if(rule.id != null) {
+@if(rule.getId() != null) {
 	<form action="@routes.Attendance.deleteRule(rule.getId())" method="post">
 		<button type="submit" class="btn btn-danger"
 			onclick="return confirm('Are you sure you want to delete this rule? This cannot be undone.');">

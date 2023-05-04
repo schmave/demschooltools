@@ -3,7 +3,7 @@ rules : List[AttendanceRule],
 codes_map : Map[String, AttendanceCode],
 enable_partial_days : Boolean,
 enable_late_fees : Boolean
-)
+)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
 
@@ -29,12 +29,12 @@ enable_late_fees : Boolean
 		</tr>
 		@for( rule <- rules ) {
 			<tr>
-				<td><a href="@routes.Attendance.rule(rule.id)">@rule.getId()</a></td>
+				<td><a href="@routes.Attendance.rule(rule.getId())">@rule.getId()</a></td>
 				<td>@rule.getCategory()</td>
 				<td>@rule.getFormattedPerson()</td>
-				<td>@rule.getFormattedDate(rule.getStartDate(), true)</td>
-				<td>@rule.getFormattedDate(rule.getEndDate(), true)</td>
-				<td>@rule.notificationEmail</td>
+				<td>@rule.getFormattedDate(rule.getStartDate(), true, Utils.getOrgConfig(request))</td>
+				<td>@rule.getFormattedDate(rule.getEndDate(), true, Utils.getOrgConfig(request))</td>
+				<td>@rule.getNotificationEmail()</td>
 				<td>@rule.getFormattedDaysOfWeek()</td>
 				<td style="background: @rule.getCodeColor(codes_map)">@rule.getAbsenceCode()</td>
 				@if(enable_partial_days) {

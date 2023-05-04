@@ -40,11 +40,11 @@ public class Organization extends Model {
   private Boolean attendanceEnableOffCampus;
   private Boolean attendanceShowReports;
   private Time attendanceReportLatestDepartureTime;
-  private Time attendanceReportLatestDepartureTime2;
+  private Time attendanceReportLatestDepartureTime_2;
   private Integer attendanceReportLateFee;
-  private Integer attendanceReportLateFee2;
+  private Integer attendanceReportLateFee_2;
   private Integer attendanceReportLateFeeInterval;
-  private Integer attendanceReportLateFeeInterval2;
+  private Integer attendanceReportLateFeeInterval_2;
   private Boolean attendanceShowPercent;
   private Boolean attendanceShowWeightedPercent;
   private Boolean attendanceEnablePartialDays;
@@ -75,12 +75,12 @@ public class Organization extends Model {
     return format.format(attendanceReportLatestDepartureTime.getTime());
   }
 
-  public String formatAttendanceReportLatestDepartureTime2() {
-    if (attendanceReportLatestDepartureTime2 == null) {
+  public String formatAttendanceReportLatestDepartureTime_2() {
+    if (attendanceReportLatestDepartureTime_2 == null) {
       return "";
     }
     DateFormat format = new SimpleDateFormat("h:mm a");
-    return format.format(attendanceReportLatestDepartureTime2.getTime());
+    return format.format(attendanceReportLatestDepartureTime_2.getTime());
   }
 
   public void updateFromForm(Map<String, String[]> values, Organization org) {
@@ -193,11 +193,11 @@ public class Organization extends Model {
       } else {
         this.attendanceReportLatestDepartureTime = null;
       }
-      if (values.containsKey("attendanceReportLatestDepartureTime2")) {
-        this.attendanceReportLatestDepartureTime2 =
-            AttendanceDay.parseTime(values.get("attendanceReportLatestDepartureTime2")[0]);
+      if (values.containsKey("attendanceReportLatestDepartureTime_2")) {
+        this.attendanceReportLatestDepartureTime_2 =
+            AttendanceDay.parseTime(values.get("attendanceReportLatestDepartureTime_2")[0]);
       } else {
-        this.attendanceReportLatestDepartureTime2 = null;
+        this.attendanceReportLatestDepartureTime_2 = null;
       }
       if (!values.containsKey("attendanceReportLateFee")
           || values.get("attendanceReportLateFee")[0].isEmpty()) {
@@ -205,11 +205,11 @@ public class Organization extends Model {
       } else {
         this.attendanceReportLateFee = Integer.parseInt(values.get("attendanceReportLateFee")[0]);
       }
-      if (!values.containsKey("attendanceReportLateFee2")
-          || values.get("attendanceReportLateFee2")[0].isEmpty()) {
-        this.attendanceReportLateFee2 = null;
+      if (!values.containsKey("attendanceReportLateFee_2")
+          || values.get("attendanceReportLateFee_2")[0].isEmpty()) {
+        this.attendanceReportLateFee_2 = null;
       } else {
-        this.attendanceReportLateFee2 = Integer.parseInt(values.get("attendanceReportLateFee2")[0]);
+        this.attendanceReportLateFee_2 = Integer.parseInt(values.get("attendanceReportLateFee_2")[0]);
       }
       if (!values.containsKey("attendanceReportLateFeeInterval")
           || values.get("attendanceReportLateFeeInterval")[0].isEmpty()) {
@@ -218,12 +218,12 @@ public class Organization extends Model {
         this.attendanceReportLateFeeInterval =
             Integer.parseInt(values.get("attendanceReportLateFeeInterval")[0]);
       }
-      if (!values.containsKey("attendanceReportLateFeeInterval2")
-          || values.get("attendanceReportLateFeeInterval2")[0].isEmpty()) {
-        this.attendanceReportLateFeeInterval2 = null;
+      if (!values.containsKey("attendanceReportLateFeeInterval_2")
+          || values.get("attendanceReportLateFeeInterval_2")[0].isEmpty()) {
+        this.attendanceReportLateFeeInterval_2 = null;
       } else {
-        this.attendanceReportLateFeeInterval2 =
-            Integer.parseInt(values.get("attendanceReportLateFeeInterval2")[0]);
+        this.attendanceReportLateFeeInterval_2 =
+            Integer.parseInt(values.get("attendanceReportLateFeeInterval_2")[0]);
       }
     }
     if (values.containsKey("accounting_settings")) {

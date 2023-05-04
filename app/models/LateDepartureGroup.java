@@ -21,11 +21,11 @@ public class LateDepartureGroup {
         events = new ArrayList<AttendanceDay>();
 
         late_fee = org.getAttendanceReportLateFee();
-        late_fee_2 = org.getAttendanceReportLateFee2();
+        late_fee_2 = org.getAttendanceReportLateFee_2();
         late_fee_interval = org.getAttendanceReportLateFeeInterval();
-        late_fee_interval_2 = org.getAttendanceReportLateFeeInterval2();
+        late_fee_interval_2 = org.getAttendanceReportLateFeeInterval_2();
         latest_departure_time = org.getAttendanceReportLatestDepartureTime();
-        latest_departure_time_2 = org.getAttendanceReportLatestDepartureTime2();
+        latest_departure_time_2 = org.getAttendanceReportLatestDepartureTime_2();
     }
 
     public int getTotalOwed() {
@@ -43,9 +43,9 @@ public class LateDepartureGroup {
         }
         int fee_1 = 0;
         int fee_2 = 0;
-        int minutes_late_1 = timeToMinutes(event.end_time) - timeToMinutes(latest_departure_time);
+        int minutes_late_1 = timeToMinutes(event.getEndTime()) - timeToMinutes(latest_departure_time);
         if (latest_departure_time_2 != null) {
-            int minutes_late_2 = timeToMinutes(event.end_time) - timeToMinutes(latest_departure_time_2);
+            int minutes_late_2 = timeToMinutes(event.getEndTime()) - timeToMinutes(latest_departure_time_2);
             if (minutes_late_2 > 0) {
                 minutes_late_1 -= minutes_late_2;
                 fee_2 = calculateFeeForRule(minutes_late_2, late_fee_2, late_fee_interval_2);

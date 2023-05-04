@@ -146,14 +146,14 @@ public class AttendanceRule extends Model {
 
         rule.organization = org;
 
-        String person_id = form.field("person_id").value();
+        String person_id = form.field("person_id").value().get();
         if (!person_id.isEmpty()) {
-            rule.person = Person.findById(Integer.valueOf(person_id));
+            rule.person = Person.findById(Integer.valueOf(person_id), org);
         } else {
             rule.person = null;
         }
 
-        String _latest_start_time = form.field("_latest_start_time").value();
+        String _latest_start_time = form.field("_latest_start_time").value().get();
         if (!_latest_start_time.isEmpty()) {
             rule.latestStartTime = AttendanceDay.parseTime(_latest_start_time);
         } else {
@@ -188,11 +188,14 @@ public class AttendanceRule extends Model {
         return "Everyone";
     }
 
-    public String getFormattedDate(Date d, boolean forDisplay) {
+    public String getFormattedDate(Date d, boolean forDisplay, OrgConfig orgConfig) {
         if (d == null) {
             return forDisplay ? "-" : "";
         }
-        return Application.formatDateMdy(d);
+        if (orgConfig.euro_dates) {
+            return new SimpleDateFormat("dd/MM/yyyy").format(d);
+        }
+        return new SimpleDateFormat("MM/dd/yyyy").format(d);
     }
 
     public String getFormattedDaysOfWeek() {
@@ -236,7 +239,7 @@ public class AttendanceRule extends Model {
     public String getCodeColor(Map<String, AttendanceCode> codes_map) {
         AttendanceCode code = codes_map.get(absenceCode);
         if (code != null) {
-            return code.color;
+            return code.getColor();
         }
         return "transparent";
     }
