@@ -38,7 +38,7 @@ enable_late_fees : Boolean
 					<img src="/assets/images/x.png">
 				</div>
 				<input type="text" class="js-person-name">
-				<input type="hidden" class="js-person-id" name="person_id"/>
+				<input type="hidden" class="js-person-id" name="personId"/>
 			</td>
 		</tr>
 		<tr>
@@ -46,21 +46,21 @@ enable_late_fees : Boolean
 				Start Date
 				<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="The date when this rule starts to take effect. Leave blank to start at the beginning of time."></span>
 			</th>
-			<td><input type="textfield" size="10" name="start_date" class="js-date" autocomplete="off" value="@rule.getFormattedDate(rule.getStartDate(), false, Utils.getOrgConfig(request))"></td>
+			<td><input type="textfield" size="10" name="startDate" class="js-date" autocomplete="off" value="@rule.getFormattedDate(rule.getStartDate(), false, Utils.getOrgConfig(request))"></td>
 		</tr>
 		<tr>
 			<th>
 				End Date
 				<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="The date when this rule expires. Leave blank to never expire."></span>
 			</th>
-			<td><input type="textfield" size="10" name="end_date" class="js-date" autocomplete="off" value="@rule.getFormattedDate(rule.getEndDate(), false, Utils.getOrgConfig(request))"></td>
+			<td><input type="textfield" size="10" name="endDate" class="js-date" autocomplete="off" value="@rule.getFormattedDate(rule.getEndDate(), false, Utils.getOrgConfig(request))"></td>
 		</tr>
 		<tr>
 			<th>
 				Notification Email
 				<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="If set, an email will automatically be sent when the rule expires."></span>
 			</th>
-			<td><input type="text" size="35" name="notification_email" value="@rule.getNotificationEmail()"></td>
+			<td><input type="text" size="35" name="notificationEmail" value="@rule.getNotificationEmail()"></td>
 		</tr>
 		<tr>
 			<th>
@@ -80,7 +80,7 @@ enable_late_fees : Boolean
 				Default Code
 				<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="If set, this absence code will be applied automatically when a day is initialized."></span>
 			</th>
-			<td><input type="text" size="10" name="absence_code" value="@rule.getAbsenceCode()"></td>
+			<td><input type="text" size="10" name="absenceCode" value="@rule.getAbsenceCode()"></td>
 		</tr>
 		@if(enable_partial_days) {
 			<tr>
@@ -88,14 +88,14 @@ enable_late_fees : Boolean
 					Min Hours
 					<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="If set, this will be used as the minimum hours required for a full day instead of the default hours configured in Settings."></span>
 				</th>
-				<td><input type="number" min="0" max="9" step="0.01" name="min_hours" value="@rule.getMinHours()"></td>
+				<td><input type="number" min="0" max="9" step="0.01" name="minHours" value="@rule.getMinHours()"></td>
 			</tr>
 			<tr>
 				<th>
 					Latest Arrival Time
 					<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="If set, this will be used as the latest arrival time allowed for a full day instead of the default time configured in Settings."></span>
 				</th>
-				<td><input type="text" size="10" name="_latest_start_time" value="@rule.getFormattedTime(rule.getLatestStartTime())"></td>
+				<td><input type="text" size="10" name="_latestStartTime" value="@rule.getFormattedTime(rule.getLatestStartTime())"></td>
 			</tr>
 		}
 		@if(enable_late_fees) {
@@ -105,7 +105,7 @@ enable_late_fees : Boolean
 					<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="If checked, the person will be exempt from late departure fees."></span>
 				</th>
 				<td>
-					<input type="checkbox" name="exempt_from_fees" @Html(if (rule.getExemptFromFees()) "checked" else "")>
+					<input type="checkbox" name="exemptFromFees" @Html(if (rule.getExemptFromFees()) "checked" else "")>
 				</td>
 			</tr>
 		}

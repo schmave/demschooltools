@@ -144,34 +144,34 @@ public class AttendanceRule extends Model {
             ? rule_from_form 
             : AttendanceRule.findById(rule_from_form.id, org);
 
-        rule.organization = org;
+        rule.setOrganization(org);
 
-        String person_id = form.field("person_id").value().get();
+        String person_id = form.field("personId").value().get();
         if (!person_id.isEmpty()) {
-            rule.person = Person.findById(Integer.valueOf(person_id), org);
+            rule.setPerson(Person.findById(Integer.valueOf(person_id), org));
         } else {
-            rule.person = null;
+            rule.setPerson(null);
         }
 
-        String _latest_start_time = form.field("_latest_start_time").value().get();
-        if (!_latest_start_time.isEmpty()) {
-            rule.latestStartTime = AttendanceDay.parseTime(_latest_start_time);
+        String latest_start_time = form.field("_latestStartTime").value().get();
+        if (!latest_start_time.isEmpty()) {
+            rule.setLatestStartTime(AttendanceDay.parseTime(latest_start_time));
         } else {
-            rule.latestStartTime = null;
+            rule.setLatestStartTime(null);
         }
 
-        rule.category = rule_from_form.category;
-        rule.startDate = rule_from_form.startDate;
-        rule.endDate = rule_from_form.endDate;
-        rule.notificationEmail = rule_from_form.notificationEmail;
-        rule.monday = rule_from_form.monday;
-        rule.tuesday = rule_from_form.tuesday;
-        rule.wednesday = rule_from_form.wednesday;
-        rule.thursday = rule_from_form.thursday;
-        rule.friday = rule_from_form.friday;
-        rule.absenceCode = rule_from_form.absenceCode;
-        rule.minHours = rule_from_form.minHours;
-        rule.exemptFromFees = rule_from_form.exemptFromFees;
+        rule.setCategory(rule_from_form.category);
+        rule.setStartDate(rule_from_form.startDate);
+        rule.setEndDate(rule_from_form.endDate);
+        rule.setNotificationEmail(rule_from_form.notificationEmail);
+        rule.setMonday(rule_from_form.monday);
+        rule.setTuesday(rule_from_form.tuesday);
+        rule.setWednesday(rule_from_form.wednesday);
+        rule.setThursday(rule_from_form.thursday);
+        rule.setFriday(rule_from_form.friday);
+        rule.setAbsenceCode(rule_from_form.absenceCode);
+        rule.setMinHours(rule_from_form.minHours);
+        rule.setExemptFromFees(rule_from_form.exemptFromFees);
 
         rule.save();
     }

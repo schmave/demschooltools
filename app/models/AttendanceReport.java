@@ -42,6 +42,9 @@ public class AttendanceReport {
                 .findList();
 
         for (AttendanceDay event : events) {
+            if (isEventExempt(event)) {
+                continue;
+            }
             String name = event.getPerson().getDisplayName();
             LateDepartureGroup group = model.late_departures.stream().filter(g -> name.equals(g.name)).findAny().orElse(null);
 
@@ -53,6 +56,18 @@ public class AttendanceReport {
         }
 
         return model;
+    }
+
+    private static boolean isEventExempt(AttendanceDay event) {
+        Date day = event.getDay();
+        Person p = event.getPerson();
+        List<AttendanceRule> rules = AttendanceRule.currentRules(day, p.getPersonId(), p.getOrganization());
+        for (AttendanceRule rule : rules) {
+            if (rule.doesMatchDaysOfWeek(day) && rule.getExemptFromFees()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static String formatDate(Date date) {
