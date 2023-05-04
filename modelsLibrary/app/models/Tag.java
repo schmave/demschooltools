@@ -27,7 +27,7 @@ public class Tag extends Model {
       name = "person_tag",
       joinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id"),
       inverseJoinColumns = @JoinColumn(name = "person_id", referencedColumnName = "person_id"))
-  public List<Person> people;
+  private List<Person> people;
 
   @ManyToOne() private Organization organization;
 

@@ -1,13 +1,10 @@
 package models;
 
+import com.feth.play.module.pa.user.AuthUser;
+import io.ebean.*;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-
-import io.ebean.*;
-
-import com.feth.play.module.pa.user.AuthUser;
-
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,12 +1,11 @@
 package com.feth.play.module.pa.providers.oauth2.facebook;
 
-import java.util.Date;
+import static com.feth.play.module.pa.providers.oauth2.OAuth2AuthProvider.Constants.ACCESS_TOKEN;
+import static com.feth.play.module.pa.providers.oauth2.OAuth2AuthProvider.Constants.REFRESH_TOKEN;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.feth.play.module.pa.providers.oauth2.OAuth2AuthInfo;
-
-import static com.feth.play.module.pa.providers.oauth2.OAuth2AuthProvider.Constants.ACCESS_TOKEN;
-import static com.feth.play.module.pa.providers.oauth2.OAuth2AuthProvider.Constants.REFRESH_TOKEN;
+import java.util.Date;
 
 public class FacebookAuthInfo extends OAuth2AuthInfo {
 

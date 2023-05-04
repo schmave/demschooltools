@@ -1,11 +1,9 @@
 package models;
 
 import io.ebean.*;
-
+import java.util.List;
 import javax.persistence.*;
 import javax.persistence.OrderBy;
-import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
 

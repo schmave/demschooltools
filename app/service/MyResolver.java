@@ -3,12 +3,9 @@ package service;
 import com.feth.play.module.pa.Resolver;
 import com.feth.play.module.pa.exceptions.AccessDeniedException;
 import com.feth.play.module.pa.exceptions.AuthException;
-
 import controllers.routes;
-
-import play.mvc.Call;
-
 import javax.inject.Singleton;
+import play.mvc.Call;
 
 @Singleton
 public class MyResolver extends Resolver {

@@ -25,9 +25,7 @@ $(function() {
 	}
 	fixHighlights();
 
-	$('.sortable th').click(function() {
-		window.setTimeout(function() { fixHighlights(); }, 50);
-	});
+	$('.sortable thead').click(fixHighlights);
 
 	$('input[value=current]').click(function() {
 		$('.attendance-view tr.inactive').hide();

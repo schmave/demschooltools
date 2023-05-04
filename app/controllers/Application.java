@@ -390,7 +390,7 @@ public class Application extends Controller {
 
     Set<Person> people = new HashSet<>();
     for (Tag tag : tags) {
-      people.addAll(tag.people);
+      people.addAll(tag.getPeople());
     }
     return new ArrayList<>(people);
   }
@@ -735,7 +735,7 @@ public class Application extends Controller {
     writer.endRecord();
 
     Meeting m = Meeting.findById(meeting_id, org);
-    for (Case c : m.cases) {
+    for (Case c : m.getCases()) {
       for (Charge charge : c.charges) {
         if (charge.displayInResolutionPlanList() && !charge.getReferredToSm()) {
           writer.write(charge.getPerson().getDisplayName());
@@ -855,6 +855,8 @@ public class Application extends Controller {
     orig_html = orig_html.replaceAll("&mdash;", "\u2014");
     orig_html = orig_html.replaceAll("&nbsp;", " ");
     orig_html = orig_html.replaceAll("&hellip;", "\u2026");
+    // Remove the Rollbar snippet because it contains some & characters that confuse the renderer
+    orig_html = orig_html.replaceAll("!function.*", "");
     writer.write(orig_html);
     writer.close();
 
@@ -1117,14 +1119,6 @@ public class Application extends Controller {
     return d;
   }
 
-  Result addRestrictStartDateMessage(Result result, OrgConfig orgConfig) {
-    return result.flashing(
-        "notice",
-        "You must be logged in to view info prior to "
-            + Application.yymmddDate(orgConfig, ModelUtils.getStartOfYear())
-            + ".");
-  }
-
   public Result viewPersonHistory(
       Integer id,
       Boolean redact_names,
@@ -1142,20 +1136,15 @@ public class Application extends Controller {
 
     Date restricted_start_date = restrictStartDate(start_date, getCurrentUser(request));
     Person p = Person.findByIdWithJCData(id, Utils.getOrg(request));
-    Result result =
-        ok(
-            view_person_history.render(
-                p,
-                new PersonHistory(p, true, start_date, end_date),
-                getLastWeekCharges(p),
-                redact_names,
-                request,
-                mMessagesApi.preferred(request)));
-
-    if (restricted_start_date != start_date) {
-      result = addRestrictStartDateMessage(result, Utils.getOrgConfig(Utils.getOrg(request)));
-    }
-    return result;
+    return ok(
+        view_person_history.render(
+            p,
+            new PersonHistory(p, true, restricted_start_date, end_date),
+            getLastWeekCharges(p),
+            redact_names,
+            restricted_start_date != start_date,
+            request,
+            mMessagesApi.preferred(request)));
   }
 
   public Result getRuleHistory(Integer id, Http.Request request) {
@@ -1183,19 +1172,14 @@ public class Application extends Controller {
     Date restricted_start_date = restrictStartDate(start_date, getCurrentUser(request));
 
     Entry r = Entry.findByIdWithJCData(id, Utils.getOrg(request));
-    Result result =
-        ok(
-            view_rule_history.render(
-                r,
-                new RuleHistory(r, true, start_date, end_date),
-                getRecentResolutionPlans(r),
-                request,
-                mMessagesApi.preferred(request)));
-
-    if (restricted_start_date != start_date) {
-      result = addRestrictStartDateMessage(result, Utils.getOrgConfig(Utils.getOrg(request)));
-    }
-    return result;
+    return ok(
+        view_rule_history.render(
+            r,
+            new RuleHistory(r, true, restricted_start_date, end_date),
+            getRecentResolutionPlans(r),
+            restricted_start_date != start_date,
+            request,
+            mMessagesApi.preferred(request)));
   }
 
   public Result viewPersonsWriteups(Integer id, Http.Request request) {
@@ -1311,7 +1295,7 @@ public class Application extends Controller {
             .findList();
 
     for (Meeting m : meetings) {
-      for (Case c : m.cases) {
+      for (Case c : m.getCases()) {
         result.num_cases++;
 
         all_cases.add(c);
@@ -1473,9 +1457,9 @@ public class Application extends Controller {
 
   public static String yymmddDate(OrgConfig orgConfig, Date d) {
     if (orgConfig.euro_dates) {
-      return new SimpleDateFormat("dd-M-yyyy").format(d);
+      return new SimpleDateFormat("dd-MM-yyyy").format(d);
     }
-    return new SimpleDateFormat("yyyy-M-dd").format(d);
+    return new SimpleDateFormat("yyyy-MM-dd").format(d);
   }
 
   public static String yymmddDate(OrgConfig orgConfig) {

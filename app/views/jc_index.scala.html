@@ -8,11 +8,11 @@ $(function() {
     var meeting_info = [ @Html(
         meetings.map( m => "{ date: \"" + Application.yymmddDate(Utils.getOrgConfig(request), (m.getDate())) +
                 "\", link: \"" + routes.Application.viewMeeting(m.getId()) +
-                "\", case_count: " + m.cases.size() + "}").mkString(",")) ];
+                "\", case_count: " + m.getCases().size() + "}").mkString(",")) ];
 
     function hasMeeting(date)
     {
-        var str_date = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+        var str_date = date.toISOString().slice(0,10);
         for (i in meeting_info) {
             if (meeting_info[i].date == str_date) {
                 return [true, "", "" + meeting_info[i].case_count + " cases"];
@@ -33,7 +33,7 @@ $(function() {
     $("#month-picker").datepicker({
         changeMonth: true,
         changeYear: true,
-        dateFormat: 'yy-m-d',
+        dateFormat: 'yy-mm-dd',
         constrainInput: true,
         beforeShowDay: hasMeeting,
         onSelect: meetingSelected

@@ -1,13 +1,11 @@
 package models;
 
 import io.ebean.*;
-import play.data.Form;
-
-import javax.persistence.*;
 import java.util.List;
-
+import javax.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import play.data.Form;
 
 @Getter
 @Setter

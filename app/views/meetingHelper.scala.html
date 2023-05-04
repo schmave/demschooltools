@@ -15,30 +15,30 @@ Edit minutes</a></p>
 
 
 <p><b>Chair:</b>
-@meeting_people(m.people_at_meeting, PersonAtMeeting.ROLE_JC_CHAIR)
+@meeting_people(m.getPeopleAtMeeting(), PersonAtMeeting.ROLE_JC_CHAIR)
 
 <b>Notetaker:</b>
-@meeting_people(m.people_at_meeting, PersonAtMeeting.ROLE_NOTE_TAKER)
+@meeting_people(m.getPeopleAtMeeting(), PersonAtMeeting.ROLE_NOTE_TAKER)
 
 <b>Committee members: </b>
-@meeting_people(m.people_at_meeting, PersonAtMeeting.ROLE_JC_MEMBER)
+@meeting_people(m.getPeopleAtMeeting(), PersonAtMeeting.ROLE_JC_MEMBER)
 
 <b>Subs: </b>
-@meeting_people(m.people_at_meeting, PersonAtMeeting.ROLE_JC_SUB)
+@meeting_people(m.getPeopleAtMeeting(), PersonAtMeeting.ROLE_JC_SUB)
 
 <b>Runners: </b>
-@meeting_people(m.people_at_meeting, PersonAtMeeting.ROLE_RUNNER)
+@meeting_people(m.getPeopleAtMeeting(), PersonAtMeeting.ROLE_RUNNER)
 </p>
 
 <h4>&nbsp;<br/>Case Notes</h4>
 @caseTableOpen()
-@for(c <- m.cases) {
+@for(c <- m.getCases()) {
 	@if( !c.empty() ) {
 		@caseTableRow(c, false)
 	}
 }
 
-@for(c <- m.additional_cases) {
+@for(c <- m.getAdditionalCases()) {
 	<tr>
 	<td><h5>#@c.getCaseNumber()	@if( c.getDateClosed() == null ) { (OPEN) }</h5></td>
 	<td>Case discussed today, but kept open for further investigation. Latest notes available

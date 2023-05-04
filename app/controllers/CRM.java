@@ -234,7 +234,7 @@ public class CRM extends Controller {
   }
 
   public Collection<Person> getTagMembers(Integer tagId, String familyMode, Organization org) {
-    List<Person> people = Tag.findById(tagId, org).people;
+    List<Person> people = Tag.findById(tagId, org).getPeople();
 
     Set<Person> selected_people = new HashSet<>(people);
 
@@ -290,13 +290,13 @@ public class CRM extends Controller {
   }
 
   public void addTag(Tag tag, Person person, User current_user, Http.Request request) {
-    if (tag.people.contains(person)) {
+    if (tag.getPeople().contains(person)) {
       return;
     }
 
     DB.execute(
         () -> {
-          tag.people.add(person);
+          tag.getPeople().add(person);
           tag.save();
 
           PersonTagChange.create(tag, person, current_user, true);
@@ -317,20 +317,14 @@ public class CRM extends Controller {
   }
 
   public void removeTag(Tag tag, Person person, User current_user, Http.Request request) {
-    if (!tag.people.contains(person)) {
+    if (!tag.getPeople().contains(person)) {
       return;
     }
     DB.execute(
         () -> {
-          if (DB.sqlUpdate(
-                      "DELETE from person_tag where personId="
-                          + person.getPersonId()
-                          + " AND tag_id="
-                          + tag.getId())
-                  .execute()
-              == 1) {
-            PersonTagChange.create(tag, person, current_user, false);
-          }
+          tag.getPeople().remove(person);
+          tag.save();
+          PersonTagChange.create(tag, person, current_user, false);
           notifyAboutTag(tag, person, false, request);
         });
   }
@@ -417,7 +411,7 @@ public class CRM extends Controller {
     Tag dest_tag = Tag.findById(Integer.parseInt(values.get("dest_id")[0]), Utils.getOrg(request));
     Tag src_tag = Tag.findById(Integer.parseInt(values.get("tag_id")[0]), Utils.getOrg(request));
 
-    for (Person p : src_tag.people) {
+    for (Person p : src_tag.getPeople()) {
       addTag(dest_tag, p, Application.getCurrentUser(request), request);
     }
 
@@ -468,10 +462,10 @@ public class CRM extends Controller {
         DB.execute(
             () -> {
               if (change.getWasAdd()) {
-                tag.people.remove(change.getPerson());
+                tag.getPeople().remove(change.getPerson());
               } else {
-                if (!tag.people.contains(change.getPerson())) {
-                  tag.people.add(change.getPerson());
+                if (!tag.getPeople().contains(change.getPerson())) {
+                  tag.getPeople().add(change.getPerson());
                 }
               }
               tag.save();
@@ -498,7 +492,7 @@ public class CRM extends Controller {
             .eq("id", id)
             .findOne();
 
-    List<Person> people = the_tag.people;
+    List<Person> people = the_tag.getPeople();
 
     Set<Person> people_with_family = new HashSet<>();
     for (Person p : people) {
@@ -551,7 +545,7 @@ public class CRM extends Controller {
             .eq("id", id)
             .findOne();
 
-    List<Person> people = the_tag.people;
+    List<Person> people = the_tag.getPeople();
 
     Workbook wb = new XSSFWorkbook();
     Sheet sheet = wb.createSheet("People");
@@ -850,7 +844,7 @@ public class CRM extends Controller {
 
   public Result viewTaskList(Integer id, Http.Request request) {
     TaskList list = TaskList.findById(id, Utils.getOrg(request));
-    List<Person> people = list.getTag().people;
+    List<Person> people = list.getTag().getPeople();
 
     return ok(task_list.render(list, people, request, mMessagesApi.preferred(request)));
   }

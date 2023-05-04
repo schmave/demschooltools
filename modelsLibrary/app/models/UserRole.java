@@ -1,9 +1,7 @@
 package models;
 
-import javax.persistence.*;
-
 import io.ebean.*;
-
+import javax.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 

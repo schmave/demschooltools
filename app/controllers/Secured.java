@@ -84,7 +84,7 @@ public class Secured {
         if (role.equals(UserRole.ROLE_VIEW_JC)
             &&
             // Don't let IP address users change their password
-            request.path().equals(routes.Application.viewPassword().path())) {
+            !request.path().equals(routes.Application.viewPassword().path())) {
           return username;
         }
       } else if (u.getActive()
