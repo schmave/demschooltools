@@ -35,10 +35,6 @@ public class AttendanceRule extends Model {
     @play.data.format.Formats.DateTime(pattern="MM/dd/yyyy")
     private Date endDate;
 
-    private String notificationEmail;
-
-    private boolean expired;
-
     private boolean monday;
     private boolean tuesday;
     private boolean wednesday;
@@ -163,7 +159,6 @@ public class AttendanceRule extends Model {
         rule.setCategory(rule_from_form.category);
         rule.setStartDate(rule_from_form.startDate);
         rule.setEndDate(rule_from_form.endDate);
-        rule.setNotificationEmail(rule_from_form.notificationEmail);
         rule.setMonday(rule_from_form.monday);
         rule.setTuesday(rule_from_form.tuesday);
         rule.setWednesday(rule_from_form.wednesday);

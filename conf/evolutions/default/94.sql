@@ -7,8 +7,6 @@ CREATE TABLE attendance_rule (
    person_id integer,
    start_date date,
    end_date date,
-   notification_email text,
-   expired boolean NOT NULL,
    monday boolean NOT NULL,
    tuesday boolean NOT NULL,
    wednesday boolean NOT NULL,

@@ -16,7 +16,6 @@ enable_late_fees : Boolean
 			<th>Person</th>
 			<th>Start Date</th>
 			<th>End Date</th>
-			<th>Notification Email</th>
 			<th>Days of Week</th>
 			<th>Default Code</th>
 			@if(enable_partial_days) {
@@ -34,7 +33,6 @@ enable_late_fees : Boolean
 				<td>@rule.getFormattedPerson()</td>
 				<td>@rule.getFormattedDate(rule.getStartDate(), true, Utils.getOrgConfig(request))</td>
 				<td>@rule.getFormattedDate(rule.getEndDate(), true, Utils.getOrgConfig(request))</td>
-				<td>@rule.getNotificationEmail()</td>
 				<td>@rule.getFormattedDaysOfWeek()</td>
 				<td style="background: @rule.getCodeColor(codes_map)">@rule.getAbsenceCode()</td>
 				@if(enable_partial_days) {
