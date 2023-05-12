@@ -43,7 +43,7 @@ public class TransactionList {
 
   private BigDecimal getBalanceAsOfTransaction(Transaction transaction) {
     return transactions.stream()
-        .filter(t -> t.getId() <= transaction.getId())
+        .filter(t -> t.getDateCreated().getTime() <= transaction.getDateCreated().getTime())
         .map(t -> t.getAmount())
         .reduce(BigDecimal.ZERO, BigDecimal::add);
   }
