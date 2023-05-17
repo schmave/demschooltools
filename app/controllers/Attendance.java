@@ -860,66 +860,67 @@ public class Attendance extends Controller {
   }
 
   public Result rules(Http.Request request) {
-      Organization org = Utils.getOrg(request);
-      Map<String, AttendanceCode> codes_map = getCodesMap(false, org);
-      List<AttendanceRule> current_rules = AttendanceRule.currentRules(new Date(), null, org);
-      List<AttendanceRule> future_rules = AttendanceRule.futureRules(new Date(), org);
-      List<AttendanceRule> past_rules = AttendanceRule.pastRules(new Date(), org);
-      AttendanceRule.sortCurrentRules(current_rules);
-      AttendanceRule.sortCurrentRules(future_rules);
-      AttendanceRule.sortPastRules(past_rules);
+    Organization org = Utils.getOrg(request);
+    Map<String, AttendanceCode> codes_map = getCodesMap(false, org);
+    List<AttendanceRule> current_rules = AttendanceRule.currentRules(new Date(), null, org);
+    List<AttendanceRule> future_rules = AttendanceRule.futureRules(new Date(), org);
+    List<AttendanceRule> past_rules = AttendanceRule.pastRules(new Date(), org);
+    AttendanceRule.sortCurrentRules(current_rules);
+    AttendanceRule.sortCurrentRules(future_rules);
+    AttendanceRule.sortPastRules(past_rules);
 
-      return ok(attendance_rules.render(
-          current_rules,
-          future_rules,
-          past_rules,
-          codes_map,
-          org.getAttendanceEnablePartialDays(),
-          org.getAttendanceShowReports(),
-          request,
-          mMessagesApi.preferred(request)
-      ));
+    return ok(
+        attendance_rules.render(
+            current_rules,
+            future_rules,
+            past_rules,
+            codes_map,
+            org.getAttendanceEnablePartialDays(),
+            org.getAttendanceShowReports(),
+            request,
+            mMessagesApi.preferred(request)));
   }
 
   public Result newRule(Http.Request request) {
-      return rule(null, request);
+    return rule(null, request);
   }
 
   public Result rule(Integer id, Http.Request request) {
-      Organization org = Utils.getOrg(request);
-      String people_json = Application.attendancePeopleJson(org);
-      AttendanceRule rule = id == null ? new AttendanceRule() : AttendanceRule.findById(id, org);
-      return ok(attendance_edit_rule.render(
-          rule,
-          people_json,
-          org.getAttendanceEnablePartialDays(),
-          org.getAttendanceShowReports(),
-          request,
-          mMessagesApi.preferred(request)
-      ));
+    Organization org = Utils.getOrg(request);
+    String people_json = Application.attendancePeopleJson(org);
+    AttendanceRule rule = id == null ? new AttendanceRule() : AttendanceRule.findById(id, org);
+    return ok(
+        attendance_edit_rule.render(
+            rule,
+            people_json,
+            org.getAttendanceEnablePartialDays(),
+            org.getAttendanceShowReports(),
+            request,
+            mMessagesApi.preferred(request)));
   }
 
   public Result saveRule(Http.Request request) throws Exception {
-      Form<AttendanceRule> form = mFormFactory.form(AttendanceRule.class);
-      Form<AttendanceRule> filledForm = form.bindFromRequest(request);
-      AttendanceRule.save(filledForm, Utils.getOrg(request));
-      return redirect(routes.Attendance.rules());
+    Form<AttendanceRule> form = mFormFactory.form(AttendanceRule.class);
+    Form<AttendanceRule> filledForm = form.bindFromRequest(request);
+    AttendanceRule.save(filledForm, Utils.getOrg(request));
+    return redirect(routes.Attendance.rules());
   }
 
   public Result deleteRule(Integer id, Http.Request request) {
-      AttendanceRule.delete(id);
-      return redirect(routes.Attendance.rules());
+    AttendanceRule.delete(id);
+    return redirect(routes.Attendance.rules());
   }
 
   public Result offCampusTime(Http.Request request) {
-    List<AttendanceDay> events = AttendanceDay.find
-      .query()
-      .where()
-      .eq("person.organization", Utils.getOrg(request))
-      .gt("day", ModelUtils.getStartOfYear())
-      .ne("offCampusDepartureTime", null)
-      .order("day ASC")
-      .findList();
+    List<AttendanceDay> events =
+        AttendanceDay.find
+            .query()
+            .where()
+            .eq("person.organization", Utils.getOrg(request))
+            .gt("day", ModelUtils.getStartOfYear())
+            .ne("offCampusDepartureTime", null)
+            .order("day ASC")
+            .findList();
 
     return ok(attendance_off_campus.render(events, request, mMessagesApi.preferred(request)));
   }

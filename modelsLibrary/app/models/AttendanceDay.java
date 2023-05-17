@@ -49,11 +49,12 @@ public class AttendanceDay extends Model {
     result.person = p;
     result.day = day;
 
-    List<AttendanceRule> rules = AttendanceRule.currentRules(day, p.getPersonId(), p.getOrganization());
+    List<AttendanceRule> rules =
+        AttendanceRule.currentRules(day, p.getPersonId(), p.getOrganization());
     for (AttendanceRule rule : rules) {
       String code = rule.getAbsenceCode();
       if (rule.doesMatchDaysOfWeek(day) && code != null && !code.equals("")) {
-          result.code = code;
+        result.code = code;
       }
     }
 
@@ -120,16 +121,17 @@ public class AttendanceDay extends Model {
       Double min_hours = org.getAttendanceDayMinHours();
       Time latest_start_time = org.getAttendanceDayLatestStartTime();
 
-      List<AttendanceRule> rules = AttendanceRule.currentRules(day, person.getPersonId(), person.getOrganization());
+      List<AttendanceRule> rules =
+          AttendanceRule.currentRules(day, person.getPersonId(), person.getOrganization());
       for (AttendanceRule rule : rules) {
-          if (rule.doesMatchDaysOfWeek(day)) {
-              if (rule.getMinHours() != null) {
-                min_hours = rule.getMinHours();
-              }
-              if (rule.getLatestStartTime() != null) {
-                latest_start_time = rule.getLatestStartTime();
-              }
+        if (rule.doesMatchDaysOfWeek(day)) {
+          if (rule.getMinHours() != null) {
+            min_hours = rule.getMinHours();
           }
+          if (rule.getLatestStartTime() != null) {
+            latest_start_time = rule.getLatestStartTime();
+          }
+        }
       }
 
       if (min_hours != null && getHours() < min_hours) {

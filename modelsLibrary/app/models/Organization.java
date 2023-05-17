@@ -209,7 +209,8 @@ public class Organization extends Model {
           || values.get("attendanceReportLateFee_2")[0].isEmpty()) {
         this.attendanceReportLateFee_2 = null;
       } else {
-        this.attendanceReportLateFee_2 = Integer.parseInt(values.get("attendanceReportLateFee_2")[0]);
+        this.attendanceReportLateFee_2 =
+            Integer.parseInt(values.get("attendanceReportLateFee_2")[0]);
       }
       if (!values.containsKey("attendanceReportLateFeeInterval")
           || values.get("attendanceReportLateFeeInterval")[0].isEmpty()) {
