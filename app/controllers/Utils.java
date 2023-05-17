@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import javax.annotation.Nonnull;
 import javax.inject.Singleton;
 import models.*;
@@ -123,6 +124,10 @@ public class Utils {
         response = client.execute(httpPost);
         HttpEntity entity = response.getEntity();
         EntityUtils.consume(entity);
+        if (response.getStatusLine().getStatusCode() != 200) {
+          throw new RuntimeException(
+              "Non-200 result from Custodia: " + response.getStatusLine().getStatusCode());
+        }
       } finally {
         if (response != null) {
           response.close();
@@ -161,16 +166,22 @@ public class Utils {
   }
 
   public static void updateCustodia() {
-    sCustodiaService.submit(
-        () -> {
-          CloseableHttpClient httpclient = HttpClients.createDefault();
-          loginToCustodia(httpclient, Public.sConfig);
-
-          makeCustodiaPost(
-              httpclient,
-              Public.sConfig.getString("custodia_url") + "/updatefromdst",
-              new ArrayList<>());
-        });
+    Future<?> result =
+        sCustodiaService.submit(
+            () -> {
+              CloseableHttpClient httpclient = HttpClients.createDefault();
+              loginToCustodia(httpclient, Public.sConfig);
+              makeCustodiaPost(
+                  httpclient,
+                  Public.sConfig.getConfig("school_crm").getString("custodia_url")
+                      + "/updatefromdst",
+                  new ArrayList<>());
+            });
+    try {
+      result.get();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public static Date localNow(OrgConfig orgConfig) {
