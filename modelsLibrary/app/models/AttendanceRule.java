@@ -133,11 +133,13 @@ public class AttendanceRule extends Model {
       rule.setPerson(null);
     }
 
-    String latest_start_time = form.field("_latestStartTime").value().get();
-    if (!latest_start_time.isEmpty()) {
-      rule.setLatestStartTime(AttendanceDay.parseTime(latest_start_time));
-    } else {
-      rule.setLatestStartTime(null);
+    if (form.field("_latestStartTime").value().isPresent()) {
+      String latest_start_time = form.field("_latestStartTime").value().get();
+      if (!latest_start_time.isEmpty()) {
+        rule.setLatestStartTime(AttendanceDay.parseTime(latest_start_time));
+      } else {
+        rule.setLatestStartTime(null);
+      }
     }
 
     rule.setCategory(rule_from_form.category);
