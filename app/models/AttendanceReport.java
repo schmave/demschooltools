@@ -19,6 +19,8 @@ public class AttendanceReport {
 
   public Time latest_departure_time;
 
+  private Boolean has_any_fees;
+
   public AttendanceReport() {
     late_departures = new ArrayList<>();
   }
@@ -40,6 +42,9 @@ public class AttendanceReport {
             .findList();
 
     for (AttendanceDay event : events) {
+      if (isEventExempt(event)) {
+        continue;
+      }
       String name = event.getPerson().getDisplayName();
       LateDepartureGroup group =
           model.late_departures.stream().filter(g -> name.equals(g.name)).findAny().orElse(null);
@@ -54,9 +59,37 @@ public class AttendanceReport {
     return model;
   }
 
+  private static boolean isEventExempt(AttendanceDay event) {
+    Date day = event.getDay();
+    Person p = event.getPerson();
+    List<AttendanceRule> rules =
+        AttendanceRule.currentRules(day, p.getPersonId(), p.getOrganization());
+    for (AttendanceRule rule : rules) {
+      if (rule.doesMatchDaysOfWeek(day) && rule.getExemptFromFees()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public static String formatDate(Date date) {
     if (date == null) return "";
     SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
     return sdf.format(date);
+  }
+
+  public Boolean hasAnyFees() {
+    if (has_any_fees != null) {
+      return has_any_fees;
+    }
+    for (LateDepartureGroup group : late_departures) {
+      int fee = group.getTotalOwed();
+      if (fee > 0) {
+        has_any_fees = true;
+        return true;
+      }
+    }
+    has_any_fees = false;
+    return false;
   }
 }

@@ -1,0 +1,124 @@
+@(
+rule : AttendanceRule,
+people_json : String,
+enable_partial_days : Boolean,
+enable_late_fees : Boolean
+)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
+
+@import helper._
+
+@main(if(rule.getId() == null) "New Attendance Rule" else "Attendance Rule #" + rule.getId(), "attendance") {
+
+@if(rule.getId() == null) {
+	<h2>New Attendance Rule</h2>
+} else {
+	<h2>Attendance Rule #@rule.getId()</h2>
+}
+
+<div class="attendance-edit-rule">
+
+@helper.form(routes.Attendance.saveRule()) {
+	<input type="hidden" name="id" value="@rule.getId()"/>
+	<table class="attendance-edit-rule-table">
+		<tr>
+			<th>
+				Category
+				<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="Setting a category helps you keep the list of rules organized."></span>
+			</th>
+			<td><input type="text" size="15" name="category" value="@rule.getCategory()"></td>
+		</tr>
+		<tr>
+			<th>
+				Person
+				<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="The person this rule applies to. Leave blank to apply the rule to everyone."></span>
+			</th>
+			<td class="js-person">
+				<div class="attendance-edit-rule-person-selected js-person-name-selected name">
+					<span class="js-person-name-selected-text label label-primary"></span>
+					<img src="/assets/images/x.png">
+				</div>
+				<input type="text" class="js-person-name">
+				<input type="hidden" class="js-person-id" name="personId"/>
+			</td>
+		</tr>
+		<tr>
+			<th>
+				Start Date
+				<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="The date when this rule starts to take effect. Leave blank to start at the beginning of time."></span>
+			</th>
+			<td><input type="textfield" size="10" name="startDate" class="js-date" autocomplete="off" value="@rule.getFormattedDate(rule.getStartDate(), false, Utils.getOrgConfig(request))"></td>
+		</tr>
+		<tr>
+			<th>
+				End Date
+				<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="The date when this rule expires. Leave blank to never expire."></span>
+			</th>
+			<td><input type="textfield" size="10" name="endDate" class="js-date" autocomplete="off" value="@rule.getFormattedDate(rule.getEndDate(), false, Utils.getOrgConfig(request))"></td>
+		</tr>
+		<tr>
+			<th>
+				Days of Week
+				<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="Which days of the week the rule applies to."></span>
+			</th>
+			<td>
+				<label><input type="checkbox" name="monday" @Html(if (rule.getMonday()) "checked" else "")>M</label>&nbsp;
+				<label><input type="checkbox" name="tuesday" @Html(if (rule.getTuesday()) "checked" else "")>T</label>&nbsp;
+				<label><input type="checkbox" name="wednesday" @Html(if (rule.getWednesday()) "checked" else "")>W</label>&nbsp;
+				<label><input type="checkbox" name="thursday" @Html(if (rule.getThursday()) "checked" else "")>Th</label>&nbsp;
+				<label><input type="checkbox" name="friday" @Html(if (rule.getFriday()) "checked" else "")>F</label>
+			</td>
+		</tr>
+		<tr>
+			<th>
+				Default Code
+				<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="If set, this absence code will be applied automatically when a day is initialized."></span>
+			</th>
+			<td><input type="text" size="10" name="absenceCode" value="@rule.getAbsenceCode()"></td>
+		</tr>
+		@if(enable_partial_days) {
+			<tr>
+				<th>
+					Min Hours
+					<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="If set, this will be used as the minimum hours required for a full day instead of the default hours configured in Settings."></span>
+				</th>
+				<td><input type="number" min="0" max="9" step="0.01" name="minHours" value="@rule.getMinHours()"></td>
+			</tr>
+			<tr>
+				<th>
+					Latest Arrival Time
+					<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="If set, this will be used as the latest arrival time allowed for a full day instead of the default time configured in Settings."></span>
+				</th>
+				<td><input type="text" size="10" name="_latestStartTime" value="@rule.getFormattedTime(rule.getLatestStartTime())"></td>
+			</tr>
+		}
+		@if(enable_late_fees) {
+			<tr>
+				<th>
+					Exempt from Fees
+					<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="If checked, the person will be exempt from late departure fees."></span>
+				</th>
+				<td>
+					<input type="checkbox" name="exemptFromFees" @Html(if (rule.getExemptFromFees()) "checked" else "")>
+				</td>
+			</tr>
+		}
+	</table>
+	<input type="submit" value="Save" class="btn btn-primary">
+}
+
+@if(rule.getId() != null) {
+	<form action="@routes.Attendance.deleteRule(rule.getId())" method="post">
+		<button type="submit" class="btn btn-danger"
+			onclick="return confirm('Are you sure you want to delete this rule? This cannot be undone.');">
+			Delete
+		</button>
+	</form>
+}
+</div>
+}
+
+<script type="text/javascript">
+	var people = @Html(people_json);
+	var selectedPersonId = @Html(if (rule.getPerson() != null) Integer.toString(rule.getPerson().getPersonId()) else "null");
+	initAttendanceRule(selectedPersonId, people);
+</script>

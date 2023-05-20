@@ -134,8 +134,20 @@ the other way around.</p>
             value="@org.getAttendanceReportLateFeeInterval()"
             @if(!org.getShowAttendance() || !org.getAttendanceShowReports()){ disabled }>
          &nbsp;minutes after&nbsp;
-        <input type="text" size="7" name="attendanceReportLatestDepartureTime"
+        <input type="time" size="7" name="attendanceReportLatestDepartureTime"
             value="@org.formatAttendanceReportLatestDepartureTime()"
+            @if(!org.getShowAttendance() || !org.getAttendanceShowReports()){ disabled }>
+        <br>Then charge&nbsp;
+        $ <input type="number" min="0" max="999" name="attendanceReportLateFee_2"
+            value="@org.getAttendanceReportLateFee_2()"
+            @if(!org.getShowAttendance() || !org.getAttendanceShowReports()){ disabled }>
+         &nbsp;per&nbsp;
+        <input type="number" min="0" max="999" name="attendanceReportLateFeeInterval_2"
+            value="@org.getAttendanceReportLateFeeInterval_2()"
+            @if(!org.getShowAttendance() || !org.getAttendanceShowReports()){ disabled }>
+         &nbsp;minutes after&nbsp;
+        <input type="time" size="7" name="attendanceReportLatestDepartureTime_2"
+            value="@org.formatAttendanceReportLatestDepartureTime_2()"
             @if(!org.getShowAttendance() || !org.getAttendanceShowReports()){ disabled }>
     </div>
 
@@ -165,7 +177,7 @@ the other way around.</p>
         <tr>
             <td>Latest arrival time allowed for a full day</td>
             <td>
-                <input type="text" size="7" name="attendanceDayLatestStartTime" value="@org.formatAttendanceLatestStartTime()"
+                <input type="time" size="7" name="attendanceDayLatestStartTime" value="@org.formatAttendanceLatestStartTime()"
                        @if(!org.getShowAttendance() || !org.getAttendanceEnablePartialDays()){ disabled }>
                 &nbsp;<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip"
                     title="If a person arrives later than this time (e.g. 11:00), the day counts as a partial day regardless of how many hours the person was at school."></span>

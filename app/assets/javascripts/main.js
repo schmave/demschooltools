@@ -19,6 +19,7 @@ const create_transaction = require('./create_transaction');
 const transaction_list = require('./transaction_list');
 const settings_page = require('./settings_page');
 const off_campus = require('./off_campus');
+const attendance_rule = require('./attendance_rule');
 
 $(function() {
     // Fix for bootstrap tabs not remembering their active tab
@@ -150,4 +151,8 @@ window.initSettingsPage = function() {
 
 window.initOffCampus = function(people) {
     return off_campus.init(people);
+};
+
+window.initAttendanceRule = function(selectedPersonId, people) {
+    return attendance_rule.init(selectedPersonId, people);
 };

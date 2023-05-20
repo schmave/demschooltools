@@ -1,0 +1,29 @@
+@(
+current_rules : List[AttendanceRule],
+future_rules : List[AttendanceRule],
+past_rules : List[AttendanceRule],
+codes_map : Map[String, AttendanceCode],
+enable_partial_days : Boolean,
+enable_late_fees : Boolean
+)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
+
+@import helper._
+
+@main("Attendance Rules", "attendance", "rules") {
+
+	<h3>Attendance Rules</h3>
+
+	<a href="@routes.Attendance.newRule()" class="btn btn-primary">New Rule</a>
+
+	<h4 class="attendance-rules-category">Current Rules</h4>
+	@attendance_rules_table(current_rules, codes_map, enable_partial_days, enable_late_fees)
+
+	<h4 class="attendance-rules-category">Future Rules</h4>
+	@attendance_rules_table(future_rules, codes_map, enable_partial_days, enable_late_fees)
+
+	<h4 class="attendance-rules-category">Past Rules</h4>
+	@attendance_rules_table(past_rules, codes_map, enable_partial_days, enable_late_fees)
+
+	<br><br><br><br>
+
+}

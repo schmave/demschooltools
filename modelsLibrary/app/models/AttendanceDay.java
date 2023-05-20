@@ -5,6 +5,7 @@ import io.ebean.*;
 import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -47,8 +48,17 @@ public class AttendanceDay extends Model {
     AttendanceDay result = new AttendanceDay();
     result.person = p;
     result.day = day;
-    result.save();
 
+    List<AttendanceRule> rules =
+        AttendanceRule.currentRules(day, p.getPersonId(), p.getOrganization());
+    for (AttendanceRule rule : rules) {
+      String code = rule.getAbsenceCode();
+      if (rule.doesMatchDaysOfWeek(day) && code != null && !code.equals("")) {
+        result.code = code;
+      }
+    }
+
+    result.save();
     return result;
   }
 
@@ -110,6 +120,19 @@ public class AttendanceDay extends Model {
     if (org.getAttendanceEnablePartialDays()) {
       Double min_hours = org.getAttendanceDayMinHours();
       Time latest_start_time = org.getAttendanceDayLatestStartTime();
+
+      List<AttendanceRule> rules =
+          AttendanceRule.currentRules(day, person.getPersonId(), person.getOrganization());
+      for (AttendanceRule rule : rules) {
+        if (rule.doesMatchDaysOfWeek(day)) {
+          if (rule.getMinHours() != null) {
+            min_hours = rule.getMinHours();
+          }
+          if (rule.getLatestStartTime() != null) {
+            latest_start_time = rule.getLatestStartTime();
+          }
+        }
+      }
 
       if (min_hours != null && getHours() < min_hours) {
         return true;

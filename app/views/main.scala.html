@@ -168,6 +168,9 @@ var _rollbarConfig = {
             </a><a @if(selectedBtn.equals("attendance_codes")) { class="active" }
                 href="@routes.Attendance.viewCodes()">Absence codes
             </a>
+            <a @if(selectedBtn.equals("attendance_rules")) { class="active" }
+                href="@routes.Attendance.rules()">Rules
+            </a>
             @if(Utils.getOrgConfig(request).org.getAttendanceEnableOffCampus()) {
                 <a @if(selectedBtn.equals("off_campus_time")) { class="active" }
                     href="@routes.Attendance.offCampusTime()">Off campus time

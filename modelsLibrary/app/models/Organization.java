@@ -40,8 +40,11 @@ public class Organization extends Model {
   private Boolean attendanceEnableOffCampus;
   private Boolean attendanceShowReports;
   private Time attendanceReportLatestDepartureTime;
+  private Time attendanceReportLatestDepartureTime_2;
   private Integer attendanceReportLateFee;
+  private Integer attendanceReportLateFee_2;
   private Integer attendanceReportLateFeeInterval;
+  private Integer attendanceReportLateFeeInterval_2;
   private Boolean attendanceShowPercent;
   private Boolean attendanceShowWeightedPercent;
   private Boolean attendanceEnablePartialDays;
@@ -56,20 +59,24 @@ public class Organization extends Model {
 
   public static Finder<Integer, Organization> find = new Finder<>(Organization.class);
 
-  public String formatAttendanceLatestStartTime() {
-    if (attendanceDayLatestStartTime == null) {
+  private String formatTime(Time value) {
+    if (value == null) {
       return "";
     }
-    DateFormat format = new SimpleDateFormat("h:mm a");
-    return format.format(attendanceDayLatestStartTime.getTime());
+    DateFormat format = new SimpleDateFormat("HH:mm");
+    return format.format(value.getTime());
+  }
+
+  public String formatAttendanceLatestStartTime() {
+    return formatTime(attendanceDayLatestStartTime);
   }
 
   public String formatAttendanceReportLatestDepartureTime() {
-    if (attendanceReportLatestDepartureTime == null) {
-      return "";
-    }
-    DateFormat format = new SimpleDateFormat("h:mm a");
-    return format.format(attendanceReportLatestDepartureTime.getTime());
+    return formatTime(attendanceReportLatestDepartureTime);
+  }
+
+  public String formatAttendanceReportLatestDepartureTime_2() {
+    return formatTime(attendanceReportLatestDepartureTime_2);
   }
 
   public void updateFromForm(Map<String, String[]> values, Organization org) {
@@ -182,11 +189,24 @@ public class Organization extends Model {
       } else {
         this.attendanceReportLatestDepartureTime = null;
       }
+      if (values.containsKey("attendanceReportLatestDepartureTime_2")) {
+        this.attendanceReportLatestDepartureTime_2 =
+            AttendanceDay.parseTime(values.get("attendanceReportLatestDepartureTime_2")[0]);
+      } else {
+        this.attendanceReportLatestDepartureTime_2 = null;
+      }
       if (!values.containsKey("attendanceReportLateFee")
           || values.get("attendanceReportLateFee")[0].isEmpty()) {
         this.attendanceReportLateFee = null;
       } else {
         this.attendanceReportLateFee = Integer.parseInt(values.get("attendanceReportLateFee")[0]);
+      }
+      if (!values.containsKey("attendanceReportLateFee_2")
+          || values.get("attendanceReportLateFee_2")[0].isEmpty()) {
+        this.attendanceReportLateFee_2 = null;
+      } else {
+        this.attendanceReportLateFee_2 =
+            Integer.parseInt(values.get("attendanceReportLateFee_2")[0]);
       }
       if (!values.containsKey("attendanceReportLateFeeInterval")
           || values.get("attendanceReportLateFeeInterval")[0].isEmpty()) {
@@ -194,6 +214,13 @@ public class Organization extends Model {
       } else {
         this.attendanceReportLateFeeInterval =
             Integer.parseInt(values.get("attendanceReportLateFeeInterval")[0]);
+      }
+      if (!values.containsKey("attendanceReportLateFeeInterval_2")
+          || values.get("attendanceReportLateFeeInterval_2")[0].isEmpty()) {
+        this.attendanceReportLateFeeInterval_2 = null;
+      } else {
+        this.attendanceReportLateFeeInterval_2 =
+            Integer.parseInt(values.get("attendanceReportLateFeeInterval_2")[0]);
       }
     }
     if (values.containsKey("accounting_settings")) {

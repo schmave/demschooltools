@@ -145,6 +145,46 @@ var zeroPad = function(minutes) {
     }
 }
 
+const registerAutocomplete = function(row, people, autoAdvance, startingId) {
+    const selected = row.find('.js-person-name-selected');
+    const selectedText = row.find('.js-person-name-selected-text');
+    const textInput = row.find('.js-person-name');
+    const idInput = row.find('.js-person-id');
+
+    textInput.autocomplete({
+        source: people,
+        delay: 0,
+        autoFocus: true,
+    });
+
+    textInput.bind("autocompleteselect", function(event, ui) {
+        select(ui.item);
+    });
+
+    if (startingId) {
+        const item = people.filter(p => p.id == startingId)[0];
+        if (item) {
+            select(item);
+        }
+    }
+
+    function select(item) {
+        idInput.val(item.id);
+        if (autoAdvance) {
+            selectNextInput(idInput);
+        }
+        textInput.hide();
+        selectedText.html(item.label);
+        selected.show();
+    }
+
+    selected.find('img').click(function() {
+        selected.hide();
+        idInput.val('');
+        textInput.val('').show().focus();
+    });
+}
+
 module.exports = {
     displayName,
     limitHeight,
@@ -153,6 +193,7 @@ module.exports = {
     selectNextInput,
     formatTime,
     zeroPad,
+    registerAutocomplete,
     // These events should capture all possible ways to change the text
     // in a textfield.
     TEXT_AREA_EVENTS: "change keyup paste cut",
