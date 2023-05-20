@@ -59,28 +59,24 @@ public class Organization extends Model {
 
   public static Finder<Integer, Organization> find = new Finder<>(Organization.class);
 
-  public String formatAttendanceLatestStartTime() {
-    if (attendanceDayLatestStartTime == null) {
+  private String formatTime(Time value) {
+    if (value == null) {
       return "";
     }
-    DateFormat format = new SimpleDateFormat("h:mm a");
-    return format.format(attendanceDayLatestStartTime.getTime());
+    DateFormat format = new SimpleDateFormat("HH:mm");
+    return format.format(value.getTime());
+  }
+
+  public String formatAttendanceLatestStartTime() {
+    return formatTime(attendanceDayLatestStartTime);
   }
 
   public String formatAttendanceReportLatestDepartureTime() {
-    if (attendanceReportLatestDepartureTime == null) {
-      return "";
-    }
-    DateFormat format = new SimpleDateFormat("h:mm a");
-    return format.format(attendanceReportLatestDepartureTime.getTime());
+    return formatTime(attendanceReportLatestDepartureTime);
   }
 
   public String formatAttendanceReportLatestDepartureTime_2() {
-    if (attendanceReportLatestDepartureTime_2 == null) {
-      return "";
-    }
-    DateFormat format = new SimpleDateFormat("h:mm a");
-    return format.format(attendanceReportLatestDepartureTime_2.getTime());
+    return formatTime(attendanceReportLatestDepartureTime_2);
   }
 
   public void updateFromForm(Map<String, String[]> values, Organization org) {
