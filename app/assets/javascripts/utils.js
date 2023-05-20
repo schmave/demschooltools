@@ -145,7 +145,7 @@ var zeroPad = function(minutes) {
     }
 }
 
-var registerAutocomplete = function(row, people, autoAdvance, startingId) {
+const registerAutocomplete = function(row, people, autoAdvance, startingId) {
     const selected = row.find('.js-person-name-selected');
     const selectedText = row.find('.js-person-name-selected-text');
     const textInput = row.find('.js-person-name');
