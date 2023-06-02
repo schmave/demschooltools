@@ -49,6 +49,7 @@ public class Organization extends Model {
   private Boolean attendanceShowWeightedPercent;
   private Boolean attendanceEnablePartialDays;
   private Time attendanceDayLatestStartTime;
+  private Time attendanceDayEarliestDepartureTime;
   private Double attendanceDayMinHours;
   private BigDecimal attendancePartialDayValue;
   private String attendanceAdminPin;
@@ -69,6 +70,10 @@ public class Organization extends Model {
 
   public String formatAttendanceLatestStartTime() {
     return formatTime(attendanceDayLatestStartTime);
+  }
+
+  public String formatAttendanceEarliestDepartureTime() {
+    return formatTime(attendanceDayEarliestDepartureTime);
   }
 
   public String formatAttendanceReportLatestDepartureTime() {
@@ -182,6 +187,12 @@ public class Organization extends Model {
             AttendanceDay.parseTime(values.get("attendanceDayLatestStartTime")[0]);
       } else {
         this.attendanceDayLatestStartTime = null;
+      }
+      if (values.containsKey("attendanceDayEarliestDepartureTime")) {
+        this.attendanceDayEarliestDepartureTime =
+            AttendanceDay.parseTime(values.get("attendanceDayEarliestDepartureTime")[0]);
+      } else {
+        this.attendanceDayEarliestDepartureTime = null;
       }
       if (values.containsKey("attendanceReportLatestDepartureTime")) {
         this.attendanceReportLatestDepartureTime =

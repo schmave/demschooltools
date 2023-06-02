@@ -21,6 +21,7 @@ enable_late_fees : Boolean
 			@if(enable_partial_days) {
 				<th>Min Hours</th>
 				<th>Latest Arrival Time</th>
+				<th>Earliest Departure Time</th>
 			}
 			@if(enable_late_fees) {
 				<th>Exempt from Fees</th>
@@ -38,6 +39,7 @@ enable_late_fees : Boolean
 				@if(enable_partial_days) {
 					<td>@rule.getMinHours()</td>
 					<td>@rule.getFormattedTime(rule.getLatestStartTime())</td>
+					<td>@rule.getFormattedTime(rule.getEarliestDepartureTime())</td>
 				}
 				@if(enable_late_fees) {
 					<td>@rule.getFormattedBoolean(rule.getExemptFromFees())</td>

@@ -44,6 +44,7 @@ public class AttendanceRule extends Model {
   private Double minHours;
 
   private Time latestStartTime;
+  private Time earliestDepartureTime;
 
   private boolean exemptFromFees;
 
@@ -139,6 +140,15 @@ public class AttendanceRule extends Model {
         rule.setLatestStartTime(AttendanceDay.parseTime(latest_start_time));
       } else {
         rule.setLatestStartTime(null);
+      }
+    }
+
+    if (form.field("_earliestDepartureTime").value().isPresent()) {
+      String earliest_departure_time = form.field("_earliestDepartureTime").value().get();
+      if (!earliest_departure_time.isEmpty()) {
+        rule.setEarliestDepartureTime(AttendanceDay.parseTime(earliest_departure_time));
+      } else {
+        rule.setEarliestDepartureTime(null);
       }
     }
 

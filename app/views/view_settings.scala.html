@@ -175,6 +175,15 @@ the other way around.</p>
     </label>
     <div class="depends-on-partial-days"><table><tbody>
         <tr>
+            <td>Minimum hours for a full day</td>
+            <td>
+                <input type="number" min="0" max="9" step="0.01" name="attendanceDayMinHours" value="@org.getAttendanceDayMinHours()"
+                       @if(!org.getShowAttendance() || !org.getAttendanceEnablePartialDays()){ disabled }>
+                &nbsp;<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip"
+                    title="If a person is present for fewer than this number of hours (e.g. 5) in a day, it counts as a partial day."></span>
+            </td>
+        </tr>
+        <tr>
             <td>Latest arrival time allowed for a full day</td>
             <td>
                 <input type="time" size="7" name="attendanceDayLatestStartTime" value="@org.formatAttendanceLatestStartTime()"
@@ -184,12 +193,12 @@ the other way around.</p>
             </td>
         </tr>
         <tr>
-            <td>Minimum hours for a full day</td>
+            <td>Earliest departure time allowed for a full day</td>
             <td>
-                <input type="number" min="0" max="9" step="0.01" name="attendanceDayMinHours" value="@org.getAttendanceDayMinHours()"
+                <input type="time" size="7" name="attendanceDayEarliestDepartureTime" value="@org.formatAttendanceEarliestDepartureTime()"
                        @if(!org.getShowAttendance() || !org.getAttendanceEnablePartialDays()){ disabled }>
                 &nbsp;<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip"
-                    title="If a person is present for fewer than this number of hours (e.g. 5) in a day, it counts as a partial day."></span>
+                    title="If a person leaves earlier than this time, the day counts as a partial day regardless of how many hours the person was at school."></span>
             </td>
         </tr>
         <tr>
