@@ -903,6 +903,7 @@ public class Attendance extends Controller {
     Form<AttendanceRule> form = mFormFactory.form(AttendanceRule.class);
     Form<AttendanceRule> filledForm = form.bindFromRequest(request);
     AttendanceRule.save(filledForm, Utils.getOrg(request));
+    CachedPage.onAttendanceChanged(Utils.getOrg(request));
     return redirect(routes.Attendance.rules());
   }
 
