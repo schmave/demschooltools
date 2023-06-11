@@ -144,7 +144,8 @@ public class AttendanceDay extends Model {
       if (latest_start_time != null && startTime.getTime() > latest_start_time.getTime()) {
         return true;
       }
-      if (earliest_departure_time != null && endTime.getTime() < earliest_departure_time.getTime()) {
+      if (earliest_departure_time != null
+          && endTime.getTime() < earliest_departure_time.getTime()) {
         return true;
       }
     }
