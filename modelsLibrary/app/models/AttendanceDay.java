@@ -120,6 +120,7 @@ public class AttendanceDay extends Model {
     if (org.getAttendanceEnablePartialDays()) {
       Double min_hours = org.getAttendanceDayMinHours();
       Time latest_start_time = org.getAttendanceDayLatestStartTime();
+      Time earliest_departure_time = org.getAttendanceDayEarliestDepartureTime();
 
       List<AttendanceRule> rules =
           AttendanceRule.currentRules(day, person.getPersonId(), person.getOrganization());
@@ -131,6 +132,9 @@ public class AttendanceDay extends Model {
           if (rule.getLatestStartTime() != null) {
             latest_start_time = rule.getLatestStartTime();
           }
+          if (rule.getEarliestDepartureTime() != null) {
+            earliest_departure_time = rule.getEarliestDepartureTime();
+          }
         }
       }
 
@@ -138,6 +142,10 @@ public class AttendanceDay extends Model {
         return true;
       }
       if (latest_start_time != null && startTime.getTime() > latest_start_time.getTime()) {
+        return true;
+      }
+      if (earliest_departure_time != null
+          && endTime.getTime() < earliest_departure_time.getTime()) {
         return true;
       }
     }

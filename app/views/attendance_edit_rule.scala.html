@@ -88,7 +88,14 @@ enable_late_fees : Boolean
 					Latest Arrival Time
 					<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="If set, this will be used as the latest arrival time allowed for a full day instead of the default time configured in Settings."></span>
 				</th>
-				<td><input type="text" size="10" name="_latestStartTime" value="@rule.getFormattedTime(rule.getLatestStartTime())"></td>
+				<td><input type="text" class="js-time" size="10" name="_latestStartTime" value="@rule.getFormattedTime(rule.getLatestStartTime())"></td>
+			</tr>
+			<tr>
+				<th>
+					Earliest Departure Time
+					<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="If set, this will be used as the earliest departure time allowed for a full day instead of the default time configured in Settings."></span>
+				</th>
+				<td><input type="text" class="js-time" size="10" name="_earliestDepartureTime" value="@rule.getFormattedTime(rule.getEarliestDepartureTime())"></td>
 			</tr>
 		}
 		@if(enable_late_fees) {

@@ -110,4 +110,8 @@ public abstract class CachedPage {
     remove(RECENT_COMMENTS, org);
     Utils.updateCustodia();
   }
+
+  public static void onAttendanceChanged(Organization org) {
+    remove(ATTENDANCE_INDEX, org);
+  }
 }
