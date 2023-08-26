@@ -16,9 +16,6 @@ public class OrgConfig {
   public String str_jc_name = "Judicial Committee";
   public String str_jc_name_short = "JC";
   public String str_findings = "Findings";
-  public String str_corporation = "Corporation";
-  public String str_committee = "Committee";
-  public String str_clerk = "Clerk";
   public String str_guilty = "Guilty";
   public String str_not_guilty = "Not Guilty";
   public String str_na = "N/A";

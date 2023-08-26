@@ -1,0 +1,59 @@
+@()(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
+
+@main("Roles", "roles", "roles_index") {
+
+	<div class="roles-tabs">
+		<div class="roles-tab" id="roles-tab-individual">@Utils.getOrg(request).getRolesIndividualTermPlural()</div>
+		<div class="roles-tab" id="roles-tab-committee">@Utils.getOrg(request).getRolesCommitteeTermPlural()</div>
+		<div class="roles-tab" id="roles-tab-group">@Utils.getOrg(request).getRolesGroupTermPlural()</div>
+	</div>
+	<div id="roles-index-container"></div>
+}
+
+<script id="roles-index-template" type="text/x-handlebars-template">
+	<table class="roles-index-table">
+		<tr>
+			<th></th>
+			{{#if hasChairs}}
+				<th>{{chairHeader}}</th>
+			{{/if}}
+			{{#if hasBackups}}
+				<th>Backup</th>
+			{{/if}}
+			{{#if hasMembers}}
+				<th>Members</th>
+			{{/if}}
+			{{#if hasNotes}}
+				<th>Notes</th>
+			{{/if}}
+			{{#if hasDescriptions}}
+				<th>Description</th>
+			{{/if}}
+		</tr>
+		{{#each role}}
+			<tr>
+				<td>{{name}}</td>
+				{{#if hasChairs}}
+					<td>{{chairs}}</td>
+				{{/if}}
+				{{#if hasBackups}}
+					<td>{{backups}}</td>
+				{{/if}}
+				{{#if hasMembers}}
+					<td>{{members}}</td>
+				{{/if}}
+				{{#if hasNotes}}
+					<td>{{notes}}</td>
+				{{/if}}
+				{{#if hasDescriptions}}
+					<td>{{description}}</td>
+				{{/if}}
+			</tr>
+		{{/each}}
+	</table>
+</script>
+
+<script type="text/javascript">
+	// var accounts = @Html(Accounting.accountsJson(Utils.getOrgConfig(request).org));
+	// initCreateTransaction(accounts);
+</script>

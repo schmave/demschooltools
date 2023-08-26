@@ -76,6 +76,11 @@ var _rollbarConfig = {
             <li @if(menu.equals("manual")) { class="active" }>
                 <a href="@routes.Application.viewManual()">@Utils.getOrgConfig(request).str_manual_title_short</a>
             </li>
+            @if(Utils.getOrgConfig(request).org.getShowRoles()) {
+                <li @if(menu.equals("roles")) { class="active" }>
+                    <a href="@routes.Roles.index()">Roles</a>
+                </li>
+            }
             @if(Utils.getOrgConfig(request).org.getShowAccounting()) {
                 <li @if(menu.equals("accounting")) { class="active" }>
                     <a href="@routes.Accounting.balances()">Accounting</a>
@@ -191,6 +196,17 @@ var _rollbarConfig = {
             }
             </div>
         </div>
+        }
+
+        @if(menu.equals("roles")) {
+            <div class="tab-pane active" id="roles">
+                <div class="subnav">
+                    <a @if(selectedBtn.equals("roles_index")) { class="active" }
+                        href="@routes.Roles.index()">Roles</a>
+                    <a @if(selectedBtn.equals("roles_new")) { class="active" }
+                        href="@routes.Roles.newRole()">Create Role</a>
+                </div>
+            </div>
         }
 
         @if(menu.equals("accounting")) {

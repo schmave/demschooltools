@@ -233,6 +233,40 @@ the other way around.</p>
 }
 
 <hr/>
+<h2>Roles</h2>
+<p class="instructions">This feature allows you to track which people are in which leadership
+roles (Committees, etc.) within DemSchoolTools. The advantage of this is that DemSchoolTools
+tracks changes in role membership over time, allowing you to view a snapshot for a given date
+or generate a resume for a particular person.</p>
+
+@helper.form(routes.Settings.editSettings()) {
+
+    <p>
+        <label>
+            <input type="checkbox" name="showRoles" @if(org.getShowRoles()){ checked }>
+            Enable the "Roles" tab
+        </label>
+    </p>
+    <table>
+        <tr>
+            <td>Individual term</td>
+            <td><input type="text" name="rolesIndividualTerm" value="@org.getRolesIndividualTerm()"></td>
+        </tr>
+        <tr>
+            <td>Committee term</td>
+            <td><input type="text" name="rolesCommitteeTerm" value="@org.getRolesCommitteeTerm()"></td>
+        </tr>
+        <tr>
+            <td>Group term</td>
+            <td><input type="text" name="rolesGroupTerm" value="@org.getRolesGroupTerm()"></td>
+        </tr>
+    </table>
+    <br>
+    <input type="hidden" name="roles_settings" value="true"/>
+    <input type="submit" value="Save Roles settings"/>
+}
+
+<hr/>
 <h2>Accounting</h2>
 <p class="instructions">This feature helps you administer student bank accounts by keeping track of
 cash deposits into the bank as well as transfers between accounts (checks). Accounts are automatically

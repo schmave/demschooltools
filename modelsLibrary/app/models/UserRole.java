@@ -14,6 +14,7 @@ public class UserRole extends Model {
   @ManyToOne() private User user;
 
   public static final String ROLE_ACCOUNTING = "accounting";
+  public static final String ROLE_ROLES = "roles";
   public static final String ROLE_ATTENDANCE = "attendance";
   public static final String ROLE_VIEW_JC = "view-jc";
   public static final String ROLE_EDIT_MANUAL = "edit-manual";
@@ -26,6 +27,7 @@ public class UserRole extends Model {
 
   public static final String[] ALL_ROLES = {
     ROLE_ACCOUNTING,
+    ROLE_ROLES,
     ROLE_VIEW_JC,
     ROLE_EDIT_RESOLUTION_PLANS,
     ROLE_EDIT_7_DAY_JC,
@@ -89,6 +91,8 @@ public class UserRole extends Model {
         return "View and Edit everything";
       case ROLE_ACCOUNTING:
         return "Manage accounts and create transactions";
+      case ROLE_ROLES:
+        return "Edit roles";
       case ROLE_ATTENDANCE:
         return "Manage attendance records";
     }
