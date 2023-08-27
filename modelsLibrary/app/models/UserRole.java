@@ -14,7 +14,7 @@ public class UserRole extends Model {
   @ManyToOne() private User user;
 
   public static final String ROLE_ACCOUNTING = "accounting";
-  public static final String ROLE_ROLES = "roles";
+  public static final String ROLE_ROLES = "edit-roles";
   public static final String ROLE_ATTENDANCE = "attendance";
   public static final String ROLE_VIEW_JC = "view-jc";
   public static final String ROLE_EDIT_MANUAL = "edit-manual";

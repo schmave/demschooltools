@@ -1,19 +1,28 @@
 @()(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @main("Roles", "roles", "roles_index") {
-
-	<div class="roles-tabs">
-		<div class="roles-tab" id="roles-tab-individual">@Utils.getOrg(request).getRolesIndividualTermPlural()</div>
-		<div class="roles-tab" id="roles-tab-committee">@Utils.getOrg(request).getRolesCommitteeTermPlural()</div>
-		<div class="roles-tab" id="roles-tab-group">@Utils.getOrg(request).getRolesGroupTermPlural()</div>
+	<div class="roles-editor">
+		<h3>Edit Role</h3>
+		<table class="roles-edit-table">
+		</table>
+		<br>
+		<input id="roles-editor-submit" type="submit" value="Update" class="btn btn-primary" />&nbsp;
+		<input id="roles-editor-cancel" type="submit" value="Cancel" class="btn btn-default" />
 	</div>
-	<div id="roles-index-container"></div>
+	<div class="roles-main">
+		<div>
+			<div class="roles-tab" data-type="Individual">@Utils.getOrg(request).getRolesIndividualTermPlural()</div>
+			<div class="roles-tab" data-type="Committee">@Utils.getOrg(request).getRolesCommitteeTermPlural()</div>
+			<div class="roles-tab" data-type="Group">@Utils.getOrg(request).getRolesGroupTermPlural()</div>
+		</div>
+		<div id="roles-index-container"></div>
+	</div>
 }
 
 <script id="roles-index-template" type="text/x-handlebars-template">
-	<table class="roles-index-table">
+	<table class="table roles-index-table">
 		<tr>
-			<th></th>
+			<th>Role</th>
 			{{#if hasChairs}}
 				<th>{{chairHeader}}</th>
 			{{/if}}
@@ -23,6 +32,9 @@
 			{{#if hasMembers}}
 				<th>Members</th>
 			{{/if}}
+			{{#if hasEligibilities}}
+				<th>Eligibility</th>
+			{{/if}}
 			{{#if hasNotes}}
 				<th>Notes</th>
 			{{/if}}
@@ -30,22 +42,25 @@
 				<th>Description</th>
 			{{/if}}
 		</tr>
-		{{#each role}}
+		{{#each roles}}
 			<tr>
-				<td>{{name}}</td>
-				{{#if hasChairs}}
+				<td><a class="roles-edit-button" data-id="{{id}}">{{name}}</a></td>
+				{{#if ../hasChairs}}
 					<td>{{chairs}}</td>
 				{{/if}}
-				{{#if hasBackups}}
+				{{#if ../hasBackups}}
 					<td>{{backups}}</td>
 				{{/if}}
-				{{#if hasMembers}}
+				{{#if ../hasMembers}}
 					<td>{{members}}</td>
 				{{/if}}
-				{{#if hasNotes}}
+				{{#if ../hasEligibilities}}
+					<td>{{eligibility}}</td>
+				{{/if}}
+				{{#if ../hasNotes}}
 					<td>{{notes}}</td>
 				{{/if}}
-				{{#if hasDescriptions}}
+				{{#if ../hasDescriptions}}
 					<td>{{description}}</td>
 				{{/if}}
 			</tr>
@@ -53,7 +68,45 @@
 	</table>
 </script>
 
+<script id="roles-editor-general-template" type="text/x-handlebars-template">
+	<tr>
+		<td><label class="control-label">Name</label></td>
+		<td><input type="text" name="name" required class="form-control" value="{{name}}"/></td>
+	</tr>
+	<tr>
+		<td><label class="control-label">Type</label></td>
+		<td>
+			<select name="type" class="form-control" value="{{type}}" disabled>
+				<option value="Individual" {{#ifEquals type "Individual"}}selected{{/ifEquals}}>@Utils.getOrg(request).getRolesIndividualTerm()</option>
+				<option value="Committee" {{#ifEquals type "Committee"}}selected{{/ifEquals}}>@Utils.getOrg(request).getRolesCommitteeTerm()</option>
+				<option value="Group" {{#ifEquals type "Group"}}selected{{/ifEquals}}>@Utils.getOrg(request).getRolesGroupTerm()</option>
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td><label class="control-label">Eligibility</label></td>
+		<td>
+			<select name="eligibility" class="form-control" value="{{eligibility}}">
+				<option value="Anyone" {{#ifEquals eligibility "Anyone"}}selected{{/ifEquals}}>Anyone</option>
+				<option value="StaffOnly" {{#ifEquals eligibility "StaffOnly"}}selected{{/ifEquals}}>Staff Only</option>
+				<option value="StudentOnly" {{#ifEquals eligibility "StudentOnly"}}selected{{/ifEquals}}>Student Only</option>
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td><label class="control-label">Notes</label></td>
+		<td><textarea name="notes" rows="2" class="form-control">{{notes}}</textarea></td>
+	</tr>
+	<tr>
+		<td><label class="control-label">Description</label></td>
+		<td><textarea name="description" rows="3" class="form-control">{{description}}</textarea></td>
+	</tr>
+</script>
+
 <script type="text/javascript">
-	// var accounts = @Html(Accounting.accountsJson(Utils.getOrgConfig(request).org));
-	// initCreateTransaction(accounts);
+	const rolesJson = @Html(Roles.rolesJson(Utils.getOrgConfig(request).org));
+	const terms = {
+		individual: '@Utils.getOrg(request).getRolesIndividualTerm()'
+	};
+	initRoles(rolesJson, terms);
 </script>

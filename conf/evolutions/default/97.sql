@@ -9,6 +9,7 @@ CREATE TABLE role (
    id serial,
    organization_id integer NOT NULL,
    type integer NOT NULL,
+   eligibility integer NOT NULL,
    name text NOT NULL,
    notes text NOT NULL,
    description text NOT NULL,

@@ -12,6 +12,7 @@ import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
 import views.html.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Secured.Auth(UserRole.ROLE_VIEW_JC)
 public class Roles extends Controller {
@@ -30,38 +31,10 @@ public class Roles extends Controller {
     return ok(roles_index.render(request, mMessagesApi.preferred(request)));
   }
 
-  public static String rolesJson(Organization org) {
-  	return "";
-  	// List<Role> roles = Role.all(org);
-  	// ObjectMapper objectMapper = new ObjectMapper();
-  	// return ObjectMapper.writeValueAsString(roles);
-
-    // List<Map<String, String>> result = new ArrayList<>();
-    // List<Role> roles = Role.all(org);
-    // for (Role role : roles) {
-    //   HashMap<String, String> values = new HashMap<>();
-    //   values.put("id", "" + role.getId());
-    //   values.put("type", role.getType().toString(org));
-    //   values.put("name", role.getName());
-    //   values.put("notes", role.getNotes());
-    //   values.put("description", role.getDescription());
-    //   values.put("isActive", role.getIsActive() ? "true" : "false");
-    //   result.add(values);
-    // }
-    // return Json.stringify(Json.toJson(result));
-  }
-
-  public static String peopleJson(Organization org) {
-  	return "";
-    // List<Map<String, String>> result = new ArrayList<>();
-    // List<Person> people = attendancePeople(org);
-    // for (Person person : people) {
-    //   HashMap<String, String> values = new HashMap<>();
-    //   values.put("id", "" + person.getPersonId());
-    //   values.put("name", person.getDisplayName());
-    //   result.add(values);
-    // }
-    // return Json.stringify(Json.toJson(result));
+  public static String rolesJson(Organization org) throws Exception {
+  	List<Role> roles = Role.all(org);
+  	ObjectMapper objectMapper = new ObjectMapper();
+  	return objectMapper.writeValueAsString(roles);
   }
 
   @Secured.Auth(UserRole.ROLE_ROLES)
@@ -71,19 +44,15 @@ public class Roles extends Controller {
   }
 
   @Secured.Auth(UserRole.ROLE_ROLES)
-  public Result makeNewRole(Http.Request request) {
+  public Result makeNewRole(Http.Request request) throws Exception {
     Form<Role> form = mFormFactory.form(Role.class);
     Form<Role> filledForm = form.bindFromRequest(request);
-    if (filledForm.hasErrors()) {
-      System.out.println("ERRORS: " + filledForm.errorsAsJson().toString());
-      return badRequest(roles_new.render(filledForm, request, mMessagesApi.preferred(request)));
-    } else {
-      try {
-        Role role = Role.create(filledForm, Utils.getOrg(request));
-        return redirect(routes.Roles.index());
-      } catch (Exception ex) {
-        return badRequest(ex.toString());
-      }
-    }
+    RoleType type = RoleType.valueOf(filledForm.field("type").value().get());
+    RoleEligibility eligibility = RoleEligibility.valueOf(filledForm.field("eligibility").value().get());
+    String name = filledForm.field("name").value().get();
+    String notes = filledForm.field("notes").value().get();
+    String description = filledForm.field("description").value().get();
+    Role.create(Utils.getOrg(request), type, eligibility, name, notes, description);
+    return redirect(routes.Roles.index());
   }
 }

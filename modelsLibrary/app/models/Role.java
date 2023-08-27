@@ -26,6 +26,7 @@ public class Role extends Model {
   public List<RoleRecord> records;
 
   private RoleType type;
+  private RoleEligibility eligibility;
 
   private String name = "";
   private String notes = "";
@@ -47,15 +48,16 @@ public class Role extends Model {
     return find.query().where().eq("organization", org).eq("id", id).findOne();
   }
 
-  public static Role create(Form<Role> form, Organization org) throws Exception {
-    Role role = form.get();
-    role.type = RoleType.valueOf(form.field("type").value().get());
-    role.isActive = true;
+  public static Role create(Organization org, RoleType type, RoleEligibility eligibility, String name, String notes, String description) {
+    Role role = new Role();
     role.organization = org;
+    role.type = type;
+    role.eligibility = eligibility;
+    role.name = name;
+    role.notes = notes;
+    role.description = description;
+    role.isActive = true;
     role.save();
     return role;
-  }
-
-  public void updateFromForm(Form<Role> form) {
   }
 }
