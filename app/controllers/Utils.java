@@ -244,7 +244,7 @@ class OrgConfigs {
     register(new TheCircleSchool());
     register(new MakariosLearningCommunity());
     register(new TheOpenSchool());
-    register(new TheOpenSchool2());
+    register(new TheOpenSchoolVirtual());
     register(new Houston());
     register(new Sandbox());
     register(new Clearview());
@@ -396,10 +396,10 @@ class TheOpenSchool extends OrgConfig {
   }
 }
 
-class TheOpenSchool2 extends OrgConfig {
-  public TheOpenSchool2() {
-    name = "The Open School - Riverside";
-    people_url = "https://tos-2.demschooltools.com";
+class TheOpenSchoolVirtual extends OrgConfig {
+  public TheOpenSchoolVirtual() {
+    name = "The Open School Virtual";
+    people_url = "https://tosv.demschooltools.com";
     time_zone = TimeZone.getTimeZone("US/Pacific");
 
     str_manual_title = "Law Book";
@@ -410,14 +410,16 @@ class TheOpenSchool2 extends OrgConfig {
     str_res_plans = "sentences";
     str_res_plans_cap = "Sentences";
     str_findings = "Findings";
-    str_jc_name = "Justice Committee";
-    str_jc_name_short = "JC";
-    str_guilty = "Confirm";
-    str_not_guilty = "Deny";
+    str_jc_name = "Civics Board";
+    str_jc_name_short = "CB";
+    str_guilty = "Agree";
+    str_not_guilty = "Disagree";
+    str_na = "Mediated";
 
     show_findings_in_rp_list = true;
     use_minor_referrals = false;
     show_no_contest_plea = true;
+    show_na_plea = true;
   }
 }
 
