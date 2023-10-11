@@ -1,3 +1,6 @@
+import django
+django.setup()
+
 from manual.models import *
 
 def main():
