@@ -72,6 +72,7 @@ class ManualChange(models.Model):
         db_table = 'manual_change'
 
     entry = models.ForeignKey(Entry, on_delete=models.PROTECT)
+    date_entered = models.DateTimeField()
 
 class Meeting(models.Model):
     class Meta:

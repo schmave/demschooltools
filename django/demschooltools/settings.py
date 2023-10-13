@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'custodia',
     'manual',
 ]
 
@@ -98,6 +99,9 @@ DATABASES = {
     },
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
+        'OPTIONS': {
+            'options': '-c search_path=public,overseer'
+        },
         'NAME': 'school_crm',
         'PORT': '5433',
         'HOST': 'localhost',
