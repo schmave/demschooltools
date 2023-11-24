@@ -472,16 +472,19 @@ class Clearview extends OrgConfig {
     name = "Clearview Sudbury School";
     people_url = "https://css.demschooltools.com";
 
-    str_manual_title = "Lawbook";
-    str_manual_title_short = "Lawbook";
-    str_res_plan_short = "Sentence";
-    str_res_plan = "sentence";
-    str_res_plan_cap = "Sentence";
-    str_res_plans = "sentences";
-    str_res_plans_cap = "Sentences";
+    str_manual_title = "Rulebook";
+    str_manual_title_short = "Rulebook";
+    str_res_plan_short = "Resolution";
+    str_res_plan = "resolution";
+    str_res_plan_cap = "Resolution";
+    str_res_plans = "resolutions";
+    str_res_plans_cap = "Resolutions";
     str_findings = "Findings";
 
-    track_writer = false;
+    str_guilty = "Yes";
+    str_not_guilty = "No";
+
+    track_writer = true;
   }
 }
 
