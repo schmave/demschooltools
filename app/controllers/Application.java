@@ -504,17 +504,24 @@ public class Application extends Controller {
     writer.write("SM decision date");
     writer.endRecord();
 
-    List<Charge> charges =
+    ExpressionList<Charge> chargeQuery =
         Charge.find
             .query()
             .fetch("theCase")
             .fetch("person")
             .fetch("rule")
             .fetch("theCase.meeting", FetchConfig.ofQuery())
+            .setLazyLoadBatchSize(1000)
             .where()
-            .eq("person.organization", org)
-            .ge("theCase.meeting.date", ModelUtils.getStartOfYear())
-            .findList();
+            .eq("person.organization", org);
+
+    User currentUser = Application.getCurrentUser(request);
+    if (currentUser == null || !currentUser.hasRole(UserRole.ROLE_ALL_ACCESS)) {
+      // Unless the user has full access, limit to the current school year.
+      chargeQuery = chargeQuery.ge("theCase.meeting.date", ModelUtils.getStartOfYear());
+    }
+
+    List<Charge> charges = chargeQuery.findList();
     for (Charge c : charges) {
       if (c.getPerson() != null) {
         writer.write(c.getPerson().getDisplayName());
