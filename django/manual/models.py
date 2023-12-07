@@ -26,6 +26,19 @@ class Person(models.Model):
     tags = models.ManyToManyField(Tag, db_table='person_tag')
 
 
+class Comment(models.Model):
+    class Meta:
+        db_table = 'comments'
+
+    created = models.DateTimeField()
+
+class CompletedTask(models.Model):
+    class Meta:
+        db_table = 'completed_task'
+
+    comment = models.ForeignKey(Comment, on_delete=models.PROTECT)
+    person = models.ForeignKey(Person, on_delete=models.PROTECT)
+
 
 class AttendanceDay(models.Model):
     class Meta:

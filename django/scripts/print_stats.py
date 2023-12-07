@@ -1,6 +1,7 @@
 import django
-
 django.setup()
+
+import argparse
 
 from datetime import datetime
 from tabulate import tabulate
@@ -11,9 +12,18 @@ from manual.models import *
 from custodia.models import Swipe
 
 
+
+
 def main():
-    start_date = datetime(2023, 8, 1)
-    end_date = datetime(2024, 7, 31)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-y', '--year', type=int, required=True)
+    args = parser.parse_args()
+
+    assert args.year > 2010, args.year
+    print(f'Data for school year {args.year}-{args.year+1}')
+
+    start_date = datetime(args.year, 8, 1)
+    end_date = datetime(args.year + 1, 7, 31)
 
     data = []
 
@@ -44,6 +54,9 @@ def main():
             Swipe.objects.filter(student__person__organization=org,
                                  swipe_day__gte=start_date,
                                  swipe_day__lte=end_date).count(),
+            CompletedTask.objects.filter(person__organization=org,
+                                         comment__created__gte=start_date,
+                                         comment__created__lte=end_date).count(),
         ])
 
     data.sort(reverse=True, key=lambda x: x[2])
@@ -60,6 +73,7 @@ def main():
                      'Manual chgs',
                      'Attendance',
                      'Custodia',
+                     'Cklist completes',
                  ]))
 
 
