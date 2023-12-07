@@ -13,6 +13,7 @@ class Tag(models.Model):
 
     organization = models.ForeignKey('Organization', on_delete=models.PROTECT)
 
+    title = models.TextField()
     show_in_jc = models.BooleanField()
     show_in_attendance = models.BooleanField()
 

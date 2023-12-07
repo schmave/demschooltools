@@ -18,9 +18,11 @@ def main():
     data = []
 
     for org in Organization.objects.all():
-        num_people = Person.objects.filter(organization=org).filter(
+        num_people = (Person.objects.filter(organization=org)
+                      .exclude(tags__title__contains='Staff')
+                      .filter(
             Q(tags__show_in_jc=True)
-            | Q(tags__show_in_attendance=True)).distinct().count()
+            | Q(tags__show_in_attendance=True)).distinct().count())
         num_tag_changes = PersonTagChange.objects.filter(
             person__organization=org, time__gte=start_date,
             time__lte=end_date).count()
