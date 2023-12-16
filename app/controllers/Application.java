@@ -589,6 +589,18 @@ public class Application extends Controller {
         .withHeader("Content-Disposition", "attachment; filename=All charges.csv");
   }
 
+  public Result viewTodaysMinutes(Http.Request request) {
+    Organization org = Utils.getOrg(request);
+    Meeting the_meeting =
+        Meeting.find
+            .query()
+            .where()
+            .eq("organization", org)
+            .eq("date", Utils.localNow(Utils.getOrgConfig(org)))
+            .findOne();
+    return ok(view_meeting.render(the_meeting, request, mMessagesApi.preferred(request)));
+  }
+
   public Result viewMeeting(int meeting_id, Http.Request request) {
     return ok(
         view_meeting.render(
