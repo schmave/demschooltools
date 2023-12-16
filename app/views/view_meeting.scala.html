@@ -2,6 +2,13 @@
 
 @import helper._
 
-@main(Utils.getOrgConfig(request).str_jc_name_short + " minutes from " + Application.formatMeetingDate(m.getDate()), "jc") {
-    @meetingHelper(m)
+
+@if(m == null) {
+    @main(Utils.getOrgConfig(request).str_jc_name_short + " minutes from today", "jc") {
+        <p style="font-size: 2em; margin-top: 2em; text-align: center">No meeting has happened yet today.</p>
+    }
+} else {
+    @main(Utils.getOrgConfig(request).str_jc_name_short + " minutes from " + Application.formatMeetingDate(m.getDate()), "jc") {
+        @meetingHelper(m)
+    }
 }

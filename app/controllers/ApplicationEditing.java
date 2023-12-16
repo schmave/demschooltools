@@ -39,16 +39,17 @@ public class ApplicationEditing extends Controller {
 
   @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
   public Result editTodaysMinutes(Http.Request request) {
+    Organization org = Utils.getOrg(request);
     Meeting the_meeting =
         Meeting.find
             .query()
             .where()
-            .eq("organization", Utils.getOrg(request))
-            .eq("date", new Date())
+            .eq("organization", org)
+            .eq("date", Utils.localNow(Utils.getOrgConfig(org)))
             .findOne();
     if (the_meeting == null) {
-      CachedPage.remove(CachedPage.JC_INDEX, Utils.getOrg(request));
-      the_meeting = Meeting.create(new Date(), Utils.getOrg(request));
+      CachedPage.remove(CachedPage.JC_INDEX, org);
+      the_meeting = Meeting.create(new Date(), org);
       the_meeting.save();
     }
     return editMinutes(the_meeting, request);

@@ -7,6 +7,7 @@ GET /login	controllers.Public.index(request: Request)
 GET     /                         controllers.Application.index(request: Request)
 
 GET     /editToday                controllers.ApplicationEditing.editTodaysMinutes(request: Request)
+GET     /viewToday                controllers.Application.viewTodaysMinutes(request: Request)
 
 
 GET  /viewMeeting/:id	controllers.Application.viewMeeting(id: Integer, request: Request)
