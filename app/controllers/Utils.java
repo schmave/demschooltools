@@ -264,15 +264,15 @@ class ThreeRiversVillageSchool extends OrgConfig {
 
     str_manual_title = "Management Manual";
     str_manual_title_short = "Manual";
-    str_res_plan_short = "RP";
-    str_res_plan = "resolution plan";
-    str_res_plan_cap = "Resolution plan";
-    str_res_plans = "resolution plans";
-    str_res_plans_cap = "Resolution plans";
-    str_jc_name = "Justice Committee";
+    str_res_plan_short = "agreement";
+    str_res_plan = "agreement";
+    str_res_plan_cap = "Agreement";
+    str_res_plans = "agreements";
+    str_res_plans_cap = "Agreements";
+    str_jc_name = "Resolution Committee";
+    str_findings = "Discussion Record";
 
     show_checkbox_for_res_plan = false;
-
     enable_file_sharing = true;
   }
 }
