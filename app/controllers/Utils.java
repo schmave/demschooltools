@@ -274,6 +274,9 @@ class ThreeRiversVillageSchool extends OrgConfig {
 
     show_checkbox_for_res_plan = false;
     enable_file_sharing = true;
+    use_minor_referrals = false;
+    show_entry = false;
+    show_plea = false;
   }
 }
 

@@ -134,28 +134,34 @@ $(function () {
 <div class="charge">
 <table>
 	<tr><td class="esm-form-label">Charge against:<td colspan=2>{{render "people-chooser" clazz=""}}
+        @if( Utils.getOrgConfig(request).show_entry ) {
 	<b>Entry:</b> {{> rule-chooser}}
-	<tr><td class="esm-form-label">Plea:<td colspan=2>
-<div class="radio-inline">
-  <label><input type="radio" class="plea plea-guilty" value="Guilty"><span>@Utils.getOrgConfig(request).str_guilty</span></label>
-</div>
-@if( Utils.getOrgConfig(request).show_no_contest_plea ) {
-<div class="radio-inline">
-  <label><input type="radio" class="plea plea-no-contest" value="No Contest"><span>No Contest</span></label>
-</div>
 }
-<div class="radio-inline">
-  <label><input type="radio" class="plea plea-not-guilty" value="Not Guilty"><span>@Utils.getOrgConfig(request).str_not_guilty</span></label>
-</div>
-@if( Utils.getOrgConfig(request).show_na_plea ) {
-<div class="radio-inline">
-  <label><input type="radio" class="plea plea-na" value="N/A"><span>@Utils.getOrgConfig(request).str_na</span></label>
-</div>
-}
+    @if( Utils.getOrgConfig(request).show_plea ) {
+    <tr>
+        <td class="esm-form-label">Plea:<td colspan=2>
+        <div class="radio-inline">
+          <label><input type="radio" class="plea plea-guilty" value="Guilty"><span>@Utils.getOrgConfig(request).str_guilty</span></label>
+        </div>
+        @if( Utils.getOrgConfig(request).show_no_contest_plea ) {
+        <div class="radio-inline">
+          <label><input type="radio" class="plea plea-no-contest" value="No Contest"><span>No Contest</span></label>
+        </div>
+        }
+        <div class="radio-inline">
+          <label><input type="radio" class="plea plea-not-guilty" value="Not Guilty"><span>@Utils.getOrgConfig(request).str_not_guilty</span></label>
+        </div>
+        @if( Utils.getOrgConfig(request).show_na_plea ) {
+        <div class="radio-inline">
+          <label><input type="radio" class="plea plea-na" value="N/A"><span>@Utils.getOrgConfig(request).str_na</span></label>
+        </div>
+        }
+    }
 &nbsp;&nbsp;&nbsp;<label><input type="checkbox" class="refer-to-sm"><span> Refer to School Meeting</span></label>
 	@if( Utils.getOrgConfig(request).use_minor_referrals ) {
         <label><span class="minor-referral-label">Refer to:</span><input type="text" class="minor-referral-destination"></label>
     }
+</td></tr>
 @if( Utils.getOrgConfig(request).show_severity ) {
     <tr><td class="esm-form-label">Severity:<td>
     <div class="radio-inline">

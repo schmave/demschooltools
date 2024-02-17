@@ -26,6 +26,9 @@ public class OrgConfig {
   public boolean show_no_contest_plea = false;
   public boolean show_na_plea = false;
   public boolean show_severity = false;
+  public boolean show_entry = true;
+  public boolean show_plea = true;
+
   public boolean use_minor_referrals = true;
   public boolean show_checkbox_for_res_plan = true;
   public boolean track_writer = true;
