@@ -4,7 +4,7 @@
 
 "files": [
   {
-    "source": "/conf/messages.en",
+    "source": "/conf/messages.en-US",
     "translation": "/conf/messages.%locale%"
   },
 ]
