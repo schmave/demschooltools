@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+    </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="DemSchoolTools" options="-Xlint:unchecked -Xlint:deprecation -Xlint:unchecked -Xlint:deprecation -encoding utf8 -g" />
+      <module name="authLibrary" options="-Xlint:unchecked -Xlint:deprecation -encoding utf8 -g" />
+      <module name="modelsLibrary" options="-Xlint:unchecked -Xlint:deprecation -encoding utf8 -g" />
+    </option>
+  </component>
+</project>

@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="sbt: org.xhtmlrenderer:flying-saucer-core:9.1.22:jar" external-system-id="SBT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/xhtmlrenderer/flying-saucer-core/9.1.22/flying-saucer-core-9.1.22.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/../Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/xhtmlrenderer/flying-saucer-core/9.1.22/flying-saucer-core-9.1.22-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/xhtmlrenderer/flying-saucer-core/9.1.22/flying-saucer-core-9.1.22-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

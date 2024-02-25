@@ -7,7 +7,6 @@ target
 dist
 
 .bsp/
-/.idea/
 
 # JS stuff
 node_modules/
