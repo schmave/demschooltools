@@ -65,7 +65,7 @@ $(function () {
         View printable minutes</a>
 </p>
 <table class="edit-minutes-members">
-<tr><td>Committee:
+<tr><td>@messages("committee_members"):
     <td>{{render "people-chooser" clazz="committee"}}
 <tr><td>Subs:
     <td>{{render "people-chooser" clazz="sub"}}
@@ -220,7 +220,7 @@ $(function () {
 
 <table>
 @if(Utils.getOrgConfig(request).track_writer) {
-    <tr><td class="esm-form-label">Who wrote complaint:
+    <tr><td class="esm-form-label">@messages("who_wrote_complaint"):
     <td>{{render "people-chooser" clazz="writer"}}</tr>
 }
 
