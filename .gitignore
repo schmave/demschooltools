@@ -7,7 +7,7 @@ target
 dist
 
 .bsp/
-/.idea/
+.idea/workspace.xml
 
 # JS stuff
 node_modules/

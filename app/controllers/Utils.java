@@ -270,6 +270,7 @@ class ThreeRiversVillageSchool extends OrgConfig {
     str_res_plans = "agreements";
     str_res_plans_cap = "Agreements";
     str_jc_name = "Resolution Committee";
+    str_jc_name_short = "RC";
     str_findings = "Discussion Record";
 
     show_checkbox_for_res_plan = false;
