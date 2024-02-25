@@ -56,7 +56,8 @@ public class Secured {
         } else {
           Http.Request childRequest =
               request.withAttrs(request.attrs().put(Security.USERNAME, username));
-          return delegate.call(childRequest.withTransientLang("en-" + Utils.getOrg(request).getShortName()));
+          return delegate.call(
+              childRequest.withTransientLang("en-" + Utils.getOrg(request).getShortName()));
         }
       } catch (RuntimeException e) {
         throw e;
