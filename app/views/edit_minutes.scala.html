@@ -81,7 +81,7 @@ $(function () {
 </div>
 
 <div style="display:none" id="dialog-confirm" title="Are you sure?">
-    <p>This will erase all data stored for this case. It cannot be undone.</p>
+    <p>@messages("erase_case_confirmation")</p>
 </div>
 
 </script>
@@ -133,7 +133,7 @@ $(function () {
 <script id="charge-template" type="text/x-handlebars-template">
 <div class="charge">
 <table>
-	<tr><td class="esm-form-label">Charge against:<td colspan=2>{{render "people-chooser" clazz=""}}
+	<tr><td class="esm-form-label">@messages("charge_against"):<td colspan=2>{{render "people-chooser" clazz=""}}
         @if( Utils.getOrgConfig(request).show_entry ) {
 	<b>Entry:</b> {{> rule-chooser}}
 }
@@ -204,16 +204,16 @@ $(function () {
     </td>
 </tr>
 </table>
-<button style="margin-left: 200px" class="btn btn-danger btn-xs remove-charge">Remove Charge</button>
-<span class="remove-charge-disabled-text" hidden>(This charge is referenced in a later case.)</span>
+<button style="margin-left: 200px" class="btn btn-danger btn-xs remove-charge">@messages("remove_charge")</button>
+<span class="remove-charge-disabled-text" hidden>@messages("no_delete_referenced_charge")</span>
 </div>
 </script>
 
 <script id="case-template" type="text/x-handlebars-template">
 <div class="case panel panel-info">
 <div class="panel-heading">
-    <h4>Case #{{num}}
-        <button class="btn btn-danger btn-xs clear-case">Erase Case</button>
+    <h4>@messages("case_title") #{{num}}
+        <button class="btn btn-danger btn-xs clear-case">@messages("erase_case")</button>
     </h4>
 </div>
 <div class="panel-body">
@@ -228,13 +228,13 @@ $(function () {
 <tr><td class="esm-form-label">Date of event: <td><input type="date">
 <span class="esm-form-label" style="margin-left: 40px;">Time:</span><input class="form-control time" type="text"></tr>
 
-<tr><td class="esm-form-label">Who testified:<td>
+<tr><td class="esm-form-label">@messages("who_testified")<td>
     {{render "people-chooser" clazz="testifier"}}
 </tr>
 
 @if( Utils.getOrgConfig(request).org.getEnableCaseReferences() ) {
     <tr>
-        <td class="esm-form-label">Referenced cases:</td>
+        <td class="esm-form-label">@messages("referenced_cases")</td>
         <td>{{render "case-chooser"}}</td>
     </tr>
     <tr>
@@ -247,7 +247,7 @@ $(function () {
 
 </table>
 <div class="charges"></div>
-<button class="add-charges">Add charges</button>
+<button class="add-charges">@messages("add_charges")</button>
 
 <div class="continued"><label>
     <input type="checkbox" class="continued"><span>To be continued</span></input>
@@ -257,15 +257,14 @@ $(function () {
 </div>
 </script>
 
-<p><button class="btn btn-primary add-case">Add a new case</button>
+<p><button class="btn btn-primary add-case">@messages("add_new_case")</button>
 @if( open_cases.size() > 0) {
     <div class="case panel panel-success">
         <div class="panel-heading">
-            <h4>Cases to be continued</h4>
+            <h4>@messages("cases_to_be_continued")</h4>
         </div>
         <div class="panel-body">
-            <p>The following open cases have been marked "to be continued". To edit them,
-                click the "continue" button next to the case you would like to edit.</p>
+            <p>@messages("choose_case_to_continue")</p>
             <ul class="continue-cases">
                 @for( c <- open_cases) {
                 @if( c.getMeeting() != meeting) {

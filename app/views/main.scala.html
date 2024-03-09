@@ -230,7 +230,7 @@ var _rollbarConfig = {
                 href="@routes.Application.thisWeekReport()">Weekly Report</a>
             <a @if(selectedBtn.equals("view_referred")) { class="active" }
                 href="@routes.Application.viewSchoolMeetingReferrals()">
-                Charges referred to S.M.
+                @messages("charges_referred_to_sm")
                 @defining( Application.getActiveSchoolMeetingReferrals(Utils.getOrgConfig(request).org) ) { sm_charges =>
                     @if( sm_charges.size() > 0 ) {
                         <span class="badge">

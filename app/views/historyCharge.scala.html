@@ -16,7 +16,7 @@
 @if( redact_findings ) { @Application.getRedactedFindings(c.getTheCase(), c.getPerson()) } else {
 	@Application.generateCompositeFindingsFromChargeReferences(c.getTheCase()) }
 
-@if( !c.getPlea().equals("Guilty") ) {
+@if(Utils.getOrgConfig(request).show_plea && !c.getPlea().equals("Guilty") ) {
 	Plead <b>@Utils.getOrgConfig(request).translatePlea(c.getPlea())</b>.
 }
 

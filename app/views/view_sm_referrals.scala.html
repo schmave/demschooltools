@@ -2,21 +2,29 @@
 
 @import helper._
 
-@main("Charges referred to School Meeting", "jc", "view_referred") {
+@main(messages("charges_referred_to_school_meeting"), "jc", "view_referred") {
 
-<h2>Charges referred to School Meeting</h2>
+<h2>@messages("charges_referred_to_school_meeting")</h2>
 @if( sm_charges.size() > 0 ) {
 	<table class="table">
-		<thead><th width="100">Case
+		<thead><th width="100">@messages("case_title")
 			<th width="20">Person
-			<th width="150">Entry
-			<th width="70">Plea
+			@if(Utils.getOrgConfig(request).show_entry){
+				<th width="150">Entry
+			}
+			@if(Utils.getOrgConfig(request).show_plea){
+				<th width="70">Plea
+			}
 			<th>@Utils.getOrgConfig(request).str_res_plan_cap<th>@Utils.getOrgConfig(request).str_findings</thead>
 	@for( c <- sm_charges ) {
 		<tr><td>@c.getTheCase().getCaseNumber()
 			<td>@if(c.getPerson() != null) { @c.getPerson().getDisplayName() } else { <i>No one</i> }
-			<td>@c.getRuleTitle()
-			<td>@Utils.getOrgConfig(request).translatePlea(c.getPlea())
+			@if(Utils.getOrgConfig(request).show_entry){
+				<td>@c.getRuleTitle()
+			}
+			@if(Utils.getOrgConfig(request).show_plea){
+				<td>@Utils.getOrgConfig(request).translatePlea(c.getPlea())
+			}
 			<td>@c.getResolutionPlan()
 			<td>@Utils.newlineToBr(Application.generateCompositeFindingsFromChargeReferences(c.getTheCase()))
 	}

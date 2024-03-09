@@ -16,11 +16,15 @@
       <sourceFolder url="file://$MODULE_DIR$/../../target/web/less/main" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/../../test" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/../../target/scala-2.13/routes/main" isTestSource="false" generated="true" />
-      <sourceFolder url="file://$MODULE_DIR$/../../target/scala-2.13/twirl/main" isTestSource="false" generated="true" />
       <excludeFolder url="file://$MODULE_DIR$/../../target/global-logging" />
       <excludeFolder url="file://$MODULE_DIR$/../../target/streams" />
       <excludeFolder url="file://$MODULE_DIR$/../../target/task-temp-directory" />
       <excludeFolder url="file://$MODULE_DIR$/../../target/universal" />
+      <excludeFolder url="file://$MODULE_DIR$/../../app/assets/javascripts/gen" />
+      <excludeFolder url="file://$MODULE_DIR$/../../dist" />
+      <excludeFolder url="file://$MODULE_DIR$/../../node_modules" />
+      <excludeFolder url="file://$MODULE_DIR$/../../target" />
+      <excludeFolder url="file://$MODULE_DIR$/../../target/scala-2.13/twirl/main" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

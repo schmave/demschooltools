@@ -30,7 +30,7 @@ Edit minutes</a></p>
 @meeting_people(m.getPeopleAtMeeting(), PersonAtMeeting.ROLE_RUNNER)
 </p>
 
-<h4>&nbsp;<br/>Case Notes</h4>
+<h4>&nbsp;<br/>@messages("case_notes")</h4>
 @caseTableOpen()
 @for(c <- m.getCases()) {
 	@if( !c.empty() ) {
@@ -41,9 +41,11 @@ Edit minutes</a></p>
 @for(c <- m.getAdditionalCases()) {
 	<tr>
 	<td><h5>#@c.getCaseNumber()	@if( c.getDateClosed() == null ) { (OPEN) }</h5></td>
-	<td>Case discussed today, but kept open for further investigation. Latest notes available
-		in meeting held on <a href="@routes.Application.viewMeeting(c.getMeeting().getId())">
-			@Application.yymmddDate(Utils.getOrgConfig(request), c.getMeeting().getDate())</a></td>
+	<td>Case discussed today, but kept open for further investigation. Latest notes available in meeting held on
+
+		<a href="@routes.Application.viewMeeting(c.getMeeting().getId())">
+			@Application.yymmddDate(Utils.getOrgConfig(request), c.getMeeting().getDate())</a>
+	</td>
 	</tr>
 
 }

@@ -269,7 +269,7 @@ the "Current Student" and "Staff" tags). Accounts can be created manually for gr
 
 @helper.form(routes.Settings.editSettings()) {
 
-    <h4>Case References</h4>
+    <h4>@messages("case_references")</h4>
     <p class="instructions">
         This feature allows you to reference a previous @Utils.getOrgConfig(request).str_jc_name_short case when creating a
         new case, for example if a @Utils.getOrgConfig(request).str_res_plan was broken.
@@ -303,14 +303,14 @@ the "Current Student" and "Staff" tags). Accounts can be created manually for gr
 <p class="instructions">The following behaviors of the @Utils.getOrgConfig(request).str_jc_name_short system can be changed easily by Evan, but not
     yet directly by you. Please <a class="feedback_open">contact me</a> if you would like to change any of them.
 <ul>
-    <li>The format of case numbers, e.g. 2017-03-02-11</li>
+    <li>@messages("case_number_format_setting")</li>
     <li>Whether to include the @Utils.getOrgConfig(request).str_findings in the list of @Utils.getOrgConfig(request).str_res_plans</li>
-    <li>Whether to track and display who wrote up a particular complaint</li>
+    <li>@messages("track_writer_complaint_setting")</li>
     <li>Whether to have the ability to refer charges to a destination of your choice (there's a text input next to
     each charge for this)</li>
     <li>Whether to include the ability to rate charges by severity, e.g. "mild", "moderate", "serious", "severe"</li>
     <li>Whether to include the plea options "No Contest" and/or "N/A"</li>
-    <li>Whether to include the case location in printed minutes</li>
+    <li>@messages("case_location_in_printed")</li>
     <li>The words that your school uses, e.g. "@Utils.getOrgConfig(request).str_jc_name", "@Utils.getOrgConfig(request).str_manual_title",
         "@Utils.getOrgConfig(request).str_findings", etc.</li>
 </ul>

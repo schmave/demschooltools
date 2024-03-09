@@ -1,5 +1,5 @@
 @()(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 <table class="table case_notes">
-<thead><tr><th width="150">Case</th><th>@Utils.getOrgConfig(request).str_findings</th>
-	<th width='250'>Charges</th></tr></thead>
+<thead><tr><th width="150">@messages("case_title")</th><th>@Utils.getOrgConfig(request).str_findings</th>
+	<th width='250'>@messages("charges_title")</th></tr></thead>
