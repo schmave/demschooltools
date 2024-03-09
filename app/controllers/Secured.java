@@ -56,8 +56,15 @@ public class Secured {
         } else {
           Http.Request childRequest =
               request.withAttrs(request.attrs().put(Security.USERNAME, username));
-          return delegate.call(
-              childRequest.withTransientLang("en-" + Utils.getOrg(request).getShortName()));
+
+          String language = "en-" + Utils.getOrg(request).getShortName();
+          if (language.length() > 10) {
+            // For some reason setting the transient language to "en-Fairhaven"
+            // causes mMessagesApi.preferred(request) to raise a NulLPointerException.
+            language = "en";
+          }
+
+          return delegate.call(childRequest.withTransientLang(language));
         }
       } catch (RuntimeException e) {
         throw e;
