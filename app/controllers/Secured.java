@@ -15,6 +15,7 @@ import javax.inject.Inject;
 import models.User;
 import models.UserRole;
 import play.Logger;
+import play.i18n.Lang;
 import play.mvc.*;
 
 // Lifted from play.mvc.Security
@@ -57,14 +58,16 @@ public class Secured {
           Http.Request childRequest =
               request.withAttrs(request.attrs().put(Security.USERNAME, username));
 
-          String language = "en-" + Utils.getOrg(request).getShortName();
-          if (language.length() > 10) {
-            // For some reason setting the transient language to "en-Fairhaven"
-            // causes mMessagesApi.preferred(request) to raise a NulLPointerException.
-            language = "en";
+          String langCode = "en-" + Utils.getOrg(request).getShortName();
+
+          Lang lang = Lang.forCode(langCode);
+          if (lang == null) {
+            sLogger.debug("original Lang was null");
+            lang = Lang.forCode("en");
           }
 
-          return delegate.call(childRequest.withTransientLang(language));
+          sLogger.debug("User's language is set to code {} Lang locale {}", langCode, lang.toLocale());
+          return delegate.call(childRequest.withTransientLang(lang));
         }
       } catch (RuntimeException e) {
         throw e;
