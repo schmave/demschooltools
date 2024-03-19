@@ -20,7 +20,9 @@ import models.*;
 import org.markdown4j.Markdown4jProcessor;
 import org.mindrot.jbcrypt.BCrypt;
 import org.xhtmlrenderer.pdf.ITextRenderer;
+import play.Logger;
 import play.api.libs.mailer.MailerClient;
+import play.i18n.Messages;
 import play.i18n.MessagesApi;
 import play.libs.Files.TemporaryFile;
 import play.libs.Json;
@@ -395,6 +397,8 @@ public class Application extends Controller {
     return new ArrayList<>(people);
   }
 
+  static Logger.ALogger sLogger = Logger.of("application");
+
   public Result index(Http.Request request) {
     return ok(
         cached_page.render(
@@ -457,6 +461,8 @@ public class Application extends Controller {
                 }
 
                 entries_with_charges.sort(Entry.SORT_NUMBER);
+
+                debugMessages(request);
 
                 return jc_index
                     .render(
@@ -1245,7 +1251,18 @@ public class Application extends Controller {
         multi_meetings.render(meetings, request, mMessagesApi.preferred(request)).toString());
   }
 
+  void debugMessages(Http.Request request) {
+    Messages messages = mMessagesApi.preferred(request);
+    sLogger.debug(
+        "messages lang: {}, one string: {}, transient lang: {}",
+        messages.lang(),
+        messages.at("erase_case_confirmation"),
+        request.transientLang());
+  }
+
   public Result viewWeeklyReport(String date_string, Http.Request request) {
+    debugMessages(request);
+
     Calendar start_date = Utils.parseDateOrNow(date_string);
     Organization org = Utils.getOrg(request);
     Utils.adjustToPreviousDay(start_date, org.getJcResetDay() + 1);

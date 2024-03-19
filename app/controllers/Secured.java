@@ -68,6 +68,7 @@ public class Secured {
 
           sLogger.debug(
               "User's language is set to code {} Lang locale {}", langCode, lang.toLocale());
+
           return delegate.call(childRequest.withTransientLang(lang));
         }
       } catch (RuntimeException e) {
