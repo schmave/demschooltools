@@ -1,13 +1,9 @@
-import django
-
-django.setup()
-
-from manual.models import *
+from manual.models import Chapter, Entry, Organization, Section
 
 
-def main():
-    tosv = Organization.objects.get(short_name='TOSV')
-    old_tos = Organization.objects.get(short_name='TOS')
+def run():
+    tosv = Organization.objects.get(short_name="TOSV")
+    old_tos = Organization.objects.get(short_name="TOS")
 
     old_chapter_to_new = {}
 
@@ -22,8 +18,7 @@ def main():
 
     old_section_to_new = {}
 
-    for section in Section.objects.filter(chapter__organization=old_tos,
-                                          deleted=False):
+    for section in Section.objects.filter(chapter__organization=old_tos, deleted=False):
         if section.chapter_id not in old_chapter_to_new:
             continue
         old_id = section.id
@@ -34,8 +29,9 @@ def main():
 
     print(old_section_to_new)
 
-    for entry in Entry.objects.filter(section__in=old_section_to_new.keys(),
-                                      deleted=False):
+    for entry in Entry.objects.filter(
+        section__in=old_section_to_new.keys(), deleted=False
+    ):
         entry.id = None
         entry.section_id = old_section_to_new[entry.section_id]
         entry.save()
