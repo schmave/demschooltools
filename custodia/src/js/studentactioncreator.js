@@ -33,43 +33,6 @@ var exports = {
       });
     });
   },
-  createStudent: function (name, start_date, email, minutes, is_teacher) {
-    ajax
-      .post("/students", {
-        name: name,
-        email: email,
-        start_date: start_date,
-        minutes: minutes,
-        is_teacher: is_teacher,
-      })
-      .then(
-        function (data) {
-          dispatcher.dispatch({
-            type: constants.studentEvents.ALL_LOADED,
-            data: data.students,
-          });
-          if (data.made) {
-            dispatcher.dispatch({
-              type: constants.systemEvents.FLASH,
-              message: "Successfully created " + data.made.name + ".",
-            });
-            myhistory.replace("studentAdmin");
-          } else {
-            dispatcher.dispatch({
-              type: constants.systemEvents.FLASH,
-              message: "Student " + name + " already exists.",
-              level: "error",
-            });
-          }
-        }.bind(this),
-        function (error) {
-          dispatcher.dispatch({
-            type: constants.systemEvents.FLASH,
-            message: "An error occurred during creation.",
-          });
-        },
-      );
-  },
   makeUser: function (name, password) {
     ajax
       .put("/user", {

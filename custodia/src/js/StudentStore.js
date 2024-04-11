@@ -1,5 +1,4 @@
-var EventEmitter = require("events").EventEmitter,
-  dispatcher = require("./appdispatcher"),
+var dispatcher = require("./appdispatcher"),
   constants = require("./appconstants"),
   base = require("./storebase"),
   actionCreator = require("./studentactioncreator");

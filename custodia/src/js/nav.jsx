@@ -2,7 +2,6 @@ var React = require("react"),
   Router = require("react-router"),
   Link = Router.Link,
   userStore = require("./userstore"),
-  SuperWrapper = require("./superwrapper.jsx"),
   AdminWrapper = require("./adminwrapper.jsx");
 
 module.exports = class Nav extends React.Component {
@@ -39,27 +38,6 @@ module.exports = class Nav extends React.Component {
                   </Link>
                 </li>
               </AdminWrapper>
-              <AdminWrapper>
-                <li>
-                  <Link id="students-link" to="/studentAdmin">
-                    Students
-                  </Link>
-                </li>
-              </AdminWrapper>
-              <AdminWrapper>
-                <li>
-                  <Link id="class-link" to="/classes">
-                    Classes
-                  </Link>{" "}
-                </li>
-              </AdminWrapper>
-              <SuperWrapper>
-                <li>
-                  <Link id="class-link" to="/administration">
-                    Site Admin
-                  </Link>{" "}
-                </li>
-              </SuperWrapper>
             </ul>
             <ul className="nav navbar-nav">
               <li>

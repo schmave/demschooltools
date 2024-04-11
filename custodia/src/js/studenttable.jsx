@@ -1,9 +1,6 @@
 var React = require("react"),
   PropTypes = require("prop-types"),
   Router = require("react-router"),
-  Link = Router.Link,
-  AdminItem = require("./adminwrapper.jsx"),
-  actionCreator = require("./studentactioncreator"),
   myhistory = require("./myhistory.js"),
   SwipeHelpers = require("./swipeHelpers.jsx"),
   studentStore = require("./StudentStore");

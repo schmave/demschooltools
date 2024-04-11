@@ -1,6 +1,4 @@
 var React = require("react"),
-  Router = require("react-router"),
-  AdminItem = require("./adminwrapper.jsx"),
   DateTimePicker = require("react-widgets").DateTimePicker,
   actionCreator = require("./studentactioncreator"),
   userStore = require("./userstore"),

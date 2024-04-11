@@ -1,16 +1,11 @@
 var React = require("react"),
   Heatmap = require("./heatmap.jsx"),
-  userStore = require("./userstore"),
-  AdminItem = require("./adminwrapper.jsx"),
-  Modal = require("./modal.jsx"),
   actionCreator = require("./studentactioncreator"),
   studentStore = require("./StudentStore"),
   Router = require("react-router"),
   Link = Router.Link,
   SwipeHelpers = require("./swipeHelpers.jsx"),
-  StudentEditor = require("./student/studentEditor.jsx"),
-  Swipes = require("./swipeslisting.jsx"),
-  SwipeListing = require("./swipeslisting.jsx");
+  SwipesListing = require("./swipeslisting.jsx");
 
 var groupingFunc = function (data) {
   return data.day.split("-")[0] + "-" + data.day.split("-")[1];
@@ -135,7 +130,7 @@ class Student extends React.Component {
 
   listMonth = (days, show, month) => {
     return days.map(
-      function (day, i) {
+      function (day) {
         var hide = !show ? "hidden" : "";
         var selected = day.day === this.getActiveDay(this.state.student) ? "selected" : "";
         var clsName = hide + " " + selected;
@@ -184,12 +179,6 @@ class Student extends React.Component {
     );
   };
 
-  toggleEdit = () => {
-    if (userStore.isAdmin()) {
-      this.refs.studentEditor.edit(this.state.student);
-    }
-  };
-
   getActiveDay = (student) => {
     if (this.props.params.day) {
       return this.props.params.day;
@@ -231,14 +220,13 @@ class Student extends React.Component {
         requiredMinutes = this.state.student.required_minutes;
       return (
         <div className="row">
-          <StudentEditor ref="studentEditor"></StudentEditor>
           <SwipeHelpers ref="missingSwipeCollector"></SwipeHelpers>
 
           <div className="col-sm-1"></div>
           <div className="col-sm-10">
             <div className="panel panel-info">
               <div className="panel-heading">
-                <div className="row" onClick={this.toggleEdit}>
+                <div className="row">
                   {this.showingStudentName()}
                   <div className="col-sm-4">
                     <div id="hd-attended" className="col-sm-6">
@@ -277,7 +265,7 @@ class Student extends React.Component {
                   </div>
                   <div className="col-sm-2">
                     {activeDate && this.state.student ? (
-                      <Swipes student={this.state.student} day={activeDate} />
+                      <SwipesListing student={this.state.student} day={activeDate} />
                     ) : (
                       ""
                     )}

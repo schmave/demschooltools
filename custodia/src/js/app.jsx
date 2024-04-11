@@ -1,19 +1,15 @@
-var React = require("react"),
-  ReactDOM = require("react-dom"),
-  Router = require("react-router"),
-  Globalize = require("globalize"),
-  globalizeLocalizer = require("react-widgets-globalize"),
-  Nav = require("./nav.jsx"),
-  Flash = require("./flashnotification.jsx"),
-  Student = require("./student.jsx"),
-  StudentAdmin = require("./studentAdmin.jsx"),
-  CreateAClass = require("./createaclass.jsx"),
-  Administration = require("./administration.jsx"),
-  SwipeListing = require("./swipeslisting.jsx"),
-  StudentReports = require("./studentreports.jsx"),
-  Classes = require("./classes.jsx"),
-  StudentTable = require("./studenttable.jsx"),
-  myhistory = require("./myhistory.js");
+import Globalize from "globalize";
+import React, { Component } from "react";
+import { render as _render } from "react-dom";
+import { IndexRoute, Route, Router } from "react-router";
+import globalizeLocalizer from "react-widgets-globalize";
+
+import Flash from "./flashnotification.jsx";
+import myhistory from "./myhistory.js";
+import Nav from "./nav.jsx";
+import Student from "./student.jsx";
+import StudentReports from "./studentreports.jsx";
+import StudentTable from "./studenttable.jsx";
 
 Globalize.load(
   require("cldr-data/main/en/ca-gregorian"),
@@ -26,7 +22,7 @@ Globalize.load(
 Globalize.locale("en");
 globalizeLocalizer();
 
-class App extends React.Component {
+class App extends Component {
   render() {
     return (
       <div>
@@ -38,22 +34,16 @@ class App extends React.Component {
   }
 }
 
-var Route = Router.Route;
-
 var router = (
-  <Router.Router history={myhistory}>
+  <Router history={myhistory}>
     <Route path="/" component={App}>
       <Route path="students" component={StudentTable} />
       <Route path="students/:studentId(/:day)" component={Student} />
-      <Route path="studentAdmin" component={StudentAdmin} />
       <Route path="reports" component={StudentReports} />
-      <Route path="classes" component={Classes} />
-      <Route path="class/new" component={CreateAClass} />
-      <Route path="administration" component={Administration} />
 
-      <Router.IndexRoute component={StudentTable} />
+      <IndexRoute component={StudentTable} />
     </Route>
-  </Router.Router>
+  </Router>
 );
 
-ReactDOM.render(router, document.getElementById("react_container"));
+_render(router, document.getElementById("react_container"));
