@@ -1,5 +1,4 @@
 var React = require("react"),
-  heatmap = require("cal-heatmap"),
   Heatmapmonth = require("./heatmapmonth.jsx");
 
 Array.prototype.concatAll = function () {

@@ -94,12 +94,10 @@
   (GET "/users/is-admin" req
        (resp/response
         {:admin (-> req friend/current-authentication :roles roles/admin)
-         :dstMode (= "true" (env :dst-mode))
          :school (queries/get-current-school)}))
   (GET "/users/is-super" req
        (let [user (users/get-user "super")]
          (resp/response {:super (-> req friend/current-authentication :roles roles/super)
-                         :dstMode (= "true" (env :dst-mode))
                          :school (queries/get-current-school)})))
 
   (GET "/js/gen/:id{.+}/app.js" req
