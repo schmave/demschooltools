@@ -22,15 +22,6 @@ var exports = assign({}, EventEmitter.prototype, {
   getSelectedSchool: function () {
     return currentSchool;
   },
-  setSuperSchool: function (school) {
-    var route = "school/" + school._id;
-    ajax.put(route).then(
-      function () {
-        currentSchool = school;
-        exports.emitChange();
-      }.bind(this),
-    );
-  },
   emitChange: function () {
     this.emit(CHANGE_EVENT);
   },
