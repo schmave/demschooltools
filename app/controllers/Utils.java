@@ -158,7 +158,7 @@ public class Utils {
             nvps.add(new BasicNameValuePair("username", config.org.getShortName()));
             nvps.add(new BasicNameValuePair("password", new_password));
             makeCustodiaPost(
-                httpclient, Public.sConfig.getString("custodia_url") + "/users/password", nvps);
+                httpclient, Public.sConfig.getConfig("school_crm").getString("custodia_url") + "/users/password", nvps);
           } catch (Exception e) {
             e.printStackTrace();
           }
