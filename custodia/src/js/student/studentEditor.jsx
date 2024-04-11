@@ -173,11 +173,7 @@ module.exports = class extends React.Component {
                   Save
                 </i>
               </button>
-              <button
-                id="cancel-name"
-                onClick={this.close}
-                className="btn btn-danger"
-              >
+              <button id="cancel-name" onClick={this.close} className="btn btn-danger">
                 <i className="fa fa-times"> Cancel</i>
               </button>
             </form>

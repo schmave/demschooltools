@@ -36,17 +36,11 @@ class Student extends React.Component {
   }
 
   signIn = () => {
-    this.refs.missingSwipeCollector.validateSignDirection(
-      this.state.student,
-      "in",
-    );
+    this.refs.missingSwipeCollector.validateSignDirection(this.state.student, "in");
   };
 
   signOut = () => {
-    this.refs.missingSwipeCollector.validateSignDirection(
-      this.state.student,
-      "out",
-    );
+    this.refs.missingSwipeCollector.validateSignDirection(this.state.student, "out");
   };
 
   markAbsent = () => {
@@ -60,10 +54,7 @@ class Student extends React.Component {
   getActionButtons = () => {
     var buttons = [];
 
-    if (
-      !this.studentInToday() ||
-      this.state.student.last_swipe_type === "out"
-    ) {
+    if (!this.studentInToday() || this.state.student.last_swipe_type === "out") {
       buttons.push(
         <button
           key="sign-in"
@@ -146,8 +137,7 @@ class Student extends React.Component {
     return days.map(
       function (day, i) {
         var hide = !show ? "hidden" : "";
-        var selected =
-          day.day === this.getActiveDay(this.state.student) ? "selected" : "";
+        var selected = day.day === this.getActiveDay(this.state.student) ? "selected" : "";
         var clsName = hide + " " + selected;
         return (
           <tr key={month + day.day} className={clsName}>
@@ -183,19 +173,12 @@ class Student extends React.Component {
             : "glyphicon glyphicon-chevron-right";
         return [
           <tr key={month} style={{ fontWeight: "bold" }}>
-            <td
-              onClick={this.toggleMonth.bind(this, month)}
-              style={{ fontWeight: "bold" }}
-            >
+            <td onClick={this.toggleMonth.bind(this, month)} style={{ fontWeight: "bold" }}>
               <span className={cls} style={{ paddingRight: "3px" }}></span>
               {month}
             </td>
           </tr>,
-          this.listMonth(
-            groupedDays[month],
-            this.state.selectedMonth == month,
-            month,
-          ),
+          this.listMonth(groupedDays[month], this.state.selectedMonth == month, month),
         ];
       }.bind(this),
     );
@@ -231,9 +214,7 @@ class Student extends React.Component {
         </span>
 
         <h2 className="badge badge-red">
-          {!this.studentInToday() && this.state.student.absent_today
-            ? "Absent"
-            : ""}
+          {!this.studentInToday() && this.state.student.absent_today ? "Absent" : ""}
         </h2>
       </div>
     );
@@ -243,9 +224,7 @@ class Student extends React.Component {
     if (this.state.student) {
       var activeDate = this.getActiveDay(this.state.student);
       var attended =
-          (
-            this.state.student.total_days + this.state.student.total_short
-          ).toString() +
+          (this.state.student.total_days + this.state.student.total_short).toString() +
           " (" +
           this.state.student.total_short +
           ")",
@@ -284,10 +263,7 @@ class Student extends React.Component {
                 <div className="row">
                   <div className="col-sm-7">
                     <div className="row">{this.getActionButtons()}</div>
-                    <Heatmap
-                      days={this.state.student.days}
-                      requiredMinutes={requiredMinutes}
-                    />
+                    <Heatmap days={this.state.student.days} requiredMinutes={requiredMinutes} />
                   </div>
                   <div className="col-sm-2">
                     <table className="table table-striped center">

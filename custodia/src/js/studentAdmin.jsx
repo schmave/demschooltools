@@ -35,11 +35,7 @@ class StudentAdmin extends React.Component {
   filterStudents = (s) => {
     return s.filter(
       function (s) {
-        return (
-          s.name
-            .toLocaleLowerCase()
-            .indexOf(this.state.filterText.toLocaleLowerCase()) > -1
-        );
+        return s.name.toLocaleLowerCase().indexOf(this.state.filterText.toLocaleLowerCase()) > -1;
       }.bind(this),
     );
   };
@@ -78,11 +74,7 @@ class StudentAdmin extends React.Component {
 
   render() {
     var createStudentLink = (
-      <span
-        onClick={this.toggleEdit}
-        className="btn btn-primary btn"
-        id="create-student"
-      >
+      <span onClick={this.toggleEdit} className="btn btn-primary btn" id="create-student">
         Add Student
       </span>
     );

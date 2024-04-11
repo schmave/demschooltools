@@ -32,9 +32,7 @@ class SwipesListing extends React.Component {
   swipesAreEmpty = (swipes) => {
     return (
       swipes.length === 0 ||
-      (swipes.length === 1 &&
-        swipes[0].in_time === null &&
-        swipes[0].out_time === null)
+      (swipes.length === 1 && swipes[0].in_time === null && swipes[0].out_time === null)
     );
   };
 
@@ -79,9 +77,7 @@ class SwipesListing extends React.Component {
   state = { day: this.getCurrentDay(this.props.student, this.props.day) };
 
   render() {
-    this.state.day.round_mins = parseFloat(this.state.day.total_mins).toFixed(
-      0,
-    );
+    this.state.day.round_mins = parseFloat(this.state.day.total_mins).toFixed(0);
     var showOverrideExcuseButtons =
       this.state.day &&
       !this.state.day.override &&
@@ -111,11 +107,7 @@ class SwipesListing extends React.Component {
               >
                 Override
               </button>
-              <button
-                type="button"
-                onClick={this.excuse}
-                className="btn btn-sm btn-info"
-              >
+              <button type="button" onClick={this.excuse} className="btn btn-sm btn-info">
                 Excuse
               </button>
             </div>

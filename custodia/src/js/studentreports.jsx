@@ -88,9 +88,7 @@ class StudentReports extends React.Component {
       selectedClass = classes.filter((cls) => cls.active == true)[0];
     }
     state.selectedClass = selectedClass || {};
-    state.selectedClassId = state.selectedClass
-      ? state.selectedClass._id
-      : null;
+    state.selectedClassId = state.selectedClass ? state.selectedClass._id : null;
     state.classes = classes;
     this.setState(state);
     this.fetchReport(state.selectedClassId, state.currentYear);
@@ -101,10 +99,7 @@ class StudentReports extends React.Component {
     var state = this.state,
       years = reportStore.getSchoolYears(),
       yearExists = years.years.indexOf(state.currentYear) !== -1,
-      currentYear =
-        yearExists && state.currentYear
-          ? state.currentYear
-          : years.current_year;
+      currentYear = yearExists && state.currentYear ? state.currentYear : years.current_year;
 
     state.years = years;
     state.currentYear = currentYear;
@@ -148,14 +143,7 @@ class StudentReports extends React.Component {
   };
 
   dateToString = (value) => {
-    return (
-      value.getYear() +
-      1900 +
-      "-" +
-      (value.getMonth() + 1) +
-      "-" +
-      value.getDate()
-    );
+    return value.getYear() + 1900 + "-" + (value.getMonth() + 1) + "-" + value.getDate();
   };
 
   onStartDateChange = (value) => {
@@ -176,15 +164,7 @@ class StudentReports extends React.Component {
           id="test"
           results={this.state.rows}
           resultsPerPage="200"
-          columns={[
-            "name",
-            "good",
-            "overrides",
-            "unexcused",
-            "excuses",
-            "short",
-            "total_hours",
-          ]}
+          columns={["name", "good", "overrides", "unexcused", "excuses", "short", "total_hours"]}
           columnMetadata={[
             {
               displayName: "Name",
@@ -230,20 +210,14 @@ class StudentReports extends React.Component {
                 )
               : ""}
           </select>
-          <select
-            className="pull-left"
-            onChange={this.yearSelected}
-            value={this.state.currentYear}
-          >
+          <select className="pull-left" onChange={this.yearSelected} value={this.state.currentYear}>
             {this.state.years
               ? this.state.years.years.map(
                   function (year) {
                     return (
                       <option key={year} value={year}>
                         {" "}
-                        {year === this.state.years.current_year
-                          ? year + " (Current)"
-                          : year}
+                        {year === this.state.years.current_year ? year + " (Current)" : year}
                       </option>
                     );
                   }.bind(this),
@@ -268,23 +242,12 @@ class StudentReports extends React.Component {
           <form className="form-inline">
             <div className="form-group">
               <label htmlFor="startDate">Start:</label>
-              <DateTimePicker
-                id="startDate"
-                onChange={this.onStartDateChange}
-                time={false}
-              />
+              <DateTimePicker id="startDate" onChange={this.onStartDateChange} time={false} />
               <label htmlFor="endDate">End:</label>
-              <DateTimePicker
-                id="endDate"
-                onChange={this.onEndDateChange}
-                time={false}
-              />
+              <DateTimePicker id="endDate" onChange={this.onEndDateChange} time={false} />
             </div>
             <div className="form-group" style={{ marginLeft: "2em" }}>
-              <button
-                className="btn btn-sm btn-primary"
-                onClick={this.createPeriod}
-              >
+              <button className="btn btn-sm btn-primary" onClick={this.createPeriod}>
                 Create Period
               </button>
             </div>

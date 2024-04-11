@@ -72,14 +72,12 @@ var exports = {
     });
   },
   addStudentToClass: function (studentId, classId) {
-    ajax
-      .post("/classes/" + classId + "/student/" + studentId + "/add", {})
-      .then(function (data) {
-        dispatcher.dispatch({
-          type: constants.classEvents.CLASS_STUDENT_ADDED,
-          data: data,
-        });
+    ajax.post("/classes/" + classId + "/student/" + studentId + "/add", {}).then(function (data) {
+      dispatcher.dispatch({
+        type: constants.classEvents.CLASS_STUDENT_ADDED,
+        data: data,
       });
+    });
   },
 };
 

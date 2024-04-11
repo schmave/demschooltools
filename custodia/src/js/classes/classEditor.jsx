@@ -1,14 +1,12 @@
-var React = require("react"),
-  ReactDOM = require("react-dom"),
-  Router = require("react-router"),
-  AdminItem = require("../adminwrapper.jsx"),
-  dispatcher = require("../appdispatcher"),
-  constants = require("../appconstants"),
-  DateTimePicker = require("react-widgets").DateTimePicker,
-  actionCreator = require("../classactioncreator"),
-  Modal = require("../modal.jsx");
+import React, { Component } from "react";
+import { findDOMNode } from "react-dom";
 
-module.exports = class extends React.Component {
+import { classEvents } from "../appconstants";
+import dispatcher from "../appdispatcher";
+import { createClass } from "../classactioncreator";
+import Modal from "../modal.jsx";
+
+export default class extends Component {
   static displayName = "ClassEditor";
 
   constructor(props, context) {
@@ -16,7 +14,7 @@ module.exports = class extends React.Component {
     var that = this;
     dispatcher.register(function (action) {
       if (
-        action.type == constants.classEvents.CLASS_CREATED
+        action.type == classEvents.CLASS_CREATED
         //     || action.type == constants.classEvents.ALL_LOADED
       ) {
         that.savingHide();
@@ -40,12 +38,12 @@ module.exports = class extends React.Component {
 
   saveChange = () => {
     this.savingShow();
-    actionCreator.createClass(
+    createClass(
       this.state.selectedClass._id,
-      ReactDOM.findDOMNode(this.refs.name).value,
+      findDOMNode(this.refs.name).value,
       null,
       null,
-      ReactDOM.findDOMNode(this.refs.required_minutes).value,
+      findDOMNode(this.refs.required_minutes).value,
       "10:30:00",
       // ReactDOM.findDOMNode(this.refs.late_time).value
     );
@@ -95,9 +93,7 @@ module.exports = class extends React.Component {
                   value={this.state.selectedClass.name}
                 />
                 <div>
-                  <label htmlFor="required_minutes">
-                    Default Required Minutes:
-                  </label>
+                  <label htmlFor="required_minutes">Default Required Minutes:</label>
                   <div>
                     <input
                       type="number"
@@ -134,11 +130,7 @@ module.exports = class extends React.Component {
                   Save
                 </i>
               </button>
-              <button
-                id="cancel-name"
-                onClick={this.close}
-                className="btn btn-danger"
-              >
+              <button id="cancel-name" onClick={this.close} className="btn btn-danger">
                 <i className="fa fa-times"> Cancel</i>
               </button>
             </form>
@@ -153,4 +145,4 @@ module.exports = class extends React.Component {
       this.refs.classEditor.hide();
     }
   };
-};
+}

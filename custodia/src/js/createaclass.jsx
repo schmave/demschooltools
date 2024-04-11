@@ -18,12 +18,7 @@ class CreateAClass extends React.Component {
               <form>
                 <div className="form-group">
                   <label htmlFor="Class">Name</label>
-                  <input
-                    ref="name"
-                    className="form-control"
-                    id="Class"
-                    placeholder="Name"
-                  />
+                  <input ref="name" className="form-control" id="Class" placeholder="Name" />
                 </div>
                 <div className="form-group">
                   <button

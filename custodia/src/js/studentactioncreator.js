@@ -162,14 +162,12 @@ var exports = {
     );
   },
   deleteSwipe: function (swipe, student) {
-    ajax
-      .post("/students/" + student._id + "/swipe/delete", { swipe: swipe })
-      .then(function (data) {
-        dispatcher.dispatch({
-          type: constants.studentEvents.STUDENT_LOADED,
-          data: data.student,
-        });
+    ajax.post("/students/" + student._id + "/swipe/delete", { swipe: swipe }).then(function (data) {
+      dispatcher.dispatch({
+        type: constants.studentEvents.STUDENT_LOADED,
+        data: data.student,
       });
+    });
   },
   excuse: function (studentId, day) {
     ajax.post("students/" + studentId + "/excuse", { day: day }).then(

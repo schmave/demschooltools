@@ -31,14 +31,8 @@ module.exports = class extends React.Component {
 
   render() {
     return (
-      <Skylight
-        ref="modal"
-        dialogStyles={{ height: "450px", backgroundColor: "", boxShadow: "" }}
-      >
-        <div
-          className="inner-large-content panel panel-primary"
-          style={{ height: "100%" }}
-        >
+      <Skylight ref="modal" dialogStyles={{ height: "450px", backgroundColor: "", boxShadow: "" }}>
+        <div className="inner-large-content panel panel-primary" style={{ height: "100%" }}>
           <div className="panel-heading">{this.props.title}</div>
           <div className="panel-body">{this.props.children}</div>
         </div>

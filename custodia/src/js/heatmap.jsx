@@ -44,12 +44,7 @@ module.exports = class extends React.Component {
 
   makeHeatmapRow = (dates, minutes, key) => {
     return (
-      <Heatmapmonth
-        key={key}
-        index={key}
-        requiredMinutes={minutes}
-        days={dates}
-      ></Heatmapmonth>
+      <Heatmapmonth key={key} index={key} requiredMinutes={minutes} days={dates}></Heatmapmonth>
     );
   };
 

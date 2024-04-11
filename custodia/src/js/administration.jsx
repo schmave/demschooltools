@@ -134,10 +134,7 @@ class Administration extends React.Component {
                       className="btn btn-default"
                       aria-label="Left Align"
                     >
-                      <span
-                        className="glyphicon glyphicon-save"
-                        aria-hidden="true"
-                      ></span>
+                      <span className="glyphicon glyphicon-save" aria-hidden="true"></span>
                       Create
                     </button>
                   </div>

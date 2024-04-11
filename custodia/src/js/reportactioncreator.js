@@ -30,37 +30,29 @@ var exports = {
       });
   },
   createPeriod: function (start, end) {
-    ajax
-      .post("/reports/years", { from_date: start, to_date: end })
-      .then(function (data) {
-        var period = data.made.name.split(" ");
-        dispatcher.dispatch({
-          type: constants.systemEvents.FLASH,
-          message:
-            "Successfully created period from " +
-            period[0] +
-            " to " +
-            period[1],
-        });
-        dispatcher.dispatch({
-          type: constants.reportEvents.PERIOD_CREATED,
-          data: data,
-        });
+    ajax.post("/reports/years", { from_date: start, to_date: end }).then(function (data) {
+      var period = data.made.name.split(" ");
+      dispatcher.dispatch({
+        type: constants.systemEvents.FLASH,
+        message: "Successfully created period from " + period[0] + " to " + period[1],
       });
+      dispatcher.dispatch({
+        type: constants.reportEvents.PERIOD_CREATED,
+        data: data,
+      });
+    });
   },
   deletePeriod: function (period) {
-    ajax
-      .delete("/reports/years/" + encodeURIComponent(period))
-      .then(function (data) {
-        dispatcher.dispatch({
-          type: constants.systemEvents.FLASH,
-          message: "Deleted period " + period,
-        });
-        dispatcher.dispatch({
-          type: constants.reportEvents.PERIOD_DELETED,
-          data: data,
-        });
+    ajax.delete("/reports/years/" + encodeURIComponent(period)).then(function (data) {
+      dispatcher.dispatch({
+        type: constants.systemEvents.FLASH,
+        message: "Deleted period " + period,
       });
+      dispatcher.dispatch({
+        type: constants.reportEvents.PERIOD_DELETED,
+        data: data,
+      });
+    });
   },
 };
 

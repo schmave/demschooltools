@@ -31,10 +31,7 @@ class HeatmapMonth extends React.Component {
 
   loadHeatmap = () => {
     var data = this.formatDays(this.props.days, this.props.requiredMinutes);
-    var highlight = this.getHighlights(
-      this.props.days,
-      this.props.requiredMinutes,
-    );
+    var highlight = this.getHighlights(this.props.days, this.props.requiredMinutes);
     if (this.map) {
       this.map = this.map.destroy();
     }
@@ -46,11 +43,7 @@ class HeatmapMonth extends React.Component {
       },
       makeDateId = function (d) {
         var datestring =
-          d.getFullYear() +
-          "-" +
-          padNumber(d.getMonth() + 1) +
-          "-" +
-          padNumber(d.getDate());
+          d.getFullYear() + "-" + padNumber(d.getMonth() + 1) + "-" + padNumber(d.getDate());
 
         return "#day-" + datestring;
       };
@@ -83,11 +76,7 @@ class HeatmapMonth extends React.Component {
 
   render() {
     return (
-      <div
-        id={"heatmap" + this.props.index}
-        className="col-sm-4"
-        style={{ float: "none" }}
-      ></div>
+      <div id={"heatmap" + this.props.index} className="col-sm-4" style={{ float: "none" }}></div>
     );
   }
 

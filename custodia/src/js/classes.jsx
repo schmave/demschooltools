@@ -7,7 +7,7 @@ var React = require("react"),
   Link = Router.Link,
   AdminWrapper = require("./adminwrapper.jsx"),
   studentStore = require("./StudentStore"),
-  ClassEditor = require("./classes/classEditor.jsx"),
+  ClassEditor = require("./classes/classEditor.jsx").default,
   FilterBox = require("./filterbox.jsx");
 
 module.exports = class Classes extends React.Component {
@@ -71,8 +71,7 @@ module.exports = class Classes extends React.Component {
     return this.state.classes.map(
       function (classval, i) {
         var boundClick = this.classSelected.bind(this, classval),
-          selected =
-            classval._id === this.state.selectedClass._id ? "selected" : "";
+          selected = classval._id === this.state.selectedClass._id ? "selected" : "";
 
         var bnp = this.makeActivateClassButtonAndPanel(classval);
         var activeTag = bnp.panel;
@@ -82,12 +81,7 @@ module.exports = class Classes extends React.Component {
          *     activeTag = <span className="pull-right margined badge badge-green">Active</span>;
          * }*/
         return (
-          <tr
-            key={classval._id}
-            id={classval.name}
-            onClick={boundClick}
-            className={selected}
-          >
+          <tr key={classval._id} id={classval.name} onClick={boundClick} className={selected}>
             <td>
               <span className="pull-left">{classval.name}</span>
               {button}
@@ -105,10 +99,7 @@ module.exports = class Classes extends React.Component {
   };
 
   deleteFromClass = (student) => {
-    actionCreator.deleteStudentFromClass(
-      student.student_id,
-      this.state.selectedClass._id,
-    );
+    actionCreator.deleteStudentFromClass(student.student_id, this.state.selectedClass._id);
   };
 
   addToClass = (student) => {
@@ -122,11 +113,7 @@ module.exports = class Classes extends React.Component {
   filterStudents = (s) => {
     return s.filter(
       function (s) {
-        return (
-          s.name
-            .toLocaleLowerCase()
-            .indexOf(this.state.filterText.toLocaleLowerCase()) > -1
-        );
+        return s.name.toLocaleLowerCase().indexOf(this.state.filterText.toLocaleLowerCase()) > -1;
       }.bind(this),
     );
   };
@@ -211,9 +198,7 @@ module.exports = class Classes extends React.Component {
     var activeClassPanel = "panel-danger";
 
     if (selectedClass.active) {
-      activateClassButton = (
-        <span className=" margined badge badge-green pull-right">Active</span>
-      );
+      activateClassButton = <span className=" margined badge badge-green pull-right">Active</span>;
       activeClassPanel = "panel-success";
     } else {
       activateClassButton = (
@@ -235,10 +220,7 @@ module.exports = class Classes extends React.Component {
 
   render() {
     var createClassLink = (
-      <button
-        className="btn btn-primary btn-sm"
-        onClick={this.toggleEdit.bind(this, null)}
-      >
+      <button className="btn btn-primary btn-sm" onClick={this.toggleEdit.bind(this, null)}>
         Add new
       </button>
     );
@@ -249,9 +231,7 @@ module.exports = class Classes extends React.Component {
       createClassLink = null;
     }
 
-    var panel = this.makeActivateClassButtonAndPanel(
-      this.state.selectedClass,
-    ).panel;
+    var panel = this.makeActivateClassButtonAndPanel(this.state.selectedClass).panel;
 
     return (
       <div>

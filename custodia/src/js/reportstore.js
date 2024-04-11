@@ -22,10 +22,7 @@ exports.getReport = function (year, classId) {
   if (!year || !classId) return null;
   if (reports[year + classId]) {
     return reports[year + classId];
-  } else if (
-    !reports[year + classId] ||
-    reports[year + classId] === "loading"
-  ) {
+  } else if (!reports[year + classId] || reports[year + classId] === "loading") {
     reports[year + classId] = "loading";
     actionCreator.loadReport(year, classId);
   }

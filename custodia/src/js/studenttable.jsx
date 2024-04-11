@@ -44,8 +44,7 @@ module.exports = class extends React.Component {
     }
     var iclassName = "fa " + buttonIcon + " sign-" + student._id;
     var is_teacher_class = student.is_teacher ? " is_teacher" : "";
-    var button_class =
-      "btn-default name-button" + (student.swiped_today_late ? " late" : "");
+    var button_class = "btn-default name-button" + (student.swiped_today_late ? " late" : "");
     var sign_function = this.isSigningIn(student) ? this.signIn : this.signOut;
     if (way === "out") {
       return (
@@ -87,22 +86,14 @@ module.exports = class extends React.Component {
 
     if (way !== "out") {
       return (
-        <div
-          key={student._id}
-          className="btn-group student-listing col-sm-11"
-          role={"group"}
-        >
+        <div key={student._id} className="btn-group student-listing col-sm-11" role={"group"}>
           {calendar_button}
           {button}
         </div>
       );
     } else {
       return (
-        <div
-          key={student._id}
-          className="btn-group student-listing col-sm-11"
-          role={"group"}
-        >
+        <div key={student._id} className="btn-group student-listing col-sm-11" role={"group"}>
           {button}
           {calendar_button}
         </div>
