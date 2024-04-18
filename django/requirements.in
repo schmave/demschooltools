@@ -1,0 +1,6 @@
+django<4
+djangorestframework
+django-extensions
+ipython
+psycopg2
+tabulate

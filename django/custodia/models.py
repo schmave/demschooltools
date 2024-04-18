@@ -7,7 +7,7 @@ class Student(models.Model):
 
     id = models.IntegerField(db_column="_id", primary_key=True)
     person = models.ForeignKey(
-        "manual.Person", db_column="dst_id", on_delete=models.PROTECT
+        "dst.Person", db_column="dst_id", on_delete=models.PROTECT
     )
 
 
@@ -15,5 +15,6 @@ class Swipe(models.Model):
     class Meta:
         db_table = "swipes"
 
+    id = models.IntegerField(db_column="_id", primary_key=True)
     student = models.ForeignKey(Student, on_delete=models.PROTECT)
     swipe_day = models.DateField()

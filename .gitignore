@@ -34,3 +34,6 @@ __pycache__/
 # Clojure VS Code plugin stuff
 /.clj-kondo
 /.lsp
+
+# Mac stuff
+.DS_Store

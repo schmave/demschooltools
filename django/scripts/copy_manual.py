@@ -1,4 +1,4 @@
-from manual.models import Chapter, Entry, Organization, Section
+from dst.models import Chapter, Entry, Organization, Section
 
 
 def run():
