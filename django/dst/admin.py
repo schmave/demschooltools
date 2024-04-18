@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from dst.models import (
     AttendanceDay,
     Chapter,

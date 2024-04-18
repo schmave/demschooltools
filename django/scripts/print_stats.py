@@ -1,5 +1,9 @@
 from datetime import datetime
 
+from django.db.models import Q
+from tabulate import tabulate
+
+from custodia.models import Swipe
 from dst.models import (
     AttendanceDay,
     CompletedTask,
@@ -9,10 +13,6 @@ from dst.models import (
     Person,
     PersonTagChange,
 )
-from tabulate import tabulate
-
-from custodia.models import Swipe
-from django.db.models import Q
 
 
 def run(year_string: str):
