@@ -2,6 +2,17 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
+class School(models.Model):
+    class Meta:
+        db_table = "schools"
+
+    id = models.IntegerField(db_column="_id", primary_key=True)
+    name = models.TextField()
+    timezone = models.TextField()
+    inserted_date = models.DateTimeField()
+    use_display_name = models.BooleanField()
+
+
 class CustodiaUser(AbstractUser):
     """
     Changes from the overseer.users table currently being used in production:
@@ -22,6 +33,8 @@ class CustodiaUser(AbstractUser):
     class Meta:
         db_table = 'overseer"."users'
 
+    school = models.ForeignKey(School, on_delete=models.PROTECT)
+
 
 class Student(models.Model):
     class Meta:
@@ -31,6 +44,8 @@ class Student(models.Model):
     person = models.ForeignKey(
         "dst.Person", db_column="dst_id", on_delete=models.PROTECT
     )
+    is_teacher = models.BooleanField()
+    name = models.TextField()
 
 
 class Swipe(models.Model):

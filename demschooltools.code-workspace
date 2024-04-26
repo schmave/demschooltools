@@ -39,6 +39,10 @@
       {
         "name": "django",
         "depth": 4
+      },
+      {
+        "name": "rest_framework",
+        "depth": 4
       }
     ],
     "python.analysis.extraPaths": ["./django"],
