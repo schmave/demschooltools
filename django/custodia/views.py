@@ -24,10 +24,11 @@ class LoginView(View):
         return render(request, "login.html")
 
     def post(self, request):
-        username = request.POST["username"]
-        password = request.POST["password"]
-        user = authenticate(request, username=username, password=password)
-        print("user", user, username, password)
+        user = authenticate(
+            request,
+            username=request.POST["username"],
+            password=request.POST["password"],
+        )
         if user is not None:
             login(request, user)
             return redirect("/")
