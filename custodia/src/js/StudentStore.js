@@ -1,12 +1,12 @@
-var dispatcher = require("./appdispatcher"),
-  constants = require("./appconstants"),
-  base = require("./storebase"),
-  actionCreator = require("./studentactioncreator");
+const dispatcher = require("./appdispatcher");
+const constants = require("./appconstants");
+const base = require("./storebase");
+const actionCreator = require("./studentactioncreator");
 
-var students, today, allStudents;
-var studentDetails = {};
+let students, today, allStudents;
+const studentDetails = {};
 
-var exports = Object.create(base);
+const exports = Object.create(base);
 
 exports.getStudents = function (force) {
   if (!force && students) {

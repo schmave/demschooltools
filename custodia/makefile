@@ -52,4 +52,5 @@ js :
 	./node_modules/.bin/browserify $(BABEL_CMD) ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
 
 watch :
-	./node_modules/.bin/watchify -v $(BABEL_CMD) ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
+	./node_modules/.bin/watchify -v $(BABEL_CMD) ./src/js/app.jsx -o ../django/static/js/gen/app.js --debug
+	# ./node_modules/.bin/watchify -v $(BABEL_CMD) ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
