@@ -42,6 +42,10 @@ INSTALLED_APPS = [
     "django_extensions",
 ]
 
+AUTH_USER_MODEL = "custodia.CustodiaUser"
+LOGIN_URL = "/users/login"
+
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -144,7 +148,6 @@ STATIC_URL = "/static/"
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
-LOGIN_URL = "/static/login.html"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

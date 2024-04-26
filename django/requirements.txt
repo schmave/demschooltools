@@ -4,6 +4,7 @@ asgiref==3.8.1
     # via django
 asttokens==2.4.1
     # via stack-data
+bcrypt==4.1.2
 decorator==5.1.1
     # via ipython
 django==3.2.25
@@ -14,7 +15,7 @@ django-extensions==3.2.3
 djangorestframework==3.15.1
 executing==2.0.1
     # via stack-data
-ipython==8.23.0
+ipython==8.24.0
 jedi==0.19.1
     # via ipython
 matplotlib-inline==0.1.7
@@ -41,7 +42,7 @@ sqlparse==0.5.0
 stack-data==0.6.3
     # via ipython
 tabulate==0.9.0
-traitlets==5.14.2
+traitlets==5.14.3
     # via
     #   ipython
     #   matplotlib-inline

@@ -73,6 +73,7 @@
             </div>
             <div class="panel-body">
               <form method="POST" action="/users/login">
+                {% csrf_token %}
                 <div class="form-group">
                   <label for="username" class="control-label">Username</label>
                   <div class="">

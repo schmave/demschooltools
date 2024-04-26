@@ -1,3 +1,4 @@
+bcrypt # Used to support old bcrypt passwords from overseer
 django<4
 djangorestframework
 django-extensions
