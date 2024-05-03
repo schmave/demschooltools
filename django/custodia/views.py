@@ -1,4 +1,3 @@
-import json
 from datetime import datetime
 
 import pytz
@@ -7,8 +6,10 @@ from django.contrib.auth.views import redirect_to_login
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.views import View
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from custodia.models import School, Student
+from custodia.models import School, Student, Swipe
 
 
 class IndexView(View):
@@ -36,6 +37,54 @@ class LoginView(View):
         return redirect_to_login("")
 
 
+def student_to_dict(student: Student, last_swipe: Swipe | None, local_now: datetime):
+    return {
+        "_id": student.id,
+        "name": student.name,
+        "last_swipe_type": "in"
+        if last_swipe and last_swipe.out_time is None
+        else "out",
+        # TODO
+        "swiped_today_late": False,
+        "is_teacher": student.is_teacher,
+        "in_today": last_swipe and last_swipe.swipe_day == local_now.date(),
+        # TODO
+        "late_time": None,
+        # TODO
+        "show_as_absent": False,
+        # TODO
+        "absent_today": False,
+        "last_swipe_date": last_swipe and last_swipe.swipe_day.strftime("%Y-%m-%d"),
+    }
+
+
+class SwipeView(APIView):
+    def post(self, request, student_id=None):
+        student = Student.objects.get(id=student_id)
+
+        direction = request.data["direction"]
+
+        school: School = request.user.school
+        local_now = datetime.now(pytz.timezone(school.timezone))
+
+        if direction == "in":
+            swipe = Swipe.objects.create(
+                student=student,
+                swipe_day=local_now.date(),
+                in_time=datetime.utcnow(),
+            )
+        elif direction == "out":
+            swipe = Swipe.objects.get(
+                student=student, swipe_day=local_now.date(), out_time=None
+            )
+            swipe.out_time = datetime.utcnow()
+            swipe.save()
+        else:
+            assert False, "invalid direction"
+
+        return Response(student_to_dict(student, swipe, local_now))
+
+
 class LogoutView(View):
     def get(self, request):
         if request.user.is_authenticated:
@@ -43,26 +92,24 @@ class LogoutView(View):
         return redirect("/")
 
 
-class IsAdminView(View):
+class IsAdminView(APIView):
     def get(self, request):
         school: School = request.user.school
-        return HttpResponse(
-            json.dumps(
-                {
-                    "admin": None,  #  "overseer.roles/admin" if admin
-                    "school": {
-                        "_id": school.id,
-                        "name": school.name,
-                        "timezone": school.timezone,
-                        "use_display_name": school.use_display_name,
-                    },
-                }
-            ),
-            content_type="application/json",
+        return Response(
+            {
+                # TODO: "overseer.roles/admin" if admin
+                "admin": None,
+                "school": {
+                    "_id": school.id,
+                    "name": school.name,
+                    "timezone": school.timezone,
+                    "use_display_name": school.use_display_name,
+                },
+            }
         )
 
 
-class StudentsView(View):
+class StudentsView(APIView):
     def get(self, request):
         school = request.user.school
         tz = pytz.timezone(school.timezone)
@@ -71,29 +118,12 @@ class StudentsView(View):
         student_infos = []
 
         for student in Student.objects.filter(person__tags__show_in_attendance=True):
-            student_infos.append(
-                {
-                    "archived": False,
-                    "_id": student.id,
-                    "name": student.name,
-                    "last_swipe_type": "out",
-                    "swiped_today_late": False,
-                    "is_teacher": student.is_teacher,
-                    "in_today": False,
-                    "swiped_today": False,
-                    "late_time": None,
-                    "show_as_absent": False,
-                    "absent_today": False,
-                    "last_swipe_date": None,  # "2024-04-11",
-                }
-            )
+            last_swipe = Swipe.objects.filter(student=student).order_by("-id").first()
+            student_infos.append(student_to_dict(student, last_swipe, now))
 
-        return HttpResponse(
-            json.dumps(
-                {
-                    "today": now.strftime("%Y-%m-%d"),
-                    "students": student_infos,
-                }
-            ),
-            content_type="application/json",
+        return Response(
+            {
+                "today": now.strftime("%Y-%m-%d"),
+                "students": student_infos,
+            }
         )

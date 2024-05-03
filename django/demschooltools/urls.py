@@ -17,7 +17,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from custodia.views import IndexView, IsAdminView, LoginView, LogoutView, StudentsView
+from custodia.views import (
+    IndexView,
+    IsAdminView,
+    LoginView,
+    LogoutView,
+    StudentsView,
+    SwipeView,
+)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -26,4 +33,5 @@ urlpatterns = [
     path("users/logout", LogoutView.as_view()),
     path("users/is-admin", IsAdminView.as_view()),
     path("students", StudentsView.as_view()),
+    path("students/<int:student_id>/swipe", SwipeView.as_view()),
 ]

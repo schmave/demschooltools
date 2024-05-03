@@ -6,7 +6,7 @@ class School(models.Model):
     class Meta:
         db_table = "schools"
 
-    id = models.IntegerField(db_column="_id", primary_key=True)
+    id = models.AutoField(db_column="_id", primary_key=True)
     name = models.TextField()
     timezone = models.TextField()
     inserted_date = models.DateTimeField()
@@ -40,7 +40,7 @@ class Student(models.Model):
     class Meta:
         db_table = "students"
 
-    id = models.IntegerField(db_column="_id", primary_key=True)
+    id = models.AutoField(db_column="_id", primary_key=True)
     person = models.ForeignKey(
         "dst.Person", db_column="dst_id", on_delete=models.PROTECT
     )
@@ -49,9 +49,20 @@ class Student(models.Model):
 
 
 class Swipe(models.Model):
+    """
+    Changes from the overseer.users table currently being used in production:
+
+    * all time fields currently use a time zone. migrate the DB to use UTC instead
+    * drop rounded_in_time and rounded_out_time columns
+    """
+
     class Meta:
         db_table = "swipes"
 
-    id = models.IntegerField(db_column="_id", primary_key=True)
+    id = models.AutoField(db_column="_id", primary_key=True)
     student = models.ForeignKey(Student, on_delete=models.PROTECT)
     swipe_day = models.DateField()
+
+    in_time = models.DateTimeField()
+    out_time = models.DateTimeField()
+    intervalmin = models.IntegerField()

@@ -42,11 +42,13 @@
       },
       {
         "name": "rest_framework",
-        "depth": 4
+        "depth": 4,
+        "includeAllSymbols": true
       }
     ],
     "python.analysis.extraPaths": ["./django"],
     "python.autoComplete.extraPaths": ["./django"],
-    "python.defaultInterpreterPath": "./django/.venv/bin/python"
+    "python.defaultInterpreterPath": "./django/.venv/bin/python",
+    "python.analysis.typeCheckingMode": "standard"
   }
 }
