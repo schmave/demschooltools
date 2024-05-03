@@ -3,7 +3,7 @@ const constants = require("./appconstants");
 const base = require("./storebase");
 const actionCreator = require("./studentactioncreator");
 
-let students, today, allStudents;
+let students, today;
 const studentDetails = {};
 
 const exports = Object.create(base);
@@ -32,10 +32,6 @@ exports.getStudent = function (id, force) {
 
 dispatcher.register(function (action) {
   switch (action.type) {
-    case constants.studentEvents.ALL_LOADED:
-      allStudents = action.data;
-      exports.emitChange();
-      break;
     case constants.studentEvents.LOADED:
       students = action.data.students;
       today = action.data.today;
