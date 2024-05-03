@@ -34,6 +34,7 @@ class CustodiaUser(AbstractUser):
         db_table = 'overseer"."users'
 
     school = models.ForeignKey(School, on_delete=models.PROTECT)
+    roles = models.TextField()
 
 
 class Student(models.Model):

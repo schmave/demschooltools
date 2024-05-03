@@ -6,6 +6,7 @@ from django.contrib.auth.views import redirect_to_login
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.views import View
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -59,10 +60,10 @@ def student_to_dict(student: Student, last_swipe: Swipe | None, local_now: datet
 
 
 class SwipeView(APIView):
-    def post(self, request, student_id=None):
+    def post(self, request: Request, student_id=None):
         student = Student.objects.get(id=student_id)
 
-        direction = request.data["direction"]
+        direction = request.data["direction"]  # type: ignore
 
         school: School = request.user.school
         local_now = datetime.now(pytz.timezone(school.timezone))
@@ -93,12 +94,13 @@ class LogoutView(View):
 
 
 class IsAdminView(APIView):
-    def get(self, request):
+    def get(self, request: Request):
         school: School = request.user.school
         return Response(
             {
-                # TODO: "overseer.roles/admin" if admin
-                "admin": None,
+                "admin": "overseer.roles/admin"
+                if "overseer.roles/admin" in request.user.roles
+                else None,
                 "school": {
                     "_id": school.id,
                     "name": school.name,
@@ -110,7 +112,7 @@ class IsAdminView(APIView):
 
 
 class StudentsView(APIView):
-    def get(self, request):
+    def get(self, request: Request):
         school = request.user.school
         tz = pytz.timezone(school.timezone)
         now = datetime.now(tz)
