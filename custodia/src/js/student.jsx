@@ -189,11 +189,6 @@ class Student extends React.Component {
     }
   };
 
-  toggleHours = () => {
-    this.state.student.olderdate = !!!this.state.student.olderdate;
-    actionCreator.toggleHours(this.state.student._id);
-  };
-
   showingStudentName = () => {
     return (
       <div className="col-sm-8" id="studentName">

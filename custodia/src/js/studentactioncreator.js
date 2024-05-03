@@ -1,27 +1,16 @@
-var eventEmitter = require("events").EventEmitter,
-  constants = require("./appconstants"),
-  ajax = require("./ajaxhelper"),
-  myhistory = require("./myhistory.js"),
-  dispatcher = require("./appdispatcher");
+const constants = require("./appconstants");
+const ajax = require("./ajaxhelper");
+const myhistory = require("./myhistory.js");
+const dispatcher = require("./appdispatcher");
 
-var exports = {
-  loadAllStudents: function () {
-    $.ajax({
-      url: "/allstudents",
-    }).then(function (data) {
-      dispatcher.dispatch({
-        type: constants.studentEvents.ALL_LOADED,
-        data: data,
-      });
-    });
-  },
+const exports = {
   loadStudents: function () {
     $.ajax({
       url: "/students",
     }).then(function (data) {
       dispatcher.dispatch({
         type: constants.studentEvents.LOADED,
-        data: data,
+        data,
       });
     });
   },
@@ -33,85 +22,23 @@ var exports = {
       });
     });
   },
-  makeUser: function (name, password) {
-    ajax
-      .put("/user", {
-        name: name,
-        password: password,
-      })
-      .then(
-        function (data) {
-          this.loadStudents();
-          dispatcher.dispatch({
-            type: constants.studentEvents.STUDENT_LOADED,
-            data: data,
-          });
-        }.bind(this),
-      );
-  },
-  updateStudent: function (id, name, start_date, email, minutes, is_teacher) {
-    ajax
-      .put("/students/" + id, {
-        name: name,
-        start_date: start_date,
-        email: email,
-        minutes: minutes,
-        is_teacher: is_teacher,
-      })
-      .then(
-        function (data) {
-          this.loadStudents();
-          dispatcher.dispatch({
-            type: constants.studentEvents.STUDENT_LOADED,
-            data: data.student,
-          });
-        }.bind(this),
-      );
-  },
   swipeStudent: function (student, direction, missing) {
-    //var student = student;
     ajax
       .post("students/" + student._id + "/swipe", {
-        direction: direction,
-        missing: missing,
+        direction,
+        missing,
       })
-      .then(
-        function (data) {
-          dispatcher.dispatch({
-            type: constants.studentEvents.STUDENT_SWIPED,
-            data: data,
-          });
-          //this.loadStudent(student._id);
-          dispatcher.dispatch({
-            type: constants.systemEvents.FLASH,
-            message: student.name + " swiped successfully!",
-          });
-          //student = null;
-          myhistory.replace("/students");
-        }.bind(this),
-      );
-  },
-  toggleArchived: function (id) {
-    ajax.post("/students/" + id + "/togglearchived").then(
-      function (data) {
+      .then(function (data) {
         dispatcher.dispatch({
-          type: constants.studentEvents.STUDENT_LOADED,
-          data: data.student,
+          type: constants.studentEvents.STUDENT_SWIPED,
+          data,
         });
-        this.loadStudents();
-      }.bind(this),
-    );
-  },
-  toggleHours: function (id) {
-    ajax.post("/students/" + id + "/togglehours").then(
-      function (data) {
         dispatcher.dispatch({
-          type: constants.studentEvents.STUDENT_LOADED,
-          data: data.student,
+          type: constants.systemEvents.FLASH,
+          message: student.name + " swiped successfully!",
         });
-        this.loadStudents();
-      }.bind(this),
-    );
+        myhistory.replace("/students");
+      });
   },
   markAbsent: function (student) {
     ajax.post("/students/" + student._id + "/absent").then(
@@ -125,7 +52,7 @@ var exports = {
     );
   },
   deleteSwipe: function (swipe, student) {
-    ajax.post("/students/" + student._id + "/swipe/delete", { swipe: swipe }).then(function (data) {
+    ajax.post("/students/" + student._id + "/swipe/delete", { swipe }).then(function (data) {
       dispatcher.dispatch({
         type: constants.studentEvents.STUDENT_LOADED,
         data: data.student,
@@ -133,15 +60,15 @@ var exports = {
     });
   },
   excuse: function (studentId, day) {
-    ajax.post("students/" + studentId + "/excuse", { day: day }).then(
-      function (data) {
+    ajax.post("students/" + studentId + "/excuse", { day }).then(
+      function () {
         this.loadStudent(studentId);
       }.bind(this),
     );
   },
   override: function (studentId, day) {
-    ajax.post("/students/" + studentId + "/override", { day: day }).then(
-      function (data) {
+    ajax.post("/students/" + studentId + "/override", { day }).then(
+      function () {
         this.loadStudent(studentId);
       }.bind(this),
     );

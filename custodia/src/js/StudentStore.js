@@ -17,15 +17,6 @@ exports.getStudents = function (force) {
   }
 };
 
-exports.getAllStudents = function (force) {
-  if (!force && allStudents) {
-    return allStudents;
-  } else {
-    actionCreator.loadAllStudents();
-    return [];
-  }
-};
-
 exports.getToday = function () {
   return today;
 };
