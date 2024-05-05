@@ -67,3 +67,14 @@ class Swipe(models.Model):
 
     in_time = models.DateTimeField()
     out_time = models.DateTimeField()
+
+
+class Override(models.Model):
+    class Meta:
+        db_table = "overrides"
+
+    id = models.AutoField(db_column="_id", primary_key=True)
+    student = models.ForeignKey(Student, on_delete=models.PROTECT)
+    inserted_date = models.DateTimeField(auto_now_add=True)
+
+    date = models.DateField()

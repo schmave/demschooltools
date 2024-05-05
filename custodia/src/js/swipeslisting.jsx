@@ -1,7 +1,7 @@
-var React = require("react"),
-  PropTypes = require("prop-types"),
-  AdminItem = require("./adminwrapper.jsx"),
-  actionCreator = require("./studentactioncreator");
+const React = require("react");
+const PropTypes = require("prop-types");
+const AdminItem = require("./adminwrapper.jsx");
+const actionCreator = require("./studentactioncreator");
 
 class SwipesListing extends React.Component {
   static contextTypes = {
@@ -10,11 +10,9 @@ class SwipesListing extends React.Component {
 
   getCurrentDay = (student, dayString) => {
     if (student) {
-      var day = student.days.find(
-        function (day) {
-          return day.day === dayString;
-        }.bind(this),
-      );
+      const day = student.days.find(function (day) {
+        return day.day === dayString;
+      });
       return day;
     } else {
       return {};
@@ -37,7 +35,7 @@ class SwipesListing extends React.Component {
   };
 
   getSwipesForDay = () => {
-    var swipeRows = [];
+    const swipeRows = [];
     if (this.state.day && !this.swipesAreEmpty(this.state.day.swipes)) {
       this.state.day.swipes.map(
         function (swipe) {
@@ -78,7 +76,7 @@ class SwipesListing extends React.Component {
 
   render() {
     this.state.day.round_mins = parseFloat(this.state.day.total_mins).toFixed(0);
-    var showOverrideExcuseButtons =
+    const showOverrideExcuseButtons =
       this.state.day &&
       !this.state.day.override &&
       !this.state.day.excused &&
