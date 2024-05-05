@@ -91,6 +91,13 @@ class SwipeView(APIView):
         return Response(student_to_dict(student, swipe, local_now))
 
 
+class DeleteSwipeView(APIView):
+    def post(self, request: Request, student_id: int):
+        swipe_id = request.data["swipe"]["_id"]  # type: ignore
+        Swipe.objects.get(id=swipe_id).delete()
+        return student_data_view(request, student_id)
+
+
 class LogoutView(View):
     def get(self, request):
         if request.user.is_authenticated:
@@ -157,89 +164,100 @@ def get_start_of_school_year(school_timezone: tzinfo) -> date:
 
 class StudentDataView(APIView):
     def get(self, request: Request, student_id: int):
-        student = Student.objects.get(id=student_id)
-        school: School = request.user.school
-        school_timezone = pytz.timezone(school.timezone)
-        local_now = datetime.now(school_timezone)
-        override_days = set(
-            Override.objects.filter(student=student).values_list("date", flat=True)
-        )
+        return student_data_view(request, student_id)
 
-        year_start = get_start_of_school_year(school_timezone)
-        day_to_swipes: defaultdict[date, list[Swipe]] = defaultdict(list)
-        for swipe in Swipe.objects.filter(student=student, swipe_day__gte=year_start):
-            day_to_swipes[swipe.swipe_day].append(swipe)
 
-        school_days = sorted(
-            Swipe.objects.filter(swipe_day__gte=year_start)
-            .values_list("swipe_day", flat=True)
-            .distinct()
-        )
+def student_data_view(request: Request, student_id: int) -> Response:
+    student = Student.objects.get(id=student_id)
+    school: School = request.user.school
+    school_timezone = pytz.timezone(school.timezone)
+    local_now = datetime.now(school_timezone)
+    override_days = set(
+        Override.objects.filter(student=student).values_list("date", flat=True)
+    )
 
-        day_data = []
-        total_seconds = 0
-        for day in school_days:
-            day_seconds = 0
-            is_override = day in override_days
+    year_start = get_start_of_school_year(school_timezone)
+    day_to_swipes: dict[date, list[Swipe]] = defaultdict(list)
+    for swipe in Swipe.objects.filter(student=student, swipe_day__gte=year_start):
+        day_to_swipes[swipe.swipe_day].append(swipe)
 
-            swipe_data = []
-            missing_swipe = False
-            for swipe in day_to_swipes[day]:
-                swipe_data.append(
-                    {
-                        "_id": swipe.id,
-                        "day": format_date(day),
-                        "nice_in_time": format_time(swipe.in_time, school_timezone),
-                        "nice_out_time": format_time(swipe.out_time, school_timezone),
-                        "student_id": student.id,
-                        "out_time": swipe.out_time and swipe.out_time.isoformat(),
-                        "in_time": swipe.in_time and swipe.in_time.isoformat(),
-                    }
-                )
-                if swipe.in_time and not swipe.out_time:
-                    missing_swipe = True
+    day_to_swipes = dict(day_to_swipes)
 
-                if swipe.in_time and swipe.out_time:
-                    day_seconds += (swipe.out_time - swipe.in_time).total_seconds()
+    school_days = sorted(
+        Swipe.objects.filter(swipe_day__gte=year_start)
+        .values_list("swipe_day", flat=True)
+        .distinct(),
+        reverse=True,
+    )
 
-            day_data.append(
+    day_data = []
+    total_seconds = 0
+    for day in school_days:
+        day_seconds = 0
+        is_override = day in override_days
+
+        swipe_data = []
+        missing_swipe = False
+        this_days_swipes = day_to_swipes.get(day, [])
+        for swipe in this_days_swipes:
+            swipe_data.append(
                 {
-                    "valid": not missing_swipe,
-                    "absent": day not in day_to_swipes,
-                    "override": is_override,
+                    "_id": swipe.id,
                     "day": format_date(day),
-                    "total_mins": DEFAULT_REQUIRED_MINUTES
-                    if is_override
-                    else (day_seconds // 60),
-                    "swipes": swipe_data,
-                    # -------TODO---------
-                    "excused": False,
-                    "short": False,
+                    "nice_in_time": format_time(swipe.in_time, school_timezone),
+                    "nice_out_time": format_time(swipe.out_time, school_timezone),
+                    "student_id": student.id,
+                    "out_time": swipe.out_time and swipe.out_time.isoformat(),
+                    "in_time": swipe.in_time and swipe.in_time.isoformat(),
                 }
             )
+            if swipe.in_time and not swipe.out_time:
+                missing_swipe = True
 
-            total_seconds += day_seconds
+            if swipe.in_time and swipe.out_time:
+                day_seconds += (swipe.out_time - swipe.in_time).total_seconds()
 
-        return Response(
+        is_short = day_seconds < DEFAULT_REQUIRED_MINUTES * 60
+        day_data.append(
             {
-                "student": {
-                    "_id": student.id,
-                    "absent_today": student.show_as_absent == local_now.date(),
-                    "days": day_data,
-                    "name": student.name,
-                    "required_minutes": DEFAULT_REQUIRED_MINUTES,
-                    "today": format_date(local_now.date()),
-                    "total_hours": total_seconds / 3600,
-                    "is_teacher": student.is_teacher,
-                    "last_swipe_date": format_date(max(day_to_swipes)),
-                    # -------- TODO: -----------
-                    "last_swipe_type": "out",
-                    "in_today": False,
-                    "total_abs": 0,
-                    "total_days": 0,
-                    "total_excused": 0,
-                    "total_overrides": 0,
-                    "total_short": 0,
-                }
+                "absent": day not in day_to_swipes,
+                "override": is_override,
+                "day": format_date(day),
+                "total_mins": DEFAULT_REQUIRED_MINUTES
+                if is_override
+                else (day_seconds // 60),
+                "swipes": swipe_data,
+                "short": is_short,
+                "valid": not is_short
+                and not missing_swipe
+                and len(this_days_swipes) > 0,
+                # -------TODO---------
+                "excused": False,
             }
         )
+
+        total_seconds += day_seconds
+
+    return Response(
+        {
+            "student": {
+                "_id": student.id,
+                "absent_today": student.show_as_absent == local_now.date(),
+                "days": day_data,
+                "name": student.name,
+                "required_minutes": DEFAULT_REQUIRED_MINUTES,
+                "today": format_date(local_now.date()),
+                "total_hours": total_seconds / 3600,
+                "is_teacher": student.is_teacher,
+                "last_swipe_date": format_date(max(day_to_swipes)),
+                # -------- TODO: -----------
+                "last_swipe_type": "out",
+                "in_today": False,
+                "total_abs": 0,
+                "total_days": 0,
+                "total_excused": 0,
+                "total_overrides": 0,
+                "total_short": 0,
+            }
+        }
+    )

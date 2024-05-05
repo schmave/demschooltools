@@ -75,6 +75,9 @@ class SwipesListing extends React.Component {
   state = { day: this.getCurrentDay(this.props.student, this.props.day) };
 
   render() {
+    if (!this.state.day) {
+      return null;
+    }
     this.state.day.round_mins = parseFloat(this.state.day.total_mins).toFixed(0);
     const showOverrideExcuseButtons =
       this.state.day &&

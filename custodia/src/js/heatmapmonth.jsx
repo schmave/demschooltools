@@ -1,12 +1,12 @@
-var React = require("react"),
-  heatmap = require("cal-heatmap"),
-  moment = require("moment");
+const React = require("react");
+const heatmap = require("cal-heatmap");
+const moment = require("moment");
 
 class HeatmapMonth extends React.Component {
   map = null;
 
   formatDays = (days, requiredMinutes) => {
-    var formatted = {};
+    const formatted = {};
     days.forEach(function (day) {
       formatted[moment(day.day).unix()] = day.total_mins;
       if (day.excused || day.override) {
@@ -19,8 +19,7 @@ class HeatmapMonth extends React.Component {
   };
 
   getHighlights = (days, requiredMinutes) => {
-    //var hights = ['now'];
-    var hights = [];
+    const hights = [];
     days.forEach(function (day) {
       if (day.excused) {
         hights.push(moment(day.day).toDate());
@@ -30,48 +29,54 @@ class HeatmapMonth extends React.Component {
   };
 
   loadHeatmap = () => {
-    var data = this.formatDays(this.props.days, this.props.requiredMinutes);
-    var highlight = this.getHighlights(this.props.days, this.props.requiredMinutes);
-    if (this.map) {
-      this.map = this.map.destroy();
+    const data = this.formatDays(this.props.days, this.props.requiredMinutes);
+    const highlight = this.getHighlights(this.props.days, this.props.requiredMinutes);
+
+    const doUpdate = this.map !== null;
+    if (!doUpdate) {
+      // eslint-disable-next-line new-cap
+      this.map = new heatmap();
     }
-    this.map = new heatmap();
 
-    var selector = "#heatmap" + this.props.index,
-      padNumber = function (n) {
-        return ("0" + n).slice(-2);
-      },
-      makeDateId = function (d) {
-        var datestring =
-          d.getFullYear() + "-" + padNumber(d.getMonth() + 1) + "-" + padNumber(d.getDate());
+    const selector = "#heatmap" + this.props.index;
+    const padNumber = function (n) {
+      return ("0" + n).slice(-2);
+    };
+    const makeDateId = function (d) {
+      const datestring =
+        d.getFullYear() + "-" + padNumber(d.getMonth() + 1) + "-" + padNumber(d.getDate());
 
-        return "#day-" + datestring;
-      };
-    this.map.init({
-      itemSelector: selector,
-      onClick: function (d, nb) {
-        $(makeDateId(d))[0].click();
-      },
-      data: data,
-      start: moment(this.props.days[0].day).startOf("month").toDate(),
-      domain: "month",
-      subDomain: "x_day",
-      subDomainTextFormat: "%d",
-      range: 4,
-      legend: [
-        0,
-        210,
-        this.props.requiredMinutes - 45,
-        this.props.requiredMinutes - 15,
-        this.props.requiredMinutes - 1,
-      ],
-      legendVerticalPosition: "center",
-      legendCellSize: 8,
-      itemName: ["minute", "minutes"],
-      legendOrientation: "vertical",
-      highlight: highlight,
-      cellSize: 15,
-    });
+      return "#day-" + datestring;
+    };
+    if (doUpdate) {
+      this.map.update(data);
+    } else {
+      this.map.init({
+        itemSelector: selector,
+        onClick: function (d, nb) {
+          $(makeDateId(d))[0].click();
+        },
+        data,
+        start: moment(this.props.days[0].day).startOf("month").toDate(),
+        domain: "month",
+        subDomain: "x_day",
+        subDomainTextFormat: "%d",
+        range: 4,
+        legend: [
+          0,
+          210,
+          this.props.requiredMinutes - 45,
+          this.props.requiredMinutes - 15,
+          this.props.requiredMinutes - 1,
+        ],
+        legendVerticalPosition: "center",
+        legendCellSize: 8,
+        itemName: ["minute", "minutes"],
+        legendOrientation: "vertical",
+        highlight,
+        cellSize: 15,
+      });
+    }
   };
 
   render() {
@@ -81,6 +86,10 @@ class HeatmapMonth extends React.Component {
   }
 
   componentDidMount() {
+    this.loadHeatmap();
+  }
+
+  componentDidUpdate() {
     this.loadHeatmap();
   }
 }
