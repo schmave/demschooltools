@@ -22,7 +22,8 @@ from custodia.views import (
     IsAdminView,
     LoginView,
     LogoutView,
-    StudentsView,
+    StudentDataView,
+    StudentsTodayView,
     SwipeView,
 )
 
@@ -32,6 +33,7 @@ urlpatterns = [
     path("users/login", LoginView.as_view()),
     path("users/logout", LogoutView.as_view()),
     path("users/is-admin", IsAdminView.as_view()),
-    path("students", StudentsView.as_view()),
+    path("students", StudentsTodayView.as_view()),
     path("students/<int:student_id>/swipe", SwipeView.as_view()),
+    path("students/<int:student_id>", StudentDataView.as_view()),
 ]

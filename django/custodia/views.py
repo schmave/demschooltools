@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 
 import pytz
 from django.contrib.auth import authenticate, login, logout
@@ -52,15 +52,13 @@ def student_to_dict(student: Student, last_swipe: Swipe | None, local_now: datet
         # TODO
         "late_time": None,
         # TODO
-        "show_as_absent": False,
-        # TODO
         "absent_today": False,
-        "last_swipe_date": last_swipe and last_swipe.swipe_day.strftime("%Y-%m-%d"),
+        "last_swipe_date": last_swipe and format_date(last_swipe.swipe_day),
     }
 
 
 class SwipeView(APIView):
-    def post(self, request: Request, student_id=None):
+    def post(self, request: Request, student_id: int):
         student = Student.objects.get(id=student_id)
 
         direction = request.data["direction"]  # type: ignore
@@ -111,7 +109,11 @@ class IsAdminView(APIView):
         )
 
 
-class StudentsView(APIView):
+def format_date(dt: datetime | date):
+    return dt.strftime("%Y-%m-%d")
+
+
+class StudentsTodayView(APIView):
     def get(self, request: Request):
         school = request.user.school
         tz = pytz.timezone(school.timezone)
@@ -125,7 +127,59 @@ class StudentsView(APIView):
 
         return Response(
             {
-                "today": now.strftime("%Y-%m-%d"),
+                "today": format_date(now),
                 "students": student_infos,
+            }
+        )
+
+
+class StudentDataView(APIView):
+    def get(self, request: Request, student_id: int):
+        student = Student.objects.get(id=student_id)
+        school: School = request.user.school
+        local_now = datetime.now(pytz.timezone(school.timezone))
+
+        return Response(
+            {
+                "student": {
+                    "_id": student.id,
+                    "absent_today": False,
+                    "days": [
+                        {
+                            "valid": False,
+                            "short": True,
+                            "absent": False,
+                            "override": False,
+                            "excused": False,
+                            "day": "2024-05-03",
+                            "total_mins": 0,
+                            "swipes": [
+                                {
+                                    "archived": False,
+                                    "_id": 10,
+                                    "day": "2024-05-03",
+                                    "nice_in_time": "03:47",
+                                    "nice_out_time": "03:48",
+                                    "student_id": student.id,
+                                    "out_time": "2024-05-03T19:48:06Z",
+                                    "in_time": "2024-05-03T19:47:03Z",
+                                }
+                            ],
+                        }
+                    ],
+                    "in_today": True,
+                    "is_teacher": False,
+                    "last_swipe_date": "2024-05-03",
+                    "last_swipe_type": "out",
+                    "name": student.name,
+                    "required_minutes": 345,
+                    "today": format_date(local_now),
+                    "total_abs": 0,
+                    "total_days": 0,
+                    "total_excused": 0,
+                    "total_hours": 0.016667,
+                    "total_overrides": 0,
+                    "total_short": 3,
+                }
             }
         )

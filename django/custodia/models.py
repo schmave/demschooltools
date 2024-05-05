@@ -66,4 +66,3 @@ class Swipe(models.Model):
 
     in_time = models.DateTimeField()
     out_time = models.DateTimeField()
-    intervalmin = models.IntegerField()
