@@ -1,25 +1,25 @@
-var React = require("react"),
-  userStore = require("./userstore"),
-  Heatmap = require("./heatmap.jsx"),
-  actionCreator = require("./studentactioncreator"),
-  studentStore = require("./StudentStore"),
-  Router = require("react-router"),
-  Link = Router.Link,
-  SwipeHelpers = require("./swipeHelpers.jsx"),
-  StudentEditor = require("./student/studentEditor.jsx"),
-  SwipesListing = require("./swipeslisting.jsx");
+const React = require("react");
+const userStore = require("./userstore");
+const Heatmap = require("./heatmap.jsx");
+const actionCreator = require("./studentactioncreator");
+const studentStore = require("./StudentStore");
+const Router = require("react-router");
+const Link = Router.Link;
+const SwipeHelpers = require("./swipeHelpers.jsx");
+const StudentEditor = require("./student/studentEditor.jsx");
+const SwipesListing = require("./swipeslisting.jsx");
 
-var groupingFunc = function (data) {
+const groupingFunc = function (data) {
   return data.day.split("-")[0] + "-" + data.day.split("-")[1];
 };
 
 class Student extends React.Component {
   constructor(props) {
     super(props);
-    var studentId = props.params.studentId;
+    const studentId = props.params.studentId;
 
     this.state = {
-      studentId: studentId,
+      studentId,
       student: studentStore.getStudent(studentId, true),
     };
   }
@@ -49,7 +49,7 @@ class Student extends React.Component {
   };
 
   getActionButtons = () => {
-    var buttons = [];
+    const buttons = [];
 
     if (!this.studentInToday() || this.state.student.last_swipe_type === "out") {
       buttons.push(
@@ -95,7 +95,7 @@ class Student extends React.Component {
   };
 
   getDayStatus = (day) => {
-    var r = "";
+    let r = "";
     if (day.valid) {
       r = " ✓";
     }
@@ -133,9 +133,9 @@ class Student extends React.Component {
   listMonth = (days, show, month) => {
     return days.map(
       function (day) {
-        var hide = !show ? "hidden" : "";
-        var selected = day.day === this.getActiveDay(this.state.student) ? "selected" : "";
-        var clsName = hide + " " + selected;
+        const hide = !show ? "hidden" : "";
+        const selected = day.day === this.getActiveDay(this.state.student) ? "selected" : "";
+        const clsName = hide + " " + selected;
         return (
           <tr key={month + day.day} className={clsName}>
             <td>
@@ -155,16 +155,16 @@ class Student extends React.Component {
   };
 
   getPreviousDays = () => {
-    var selectedDay = this.props.params.day;
+    const selectedDay = this.props.params.day;
     if (!selectedDay && this.state.day) {
-      //routerc.get().transitionTo('swipes', {studentId :this.state.studentId, day: this.state.day});
+      // routerc.get().transitionTo('swipes', {studentId :this.state.studentId, day: this.state.day});
     }
-    var groupedDays = this.state.student.days.groupBy(groupingFunc);
-    var months = Object.keys(groupedDays);
+    const groupedDays = this.state.student.days.groupBy(groupingFunc);
+    const months = Object.keys(groupedDays);
     // This returns a list of lists (of lists?), which React appears to flatten.
     return months.map(
       function (month) {
-        var cls =
+        const cls =
           month === this.state.selectedMonth
             ? "glyphicon glyphicon-chevron-down"
             : "glyphicon glyphicon-chevron-right";
@@ -214,13 +214,13 @@ class Student extends React.Component {
 
   render() {
     if (this.state.student) {
-      var activeDate = this.getActiveDay(this.state.student);
-      var attended =
-          (this.state.student.total_days + this.state.student.total_short).toString() +
-          " (" +
-          this.state.student.total_short +
-          ")",
-        requiredMinutes = this.state.student.required_minutes;
+      const activeDate = this.getActiveDay(this.state.student);
+      const attended =
+        (this.state.student.total_days + this.state.student.total_short).toString() +
+        " (" +
+        this.state.student.total_short +
+        ")";
+      const requiredMinutes = this.state.student.required_minutes;
       return (
         <div className="row">
           <StudentEditor ref="studentEditor" />
@@ -287,13 +287,13 @@ class Student extends React.Component {
   }
 
   _onChange = () => {
-    var s = studentStore.getStudent(this.state.studentId);
+    const s = studentStore.getStudent(this.state.studentId);
 
-    var activeDay = this.getActiveDay(s);
+    const activeDay = this.getActiveDay(s);
     this.setState({
       student: s,
-      selectedMonth: "2016-04",
-      activeDay: activeDay,
+      selectedMonth: activeDay.substr(0, 7),
+      activeDay,
     });
   };
 }
