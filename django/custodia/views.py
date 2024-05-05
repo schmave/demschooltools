@@ -51,8 +51,7 @@ def student_to_dict(student: Student, last_swipe: Swipe | None, local_now: datet
         "in_today": last_swipe and last_swipe.swipe_day == local_now.date(),
         # TODO
         "late_time": None,
-        # TODO
-        "absent_today": False,
+        "absent_today": student.show_as_absent == local_now.date(),
         "last_swipe_date": last_swipe and format_date(last_swipe.swipe_day),
     }
 
@@ -143,7 +142,7 @@ class StudentDataView(APIView):
             {
                 "student": {
                     "_id": student.id,
-                    "absent_today": False,
+                    "absent_today": student.show_as_absent == local_now.date(),
                     "days": [
                         {
                             "valid": False,
@@ -167,7 +166,7 @@ class StudentDataView(APIView):
                             ],
                         }
                     ],
-                    "in_today": True,
+                    "in_today": False,
                     "is_teacher": False,
                     "last_swipe_date": "2024-05-03",
                     "last_swipe_type": "out",

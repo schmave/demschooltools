@@ -47,6 +47,7 @@ class Student(models.Model):
     )
     is_teacher = models.BooleanField()
     name = models.TextField()
+    show_as_absent = models.DateField()
 
 
 class Swipe(models.Model):

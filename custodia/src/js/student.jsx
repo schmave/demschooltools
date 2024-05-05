@@ -1,10 +1,12 @@
 var React = require("react"),
+  userStore = require("./userstore"),
   Heatmap = require("./heatmap.jsx"),
   actionCreator = require("./studentactioncreator"),
   studentStore = require("./StudentStore"),
   Router = require("react-router"),
   Link = Router.Link,
   SwipeHelpers = require("./swipeHelpers.jsx"),
+  StudentEditor = require("./student/studentEditor.jsx"),
   SwipesListing = require("./swipeslisting.jsx");
 
 var groupingFunc = function (data) {
@@ -179,6 +181,12 @@ class Student extends React.Component {
     );
   };
 
+  toggleEdit = () => {
+    if (userStore.isAdmin()) {
+      this.refs.studentEditor.edit(this.state.student);
+    }
+  };
+
   getActiveDay = (student) => {
     if (this.props.params.day) {
       return this.props.params.day;
@@ -215,13 +223,13 @@ class Student extends React.Component {
         requiredMinutes = this.state.student.required_minutes;
       return (
         <div className="row">
-          <SwipeHelpers ref="missingSwipeCollector"></SwipeHelpers>
-
+          <StudentEditor ref="studentEditor" />
+          <SwipeHelpers ref="missingSwipeCollector" />
           <div className="col-sm-1"></div>
           <div className="col-sm-10">
             <div className="panel panel-info">
               <div className="panel-heading">
-                <div className="row">
+                <div className="row" onClick={this.toggleEdit}>
                   {this.showingStudentName()}
                   <div className="col-sm-4">
                     <div id="hd-attended" className="col-sm-6">
