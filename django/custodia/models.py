@@ -48,6 +48,7 @@ class Student(models.Model):
     is_teacher = models.BooleanField()
     name = models.TextField()
     show_as_absent = models.DateField()
+    school = models.ForeignKey(School, on_delete=models.PROTECT)
 
 
 class Swipe(models.Model):
@@ -101,3 +102,23 @@ class Excuse(models.Model):
     inserted_date = models.DateTimeField(auto_now_add=True)
 
     date = models.DateField()
+
+
+class Year(models.Model):
+    """
+    Recommended changes from the overseer.years table currently being used in production:
+
+    Figure out timezone of from_date and to_date columns
+    """
+
+    class Meta:
+        db_table = "years"
+
+    id = models.AutoField(db_column="_id", primary_key=True)
+
+    from_date = models.DateTimeField()
+    to_date = models.DateTimeField()
+
+    inserted_date = models.DateTimeField(auto_now_add=True)
+    name = models.TextField()
+    school = models.ForeignKey(School, on_delete=models.PROTECT)

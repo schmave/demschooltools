@@ -1,14 +1,12 @@
-var EventEmitter = require("events").EventEmitter,
-  dispatcher = require("./appdispatcher"),
-  base = require("./storebase"),
-  constants = require("./appconstants"),
-  actionCreator = require("./reportactioncreator");
+const dispatcher = require("./appdispatcher");
+const base = require("./storebase");
+const constants = require("./appconstants");
+const actionCreator = require("./reportactioncreator");
 
-var isAdmin;
-var reports = {};
-var schoolYears;
+let reports = {};
+let schoolYears;
 
-var exports = Object.create(base);
+const exports = Object.create(base);
 
 exports.getSchoolYears = function (force) {
   if (!schoolYears || force) {
@@ -18,7 +16,8 @@ exports.getSchoolYears = function (force) {
   }
 };
 
-exports.getReport = function (year, classId) {
+exports.getReport = function (year) {
+  const classId = 2; // This is only needed to communicate with the old backend.
   if (!year || !classId) return null;
   if (reports[year + classId]) {
     return reports[year + classId];

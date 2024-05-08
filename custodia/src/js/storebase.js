@@ -1,10 +1,10 @@
-var EventEmitter = require("events").EventEmitter,
-  assign = require("object-assign");
+const EventEmitter = require("events").EventEmitter;
+const assign = require("object-assign");
 
-var CHANGE_EVENT = "change";
+const CHANGE_EVENT = "change";
 
-var exports = assign({}, EventEmitter.prototype, {
-  CHANGE_EVENT: CHANGE_EVENT,
+const exports = assign({}, EventEmitter.prototype, {
+  CHANGE_EVENT,
   emitChange: function () {
     this.emit(CHANGE_EVENT);
   },

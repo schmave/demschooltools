@@ -1,24 +1,21 @@
-var reportStore = require("./reportstore"),
-  classStore = require("./classstore"),
-  Modal = require("./modal.jsx"),
-  Router = require("react-router"),
-  Link = Router.Link,
-  DateTimePicker = require("react-widgets").DateTimePicker,
-  actionCreator = require("./reportactioncreator"),
-  React = require("react"),
-  Griddle = require("griddle-react");
+const reportStore = require("./reportstore");
+const Modal = require("./modal.jsx");
+const Router = require("react-router");
+const Link = Router.Link;
+const DateTimePicker = require("react-widgets").DateTimePicker;
+const actionCreator = require("./reportactioncreator");
+const React = require("react");
+const Griddle = require("griddle-react");
 
 // Table data as a list of array.
-var getState = function () {
+const getState = function () {
   return {
     rows: [],
-    classesAndThings: classStore.getClasses(),
-    classes: [],
     years: reportStore.getSchoolYears(),
   };
 };
 function pad(num, size) {
-  var s = num + "";
+  let s = num + "";
   while (s.length < size) s = "0" + s;
   return s;
 }
@@ -26,32 +23,32 @@ function deciHours(time) {
   if (!time) {
     return "0:00";
   }
-  var i = parseInt(time, 10);
+  const i = parseInt(time, 10);
   return i.toString() + ":" + pad(Math.round((time - i) * 60, 10), 2);
 }
 
 class StudentTotalComponent extends React.Component {
   render() {
-    var t = deciHours(this.props.data);
+    const t = deciHours(this.props.data);
     return <span>{t}</span>;
   }
 }
 
-class StudentAttendendedComponent extends React.Component {
+class StudentAttendedComponent extends React.Component {
   render() {
-    var good = this.props.rowData.good;
-    var short = this.props.rowData.short;
+    let good = this.props.rowData.good;
+    const short = this.props.rowData.short;
 
-    var good = good + short + " (" + short + ")";
+    good = good + short + " (" + short + ")";
     return <span>{good}</span>;
   }
 }
 
 class StudentLinkComponent extends React.Component {
   render() {
-    //url ="#speakers/" + props.rowData._id + "/" + this.props.data;
-    var sid = this.props.rowData._id,
-      name = this.props.data;
+    // url ="#speakers/" + props.rowData._id + "/" + this.props.data;
+    const sid = this.props.rowData._id;
+    const name = this.props.data;
     return (
       <Link to={"/students/" + sid} id={"student-" + sid}>
         {name}
@@ -65,73 +62,48 @@ class StudentReports extends React.Component {
 
   componentDidMount() {
     reportStore.addChangeListener(this.onReportChange);
-    classStore.addChangeListener(this.onClassChange);
-    classStore.getClasses(true);
     reportStore.getSchoolYears(true);
-    this.fetchReport(this.state.selectedClassId, this.state.currentYear);
+    this.fetchReport(this.state.currentYear);
   }
 
   componentWillUnmount() {
     reportStore.removeChangeListener(this.onReportChange);
-    classStore.removeChangeListener(this.onClassChange);
   }
 
   onClassChange = () => {
     this.refs.newSchoolYear.hide();
-    var classesAndThings = classStore.getClasses(),
-      state = this.state,
-      classes = classesAndThings == [] ? [] : classesAndThings.classes,
-      currentSelectedClassId = this.state.selectedClassId,
-      matching = classes.filter((cls) => cls._id === currentSelectedClassId),
-      selectedClass = matching[0] || classes[0];
-    if (classes != [] && !currentSelectedClassId) {
-      selectedClass = classes.filter((cls) => cls.active == true)[0];
-    }
-    state.selectedClass = selectedClass || {};
-    state.selectedClassId = state.selectedClass ? state.selectedClass._id : null;
-    state.classes = classes;
+    const state = this.state;
     this.setState(state);
-    this.fetchReport(state.selectedClassId, state.currentYear);
+    this.fetchReport(state.currentYear);
   };
 
   onReportChange = (x) => {
     this.refs.newSchoolYear.hide();
-    var state = this.state,
-      years = reportStore.getSchoolYears(),
-      yearExists = years.years.indexOf(state.currentYear) !== -1,
-      currentYear = yearExists && state.currentYear ? state.currentYear : years.current_year;
+    const state = this.state;
+    const years = reportStore.getSchoolYears();
+    const yearExists = years.years.indexOf(state.currentYear) !== -1;
+    const currentYear = yearExists && state.currentYear ? state.currentYear : years.current_year;
 
     state.years = years;
     state.currentYear = currentYear;
 
     this.setState(state);
-    this.fetchReport(this.state.selectedClassId, currentYear);
+    this.fetchReport(currentYear);
   };
 
-  fetchReport = (currentClassId, year) => {
-    var report = reportStore.getReport(year, currentClassId),
-      rows = report != "loading" ? report : [];
+  fetchReport = (year) => {
+    const report = reportStore.getReport(year);
+    const rows = report != "loading" ? report : [];
     this.setState({
       loading: report == null || report == "loading",
-      rows: rows,
+      rows,
     });
-  };
-
-  classSelected = (event) => {
-    var currentClassId = event.target.value,
-      matching = this.state.classes.filter((cls) => cls._id == currentClassId),
-      selectedClass = matching[0] ? matching[0] : this.state.classes[0];
-    this.setState({
-      selectedClass: selectedClass,
-      selectedClassId: selectedClass._id,
-    });
-    this.fetchReport(selectedClass._id, this.state.currentYear);
   };
 
   yearSelected = (event) => {
-    var currentYear = event.target.value;
-    this.setState({ currentYear: currentYear });
-    this.fetchReport(this.state.selectedClassId, currentYear);
+    const currentYear = event.target.value;
+    this.setState({ currentYear });
+    this.fetchReport(currentYear);
   };
 
   createPeriod = () => {
@@ -155,7 +127,7 @@ class StudentReports extends React.Component {
   };
 
   render() {
-    var grid = null;
+    let grid = null;
     if (this.state.loading) {
       grid = <div>Loading</div>;
     } else {
@@ -173,7 +145,7 @@ class StudentReports extends React.Component {
             },
             {
               displayName: "Attended",
-              customComponent: StudentAttendendedComponent,
+              customComponent: StudentAttendedComponent,
               columnName: "good",
             },
             { displayName: "Overrides", columnName: "overrides" },
@@ -192,24 +164,6 @@ class StudentReports extends React.Component {
     return (
       <div>
         <div className="row margined">
-          <select
-            id="class-select"
-            className="pull-left"
-            onChange={this.classSelected}
-            value={this.state.selectedClassId}
-          >
-            {this.state.classes
-              ? this.state.classes.map(
-                  function (cls) {
-                    return (
-                      <option key={cls._id} value={cls._id}>
-                        {cls.name}
-                      </option>
-                    );
-                  }.bind(this),
-                )
-              : ""}
-          </select>
           <select className="pull-left" onChange={this.yearSelected} value={this.state.currentYear}>
             {this.state.years
               ? this.state.years.years.map(

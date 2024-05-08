@@ -1,9 +1,8 @@
-var eventEmitter = require("events").EventEmitter,
-  constants = require("./appconstants"),
-  ajax = require("./ajaxhelper"),
-  dispatcher = require("./appdispatcher");
+const constants = require("./appconstants");
+const ajax = require("./ajaxhelper");
+const dispatcher = require("./appdispatcher");
 
-var exports = {
+const exports = {
   loadSchoolYears: function () {
     ajax
       .get({
@@ -12,12 +11,12 @@ var exports = {
       .then(function (data) {
         dispatcher.dispatch({
           type: constants.reportEvents.YEARS_LOADED,
-          data: data,
+          data,
         });
       });
   },
   loadReport: function (year, classId) {
-    var classRouteId = classId ? "/" + classId : "";
+    const classRouteId = classId ? "/" + classId : "";
     ajax
       .get({
         url: "/reports/" + encodeURIComponent(year) + classRouteId,
@@ -25,20 +24,19 @@ var exports = {
       .then(function (data) {
         dispatcher.dispatch({
           type: constants.reportEvents.REPORT_LOADED,
-          data: { year: year, report: data, classId: classId },
+          data: { year, report: data, classId },
         });
       });
   },
   createPeriod: function (start, end) {
     ajax.post("/reports/years", { from_date: start, to_date: end }).then(function (data) {
-      var period = data.made.name.split(" ");
+      const period = data.made.name.split(" ");
       dispatcher.dispatch({
         type: constants.systemEvents.FLASH,
         message: "Successfully created period from " + period[0] + " to " + period[1],
       });
       dispatcher.dispatch({
         type: constants.reportEvents.PERIOD_CREATED,
-        data: data,
       });
     });
   },
@@ -50,7 +48,7 @@ var exports = {
       });
       dispatcher.dispatch({
         type: constants.reportEvents.PERIOD_DELETED,
-        data: data,
+        data,
       });
     });
   },

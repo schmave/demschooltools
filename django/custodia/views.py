@@ -11,7 +11,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from custodia.models import Excuse, Override, School, Student, Swipe
+from custodia.models import Excuse, Override, School, Student, Swipe, Year
 
 # TODO: Allow per-student overrides to this (if schools are using it) via
 # the students_required_minutes table.
@@ -174,7 +174,9 @@ class StudentsTodayView(APIView):
 
         student_infos = []
 
-        for student in Student.objects.filter(person__tags__show_in_attendance=True):
+        for student in Student.objects.filter(
+            person__tags__show_in_attendance=True, school=school
+        ):
             last_swipe = Swipe.objects.filter(student=student).order_by("-id").first()
             student_infos.append(student_to_dict(student, last_swipe, now))
 
@@ -190,12 +192,12 @@ def get_start_of_school_year(school_timezone: tzinfo) -> date:
     local_now = datetime.now(school_timezone)
     result = date(local_now.year, 8, 1)
     if result > local_now.date():
-        return date(local_now.year - 1, 1, 1)
+        return date(local_now.year - 1, 8, 1)
     return result
 
 
 class StudentDataView(APIView):
-    def get(self, request: Request, student_id: int):
+    def get(self, request: Request, student_id: int) -> Response:
         return student_data_view(request, student_id)
 
 
@@ -295,3 +297,48 @@ def student_data_view(request: Request, student_id: int) -> Response:
             }
         }
     )
+
+
+class ReportYears(APIView):
+    def get(self, request: Request) -> Response:
+        school: School = request.user.school
+        years: list[str] = []
+
+        now = datetime.now()
+
+        current_year = None
+        for year in Year.objects.filter(school=school).order_by("id"):
+            if current_year is None and now > year.from_date and now < year.to_date:
+                current_year = year.name
+            years.append(year.name)
+
+        if current_year is None:
+            current_year = years[-1]
+
+        return Response(
+            {
+                "years": years,
+                "current_year": current_year,
+            }
+        )
+
+    def post(self, request: Request) -> Response:
+        def parse_date(date_str: str) -> date:
+            return datetime.strptime(date_str, "%Y-%m-%d")
+
+        from_date = parse_date(request.data["from_date"])  # type: ignore
+        to_date = parse_date(request.data["to_date"])  # type: ignore
+
+        year = Year.objects.create(
+            school=request.user.school,
+            from_date=from_date,
+            to_date=to_date,
+            name=f"{format_date(from_date)} {format_date(to_date)}",
+        )
+
+        return Response({"made": {"name": year.name}})
+
+    def delete(self, request: Request, year_name: str) -> Response:
+        Year.objects.filter(school=request.user.school, name=year_name).delete()
+
+        return self.get(request)
