@@ -18,11 +18,14 @@ from django.contrib import admin
 from django.urls import path
 
 from custodia.views import (
+    AbsentView,
     DeleteSwipeView,
+    ExcuseView,
     IndexView,
     IsAdminView,
     LoginView,
     LogoutView,
+    OverrideView,
     StudentDataView,
     StudentsTodayView,
     SwipeView,
@@ -37,5 +40,8 @@ urlpatterns = [
     path("students", StudentsTodayView.as_view()),
     path("students/<int:student_id>/swipe/delete", DeleteSwipeView.as_view()),
     path("students/<int:student_id>/swipe", SwipeView.as_view()),
+    path("students/<int:student_id>/absent", AbsentView.as_view()),
+    path("students/<int:student_id>/excuse", ExcuseView.as_view()),
+    path("students/<int:student_id>/override", OverrideView.as_view()),
     path("students/<int:student_id>", StudentDataView.as_view()),
 ]

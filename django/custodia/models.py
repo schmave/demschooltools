@@ -70,8 +70,31 @@ class Swipe(models.Model):
 
 
 class Override(models.Model):
+    """
+    Recommended changes from the overseer.overrides table currently being used in production:
+
+    Add unique (student, date) constraint
+    """
+
     class Meta:
         db_table = "overrides"
+
+    id = models.AutoField(db_column="_id", primary_key=True)
+    student = models.ForeignKey(Student, on_delete=models.PROTECT)
+    inserted_date = models.DateTimeField(auto_now_add=True)
+
+    date = models.DateField()
+
+
+class Excuse(models.Model):
+    """
+    Recommended changes from the overseer.excuses table currently being used in production:
+
+    Add unique (student, date) constraint
+    """
+
+    class Meta:
+        db_table = "excuses"
 
     id = models.AutoField(db_column="_id", primary_key=True)
     student = models.ForeignKey(Student, on_delete=models.PROTECT)

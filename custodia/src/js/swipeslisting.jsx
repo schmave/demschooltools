@@ -106,10 +106,10 @@ class SwipesListing extends React.Component {
                 onClick={this.override}
                 className="btn btn-sm btn-info"
               >
-                Override
+                Override {this.state.day.day}
               </button>
               <button type="button" onClick={this.excuse} className="btn btn-sm btn-info">
-                Excuse
+                Excuse {this.state.day.day}
               </button>
             </div>
           </AdminItem>

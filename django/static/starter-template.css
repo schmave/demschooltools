@@ -291,7 +291,8 @@ rect.highlight {
     border-top: solid lightgray 1px;
     padding-top: 5px;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+    gap: 5px;
 }
 .action-buttons button {
     margin: 0 3px;

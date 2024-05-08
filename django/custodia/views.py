@@ -11,7 +11,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from custodia.models import Override, School, Student, Swipe
+from custodia.models import Excuse, Override, School, Student, Swipe
 
 # TODO: Allow per-student overrides to this (if schools are using it) via
 # the students_required_minutes table.
@@ -64,8 +64,40 @@ def student_to_dict(student: Student, last_swipe: Swipe | None, local_now: datet
     }
 
 
+class AbsentView(APIView):
+    def post(self, request: Request, student_id: int) -> Response:
+        student = Student.objects.get(id=student_id)
+        school: School = request.user.school
+        local_now = datetime.now(pytz.timezone(school.timezone))
+
+        student.show_as_absent = local_now.date()
+        student.save()
+
+        return student_data_view(request, student_id)
+
+
+class ExcuseView(APIView):
+    def post(self, request: Request, student_id: int) -> Response:
+        student = Student.objects.get(id=student_id)
+        date: str = request.data["day"]  # type: ignore
+
+        Excuse.objects.create(student=student, date=date)
+
+        return student_data_view(request, student_id)
+
+
+class OverrideView(APIView):
+    def post(self, request: Request, student_id: int) -> Response:
+        student = Student.objects.get(id=student_id)
+        date: str = request.data["day"]  # type: ignore
+
+        Override.objects.create(student=student, date=date)
+
+        return student_data_view(request, student_id)
+
+
 class SwipeView(APIView):
-    def post(self, request: Request, student_id: int):
+    def post(self, request: Request, student_id: int) -> Response:
         student = Student.objects.get(id=student_id)
 
         direction = request.data["direction"]  # type: ignore
@@ -92,7 +124,7 @@ class SwipeView(APIView):
 
 
 class DeleteSwipeView(APIView):
-    def post(self, request: Request, student_id: int):
+    def post(self, request: Request, student_id: int) -> Response:
         swipe_id = request.data["swipe"]["_id"]  # type: ignore
         Swipe.objects.get(id=swipe_id).delete()
         return student_data_view(request, student_id)
@@ -106,7 +138,7 @@ class LogoutView(View):
 
 
 class IsAdminView(APIView):
-    def get(self, request: Request):
+    def get(self, request: Request) -> Response:
         school: School = request.user.school
         return Response(
             {
@@ -172,8 +204,11 @@ def student_data_view(request: Request, student_id: int) -> Response:
     school: School = request.user.school
     school_timezone = pytz.timezone(school.timezone)
     local_now = datetime.now(school_timezone)
-    override_days = set(
+    override_days: set[date] = set(
         Override.objects.filter(student=student).values_list("date", flat=True)
+    )
+    excused_days: set[date] = set(
+        Excuse.objects.filter(student=student).values_list("date", flat=True)
     )
 
     year_start = get_start_of_school_year(school_timezone)
@@ -183,7 +218,7 @@ def student_data_view(request: Request, student_id: int) -> Response:
 
     day_to_swipes = dict(day_to_swipes)
 
-    school_days = sorted(
+    school_days: list[date] = sorted(
         Swipe.objects.filter(swipe_day__gte=year_start)
         .values_list("swipe_day", flat=True)
         .distinct(),
@@ -218,21 +253,20 @@ def student_data_view(request: Request, student_id: int) -> Response:
                 day_seconds += (swipe.out_time - swipe.in_time).total_seconds()
 
         is_short = day_seconds < DEFAULT_REQUIRED_MINUTES * 60
+        is_excused = day in excused_days
         day_data.append(
             {
-                "absent": day not in day_to_swipes,
+                "absent": not is_excused and (day not in day_to_swipes),
                 "override": is_override,
+                "excused": is_excused,
                 "day": format_date(day),
                 "total_mins": DEFAULT_REQUIRED_MINUTES
                 if is_override
                 else (day_seconds // 60),
                 "swipes": swipe_data,
                 "short": is_short,
-                "valid": not is_short
-                and not missing_swipe
-                and len(this_days_swipes) > 0,
-                # -------TODO---------
-                "excused": False,
+                "valid": is_override
+                or (not is_short and not missing_swipe and len(this_days_swipes) > 0),
             }
         )
 

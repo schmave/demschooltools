@@ -86,7 +86,7 @@ class Student extends React.Component {
           onClick={this.markAbsent}
           className="btn btn-sm btn-info margined"
         >
-          Absent
+          Absent today
         </button>,
       );
     }
