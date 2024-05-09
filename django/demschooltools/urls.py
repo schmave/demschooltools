@@ -26,6 +26,7 @@ from custodia.views import (
     LoginView,
     LogoutView,
     OverrideView,
+    ReportView,
     ReportYears,
     StudentDataView,
     StudentsTodayView,
@@ -47,4 +48,6 @@ urlpatterns = [
     path("students/<int:student_id>", StudentDataView.as_view()),
     path("reports/years/<str:year_name>", ReportYears.as_view()),
     path("reports/years", ReportYears.as_view()),
+    path("reports/<str:year_name>/<int:class_id>", ReportView.as_view()),
+    path("reports/<str:year_name>", ReportView.as_view()),
 ]

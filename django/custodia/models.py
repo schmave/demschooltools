@@ -17,17 +17,22 @@ class CustodiaUser(AbstractUser):
     """
     Changes from the overseer.users table currently being used in production:
 
-    ALTER TABLE overseer.users RENAME COLUMN user_id TO id;
-    ALTER TABLE overseer.users RENAME COLUMN insert_date TO date_joined;
+        ALTER TABLE overseer.users RENAME COLUMN user_id TO id;
+        ALTER TABLE overseer.users RENAME COLUMN inserted_date TO date_joined;
 
-    ALTER TABLE overseer.users ADD COLUMN last_login timestamptz NULL default now();
-    ALTER TABLE overseer.users ADD COLUMN is_superuser bool NOT NULL default false;
-    ALTER TABLE overseer.users ADD COLUMN first_name varchar(150) NOT NULL default '';
-    ALTER TABLE overseer.users ADD COLUMN last_name varchar(150) NOT NULL default '';
-    ALTER TABLE overseer.users ADD COLUMN email varchar(254) NOT NULL default '';
-    ALTER TABLE overseer.users ADD COLUMN is_staff bool NOT NULL default false;
-    ALTER TABLE overseer.users ADD COLUMN is_active bool NOT NULL default true;
-    ALTER TABLE overseer.users ADD COLUMN is_superuser bool NOT NULL default false;
+        ALTER TABLE overseer.users ADD COLUMN last_login timestamptz NULL default now();
+        ALTER TABLE overseer.users ADD COLUMN is_superuser bool NOT NULL default false;
+        ALTER TABLE overseer.users ADD COLUMN first_name varchar(150) NOT NULL default '';
+        ALTER TABLE overseer.users ADD COLUMN last_name varchar(150) NOT NULL default '';
+        ALTER TABLE overseer.users ADD COLUMN email varchar(254) NOT NULL default '';
+        ALTER TABLE overseer.users ADD COLUMN is_staff bool NOT NULL default false;
+        ALTER TABLE overseer.users ADD COLUMN is_active bool NOT NULL default true;
+
+
+    Also need to deal with the fact that passwords are not in the right format.
+    Django bcrypt looks like:
+       bcrypt$$2b$12$kHtLdeD00SoRqyuqgXZgfevdO0Gy7PAGRFqw0cX49FGLInWRwHZDS
+
     """
 
     class Meta:

@@ -100,7 +100,7 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "OPTIONS": {"options": "-c search_path=public,overseer"},
-        "NAME": "school_crm",
+        "NAME": "school_crm_from_prod",
         "PORT": "5432",
         "HOST": "localhost",
         "USER": "postgres",
@@ -128,6 +128,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+PASSWORD_HASHERS = [
+    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+    "django.contrib.auth.hashers.BCryptPasswordHasher",  # For reading passwords hashed by Custodia
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/

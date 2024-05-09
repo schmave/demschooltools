@@ -73,7 +73,7 @@ class AbsentView(APIView):
         student.show_as_absent = local_now.date()
         student.save()
 
-        return student_data_view(request, student_id)
+        return student_data_view(student_id)
 
 
 class ExcuseView(APIView):
@@ -83,7 +83,7 @@ class ExcuseView(APIView):
 
         Excuse.objects.create(student=student, date=date)
 
-        return student_data_view(request, student_id)
+        return student_data_view(student_id)
 
 
 class OverrideView(APIView):
@@ -93,7 +93,7 @@ class OverrideView(APIView):
 
         Override.objects.create(student=student, date=date)
 
-        return student_data_view(request, student_id)
+        return student_data_view(student_id)
 
 
 class SwipeView(APIView):
@@ -127,7 +127,7 @@ class DeleteSwipeView(APIView):
     def post(self, request: Request, student_id: int) -> Response:
         swipe_id = request.data["swipe"]["_id"]  # type: ignore
         Swipe.objects.get(id=swipe_id).delete()
-        return student_data_view(request, student_id)
+        return student_data_view(student_id)
 
 
 class LogoutView(View):
@@ -198,12 +198,27 @@ def get_start_of_school_year(school_timezone: tzinfo) -> date:
 
 class StudentDataView(APIView):
     def get(self, request: Request, student_id: int) -> Response:
-        return student_data_view(request, student_id)
+        return student_data_view(student_id)
 
 
-def student_data_view(request: Request, student_id: int) -> Response:
+def get_school_days(school: School, start: date, end: date):
+    return sorted(
+        Swipe.objects.filter(
+            student__school=school, swipe_day__gte=start, swipe_day__lte=end
+        )
+        .values_list("swipe_day", flat=True)
+        .distinct(),
+        reverse=True,
+    )
+
+
+def student_data_view(student_id: int, year: Year | None = None) -> Response:
+    return Response({"student": get_student_data(student_id, year)})
+
+
+def get_student_data(student_id: int, year: Year | None = None) -> dict:
     student = Student.objects.get(id=student_id)
-    school: School = request.user.school
+    school: School = student.school
     school_timezone = pytz.timezone(school.timezone)
     local_now = datetime.now(school_timezone)
     override_days: set[date] = set(
@@ -213,22 +228,29 @@ def student_data_view(request: Request, student_id: int) -> Response:
         Excuse.objects.filter(student=student).values_list("date", flat=True)
     )
 
-    year_start = get_start_of_school_year(school_timezone)
+    if year:
+        year_start = year.from_date
+        year_end = year.to_date
+    else:
+        year_start = get_start_of_school_year(school_timezone)
+        year_end = datetime(3000, 1, 1)
+
     day_to_swipes: dict[date, list[Swipe]] = defaultdict(list)
-    for swipe in Swipe.objects.filter(student=student, swipe_day__gte=year_start):
+    for swipe in Swipe.objects.filter(
+        student=student, swipe_day__gte=year_start, swipe_day__lte=year_end
+    ):
         day_to_swipes[swipe.swipe_day].append(swipe)
 
     day_to_swipes = dict(day_to_swipes)
-
-    school_days: list[date] = sorted(
-        Swipe.objects.filter(swipe_day__gte=year_start)
-        .values_list("swipe_day", flat=True)
-        .distinct(),
-        reverse=True,
-    )
+    school_days = get_school_days(school, year_start, year_end)
 
     day_data = []
     total_seconds = 0
+    total_abs = 0
+    total_days = 0
+    total_excused = 0
+    total_overrides = 0
+    total_short = 0
     for day in school_days:
         day_seconds = 0
         is_override = day in override_days
@@ -256,9 +278,10 @@ def student_data_view(request: Request, student_id: int) -> Response:
 
         is_short = day_seconds < DEFAULT_REQUIRED_MINUTES * 60
         is_excused = day in excused_days
+        is_absent = not is_excused and (day not in day_to_swipes)
         day_data.append(
             {
-                "absent": not is_excused and (day not in day_to_swipes),
+                "absent": is_absent,
                 "override": is_override,
                 "excused": is_excused,
                 "day": format_date(day),
@@ -272,31 +295,38 @@ def student_data_view(request: Request, student_id: int) -> Response:
             }
         )
 
+        if is_absent:
+            total_abs += 1
+        elif is_excused:
+            total_excused += 1
+        elif is_override:
+            total_overrides += 1
+        elif is_short:
+            total_short += 1
+        else:
+            total_days += 1
+
         total_seconds += day_seconds
 
-    return Response(
-        {
-            "student": {
-                "_id": student.id,
-                "absent_today": student.show_as_absent == local_now.date(),
-                "days": day_data,
-                "name": student.name,
-                "required_minutes": DEFAULT_REQUIRED_MINUTES,
-                "today": format_date(local_now.date()),
-                "total_hours": total_seconds / 3600,
-                "is_teacher": student.is_teacher,
-                "last_swipe_date": format_date(max(day_to_swipes)),
-                # -------- TODO: -----------
-                "last_swipe_type": "out",
-                "in_today": False,
-                "total_abs": 0,
-                "total_days": 0,
-                "total_excused": 0,
-                "total_overrides": 0,
-                "total_short": 0,
-            }
-        }
-    )
+    return {
+        "_id": student.id,
+        "absent_today": student.show_as_absent == local_now.date(),
+        "days": day_data,
+        "name": student.name,
+        "required_minutes": DEFAULT_REQUIRED_MINUTES,
+        "today": format_date(local_now.date()),
+        "total_hours": total_seconds / 3600,
+        "is_teacher": student.is_teacher,
+        "last_swipe_date": format_date(max(day_to_swipes)),
+        "total_abs": total_abs,
+        "total_days": total_days,
+        "total_excused": total_excused,
+        "total_overrides": total_overrides,
+        "total_short": total_short,
+        # -------- TODO: -----------
+        "last_swipe_type": "out",
+        "in_today": False,
+    }
 
 
 class ReportYears(APIView):
@@ -360,3 +390,34 @@ class ReportYears(APIView):
         Year.objects.filter(school=request.user.school, name=year_name).delete()
 
         return self.get(request)
+
+
+class ReportView(APIView):
+    def get(self, request: Request, year_name: str, class_id: int = -1) -> Response:
+        school = request.user.school
+        year = Year.objects.get(school=school, name=year_name)
+
+        students = list(
+            Student.objects.filter(
+                person__tags__show_in_attendance=True, school=school
+            ).order_by("name")
+        )
+
+        student_info = []
+        for student in students:
+            student_data = get_student_data(student.id, year)
+            student_info.append(
+                {
+                    "student_id": student_data["_id"],
+                    "_id": student_data["_id"],
+                    "name": student_data["name"],
+                    "total_hours": student_data["total_hours"],
+                    "good": student_data["total_days"],
+                    "short": student_data["total_short"],
+                    "overrides": student_data["total_overrides"],
+                    "excuses": student_data["total_excused"],
+                    "unexcused": student_data["total_abs"],
+                }
+            )
+
+        return Response(student_info)
