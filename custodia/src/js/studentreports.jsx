@@ -2,7 +2,6 @@ const reportStore = require("./reportstore");
 const Modal = require("./modal.jsx");
 const Router = require("react-router");
 const Link = Router.Link;
-const DateTimePicker = require("react-widgets").DateTimePicker;
 const actionCreator = require("./reportactioncreator");
 const React = require("react");
 const Griddle = require("griddle-react");
@@ -114,16 +113,12 @@ class StudentReports extends React.Component {
     actionCreator.deletePeriod(this.state.currentYear);
   };
 
-  dateToString = (value) => {
-    return value.getYear() + 1900 + "-" + (value.getMonth() + 1) + "-" + value.getDate();
+  onStartDateChange = (e) => {
+    this.setState({ startDate: e.target.value });
   };
 
-  onStartDateChange = (value) => {
-    this.setState({ startDate: this.dateToString(value) });
-  };
-
-  onEndDateChange = (value) => {
-    this.setState({ endDate: this.dateToString(value) });
+  onEndDateChange = (e) => {
+    this.setState({ endDate: e.target.value });
   };
 
   render() {
@@ -164,13 +159,13 @@ class StudentReports extends React.Component {
     return (
       <div>
         <div className="row margined">
+          <div className="pull-left">Report time period:</div>
           <select className="pull-left" onChange={this.yearSelected} value={this.state.currentYear}>
             {this.state.years
               ? this.state.years.years.map(
                   function (year) {
                     return (
                       <option key={year} value={year}>
-                        {" "}
                         {year === this.state.years.current_year ? year + " (Current)" : year}
                       </option>
                     );
@@ -193,12 +188,16 @@ class StudentReports extends React.Component {
         </div>
         {grid}
         <Modal ref="newSchoolYear" title="Create new period">
-          <form className="form-inline">
+          <form className="form">
             <div className="form-group">
-              <label htmlFor="startDate">Start:</label>
-              <DateTimePicker id="startDate" onChange={this.onStartDateChange} time={false} />
-              <label htmlFor="endDate">End:</label>
-              <DateTimePicker id="endDate" onChange={this.onEndDateChange} time={false} />
+              <div className="margined">
+                <label htmlFor="startDate">Start:</label>{" "}
+                <input type="date" onChange={this.onStartDateChange} />
+              </div>
+              <div className="margined">
+                <label htmlFor="endDate">End:</label>{" "}
+                <input type="date" onChange={this.onEndDateChange} />
+              </div>
             </div>
             <div className="form-group" style={{ marginLeft: "2em" }}>
               <button className="btn btn-sm btn-primary" onClick={this.createPeriod}>

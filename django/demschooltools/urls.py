@@ -45,6 +45,6 @@ urlpatterns = [
     path("students/<int:student_id>/excuse", ExcuseView.as_view()),
     path("students/<int:student_id>/override", OverrideView.as_view()),
     path("students/<int:student_id>", StudentDataView.as_view()),
-    path("reports/years", ReportYears.as_view()),
     path("reports/years/<str:year_name>", ReportYears.as_view()),
+    path("reports/years", ReportYears.as_view()),
 ]

@@ -307,13 +307,21 @@ class ReportYears(APIView):
         now = datetime.now()
 
         current_year = None
-        for year in Year.objects.filter(school=school).order_by("id"):
+        for year in Year.objects.filter(school=school).order_by("from_date", "to_date"):
             if current_year is None and now > year.from_date and now < year.to_date:
                 current_year = year.name
             years.append(year.name)
 
         if current_year is None:
-            current_year = years[-1]
+            from_date = get_start_of_school_year(pytz.timezone(school.timezone))
+            to_date = date(from_date.year + 1, 7, 31)
+            year = Year.objects.create(
+                school=school,
+                from_date=from_date,
+                to_date=to_date,
+                name=self.make_period_name(from_date, to_date),
+            )
+            current_year = year.name
 
         return Response(
             {
@@ -333,10 +341,20 @@ class ReportYears(APIView):
             school=request.user.school,
             from_date=from_date,
             to_date=to_date,
-            name=f"{format_date(from_date)} {format_date(to_date)}",
+            name=self.make_period_name(from_date, to_date),
         )
 
         return Response({"made": {"name": year.name}})
+
+    def make_period_name(self, from_date: date, to_date: date) -> str:
+        if from_date.year != to_date.year:
+            return (
+                f"{from_date.strftime('%B %-d, %Y')} - {to_date.strftime('%B %-d, %Y')}"
+            )
+        elif from_date.month != to_date.month:
+            return f"{from_date.strftime('%B %-d')} - {to_date.strftime('%B %-d, %Y')}"
+
+        return f"{from_date.strftime('%B %-d')}-{to_date.strftime('%-d, %Y')}"
 
     def delete(self, request: Request, year_name: str) -> Response:
         Year.objects.filter(school=request.user.school, name=year_name).delete()

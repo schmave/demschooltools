@@ -1,5 +1,5 @@
-var React = require("react"),
-  Skylight = require("react-skylight").default;
+const React = require("react");
+const Skylight = require("react-skylight").default;
 
 module.exports = class extends React.Component {
   static displayName = "Modal";
@@ -15,7 +15,7 @@ module.exports = class extends React.Component {
   };
 
   handleKeyDown = (keypress) => {
-    if (keypress.keyCode == 27 /*esc*/) {
+    if (keypress.keyCode == 27 /* esc */) {
       this.hide();
       this.unbindEsc();
     }

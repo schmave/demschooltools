@@ -30,10 +30,9 @@ const exports = {
   },
   createPeriod: function (start, end) {
     ajax.post("/reports/years", { from_date: start, to_date: end }).then(function (data) {
-      const period = data.made.name.split(" ");
       dispatcher.dispatch({
         type: constants.systemEvents.FLASH,
-        message: "Successfully created period from " + period[0] + " to " + period[1],
+        message: "Successfully created report period " + data.made.name,
       });
       dispatcher.dispatch({
         type: constants.reportEvents.PERIOD_CREATED,

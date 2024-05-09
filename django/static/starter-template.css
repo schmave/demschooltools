@@ -327,3 +327,13 @@ rect.highlight {
     padding-top: 0;
     height: inherit;
 }
+
+a.skylight-close-button {
+    right: 20px !important;
+    top: initial !important;
+    color: white;
+}
+
+a.skylight-close-button:hover, a.skylight-close-button:focus {
+    text-decoration: none;
+}

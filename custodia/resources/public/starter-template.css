@@ -291,7 +291,8 @@ rect.highlight {
     border-top: solid lightgray 1px;
     padding-top: 5px;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+    gap: 5px;
 }
 .action-buttons button {
     margin: 0 3px;
@@ -325,4 +326,14 @@ rect.highlight {
     padding-bottom: 0;
     padding-top: 0;
     height: inherit;
+}
+
+a.skylight-close-button {
+    right: 20px !important;
+    top: initial !important;
+    color: white;
+}
+
+a.skylight-close-button:hover, a.skylight-close-button:focus {
+    text-decoration: none;
 }
