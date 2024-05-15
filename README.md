@@ -13,6 +13,8 @@ See [the wiki](https://github.com/schmave/demschooltools/wiki/) for more informa
 the source code, or clone the git repository. `cd` into the root level
 of the source code.
 
+1. [Download](https://openjdk.org/) and install OpenJDK version 11.x and setup local environment (ex: JAVA_HOME environment variables)
+
 1. [Download](https://www.playframework.com/documentation/2.8.x/Requirements) 
 and install sbt and the Play Framework. You will also need Java 11 if 
 you don't have it installed already.
@@ -31,8 +33,7 @@ including pgAdmin, their graphical administration tool.
 FACEBOOK_CLIENT_SECRET, ROLLBAR_TOKEN, and SES_PASSWORD to empty values. You can run the 
 "set_keys_blank.sh" script to do this on Mac/Linux.
 
-1. Run sbt (see [Play documentation](https://playframework.com/documentation/2.8.x/PlayConsole) 
-for more info) and execute the "run" command at the activator console.
+1. Run sbt `sh sbt.sh`, then execute the `run` command in the sbt/play console.
 
 1. Navigate to [http://localhost:9000](http://localhost:9000) in your browser 
 and wait while DemSchoolTools is compiled.
@@ -43,14 +44,13 @@ and wait while DemSchoolTools is compiled.
 1. Open pgAdmin and run this SQL:
 
         INSERT INTO organization_hosts(host, organization_id) VALUES ('localhost:9000', 1);
-        INSERT INTO tag(title, use_student_display, organization_id, show_in_jc) VALUES ('Current Student', true, 1, true);
-        INSERT INTO tag(title, use_student_display, organization_id, show_in_jc) VALUES ('Staff', false, 1, true);
+        INSERT INTO tag(title, use_student_display, organization_id, show_in_jc, show_in_account_balances) VALUES ('Current Student', true, 1, true, true);
+        INSERT INTO tag(title, use_student_display, organization_id, show_in_jc, show_in_account_balances) VALUES ('Staff', false, 1, true, true);
 
-1. Disable authentication by adding the following code to the top of `Authenticator.getUsername` in app/controllers/Secured.java:
-
-        if (1 == 1) {
-            return "Admin User";
-        }
+1. Create a user for logging in:
+Go to `https://www.browserling.com/tools/bcrypt` to encrypt a password
+In pgAdmin run the following query (replacing names and passwords): `INSERT INTO users(email, name, active, email_validated, hashed_password) VALUES ('EMAIL', 'NAME', true, true, 'PASSWORDHERE');`
+In pgAdmin run the following query (replacing the user_id with the user you just created): `INSERT INTO public.user_role (user_id, role) VALUES (USERID, 'all-access');`
 
 1. Navigate to [http://localhost:9000](http://localhost:9000). You will see 
 a page with headings "People", "Attendance", "JC", etc.
