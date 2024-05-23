@@ -10,7 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
-import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -39,9 +38,13 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "custodia",
-    "manual",
+    "dst",
     "django_extensions",
 ]
+
+AUTH_USER_MODEL = "custodia.CustodiaUser"
+LOGIN_URL = "/users/login"
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -94,18 +97,14 @@ WSGI_APPLICATION = "demschooltools.wsgi.application"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    "local": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    },
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "OPTIONS": {"options": "-c search_path=public,overseer"},
-        "NAME": "school_crm",
-        "PORT": "5433",
+        "NAME": "school_crm_from_prod",
+        "PORT": "5432",
         "HOST": "localhost",
-        "USER": "evan",
-        "PASSWORD": os.environ["DB_PASSWORD"],
+        "USER": "postgres",
+        "PASSWORD": "abc123",
     },
 }
 
@@ -129,6 +128,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+PASSWORD_HASHERS = [
+    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+    "django.contrib.auth.hashers.BCryptPasswordHasher",  # For reading passwords hashed by Custodia
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
@@ -146,6 +149,9 @@ USE_L10N = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = "/static/"
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

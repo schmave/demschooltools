@@ -9,8 +9,8 @@
       "editor.formatOnSave": true,
       "editor.defaultFormatter": "charliermarsh.ruff",
       "editor.codeActionsOnSave": {
-        "source.fixAll": "explicit",
-        "source.organizeImports": "explicit"
+        "source.fixAll": "always",
+        "source.organizeImports": "always"
       }
     },
     "[javascript]": {
@@ -28,6 +28,27 @@
     "[jsonc]": {
       "editor.formatOnSave": true,
       "editor.defaultFormatter": "esbenp.prettier-vscode"
-    }
+    },
+    "prettier.prettierPath": "",
+    "[java]": {
+      "editor.formatOnSave": false,
+      "editor.formatOnPaste": false
+    },
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.packageIndexDepths": [
+      {
+        "name": "django",
+        "depth": 4
+      },
+      {
+        "name": "rest_framework",
+        "depth": 4,
+        "includeAllSymbols": true
+      }
+    ],
+    "python.analysis.extraPaths": ["./django"],
+    "python.autoComplete.extraPaths": ["./django"],
+    "python.defaultInterpreterPath": "./django/.venv/bin/python",
+    "python.analysis.typeCheckingMode": "standard"
   }
 }

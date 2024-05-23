@@ -4,7 +4,7 @@ from django.db.models import Q
 from tabulate import tabulate
 
 from custodia.models import Swipe
-from manual.models import (
+from dst.models import (
     AttendanceDay,
     CompletedTask,
     ManualChange,

@@ -17,6 +17,37 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from custodia.views import (
+    AbsentView,
+    DeleteSwipeView,
+    ExcuseView,
+    IndexView,
+    IsAdminView,
+    LoginView,
+    LogoutView,
+    OverrideView,
+    ReportView,
+    ReportYears,
+    StudentDataView,
+    StudentsTodayView,
+    SwipeView,
+)
+
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("", IndexView.as_view()),
+    path("users/login", LoginView.as_view()),
+    path("users/logout", LogoutView.as_view()),
+    path("users/is-admin", IsAdminView.as_view()),
+    path("students", StudentsTodayView.as_view()),
+    path("students/<int:student_id>/swipe/delete", DeleteSwipeView.as_view()),
+    path("students/<int:student_id>/swipe", SwipeView.as_view()),
+    path("students/<int:student_id>/absent", AbsentView.as_view()),
+    path("students/<int:student_id>/excuse", ExcuseView.as_view()),
+    path("students/<int:student_id>/override", OverrideView.as_view()),
+    path("students/<int:student_id>", StudentDataView.as_view()),
+    path("reports/years/<str:year_name>", ReportYears.as_view()),
+    path("reports/years", ReportYears.as_view()),
+    path("reports/<str:year_name>/<int:class_id>", ReportView.as_view()),
+    path("reports/<str:year_name>", ReportView.as_view()),
 ]

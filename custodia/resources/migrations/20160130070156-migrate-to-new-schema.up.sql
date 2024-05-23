@@ -1,5 +1,3 @@
-create schema phillyfreeschool;
---;;
 alter TABLE years set schema phillyfreeschool;
 --;;
 alter TABLE students set schema phillyfreeschool;
