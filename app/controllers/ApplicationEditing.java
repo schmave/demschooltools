@@ -78,13 +78,12 @@ public class ApplicationEditing extends Controller {
     the_meeting.prepareForEditing(Utils.getOrg(request));
 
     return ok(edit_minutes_react.render(
-      the_meeting,
+            the_meeting,
             Case.getOpenCases(Utils.getOrg(request)),
             request,
             mMessagesApi.preferred(request)))
         .withHeader("Cache-Control", "max-age=0, no-cache, no-store")
         .withHeader("Pragma", "no-cache");
-
   }
 
   Result tooOldToEdit() {
