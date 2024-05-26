@@ -55,6 +55,38 @@ public class ApplicationEditing extends Controller {
     return editMinutes(the_meeting, request);
   }
 
+  @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
+  public Result editTodaysMinutesReact(Http.Request request) {
+    Organization org = Utils.getOrg(request);
+    Meeting the_meeting =
+        Meeting.find
+            .query()
+            .where()
+            .eq("organization", org)
+            .eq("date", Utils.localNow(Utils.getOrgConfig(org)))
+            .findOne();
+    if (the_meeting == null) {
+      CachedPage.remove(CachedPage.JC_INDEX, org);
+      the_meeting = Meeting.create(new Date(), org);
+      the_meeting.save();
+    }
+
+    // This is a nearly exact copy of editMinutes() -- stop duplicating code eventually
+    if (!authToEdit(the_meeting.getDate(), request)) {
+      return tooOldToEdit();
+    }
+    the_meeting.prepareForEditing(Utils.getOrg(request));
+
+    return ok(edit_minutes_react.render(
+      the_meeting,
+            Case.getOpenCases(Utils.getOrg(request)),
+            request,
+            mMessagesApi.preferred(request)))
+        .withHeader("Cache-Control", "max-age=0, no-cache, no-store")
+        .withHeader("Pragma", "no-cache");
+
+  }
+
   Result tooOldToEdit() {
     return unauthorized("This JC data is too old for you to edit.");
   }

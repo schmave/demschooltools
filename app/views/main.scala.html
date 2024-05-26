@@ -223,6 +223,9 @@ var _rollbarConfig = {
                 <a href="@routes.ApplicationEditing.editTodaysMinutes()">
                     Edit today's minutes</a>
             </span>
+            <a @if(selectedBtn.equals("edit_minutes_react")) { class="active" }
+                href="@routes.ApplicationEditing.editTodaysMinutesReact()">
+                Edit today's minutes (React)</a>
             <a @if(selectedBtn.equals("rps")) { class="active" }
                 href="@routes.Application.editResolutionPlanList()">
                 @Utils.getOrgConfig(request).str_res_plans_cap</a>

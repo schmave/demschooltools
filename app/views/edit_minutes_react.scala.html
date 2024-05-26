@@ -1,0 +1,32 @@
+@(meeting : Meeting, open_cases: List[Case])(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
+
+@import helper._
+
+@main("(React) Edit meeting minutes for date " + meeting.getDate(), "jc", "edit_minutes_react") {
+    <div id="react-root"></div>
+
+    <script type="text/javascript">
+    initialData = {}
+    initialData.meeting_id = @meeting.getId();
+    initialData.ROLE_JC_CHAIR = @PersonAtMeeting.ROLE_JC_CHAIR
+    initialData.ROLE_JC_MEMBER = @PersonAtMeeting.ROLE_JC_MEMBER
+    initialData.ROLE_NOTE_TAKER = @PersonAtMeeting.ROLE_NOTE_TAKER
+    initialData.ROLE_JC_SUB = @PersonAtMeeting.ROLE_JC_SUB
+    initialData.ROLE_RUNNER = @PersonAtMeeting.ROLE_RUNNER
+    initialData.ROLE_TESTIFIER = @PersonAtCase.ROLE_TESTIFIER
+    initialData.ROLE_WRITER = @PersonAtCase.ROLE_WRITER
+
+    initialData.people = @Html(Application.jcPeople("", Utils.getOrgConfig(request).org))
+    initialData.rules = @Html(Application.jsonRules(false, Utils.getOrgConfig(request).org))
+    initialData.cases = @Html(Application.jsonCases("", Utils.getOrgConfig(request).org))
+
+    initialData.committee = @Html(meeting.getJsonPeople(PersonAtMeeting.ROLE_JC_MEMBER));
+    initialData.chair = @Html(meeting.getJsonPeople(PersonAtMeeting.ROLE_JC_CHAIR));
+    initialData.notetaker = @Html(meeting.getJsonPeople(PersonAtMeeting.ROLE_NOTE_TAKER));
+    initialData.sub = @Html(meeting.getJsonPeople(PersonAtMeeting.ROLE_JC_SUB));
+    initialData.runners = @Html(meeting.getJsonPeople(PersonAtMeeting.ROLE_RUNNER));
+    initialData.config = @Html(Utils.toJson(Utils.getOrgConfig(request)));
+    </script>
+    <script type="text/javascript"
+    src="@routes.Assets.versioned("javascripts/gen/edit_minutes_react.js")"></script>
+}

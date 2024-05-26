@@ -3,9 +3,6 @@ const webpack = require("webpack");
 
 const ESLintPlugin = require("eslint-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const { EsbuildPlugin } = require("esbuild-loader");
-
-const ESBUILD_TARGET = ["chrome58", "edge16", "firefox57", "safari11"];
 
 module.exports = function (env, argv) {
   return {
@@ -14,18 +11,45 @@ module.exports = function (env, argv) {
     entry: {
       bundle: "./javascripts/main.js",
       checkin: "./checkin/app.js",
+      edit_minutes_react: "./javascripts/EditMinutesApp.jsx",
     },
     module: {
       rules: [
         {
-          test: /\.(?:js|mjs|cjs)$/,
+          test: /\.s[ac]ss$/i,
+          use: [
+            // Creates `style` nodes from JS strings
+            "style-loader",
+            // Translates CSS into CommonJS
+            "css-loader",
+            // Compiles Sass to CSS
+            "sass-loader",
+          ],
+        },
+        {
+          test: /\.(jsx|js|mjs|cjs)$/,
           exclude: /node_modules/,
-          use: {
-            loader: "esbuild-loader",
-            options: {
-              target: ESBUILD_TARGET,
+          use: [
+            {
+              loader: "babel-loader",
+              options: {
+                presets: [
+                  [
+                    "@babel/preset-env",
+                    {
+                      targets: {
+                        chrome: 58,
+                        edge: 16,
+                        firefox: 57,
+                        safari: 11,
+                      },
+                    },
+                  ],
+                  "@babel/preset-react",
+                ],
+              },
             },
-          },
+          ],
         },
       ],
     },
@@ -36,18 +60,11 @@ module.exports = function (env, argv) {
       sourceMapFilename: "[file].[chunkhash].map[query]",
     },
     resolve: {
+      extensions: ["", ".js", ".jsx"],
       alias: {
         handlebars: "handlebars/dist/handlebars",
         jquery: "jquery/src/jquery",
       },
-    },
-    optimization: {
-      minimize: true,
-      minimizer: [
-        new EsbuildPlugin({
-          target: ESBUILD_TARGET,
-        }),
-      ],
     },
 
     plugins: [
@@ -65,7 +82,8 @@ module.exports = function (env, argv) {
         hash: argv.mode != "production",
         chunks: ["checkin"],
         templateParameters: {
-          rollbarEnvironment: argv.mode == "production" ? "production" : "development",
+          rollbarEnvironment:
+            argv.mode == "production" ? "production" : "development",
         },
       }),
     ],
