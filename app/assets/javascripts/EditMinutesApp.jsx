@@ -14,13 +14,13 @@ function RootApp() {
   const [rules, setRules] = useState(window.initialData.rules);
   const [runners, setRunners] = useState(window.initialData.runners);
   const [sub, setSub] = useState(window.initialData.sub);
-  
+
   return (
     <React.StrictMode>
       <>
         <div className="div-test">Hello World, No More Classes</div>
 
-        {window.initialData.cases.map((caseData) => (
+        {cases.map((caseData) => (
           <Case key={caseData.label} caseData={caseData} />
         ))}
         {people.map((person) => (
