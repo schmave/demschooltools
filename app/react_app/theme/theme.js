@@ -1,5 +1,6 @@
 import { createTheme } from '@mui/material/styles';
 
+// TO-DO: Replace colors here, pulled from a Slalom app
 export const darkTheme = createTheme({
   palette: {
     mode: 'dark',
@@ -31,7 +32,6 @@ export const lightTheme = createTheme({
       main: '#1be1f2',
     },
     info: {
-      // main: '#c7b9ff', // Slalom Purple, replaced with a gray below
       main: '#7e8289',
     },
     error: {
@@ -39,7 +39,6 @@ export const lightTheme = createTheme({
     },
     warning: {
       main: '#ffcc00',
-      // main: '#deff4d', // Slalom color, but it's terrible
     },
   },
 });

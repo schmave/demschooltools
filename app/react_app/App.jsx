@@ -23,7 +23,7 @@ function App() {
 
   // Pieces for the Snackbar Context
   const setSnackbar = (props) => {
-    const { message, action, severity = "success", duration = 7000 } = props;
+    const { message, action, severity = "success", duration = 5000 } = props;
     setSnackbarDetails({
       message: message,
       duration: duration,
