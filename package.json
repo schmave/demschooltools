@@ -1,14 +1,28 @@
 {
   "name": "demschooltools",
   "dependencies": {
+    "@date-io/moment": "^3.0.0",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@mui/icons-material": "^5.15.18",
+    "@mui/material": "^5.15.18",
+    "@mui/styled-engine-sc": "^6.0.0-alpha.18",
+    "@mui/x-date-pickers": "^7.5.1",
+    "axios": "^1.7.2",
     "bootstrap": "3.3.7",
+    "dayjs": "^1.11.11",
     "handlebars": "4.0.10",
     "jquery": "3.2.1",
     "jquery-form": "4.2.1",
     "jquery-ui": "1.12.1",
     "localforage": "^1.7.3",
+    "moment": "^2.30.1",
     "react": "^18.3.1",
-    "spectrum-colorpicker": "1.8.0"
+    "react-icons": "^5.2.1",
+    "react-router-dom": "^6.23.1",
+    "shuffle-seed": "^1.1.6",
+    "spectrum-colorpicker": "1.8.0",
+    "uuid": "^9.0.1"
   },
   "scripts": {
     "compile": "webpack --mode production",

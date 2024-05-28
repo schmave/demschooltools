@@ -7,11 +7,11 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 module.exports = function (env, argv) {
   return {
     devtool: "source-map",
-    context: path.join(__dirname, "/app/assets"),
+    context: path.join(__dirname, "/app"),
     entry: {
-      bundle: "./javascripts/main.js",
-      checkin: "./checkin/app.js",
-      edit_minutes_react: "./javascripts/EditMinutesApp.jsx",
+      bundle: "./assets/javascripts/main.js",
+      checkin: "./assets/checkin/app.js",
+      reactapp: "./react_app/index.js",
     },
     module: {
       rules: [
