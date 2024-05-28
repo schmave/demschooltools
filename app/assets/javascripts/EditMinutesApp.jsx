@@ -1,19 +1,21 @@
 import React from "react";
-import { createRoot } from "react-dom/client";
+import ReactDOM from "react-dom/client";
 import "./edit_minutes.scss";
 import Case from "./minutes/Case";
 
-export class EditMinutesApp extends React.Component {
-  render = () => (
-    <>
-      <div className="div-test">Hello, world!</div>
+function RootApp() {
+  return (
+    <React.StrictMode>
+      <>
+        <div className="div-test">Hello World, No More Classes</div>
 
-      {window.initialData.cases.map((caseData) => (
-        <Case key={caseData.label} caseData={caseData} />
-      ))}
-    </>
+        {window.initialData.cases.map((caseData) => (
+          <Case key={caseData.label} caseData={caseData} />
+        ))}
+      </>
+    </React.StrictMode>
   );
 }
 
-const root = createRoot(document.getElementById("react-root"));
-root.render(<EditMinutesApp />);
+const root = ReactDOM.createRoot(document.getElementById("react-root"));
+root.render(<RootApp />);
