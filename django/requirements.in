@@ -1,8 +1,8 @@
 bcrypt # Used to support old bcrypt passwords from overseer
 django-extensions
-django<4
+django
 djangorestframework
 ipython
-psycopg2
+psycopg
 pytz
 tabulate
