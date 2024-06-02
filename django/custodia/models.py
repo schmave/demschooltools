@@ -62,6 +62,7 @@ class Swipe(models.Model):
 
     * all time fields currently use a time zone. migrate the DB to use UTC instead
     * drop rounded_in_time and rounded_out_time columns
+    * create index on overseer.swipes (student_id, swipe_day)
     """
 
     class Meta:
@@ -69,6 +70,7 @@ class Swipe(models.Model):
 
     id = models.AutoField(db_column="_id", primary_key=True)
     student = models.ForeignKey(Student, on_delete=models.PROTECT)
+    student_id: int
     swipe_day = models.DateField()
 
     in_time = models.DateTimeField()

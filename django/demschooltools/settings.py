@@ -27,8 +27,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+SILK_ENABLED = False
 
 # Application definition
+
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -40,13 +42,13 @@ INSTALLED_APPS = [
     "custodia",
     "dst",
     "django_extensions",
-]
+] + (["silk"] if SILK_ENABLED else [])
 
 AUTH_USER_MODEL = "custodia.CustodiaUser"
 LOGIN_URL = "/users/login"
 
 
-MIDDLEWARE = [
+MIDDLEWARE = (["silk.middleware.SilkyMiddleware"] if SILK_ENABLED else []) + [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",

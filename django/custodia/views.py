@@ -4,9 +4,11 @@ from datetime import date, datetime, tzinfo
 import pytz
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.views import redirect_to_login
+from django.db.models import Max
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.views import View
+from rest_framework.generics import QuerySet
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -174,10 +176,19 @@ class StudentsTodayView(APIView):
 
         student_infos = []
 
-        for student in Student.objects.filter(
-            person__tags__show_in_attendance=True, school=school
-        ):
-            last_swipe = Swipe.objects.filter(student=student).order_by("-id").first()
+        students = list(
+            Student.objects.filter(
+                person__tags__show_in_attendance=True, school=school
+            ).annotate(max_swipe_id=Max("swipe__id"))
+        )
+
+        student_to_last_swipe = {
+            x.student_id: x
+            for x in Swipe.objects.filter(id__in=[x.max_swipe_id for x in students])
+        }
+
+        for student in students:
+            last_swipe = student_to_last_swipe[student.id]
             student_infos.append(student_to_dict(student, last_swipe, now))
 
         return Response(
@@ -188,11 +199,11 @@ class StudentsTodayView(APIView):
         )
 
 
-def get_start_of_school_year(school_timezone: tzinfo) -> date:
+def get_start_of_school_year(school_timezone: tzinfo) -> datetime:
     local_now = datetime.now(school_timezone)
-    result = date(local_now.year, 8, 1)
-    if result > local_now.date():
-        return date(local_now.year - 1, 8, 1)
+    result = datetime(local_now.year, 8, 1, tzinfo=school_timezone)
+    if result > local_now:
+        return datetime(local_now.year - 1, 8, 1, tzinfo=school_timezone)
     return result
 
 
@@ -201,7 +212,16 @@ class StudentDataView(APIView):
         return student_data_view(student_id)
 
 
-def get_school_days(school: School, start: date, end: date):
+def get_year_start_end(school: School, year: Year | None) -> tuple[datetime, datetime]:
+    if year:
+        return (year.from_date, year.to_date)
+    return (
+        get_start_of_school_year(pytz.timezone(school.timezone)),
+        datetime(3000, 1, 1),
+    )
+
+
+def get_school_days(school: School, start: datetime, end: datetime) -> list[date]:
     return sorted(
         Swipe.objects.filter(
             student__school=school, swipe_day__gte=start, swipe_day__lte=end
@@ -213,36 +233,64 @@ def get_school_days(school: School, start: date, end: date):
 
 
 def student_data_view(student_id: int, year: Year | None = None) -> Response:
-    return Response({"student": get_student_data(student_id, year)})
+    return Response(
+        {
+            "student": get_student_batch_data(
+                Student.objects.filter(id=student_id), year
+            )[student_id]
+        }
+    )
 
 
-def get_student_data(student_id: int, year: Year | None = None) -> dict:
-    student = Student.objects.get(id=student_id)
-    school: School = student.school
+def get_student_batch_data(
+    students: QuerySet[Student], year: Year | None
+) -> dict[int, dict]:
+    school = students[0].school
+    year_start, year_end = get_year_start_end(school, year)
+    school_days = get_school_days(school, year_start, year_end)
+
+    overrides: dict[int, set[date]] = defaultdict(set)
+    for student_id, the_date in Override.objects.filter(
+        student__in=students
+    ).values_list("student_id", "date"):
+        overrides[student_id].add(the_date)
+
+    excuses: dict[int, set[date]] = defaultdict(set)
+    for student_id, the_date in Excuse.objects.filter(student__in=students).values_list(
+        "student_id", "date"
+    ):
+        excuses[student_id].add(the_date)
+
+    swipes: dict[int, dict[date, list[Swipe]]] = defaultdict(lambda: defaultdict(list))
+
+    for swipe in Swipe.objects.filter(
+        student__in=students, swipe_day__gte=year_start, swipe_day__lte=year_end
+    ):
+        swipes[swipe.student_id][swipe.swipe_day].append(swipe)
+
+    result: dict[int, dict] = {}
+    for student in students:
+        result[student.id] = get_student_data(
+            student,
+            school,
+            school_days,
+            overrides[student.id],
+            excuses[student.id],
+            dict(swipes[student.id]),
+        )
+    return result
+
+
+def get_student_data(
+    student: Student,
+    school: School,
+    school_days: list[date],
+    override_days: set[date],
+    excused_days: set[date],
+    day_to_swipes: dict[date, list[Swipe]],
+) -> dict:
     school_timezone = pytz.timezone(school.timezone)
     local_now = datetime.now(school_timezone)
-    override_days: set[date] = set(
-        Override.objects.filter(student=student).values_list("date", flat=True)
-    )
-    excused_days: set[date] = set(
-        Excuse.objects.filter(student=student).values_list("date", flat=True)
-    )
-
-    if year:
-        year_start = year.from_date
-        year_end = year.to_date
-    else:
-        year_start = get_start_of_school_year(school_timezone)
-        year_end = datetime(3000, 1, 1)
-
-    day_to_swipes: dict[date, list[Swipe]] = defaultdict(list)
-    for swipe in Swipe.objects.filter(
-        student=student, swipe_day__gte=year_start, swipe_day__lte=year_end
-    ):
-        day_to_swipes[swipe.swipe_day].append(swipe)
-
-    day_to_swipes = dict(day_to_swipes)
-    school_days = get_school_days(school, year_start, year_end)
 
     day_data = []
     total_seconds = 0
@@ -317,7 +365,7 @@ def get_student_data(student_id: int, year: Year | None = None) -> dict:
         "today": format_date(local_now.date()),
         "total_hours": total_seconds / 3600,
         "is_teacher": student.is_teacher,
-        "last_swipe_date": format_date(max(day_to_swipes)),
+        "last_swipe_date": format_date(max(day_to_swipes)) if day_to_swipes else None,
         "total_abs": total_abs,
         "total_days": total_days,
         "total_excused": total_excused,
@@ -397,15 +445,14 @@ class ReportView(APIView):
         school = request.user.school
         year = Year.objects.get(school=school, name=year_name)
 
-        students = list(
-            Student.objects.filter(
-                person__tags__show_in_attendance=True, school=school
-            ).order_by("name")
-        )
+        students = Student.objects.filter(
+            person__tags__show_in_attendance=True, school=school
+        ).order_by("name")
 
         student_info = []
+        batch_data = get_student_batch_data(students, year)
         for student in students:
-            student_data = get_student_data(student.id, year)
+            student_data = batch_data[student.id]
             student_info.append(
                 {
                     "student_id": student_data["_id"],

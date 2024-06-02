@@ -15,7 +15,7 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
 
 from custodia.views import (
     AbsentView,
@@ -32,6 +32,7 @@ from custodia.views import (
     StudentsTodayView,
     SwipeView,
 )
+from demschooltools.settings import SILK_ENABLED
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -51,3 +52,6 @@ urlpatterns = [
     path("reports/<str:year_name>/<int:class_id>", ReportView.as_view()),
     path("reports/<str:year_name>", ReportView.as_view()),
 ]
+
+if SILK_ENABLED:
+    urlpatterns += [path("silk/", include("silk.urls", namespace="silk"))]
