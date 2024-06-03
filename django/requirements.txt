@@ -55,6 +55,8 @@ pycodestyle==2.11.1
     # via autopep8
 pygments==2.18.0
     # via ipython
+pyinstrument==4.6.2
+    # via -r requirements.in
 pytz==2024.1
     # via -r requirements.in
 six==1.16.0

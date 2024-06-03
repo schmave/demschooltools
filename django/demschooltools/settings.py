@@ -27,7 +27,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Profiling
 SILK_ENABLED = False
+PYINSTRUMENT_PROFILE_DIR = "profiles"  # also add pyinstrument to MIDDLEWARE
 
 # Application definition
 
@@ -60,6 +62,7 @@ MIDDLEWARE = (["silk.middleware.SilkyMiddleware"] if SILK_ENABLED else []) + [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # "pyinstrument.middleware.ProfilerMiddleware",
 ]
 
 ROOT_URLCONF = "demschooltools.urls"
@@ -111,6 +114,7 @@ DATABASES = {
         "HOST": "localhost",
         "USER": "postgres",
         "PASSWORD": "abc123",
+        "CONN_MAX_AGE": 60,
     },
 }
 
