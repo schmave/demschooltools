@@ -15,8 +15,19 @@ const groupingFunc = function (data) {
   return data.day.split("-")[0] + "-" + data.day.split("-")[1] + "-" + "01";
 };
 
-module.exports = class extends React.Component {
-  static displayName = "Heatmap";
+module.exports = class Heatmap extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      mounted: false,
+    };
+
+    // Defer rendering the heatmaps so that the initial page load can take
+    // place without waiting for them.
+    setTimeout(() => {
+      this.setState({ mounted: true });
+    }, 0);
+  }
 
   loadHeatmaps = () => {
     const groupedDays = this.props.days.groupBy(groupingFunc);
@@ -46,6 +57,6 @@ module.exports = class extends React.Component {
   };
 
   render() {
-    return <div className="row">{this.loadHeatmaps()}</div>;
+    return this.state.mounted && <div className="row">{this.loadHeatmaps()}</div>;
   }
 };
