@@ -16,11 +16,16 @@ django==5.0.6
     #   django-extensions
     #   django-silk
     #   djangorestframework
+    #   drf-orjson-renderer
 django-extensions==3.2.3
     # via -r requirements.in
 django-silk==5.1.0
     # via -r requirements.in
 djangorestframework==3.15.1
+    # via
+    #   -r requirements.in
+    #   drf-orjson-renderer
+drf-orjson-renderer==1.7.2
     # via -r requirements.in
 executing==2.0.1
     # via stack-data
@@ -32,6 +37,8 @@ jedi==0.19.1
     # via ipython
 matplotlib-inline==0.1.7
     # via ipython
+orjson==3.10.3
+    # via drf-orjson-renderer
 parso==0.8.4
     # via jedi
 pexpect==4.9.0

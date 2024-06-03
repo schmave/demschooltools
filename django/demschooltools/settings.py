@@ -47,6 +47,10 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = "custodia.CustodiaUser"
 LOGIN_URL = "/users/login"
 
+REST_FRAMEWORK = {
+    "DEFAULT_RENDERER_CLASSES": ("drf_orjson_renderer.renderers.ORJSONRenderer",),
+    "DEFAULT_PARSER_CLASSES": ("drf_orjson_renderer.parsers.ORJSONParser",),
+}
 
 MIDDLEWARE = (["silk.middleware.SilkyMiddleware"] if SILK_ENABLED else []) + [
     "django.middleware.security.SecurityMiddleware",

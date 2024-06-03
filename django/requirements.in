@@ -3,6 +3,7 @@ django-extensions
 django
 djangorestframework
 django-silk
+drf-orjson-renderer
 ipython
 psycopg
 pytz
