@@ -43,7 +43,7 @@ parso==0.8.4
     # via jedi
 pexpect==4.9.0
     # via ipython
-prompt-toolkit==3.0.45
+prompt-toolkit==3.0.46
     # via ipython
 psycopg==3.1.19
     # via -r requirements.in
@@ -56,8 +56,6 @@ pycodestyle==2.11.1
 pygments==2.18.0
     # via ipython
 pyinstrument==4.6.2
-    # via -r requirements.in
-pytz==2024.1
     # via -r requirements.in
 six==1.16.0
     # via asttokens

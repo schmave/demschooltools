@@ -3,6 +3,12 @@ from django.db import models
 
 
 class School(models.Model):
+    """
+    Changes from the overseer.schools table currently being used in production:
+
+    alter table overseer.schools add column late_time time DEFAULT '10:15:00'::time without time zone NULL;
+    """
+
     class Meta:
         db_table = "schools"
 
@@ -11,6 +17,7 @@ class School(models.Model):
     timezone = models.TextField()
     inserted_date = models.DateTimeField()
     use_display_name = models.BooleanField()
+    late_time = models.TimeField()
 
 
 class CustodiaUser(AbstractUser):

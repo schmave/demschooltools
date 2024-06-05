@@ -62,6 +62,7 @@ MIDDLEWARE = (["silk.middleware.SilkyMiddleware"] if SILK_ENABLED else []) + [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "demschooltools.middleware.TimezoneMiddleware",
     # "pyinstrument.middleware.ProfilerMiddleware",
 ]
 
@@ -118,7 +119,9 @@ DATABASES = {
     },
 }
 
-USE_TZ = False
+USE_TZ = True
+TIME_ZONE = "UTC"
+
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -148,10 +151,7 @@ PASSWORD_HASHERS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
-
 USE_I18N = True
-
 USE_L10N = True
 
 

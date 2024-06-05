@@ -1,12 +1,12 @@
 from collections import defaultdict
-from datetime import date, datetime, tzinfo
+from datetime import date, datetime
 
-import pytz
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.views import redirect_to_login
 from django.db.models import Max
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
+from django.utils import timezone
 from django.views import View
 from rest_framework.generics import QuerySet
 from rest_framework.request import Request
@@ -48,44 +48,49 @@ class LoginView(View):
         return redirect_to_login("")
 
 
-def student_to_dict(student: Student, last_swipe: Swipe | None, local_now: datetime):
+def student_to_dict(
+    student: Student,
+    school: School,
+    last_swipe: Swipe | None,
+    in_today_time: datetime | None,
+):
+    today = timezone.localdate()
+    if in_today_time:
+        in_today_time = timezone.localtime(in_today_time)
+    in_today = last_swipe and last_swipe.swipe_day == today
     return {
         "_id": student.id,
         "name": student.name,
-        "last_swipe_type": "in"
-        if last_swipe and last_swipe.out_time is None
-        else "out",
-        # TODO
-        "swiped_today_late": False,
+        "last_swipe_type": (
+            "in" if last_swipe and last_swipe.out_time is None else "out"
+        ),
+        "swiped_today_late": (
+            in_today_time and in_today_time.time() > school.late_time
+        ),
         "is_teacher": student.is_teacher,
-        "in_today": last_swipe and last_swipe.swipe_day == local_now.date(),
-        # TODO
-        "late_time": None,
-        "absent_today": student.show_as_absent == local_now.date(),
+        "in_today": in_today,
+        "absent_today": student.show_as_absent == today,
         "last_swipe_date": last_swipe and format_date(last_swipe.swipe_day),
     }
 
 
 class AbsentView(APIView):
     def post(self, request: Request, student_id: int) -> Response:
-        student = Student.objects.get(id=student_id)
-        school: School = request.user.school
-        local_now = datetime.now(pytz.timezone(school.timezone))
-
-        student.show_as_absent = local_now.date()
+        student = Student.objects.get(id=student_id, school=request.user.school)
+        student.show_as_absent = timezone.localdate()
         student.save()
 
-        return student_data_view(student_id)
+        return student_data_view(student_id, request.user.school)
 
 
 class ExcuseView(APIView):
     def post(self, request: Request, student_id: int) -> Response:
-        student = Student.objects.get(id=student_id)
+        student = Student.objects.get(id=student_id, school=request.user.school)
         date: str = request.data["day"]  # type: ignore
 
         Excuse.objects.create(student=student, date=date)
 
-        return student_data_view(student_id)
+        return student_data_view(student_id, request.user.school)
 
 
 class OverrideView(APIView):
@@ -95,41 +100,46 @@ class OverrideView(APIView):
 
         Override.objects.create(student=student, date=date)
 
-        return student_data_view(student_id)
+        return student_data_view(student_id, request.user.school)
 
 
 class SwipeView(APIView):
     def post(self, request: Request, student_id: int) -> Response:
-        student = Student.objects.get(id=student_id)
+        student = Student.objects.get(id=student_id, school=request.user.school)
 
         direction = request.data["direction"]  # type: ignore
 
         school: School = request.user.school
-        local_now = datetime.now(pytz.timezone(school.timezone))
+        today = timezone.localdate()
 
         if direction == "in":
             swipe = Swipe.objects.create(
                 student=student,
-                swipe_day=local_now.date(),
+                swipe_day=today,
                 in_time=datetime.utcnow(),
             )
         elif direction == "out":
-            swipe = Swipe.objects.get(
-                student=student, swipe_day=local_now.date(), out_time=None
-            )
+            swipe = Swipe.objects.get(student=student, swipe_day=today, out_time=None)
             swipe.out_time = datetime.utcnow()
             swipe.save()
         else:
             assert False, "invalid direction"
 
-        return Response(student_to_dict(student, swipe, local_now))
+        in_time_today = (
+            Swipe.objects.filter(student=student, swipe_day=today)
+            .order_by("in_time")
+            .values_list("in_time", flat=True)
+            .first()
+        )
+
+        return Response(student_to_dict(student, school, swipe, in_time_today))
 
 
 class DeleteSwipeView(APIView):
     def post(self, request: Request, student_id: int) -> Response:
         swipe_id = request.data["swipe"]["_id"]  # type: ignore
         Swipe.objects.get(id=swipe_id).delete()
-        return student_data_view(student_id)
+        return student_data_view(student_id, request.user.school)
 
 
 class LogoutView(View):
@@ -161,9 +171,9 @@ def format_date(dt: date) -> str:
     return dt.strftime("%Y-%m-%d")
 
 
-def format_time(dt: datetime | None, timezone: tzinfo) -> str:
+def format_time(dt: datetime | None) -> str:
     if dt:
-        return dt.astimezone(timezone).strftime("%I:%M")
+        return timezone.localtime(dt).strftime("%I:%M")
     else:
         return ""
 
@@ -171,8 +181,7 @@ def format_time(dt: datetime | None, timezone: tzinfo) -> str:
 class StudentsTodayView(APIView):
     def get(self, request: Request):
         school = request.user.school
-        tz = pytz.timezone(school.timezone)
-        now = datetime.now(tz)
+        today = timezone.localdate()
 
         student_infos = []
 
@@ -184,39 +193,60 @@ class StudentsTodayView(APIView):
 
         student_to_last_swipe = {
             x.student_id: x
-            for x in Swipe.objects.filter(id__in=[x.max_swipe_id for x in students])
+            for x in Swipe.objects.filter(
+                id__in=[x.max_swipe_id for x in students]  # type: ignore
+            )
         }
+
+        student_to_in_time: dict[int, datetime] = {}
+        for student_id, in_time in (
+            Swipe.objects.filter(
+                student__in=students,
+                swipe_day=today,
+            )
+            .order_by("in_time")
+            .values_list("student_id", "in_time")
+        ):
+            if student_id not in student_to_in_time:
+                student_to_in_time[student_id] = in_time
 
         for student in students:
             last_swipe = student_to_last_swipe[student.id]
-            student_infos.append(student_to_dict(student, last_swipe, now))
+            student_infos.append(
+                student_to_dict(
+                    student,
+                    school,
+                    last_swipe,
+                    student_to_in_time.get(student.id),
+                )
+            )
 
         return Response(
             {
-                "today": format_date(now),
+                "today": format_date(today),
                 "students": student_infos,
             }
         )
 
 
-def get_start_of_school_year(school_timezone: tzinfo) -> datetime:
-    local_now = datetime.now(school_timezone)
-    result = datetime(local_now.year, 8, 1, tzinfo=school_timezone)
+def get_start_of_school_year() -> datetime:
+    local_now = timezone.localtime()
+    result = datetime(local_now.year, 8, 1, tzinfo=local_now.tzinfo)
     if result > local_now:
-        return datetime(local_now.year - 1, 8, 1, tzinfo=school_timezone)
+        return datetime(local_now.year - 1, 8, 1, tzinfo=local_now.tzinfo)
     return result
 
 
 class StudentDataView(APIView):
     def get(self, request: Request, student_id: int) -> Response:
-        return student_data_view(student_id)
+        return student_data_view(student_id, request.user.school)
 
 
-def get_year_start_end(school: School, year: Year | None) -> tuple[datetime, datetime]:
+def get_year_start_end(year: Year | None) -> tuple[datetime, datetime]:
     if year:
         return (year.from_date, year.to_date)
     return (
-        get_start_of_school_year(pytz.timezone(school.timezone)),
+        get_start_of_school_year(),
         datetime(3000, 1, 1),
     )
 
@@ -232,11 +262,13 @@ def get_school_days(school: School, start: datetime, end: datetime) -> list[date
     )
 
 
-def student_data_view(student_id: int, year: Year | None = None) -> Response:
+def student_data_view(
+    student_id: int, school: School, year: Year | None = None
+) -> Response:
     return Response(
         {
             "student": get_student_batch_data(
-                Student.objects.filter(id=student_id), year
+                Student.objects.filter(id=student_id, school=school), year
             )[student_id]
         }
     )
@@ -246,7 +278,7 @@ def get_student_batch_data(
     students: QuerySet[Student], year: Year | None
 ) -> dict[int, dict]:
     school = students[0].school
-    year_start, year_end = get_year_start_end(school, year)
+    year_start, year_end = get_year_start_end(year)
     school_days = get_school_days(school, year_start, year_end)
 
     overrides: dict[int, set[date]] = defaultdict(set)
@@ -272,7 +304,6 @@ def get_student_batch_data(
     for student in students:
         result[student.id] = get_student_data(
             student,
-            school,
             school_days,
             overrides[student.id],
             excuses[student.id],
@@ -283,15 +314,11 @@ def get_student_batch_data(
 
 def get_student_data(
     student: Student,
-    school: School,
     school_days: list[date],
     override_days: set[date],
     excused_days: set[date],
     day_to_swipes: dict[date, list[Swipe]],
 ) -> dict:
-    school_timezone = pytz.timezone(school.timezone)
-    local_now = datetime.now(school_timezone)
-
     day_data = []
     total_seconds = 0
     total_abs = 0
@@ -311,8 +338,8 @@ def get_student_data(
                 {
                     "_id": swipe.id,
                     "day": format_date(day),
-                    "nice_in_time": format_time(swipe.in_time, school_timezone),
-                    "nice_out_time": format_time(swipe.out_time, school_timezone),
+                    "nice_in_time": format_time(swipe.in_time),
+                    "nice_out_time": format_time(swipe.out_time),
                     "student_id": student.id,
                     "out_time": swipe.out_time and swipe.out_time.isoformat(),
                     "in_time": swipe.in_time and swipe.in_time.isoformat(),
@@ -356,13 +383,15 @@ def get_student_data(
 
         total_seconds += day_seconds
 
+    today = timezone.localdate()
+
     return {
         "_id": student.id,
-        "absent_today": student.show_as_absent == local_now.date(),
+        "absent_today": student.show_as_absent == today,
         "days": day_data,
         "name": student.name,
         "required_minutes": DEFAULT_REQUIRED_MINUTES,
-        "today": format_date(local_now.date()),
+        "today": format_date(today),
         "total_hours": total_seconds / 3600,
         "is_teacher": student.is_teacher,
         "last_swipe_date": format_date(max(day_to_swipes)) if day_to_swipes else None,
@@ -382,7 +411,7 @@ class ReportYears(APIView):
         school: School = request.user.school
         years: list[str] = []
 
-        now = datetime.now()
+        now = timezone.localtime()
 
         current_year = None
         for year in Year.objects.filter(school=school).order_by("from_date", "to_date"):
@@ -391,7 +420,7 @@ class ReportYears(APIView):
             years.append(year.name)
 
         if current_year is None:
-            from_date = get_start_of_school_year(pytz.timezone(school.timezone))
+            from_date = get_start_of_school_year()
             to_date = date(from_date.year + 1, 7, 31)
             year = Year.objects.create(
                 school=school,
