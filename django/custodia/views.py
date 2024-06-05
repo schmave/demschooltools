@@ -223,7 +223,6 @@ class StudentsTodayView(APIView):
 
         return Response(
             {
-                "today": format_date(today),
                 "students": student_infos,
             }
         )
@@ -391,7 +390,6 @@ def get_student_data(
         "days": day_data,
         "name": student.name,
         "required_minutes": DEFAULT_REQUIRED_MINUTES,
-        "today": format_date(today),
         "total_hours": total_seconds / 3600,
         "is_teacher": student.is_teacher,
         "last_swipe_date": format_date(max(day_to_swipes)) if day_to_swipes else None,

@@ -1,18 +1,12 @@
-var React = require("react"),
-  PropTypes = require("prop-types"),
-  Router = require("react-router"),
-  myhistory = require("./myhistory.js"),
-  SwipeHelpers = require("./swipeHelpers.jsx"),
-  studentStore = require("./StudentStore");
+const React = require("react");
+const myhistory = require("./myhistory.js");
+const SwipeHelpers = require("./swipeHelpers.jsx");
+const studentStore = require("./StudentStore");
 
 module.exports = class extends React.Component {
   static displayName = "StudentTable";
 
-  static contextTypes = {
-    router: PropTypes.object.isRequired,
-  };
-
-  state = { students: studentStore.getStudents(true), today: null };
+  state = { students: studentStore.getStudents(true) };
 
   componentDidMount() {
     studentStore.addChangeListener(this._onChange);
@@ -35,14 +29,14 @@ module.exports = class extends React.Component {
   };
 
   getSwipeButton = (student, way) => {
-    var buttonIcon = "fa-arrow-right";
+    let buttonIcon = "fa-arrow-right";
     if (way === "out") {
       buttonIcon = "fa-arrow-left";
     }
-    var iclassName = "fa " + buttonIcon + " sign-" + student._id;
-    var is_teacher_class = student.is_teacher ? " is_teacher" : "";
-    var button_class = "btn-default name-button" + (student.swiped_today_late ? " late" : "");
-    var sign_function = this.isSigningIn(student) ? this.signIn : this.signOut;
+    const iclassName = "fa " + buttonIcon + " sign-" + student._id;
+    const is_teacher_class = student.is_teacher ? " is_teacher" : "";
+    const button_class = "btn-default name-button" + (student.swiped_today_late ? " late" : "");
+    const sign_function = this.isSigningIn(student) ? this.signIn : this.signOut;
     if (way === "out") {
       return (
         <button
@@ -67,10 +61,10 @@ module.exports = class extends React.Component {
   };
 
   getStudent = (student, way) => {
-    var link = <span className="glyphicon glyphicon-calendar"></span>;
-    var button = this.getSwipeButton(student, way);
-    var calendar_button_class = "btn btn-default calendar-button";
-    var calendar_button = (
+    const link = <span className="glyphicon glyphicon-calendar"></span>;
+    const button = this.getSwipeButton(student, way);
+    const calendar_button_class = "btn btn-default calendar-button";
+    const calendar_button = (
       <div
         onClick={function () {
           myhistory.push("/students/" + student._id);
@@ -99,14 +93,14 @@ module.exports = class extends React.Component {
   };
 
   render() {
-    var absentCol = [],
-      notYetInCol = [],
-      inCol = [],
-      outCol = [];
+    const absentCol = [];
+    const notYetInCol = [];
+    const inCol = [];
+    const outCol = [];
 
-    var students = this.state.students;
+    const students = this.state.students;
     students.sort((a, b) => {
-      return a["name"] > b["name"] ? 1 : -1;
+      return a.name > b.name ? 1 : -1;
     });
     students.map(
       function (student) {
@@ -166,7 +160,6 @@ module.exports = class extends React.Component {
   _onChange = () => {
     this.setState({
       students: studentStore.getStudents(),
-      today: studentStore.getToday(),
     });
   };
 };
