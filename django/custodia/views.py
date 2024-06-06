@@ -387,6 +387,15 @@ def get_student_data(
 
     today = timezone.localdate()
 
+    last_swipe = None
+    last_swipe_in_time = None
+    if day_to_swipes:
+        for swipe in day_to_swipes[max(day_to_swipes)]:
+            if last_swipe_in_time is None or swipe.in_time > last_swipe_in_time:
+                last_swipe_in_time = swipe.in_time
+                last_swipe = swipe
+
+    last_swipe_date = max(day_to_swipes) if day_to_swipes else None
     return {
         "_id": student.id,
         "absent_today": student.show_as_absent == today,
@@ -395,15 +404,16 @@ def get_student_data(
         "required_minutes": DEFAULT_REQUIRED_MINUTES,
         "total_hours": total_seconds / 3600,
         "is_teacher": student.is_teacher,
-        "last_swipe_date": format_date(max(day_to_swipes)) if day_to_swipes else None,
+        "last_swipe_date": format_date(last_swipe_date) if last_swipe_date else None,
         "total_abs": total_abs,
         "total_days": total_days,
         "total_excused": total_excused,
         "total_overrides": total_overrides,
         "total_short": total_short,
-        # -------- TODO: -----------
-        "last_swipe_type": "out",
-        "in_today": False,
+        "last_swipe_type": (
+            "in" if last_swipe and last_swipe.out_time is None else "out"
+        ),
+        "in_today": last_swipe_date == timezone.localdate(),
     }
 
 
