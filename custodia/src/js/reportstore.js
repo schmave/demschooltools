@@ -16,14 +16,17 @@ exports.getSchoolYears = function (force) {
   }
 };
 
-exports.getReport = function (year) {
+exports.getReport = function (year, filterStudents) {
   const classId = 2; // This is only needed to communicate with the old backend.
   if (!year || !classId) return null;
-  if (reports[year + classId]) {
-    return reports[year + classId];
-  } else if (!reports[year + classId] || reports[year + classId] === "loading") {
-    reports[year + classId] = "loading";
-    actionCreator.loadReport(year, classId);
+
+  const reportKey = year + classId + filterStudents;
+
+  if (reports[reportKey]) {
+    return reports[reportKey];
+  } else {
+    reports[reportKey] = "loading";
+    actionCreator.loadReport(year, classId, filterStudents);
   }
   return null;
 };
@@ -43,7 +46,8 @@ dispatcher.register(function (action) {
       break;
     case constants.reportEvents.REPORT_LOADED:
       reports = {};
-      reports[action.data.year + action.data.classId] = action.data.report;
+      reports[action.data.year + action.data.classId + action.data.filterStudents] =
+        action.data.report;
       exports.emitChange();
       break;
     case constants.reportEvents.PERIOD_CREATED:

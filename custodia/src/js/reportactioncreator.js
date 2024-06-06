@@ -15,16 +15,20 @@ const exports = {
         });
       });
   },
-  loadReport: function (year, classId) {
+  loadReport: function (year, classId, filterStudents) {
     const classRouteId = classId ? "/" + classId : "";
     ajax
       .get({
-        url: "/reports/" + encodeURIComponent(year) + classRouteId,
+        url:
+          "/reports/" +
+          encodeURIComponent(year) +
+          classRouteId +
+          `?filterStudents=${filterStudents}`,
       })
       .then(function (data) {
         dispatcher.dispatch({
           type: constants.reportEvents.REPORT_LOADED,
-          data: { year, report: data, classId },
+          data: { year, report: data, classId, filterStudents },
         });
       });
   },
