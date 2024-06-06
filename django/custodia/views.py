@@ -4,6 +4,7 @@ from datetime import date, datetime
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.views import redirect_to_login
 from django.db.models import Max
+from django.db.transaction import atomic
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.utils import timezone
@@ -437,6 +438,7 @@ class ReportYears(APIView):
             }
         )
 
+    @atomic
     def post(self, request: Request) -> Response:
         def parse_date(date_str: str) -> date:
             return datetime.strptime(date_str, "%Y-%m-%d")
@@ -444,7 +446,7 @@ class ReportYears(APIView):
         from_date = parse_date(request.data["from_date"])  # type: ignore
         to_date = parse_date(request.data["to_date"])  # type: ignore
 
-        year = Year.objects.create(
+        year, _ = Year.objects.get_or_create(
             school=request.user.school,
             from_time=timezone.make_aware(
                 datetime(from_date.year, from_date.month, from_date.day)

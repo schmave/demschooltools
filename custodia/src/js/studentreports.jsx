@@ -1,15 +1,20 @@
+const React = require("react");
+const Griddle = require("griddle-react");
+const dayjs = require("dayjs");
+
 const reportStore = require("./reportstore");
 const Modal = require("./modal.jsx");
 const Router = require("react-router");
 const Link = Router.Link;
 const actionCreator = require("./reportactioncreator");
-const React = require("react");
-const Griddle = require("griddle-react");
 
 // Table data as a list of array.
 const getState = function () {
+  const now = dayjs();
   return {
     rows: [],
+    startDate: now.startOf("month").format("YYYY-MM-DD"),
+    endDate: now.endOf("month").format("YYYY-MM-DD"),
     years: reportStore.getSchoolYears(),
   };
 };
@@ -69,13 +74,6 @@ class StudentReports extends React.Component {
     reportStore.removeChangeListener(this.onReportChange);
   }
 
-  onClassChange = () => {
-    this.refs.newSchoolYear.hide();
-    const state = this.state;
-    this.setState(state);
-    this.fetchReport(state.currentYear);
-  };
-
   onReportChange = (x) => {
     this.refs.newSchoolYear.hide();
     const state = this.state;
@@ -106,7 +104,10 @@ class StudentReports extends React.Component {
   };
 
   createPeriod = () => {
-    actionCreator.createPeriod(this.state.startDate, this.state.endDate);
+    actionCreator.createPeriod(this.state.startDate, this.state.endDate).then((newYearName) => {
+      this.setState({ currentYear: newYearName });
+      this.fetchReport(newYearName);
+    });
   };
 
   deletePeriod = () => {
@@ -189,14 +190,14 @@ class StudentReports extends React.Component {
         {grid}
         <Modal ref="newSchoolYear" title="Create new period">
           <form className="form">
-            <div className="form-group">
+            <div className="form-group" style={{ display: "flex" }}>
               <div className="margined">
                 <label htmlFor="startDate">Start:</label>{" "}
-                <input type="date" onChange={this.onStartDateChange} />
+                <input type="date" value={this.state.startDate} onChange={this.onStartDateChange} />
               </div>
               <div className="margined">
                 <label htmlFor="endDate">End:</label>{" "}
-                <input type="date" onChange={this.onEndDateChange} />
+                <input type="date" value={this.state.endDate} onChange={this.onEndDateChange} />
               </div>
             </div>
             <div className="form-group" style={{ marginLeft: "2em" }}>

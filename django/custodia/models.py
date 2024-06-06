@@ -122,7 +122,7 @@ class Year(models.Model):
     """
     Recommended changes from the overseer.years table currently being used in production:
 
-    Figure out timezone of from_date and to_date columns
+      * add unique(school, name) constraint
     """
 
     class Meta:
