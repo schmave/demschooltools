@@ -230,9 +230,9 @@ class StudentsTodayView(APIView):
 
 def get_start_of_school_year() -> datetime:
     local_now = timezone.localtime()
-    result = datetime(local_now.year, 8, 1, tzinfo=local_now.tzinfo)
+    result = timezone.make_aware(datetime(local_now.year, 8, 1))
     if result > local_now:
-        return datetime(local_now.year - 1, 8, 1, tzinfo=local_now.tzinfo)
+        return timezone.make_aware(datetime(local_now.year - 1, 8, 1))
     return result
 
 
@@ -243,7 +243,7 @@ class StudentDataView(APIView):
 
 def get_year_start_end(year: Year | None) -> tuple[datetime, datetime]:
     if year:
-        return (year.from_date, year.to_date)
+        return (year.from_time, year.to_time)
     return (
         get_start_of_school_year(),
         datetime(3000, 1, 1),
@@ -253,7 +253,9 @@ def get_year_start_end(year: Year | None) -> tuple[datetime, datetime]:
 def get_school_days(school: School, start: datetime, end: datetime) -> list[date]:
     return sorted(
         Swipe.objects.filter(
-            student__school=school, swipe_day__gte=start, swipe_day__lte=end
+            student__school=school,
+            swipe_day__gte=start.date(),
+            swipe_day__lte=end.date(),
         )
         .values_list("swipe_day", flat=True)
         .distinct(),
@@ -412,18 +414,18 @@ class ReportYears(APIView):
         now = timezone.localtime()
 
         current_year = None
-        for year in Year.objects.filter(school=school).order_by("from_date", "to_date"):
-            if current_year is None and now > year.from_date and now < year.to_date:
+        for year in Year.objects.filter(school=school).order_by("from_time", "to_time"):
+            if current_year is None and now > year.from_time and now < year.to_time:
                 current_year = year.name
             years.append(year.name)
 
         if current_year is None:
-            from_date = get_start_of_school_year()
+            from_date = get_start_of_school_year().date()
             to_date = date(from_date.year + 1, 7, 31)
             year = Year.objects.create(
                 school=school,
-                from_date=from_date,
-                to_date=to_date,
+                from_time=from_date,
+                to_time=to_date,
                 name=self.make_period_name(from_date, to_date),
             )
             current_year = year.name
@@ -444,8 +446,12 @@ class ReportYears(APIView):
 
         year = Year.objects.create(
             school=request.user.school,
-            from_date=from_date,
-            to_date=to_date,
+            from_time=timezone.make_aware(
+                datetime(from_date.year, from_date.month, from_date.day)
+            ),
+            to_time=timezone.make_aware(
+                datetime(to_date.year, to_date.month, to_date.day)
+            ),
             name=self.make_period_name(from_date, to_date),
         )
 
@@ -458,8 +464,10 @@ class ReportYears(APIView):
             )
         elif from_date.month != to_date.month:
             return f"{from_date.strftime('%B %-d')} - {to_date.strftime('%B %-d, %Y')}"
+        elif from_date.day != to_date.day:
+            return f"{from_date.strftime('%B %-d')}-{to_date.strftime('%-d, %Y')}"
 
-        return f"{from_date.strftime('%B %-d')}-{to_date.strftime('%-d, %Y')}"
+        return from_date.strftime("%B %-d, %Y")
 
     def delete(self, request: Request, year_name: str) -> Response:
         Year.objects.filter(school=request.user.school, name=year_name).delete()

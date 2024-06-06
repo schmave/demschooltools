@@ -130,8 +130,8 @@ class Year(models.Model):
 
     id = models.AutoField(db_column="_id", primary_key=True)
 
-    from_date = models.DateTimeField()
-    to_date = models.DateTimeField()
+    from_time = models.DateTimeField(db_column="from_date")
+    to_time = models.DateTimeField(db_column="to_date")
 
     inserted_date = models.DateTimeField(auto_now_add=True)
     name = models.TextField()
