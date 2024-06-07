@@ -102,19 +102,17 @@ module.exports = class extends React.Component {
     students.sort((a, b) => {
       return a.name > b.name ? 1 : -1;
     });
-    students.map(
-      function (student) {
-        if (!student.in_today && student.absent_today) {
-          absentCol.push(this.getStudent(student, "absent"));
-        } else if (!student.in_today && !student.absent_today) {
-          notYetInCol.push(this.getStudent(student, "notYetIn"));
-        } else if (student.in_today && student.last_swipe_type === "in") {
-          inCol.push(this.getStudent(student, "in"));
-        } else if (student.in_today && student.last_swipe_type === "out") {
-          outCol.push(this.getStudent(student, "out"));
-        }
-      }.bind(this),
-    );
+    students.forEach((student) => {
+      if (!student.in_today && student.absent_today) {
+        absentCol.push(this.getStudent(student, "absent"));
+      } else if (!student.in_today && !student.absent_today) {
+        notYetInCol.push(this.getStudent(student, "notYetIn"));
+      } else if (student.in_today && student.last_swipe_type === "in") {
+        inCol.push(this.getStudent(student, "in"));
+      } else if (student.in_today && student.last_swipe_type === "out") {
+        outCol.push(this.getStudent(student, "out"));
+      }
+    });
 
     return (
       <div className="row">

@@ -111,23 +111,30 @@ class SwipeView(APIView):
         direction = request.data["direction"]  # type: ignore
 
         school: School = request.user.school
-        today = timezone.localdate()
+        swipe_time = timezone.localtime()
+
+        if request.data.get("overrideDateTime"):  # type: ignore
+            swipe_time = datetime.fromisoformat(
+                request.data["overrideDateTime"]  # type: ignore
+            )
 
         if direction == "in":
             swipe = Swipe.objects.create(
                 student=student,
-                swipe_day=today,
-                in_time=datetime.utcnow(),
+                swipe_day=swipe_time.date(),
+                in_time=swipe_time,
             )
         elif direction == "out":
-            swipe = Swipe.objects.get(student=student, swipe_day=today, out_time=None)
-            swipe.out_time = datetime.utcnow()
+            swipe = Swipe.objects.get(
+                student=student, swipe_day=swipe_time.date(), out_time=None
+            )
+            swipe.out_time = swipe_time
             swipe.save()
         else:
             assert False, "invalid direction"
 
         in_time_today = (
-            Swipe.objects.filter(student=student, swipe_day=today)
+            Swipe.objects.filter(student=student, swipe_day=timezone.localdate())
             .order_by("in_time")
             .values_list("in_time", flat=True)
             .first()
@@ -391,7 +398,9 @@ def get_student_data(
     last_swipe_in_time = None
     if day_to_swipes:
         for swipe in day_to_swipes[max(day_to_swipes)]:
-            if last_swipe_in_time is None or swipe.in_time > last_swipe_in_time:
+            if last_swipe_in_time is None or (
+                swipe.in_time is not None and swipe.in_time > last_swipe_in_time
+            ):
                 last_swipe_in_time = swipe.in_time
                 last_swipe = swipe
 

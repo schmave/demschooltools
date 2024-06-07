@@ -80,8 +80,8 @@ class Swipe(models.Model):
     student_id: int
     swipe_day = models.DateField()
 
-    in_time = models.DateTimeField()
-    out_time = models.DateTimeField()
+    in_time = models.DateTimeField(null=True)
+    out_time = models.DateTimeField(null=True)
 
 
 class Override(models.Model):

@@ -1,8 +1,12 @@
-var React = require("react"),
-  DateTimePicker = require("react-widgets").DateTimePicker,
-  actionCreator = require("./studentactioncreator"),
-  userStore = require("./userstore"),
-  Modal = require("./modal.jsx");
+const React = require("react");
+const dayjs = require("dayjs");
+const DateTimePicker = require("react-widgets").DateTimePicker;
+
+const actionCreator = require("./studentactioncreator");
+const userStore = require("./userstore");
+const Modal = require("./modal.jsx");
+const constants = require("./appconstants");
+const dispatcher = require("./appdispatcher");
 
 module.exports = class extends React.Component {
   static displayName = "SwipeHelpers";
@@ -13,19 +17,22 @@ module.exports = class extends React.Component {
     student: undefined,
   };
 
-  _swipeWithMissing = (missing) => {
-    var student = this.state.student,
-      missing = this.state.missing_date;
-    actionCreator.swipeStudent(student, student.direction, missing);
+  _swipeWithMissing = () => {
+    const student = this.state.student;
+    actionCreator.swipeStudent(student, this.state.missing_direction, this.state.missing_date);
     this.setState({ student: undefined, missing_direction: undefined });
+    dispatcher.dispatch({
+      type: constants.systemEvents.FLASH,
+      message: `Your missing time was recorded. You can now continue to sign ${student.direction}.`,
+    });
   };
 
   validateSignDirection = (student, direction) => {
-    this.setState({ student: student, missing_direction: undefined });
+    this.setState({ student, missing_direction: undefined });
     student.direction = direction;
     if (student.last_swipe_type === direction) {
-      var missing_direction = direction === "in" ? "out" : "in";
-      this.setState({ missing_direction: missing_direction });
+      const missing_direction = direction === "in" ? "out" : "in";
+      this.setState({ missing_direction });
       this._setCalendarTime(student, missing_direction);
     } else {
       actionCreator.swipeStudent(student, direction);
@@ -33,7 +40,7 @@ module.exports = class extends React.Component {
   };
 
   _setCalendarTime = (student, missing_direction) => {
-    var d = new Date();
+    let d = new Date();
     if (!student) {
       return d;
     }
@@ -54,48 +61,48 @@ module.exports = class extends React.Component {
   };
 
   render() {
-    var self = this;
-    if (this.state.missing_direction !== undefined) {
-      console.log("render", this.state.missing_date);
-    }
-    return this.state.missing_direction === undefined ? (
-      ""
-    ) : (
-      <div className="row">
-        <Modal
-          ref="missingSwipeCollector"
-          title={"What time did you sign " + this.state.missing_direction + "?"}
-        >
-          <form className="form-inline">
-            <div className="form-group">
-              <label htmlFor="missing">
-                What time did you sign {this.state.missing_direction}?
-              </label>
-              <DateTimePicker
-                format="hh:mm a"
-                date={false}
-                id="missing"
-                ref="missing_datepicker"
-                step={15}
-                defaultValue={this.state.missing_date}
-                onChange={function (value) {
-                  console.log(value);
-                  self.setState({ missing_date: value });
-                }}
-              />
-            </div>
-            <div className="form-group" style={{ marginLeft: "2em" }}>
-              <button
-                id="submit-missing"
-                className="btn btn-sm btn-primary"
-                onClick={this._swipeWithMissing}
-              >
-                Sign {this.state.missing_direction}{" "}
-              </button>
-            </div>
-          </form>
-        </Modal>
-      </div>
+    const self = this;
+    return (
+      this.state.missing_direction !== undefined && (
+        <div className="row">
+          <Modal
+            ref="missingSwipeCollector"
+            title={"What time did you sign " + this.state.missing_direction + "?"}
+          >
+            <form className="form-inline">
+              <div className="form-group">
+                <div style={{ marginBottom: "2em" }}>
+                  You forgot to sign out on{" "}
+                  {dayjs(this.state.student.last_swipe_date).format("dddd, MMMM D")}.
+                </div>
+                <label htmlFor="missing">
+                  What time did you sign {this.state.missing_direction}?
+                </label>
+                <DateTimePicker
+                  format="hh:mm a"
+                  date={false}
+                  id="missing"
+                  ref="missing_datepicker"
+                  step={15}
+                  defaultValue={this.state.missing_date}
+                  onChange={function (value) {
+                    self.setState({ missing_date: value });
+                  }}
+                />
+              </div>
+              <div className="form-group" style={{ marginLeft: "2em" }}>
+                <button
+                  id="submit-missing"
+                  className="btn btn-sm btn-primary"
+                  onClick={this._swipeWithMissing}
+                >
+                  Sign {this.state.missing_direction}{" "}
+                </button>
+              </div>
+            </form>
+          </Modal>
+        </div>
+      )
     );
   }
 };
