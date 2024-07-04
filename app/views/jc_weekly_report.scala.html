@@ -15,22 +15,22 @@ Period from
 <a href="@routes.Application.viewWeeklyReport(Application.forDateInput(Application.addWeek(end_date, 1)))">Next week &gt;&gt;</a>
 <p>
 <p>
-<p>@data.num_cases total cases.
-<p>@data.num_charges total charges.
+<p>@messages("total_cases", data.num_cases)
+<p>@messages("total_charges", data.num_charges)
 <p><a href="@routes.Application.printWeeklyMinutes(Application.forDateInput(start_date))">Print the week's minutes</a></p>
 
 <div class="row">
 	<div class="col-sm-4">
-        <h4>Charges per rule</h4>
+        <h4>@messages("charges_per_rule")</h4>
 		<table class="table sortable">
-			<tr><th>Rule<th width=100># Charges</tr>
+			<tr><th>Rule<th width=100># @messages("charges_title")</tr>
 			@for( (rule, count) <- data.rule_counts ) {
 				<tr><td>@rule.getNumber() @rule.getTitle()<td>@count</tr>
 			}
 		</table>
 	</div>
 	<div class="col-sm-4">
-        <h4>Charges per person</h4>
+        <h4>@messages("charges_per_person")</h4>
 		<table class="table sortable">
 		<tr><th>Person
 			<th>Week<th>Month<th>Year
@@ -47,7 +47,7 @@ Period from
 		</table>
 	</div>
 	<div class="col-sm-4">
-		<h4>People with no charges this week</h4>
+		<h4>@messages("no_charge_people")</h4>
 		<ol>
 		@for( p <- data.uncharged_people) {
 			<li>@p.getDisplayName()
@@ -56,7 +56,7 @@ Period from
 	</div>
 </div>
 
-<h4>&nbsp;<br>Cases with no charges</h4>
+<h4>&nbsp;<br>@messages("cases_no_charges")</h4>
 @caseTableOpen()
 @for(c <- cases) {
 	@if( !c.empty() && c.charges.size() == 0 ) {
@@ -67,7 +67,7 @@ Period from
 
 @if( Utils.getOrgConfig(request).use_minor_referrals ) {
   @for( dest <- minor_referral_destinations ) {
-	<h4>&nbsp;<br>Charges referred to @dest</h4>
+	<h4>&nbsp;<br>@messages("charges_referred_to", dest)</h4>
 	@for(c <- cases) {
 	  @for(ch <- c.charges) {
 		@if( ch.getMinorReferralDestination().equals(dest) ) {

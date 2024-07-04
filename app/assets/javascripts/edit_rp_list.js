@@ -107,7 +107,7 @@ const addCharge = function(data, parent_el) {
         closed_day_of_week: utils.reformatDate('D', data.theCase.dateClosed),
         sm_date: utils.reformatDate('m/dd', data.smDecisionDate),
         sm_day_of_week: utils.reformatDate('D', data.smDecisionDate),
-        rule_title: data.rule ? data.ruleTitle : "<No rule>",
+        rule_title: data.rule ? data.ruleTitle : window.config.show_entry ? "<No rule>" : "",
         resolutionPlan: data.resolutionPlan,
         smDecision: data.smDecision,
         findings: data.theCase.compositeFindings,

@@ -2,9 +2,9 @@
 
 @import helper._
 
-@main("Enter School Meeting charges", "jc") {
+@main("Enter School Meeting decisions", "jc") {
 
-<h3> Charges awaiting School Meeting decision</h3>
+<h3>@messages("waiting_for_sm_decision_title")</h3>
 
 @if( sm_charges.size() > 0 ) {
 

@@ -233,8 +233,12 @@ var _rollbarConfig = {
             <div class="subnav">
             <a @if(selectedBtn.equals("jc_home")) { class="active" }
                 href="@routes.Application.index()">Home</a>
-            <a href="@routes.ApplicationEditing.editTodaysMinutes()">
-                Edit today's minutes</a>
+            <span>
+                <a href="@routes.Application.viewTodaysMinutes()">
+                    View</a> /
+                <a href="@routes.ApplicationEditing.editTodaysMinutes()">
+                    Edit today's minutes</a>
+            </span>
             <a @if(selectedBtn.equals("rps")) { class="active" }
                 href="@routes.Application.editResolutionPlanList()">
                 @Utils.getOrgConfig(request).str_res_plans_cap</a>
@@ -242,7 +246,7 @@ var _rollbarConfig = {
                 href="@routes.Application.thisWeekReport()">Weekly Report</a>
             <a @if(selectedBtn.equals("view_referred")) { class="active" }
                 href="@routes.Application.viewSchoolMeetingReferrals()">
-                Charges referred to S.M.
+                @messages("charges_referred_to_sm")
                 @defining( Application.getActiveSchoolMeetingReferrals(Utils.getOrgConfig(request).org) ) { sm_charges =>
                     @if( sm_charges.size() > 0 ) {
                         <span class="badge">

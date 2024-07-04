@@ -7,7 +7,7 @@ target
 dist
 
 .bsp/
-/.idea/
+.idea/workspace.xml
 
 # JS stuff
 node_modules/
@@ -30,3 +30,10 @@ makarios_learning_community/*
 conf/generated.keystore
 
 __pycache__/
+
+# Clojure VS Code plugin stuff
+/.clj-kondo
+/.lsp
+
+# Mac stuff
+.DS_Store

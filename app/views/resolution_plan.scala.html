@@ -6,7 +6,9 @@
 			<tr>
 				<td class="name col-xs-1">@charge.getPerson().getDisplayName()
 				<td class="col-xs-3">@charge.getTheCase().getCaseNumber() (@Html(charge.getDayOfWeek()))<br>
+				@if(Utils.getOrgConfig(request).show_entry){
 					@charge.getRuleTitle()
+				}
 				<td class="col-xs-7">@charge.getResolutionPlan()
 				@if(charge.getSmDecision() != null) { <b>[Sch. Mtg. decided:</b> @charge.getSmDecision()<b>]</b> }
 				<td class="col-xs-1" style="vertical-align:middle;">@if( Utils.getOrgConfig(request).show_checkbox_for_res_plan ) {<div class="checkbox"></div>}

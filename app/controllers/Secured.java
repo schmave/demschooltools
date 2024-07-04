@@ -15,6 +15,7 @@ import javax.inject.Inject;
 import models.User;
 import models.UserRole;
 import play.Logger;
+import play.i18n.Lang;
 import play.mvc.*;
 
 // Lifted from play.mvc.Security
@@ -56,7 +57,19 @@ public class Secured {
         } else {
           Http.Request childRequest =
               request.withAttrs(request.attrs().put(Security.USERNAME, username));
-          return delegate.call(childRequest);
+
+          String langCode = "en-" + Utils.getOrg(request).getShortName();
+
+          Lang lang = Lang.forCode(langCode);
+          if (lang == null) {
+            sLogger.debug("original Lang was null");
+            lang = Lang.forCode("en");
+          }
+
+          sLogger.debug(
+              "User's language is set to code {} Lang locale {}", langCode, lang.toLocale());
+
+          return delegate.call(childRequest.withTransientLang(lang));
         }
       } catch (RuntimeException e) {
         throw e;

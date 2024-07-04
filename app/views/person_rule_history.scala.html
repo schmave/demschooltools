@@ -11,7 +11,7 @@ history: PersonHistory)(implicit request: play.mvc.Http.Request, messages: play.
 <p><b>Most recent charge</b>: @Application.formatDateShort(Utils.getOrgConfig(request), record.most_recent_charge)</p>
 <p><b>Total charges</b>: @record.count</p>
 
-<h5 style="margin-top: 30px;">Case Details</h5>
+<h5 style="margin-top: 30px;">@messages("case_details")</h5>
 @for( c <- charges) {
 	@historyCharge(c, false, false, false)
 }

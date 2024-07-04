@@ -1,0 +1,8 @@
+bcrypt # Used to support old bcrypt passwords from overseer
+django-extensions
+django<4
+djangorestframework
+ipython
+psycopg2
+pytz
+tabulate

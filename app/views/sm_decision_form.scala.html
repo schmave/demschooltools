@@ -4,8 +4,11 @@
 
 <div class="panel panel-info">
 <div class="panel-heading"><h4>#@c.getTheCase().getCaseNumber() &bull;
-	@if(c.getPerson() != null) { @c.getPerson().getDisplayName() } &bull;
-	@c.getRuleTitle()</div>
+	@if(c.getPerson() != null) { @c.getPerson().getDisplayName() }
+	@if(Utils.getOrgConfig(request).show_entry){
+	&bull; @c.getRuleTitle()
+	}
+</div>
 <div class="panel-body">
 @caseTableOpen()
 @caseTableRow(c.getTheCase(), false)
@@ -13,7 +16,9 @@
 
 <p>The recommended @Utils.getOrgConfig(request).str_res_plan was:
 	<p style="padding-left:1in">@c.getResolutionPlan()
-<p>The plea was @Utils.getOrgConfig(request).translatePlea(c.getPlea()).
+@if(Utils.getOrgConfig(request).show_plea){
+	<p>The plea was @Utils.getOrgConfig(request).translatePlea(c.getPlea()).
+}
 
 <form class="form-horizontal" method=POST action="@routes.ApplicationEditing.saveSchoolMeetingDecisions()">
 

@@ -1,0 +1,121 @@
+* TODO Student Page - we have excused and unexcused short days?
+* DONE Student Page - make excuse and give attendance buttons only show on short or absent days
+CLOSED: [2016-02-01 Mon 06:53]
+* DONE Student Page - short count to change if the short day is excused
+CLOSED: [2016-02-01 Mon 06:54]
+* DONE Student Page - only 15 minutes short 
+CLOSED: [2016-01-20 Wed 17:26]
+1. Dark Green (the current "more than 300" color)- met attendance requirement 
+2. Light Green (the current "less than 75" color)- up to fifteen minutes short
+3. Yellow- more than 15 minutes short
+4. Middle Green (current " between 150 and 225" color)- absent/short day, excused
+5. Red- absent, unexcused
+* TODO Student Totals - "attended" days include "short" days?
+* TODO Link online excused absence form that people can fill out. 
+Is there a way to link it to the software?
+* DONE Start date for kids who enroll halfway through year
+CLOSED: [2016-03-30 Wed 06:53]
+* DONE multi-tenented
+CLOSED: [2016-02-01 Mon 06:52]
+* DONE Collect missing swipe from front page
+CLOSED: [2015-12-07 Mon 07:18]
+* DONE Student Page - Change absent to unexcused 
+CLOSED: [2016-01-12 Tue 07:31]
+On the student page in the top right corner where student numbers are listed: could we change "absent" to "unexcused" and put it directly below the excused absences?
+* DONE Student Page - we change "gave attendance" back to "override"?
+CLOSED: [2016-01-12 Tue 07:31]
+* DONE Student Page - make short and absent days show that way on sidebar
+CLOSED: [2016-01-14 Thu 16:42]
+* DONE Student Page - show minute count on days
+CLOSED: [2016-01-14 Thu 07:21]
+* DONE Student Page - "attended" days include "short" days?
+CLOSED: [2016-01-14 Thu 16:53]
+I think we could remove the "Short" section on the student page, and list the
+number in the attended section as "2 (1)" meaning they were here 2 days but 1
+day was short.
+* DONE Student Totals - limit the total hours display to two digits after the decimal point?
+CLOSED: [2016-01-15 Fri 17:30]
+* DONE Student Totals - student name link to student page
+CLOSED: [2016-01-15 Fri 07:46]
+* DONE Fix Angular Jump 
+  CLOSED: [2015-03-26 Thu 16:15]
+* DONE Make absent column
+  CLOSED: [2015-04-16 Thu 07:02]
+* DONE Make double wide "in" column
+  CLOSED: [2015-04-16 Thu 07:02]
+* DONE Remove today's attendance 
+  CLOSED: [2015-04-16 Thu 07:02]
+* DONE Make student page single query
+CLOSED: [2015-05-13 Wed 17:47]
+* DONE New Relic tracing
+CLOSED: [2015-05-13 Wed 17:47]
+* DONE Database stored sessions
+  CLOSED: [2015-04-16 Thu 07:02]
+* DONE Web Drive Test Site
+  CLOSED: [2015-04-16 Thu 07:02]
+* DONE Edit student
+CLOSED: [2015-05-13 Wed 17:47]
+* TODO Configurable passwords
+* DONE Hide student
+CLOSED: [2015-12-07 Mon 07:18]
+* DONE ng grid
+CLOSED: [2016-01-14 Thu 16:44]
+* DONE Create student
+  CLOSED: [2014-12-23 Tue 12:03]
+* DONE swipe in 
+  CLOSED: [2014-12-23 Tue 12:31]
+* DONE swipe outp
+  CLOSED: [2014-12-23 Tue 12:31]
+* DONE get missing in swipe
+  CLOSED: [2015-01-20 Tue 07:36]
+* DONE get missing out swipe
+  CLOSED: [2015-01-20 Tue 07:36]
+* DONE view students attendence
+  CLOSED: [2015-01-03 Sat 09:51]
+* DONE add date override for student
+  CLOSED: [2015-01-03 Sat 12:41]
+* DONE mark student "older"
+  CLOSED: [2015-01-20 Tue 07:36]
+* DONE sign in for admin/swipes
+  CLOSED: [2015-01-03 Sat 13:51]
+* DONE reverse list of dates
+  CLOSED: [2015-01-03 Sat 09:52]
+* DONE fix swipe in date nil
+  CLOSED: [2015-01-03 Sat 09:52]
+* DONE fix utc date issue showing up wrong timezone
+  CLOSED: [2015-01-03 Sat 10:52]
+* DONE Make school year to show totals
+  CLOSED: [2015-01-03 Sat 15:43]
+* DONE Report - Students swiped in today
+  CLOSED: [2015-01-03 Sat 20:49]
+* DONE School day is student swipe in
+  CLOSED: [2015-01-08 Thu 08:11]
+* DONE Prevent swipe going over many days
+  CLOSED: [2015-01-13 Tue 20:16]
+* DONE Show swipe success
+  CLOSED: [2015-01-13 Tue 20:16]
+* DONE add “short” count and total hours count to the totals
+  CLOSED: [2015-02-03 Tue 07:14]
+* DONE add “unexcused” vs “exused” absence - but BOTH are absences
+  CLOSED: [2015-02-03 Tue 12:21]
+* DONE remove exused from the addendence column
+  CLOSED: [2015-02-03 Tue 12:27]
+* DONE leave in override and make it add minutes to the total count
+  CLOSED: [2015-02-03 Tue 07:14]
+* DONE delete swipe
+  CLOSED: [2015-02-04 Wed 07:17]
+* DONE show students in attendence today on main screen
+  CLOSED: [2015-02-05 Thu 08:06]
+
+* DONE third column for swiped out today
+  CLOSED: [2015-02-06 Fri 06:56]
+* DONE prevent swipes across days
+  CLOSED: [2015-02-06 Fri 06:59]
+* DONE change "swipe" to "sign" in ui
+  CLOSED: [2015-02-07 Sat 12:13]
+* DONE change "in today " to "IN"
+  CLOSED: [2015-02-07 Sat 12:13]
+* DONE make columns full width on home page if user
+  CLOSED: [2015-02-07 Sat 12:45]
+* DONE Fix  IN - - OUT scenario where it doesn't ask for today's IN 
+  CLOSED: [2015-03-26 Thu 07:09]

@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="sbt: com.github.virtuald:curvesapi:1.07:jar" external-system-id="SBT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/github/virtuald/curvesapi/1.07/curvesapi-1.07.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/../Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/github/virtuald/curvesapi/1.07/curvesapi-1.07-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/com/github/virtuald/curvesapi/1.07/curvesapi-1.07-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -16,7 +16,7 @@
     </span>
     </p></td>
 	<td valign="top"><p>
-		<i>Testifiers</i>:
+		<i>@messages("who_testified")</i>
 		@if( c.charges.size() == 0 && Utils.getOrgConfig(request).filter_no_charge_cases ) {
 			@defining( c.people_at_case.filter(_.getRole() == PersonAtCase.ROLE_TESTIFIER).size() ) { num =>
 				@num @if(num==1) { person } else { people } testified.
@@ -27,7 +27,7 @@
 		</p>
 		<p>
 		@if( Utils.getOrgConfig(request).filter_no_charge_cases && c.getDateClosed() == null &&	c.charges.size() == 0 ) {
-			<i>The findings are not shown here because this case has no charges and is not closed.</i>
+			<i>@messages("findings_not_shown_no_charges")</i>
 		} else {
 			@Utils.newlineToBr(Application.generateCompositeFindingsFromChargeReferences(c))
 		}
@@ -51,19 +51,21 @@
 			}
 			</ol>
 		} else {
-			No charges.
+			@messages("no_charges")
 		}
 	</td></tr>
 
 	@for( charge <- c.charges ) {
 		@if( charge.getReferredToSm() && charge.getSmDecision() == null) {
-			<tr><td colspan="3" class="smDecision">*** Awaiting @Utils.getOrgConfig(request).getReferralDestination(charge) decision on charging
-			@if(charge.getPerson() != null) { @charge.getPerson().getDisplayName() } else { ??? } with
-			@charge.getRuleTitle().
+			<tr><td colspan="3" class="smDecision">
+				@messages("awaiting_sm_decision", Utils.getOrgConfig(request).getReferralDestination(charge),
+					if (charge.getPerson() == null) "???" else charge.getPerson().getDisplayName(),
+				charge.getRuleTitle())
+
 			</td></tr>
 		}
 		@if( !charge.getMinorReferralDestination().equals("")) {
-			<tr><td colspan="3" class="smDecision">Charge against
+			<tr><td colspan="3" class="smDecision">@messages("charge_against")
 			@if(charge.getPerson() != null) { @charge.getPerson().getDisplayName() } else { ??? } with
 			@charge.getRuleTitle() referred to
 				@{charge.getMinorReferralDestination()}.

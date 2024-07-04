@@ -2,9 +2,9 @@
 
 @import helper._
 
-@main("Cases written up by " + p.getDisplayName(), "jc") {
+@main(messages("cases_written_by_who", p.getDisplayName()), "jc") {
 
-<h4>&nbsp;<br>Cases written up by @p.getDisplayName()</h4>
+<h4>&nbsp;<br>@messages("cases_written_by_who", p.getDisplayName())</h4>
 @caseTableOpen()
 @for(c <- cases) {
 	@if( !c.empty() ) {

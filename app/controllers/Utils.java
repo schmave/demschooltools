@@ -158,7 +158,10 @@ public class Utils {
             nvps.add(new BasicNameValuePair("username", config.org.getShortName()));
             nvps.add(new BasicNameValuePair("password", new_password));
             makeCustodiaPost(
-                httpclient, Public.sConfig.getString("custodia_url") + "/users/password", nvps);
+                httpclient,
+                Public.sConfig.getConfig("school_crm").getString("custodia_url")
+                    + "/users/password",
+                nvps);
           } catch (Exception e) {
             e.printStackTrace();
           }
@@ -244,7 +247,7 @@ class OrgConfigs {
     register(new TheCircleSchool());
     register(new MakariosLearningCommunity());
     register(new TheOpenSchool());
-    register(new TheOpenSchool2());
+    register(new TheOpenSchoolVirtual());
     register(new Houston());
     register(new Sandbox());
     register(new Clearview());
@@ -264,16 +267,20 @@ class ThreeRiversVillageSchool extends OrgConfig {
 
     str_manual_title = "Management Manual";
     str_manual_title_short = "Manual";
-    str_res_plan_short = "RP";
-    str_res_plan = "resolution plan";
-    str_res_plan_cap = "Resolution plan";
-    str_res_plans = "resolution plans";
-    str_res_plans_cap = "Resolution plans";
-    str_jc_name = "Justice Committee";
+    str_res_plan_short = "agreement";
+    str_res_plan = "agreement";
+    str_res_plan_cap = "Agreement";
+    str_res_plans = "agreements";
+    str_res_plans_cap = "Agreements";
+    str_jc_name = "Resolution Committee";
+    str_jc_name_short = "RC";
+    str_findings = "Discussion Record";
 
     show_checkbox_for_res_plan = false;
-
     enable_file_sharing = true;
+    use_minor_referrals = false;
+    show_entry = false;
+    show_plea = false;
   }
 }
 
@@ -396,10 +403,10 @@ class TheOpenSchool extends OrgConfig {
   }
 }
 
-class TheOpenSchool2 extends OrgConfig {
-  public TheOpenSchool2() {
-    name = "The Open School - Riverside";
-    people_url = "https://tos-2.demschooltools.com";
+class TheOpenSchoolVirtual extends OrgConfig {
+  public TheOpenSchoolVirtual() {
+    name = "The Open School Virtual";
+    people_url = "https://tosv.demschooltools.com";
     time_zone = TimeZone.getTimeZone("US/Pacific");
 
     str_manual_title = "Law Book";
@@ -410,14 +417,16 @@ class TheOpenSchool2 extends OrgConfig {
     str_res_plans = "sentences";
     str_res_plans_cap = "Sentences";
     str_findings = "Findings";
-    str_jc_name = "Justice Committee";
-    str_jc_name_short = "JC";
-    str_guilty = "Confirm";
-    str_not_guilty = "Deny";
+    str_jc_name = "Civics Board";
+    str_jc_name_short = "CB";
+    str_guilty = "Agree";
+    str_not_guilty = "Disagree";
+    str_na = "Mediated";
 
     show_findings_in_rp_list = true;
     use_minor_referrals = false;
     show_no_contest_plea = true;
+    show_na_plea = true;
   }
 }
 
@@ -470,16 +479,19 @@ class Clearview extends OrgConfig {
     name = "Clearview Sudbury School";
     people_url = "https://css.demschooltools.com";
 
-    str_manual_title = "Lawbook";
-    str_manual_title_short = "Lawbook";
-    str_res_plan_short = "Sentence";
-    str_res_plan = "sentence";
-    str_res_plan_cap = "Sentence";
-    str_res_plans = "sentences";
-    str_res_plans_cap = "Sentences";
+    str_manual_title = "Rulebook";
+    str_manual_title_short = "Rulebook";
+    str_res_plan_short = "Resolution";
+    str_res_plan = "resolution";
+    str_res_plan_cap = "Resolution";
+    str_res_plans = "resolutions";
+    str_res_plans_cap = "Resolutions";
     str_findings = "Findings";
 
-    track_writer = false;
+    str_guilty = "Yes";
+    str_not_guilty = "No";
+
+    track_writer = true;
   }
 }
 

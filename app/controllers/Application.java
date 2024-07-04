@@ -20,7 +20,9 @@ import models.*;
 import org.markdown4j.Markdown4jProcessor;
 import org.mindrot.jbcrypt.BCrypt;
 import org.xhtmlrenderer.pdf.ITextRenderer;
+import play.Logger;
 import play.api.libs.mailer.MailerClient;
+import play.i18n.Messages;
 import play.i18n.MessagesApi;
 import play.libs.Files.TemporaryFile;
 import play.libs.Json;
@@ -395,6 +397,8 @@ public class Application extends Controller {
     return new ArrayList<>(people);
   }
 
+  static Logger.ALogger sLogger = Logger.of("application");
+
   public Result index(Http.Request request) {
     return ok(
         cached_page.render(
@@ -458,6 +462,8 @@ public class Application extends Controller {
 
                 entries_with_charges.sort(Entry.SORT_NUMBER);
 
+                debugMessages(request);
+
                 return jc_index
                     .render(
                         meetings,
@@ -504,17 +510,24 @@ public class Application extends Controller {
     writer.write("SM decision date");
     writer.endRecord();
 
-    List<Charge> charges =
+    ExpressionList<Charge> chargeQuery =
         Charge.find
             .query()
             .fetch("theCase")
             .fetch("person")
             .fetch("rule")
             .fetch("theCase.meeting", FetchConfig.ofQuery())
+            .setLazyLoadBatchSize(1000)
             .where()
-            .eq("person.organization", org)
-            .ge("theCase.meeting.date", ModelUtils.getStartOfYear())
-            .findList();
+            .eq("person.organization", org);
+
+    User currentUser = Application.getCurrentUser(request);
+    if (currentUser == null || !currentUser.hasRole(UserRole.ROLE_ALL_ACCESS)) {
+      // Unless the user has full access, limit to the current school year.
+      chargeQuery = chargeQuery.ge("theCase.meeting.date", ModelUtils.getStartOfYear());
+    }
+
+    List<Charge> charges = chargeQuery.findList();
     for (Charge c : charges) {
       if (c.getPerson() != null) {
         writer.write(c.getPerson().getDisplayName());
@@ -580,6 +593,18 @@ public class Application extends Controller {
     return ok("\ufeff" + new String(baos.toByteArray(), charset))
         .as("text/csv; charset=utf-8")
         .withHeader("Content-Disposition", "attachment; filename=All charges.csv");
+  }
+
+  public Result viewTodaysMinutes(Http.Request request) {
+    Organization org = Utils.getOrg(request);
+    Meeting the_meeting =
+        Meeting.find
+            .query()
+            .where()
+            .eq("organization", org)
+            .eq("date", Utils.localNow(Utils.getOrgConfig(org)))
+            .findOne();
+    return ok(view_meeting.render(the_meeting, request, mMessagesApi.preferred(request)));
   }
 
   public Result viewMeeting(int meeting_id, Http.Request request) {
@@ -1226,7 +1251,18 @@ public class Application extends Controller {
         multi_meetings.render(meetings, request, mMessagesApi.preferred(request)).toString());
   }
 
+  void debugMessages(Http.Request request) {
+    Messages messages = mMessagesApi.preferred(request);
+    sLogger.debug(
+        "messages lang: {}, one string: {}, transient lang: {}",
+        messages.lang(),
+        messages.at("erase_case_confirmation"),
+        request.transientLang());
+  }
+
   public Result viewWeeklyReport(String date_string, Http.Request request) {
+    debugMessages(request);
+
     Calendar start_date = Utils.parseDateOrNow(date_string);
     Organization org = Utils.getOrg(request);
     Utils.adjustToPreviousDay(start_date, org.getJcResetDay() + 1);
