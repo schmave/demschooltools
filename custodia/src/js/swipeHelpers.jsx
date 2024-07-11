@@ -1,6 +1,5 @@
 const React = require("react");
 const dayjs = require("dayjs");
-const DateTimePicker = require("react-widgets").DateTimePicker;
 
 const actionCreator = require("./studentactioncreator");
 const userStore = require("./userstore");
@@ -8,9 +7,7 @@ const Modal = require("./modal.jsx");
 const constants = require("./appconstants");
 const dispatcher = require("./appdispatcher");
 
-module.exports = class extends React.Component {
-  static displayName = "SwipeHelpers";
-
+module.exports = class SwipeHelpers extends React.Component {
   state = {
     missing_date: undefined,
     missing_direction: undefined,
@@ -73,17 +70,18 @@ module.exports = class extends React.Component {
               <div className="form-group">
                 <div style={{ marginBottom: "2em" }}>
                   You forgot to sign out on{" "}
-                  {dayjs(this.state.student.last_swipe_date).format("dddd, MMMM D")}.
+                  {dayjs(this.state.student.last_swipe_date).format("dddd, MMMM D")}!
                 </div>
                 <label htmlFor="missing">
                   What time did you sign {this.state.missing_direction}?
                 </label>
-                <DateTimePicker
+                <input
+                  type="time"
                   format="hh:mm a"
                   date={false}
                   id="missing"
                   ref="missing_datepicker"
-                  step={15}
+                  step={60 * 15}
                   defaultValue={this.state.missing_date}
                   onChange={function (value) {
                     self.setState({ missing_date: value });

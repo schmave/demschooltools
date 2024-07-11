@@ -1,6 +1,6 @@
 const constants = require("./appconstants");
 const ajax = require("./ajaxhelper");
-const myhistory = require("./myhistory.js");
+const myhistory = require("./myhistory.js").default;
 const dispatcher = require("./appdispatcher");
 
 export const loadStudents = () => {

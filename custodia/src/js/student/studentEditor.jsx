@@ -4,7 +4,6 @@ var React = require("react"),
   AdminItem = require("../adminwrapper.jsx"),
   dispatcher = require("../appdispatcher"),
   constants = require("../appconstants"),
-  DateTimePicker = require("react-widgets").DateTimePicker,
   actionCreator = require("../studentactioncreator"),
   Modal = require("../modal.jsx");
 
@@ -153,7 +152,8 @@ module.exports = class extends React.Component {
                   </div>
                 </div>
                 <b>Student Start Date:</b>
-                <DateTimePicker
+                <input
+                  type="date"
                   id="missing"
                   value={this.state.startdate_datepicker}
                   ref="startdate"

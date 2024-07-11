@@ -1,5 +1,5 @@
 const React = require("react");
-const myhistory = require("./myhistory.js");
+const myhistory = require("./myhistory.js").default;
 const SwipeHelpers = require("./swipeHelpers.jsx");
 const studentStore = require("./StudentStore");
 
