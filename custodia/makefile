@@ -34,7 +34,7 @@ webdriver-test :
 connect-dst :
 	ssh custodia@demschooltools.com -L 5433:localhost:5432
 
-deploy-dst : minify
+deploy-dst : js
 	${LEIN} uberjar
 	scp target/overseer-standalone.jar custodia@demschooltools.com:~/overseer-new.jar
 	scp dst_server/* custodia@demschooltools.com:~/
@@ -43,14 +43,8 @@ deploy-dst : minify
 drop-tables :
 	psql -d school_crm -c "DROP SCHEMA IF EXISTS phillyfreeschool CASCADE; DROP SCHEMA IF EXISTS overseer CASCADE; DROP TABLE IF EXISTS public.emails; DROP TABLE if EXISTS public.schema_migrations; DROP TABLE IF EXISTS public.session_store;"
 
-BABEL_CMD = -t [ babelify --presets [ es2015 react stage-1 ] ]
-
-minify :
-	./node_modules/.bin/browserify $(BABEL_CMD) -t reactify -t uglifyify ./src/js/app.jsx -o ./resources/public/js/gen/app.js
-
 js :
-	./node_modules/.bin/browserify $(BABEL_CMD) ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
+	npm run compile
 
 watch :
-	./node_modules/.bin/watchify -v $(BABEL_CMD) ./src/js/app.jsx -o ../django/static/js/gen/app.js --debug
-	# ./node_modules/.bin/watchify -v $(BABEL_CMD) ./src/js/app.jsx -o ./resources/public/js/gen/app.js --debug
+	npm run watch
