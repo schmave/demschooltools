@@ -32,7 +32,7 @@ See [the wiki](https://github.com/schmave/demschooltools/wiki/) for more informa
 1.  Start PostgreSQL and create a database named "school_crm".
 
 1.  Set the environment variables APPLICATION_SECRET, GOOGLE_CLIENT_SECRET,
-    FACEBOOK_CLIENT_SECRET, ROLLBAR_TOKEN, and SES_PASSWORD to empty values. You can run the
+    FACEBOOK_CLIENT_SECRET, ROLLBAR_TOKEN, CUSTODIA_PASSWORD, and SES_PASSWORD to empty values. You can run the
     "set_keys_blank.sh" script to do this on Mac/Linux.
 
 1.  Run sbt `./sbt.sh`, then execute the `run` command in the sbt/play console.
