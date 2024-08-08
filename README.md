@@ -29,7 +29,7 @@ See [the wiki](https://github.com/schmave/demschooltools/wiki/) for more informa
 
 1.  Run `npm install` to install the Javascript libraries.
 
-1.  Start PostgreSQL and create a database named "school_crm".
+1.  Start PostgreSQL and create a database named "school_crm". You'll also need to set the password for the user named "postgres" to "123", or change the database username and password in conf/base.conf.
 
 1.  Set the environment variables APPLICATION_SECRET, GOOGLE_CLIENT_SECRET,
     FACEBOOK_CLIENT_SECRET, ROLLBAR_TOKEN, CUSTODIA_PASSWORD, and SES_PASSWORD to empty values. You can run the
