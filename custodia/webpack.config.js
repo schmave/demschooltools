@@ -1,8 +1,6 @@
 const path = require("path");
 const webpack = require("webpack");
 
-const ESLintPlugin = require("eslint-webpack-plugin");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 
 const isDevelopment = process.env.NODE_ENV !== "production";
@@ -87,7 +85,9 @@ module.exports = function (env, argv) {
     plugins: [
       isDevelopment &&
         new ReactRefreshWebpackPlugin({
-          overlay: { sockPort: DEV_SERVER_PORT },
+          overlay: {
+            sockPort: DEV_SERVER_PORT,
+          },
         }),
 
       //   new ESLintPlugin({

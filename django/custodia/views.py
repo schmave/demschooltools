@@ -1,5 +1,5 @@
 from collections import defaultdict
-from datetime import date, datetime
+from datetime import date, datetime, time
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.views import redirect_to_login
@@ -113,9 +113,13 @@ class SwipeView(APIView):
         school: School = request.user.school
         swipe_time = timezone.localtime()
 
-        if request.data.get("overrideDateTime"):  # type: ignore
-            swipe_time = datetime.fromisoformat(
-                request.data["overrideDateTime"]  # type: ignore
+        if request.data.get("overrideDate"):  # type: ignore
+            the_date = datetime.fromisoformat(request.data["overrideDate"])
+            the_time = time.fromisoformat(
+                request.data["overrideTime"]  # type: ignore
+            )
+            swipe_time = timezone.make_aware(
+                the_date.replace(hour=the_time.hour, minute=the_time.minute)
             )
 
         if direction == "in":

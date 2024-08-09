@@ -22,18 +22,24 @@ export const loadStudent = function (id) {
     });
   });
 };
-export const swipeStudent = function (student, direction, overrideDateTime) {
+export const swipeStudent = function (student, direction, overrideTime) {
+  let overrideDate;
+  if (overrideTime) {
+    overrideDate =
+      direction === "in" ? new Date().toISOString().substr(0, 10) : student.last_swipe_date;
+  }
   ajax
     .post("students/" + student._id + "/swipe", {
       direction,
-      overrideDateTime: overrideDateTime && overrideDateTime.toISOString(),
+      overrideDate,
+      overrideTime,
     })
     .then(function (data) {
       dispatcher.dispatch({
         type: constants.studentEvents.STUDENT_SWIPED,
         data,
       });
-      if (overrideDateTime === undefined) {
+      if (overrideTime === undefined) {
         // Don't show this message if we are filling in an old missing swipe.
         dispatcher.dispatch({
           type: constants.systemEvents.FLASH,

@@ -9,14 +9,14 @@ const dispatcher = require("./appdispatcher");
 
 module.exports = class SwipeHelpers extends React.Component {
   state = {
-    missing_date: undefined,
+    missing_time: undefined,
     missing_direction: undefined,
     student: undefined,
   };
 
   _swipeWithMissing = () => {
     const student = this.state.student;
-    actionCreator.swipeStudent(student, this.state.missing_direction, this.state.missing_date);
+    actionCreator.swipeStudent(student, this.state.missing_direction, this.state.missing_time);
     this.setState({ student: undefined, missing_direction: undefined });
     dispatcher.dispatch({
       type: constants.systemEvents.FLASH,
@@ -30,25 +30,13 @@ module.exports = class SwipeHelpers extends React.Component {
     if (student.last_swipe_type === direction) {
       const missing_direction = direction === "in" ? "out" : "in";
       this.setState({ missing_direction });
-      this._setCalendarTime(student, missing_direction);
+      const school = userStore.getSelectedSchool();
+      const defaultOutHours = school._id === 11 ? 16 : 15;
+      const hours = missing_direction === "in" ? 9 : defaultOutHours;
+      this.setState({ missing_time: `${hours}:00` });
     } else {
       actionCreator.swipeStudent(student, direction);
     }
-  };
-
-  _setCalendarTime = (student, missing_direction) => {
-    let d = new Date();
-    if (!student) {
-      return d;
-    }
-
-    if (missing_direction === "out") {
-      d = new Date(student.last_swipe_date + "T00:00:00");
-    }
-    const school = userStore.getSelectedSchool();
-    const defaultOutTime = school._id === 11 ? 16 : 15;
-    d.setHours(missing_direction === "in" ? 9 : defaultOutTime);
-    this.setState({ missing_date: d });
   };
 
   componentDidUpdate = () => {
@@ -74,28 +62,28 @@ module.exports = class SwipeHelpers extends React.Component {
                 </div>
                 <label htmlFor="missing">
                   What time did you sign {this.state.missing_direction}?
-                </label>
+                </label>{" "}
                 <input
                   type="time"
                   format="hh:mm a"
                   date={false}
                   id="missing"
-                  ref="missing_datepicker"
+                  ref="missing_timepicker"
                   step={60 * 15}
-                  defaultValue={this.state.missing_date}
-                  onChange={function (value) {
-                    self.setState({ missing_date: value });
+                  defaultValue={this.state.missing_time}
+                  onChange={function (e) {
+                    self.setState({ missing_time: e.target.value });
                   }}
                 />
-              </div>
-              <div className="form-group" style={{ marginLeft: "2em" }}>
-                <button
-                  id="submit-missing"
-                  className="btn btn-sm btn-primary"
-                  onClick={this._swipeWithMissing}
-                >
-                  Sign {this.state.missing_direction}{" "}
-                </button>
+                <div style={{ textAlign: "center" }}>
+                  <button
+                    id="submit-missing"
+                    className="btn btn-sm btn-primary"
+                    onClick={this._swipeWithMissing}
+                  >
+                    Sign {this.state.missing_direction}{" "}
+                  </button>
+                </div>
               </div>
             </form>
           </Modal>
