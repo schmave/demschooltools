@@ -88,7 +88,7 @@ class SwipesListing extends React.Component {
       <span>
         <div>Day: {this.state.day.day}</div>
         <div>Minutes: {this.state.day.round_mins}</div>
-        <table className="table table-striped center">
+        <table className="table table-striped center swipes-table">
           <thead>
             <tr>
               <th className="center">In Time</th>

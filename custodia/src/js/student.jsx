@@ -252,11 +252,11 @@ class Student extends React.Component {
               </div>
               <div className="panel-body">
                 <div className="row">
-                  <div className="col-sm-7">
+                  <div className="col-md-7">
                     <div className="row">{this.getActionButtons()}</div>
                     <Heatmap days={this.state.student.days} requiredMinutes={requiredMinutes} />
                   </div>
-                  <div className="col-sm-2">
+                  <div className="col-md-2">
                     <table className="table table-striped center">
                       <thead>
                         <tr>
@@ -266,7 +266,7 @@ class Student extends React.Component {
                       <tbody>{this.getPreviousDays()}</tbody>
                     </table>
                   </div>
-                  <div className="col-sm-2">
+                  <div className="col-md-3">
                     {activeDate && this.state.student ? (
                       <SwipesListing student={this.state.student} day={activeDate} />
                     ) : (

@@ -80,9 +80,7 @@ class HeatmapMonth extends React.Component {
   };
 
   render() {
-    return (
-      <div id={"heatmap" + this.props.index} className="col-sm-4" style={{ float: "none" }}></div>
-    );
+    return <div id={"heatmap" + this.props.index} style={{ float: "none" }}></div>;
   }
 
   componentDidMount() {

@@ -185,7 +185,7 @@ def format_date(dt: date) -> str:
 
 def format_time(dt: datetime | None) -> str:
     if dt:
-        return timezone.localtime(dt).strftime("%I:%M")
+        return timezone.localtime(dt).strftime("%-I:%M %p").lower()
     else:
         return ""
 

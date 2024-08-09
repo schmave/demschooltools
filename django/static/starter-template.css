@@ -138,6 +138,10 @@ rect.highlight {
     font-weight: bold;
 }
 
+.swipes-table td,th {
+    white-space: nowrap;
+}
+
 .student-listing-classes {
     font-size: 1.4em;
     /* padding: 2px 10px 3px 10px; */
