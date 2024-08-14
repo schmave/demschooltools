@@ -1,4 +1,5 @@
 const utils = require('./utils');
+const autocomplete = require('./autocomplete');
 
 export function init(selectedPersonId, people) {
   $('.js-date').datepicker();
@@ -8,5 +9,8 @@ export function init(selectedPersonId, people) {
     $(this).val(time);
   });
 
-  utils.registerAutocomplete($('.js-person'), people, false, selectedPersonId);
+  const container = document.getElementById('attendance-edit-rule-person');
+  const startingValues = [{ id: selectedPersonId }];
+  const opts = { idFieldName: 'personId' };
+  autocomplete.registerAutocomplete(container, people, startingValues, opts);
 }

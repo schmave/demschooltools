@@ -55,4 +55,9 @@ public class Roles extends Controller {
     Role.create(Utils.getOrg(request), type, eligibility, name, notes, description);
     return redirect(routes.Roles.index());
   }
+
+  @Secured.Auth(UserRole.ROLE_ROLES)
+  public Result updateRole(Http.Request request) {
+    
+  }
 }

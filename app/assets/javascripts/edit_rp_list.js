@@ -158,13 +158,13 @@ function loadCharge(charge_data, list, parent_el) {
 
 window.initRpList = function() {
     app.rp_template = Handlebars.compile($("#rp-template").html());
-    for (var i in app.initial_data.active_rps) {
+    for (const i in app.initial_data.active_rps) {
         loadCharge(app.initial_data.active_rps[i], app.active_rps, $(".active-rps"));
     }
-    for (i in app.initial_data.completed_rps) {
+    for (const i in app.initial_data.completed_rps) {
         loadCharge(app.initial_data.completed_rps[i], app.completed_rps, $(".completed-rps"));
     }
-    for (i in app.initial_data.nullified_rps) {
+    for (const i in app.initial_data.nullified_rps) {
         loadCharge(app.initial_data.nullified_rps[i], app.nullified_rps, $(".nullified-rps"));
     }
 }

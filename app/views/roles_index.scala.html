@@ -6,8 +6,7 @@
 		<table class="roles-edit-table">
 		</table>
 		<br>
-		<input id="roles-editor-submit" type="submit" value="Update" class="btn btn-primary" />&nbsp;
-		<input id="roles-editor-cancel" type="submit" value="Cancel" class="btn btn-default" />
+		<div id="roles-editor-buttons"></div>
 	</div>
 	<div class="roles-main">
 		<div>
@@ -68,6 +67,11 @@
 	</table>
 </script>
 
+<script id="roles-editor-buttons-template" type="text/x-handlebars-template">
+	<input id="roles-editor-submit" type="submit" value="Update" class="btn btn-primary" />&nbsp;
+	<input id="roles-editor-cancel" type="submit" value="Cancel" class="btn btn-default" />
+</script>
+
 <script id="roles-editor-general-template" type="text/x-handlebars-template">
 	<tr>
 		<td><label class="control-label">Name</label></td>
@@ -103,10 +107,33 @@
 	</tr>
 </script>
 
+<script id="roles-editor-individual-template" type="text/x-handlebars-template">
+	<tr>
+		<td><label class="control-label"><span>@Utils.getOrg(request).getRolesIndividualTerm()</span>(s)</label></td>
+		<td class="js-roles-editor-chairs"></td>
+	</tr>
+	<tr>
+		<td><label class="control-label">Backups</label></td>
+		<td class="js-roles-editor-backups"></td>
+	</tr>
+</script>
+
+<script id="roles-editor-group-template" type="text/x-handlebars-template">
+	<tr>
+		<td><label class="control-label">Chair(s)</label></td>
+		<td class="js-roles-editor-chairs"></td>
+	</tr>
+	<tr>
+		<td><label class="control-label">Other Members</label></td>
+		<td class="js-roles-editor-members"></td>
+	</tr>
+</script>
+
 <script type="text/javascript">
+	var peopleJson = @Html(Application.rolesPeopleJson(Utils.getOrgConfig(request).org));
 	const rolesJson = @Html(Roles.rolesJson(Utils.getOrgConfig(request).org));
 	const terms = {
 		individual: '@Utils.getOrg(request).getRolesIndividualTerm()'
 	};
-	initRoles(rolesJson, terms);
+	initRoles(rolesJson, peopleJson, terms);
 </script>

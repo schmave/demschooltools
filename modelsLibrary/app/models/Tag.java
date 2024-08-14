@@ -21,6 +21,7 @@ public class Tag extends Model {
   private boolean showInJc;
   private boolean showInAttendance;
   private boolean showInAccountBalances;
+  private boolean showInRoles;
 
   @ManyToMany(cascade = CascadeType.ALL)
   @JoinTable(
@@ -77,6 +78,7 @@ public class Tag extends Model {
     showInAttendance = ModelUtils.getBooleanFromFormValue(form.field("showInAttendance"));
     showInMenu = ModelUtils.getBooleanFromFormValue(form.field("showInMenu"));
     showInAccountBalances = ModelUtils.getBooleanFromFormValue(form.field("showInAccountBalances"));
+    showInRoles = ModelUtils.getBooleanFromFormValue(form.field("showInRoles"));
     save();
   }
 

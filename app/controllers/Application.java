@@ -375,9 +375,22 @@ public class Application extends Controller {
     return peopleByTagType("showInAttendance", org);
   }
 
+  public static List<Person> rolesPeople(Organization org) {
+    return peopleByTagType("showInRoles", org);
+  }
+
   public static String attendancePeopleJson(Organization org) {
-    List<Map<String, String>> result = new ArrayList<>();
     List<Person> people = attendancePeople(org);
+    return peopleToJson(people);
+  }
+
+  public static String rolesPeopleJson(Organization org) {
+    List<Person> people = rolesPeople(org);
+    return peopleToJson(people);
+  }
+
+  private static String peopleToJson(List<Person> people) {
+    List<Map<String, String>> result = new ArrayList<>();
     for (Person p : people) {
       HashMap<String, String> values = new HashMap<>();
       values.put("label", p.getDisplayName());

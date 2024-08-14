@@ -463,7 +463,7 @@ td.attendance-error {
     }
 }
 
-.attendance-edit-rule-person-selected {
+.autocomplete-selected {
   display: none;
   margin-top: 3px;
 
@@ -845,12 +845,18 @@ input.date {
 }
 
 .roles-main {
-    overflow-x: scroll;
+    overflow-x: auto;
+    overflow-y: auto;
+    // 82px is the height of the site header plus body top padding
+    height: ~"calc(100vh - 82px)";
 }
 
 .roles-editor {
     display: none;
     float: right;
+    overflow-y: scroll;
+    // 82px is the height of the site header plus body top padding
+    height: ~"calc(100vh - 82px)";
     margin-left: 10px;
     padding: 20px;
     padding-top: 0;
@@ -920,23 +926,6 @@ input.date {
 
 .attendance-off-campus-time {
   width: 90px;
-}
-
-.attendance-off-campus-person {
-  width: 120px;
-}
-
-.attendance-off-campus-person-selected {
-  display: none;
-  margin-top: 3px;
-
-  .label {
-    margin-left: 0;
-  }
-
-  img {
-    margin-left: -4px;
-  }
 }
 
 .alert-warning {
