@@ -109,23 +109,23 @@
 
 <script id="roles-editor-individual-template" type="text/x-handlebars-template">
 	<tr>
-		<td><label class="control-label"><span>@Utils.getOrg(request).getRolesIndividualTerm()</span>(s)</label></td>
-		<td class="js-roles-editor-chairs"></td>
+		<td><label class="control-label"><span>@Utils.getOrg(request).getRolesIndividualTerm()</span></label></td>
+		<td id="roles-editor-chairs" class="roles-editor-people"></td>
 	</tr>
 	<tr>
 		<td><label class="control-label">Backups</label></td>
-		<td class="js-roles-editor-backups"></td>
+		<td id="roles-editor-backups" class="roles-editor-people"></td>
 	</tr>
 </script>
 
 <script id="roles-editor-group-template" type="text/x-handlebars-template">
 	<tr>
-		<td><label class="control-label">Chair(s)</label></td>
-		<td class="js-roles-editor-chairs"></td>
+		<td><label class="control-label">Chair</label></td>
+		<td id="roles-editor-chairs" class="roles-editor-people"></td>
 	</tr>
 	<tr>
-		<td><label class="control-label">Other Members</label></td>
-		<td class="js-roles-editor-members"></td>
+		<td><label class="control-label">Members</label></td>
+		<td id="roles-editor-members" class="roles-editor-people"></td>
 	</tr>
 </script>
 

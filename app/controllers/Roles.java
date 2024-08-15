@@ -57,7 +57,7 @@ public class Roles extends Controller {
   }
 
   @Secured.Auth(UserRole.ROLE_ROLES)
-  public Result updateRole(Http.Request request) {
-    
+  public Result updateRole(Integer id, String role, Http.Request request) {
+    return ok();
   }
 }

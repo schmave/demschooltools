@@ -11,6 +11,10 @@ function registerAutocomplete(container, source, startingValues, opts) {
         item.setValue(value);
     }
 
+    if (!startingValues.length) {
+        items.push(registerAutocompleteItem(container, source, opts, onSelect));
+    }
+
     function onSelect() {
         if (opts.multi && !anyBlanks()) {
             items.push(registerAutocompleteItem(container, source, opts, onSelect));
@@ -22,35 +26,40 @@ function registerAutocomplete(container, source, startingValues, opts) {
     }
 
     function isBlank(item) {
-        const value = item();
         if (opts.allowPlainText) {
-            return !value.id && !value.label;
+            return !item.getId() && !item.getLabel();
         } else {
-            return !value.id;
+            return !item.getId();
         }
     }
 
     return () => {
-        return items.filter(item => !isBlank(item)).map(item => item());
+        return items.filter(item => !isBlank(item)).map(item => {
+            return {
+                label: item.getLabel(),
+                id: item.getId()
+            };
+        });
     }
 }
 
 function registerAutocompleteItem(container, source, opts, onSelect) {
-    const div = document.createElement('div');
-    div.classList.add('autocomplete-item');
+    const div = $('<div class="autocomplete-item"></div>');
+    $(container).append(div);
+
     const template = Handlebars.compile($('#autocomplete-template').html());
-    div.innerHTML = template({
-        textFieldWidth: opts.textFieldWidth ? `${opts.textFieldWidth}px` : '',
+    div.html(template({
+        textFieldSize: opts.textFieldSize,
+        textFieldClass: opts.textFieldClass,
         textFieldName: opts.textFieldName,
         idFieldName: opts.idFieldName
-    });
-    container.append(div);
+    }));
 
-    const selected = container.find('.autocomplete-selected');
+    const selected = $(div).find('.autocomplete-selected');
     const removeButton = selected.find('img');
-    const selectedText = container.find('.autocomplete-selected-text');
-    const textInput = container.find('.autocomplete-text');
-    const idInput = container.find('.autocomplete-id');
+    const selectedText = $(div).find('.autocomplete-selected-text');
+    const textInput = $(div).find('.autocomplete-text');
+    const idInput = $(div).find('.autocomplete-id');
 
     textInput.autocomplete({
         source,
@@ -58,15 +67,15 @@ function registerAutocompleteItem(container, source, opts, onSelect) {
         autoFocus: true,
     });
 
-    textInput.bind("autocompleteselect", function(event, ui) {
+    textInput.on('autocompleteselect', function(event, ui) {
         select(ui.item);
     });
 
     if (opts.allowPlainText) {
-        textInput.addEventListener('input', onSelect);
+        textInput.on('input', onSelect);
     }
 
-    removeButton.click(function() {
+    removeButton.on('click', function() {
         selected.hide();
         idInput.val('');
         textInput.val('').show().focus();
@@ -85,13 +94,11 @@ function registerAutocompleteItem(container, source, opts, onSelect) {
         }
     }
 
-    return () => {
-        return {
-            label: textInput.value,
-            id: idInput.value,
-            setValue: value => select(value)
-        };
-    }
+    return {
+        getLabel: () => textInput.val(),
+        getId: () => idInput.val(),
+        setValue: select
+    };
 }
 
 module.exports = {

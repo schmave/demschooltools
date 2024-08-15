@@ -855,6 +855,7 @@ input.date {
     display: none;
     float: right;
     overflow-y: scroll;
+    width: 550px;
     // 82px is the height of the site header plus body top padding
     height: ~"calc(100vh - 82px)";
     margin-left: 10px;
@@ -903,12 +904,28 @@ input.date {
 }
 
 .roles-edit-table {
-    select {
+  width: 100%;
+  select {
+      width: auto;
+  }
+  input {
+      width: 400px;
+      &.autocomplete-text {
         width: auto;
-    }
-    input {
-        width: 400px;
-    }
+        margin-right: 6px;
+        margin-bottom: 5px;
+      }
+  }
+  .autocomplete-item {
+    display: inline-block;
+  }
+  .autocomplete-selected {
+    margin-right: 6px;
+  }
+}
+
+.roles-editor-people {
+  line-height: 2.5;
 }
 
 .attendance-pins-table, .roles-edit-table {

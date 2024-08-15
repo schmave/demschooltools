@@ -160,7 +160,7 @@ POST 	/accounting/report				  			controllers.Accounting.runReport(request: Reque
 GET 	/roles/index            controllers.Roles.index(request: Request)
 GET 	/roles/newRole          controllers.Roles.newRole(request: Request)
 POST 	/roles/newRole          controllers.Roles.makeNewRole(request: Request)
-POST    /roles/updateRole/:id   controllers.Roles.updateRole(id: Integer, role: String, chairs: String, backups: String, members: String, request: Request)
+POST    /roles/updateRole/:id   controllers.Roles.updateRole(id: Integer, role: String, request: Request)
 
 GET     /people/edit/:id          controllers.CRM.editPerson(id: Integer, request: Request)
 POST    /people/edit              controllers.CRM.savePersonEdits(request: Request)

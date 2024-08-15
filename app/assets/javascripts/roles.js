@@ -7,7 +7,7 @@ Handlebars.registerHelper('ifEquals', function(arg1, arg2, options) {
 
 export function init(roles, people, terms) {
     sortAll(roles);
-    registerTabEvents(roles, terms);
+    registerTabEvents(roles, terms, people);
     switchTab(roles, terms, people, 'Individual');
 }
 
@@ -40,7 +40,7 @@ function renderIndex(roles, terms, people, roleType) {
         container.innerHTML = '<div style="padding:15px;">No roles have been created yet with this type.</div>';
         return;
     }
-    const template = Handlebars.compile($('#roles-index-template').html());
+    const template = Handlebars.compile(document.getElementById('roles-index-template').innerHTML);
     container.innerHTML = template({
         chairHeader: getChairHeader(roleType, terms),
         hasChairs: roles.some(r => getMembers(r, 'Chair').length > 0),
@@ -76,7 +76,7 @@ function renderIndex(roles, terms, people, roleType) {
 function renderEditor(role, people) {
     document.querySelector('.roles-editor').style.display = 'block';
     const table = document.querySelector('.roles-edit-table');
-    const generalTemplate = Handlebars.compile($('#roles-editor-general-template').html());
+    const generalTemplate = Handlebars.compile(document.getElementById('roles-editor-general-template').innerHTML);
     const generalHtml = generalTemplate({
         name: role.name,
         type: role.type,
@@ -85,21 +85,21 @@ function renderEditor(role, people) {
         description: role.description
     });
     table.innerHTML = generalHtml;
-    table.innerHTML += getEditorSpecialHtml();
+    table.innerHTML += getEditorSpecialHtml(role);
 
     const getPeopleResults = renderEditorPeople(role, people);
     registerEditorEvents(role, getPeopleResults);
 }
 
-function getEditorSpecialHtml() {
+function getEditorSpecialHtml(role) {
     if (role.type === 'Individual') {
-        const template = Handlebars.compile($('#roles-editor-individual-template').html());
+        const template = Handlebars.compile(document.getElementById('roles-editor-individual-template').innerHTML);
         return template({
             chairs: getMembers(role, 'Chair'),
             backups: getMembers(role, 'Backup')
         });
     } else {
-        const template = Handlebars.compile($('#roles-editor-group-template').html());
+        const template = Handlebars.compile(document.getElementById('roles-editor-group-template').innerHTML);
         return template({
             chairs: getMembers(role, 'Chair'),
             members: getMembers(role, 'Member')
@@ -109,13 +109,15 @@ function getEditorSpecialHtml() {
 
 function renderEditorPeople(role, people) {
     const getResults = {};
-    const chairsContainer = $('.js-roles-editor-chairs');
-    const backupsContainer = $('.js-roles-editor-backups');
-    const membersContainer = $('.js-roles-editor-members');
+    const chairsContainer = document.getElementById('roles-editor-chairs');
+    const backupsContainer = document.getElementById('roles-editor-backups');
+    const membersContainer = document.getElementById('roles-editor-members');
     const opts = {
         multi: true,
         allowPlainText: true,
-        autoAdvance: true
+        autoAdvance: true,
+        textFieldSize: 14,
+        textFieldClass: 'form-control'
     };
     if (chairsContainer) {
         getResults.chairs = autocomplete.registerAutocomplete(chairsContainer, people, getMembers(role, 'Chair'), opts);
@@ -133,8 +135,8 @@ function registerEditorEvents(role, getPeopleResults) {
     const buttonsContainer = document.getElementById('roles-editor-buttons');
     const template = Handlebars.compile(document.getElementById('roles-editor-buttons-template').innerHTML);
     buttonsContainer.innerHTML = template({});
-    const submitButton = buttonsContainer.getElementById('roles-editor-submit');
-    const cancelButton = buttonsContainer.getElementById('roles-editor-cancel');
+    const submitButton = document.getElementById('roles-editor-submit');
+    const cancelButton = document.getElementById('roles-editor-cancel');
     submitButton.addEventListener('click', () => {
         saveRole(role, getPeopleResults);
         updateIndex(role);
@@ -146,28 +148,18 @@ function registerEditorEvents(role, getPeopleResults) {
 }
 
 function saveRole(role, getPeopleResults) {
-    const role = JSON.stringify({
+    const roleJson = JSON.stringify({
         eligibility: role.eligibility,
         name: role.name,
         notes: role.notes,
         description: role.description,
-        is_active: role.is_active
+        is_active: role.is_active,
+        chairs: getPeopleResults.chairs(),
+        backups: getPeopleResults.backups(),
+        members: getPeopleResults.members()
     });
-    const chairs = autocompleteResultToJson(getPeopleResults.chairs);
-    const backups = autocompleteResultToJson(getPeopleResults.backups);
-    const members = autocompleteResultToJson(getPeopleResults.members);
-    const queryString = `?role=${role}&chairs=${chairs}&backups=${backups}&members=${members}`;
-    const url = `/roles/updateRole/${role.id}${queryString}`;
+    const url = `/roles/updateRole/${role.id}?role=${roleJson}`;
     fetch(url, { method: 'POST' });
-}
-
-function autocompleteResultToJson(result) {
-    return JSON.stringify(result().map(r => {
-        return {
-            label: r.label,
-            id: r.id
-        };
-    }));
 }
 
 function updateIndex(role) {

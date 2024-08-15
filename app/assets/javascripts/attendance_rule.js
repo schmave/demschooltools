@@ -11,6 +11,9 @@ export function init(selectedPersonId, people) {
 
   const container = document.getElementById('attendance-edit-rule-person');
   const startingValues = [{ id: selectedPersonId }];
-  const opts = { idFieldName: 'personId' };
+  const opts = {
+    idFieldName: 'personId',
+    textFieldSize: 15
+  };
   autocomplete.registerAutocomplete(container, people, startingValues, opts);
 }

@@ -322,11 +322,11 @@ var _rollbarConfig = {
         <div class="no-print feedback_open" id="main_feedback_open">Have Feedback?</div>
 
         <script id="autocomplete-template" type="text/x-handlebars-template">
-            <div class="autocomplete-selected">
+            <div class="autocomplete-selected name">
                 <span class="autocomplete-selected-text label label-primary"></span>
                 <img src="/assets/images/x.png">
             </div>
-            <input type="text" class="autocomplete-text" name="{{textFieldName}}" width="{{textFieldWidth}}">
+            <input type="text" class="autocomplete-text {{textFieldClass}}" name="{{textFieldName}}" size="{{textFieldSize}}">
             <input type="hidden" class="autocomplete-id" name="{{idFieldName}}"/>
         </script>
     
