@@ -10,6 +10,7 @@ import javax.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import play.data.*;
+import java.text.SimpleDateFormat;
 
 @Getter
 @Setter
@@ -19,10 +20,10 @@ public class Role extends Model {
   @Id private Integer id;
 
   @ManyToOne()
+  @JsonIgnore
   private Organization organization;
 
   @OneToMany(mappedBy = "role")
-  @JsonIgnore
   public List<RoleRecord> records;
 
   private RoleType type;
@@ -41,14 +42,26 @@ public class Role extends Model {
   private static final Finder<Integer, Role> find = new Finder<>(Role.class);
 
   public static List<Role> all(Organization org) {
-    return find.query().where().eq("organization", org).findList();
+    return find.query()
+      .fetch("records", FetchConfig.ofQuery())
+      .fetch("records.members", FetchConfig.ofQuery())
+      .where()
+      .eq("organization", org)
+      .findList();
   }
 
   public static Role findById(Integer id, Organization org) {
     return find.query().where().eq("organization", org).eq("id", id).findOne();
   }
 
-  public static Role create(Organization org, RoleType type, RoleEligibility eligibility, String name, String notes, String description) {
+  public static Role create(
+    Organization org,
+    RoleType type,
+    RoleEligibility eligibility,
+    String name,
+    String notes,
+    String description
+  ) {
     Role role = new Role();
     role.organization = org;
     role.type = type;
@@ -59,5 +72,40 @@ public class Role extends Model {
     role.isActive = true;
     role.save();
     return role;
+  }
+
+  public void update(
+    RoleEligibility eligibility,
+    String name,
+    String notes,
+    String description,
+    List<Map.Entry<Integer, String>> chairs,
+    List<Map.Entry<Integer, String>> backups,
+    List<Map.Entry<Integer, String>> members
+  ) {
+    this.eligibility = eligibility;
+    this.name = name;
+    this.notes = notes;
+    this.description = description;
+    save();
+    RoleRecord record = findOrCreateCurrentRecord();
+    record.addMembers(chairs, backups, members);
+  }
+
+  private RoleRecord findOrCreateCurrentRecord() {
+    if (!records.isEmpty()) {
+      Collections.sort(records, Collections.reverseOrder());
+      RoleRecord record = records.get(0);
+      if (areSameDay(record.getDateCreated(), new Date())) {
+        record.clearMembers();
+        return record;
+      }
+    }
+    return RoleRecord.create(this);
+  }
+
+  private static boolean areSameDay(Date a, Date b) {
+    SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd");
+    return fmt.format(a).equals(fmt.format(b));
   }
 }

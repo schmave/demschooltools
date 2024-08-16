@@ -108,7 +108,11 @@ function getEditorSpecialHtml(role) {
 }
 
 function renderEditorPeople(role, people) {
-    const getResults = {};
+    const getResults = {
+        chairs: () => [],
+        backups: () => [],
+        members: () => []
+    };
     const chairsContainer = document.getElementById('roles-editor-chairs');
     const backupsContainer = document.getElementById('roles-editor-backups');
     const membersContainer = document.getElementById('roles-editor-members');
@@ -120,13 +124,16 @@ function renderEditorPeople(role, people) {
         textFieldClass: 'form-control'
     };
     if (chairsContainer) {
-        getResults.chairs = autocomplete.registerAutocomplete(chairsContainer, people, getMembers(role, 'Chair'), opts);
+        const startingValues = formatMembersForAutocomplete(getMembers(role, 'Chair'));
+        getResults.chairs = autocomplete.registerAutocomplete(chairsContainer, people, startingValues, opts);
     }
     if (backupsContainer) {
-        getResults.backups = autocomplete.registerAutocomplete(backupsContainer, people, getMembers(role, 'Backup'), opts);
+        const startingValues = formatMembersForAutocomplete(getMembers(role, 'Backup'));
+        getResults.backups = autocomplete.registerAutocomplete(backupsContainer, people, startingValues, opts);
     }
     if (membersContainer) {
-        getResults.members = autocomplete.registerAutocomplete(membersContainer, people, getMembers(role, 'Member'), opts);
+        const startingValues = formatMembersForAutocomplete(getMembers(role, 'Member'));
+        getResults.members = autocomplete.registerAutocomplete(membersContainer, people, startingValues, opts);
     }
     return getResults;
 }
@@ -138,7 +145,7 @@ function registerEditorEvents(role, getPeopleResults) {
     const submitButton = document.getElementById('roles-editor-submit');
     const cancelButton = document.getElementById('roles-editor-cancel');
     submitButton.addEventListener('click', () => {
-        saveRole(role, getPeopleResults);
+        saveRole(role.id, getPeopleResults);
         updateIndex(role);
         closeEditor();
     });
@@ -147,18 +154,17 @@ function registerEditorEvents(role, getPeopleResults) {
     });
 }
 
-function saveRole(role, getPeopleResults) {
+function saveRole(id, getPeopleResults) {
     const roleJson = JSON.stringify({
-        eligibility: role.eligibility,
-        name: role.name,
-        notes: role.notes,
-        description: role.description,
-        is_active: role.is_active,
+        eligibility: document.getElementById('roles-editor-eligibility').value,
+        name: document.getElementById('roles-editor-name').value,
+        notes: document.getElementById('roles-editor-notes').value,
+        description: document.getElementById('roles-editor-description').value,
         chairs: getPeopleResults.chairs(),
         backups: getPeopleResults.backups(),
         members: getPeopleResults.members()
     });
-    const url = `/roles/updateRole/${role.id}?role=${roleJson}`;
+    const url = `/roles/updateRole/${id}?roleJson=${roleJson}`;
     fetch(url, { method: 'POST' });
 }
 
@@ -190,7 +196,16 @@ function getMembers(role, memberType) {
 
 function formatMemberList(role, memberType) {
     const members = getMembers(role, memberType);
-    return members.map(m => getMemberName(m)).filter(m => !!m).join(', ');
+    return members.map(m => m.personName).filter(m => !!m).join(', ');
+}
+
+function formatMembersForAutocomplete(members) {
+    return members.map(m => {
+        return {
+            id: m.personId,
+            label: m.personName
+        };
+    });
 }
 
 function formatEligibility(eligibility) {
@@ -201,13 +216,6 @@ function formatEligibility(eligibility) {
         return 'Student Only';
     }
     return '';
-}
-
-function getMemberName(member) {
-    if (member.person) {
-        return member.person.displayName || '';
-    }
-    return member.personName || '';
 }
 
 function sortAll(roles) {
@@ -238,7 +246,7 @@ function sortRecords(records) {
 }
 
 function sortMembers(members) {
-    sortAlphabetically(members, m => getMemberName(m));
+    sortAlphabetically(members, m => m.personName);
 }
 
 function sortAlphabetically(arr, nameFn) {

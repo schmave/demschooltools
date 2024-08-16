@@ -6,19 +6,23 @@ function registerAutocomplete(container, source, startingValues, opts) {
     const items = [];
 
     for (const value of startingValues) {
-        const item = registerAutocompleteItem(container, source, opts, onSelect);
-        items.push(item);
-        item.setValue(value);
+        addItem().setValue(value);
     }
 
-    if (!startingValues.length) {
-        items.push(registerAutocompleteItem(container, source, opts, onSelect));
+    if (!startingValues.length || (opts.multi && !anyBlanks())) {
+        addItem();
     }
 
     function onSelect() {
         if (opts.multi && !anyBlanks()) {
-            items.push(registerAutocompleteItem(container, source, opts, onSelect));
+            addItem();
         }
+    }
+
+    function addItem() {
+        const item = registerAutocompleteItem(container, source, opts, onSelect);
+        items.push(item);
+        return item;
     }
 
     function anyBlanks() {
@@ -82,22 +86,28 @@ function registerAutocompleteItem(container, source, opts, onSelect) {
     });
 
     function select(value) {
-        selectedText.html(value.label);
+        setValue(value);
+        if (value.id && opts.autoAdvance) {
+            utils.selectNextInput(idInput);
+        }
+        onSelect();
+    }
+
+    function setValue(value) {
         if (value.id) {
             idInput.val(value.id);
-            onSelect();
-            if (opts.autoAdvance) {
-                utils.selectNextInput(idInput);
-            }
+            selectedText.html(value.label);
             textInput.hide();
             selected.show();
+        } else {
+            textInput.val(value.label);
         }
     }
 
     return {
         getLabel: () => textInput.val(),
         getId: () => idInput.val(),
-        setValue: select
+        setValue
     };
 }
 

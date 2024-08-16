@@ -75,7 +75,7 @@
 <script id="roles-editor-general-template" type="text/x-handlebars-template">
 	<tr>
 		<td><label class="control-label">Name</label></td>
-		<td><input type="text" name="name" required class="form-control" value="{{name}}"/></td>
+		<td><input type="text" id="roles-editor-name" required class="form-control" value="{{name}}"/></td>
 	</tr>
 	<tr>
 		<td><label class="control-label">Type</label></td>
@@ -90,7 +90,7 @@
 	<tr>
 		<td><label class="control-label">Eligibility</label></td>
 		<td>
-			<select name="eligibility" class="form-control" value="{{eligibility}}">
+			<select id="roles-editor-eligibility" class="form-control" value="{{eligibility}}">
 				<option value="Anyone" {{#ifEquals eligibility "Anyone"}}selected{{/ifEquals}}>Anyone</option>
 				<option value="StaffOnly" {{#ifEquals eligibility "StaffOnly"}}selected{{/ifEquals}}>Staff Only</option>
 				<option value="StudentOnly" {{#ifEquals eligibility "StudentOnly"}}selected{{/ifEquals}}>Student Only</option>
@@ -99,11 +99,11 @@
 	</tr>
 	<tr>
 		<td><label class="control-label">Notes</label></td>
-		<td><textarea name="notes" rows="2" class="form-control">{{notes}}</textarea></td>
+		<td><textarea id="roles-editor-notes" rows="2" class="form-control">{{notes}}</textarea></td>
 	</tr>
 	<tr>
 		<td><label class="control-label">Description</label></td>
-		<td><textarea name="description" rows="3" class="form-control">{{description}}</textarea></td>
+		<td><textarea id="roles-editor-description" rows="3" class="form-control">{{description}}</textarea></td>
 	</tr>
 </script>
 
@@ -113,7 +113,7 @@
 		<td id="roles-editor-chairs" class="roles-editor-people"></td>
 	</tr>
 	<tr>
-		<td><label class="control-label">Backups</label></td>
+		<td><label class="control-label">Backup</label></td>
 		<td id="roles-editor-backups" class="roles-editor-people"></td>
 	</tr>
 </script>

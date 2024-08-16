@@ -12,7 +12,7 @@ import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
 import views.html.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
 
 @Secured.Auth(UserRole.ROLE_VIEW_JC)
 public class Roles extends Controller {
@@ -33,8 +33,7 @@ public class Roles extends Controller {
 
   public static String rolesJson(Organization org) throws Exception {
   	List<Role> roles = Role.all(org);
-  	ObjectMapper objectMapper = new ObjectMapper();
-  	return objectMapper.writeValueAsString(roles);
+    return Utils.toJson(roles);
   }
 
   @Secured.Auth(UserRole.ROLE_ROLES)
@@ -57,7 +56,35 @@ public class Roles extends Controller {
   }
 
   @Secured.Auth(UserRole.ROLE_ROLES)
-  public Result updateRole(Integer id, String role, Http.Request request) {
+  public Result updateRole(Integer id, String roleJson, Http.Request request) {
+    Role role = Role.findById(id, Utils.getOrg(request));
+    JsonNode node = Json.parse(roleJson);
+    role.update(
+      RoleEligibility.valueOf(node.get("eligibility").textValue()),
+      node.get("name").textValue(),
+      node.get("notes").textValue(),
+      node.get("description").textValue(),
+      membersJsonToList(node.get("chairs")),
+      membersJsonToList(node.get("backups")),
+      membersJsonToList(node.get("members"))
+    );
     return ok();
+  }
+
+  private static List<Map.Entry<Integer, String>> membersJsonToList(JsonNode json) {
+    List<Map.Entry<Integer, String>> results = new ArrayList<Map.Entry<Integer, String>>();
+    Iterator<JsonNode> iterator = json.elements();
+    for (JsonNode element; iterator.hasNext();) {
+      element = iterator.next();
+      String label = element.get("label").textValue();
+      Integer id = 0;
+      try {
+        id = Integer.parseInt(element.get("id").textValue());
+      }
+      catch (NumberFormatException e) {
+      }
+      results.add(new AbstractMap.SimpleEntry<Integer, String>(id, label));
+    }
+    return results;
   }
 }
