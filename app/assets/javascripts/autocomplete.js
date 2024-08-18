@@ -94,13 +94,12 @@ function registerAutocompleteItem(container, source, opts, onSelect) {
     }
 
     function setValue(value) {
+        textInput.val(value.label);
         if (value.id) {
             idInput.val(value.id);
             selectedText.html(value.label);
             textInput.hide();
             selected.show();
-        } else {
-            textInput.val(value.label);
         }
     }
 

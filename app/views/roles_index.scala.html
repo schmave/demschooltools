@@ -42,10 +42,10 @@
 			{{/if}}
 		</tr>
 		{{#each roles}}
-			<tr>
+			<tr data-id="{{id}}" class="{{rowClass}}">
 				<td><a class="roles-edit-button" data-id="{{id}}">{{name}}</a></td>
 				{{#if ../hasChairs}}
-					<td>{{chairs}}</td>
+					<td class="roles-chairs">{{chairs}}</td>
 				{{/if}}
 				{{#if ../hasBackups}}
 					<td>{{backups}}</td>
@@ -69,7 +69,8 @@
 
 <script id="roles-editor-buttons-template" type="text/x-handlebars-template">
 	<input id="roles-editor-submit" type="submit" value="Update" class="btn btn-primary" />&nbsp;
-	<input id="roles-editor-cancel" type="submit" value="Cancel" class="btn btn-default" />
+	<input id="roles-editor-cancel" type="submit" value="Cancel" class="btn btn-default" />&nbsp;
+	<input id="roles-editor-delete" type="submit" value="Delete" class="btn btn-danger" />
 </script>
 
 <script id="roles-editor-general-template" type="text/x-handlebars-template">

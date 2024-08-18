@@ -71,6 +71,13 @@ public class Roles extends Controller {
     return ok();
   }
 
+  @Secured.Auth(UserRole.ROLE_ROLES)
+  public Result deleteRole(Integer id, Http.Request request) {
+    Role role = Role.findById(id, Utils.getOrg(request));
+    role.delete();
+    return ok();
+  }
+
   private static List<Map.Entry<Integer, String>> membersJsonToList(JsonNode json) {
     List<Map.Entry<Integer, String>> results = new ArrayList<Map.Entry<Integer, String>>();
     Iterator<JsonNode> iterator = json.elements();

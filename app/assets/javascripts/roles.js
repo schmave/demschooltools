@@ -34,8 +34,9 @@ function switchTab(roles, terms, people, roleType) {
     renderIndex(filteredRoles, terms, people, roleType);
 }
 
-function renderIndex(roles, terms, people, roleType) {
+function renderIndex(roles, terms, people, roleType, selectedRoleId) {
     const container = document.getElementById('roles-index-container');
+    roles = roles.filter(r => !!r.id);
     if (!roles || !roles.length) {
         container.innerHTML = '<div style="padding:15px;">No roles have been created yet with this type.</div>';
         return;
@@ -52,6 +53,7 @@ function renderIndex(roles, terms, people, roleType) {
         roles: roles.map(role => {
             return {
                 id: role.id,
+                rowClass: selectedRoleId === role.id ? 'selected' : '',
                 name: role.name,
                 chairs: formatMemberList(role, 'Chair'),
                 backups: formatMemberList(role, 'Backup'),
@@ -62,18 +64,24 @@ function renderIndex(roles, terms, people, roleType) {
             };
         })
     });
+    const selectedRole = roles.filter(r => r.id == selectedRoleId)[0];
+    if (selectedRole) {
+        const reloadIndex = () => renderIndex(roles, terms, people, roleType);
+        renderEditor(selectedRole, people, reloadIndex);
+    } else {
+        document.querySelector('.roles-editor').style.display = 'none';
+    }
     const editButtons = document.getElementsByClassName('roles-edit-button');
     for (const editButton of editButtons) {
         editButton.addEventListener('click', () => {
-            const roleId = editButton.getAttribute('data-id');
-            const role = roles.filter(r => r.id == roleId)[0];
-            renderEditor(role, people);
+            const roleId = Number(editButton.getAttribute('data-id'));
+            renderIndex(roles, terms, people, roleType, roleId);
         });
     }
     sorttable.makeSortable(container.querySelector('table'));
 }
 
-function renderEditor(role, people) {
+function renderEditor(role, people, reloadIndex) {
     document.querySelector('.roles-editor').style.display = 'block';
     const table = document.querySelector('.roles-edit-table');
     const generalTemplate = Handlebars.compile(document.getElementById('roles-editor-general-template').innerHTML);
@@ -88,7 +96,7 @@ function renderEditor(role, people) {
     table.innerHTML += getEditorSpecialHtml(role);
 
     const getPeopleResults = renderEditorPeople(role, people);
-    registerEditorEvents(role, getPeopleResults);
+    registerEditorEvents(role, getPeopleResults, reloadIndex);
 }
 
 function getEditorSpecialHtml(role) {
@@ -138,24 +146,28 @@ function renderEditorPeople(role, people) {
     return getResults;
 }
 
-function registerEditorEvents(role, getPeopleResults) {
+function registerEditorEvents(role, getPeopleResults, reloadIndex) {
     const buttonsContainer = document.getElementById('roles-editor-buttons');
     const template = Handlebars.compile(document.getElementById('roles-editor-buttons-template').innerHTML);
     buttonsContainer.innerHTML = template({});
     const submitButton = document.getElementById('roles-editor-submit');
     const cancelButton = document.getElementById('roles-editor-cancel');
+    const deleteButton = document.getElementById('roles-editor-delete');
     submitButton.addEventListener('click', () => {
-        saveRole(role.id, getPeopleResults);
-        updateIndex(role);
-        closeEditor();
+        saveRole(role, getPeopleResults);
+        reloadIndex();
     });
     cancelButton.addEventListener('click', () => {
-        closeEditor();
+        reloadIndex();
+    });
+    deleteButton.addEventListener('click', () => {
+        deleteRole(role);
+        reloadIndex();
     });
 }
 
-function saveRole(id, getPeopleResults) {
-    const roleJson = JSON.stringify({
+function saveRole(role, getPeopleResults) {
+    const results = {
         eligibility: document.getElementById('roles-editor-eligibility').value,
         name: document.getElementById('roles-editor-name').value,
         notes: document.getElementById('roles-editor-notes').value,
@@ -163,17 +175,23 @@ function saveRole(id, getPeopleResults) {
         chairs: getPeopleResults.chairs(),
         backups: getPeopleResults.backups(),
         members: getPeopleResults.members()
-    });
-    const url = `/roles/updateRole/${id}?roleJson=${roleJson}`;
+    };
+    const url = `/roles/updateRole/${role.id}?roleJson=${JSON.stringify(results)}`;
     fetch(url, { method: 'POST' });
+    role.eligibility = results.eligibility;
+    role.name = results.name;
+    role.notes = results.notes;
+    role.description = results.description;
+    makeLocalRecord(role, results.chairs, results.backups, results.members);
 }
 
-function updateIndex(role) {
-
-}
-
-function closeEditor() {
-    document.querySelector('.roles-editor').style.display = 'none';
+function deleteRole(role) {
+    if (confirm(`Are you sure you want to delete the role "${role.name}"? Membership records will not be deleted.`)) {
+        const url = `/roles/deleteRole/${role.id}`;
+        fetch(url, { method: 'POST' });
+        // indicates to index that the role has been deleted
+        role.id = null;
+    }
 }
 
 function getChairHeader(roleType, terms) {
@@ -206,6 +224,21 @@ function formatMembersForAutocomplete(members) {
             label: m.personName
         };
     });
+}
+
+function makeLocalRecord(role, chairs, backups, members) {
+    const record = {};
+    role.records.push(record);
+    record.members = chairs.map(m => format(m, 'Chair'));
+    record.members.push(...backups.map(m => format(m, 'Backup')));
+    record.members.push(...members.map(m => format(m, 'Member')));
+    function format(m, type) {
+        return {
+            type,
+            personId: m.id,
+            personName: m.label
+        };
+    }
 }
 
 function formatEligibility(eligibility) {

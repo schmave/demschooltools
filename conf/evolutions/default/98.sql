@@ -13,18 +13,17 @@ CREATE TABLE role (
    name text NOT NULL,
    notes text NOT NULL,
    description text NOT NULL,
-   is_active boolean NOT NULL DEFAULT true,
    CONSTRAINT pk_role primary key(id),
-   CONSTRAINT fk_role_organization FOREIGN KEY (organization_id) references organization(id)
+   CONSTRAINT fk_role_organization FOREIGN KEY (organization_id) REFERENCES organization(id)
 );
 
 CREATE TABLE role_record (
    id serial,
-   role_id integer NOT NULL,
+   role_id integer,
    role_name text NOT NULL,
    date_created timestamp NOT NULL,
    CONSTRAINT pk_role_record primary key(id),
-   CONSTRAINT fk_role_record_role FOREIGN KEY (role_id) references role(id)
+   CONSTRAINT fk_role_record_role FOREIGN KEY (role_id) REFERENCES role(id)
 );
 
 CREATE TABLE role_record_member (
