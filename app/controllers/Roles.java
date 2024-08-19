@@ -74,6 +74,10 @@ public class Roles extends Controller {
   @Secured.Auth(UserRole.ROLE_ROLES)
   public Result deleteRole(Integer id, Http.Request request) {
     Role role = Role.findById(id, Utils.getOrg(request));
+    for (RoleRecord record : role.records) {
+      record.setRole(null);
+      record.save();
+    }
     role.delete();
     return ok();
   }

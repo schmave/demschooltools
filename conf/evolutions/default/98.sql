@@ -5,6 +5,8 @@ ALTER TABLE organization ADD COLUMN roles_individual_term text DEFAULT 'Clerk';
 ALTER TABLE organization ADD COLUMN roles_committee_term text DEFAULT 'Committee';
 ALTER TABLE organization ADD COLUMN roles_group_term text DEFAULT 'Group';
 
+ALTER TABLE tag ADD COLUMN show_in_roles boolean NOT NULL DEFAULT true;
+
 CREATE TABLE role (
    id serial,
    organization_id integer NOT NULL,
@@ -45,3 +47,5 @@ ALTER TABLE organization DROP COLUMN roles_individual_term;
 ALTER TABLE organization DROP COLUMN roles_committee_term;
 ALTER TABLE organization DROP COLUMN roles_group_term;
 ALTER TABLE organization DROP COLUMN show_roles;
+
+ALTER TABLE tag DROP COLUMN show_in_roles;

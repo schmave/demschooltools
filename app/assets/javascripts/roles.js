@@ -35,6 +35,7 @@ function switchTab(roles, terms, people, roleType) {
 }
 
 function renderIndex(roles, terms, people, roleType, selectedRoleId) {
+    document.querySelector('.roles-editor').style.display = 'none';
     const container = document.getElementById('roles-index-container');
     roles = roles.filter(r => !!r.id);
     if (!roles || !roles.length) {
@@ -68,8 +69,6 @@ function renderIndex(roles, terms, people, roleType, selectedRoleId) {
     if (selectedRole) {
         const reloadIndex = () => renderIndex(roles, terms, people, roleType);
         renderEditor(selectedRole, people, reloadIndex);
-    } else {
-        document.querySelector('.roles-editor').style.display = 'none';
     }
     const editButtons = document.getElementsByClassName('roles-edit-button');
     for (const editButton of editButtons) {
@@ -161,8 +160,9 @@ function registerEditorEvents(role, getPeopleResults, reloadIndex) {
         reloadIndex();
     });
     deleteButton.addEventListener('click', () => {
-        deleteRole(role);
-        reloadIndex();
+        if (deleteRole(role)) {
+            reloadIndex();
+        }
     });
 }
 
@@ -191,7 +191,9 @@ function deleteRole(role) {
         fetch(url, { method: 'POST' });
         // indicates to index that the role has been deleted
         role.id = null;
+        return true;
     }
+    return false;
 }
 
 function getChairHeader(roleType, terms) {

@@ -33,8 +33,6 @@ public class Role extends Model {
   private String notes = "";
   private String description = "";
 
-  private boolean isActive;
-
   public String getTypeName() {
     return type.toString(organization);
   }
@@ -69,7 +67,6 @@ public class Role extends Model {
     role.name = name;
     role.notes = notes;
     role.description = description;
-    role.isActive = true;
     role.save();
     return role;
   }
