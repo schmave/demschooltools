@@ -10,6 +10,7 @@ ALTER TABLE tag ADD COLUMN show_in_roles boolean NOT NULL DEFAULT true;
 CREATE TABLE role (
    id serial,
    organization_id integer NOT NULL,
+   is_active boolean NOT NULL DEFAULT true,
    type integer NOT NULL,
    eligibility integer NOT NULL,
    name text NOT NULL,
@@ -21,7 +22,7 @@ CREATE TABLE role (
 
 CREATE TABLE role_record (
    id serial,
-   role_id integer,
+   role_id integer NOT NULL,
    role_name text NOT NULL,
    date_created timestamp NOT NULL,
    CONSTRAINT pk_role_record primary key(id),

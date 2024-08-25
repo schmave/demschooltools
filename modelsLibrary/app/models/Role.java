@@ -26,6 +26,8 @@ public class Role extends Model {
   @OneToMany(mappedBy = "role")
   public List<RoleRecord> records;
 
+  private boolean isActive;
+
   private RoleType type;
   private RoleEligibility eligibility;
 
@@ -45,6 +47,7 @@ public class Role extends Model {
       .fetch("records.members", FetchConfig.ofQuery())
       .where()
       .eq("organization", org)
+      .eq("is_active", true)
       .findList();
   }
 
@@ -87,6 +90,12 @@ public class Role extends Model {
     save();
     RoleRecord record = findOrCreateCurrentRecord();
     record.addMembers(chairs, backups, members);
+  }
+
+  public void deactivate() {
+    this.is_active = false;
+    RoleRecord record = findOrCreateCurrentRecord();
+    save();
   }
 
   private RoleRecord findOrCreateCurrentRecord() {

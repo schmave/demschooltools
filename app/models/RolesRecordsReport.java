@@ -24,7 +24,7 @@ public class RolesRecordsReport {
         if (person == null) {
             return;
         }
-        Map<String, List<RoleRecord>> groups = groupRecordsByRole(org);
+        Map<String, List<RoleRecord>> groups = groupRecordsByRole();
         for (Map.Entry<String, List<RoleRecord>> group : groups.entrySet()) {
             RolesRecordsReportEntry entry = new RolesRecordsReportEntry(group.getKey());
             entry.dates = groupRecordsByDate(group.getValue());
@@ -33,16 +33,13 @@ public class RolesRecordsReport {
         Collections.sort(entries, Collections.reverseOrder());
     }
 
-    private Map<String, List<RoleRecord>> groupRecordsByRole(Organization org) {
+    private Map<String, List<RoleRecord>> groupRecordsByRole() {
         Map<String, List<RoleRecord>> groups = new HashMap<String, List<RoleRecord>>();
         for (RoleRecordMember m : person.getRoleRecordMembers()) {
             Role role = m.getRecord().getRole();
-            String roleName = role != null ? role.getName() : m.getRecord().getRoleName();
-            if (groups.containsKey(roleName)) {
-                continue;
+            if (!groups.containsKey(role.getName())) {
+                groups.put(role.getName(), role.getRecords());
             }
-            List<RoleRecord> records = role != null ? role.getRecords() : RoleRecord.findByRoleName(roleName, org);
-            groups.put(roleName, records);
         }
         return groups;
     }
@@ -50,15 +47,25 @@ public class RolesRecordsReport {
     private List<RolesRecordsReportEntryDate> groupRecordsByDate(List<RoleRecord> records) {
         List<RolesRecordsReportEntryDate> groups = new ArrayList<RolesRecordsReportEntryDate>();
         RolesRecordsReportEntryDate currentGroup = null;
+        RolesRecordsReportEntryDate previousGroup = null;
         Collections.sort(records);
         for (RoleRecord record : records) {
-            boolean isPersonPresent = record.getMembers().contains(person);
+            boolean isPersonPresent = record.getMembers().stream().filter(m -> m.getPerson().equals(person)).findFirst().isPresent();
             if (isPersonPresent) {
                 if (currentGroup == null) {
-                    // As of this record, the person has this role but did not previously have it,
-                    // so we start a new date group
-                    currentGroup = new RolesRecordsReportEntryDate(record.getDateCreated());
-                    groups.add(currentGroup);
+                    if (previousGroup != null && areDateMonthsEqual(previousGroup.endDate, record.getDateCreated())) {
+                        // As of this record, the person has this role now and they had it earlier in the same
+                        // month, but there was a period in the middle of the month when they didn't have it,
+                        // so we ignore the intermediate period by continuing the previous date group
+                        currentGroup = previousGroup;
+                        currentGroup.endDate = record.getDateCreated();
+                    }
+                    else {
+                        // As of this record, the person has this role but did not previously have it,
+                        // so we start a new date group
+                        currentGroup = new RolesRecordsReportEntryDate(record.getDateCreated());
+                        groups.add(currentGroup);
+                    }
                 }
                 else {
                     // As of this record, the person has this role and already had it before,
@@ -68,7 +75,9 @@ public class RolesRecordsReport {
             }
             else if (currentGroup != null) {
                 // As of this record, the person had this role before but does not have it anymore,
-                // so we terminate the date group
+                // so we update the end date of the date group and then terminate it
+                currentGroup.endDate = record.getDateCreated();
+                previousGroup = currentGroup;
                 currentGroup = null;
             }
             // If we get here, the person did not already have the role and still doesn't have it,
@@ -80,5 +89,14 @@ public class RolesRecordsReport {
         }
         Collections.sort(groups, Collections.reverseOrder());
         return groups;
+    }
+
+    private boolean areDateMonthsEqual(Date a, Date b) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(a);
+        int monthA = cal.get(Calendar.MONTH);
+        cal.setTime(b);
+        int monthB = cal.get(Calendar.MONTH);
+        return monthA == monthB;
     }
 }

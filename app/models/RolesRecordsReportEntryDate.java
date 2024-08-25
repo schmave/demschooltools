@@ -1,18 +1,26 @@
 package models;
 
 import java.util.*;
+import java.text.SimpleDateFormat;
 
 public class RolesRecordsReportEntryDate implements Comparable<RolesRecordsReportEntryDate> {
 
-    @play.data.format.Formats.DateTime(pattern = "MM/dd/yyyy")
     public Date startDate;
-
-    @play.data.format.Formats.DateTime(pattern = "MM/dd/yyyy")
     public Date endDate;
+
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM yyyy");
 
     public RolesRecordsReportEntryDate(Date date) {
         startDate = date;
         endDate = date;
+    }
+
+    public String formatStartDate() {
+        return dateFormat.format(startDate);
+    }
+
+    public String formatEndDate() {
+        return dateFormat.format(endDate);
     }
 
     @Override
