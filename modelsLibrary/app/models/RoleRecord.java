@@ -30,6 +30,17 @@ public class RoleRecord extends Model implements Comparable<RoleRecord> {
   @play.data.format.Formats.DateTime(pattern = "MM/dd/yyyy")
   private Date dateCreated = new Date();
 
+  public static Finder<Integer, RoleRecord> find = new Finder<>(RoleRecord.class);
+
+  public static List<RoleRecord> findByRoleName(String roleName, Organization org) {
+    return find.query()
+        .fetch("members", FetchConfig.ofQuery())
+        .where()
+        .eq("organization", org)
+        .eq("roleName", roleName)
+        .findList();
+  }
+
   public static RoleRecord create(Role role) {
     RoleRecord record = new RoleRecord();
     record.role = role;

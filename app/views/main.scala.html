@@ -205,6 +205,8 @@ var _rollbarConfig = {
                         href="@routes.Roles.index()">Roles</a>
                     <a @if(selectedBtn.equals("roles_new")) { class="active" }
                         href="@routes.Roles.newRole()">Create Role</a>
+                    <a @if(selectedBtn.equals("roles_records")) { class="active" }
+                        href="@routes.Roles.records()">Records</a>
                 </div>
             </div>
         }

@@ -82,6 +82,13 @@ public class Roles extends Controller {
     return ok();
   }
 
+  public Result records(Http.Request request) {
+    Form<RolesRecordsReport> form = mFormFactory.form(RolesRecordsReport.class).withDirectFieldAccess(true);
+    Form<RolesRecordsReport> filledForm = form.bindFromRequest(request);
+    RolesRecordsReport report = RolesRecordsReport.create(filledForm, Utils.getOrg(request));
+    return ok(roles_records.render(report, request, mMessagesApi.preferred(request)));
+  }
+
   private static List<Map.Entry<Integer, String>> membersJsonToList(JsonNode json) {
     List<Map.Entry<Integer, String>> results = new ArrayList<Map.Entry<Integer, String>>();
     Iterator<JsonNode> iterator = json.elements();

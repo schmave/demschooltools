@@ -5,6 +5,14 @@ Handlebars.registerHelper('ifEquals', function(arg1, arg2, options) {
     return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
 });
 
+export function initRecordsReport(people) {
+    const container = document.getElementById('roles-records-person');
+    const opts = {
+        idFieldName: 'personId'
+    };
+    autocomplete.registerAutocomplete(container, people, [], opts);
+}
+
 export function init(roles, people, terms) {
     sortAll(roles);
     registerTabEvents(roles, terms, people);

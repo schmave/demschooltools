@@ -1,0 +1,51 @@
+@(report: RolesRecordsReport)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
+
+@import helper._
+
+@main("Roles Records", "roles", "roles_records") {
+
+	@helper.form(routes.Roles.records()) {
+
+        <table class="roles-records-report-settings">
+			<tr>
+				<th>Person</th>
+				<td id="roles-records-person"></td>
+			</tr>
+			<tr>
+				<td colspan="2"><button type="submit" class="btn-submit">Fetch Records</button></td>
+			</tr>
+		</table>
+	}
+
+	@if(report.person != null) {
+        <h4><span>@report.person.getDisplayName()</span>'s Roles</h4>
+		<div class="roles-records-report-results">
+			<table class="table">
+				<tr>
+					<th>Role</th>
+					<th>Start Date</th>
+					<th>End Date</th>
+				</tr>
+				@for(entry <- report.entries) {
+					@for((date, i) <- entry.dates.view.zipWithIndex) {
+						<tr>
+							@if(i == 0) {
+								<td rowspan="@entry.dates.size()">@entry.roleName</td>
+							}
+							<td>@date.startDate</td>
+							<td>@date.endDate</td>
+						</tr>		
+					}
+				}
+			</table>
+		</div>
+	}
+
+	<br>
+	<br>
+}
+
+<script type="text/javascript">
+    var peopleJson = @Html(Application.rolesPeopleJson(Utils.getOrgConfig(request).org));
+	initRolesRecordsReport(peopleJson);
+</script>

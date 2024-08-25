@@ -150,6 +150,10 @@ window.initRoles = function(rolesJson, people, terms) {
     return roles.init(rolesJson, people, terms);
 }
 
+window.initRolesRecordsReport = function(people) {
+    return roles.initRecordsReport(people);
+}
+
 window.initSettingsPage = function() {
     return settings_page.init();
 };
