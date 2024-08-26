@@ -15,16 +15,16 @@ export function initRecordsReport(people) {
 
 export function init(roles, people, terms, canEdit) {
     sortAll(roles);
-    registerTabEvents(roles, terms, people);
+    registerTabEvents(roles, terms, people, canEdit);
     switchTab(roles, terms, people, 'Individual', canEdit);
 }
 
-function registerTabEvents(roles, terms, people) {
+function registerTabEvents(roles, terms, people, canEdit) {
     const tabs = document.getElementsByClassName('roles-tab');
     for (const tab of tabs) {
         const roleType = tab.getAttribute('data-type');
         tab.addEventListener('click', () => {
-            switchTab(roles, terms, people, roleType);
+            switchTab(roles, terms, people, roleType, canEdit);
         });
     }
 }
