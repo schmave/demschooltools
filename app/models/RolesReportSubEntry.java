@@ -2,13 +2,14 @@ package models;
 
 import java.util.*;
 
-public class RolesRecordsReportEntry implements Comparable<RolesRecordsReportEntry> {
+public class RolesReportSubEntry implements Comparable<RolesReportSubEntry> {
 
-    public String roleName;
-    public List<RolesRecordsReportEntryDate> dates = new ArrayList<RolesRecordsReportEntryDate>();
+    public String description;
+    public List<RolesReportDate> dates;
 
-    public RolesRecordsReportEntry(String roleName) {
-        this.roleName = roleName;
+    public RolesReportSubEntry(String description, List<RolesReportDate> dates) {
+        this.description = description;
+        this.dates = dates;
     }
 
     public Date getFinalDate() {
@@ -21,7 +22,7 @@ public class RolesRecordsReportEntry implements Comparable<RolesRecordsReportEnt
     }
 
     @Override
-    public int compareTo(RolesRecordsReportEntry e) {
+    public int compareTo(RolesReportSubEntry e) {
         return getFinalDate().compareTo(e.getFinalDate());
     }
 }

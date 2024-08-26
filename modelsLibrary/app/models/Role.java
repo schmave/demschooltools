@@ -65,6 +65,7 @@ public class Role extends Model {
   ) {
     Role role = new Role();
     role.organization = org;
+    role.isActive = true;
     role.type = type;
     role.eligibility = eligibility;
     role.name = name;
@@ -93,7 +94,7 @@ public class Role extends Model {
   }
 
   public void deactivate() {
-    this.is_active = false;
+    this.isActive = false;
     RoleRecord record = findOrCreateCurrentRecord();
     save();
   }

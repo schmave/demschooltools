@@ -3,14 +3,14 @@ package models;
 import java.util.*;
 import java.text.SimpleDateFormat;
 
-public class RolesRecordsReportEntryDate implements Comparable<RolesRecordsReportEntryDate> {
+public class RolesReportDate implements Comparable<RolesReportDate> {
 
     public Date startDate;
     public Date endDate;
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM yyyy");
 
-    public RolesRecordsReportEntryDate(Date date) {
+    public RolesReportDate(Date date) {
         startDate = date;
         endDate = date;
     }
@@ -24,7 +24,7 @@ public class RolesRecordsReportEntryDate implements Comparable<RolesRecordsRepor
     }
 
     @Override
-    public int compareTo(RolesRecordsReportEntryDate d) {
+    public int compareTo(RolesReportDate d) {
         return endDate.compareTo(d.endDate);
     }
 }

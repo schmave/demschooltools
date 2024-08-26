@@ -1,4 +1,4 @@
-@(report: RolesRecordsReport)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
+@(report: RolesReport)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @import helper._
 
@@ -6,12 +6,10 @@
 
 	@helper.form(routes.Roles.records()) {
 
-        <table class="roles-records-report-settings">
+        <table class="roles-report-settings">
 			<tr>
 				<th>Person</th>
-				<td id="roles-records-person"></td>
-			</tr>
-			<tr>
+				<td id="roles-report-person"></td>
 				<td colspan="2"><button type="submit" class="btn-submit">Fetch Records</button></td>
 			</tr>
 		</table>
@@ -19,22 +17,28 @@
 
 	@if(report.person != null) {
         <h4><span>@report.person.getDisplayName()</span>'s Roles</h4>
-		<div class="roles-records-report-results">
+		<div class="roles-report-results">
 			<table class="table">
 				<tr>
 					<th>Role</th>
+					<th></th>
 					<th>Start Date</th>
 					<th>End Date</th>
 				</tr>
 				@for(entry <- report.entries) {
-					@for((date, i) <- entry.dates.view.zipWithIndex) {
-						<tr>
-							@if(i == 0) {
-								<td rowspan="@entry.dates.size()">@entry.roleName</td>
-							}
-							<td>@date.formatStartDate</td>
-							<td>@date.formatEndDate</td>
-						</tr>		
+					@for((subEntry, i) <- entry.subEntries.view.zipWithIndex) {
+						@for((date, j) <- subEntry.dates.view.zipWithIndex) {
+							<tr>
+								@if(i == 0 && j == 0) {
+									<td class="roles-report-entry" rowspan="@entry.getTotalDates()">@entry.roleName</td>
+								}
+								@if(j == 0) {
+									<td class="roles-report-subentry" rowspan="@subEntry.dates.size()">@subEntry.description</td>
+								}
+								<td>@date.formatStartDate</td>
+								<td>@date.formatEndDate</td>
+							</tr>		
+						}	
 					}
 				}
 			</table>

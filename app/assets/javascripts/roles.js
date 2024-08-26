@@ -6,7 +6,7 @@ Handlebars.registerHelper('ifEquals', function(arg1, arg2, options) {
 });
 
 export function initRecordsReport(people) {
-    const container = document.getElementById('roles-records-person');
+    const container = document.getElementById('roles-report-person');
     const opts = {
         idFieldName: 'personId'
     };
@@ -283,8 +283,7 @@ function sortRecords(records) {
     // sorts chronologically
     records.sort((a, b) => sortFunction(a.dateCreated, b.dateCreated));
     function sortFunction(a, b) {
-        // TODO IMPLEMENT
-        return 0;
+        return new Date(a) - new Date(b);
     }
 }
 

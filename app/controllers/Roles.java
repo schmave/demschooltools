@@ -79,9 +79,9 @@ public class Roles extends Controller {
   }
 
   public Result records(Http.Request request) {
-    Form<RolesRecordsReport> form = mFormFactory.form(RolesRecordsReport.class).withDirectFieldAccess(true);
-    Form<RolesRecordsReport> filledForm = form.bindFromRequest(request);
-    RolesRecordsReport report = RolesRecordsReport.create(filledForm, Utils.getOrg(request));
+    Form<RolesReport> form = mFormFactory.form(RolesReport.class).withDirectFieldAccess(true);
+    Form<RolesReport> filledForm = form.bindFromRequest(request);
+    RolesReport report = RolesReport.create(filledForm, Utils.getOrg(request));
     return ok(roles_records.render(report, request, mMessagesApi.preferred(request)));
   }
 

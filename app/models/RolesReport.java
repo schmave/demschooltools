@@ -3,20 +3,20 @@ package models;
 import java.util.*;
 import play.data.*;
 
-public class RolesRecordsReport {
+public class RolesReport {
 
     public Integer personId;
     public Person person;
-    public List<RolesRecordsReportEntry> entries;
+    public List<RolesReportEntry> entries;
 
-    public static RolesRecordsReport create(Form<RolesRecordsReport> form, Organization org) {
-        RolesRecordsReport report = form.get();
+    public static RolesReport create(Form<RolesReport> form, Organization org) {
+        RolesReport report = form.get();
         report.runReport(org);
         return report;
     }
 
     public void runReport(Organization org) {
-        entries = new ArrayList<RolesRecordsReportEntry>();
+        entries = new ArrayList<RolesReportEntry>();
         if (personId == null) {
             return;
         }
@@ -26,8 +26,10 @@ public class RolesRecordsReport {
         }
         Map<String, List<RoleRecord>> groups = groupRecordsByRole();
         for (Map.Entry<String, List<RoleRecord>> group : groups.entrySet()) {
-            RolesRecordsReportEntry entry = new RolesRecordsReportEntry(group.getKey());
-            entry.dates = groupRecordsByDate(group.getValue());
+            List<RoleRecord> records = group.getValue();
+            RoleType roleType = records.get(0).getRole().getType();
+            List<RolesReportSubEntry> subEntries = getSubEntries(records, org, roleType);
+            RolesReportEntry entry = new RolesReportEntry(group.getKey(), subEntries);
             entries.add(entry);
         }
         Collections.sort(entries, Collections.reverseOrder());
@@ -38,19 +40,48 @@ public class RolesRecordsReport {
         for (RoleRecordMember m : person.getRoleRecordMembers()) {
             Role role = m.getRecord().getRole();
             if (!groups.containsKey(role.getName())) {
-                groups.put(role.getName(), role.getRecords());
+                groups.put(role.getName(), RoleRecord.findByRoleName(role.getName(), role.getOrganization()));
             }
         }
         return groups;
     }
 
-    private List<RolesRecordsReportEntryDate> groupRecordsByDate(List<RoleRecord> records) {
-        List<RolesRecordsReportEntryDate> groups = new ArrayList<RolesRecordsReportEntryDate>();
-        RolesRecordsReportEntryDate currentGroup = null;
-        RolesRecordsReportEntryDate previousGroup = null;
+    private List<RolesReportSubEntry> getSubEntries(List<RoleRecord> records, Organization org, RoleType roleType) {
+        List<RolesReportSubEntry> subEntries = new ArrayList<RolesReportSubEntry>();
+        List<RolesReportDate> chairDates = getDates(records, new RoleRecordMemberType[]{RoleRecordMemberType.Chair});
+        List<RolesReportDate> backupDates = getDates(records, new RoleRecordMemberType[]{RoleRecordMemberType.Backup});
+        List<RolesReportDate> memberDates = getDates(records, new RoleRecordMemberType[]{RoleRecordMemberType.Member});
+        if (chairDates.size() > 0) {
+            String description = "Chair";
+            if (roleType == RoleType.Individual) {
+                description = backupDates.size() > 0 ? RoleType.Individual.toString(org) : "";
+            }
+            subEntries.add(new RolesReportSubEntry(description, chairDates));
+        }
+        if (backupDates.size() > 0) {
+            String description = "Backup";
+            subEntries.add(new RolesReportSubEntry(description, backupDates));
+        }
+        if (memberDates.size() > 0) {
+            String description = "";
+            if (chairDates.size() > 0) {
+                description = "Member";
+                memberDates = getDates(records, new RoleRecordMemberType[]{RoleRecordMemberType.Member, RoleRecordMemberType.Chair});
+            }
+            subEntries.add(new RolesReportSubEntry(description, memberDates));
+        }
+        return subEntries;
+    }
+
+    private List<RolesReportDate> getDates(List<RoleRecord> records, RoleRecordMemberType[] memberTypes) {
+        List<RolesReportDate> groups = new ArrayList<RolesReportDate>();
+        RolesReportDate currentGroup = null;
+        RolesReportDate previousGroup = null;
         Collections.sort(records);
         for (RoleRecord record : records) {
-            boolean isPersonPresent = record.getMembers().stream().filter(m -> m.getPerson().equals(person)).findFirst().isPresent();
+            boolean isPersonPresent = record.getMembers().stream()
+                .filter(m -> m.getPerson().equals(person) && Arrays.asList(memberTypes).contains(m.getType()))
+                .findFirst().isPresent();
             if (isPersonPresent) {
                 if (currentGroup == null) {
                     if (previousGroup != null && areDateMonthsEqual(previousGroup.endDate, record.getDateCreated())) {
@@ -63,7 +94,7 @@ public class RolesRecordsReport {
                     else {
                         // As of this record, the person has this role but did not previously have it,
                         // so we start a new date group
-                        currentGroup = new RolesRecordsReportEntryDate(record.getDateCreated());
+                        currentGroup = new RolesReportDate(record.getDateCreated());
                         groups.add(currentGroup);
                     }
                 }

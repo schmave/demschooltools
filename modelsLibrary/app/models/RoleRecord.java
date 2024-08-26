@@ -32,9 +32,17 @@ public class RoleRecord extends Model implements Comparable<RoleRecord> {
 
   public static Finder<Integer, RoleRecord> find = new Finder<>(RoleRecord.class);
 
+  public static List<RoleRecord> findByRoleName(String roleName, Organization org) {
+    return find.query()
+        .fetch("members", FetchConfig.ofQuery())
+        .where()
+        .eq("role.organization", org)
+        .eq("roleName", roleName)
+        .findList();
+  }
+
   public static RoleRecord create(Role role) {
     RoleRecord record = new RoleRecord();
-    record.organization = role.getOrganization();
     record.role = role;
     record.roleName = role.getName();
     record.save();
