@@ -28,7 +28,9 @@ public class Roles extends Controller {
 
   public Result index(Http.Request request) {
     Organization org = Utils.getOrg(request);
-    return ok(roles_index.render(request, mMessagesApi.preferred(request)));
+    User currentUser = Application.getCurrentUser(request);
+    boolean canEdit = currentUser != null && currentUser.hasRole(UserRole.ROLE_ROLES);
+    return ok(roles_index.render(canEdit, request, mMessagesApi.preferred(request)));
   }
 
   public static String rolesJson(Organization org) throws Exception {

@@ -1,4 +1,4 @@
-@()(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
+@(canEdit: Boolean)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
 @main("Roles", "roles", "roles_index") {
 	<div class="roles-editor">
@@ -43,7 +43,13 @@
 		</tr>
 		{{#each roles}}
 			<tr data-id="{{id}}" class="{{rowClass}}">
-				<td><a class="roles-edit-button" data-id="{{id}}">{{name}}</a></td>
+				<td>
+					{{#if ../canEdit}}
+						<a class="roles-edit-button" data-id="{{id}}">{{name}}</a>
+					{{else}}
+						{{name}}
+					{{/if}}
+				</td>
 				{{#if ../hasChairs}}
 					<td class="roles-chairs">{{chairs}}</td>
 				{{/if}}
@@ -54,13 +60,13 @@
 					<td>{{members}}</td>
 				{{/if}}
 				{{#if ../hasEligibilities}}
-					<td>{{eligibility}}</td>
+					<td class="roles-verbose">{{eligibility}}</td>
 				{{/if}}
 				{{#if ../hasNotes}}
-					<td>{{notes}}</td>
+					<td class="roles-verbose">{{notes}}</td>
 				{{/if}}
 				{{#if ../hasDescriptions}}
-					<td>{{description}}</td>
+					<td class="roles-verbose">{{description}}</td>
 				{{/if}}
 			</tr>
 		{{/each}}
@@ -136,5 +142,5 @@
 	const terms = {
 		individual: '@Utils.getOrg(request).getRolesIndividualTerm()'
 	};
-	initRoles(rolesJson, peopleJson, terms);
+	initRoles(rolesJson, peopleJson, terms, @canEdit);
 </script>

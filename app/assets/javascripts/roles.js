@@ -13,10 +13,10 @@ export function initRecordsReport(people) {
     autocomplete.registerAutocomplete(container, people, [], opts);
 }
 
-export function init(roles, people, terms) {
+export function init(roles, people, terms, canEdit) {
     sortAll(roles);
     registerTabEvents(roles, terms, people);
-    switchTab(roles, terms, people, 'Individual');
+    switchTab(roles, terms, people, 'Individual', canEdit);
 }
 
 function registerTabEvents(roles, terms, people) {
@@ -29,7 +29,7 @@ function registerTabEvents(roles, terms, people) {
     }
 }
 
-function switchTab(roles, terms, people, roleType) {
+function switchTab(roles, terms, people, roleType, canEdit) {
     const tabs = document.getElementsByClassName('roles-tab');
     for (const tab of tabs) {
         if (tab.getAttribute('data-type') === roleType) {
@@ -39,10 +39,10 @@ function switchTab(roles, terms, people, roleType) {
         }
     }
     const filteredRoles = roles.filter(r => r.type === roleType);
-    renderIndex(filteredRoles, terms, people, roleType);
+    renderIndex(filteredRoles, terms, people, roleType, canEdit);
 }
 
-function renderIndex(roles, terms, people, roleType, selectedRoleId) {
+function renderIndex(roles, terms, people, roleType, canEdit, selectedRoleId) {
     document.querySelector('.roles-editor').style.display = 'none';
     const container = document.getElementById('roles-index-container');
     roles = roles.filter(r => !!r.id);
@@ -52,6 +52,7 @@ function renderIndex(roles, terms, people, roleType, selectedRoleId) {
     }
     const template = Handlebars.compile(document.getElementById('roles-index-template').innerHTML);
     container.innerHTML = template({
+        canEdit,
         chairHeader: getChairHeader(roleType, terms),
         hasChairs: roles.some(r => getMembers(r, 'Chair').length > 0),
         hasBackups: roles.some(r => getMembers(r, 'Backup').length > 0),
@@ -75,14 +76,14 @@ function renderIndex(roles, terms, people, roleType, selectedRoleId) {
     });
     const selectedRole = roles.filter(r => r.id == selectedRoleId)[0];
     if (selectedRole) {
-        const reloadIndex = () => renderIndex(roles, terms, people, roleType);
+        const reloadIndex = () => renderIndex(roles, terms, people, roleType, canEdit);
         renderEditor(selectedRole, people, reloadIndex);
     }
     const editButtons = document.getElementsByClassName('roles-edit-button');
     for (const editButton of editButtons) {
         editButton.addEventListener('click', () => {
             const roleId = Number(editButton.getAttribute('data-id'));
-            renderIndex(roles, terms, people, roleType, roleId);
+            renderIndex(roles, terms, people, roleType, canEdit, roleId);
         });
     }
     sorttable.makeSortable(container.querySelector('table'));

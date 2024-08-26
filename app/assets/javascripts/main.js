@@ -146,8 +146,8 @@ window.initTransactionList = function() {
     return transaction_list.init();
 };
 
-window.initRoles = function(rolesJson, people, terms) {
-    return roles.init(rolesJson, people, terms);
+window.initRoles = function(rolesJson, people, terms, canEdit) {
+    return roles.init(rolesJson, people, terms, canEdit);
 }
 
 window.initRolesRecordsReport = function(people) {
