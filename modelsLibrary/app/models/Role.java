@@ -93,6 +93,7 @@ public class Role extends Model {
     record.addMembers(chairs, backups, members);
   }
 
+
   public void deactivate() {
     this.isActive = false;
     RoleRecord record = findOrCreateCurrentRecord();
