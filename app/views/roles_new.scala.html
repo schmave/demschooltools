@@ -1,0 +1,47 @@
+@(roleForm: Form[Role])(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
+
+@import helper._
+
+@main("New Role", "roles", "roles_new") {
+
+	@form(routes.Roles.makeNewRole(), Symbol("class") -> "form-horizontal", Symbol("role") -> "form") {
+
+		<h2>New Role</h2>
+		<table class="roles-edit-table">
+			<tr>
+				<td><label class="control-label">Name</label></td>
+				<td><input type="text" name="name" required class="form-control"/></td>
+			</tr>
+			<tr>
+				<td><label class="control-label">Type</label></td>
+				<td>
+					<select name="type" class="form-control">
+						<option value="Individual">@Utils.getOrg(request).getRolesIndividualTerm()</option>
+						<option value="Committee">@Utils.getOrg(request).getRolesCommitteeTerm()</option>
+						<option value="Group">@Utils.getOrg(request).getRolesGroupTerm()</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td><label class="control-label">Eligibility</label></td>
+				<td>
+					<select name="eligibility" class="form-control">
+						<option value="Anyone">Anyone</option>
+						<option value="StaffOnly">Staff Only</option>
+						<option value="StudentOnly">Student Only</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td><label class="control-label">Notes</label></td>
+				<td><textarea name="notes" rows="2" class="form-control"></textarea></td>
+			</tr>
+			<tr>
+				<td><label class="control-label">Description</label></td>
+				<td><textarea name="description" rows="3" class="form-control"></textarea></td>
+			</tr>
+		</table>
+		<br>
+		<input type="submit" value="Create" class="btn btn-primary" />
+	}
+}

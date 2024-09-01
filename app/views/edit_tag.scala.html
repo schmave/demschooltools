@@ -18,6 +18,9 @@
         @if(Utils.getOrgConfig(request).org.getShowAccounting()) {
             @helper.checkbox(form("showInAccountBalances"), Symbol("_label") -> "Include tag members in Account Balances list")
         }
+        @if(Utils.getOrgConfig(request).org.getShowRoles()) {
+            @helper.checkbox(form("showInRoles"), Symbol("_label") -> "Include tag members in Roles")
+        }
         @helper.checkbox(form("showInMenu"), Symbol("_label") -> "Include this tag in the Tags menu")
         @save_button("Save")
     }

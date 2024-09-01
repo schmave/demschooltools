@@ -16,6 +16,7 @@ require('./sorttable');
 const people_chooser = require('./people_chooser');
 const chooser = require('./chooser');
 const create_transaction = require('./create_transaction');
+const roles = require('./roles');
 const transaction_list = require('./transaction_list');
 const settings_page = require('./settings_page');
 const off_campus = require('./off_campus');
@@ -144,6 +145,14 @@ window.initCreateTransaction = function(accounts) {
 window.initTransactionList = function() {
     return transaction_list.init();
 };
+
+window.initRoles = function(rolesJson, people, terms, canEdit) {
+    return roles.init(rolesJson, people, terms, canEdit);
+}
+
+window.initRolesRecordsReport = function(people) {
+    return roles.initRecordsReport(people);
+}
 
 window.initSettingsPage = function() {
     return settings_page.init();

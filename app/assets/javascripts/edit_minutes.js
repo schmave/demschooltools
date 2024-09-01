@@ -320,7 +320,7 @@ function Case (id, el) {
         el.find(".findings").val(data.findings);
         el.find("input.continued").prop("checked", data.dateClosed === null);
 
-        for (var i in data.people_at_case) {
+        for (const i in data.people_at_case) {
             const pac = data.people_at_case[i];
             if (pac.role == app.ROLE_TESTIFIER) {
                 self.testifier_chooser.addPerson(
@@ -336,7 +336,7 @@ function Case (id, el) {
         $.get("/getCaseReferencesJson?case_id=" + self.id, function(case_references) {
             setCaseReferences(case_references);
             const case_references_json = $.parseJSON(case_references);
-            for (i in data.charges) {
+            for (const i in data.charges) {
                 const ch = data.charges[i];
                 const new_charge = self.addChargeNoServer(ch.id);
                 new_charge.loadData(ch, findReferencedCharge(ch.id, case_references_json));

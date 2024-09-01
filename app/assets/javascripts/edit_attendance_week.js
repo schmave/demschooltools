@@ -253,21 +253,21 @@ window.initAttendanceWeek = function() {
         Handlebars.compile($("#additional-person-template").html());
 
     const no_school_buttons = $("button.no-school");
-    for (var i = 0; i < 5; i++) {
+    for (let i = 0; i < 5; i++) {
         const button = no_school_buttons[i];
         $(button).click(handleNoSchoolButton(i));
     }
 
-    for (i in app.initial_data.active_people) {
-        var person = app.initial_data.active_people[i];
+    for (const i in app.initial_data.active_people) {
+        const person = app.initial_data.active_people[i];
         loadRow(person,
                 app.initial_data.days[person.personId],
                 app.initial_data.weeks[person.personId],
                 $('.attendance-view tbody'));
     }
 
-    for (i in app.initial_data.additional_people) {
-        person = app.initial_data.additional_people[i];
+    for (const i in app.initial_data.additional_people) {
+        const person = app.initial_data.additional_people[i];
         addAdditionalPerson(person);
     }
 

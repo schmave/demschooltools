@@ -17,7 +17,7 @@
 		@for(account <- accounts) {
 			<tr>
 				<td><a href="@routes.Accounting.account(account.getId())">@account.getName()</a></td>
-				<td>@account.getTypeName(Utils.getOrgConfig(request))</td>
+				<td>@account.getTypeName()</td>
 				<td class="balance">@account.getFormattedBalance()</td>
 			</tr>
 		}

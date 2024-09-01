@@ -34,6 +34,7 @@ public class Organization extends Model {
   private Boolean showAttendance;
   private Boolean showElectronicSignin;
   private Boolean showAccounting;
+  private Boolean showRoles;
 
   private Boolean enableCaseReferences;
 
@@ -53,6 +54,10 @@ public class Organization extends Model {
   private Double attendanceDayMinHours;
   private BigDecimal attendancePartialDayValue;
   private String attendanceAdminPin;
+
+  private String rolesIndividualTerm;
+  private String rolesCommitteeTerm;
+  private String rolesGroupTerm;
 
   @OneToMany(mappedBy = "organization")
   @JsonIgnore
@@ -82,6 +87,18 @@ public class Organization extends Model {
 
   public String formatAttendanceReportLatestDepartureTime_2() {
     return formatTime(attendanceReportLatestDepartureTime_2);
+  }
+
+  public String getRolesIndividualTermPlural() {
+    return rolesIndividualTerm + "s";
+  }
+
+  public String getRolesCommitteeTermPlural() {
+    return rolesCommitteeTerm + "s";
+  }
+
+  public String getRolesGroupTermPlural() {
+    return rolesGroupTerm + "s";
   }
 
   public void updateFromForm(Map<String, String[]> values, Organization org) {
@@ -242,6 +259,28 @@ public class Organization extends Model {
         }
       } else {
         this.showAccounting = false;
+      }
+    }
+    if (values.containsKey("roles_settings")) {
+      if (values.containsKey("showRoles")) {
+        this.showRoles = ModelUtils.getBooleanFromFormValue(values.get("showRoles")[0]);
+      } else {
+        this.showRoles = false;
+      }
+      if (values.containsKey("rolesIndividualTerm")) {
+        this.rolesIndividualTerm = values.get("rolesIndividualTerm")[0];
+      } else {
+        this.rolesIndividualTerm = "";
+      }
+      if (values.containsKey("rolesCommitteeTerm")) {
+        this.rolesCommitteeTerm = values.get("rolesCommitteeTerm")[0];
+      } else {
+        this.rolesCommitteeTerm = "";
+      }
+      if (values.containsKey("rolesGroupTerm")) {
+        this.rolesGroupTerm = values.get("rolesGroupTerm")[0];
+      } else {
+        this.rolesGroupTerm = "";
       }
     }
     this.save();
