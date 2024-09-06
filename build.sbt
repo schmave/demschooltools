@@ -5,10 +5,6 @@ ThisBuild / scalaVersion := "2.13.10"
 ThisBuild / version := "1.1"
 ThisBuild / javacOptions ++= Seq("-Xlint:unchecked", "-Xlint:deprecation")
 
-// I think these aren't working yet
-ThisBuild / Compile / doc / sources := Seq.empty
-ThisBuild / Compile / packageDoc / publishArtifact := false
-
 lazy val authLibrary = (project in file("authLibrary")).enablePlugins(PlayJava)
   .settings(
   libraryDependencies ++= Seq(
@@ -33,6 +29,15 @@ lazy val root = (project in file("."))
 	.enablePlugins(PlayJava, PlayEbean)
   .aggregate(modelsLibrary, authLibrary)
   .dependsOn(modelsLibrary, authLibrary)
+
+authLibrary / Compile / doc / sources := Seq.empty
+authLibrary / Compile / packageDoc / publishArtifact := false
+modelsLibrary / Compile / doc / sources := Seq.empty
+modelsLibrary / Compile / packageDoc / publishArtifact := false
+root / Compile / doc / sources := Seq.empty
+root / Compile / packageDoc / publishArtifact := false
+
+
 
 javacOptions ++= Seq("-Xlint:unchecked", "-Xlint:deprecation")
 pipelineStages := Seq(digest, gzip)
