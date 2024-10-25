@@ -58,6 +58,8 @@ class PersonTagChange(models.Model):
 
     person = models.ForeignKey(Person, on_delete=models.PROTECT)
     time = models.DateTimeField()
+    was_add = models.BooleanField()
+    tag = models.ForeignKey(Tag, on_delete=models.PROTECT)
 
 
 class Chapter(models.Model):
