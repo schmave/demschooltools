@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 import os
 
-from settings import *  # noqa: F403
+from demschooltools.settings import *  # noqa: F403
 
 DATABASES = {
     "default": {
