@@ -2,15 +2,14 @@ package models;
 
 import com.fasterxml.jackson.annotation.*;
 import io.ebean.*;
-import io.ebean.Query;
 import java.math.*;
 import java.text.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import play.data.*;
-import java.text.SimpleDateFormat;
 
 @Getter
 @Setter
@@ -19,9 +18,7 @@ public class Role extends Model {
 
   @Id private Integer id;
 
-  @ManyToOne()
-  @JsonIgnore
-  private Organization organization;
+  @ManyToOne() @JsonIgnore private Organization organization;
 
   @OneToMany(mappedBy = "role")
   public List<RoleRecord> records;
@@ -43,12 +40,12 @@ public class Role extends Model {
 
   public static List<Role> all(Organization org) {
     return find.query()
-      .fetch("records", FetchConfig.ofQuery())
-      .fetch("records.members", FetchConfig.ofQuery())
-      .where()
-      .eq("organization", org)
-      .eq("is_active", true)
-      .findList();
+        .fetch("records", FetchConfig.ofQuery())
+        .fetch("records.members", FetchConfig.ofQuery())
+        .where()
+        .eq("organization", org)
+        .eq("is_active", true)
+        .findList();
   }
 
   public static Role findById(Integer id, Organization org) {
@@ -56,13 +53,12 @@ public class Role extends Model {
   }
 
   public static Role create(
-    Organization org,
-    RoleType type,
-    RoleEligibility eligibility,
-    String name,
-    String notes,
-    String description
-  ) {
+      Organization org,
+      RoleType type,
+      RoleEligibility eligibility,
+      String name,
+      String notes,
+      String description) {
     Role role = new Role();
     role.organization = org;
     role.isActive = true;
@@ -76,14 +72,13 @@ public class Role extends Model {
   }
 
   public void update(
-    RoleEligibility eligibility,
-    String name,
-    String notes,
-    String description,
-    List<Map.Entry<Integer, String>> chairs,
-    List<Map.Entry<Integer, String>> backups,
-    List<Map.Entry<Integer, String>> members
-  ) {
+      RoleEligibility eligibility,
+      String name,
+      String notes,
+      String description,
+      List<Map.Entry<Integer, String>> chairs,
+      List<Map.Entry<Integer, String>> backups,
+      List<Map.Entry<Integer, String>> members) {
     this.eligibility = eligibility;
     this.name = name;
     this.notes = notes;
@@ -92,7 +87,6 @@ public class Role extends Model {
     RoleRecord record = findOrCreateCurrentRecord();
     record.addMembers(chairs, backups, members);
   }
-
 
   public void deactivate() {
     this.isActive = false;
