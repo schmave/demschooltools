@@ -14,8 +14,16 @@
        <td>@p.getGrade()
        <td>@p.getGender()
        <td>@p.numSiblings()
-       <td>@Html(p.familyAddresses().mkString("<br/>"))
-       <td>@Html(p.familyPhoneNumbers.mkString("<br/>"))
+       <td>@for( address <- p.familyAddresses()) {
+              @address
+              <br/>
+       }
+       </td>
+       <td>@for( phone <- p.familyPhoneNumbers()) {
+              @phone
+              <br/>
+       }
+       </td>
        </tr>
 }
 

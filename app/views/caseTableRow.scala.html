@@ -9,7 +9,7 @@
 	@if(Utils.getOrgConfig(request).track_writer) {
 		<i>Writers</i>: @c.people_at_case.filter((p: PersonAtCase) =>
 			p.getRole() == PersonAtCase.ROLE_WRITER).map { tr =>
-				@tr.getPerson().getDisplayName()}.mkString(", ").
+				@Html(tr.getPerson().getDisplayName())}.mkString(", ").
 	}
     <span class=@if( Utils.getOrgConfig(request).hide_location_for_print ) { "no-print" } else { "" }>
         <i>Location</i>: @if(!c.getLocation().equals("")) {@c.getLocation()} else {unknown}.
@@ -22,7 +22,7 @@
 				@num @if(num==1) { person } else { people } testified.
 			}
 		} else {
-			@c.people_at_case.filter(_.getRole() == PersonAtCase.ROLE_TESTIFIER).map {tr =>@tr.getPerson().getDisplayName()}.mkString(", ")
+			@c.people_at_case.filter(_.getRole() == PersonAtCase.ROLE_TESTIFIER).map {tr =>@Html(tr.getPerson().getDisplayName())}.mkString(", ")
 		}
 		</p>
 		<p>
