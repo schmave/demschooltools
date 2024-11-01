@@ -2,7 +2,6 @@ package models;
 
 import com.fasterxml.jackson.annotation.*;
 import io.ebean.*;
-import io.ebean.Query;
 import java.math.*;
 import java.text.*;
 import java.util.*;
@@ -16,9 +15,7 @@ import play.data.*;
 @Entity
 public class RoleRecordMember extends Model {
 
-  @ManyToOne()
-  @JsonIgnore
-  private RoleRecord record;
+  @ManyToOne() @JsonIgnore private RoleRecord record;
 
   @ManyToOne()
   @JoinColumn(name = "person_id")
@@ -34,7 +31,8 @@ public class RoleRecordMember extends Model {
     return person != null ? person.getPersonId() : null;
   }
 
-  public static RoleRecordMember create(RoleRecord record, Person person, String personName, RoleRecordMemberType type) {
+  public static RoleRecordMember create(
+      RoleRecord record, Person person, String personName, RoleRecordMemberType type) {
     RoleRecordMember member = new RoleRecordMember();
     member.record = record;
     member.person = person;
