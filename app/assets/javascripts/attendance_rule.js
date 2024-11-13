@@ -10,7 +10,9 @@ export function init(selectedPersonId, people) {
   });
 
   const container = document.getElementById('attendance-edit-rule-person');
-  const startingValues = [{ id: selectedPersonId }];
+  const person = people.filter(p => Number(p.id) === selectedPersonId)[0];
+  const personName = person ? person.label : null;
+  const startingValues = [{ id: selectedPersonId, label: personName }];
   const opts = {
     idFieldName: 'personId',
     textFieldSize: 15
