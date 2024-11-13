@@ -1,7 +1,7 @@
 const utils = require('./utils');
 const autocomplete = require('./autocomplete');
 
-export function init(selectedPersonId, people) {
+export function init(selectedPersonId, selectedPersonName, people) {
   $('.js-date').datepicker();
 
   $('.js-time').blur(function() {
@@ -10,9 +10,7 @@ export function init(selectedPersonId, people) {
   });
 
   const container = document.getElementById('attendance-edit-rule-person');
-  const person = people.filter(p => Number(p.id) === selectedPersonId)[0];
-  const personName = person ? person.label : null;
-  const startingValues = [{ id: selectedPersonId, label: personName }];
+  const startingValues = [{ id: selectedPersonId, label: selectedPersonName }];
   const opts = {
     idFieldName: 'personId',
     textFieldSize: 15
