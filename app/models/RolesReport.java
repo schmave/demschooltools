@@ -94,7 +94,7 @@ public class RolesReport {
           record.getMembers().stream()
               .filter(
                   m ->
-                      m.getPerson().equals(person)
+                      person.equals(m.getPerson())
                           && Arrays.asList(memberTypes).contains(m.getType()))
               .findFirst()
               .isPresent();
