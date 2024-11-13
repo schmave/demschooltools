@@ -48,6 +48,7 @@ public class Organization extends Model {
   private Integer attendanceReportLateFeeInterval_2;
   private Boolean attendanceShowPercent;
   private Boolean attendanceShowWeightedPercent;
+  private Boolean attendanceShowRateInCheckin;
   private Boolean attendanceEnablePartialDays;
   private Time attendanceDayLatestStartTime;
   private Time attendanceDayEarliestDepartureTime;
@@ -175,6 +176,12 @@ public class Organization extends Model {
             ModelUtils.getBooleanFromFormValue(values.get("attendanceShowWeightedPercent")[0]);
       } else {
         this.attendanceShowWeightedPercent = false;
+      }
+      if (values.containsKey("attendanceShowRateInCheckin")) {
+        this.attendanceShowRateInCheckin =
+            ModelUtils.getBooleanFromFormValue(values.get("attendanceShowRateInCheckin")[0]);
+      } else {
+        this.attendanceShowRateInCheckin = false;
       }
       if (values.containsKey("attendanceEnablePartialDays")) {
         this.attendanceEnablePartialDays =

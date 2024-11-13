@@ -165,7 +165,15 @@ the other way around.</p>
         Show the "Weighted Attendance Rate" column
     </label>
     &nbsp;<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip"
-        title="Like the Attendance Rate column, except recent days are worth more while distant past days are worth less, with a smooth transition in between. If you are using the check-in app, this value will be shown to the student when they check in each day."></span>
+        title="Like the Attendance Rate column, except recent days are worth more while distant past days are worth less, with a smooth transition in between."></span>
+    <br>
+    <label>
+        <input type="checkbox" name="attendanceShowRateInCheckin" id="attendance-show-rate-in-checkin"
+               @if(org.getAttendanceShowRateInCheckin()){ checked }>
+        Show student's attendance rate to them when they use the electronic check-in app
+    </label>
+    &nbsp;<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip"
+        title='If you are using the electronic check-in app, this will show each student their own attendance rate when they sign in each day. If the checkbox "Show the Weighted Attendance Rate column" is checked, weighted attendance rate will be used; otherwise normal attendance rate will be used.'></span>
     <br>
     <label>
         <input type="checkbox" name="attendanceEnablePartialDays" id="attendance-enable-partial-days"
