@@ -55,6 +55,8 @@ public class Organization extends Model {
   private Double attendanceDayMinHours;
   private BigDecimal attendancePartialDayValue;
   private String attendanceAdminPin;
+  private String attendanceDefaultAbsenceCode;
+  private Time attendanceDefaultAbsenceCodeTime;
 
   private String rolesIndividualTerm;
   private String rolesCommitteeTerm;
@@ -256,6 +258,17 @@ public class Organization extends Model {
       } else {
         this.attendanceReportLateFeeInterval_2 =
             Integer.parseInt(values.get("attendanceReportLateFeeInterval_2")[0]);
+      }
+      if (values.containsKey("attendanceDefaultAbsenceCode")) {
+        this.attendanceDefaultAbsenceCode = values.get("attendanceDefaultAbsenceCode")[0];
+      } else {
+        this.attendanceDefaultAbsenceCode = null;
+      }
+      if (values.containsKey("attendanceDefaultAbsenceCodeTime")) {
+        this.attendanceDefaultAbsenceCodeTime =
+            AttendanceDay.parseTime(values.get("attendanceDefaultAbsenceCodeTime")[0]);
+      } else {
+        this.attendanceDefaultAbsenceCodeTime = null;
       }
     }
     if (values.containsKey("accounting_settings")) {

@@ -8,6 +8,7 @@ import java.util.stream.*;
 import models.*;
 import play.libs.Json;
 import play.mvc.*;
+import org.apache.commons.lang3.StringUtils;
 
 @Secured.Auth(UserRole.ROLE_CHECKIN_APP)
 public class Checkin extends Controller {
@@ -45,6 +46,24 @@ public class Checkin extends Controller {
                         show_attendance_rate,
                         use_weighted_attendance_rate))
             .collect(Collectors.toList());
+
+    // Automatically set absence code if someone hasn't signed in by a certain time
+    String defaultAbsenceCode = organization.getAttendanceDefaultAbsenceCode();
+    Time defaultAbsenceCodeTime = organization.getAttendanceDefaultAbsenceCodeTime();
+    Time currentTime = new Time((new SimpleDateFormat("h:mm:ss a").parse(time.split(", ")[1])).getTime());
+    if (StringUtils.isNotBlank(defaultAbsenceCode) && currentTime.getTime() > defaultAbsenceCodeTime.getTime()) {
+      for (CheckinPerson person : people) {
+        if (StringUtils.isBlank(person.current_day_code) && 
+            StringUtils.isBlank(person.current_day_start_time) &&
+            StringUtils.isBlank(person.current_day_end_time)) {
+          AttendanceDay attendance_day = AttendanceDay.findCurrentDay(date, person.personId, organization);
+          if (attendance_day != null) {
+            attendance_day.setCode(defaultAbsenceCode);
+            attendance_day.update();
+          }
+        }
+      }
+    }
 
     // add admin
     Person admin = new Person();

@@ -109,6 +109,11 @@ the other way around.</p>
         "@Utils.getOrgConfig(request).org.getShortName()" (case-sensitive). To reset the password, enter a new one here:
         <br>
         <input type="text" size="30" placeholder="New password" name="electronic_signin_password" />
+        <br>
+        Have the app automatically assign absence code
+        <input size="7" type="text" name="attendanceDefaultAbsenceCode" value="@org.getAttendanceDefaultAbsenceCode()">
+        if someone doesn't sign in by
+        <input type="time" size="7" name="attendanceDefaultAbsenceCodeTime" value="@org.getAttendanceDefaultAbsenceCodeTime()">
     </p>
 
     <label>
