@@ -107,6 +107,8 @@ public class Transaction extends Model {
       Boolean include_cash_withdrawals,
       Boolean include_digital,
       Boolean include_archived,
+      Date start_date,
+      Date end_date,
       Organization org) {
 
     return find
@@ -124,7 +126,9 @@ public class Transaction extends Model {
                     && (include_cash_deposits || t.type != TransactionType.CashDeposit)
                     && (include_cash_withdrawals || t.type != TransactionType.CashWithdrawal)
                     && (include_digital || t.type != TransactionType.DigitalTransaction)
-                    && (include_archived || !t.archived))
+                    && (include_archived || !t.archived)
+                    && (start_date == null || t.dateCreated.compareTo(start_date) >= 0)
+                    && (end_date == null || t.dateCreated.compareTo(end_date) <= 0))
         .collect(Collectors.toList());
   }
 

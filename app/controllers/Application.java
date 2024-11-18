@@ -1501,6 +1501,9 @@ public class Application extends Controller {
   }
 
   public static String forDateInput(Date d) {
+    if (d == null) {
+      return null;
+    }
     return new SimpleDateFormat("yyyy-MM-dd").format(d);
   }
 
