@@ -46,7 +46,7 @@ public class Account extends Model {
   private Date dateLastMonthlyCredit;
 
   public static void createPersonalAccounts(Organization org) {
-    for (Person person : allPeople(org)) {
+    for (Person person : Person.all(org)) {
       if (!person.hasAccount(AccountType.PersonalChecking)) {
         create(AccountType.PersonalChecking, "", person, org);
       }

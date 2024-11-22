@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Date;
 import play.data.Form;
 
 public class TransactionList {
@@ -16,6 +17,8 @@ public class TransactionList {
   public Boolean include_cash_withdrawals = false;
   public Boolean include_digital = false;
   public Boolean include_archived = false;
+  public Date start_date;
+  public Date end_date;
 
   public static List<Transaction> getTransactionsViewModel(Account account) {
     List<Transaction> result = new ArrayList<>();
@@ -124,6 +127,8 @@ public class TransactionList {
             model.include_cash_withdrawals,
             model.include_digital,
             model.include_archived,
+            model.start_date,
+            model.end_date,
             org);
 
     for (Transaction t : model.transactions) {
