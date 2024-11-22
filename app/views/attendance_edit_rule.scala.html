@@ -119,6 +119,10 @@ enable_late_fees : Boolean
 
 <script type="text/javascript">
 	var people = @Html(people_json);
-	var selectedPersonId = @Html(if (rule.getPerson() != null) Integer.toString(rule.getPerson().getPersonId()) else "null");
-	initAttendanceRule(selectedPersonId, people);
+	var selectedPersonId, selectedPersonName;
+	@if(rule.getPerson() != null) {
+		selectedPersonId = @Html(Integer.toString(rule.getPerson().getPersonId()));
+		selectedPersonName = "@Html(rule.getPerson().getDisplayName())";
+	}
+	initAttendanceRule(selectedPersonId, selectedPersonName, people);
 </script>

@@ -162,6 +162,6 @@ window.initOffCampus = function(people) {
     return off_campus.init(people);
 };
 
-window.initAttendanceRule = function(selectedPersonId, people) {
-    return attendance_rule.init(selectedPersonId, people);
+window.initAttendanceRule = function(selectedPersonId, selectedPersonName, people) {
+    return attendance_rule.init(selectedPersonId, selectedPersonName, people);
 };
