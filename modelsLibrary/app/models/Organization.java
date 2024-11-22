@@ -48,12 +48,15 @@ public class Organization extends Model {
   private Integer attendanceReportLateFeeInterval_2;
   private Boolean attendanceShowPercent;
   private Boolean attendanceShowWeightedPercent;
+  private Boolean attendanceShowRateInCheckin;
   private Boolean attendanceEnablePartialDays;
   private Time attendanceDayLatestStartTime;
   private Time attendanceDayEarliestDepartureTime;
   private Double attendanceDayMinHours;
   private BigDecimal attendancePartialDayValue;
   private String attendanceAdminPin;
+  private String attendanceDefaultAbsenceCode;
+  private Time attendanceDefaultAbsenceCodeTime;
 
   private String rolesIndividualTerm;
   private String rolesCommitteeTerm;
@@ -176,6 +179,12 @@ public class Organization extends Model {
       } else {
         this.attendanceShowWeightedPercent = false;
       }
+      if (values.containsKey("attendanceShowRateInCheckin")) {
+        this.attendanceShowRateInCheckin =
+            ModelUtils.getBooleanFromFormValue(values.get("attendanceShowRateInCheckin")[0]);
+      } else {
+        this.attendanceShowRateInCheckin = false;
+      }
       if (values.containsKey("attendanceEnablePartialDays")) {
         this.attendanceEnablePartialDays =
             ModelUtils.getBooleanFromFormValue(values.get("attendanceEnablePartialDays")[0]);
@@ -249,6 +258,17 @@ public class Organization extends Model {
       } else {
         this.attendanceReportLateFeeInterval_2 =
             Integer.parseInt(values.get("attendanceReportLateFeeInterval_2")[0]);
+      }
+      if (values.containsKey("attendanceDefaultAbsenceCode")) {
+        this.attendanceDefaultAbsenceCode = values.get("attendanceDefaultAbsenceCode")[0];
+      } else {
+        this.attendanceDefaultAbsenceCode = null;
+      }
+      if (values.containsKey("attendanceDefaultAbsenceCodeTime")) {
+        this.attendanceDefaultAbsenceCodeTime =
+            AttendanceDay.parseTime(values.get("attendanceDefaultAbsenceCodeTime")[0]);
+      } else {
+        this.attendanceDefaultAbsenceCodeTime = null;
       }
     }
     if (values.containsKey("accounting_settings")) {
