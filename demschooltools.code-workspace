@@ -49,6 +49,8 @@
     "python.analysis.extraPaths": ["./django"],
     "python.autoComplete.extraPaths": ["./django"],
     "python.defaultInterpreterPath": "./django/.venv/bin/python",
-    "python.analysis.typeCheckingMode": "standard"
+    "python.analysis.typeCheckingMode": "standard",
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true
   }
 }

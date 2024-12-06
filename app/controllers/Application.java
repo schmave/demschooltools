@@ -413,20 +413,29 @@ public class Application extends Controller {
   static Logger.ALogger sLogger = Logger.of("application");
 
   public Result index(Http.Request request) {
+    final boolean isLoggedIn = isCurrentUserLoggedIn(currentUsername(request));
     return ok(
         cached_page.render(
             new CachedPage(
-                CachedPage.JC_INDEX, "JC database", "jc", "jc_home", Utils.getOrg(request)) {
+                isLoggedIn ? CachedPage.JC_INDEX : CachedPage.JC_INDEX_LOGGED_OUT,
+                "JC database",
+                "jc",
+                "jc_home",
+                Utils.getOrg(request)) {
               @Override
               String render() {
-                List<Meeting> meetings =
+                ExpressionList<Meeting> meetingQuery =
                     Meeting.find
                         .query()
                         .fetch("cases")
                         .where()
-                        .eq("organization", Utils.getOrg(request))
-                        .orderBy("date DESC")
-                        .findList();
+                        .eq("organization", Utils.getOrg(request));
+
+                if (!isLoggedIn) {
+                  meetingQuery = meetingQuery.gt("date", ModelUtils.getStartOfYear());
+                }
+
+                List<Meeting> meetings = meetingQuery.orderBy("date DESC").findList();
 
                 List<Tag> tags =
                     Tag.find
@@ -621,11 +630,12 @@ public class Application extends Controller {
   }
 
   public Result viewMeeting(int meeting_id, Http.Request request) {
-    return ok(
-        view_meeting.render(
-            Meeting.findById(meeting_id, Utils.getOrg(request)),
-            request,
-            mMessagesApi.preferred(request)));
+    Meeting m = Meeting.findById(meeting_id, Utils.getOrg(request));
+    if (isCurrentUserLoggedIn(currentUsername(request))
+        || (m != null && m.getDate().after(ModelUtils.getStartOfYear()))) {
+      return ok(view_meeting.render(m, request, mMessagesApi.preferred(request)));
+    }
+    return ok("You must be logged in to view this meeting");
   }
 
   public Result printMeeting(int meeting_id, Http.Request request) throws Exception {
