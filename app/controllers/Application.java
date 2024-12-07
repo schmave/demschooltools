@@ -22,7 +22,6 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 import play.Logger;
 import play.api.libs.mailer.MailerClient;
-import play.i18n.Messages;
 import play.i18n.MessagesApi;
 import play.libs.Files.TemporaryFile;
 import play.libs.Json;
