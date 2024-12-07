@@ -432,7 +432,7 @@ public class Application extends Controller {
                         .eq("organization", Utils.getOrg(request));
 
                 if (!isLoggedIn) {
-                  meetingQuery = meetingQuery.gt("date", ModelUtils.getStartOfYear());
+                  meetingQuery = meetingQuery.ge("date", ModelUtils.getStartOfYear());
                 }
 
                 List<Meeting> meetings = meetingQuery.orderBy("date DESC").findList();
@@ -483,8 +483,6 @@ public class Application extends Controller {
                 }
 
                 entries_with_charges.sort(Entry.SORT_NUMBER);
-
-                debugMessages(request);
 
                 return jc_index
                     .render(
@@ -632,7 +630,7 @@ public class Application extends Controller {
   public Result viewMeeting(int meeting_id, Http.Request request) {
     Meeting m = Meeting.findById(meeting_id, Utils.getOrg(request));
     if (isCurrentUserLoggedIn(currentUsername(request))
-        || (m != null && m.getDate().after(ModelUtils.getStartOfYear()))) {
+        || (m != null && m.getDate().compareTo(ModelUtils.getStartOfYear()) >= 0)) {
       return ok(view_meeting.render(m, request, mMessagesApi.preferred(request)));
     }
     return ok("You must be logged in to view this meeting");
@@ -1274,18 +1272,7 @@ public class Application extends Controller {
         multi_meetings.render(meetings, request, mMessagesApi.preferred(request)).toString());
   }
 
-  void debugMessages(Http.Request request) {
-    Messages messages = mMessagesApi.preferred(request);
-    sLogger.debug(
-        "messages lang: {}, one string: {}, transient lang: {}",
-        messages.lang(),
-        messages.at("erase_case_confirmation"),
-        request.transientLang());
-  }
-
   public Result viewWeeklyReport(String date_string, Http.Request request) {
-    debugMessages(request);
-
     Calendar start_date = Utils.parseDateOrNow(date_string);
     Organization org = Utils.getOrg(request);
     Utils.adjustToPreviousDay(start_date, org.getJcResetDay() + 1);
