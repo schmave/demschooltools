@@ -23,7 +23,8 @@ public class CheckinPerson {
     name = person.getDisplayName();
 
     if (stats != null && show_attendance_rate) {
-      double rate = use_weighted_attendance_rate ? stats.weightedAttendanceRate() : stats.attendanceRate();
+      double rate =
+          use_weighted_attendance_rate ? stats.weightedAttendanceRate() : stats.attendanceRate();
       if (!Double.isNaN(rate)) {
         attendance_rate = ModelUtils.formatAsPercent(rate);
       }
