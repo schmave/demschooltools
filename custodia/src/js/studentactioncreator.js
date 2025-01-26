@@ -22,6 +22,21 @@ export const loadStudent = function (id) {
     });
   });
 };
+
+export const updateStudent = function (id, start_date, minutes) {
+  return ajax
+    .put("/students/" + id, {
+      start_date: start_date,
+      minutes: minutes,
+    })
+    .then(function (data) {
+      dispatcher.dispatch({
+        type: constants.studentEvents.STUDENT_LOADED,
+        data: data.student,
+      });
+    });
+};
+
 export const swipeStudent = function (student, direction, overrideTime) {
   let overrideDate;
   if (overrideTime) {

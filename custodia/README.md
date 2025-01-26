@@ -1,22 +1,31 @@
-
 # Overseer
 
 Overseer is a clojure web application which runs on the Jetty server. The site
 uses postgres for persistence.
 
-## Lein
+## Frontend
+
+You will need to install [Node.js and npm](https://nodejs.org/en/download/releases/).
+
+### Running Locally
+
+    cd custodia
+    npm install
+    make watch
+
+## Backend
 
 You will need to get [lein 2](http://leiningen.org/) installed and running.
 
-To ensure you have the correct version, run: ```lein --version``` and verify
+To ensure you have the correct version, run: `lein --version` and verify
 that it is greater than 2.0.
 
-## Postgres
+### Postgres
 
 You will need a running [postgres](https://www.postgresql.org/) database on your
 system. Once that is complete, create a new database for overseer to use to run.
 
-## Profiles.clj
+### Profiles.clj
 
 To run the site locally, you need to configure lein to pass the correct database
 connection settings to your running web site. To make this easier, lein allows
@@ -57,71 +66,24 @@ GIT. Add in the following:
 
 Replace the following words in your profiles.clj:
 
-* DATABASE - your desired local database name
-* USER - your local postgres username
-* PASSWORD - your local postgres username's password
+- DATABASE - your desired local database name
+- USER - your local postgres username
+- PASSWORD - your local postgres username's password
 
 Keep in mind that the assumed port number (5432) in the two connection strings
 is the postgres default. If your postgres uses a different port, you will need
 to change that too.
 
 When starting with a new database, or when you want to "reset" your current
-database, set the key ```:newdb``` to ```true``` before you start the
+database, set the key `:newdb` to `true` before you start the
 application. That will cause the database to be recreated empty, then some
-sample data be put inside it. CAUTION: leaving it set to ```true``` will cause
+sample data be put inside it. CAUTION: leaving it set to `true` will cause
 it to drop EVERY TIME. You might want it true for the first time, then
-immediately set it to ```false``` after the application starts.
+immediately set it to `false` after the application starts.
 
 If you want to apply a new migration to an existing database, set the key
-```:migratedb``` to ```true```.
+`:migratedb` to `true`.
 
 The application also sets up five default users for local testing. They are
 "admin", "super", "admin2", "user", and "demo". They all have the password
 "web". Typically, you will use "super" for local testing.
-
-## NPM
-
-You will need to install [Node.js and npm](https://nodejs.org/en/download/releases/).
-
-## Running Locally
-
-```sh
-$ git clone https://github.com/steveshogren/overseer.git
-$ cd overseer
-$ npm install
-```
-
-To build the frontend and serve it while listening for changes,
-run ```make watch```
-
-To run the backend, run ```make start```.
-
-If both the frontend and backend are running, the app will be available at
-[localhost:5000](http://localhost:5000/).
-
-### Logging
-
-Exception and debugging logging can be added to the system via the
-```log4j.properties``` in the ```src/``` directory.
-
-An example that logs all INFO messages to a file but only WARN to the console
-would look like this:
-
-```
-log4j.rootLogger=INFO, A1, CA
-
-log4j.appender.CA=org.apache.log4j.ConsoleAppender
-log4j.appender.CA.layout=org.apache.log4j.PatternLayout
-log4j.appender.CA.layout.ConversionPattern=%-4r [%t] %-5p %c %x - %m%n
-log4j.appender.CA.Threshold = WARN
-
-log4j.appender.A1=org.apache.log4j.RollingFileAppender
-log4j.appender.A1.File=log/app.log
-log4j.appender.A1.MaxFileSize=500MB
-log4j.appender.A1.MaxBackupIndex=2
-log4j.appender.A1.layout=org.apache.log4j.PatternLayout
-log4j.appender.A1.layout.ConversionPattern=%d [%t] %-5p%c - %m%n
-```
-
-
-License: GPL-3.0+

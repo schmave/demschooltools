@@ -14,10 +14,15 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from custodia.models import Excuse, Override, School, Student, Swipe, Year
-
-# TODO: Allow per-student overrides to this (if schools are using it) via
-# the students_required_minutes table.
+from custodia.models import (
+    Excuse,
+    Override,
+    School,
+    Student,
+    StudentRequiredMinutes,
+    Swipe,
+    Year,
+)
 
 # TODO? This used to be configurable via the classes table, but
 # even PFS hasn't configured it. Maybe make this a DST setting for Custodia.
@@ -249,6 +254,22 @@ def get_start_of_school_year() -> datetime:
 
 
 class StudentDataView(APIView):
+    def put(self, request: Request, student_id: int) -> Response:
+        student = Student.objects.get(id=student_id)
+        if start_date_str := request.data["start_date"]:
+            student.start_date = datetime.fromtimestamp(start_date_str).date()
+
+        local_now = datetime.now(pytz.timezone(student.school.timezone))
+        StudentRequiredMinutes.objects.update_or_create(
+            student=student,
+            fromdate=local_now.date(),
+            defaults=dict(required_minutes=request.data["minutes"]),
+        )
+
+        student.save()
+
+        return student_data_view(student.id)
+
     def get(self, request: Request, student_id: int) -> Response:
         return student_data_view(student_id, request.user.school)
 
@@ -271,7 +292,6 @@ def get_school_days(school: School, start: datetime, end: datetime) -> list[date
         )
         .values_list("swipe_day", flat=True)
         .distinct(),
-        reverse=True,
     )
 
 
@@ -332,6 +352,13 @@ def get_student_data(
     excused_days: set[date],
     day_to_swipes: dict[date, list[Swipe]],
 ) -> dict:
+
+    required_minutes = list(
+        StudentRequiredMinutes.objects.filter(student=student).order_by("fromdate")
+    )
+    required_minutes_i = -1
+    current_required_minutes = DEFAULT_REQUIRED_MINUTES
+
     day_data = []
     total_seconds = 0
     total_abs = 0
@@ -340,6 +367,15 @@ def get_student_data(
     total_overrides = 0
     total_short = 0
     for day in school_days:
+        if (
+            required_minutes_i + 1 < len(required_minutes)
+            and day >= required_minutes[required_minutes_i + 1].fromdate
+        ):
+            required_minutes_i += 1
+            current_required_minutes = required_minutes[
+                required_minutes_i
+            ].required_minutes
+
         day_seconds = 0
         is_override = day in override_days
 
@@ -364,7 +400,7 @@ def get_student_data(
             if swipe.in_time and swipe.out_time:
                 day_seconds += (swipe.out_time - swipe.in_time).total_seconds()
 
-        is_short = day_seconds < DEFAULT_REQUIRED_MINUTES * 60
+        is_short = day_seconds < current_required_minutes * 60
         is_excused = day in excused_days
         is_absent = not is_excused and (day not in day_to_swipes)
         day_data.append(
@@ -373,7 +409,7 @@ def get_student_data(
                 "override": is_override,
                 "excused": is_excused,
                 "day": format_date(day),
-                "total_mins": DEFAULT_REQUIRED_MINUTES
+                "total_mins": current_required_minutes
                 if is_override
                 else (day_seconds // 60),
                 "swipes": swipe_data,
@@ -414,7 +450,9 @@ def get_student_data(
         "absent_today": student.show_as_absent == today,
         "days": day_data,
         "name": student.name,
-        "required_minutes": DEFAULT_REQUIRED_MINUTES,
+        "required_minutes": required_minutes[-1].required_minutes
+        if required_minutes
+        else DEFAULT_REQUIRED_MINUTES,
         "total_hours": total_seconds / 3600,
         "is_teacher": student.is_teacher,
         "last_swipe_date": format_date(last_swipe_date) if last_swipe_date else None,

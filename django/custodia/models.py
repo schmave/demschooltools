@@ -57,10 +57,25 @@ class Student(models.Model):
     person = models.ForeignKey(
         "dst.Person", db_column="dst_id", on_delete=models.PROTECT
     )
+    start_date = models.DateField()
     is_teacher = models.BooleanField()
     name = models.TextField()
     show_as_absent = models.DateField()
     school = models.ForeignKey(School, on_delete=models.PROTECT)
+
+
+class StudentRequiredMinutes(models.Model):
+    class Meta:
+        db_table = "students_required_minutes"
+
+    student = models.ForeignKey(
+        Student,
+        on_delete=models.PROTECT,
+        related_name="required_minutes",
+        primary_key=True,  # This is not true. (student, fromdate) is unique
+    )
+    fromdate = models.DateField()
+    required_minutes = models.IntegerField()
 
 
 class Swipe(models.Model):

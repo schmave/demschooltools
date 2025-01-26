@@ -1,7 +1,5 @@
 var React = require("react"),
   ReactDOM = require("react-dom"),
-  Router = require("react-router"),
-  AdminItem = require("../adminwrapper.jsx"),
   dispatcher = require("../appdispatcher"),
   constants = require("../appconstants"),
   actionCreator = require("../studentactioncreator"),
@@ -10,22 +8,20 @@ var React = require("react"),
 module.exports = class extends React.Component {
   static displayName = "StudentEditor";
 
-  constructor(props, context) {
-    super(props, context);
-    var that = this;
-    this.dispatchToken = dispatcher.register(function (action) {
+  constructor(props) {
+    super(props);
+    this.dispatchToken = dispatcher.register((action) => {
       if (
         action.type == constants.studentEvents.STUDENT_LOADED ||
         action.type == constants.studentEvents.ALL_LOADED
       ) {
-        that.savingHide();
-        that.close();
+        this.close();
       }
     });
 
     this.state = {
       saving: false,
-      student: { start_date: null, guardian_email: "", name: "", olderdate: null },
+      student: { start_date: null },
       startdate_datepicker: new Date(),
     };
   }
@@ -42,34 +38,24 @@ module.exports = class extends React.Component {
     this.setState({ saving: false });
   };
 
-  saveChange = () => {
+  saveChange = (e) => {
+    e.preventDefault();
     this.savingShow();
-    var startDate = this.refs.startdate.props.value;
-    if (this.state.student._id == null) {
-      actionCreator.createStudent(
-        ReactDOM.findDOMNode(this.refs.name).value,
-        startDate,
-        ReactDOM.findDOMNode(this.refs.email).value,
-        ReactDOM.findDOMNode(this.refs.required_minutes).value,
-        this.state.student.is_teacher,
-      );
-    } else {
-      actionCreator.updateStudent(
+    const { startdate_datepicker } = this.state;
+    const timestamp = startdate_datepicker ? startdate_datepicker.getTime() : null;
+    actionCreator
+      .updateStudent(
         this.state.student._id,
-        ReactDOM.findDOMNode(this.refs.name).value,
-        startDate,
-        ReactDOM.findDOMNode(this.refs.email).value,
-        ReactDOM.findDOMNode(this.refs.required_minutes).value,
-        this.state.student.is_teacher,
-      );
-    }
+        timestamp,
+        parseInt(ReactDOM.findDOMNode(this.refs.required_minutes).value, 10),
+      )
+      .always(this.savingHide);
   };
 
   edit = (student) => {
     var s = jQuery.extend({}, student);
     this.setState({
       student: s,
-      creating: !s._id,
       startdate_datepicker: s.start_date ? new Date(s.start_date) : null,
     });
     this.refs.studentEditor.show();
@@ -79,11 +65,6 @@ module.exports = class extends React.Component {
     if (this.refs.studentEditor) {
       this.refs.studentEditor.hide();
     }
-  };
-
-  handleTeacherChange = (state) => {
-    this.state.student.is_teacher = !this.state.student.is_teacher;
-    this.setState({ student: this.state.student });
   };
 
   handleDateChange = (d) => {
@@ -100,76 +81,44 @@ module.exports = class extends React.Component {
   };
 
   render() {
-    var title = (this.state.creating ? "Create" : "Edit") + " Student";
     return (
       <div className="row">
-        <Modal ref="studentEditor" title={title}>
+        <Modal ref="studentEditor" title={`Edit ${this.state.student.name}`}>
           {this.state.saving ? (
             <div>
-              <p style={{ "text-align": "center" }}>
-                <img src="/images/spinner.gif" />
+              <p style={{ textAlign: "center" }}>
+                <img src="/static/images/spinner.gif" />
               </p>
             </div>
           ) : (
             <form className="form">
-              <div className="form-group" id="nameRow">
-                <label htmlFor="name">Name:</label>
-                <input
-                  ref="name"
-                  className="form-control"
-                  id="name"
-                  onChange={this.handleChange}
-                  value={this.state.student.name}
-                />
-                <label htmlFor="email">Parent Email:</label>
-                <input
-                  ref="email"
-                  className="form-control"
-                  id="guardian_email"
-                  onChange={this.handleChange}
-                  value={this.state.student.guardian_email}
-                />
-
+              <div className="form-group">
                 <label htmlFor="required_minutes">Required Minutes:</label>
                 <input
                   ref="required_minutes"
                   className="form-control"
                   id="required_minutes"
+                  type="number"
                   onChange={this.handleChange}
                   value={this.state.student.required_minutes}
                 />
-
-                <div>
-                  <label htmlFor="is_teacher">Is Teacher:</label>
-                  <div>
-                    <input
-                      type="checkbox"
-                      id="is_teacher"
-                      onChange={this.handleTeacherChange}
-                      checked={this.state.student.is_teacher}
-                    />{" "}
-                    Is Teacher?
-                  </div>
-                </div>
-                <b>Student Start Date:</b>
+              </div>
+              <div className="form-group">
+                <label htmlFor="startdate">Student Start Date:</label>
                 <input
                   type="date"
-                  id="missing"
+                  id="startdate"
                   value={this.state.startdate_datepicker}
-                  ref="startdate"
                   onChange={this.handleDateChange}
                   date={true}
                   time={false}
                 />
               </div>
-              <button onClick={this.saveChange} className="btn btn-success">
-                <i id="save-name" className="fa fa-check icon-large">
-                  {" "}
-                  Save
-                </i>
-              </button>
+              <button onClick={this.saveChange} type="submit" className="btn btn-success">
+                <i id="save-name" className="fa fa-check icon-large"></i> Save
+              </button>{" "}
               <button id="cancel-name" onClick={this.close} className="btn btn-danger">
-                <i className="fa fa-times"> Cancel</i>
+                <i className="fa fa-times"></i> Cancel
               </button>
             </form>
           )}
