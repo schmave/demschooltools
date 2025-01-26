@@ -39,7 +39,6 @@ function Day(data, start_input, end_input) {
         } else {
             self.color_bar.hide();
         }
-
         self.code_mode = true;
     };
 
@@ -67,6 +66,7 @@ function Day(data, start_input, end_input) {
     self.onBlur = function () {
         self.start_input.val(utils.formatTime(self.start_input.val()));
         self.end_input.val(utils.formatTime(self.end_input.val()));
+        saveIfNeeded();
     };
 
     this.save = function () {
@@ -93,14 +93,14 @@ function Day(data, start_input, end_input) {
 
     if (data.code) {
         self.start_input.val(data.code);
-        self.checkForCode();
     } else {
         self.start_input.val(dbTimeToUserTime(data.startTime));
         self.end_input.val(dbTimeToUserTime(data.endTime));
     }
+    self.checkForCode();
 
-    self.start_input.blur(self.onBlur);
-    self.end_input.blur(self.onBlur);
+    self.start_input.on('blur', self.onBlur);
+    self.end_input.on('blur', self.onBlur);
     self.start_input.on(utils.TEXT_AREA_EVENTS, self.onChange);
     self.end_input.on(utils.TEXT_AREA_EVENTS, self.onChange);
 
@@ -154,6 +154,7 @@ function PersonRow(person, days, week, el) {
     self.week_el.val(week.extraHours);
 
     self.week_el.on(utils.TEXT_AREA_EVENTS, self.setDirty);
+    self.week_el.on('blur', saveIfNeeded);
 
     return self;
 }
@@ -266,8 +267,6 @@ function saveIfNeeded() {
             }
         }
     }
-
-    window.setTimeout(saveIfNeeded, 2000);
 }
 
 window.initAttendanceWeek = function () {
@@ -299,7 +298,9 @@ window.initAttendanceWeek = function () {
         addAdditionalPerson(person);
     }
 
-    saveIfNeeded();
+    // This is mostly unneeded since we now save immediately when a text input
+    // blur event happens. But just in case, save every 2 seconds...
+    setInterval(saveIfNeeded, 2000);
 
     $('button.add-all').click(addAllAdditionalPeople);
 };
