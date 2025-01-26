@@ -1,14 +1,14 @@
 const Handlebars = require('handlebars');
 const autocomplete = require('./autocomplete');
 
-Handlebars.registerHelper('ifEquals', function(arg1, arg2, options) {
-    return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+Handlebars.registerHelper('ifEquals', function (arg1, arg2, options) {
+    return arg1 == arg2 ? options.fn(this) : options.inverse(this);
 });
 
 export function initRecordsReport(people) {
     const container = document.getElementById('roles-report-person');
     const opts = {
-        idFieldName: 'personId'
+        idFieldName: 'personId',
     };
     autocomplete.registerAutocomplete(container, people, [], opts);
 }
@@ -38,29 +38,32 @@ function switchTab(roles, terms, people, roleType, canEdit) {
             tab.classList.remove('active');
         }
     }
-    const filteredRoles = roles.filter(r => r.type === roleType);
+    const filteredRoles = roles.filter((r) => r.type === roleType);
     renderIndex(filteredRoles, terms, people, roleType, canEdit);
 }
 
 function renderIndex(roles, terms, people, roleType, canEdit, selectedRoleId) {
     document.querySelector('.roles-editor').style.display = 'none';
     const container = document.getElementById('roles-index-container');
-    roles = roles.filter(r => !!r.id);
+    roles = roles.filter((r) => !!r.id);
     if (!roles || !roles.length) {
-        container.innerHTML = '<div style="padding:15px;">No roles have been created yet with this type.</div>';
+        container.innerHTML =
+            '<div style="padding:15px;">No roles have been created yet with this type.</div>';
         return;
     }
-    const template = Handlebars.compile(document.getElementById('roles-index-template').innerHTML);
+    const template = Handlebars.compile(
+        document.getElementById('roles-index-template').innerHTML,
+    );
     container.innerHTML = template({
         canEdit,
         chairHeader: getChairHeader(roleType, terms),
-        hasChairs: roles.some(r => getMembers(r, 'Chair').length > 0),
-        hasBackups: roles.some(r => getMembers(r, 'Backup').length > 0),
-        hasMembers: roles.some(r => getMembers(r, 'Member').length > 0),
-        hasEligibilities: roles.some(r => r.eligibility !== 'Anyone'),
-        hasNotes: roles.some(r => !!r.notes),
-        hasDescriptions: roles.some(r => !!r.description),
-        roles: roles.map(role => {
+        hasChairs: roles.some((r) => getMembers(r, 'Chair').length > 0),
+        hasBackups: roles.some((r) => getMembers(r, 'Backup').length > 0),
+        hasMembers: roles.some((r) => getMembers(r, 'Member').length > 0),
+        hasEligibilities: roles.some((r) => r.eligibility !== 'Anyone'),
+        hasNotes: roles.some((r) => !!r.notes),
+        hasDescriptions: roles.some((r) => !!r.description),
+        roles: roles.map((role) => {
             return {
                 id: role.id,
                 rowClass: selectedRoleId === role.id ? 'selected' : '',
@@ -70,13 +73,14 @@ function renderIndex(roles, terms, people, roleType, canEdit, selectedRoleId) {
                 members: formatMemberList(role, 'Member'),
                 eligibility: formatEligibility(role.eligibility),
                 notes: role.notes,
-                description: role.description
+                description: role.description,
             };
-        })
+        }),
     });
-    const selectedRole = roles.filter(r => r.id == selectedRoleId)[0];
+    const selectedRole = roles.filter((r) => r.id == selectedRoleId)[0];
     if (selectedRole) {
-        const reloadIndex = () => renderIndex(roles, terms, people, roleType, canEdit);
+        const reloadIndex = () =>
+            renderIndex(roles, terms, people, roleType, canEdit);
         renderEditor(selectedRole, people, reloadIndex);
     }
     const editButtons = document.getElementsByClassName('roles-edit-button');
@@ -92,13 +96,15 @@ function renderIndex(roles, terms, people, roleType, canEdit, selectedRoleId) {
 function renderEditor(role, people, reloadIndex) {
     document.querySelector('.roles-editor').style.display = 'block';
     const table = document.querySelector('.roles-edit-table');
-    const generalTemplate = Handlebars.compile(document.getElementById('roles-editor-general-template').innerHTML);
+    const generalTemplate = Handlebars.compile(
+        document.getElementById('roles-editor-general-template').innerHTML,
+    );
     const generalHtml = generalTemplate({
         name: role.name,
         type: role.type,
         eligibility: role.eligibility,
         notes: role.notes,
-        description: role.description
+        description: role.description,
     });
     table.innerHTML = generalHtml;
     table.innerHTML += getEditorSpecialHtml(role);
@@ -109,16 +115,21 @@ function renderEditor(role, people, reloadIndex) {
 
 function getEditorSpecialHtml(role) {
     if (role.type === 'Individual') {
-        const template = Handlebars.compile(document.getElementById('roles-editor-individual-template').innerHTML);
+        const template = Handlebars.compile(
+            document.getElementById('roles-editor-individual-template')
+                .innerHTML,
+        );
         return template({
             chairs: getMembers(role, 'Chair'),
-            backups: getMembers(role, 'Backup')
+            backups: getMembers(role, 'Backup'),
         });
     } else {
-        const template = Handlebars.compile(document.getElementById('roles-editor-group-template').innerHTML);
+        const template = Handlebars.compile(
+            document.getElementById('roles-editor-group-template').innerHTML,
+        );
         return template({
             chairs: getMembers(role, 'Chair'),
-            members: getMembers(role, 'Member')
+            members: getMembers(role, 'Member'),
         });
     }
 }
@@ -127,7 +138,7 @@ function renderEditorPeople(role, people) {
     const getResults = {
         chairs: () => [],
         backups: () => [],
-        members: () => []
+        members: () => [],
     };
     const chairsContainer = document.getElementById('roles-editor-chairs');
     const backupsContainer = document.getElementById('roles-editor-backups');
@@ -137,26 +148,49 @@ function renderEditorPeople(role, people) {
         allowPlainText: true,
         autoAdvance: true,
         textFieldSize: 14,
-        textFieldClass: 'form-control'
+        textFieldClass: 'form-control',
     };
     if (chairsContainer) {
-        const startingValues = formatMembersForAutocomplete(getMembers(role, 'Chair'));
-        getResults.chairs = autocomplete.registerAutocomplete(chairsContainer, people, startingValues, opts);
+        const startingValues = formatMembersForAutocomplete(
+            getMembers(role, 'Chair'),
+        );
+        getResults.chairs = autocomplete.registerAutocomplete(
+            chairsContainer,
+            people,
+            startingValues,
+            opts,
+        );
     }
     if (backupsContainer) {
-        const startingValues = formatMembersForAutocomplete(getMembers(role, 'Backup'));
-        getResults.backups = autocomplete.registerAutocomplete(backupsContainer, people, startingValues, opts);
+        const startingValues = formatMembersForAutocomplete(
+            getMembers(role, 'Backup'),
+        );
+        getResults.backups = autocomplete.registerAutocomplete(
+            backupsContainer,
+            people,
+            startingValues,
+            opts,
+        );
     }
     if (membersContainer) {
-        const startingValues = formatMembersForAutocomplete(getMembers(role, 'Member'));
-        getResults.members = autocomplete.registerAutocomplete(membersContainer, people, startingValues, opts);
+        const startingValues = formatMembersForAutocomplete(
+            getMembers(role, 'Member'),
+        );
+        getResults.members = autocomplete.registerAutocomplete(
+            membersContainer,
+            people,
+            startingValues,
+            opts,
+        );
     }
     return getResults;
 }
 
 function registerEditorEvents(role, getPeopleResults, reloadIndex) {
     const buttonsContainer = document.getElementById('roles-editor-buttons');
-    const template = Handlebars.compile(document.getElementById('roles-editor-buttons-template').innerHTML);
+    const template = Handlebars.compile(
+        document.getElementById('roles-editor-buttons-template').innerHTML,
+    );
     buttonsContainer.innerHTML = template({});
     const submitButton = document.getElementById('roles-editor-submit');
     const cancelButton = document.getElementById('roles-editor-cancel');
@@ -183,7 +217,7 @@ function saveRole(role, getPeopleResults) {
         description: document.getElementById('roles-editor-description').value,
         chairs: getPeopleResults.chairs(),
         backups: getPeopleResults.backups(),
-        members: getPeopleResults.members()
+        members: getPeopleResults.members(),
     };
     const url = `/roles/updateRole/${role.id}?roleJson=${JSON.stringify(results)}`;
     fetch(url, { method: 'POST' });
@@ -195,7 +229,11 @@ function saveRole(role, getPeopleResults) {
 }
 
 function deleteRole(role) {
-    if (confirm(`Are you sure you want to delete the role "${role.name}"? Membership records will not be deleted.`)) {
+    if (
+        confirm(
+            `Are you sure you want to delete the role "${role.name}"? Membership records will not be deleted.`,
+        )
+    ) {
         const url = `/roles/deleteRole/${role.id}`;
         fetch(url, { method: 'POST' });
         // indicates to index that the role has been deleted
@@ -220,19 +258,22 @@ function getMembers(role, memberType) {
     if (!lastRecord.members) {
         return [];
     }
-    return lastRecord.members.filter(m => m.type === memberType);
+    return lastRecord.members.filter((m) => m.type === memberType);
 }
 
 function formatMemberList(role, memberType) {
     const members = getMembers(role, memberType);
-    return members.map(m => m.personName).filter(m => !!m).join(', ');
+    return members
+        .map((m) => m.personName)
+        .filter((m) => !!m)
+        .join(', ');
 }
 
 function formatMembersForAutocomplete(members) {
-    return members.map(m => {
+    return members.map((m) => {
         return {
             id: m.personId,
-            label: m.personName
+            label: m.personName,
         };
     });
 }
@@ -240,14 +281,14 @@ function formatMembersForAutocomplete(members) {
 function makeLocalRecord(role, chairs, backups, members) {
     const record = {};
     role.records.push(record);
-    record.members = chairs.map(m => format(m, 'Chair'));
-    record.members.push(...backups.map(m => format(m, 'Backup')));
-    record.members.push(...members.map(m => format(m, 'Member')));
+    record.members = chairs.map((m) => format(m, 'Chair'));
+    record.members.push(...backups.map((m) => format(m, 'Backup')));
+    record.members.push(...members.map((m) => format(m, 'Member')));
     function format(m, type) {
         return {
             type,
             personId: m.id,
-            personName: m.label
+            personName: m.label,
         };
     }
 }
@@ -277,7 +318,7 @@ function sortAll(roles) {
 }
 
 function sortRoles(roles) {
-    sortAlphabetically(roles, r => r.name);
+    sortAlphabetically(roles, (r) => r.name);
 }
 
 function sortRecords(records) {
@@ -289,7 +330,7 @@ function sortRecords(records) {
 }
 
 function sortMembers(members) {
-    sortAlphabetically(members, m => m.personName);
+    sortAlphabetically(members, (m) => m.personName);
 }
 
 function sortAlphabetically(arr, nameFn) {

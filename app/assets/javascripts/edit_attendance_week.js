@@ -119,7 +119,7 @@ function PersonRow(person, days, week, el) {
             '/attendance/deletePersonWeek?personId=' +
                 person.personId +
                 '&monday=' +
-                app.monday
+                app.monday,
         ).done(function (data) {
             self.el.remove();
             app.person_rows.splice(app.person_rows.indexOf(self), 1);
@@ -133,7 +133,7 @@ function PersonRow(person, days, week, el) {
             '/attendance/saveWeek?week_id=' +
                 self.week.id +
                 '&extraHours=' +
-                self.week_el.val()
+                self.week_el.val(),
         );
     };
 
@@ -181,7 +181,7 @@ function addAdditionalPerson(person) {
         .append(
             app.additional_person_template({
                 name: person.firstName + ' ' + person.lastName,
-            })
+            }),
         )
         .children(':last-child');
 
@@ -213,8 +213,8 @@ function loadRow(person, days, week, dest_el) {
             app.person_row_template({
                 firstName: person.firstName,
                 lastName: person.lastName,
-            })
-        )
+            }),
+        ),
     );
     if (insert_before_i !== undefined) {
         app.person_rows[insert_before_i].el.before(new_row_el);
@@ -271,10 +271,10 @@ function saveIfNeeded() {
 
 window.initAttendanceWeek = function () {
     app.person_row_template = Handlebars.compile(
-        $('#person-row-template').html().trim()
+        $('#person-row-template').html().trim(),
     );
     app.additional_person_template = Handlebars.compile(
-        $('#additional-person-template').html()
+        $('#additional-person-template').html(),
     );
 
     const no_school_buttons = $('button.no-school');
@@ -289,7 +289,7 @@ window.initAttendanceWeek = function () {
             person,
             app.initial_data.days[person.personId],
             app.initial_data.weeks[person.personId],
-            $('.attendance-view tbody')
+            $('.attendance-view tbody'),
         );
     }
 
