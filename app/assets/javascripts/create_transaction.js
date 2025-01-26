@@ -2,15 +2,19 @@ const Handlebars = require('handlebars');
 const utils = require('./utils');
 
 export function init(accounts) {
-    const createTransactionTemplate = Handlebars.compile($("#create-transaction-template").html());
+    const createTransactionTemplate = Handlebars.compile(
+        $('#create-transaction-template').html(),
+    );
 
     let modeSelectingOption = true;
-    $('.create-transaction-option').click(function() {
+    $('.create-transaction-option').click(function () {
         if (modeSelectingOption) {
             modeSelectingOption = false;
             $('.create-transaction-option').not(this).hide(300);
             $(this).addClass('selected');
-            $('#create-transaction').show().html(renderTransactionCreator($(this).data('type')));
+            $('#create-transaction')
+                .show()
+                .html(renderTransactionCreator($(this).data('type')));
         } else {
             modeSelectingOption = true;
             $('.create-transaction-option').show(300).removeClass('selected');
@@ -18,7 +22,7 @@ export function init(accounts) {
         }
     });
 
-    $('body').on('input', '#amount', function() {
+    $('body').on('input', '#amount', function () {
         if (Number($('#balance').data('value')) - Number($(this).val()) < 0) {
             $('#balance').addClass('warning');
         } else {
@@ -61,7 +65,7 @@ export function init(accounts) {
             delay: 0,
             autoFocus: true,
         });
-        textInput.bind("autocompleteselect", function(event, ui) {
+        textInput.bind('autocompleteselect', function (event, ui) {
             select(ui.item);
         });
 
@@ -71,7 +75,9 @@ export function init(accounts) {
             textInput.hide();
             selectedText.html(item.label);
             if (isFromDigitalAccount) {
-                $('#balance').data('value', item.balance).html(item.label + '\'s current balance: $' + item.balance);
+                $('#balance')
+                    .data('value', item.balance)
+                    .html(item.label + "'s current balance: $" + item.balance);
                 if (Number(item.balance) - Number($('#amount').val()) < 0) {
                     $('#balance').addClass('warning');
                 }
@@ -79,7 +85,7 @@ export function init(accounts) {
             selected.show();
         }
 
-        selected.find('img').click(function() {
+        selected.find('img').click(function () {
             selected.hide();
             idInput.val('');
             textInput.val('').show().focus();

@@ -40,14 +40,22 @@
 					@codes.get(day.getCode()).getDescription()
 					</td>
 				} else {
-					<td colspan=2>@day.getCode()</td>
+					<td colspan=2 class="attendance-error">@day.getCode()</td>
 				}
 			} else {
-				@if( day.getStartTime() == null || day.getEndTime() == null ) {
-					<td colspan=2 class="attendance-error">???</td>
+				@if( day.getStartTime() == null && day.getEndTime() == null ) {
+					<td colspan=2 class="attendance-error">&mdash;</td>
 				} else {
-					<td>@Attendance.formatTime(day.getStartTime())</td>
-					<td>@Attendance.formatTime(day.getEndTime())</td>
+					@if( day.getStartTime() == null) {
+						<td class="attendance-error">?</td>
+					} else {
+						<td>@Attendance.formatTime(day.getStartTime())</td>
+					}
+					@if( day.getEndTime() == null) {
+						<td class="attendance-error">?</td>
+					} else {
+						<td>@Attendance.formatTime(day.getEndTime())</td>
+					}
 				}
 			}
 		}

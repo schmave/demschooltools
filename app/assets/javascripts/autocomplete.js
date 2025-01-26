@@ -20,13 +20,18 @@ function registerAutocomplete(container, source, startingValues, opts) {
     }
 
     function addItem() {
-        const item = registerAutocompleteItem(container, source, opts, onSelect);
+        const item = registerAutocompleteItem(
+            container,
+            source,
+            opts,
+            onSelect,
+        );
         items.push(item);
         return item;
     }
 
     function anyBlanks() {
-        return items.some(item => isBlank(item));
+        return items.some((item) => isBlank(item));
     }
 
     function isBlank(item) {
@@ -38,13 +43,15 @@ function registerAutocomplete(container, source, startingValues, opts) {
     }
 
     return () => {
-        return items.filter(item => !isBlank(item)).map(item => {
-            return {
-                label: item.getLabel(),
-                id: item.getId()
-            };
-        });
-    }
+        return items
+            .filter((item) => !isBlank(item))
+            .map((item) => {
+                return {
+                    label: item.getLabel(),
+                    id: item.getId(),
+                };
+            });
+    };
 }
 
 function registerAutocompleteItem(container, source, opts, onSelect) {
@@ -52,12 +59,14 @@ function registerAutocompleteItem(container, source, opts, onSelect) {
     $(container).append(div);
 
     const template = Handlebars.compile($('#autocomplete-template').html());
-    div.html(template({
-        textFieldSize: opts.textFieldSize,
-        textFieldClass: opts.textFieldClass,
-        textFieldName: opts.textFieldName,
-        idFieldName: opts.idFieldName
-    }));
+    div.html(
+        template({
+            textFieldSize: opts.textFieldSize,
+            textFieldClass: opts.textFieldClass,
+            textFieldName: opts.textFieldName,
+            idFieldName: opts.idFieldName,
+        }),
+    );
 
     const selected = $(div).find('.autocomplete-selected');
     const removeButton = selected.find('img');
@@ -71,7 +80,7 @@ function registerAutocompleteItem(container, source, opts, onSelect) {
         autoFocus: true,
     });
 
-    textInput.on('autocompleteselect', function(event, ui) {
+    textInput.on('autocompleteselect', function (event, ui) {
         select(ui.item);
     });
 
@@ -79,7 +88,7 @@ function registerAutocompleteItem(container, source, opts, onSelect) {
         textInput.on('input', onSelect);
     }
 
-    removeButton.on('click', function() {
+    removeButton.on('click', function () {
         selected.hide();
         idInput.val('');
         textInput.val('').show().focus();
@@ -106,10 +115,10 @@ function registerAutocompleteItem(container, source, opts, onSelect) {
     return {
         getLabel: () => textInput.val(),
         getId: () => idInput.val(),
-        setValue
+        setValue,
     };
 }
 
 module.exports = {
-    registerAutocomplete
+    registerAutocomplete,
 };

@@ -24,7 +24,7 @@ function checkboxChange() {
     }
 }
 
-window.initAttendancePerson = function() {
+window.initAttendancePerson = function () {
     $('#check-all').click(checkAll);
     $('#uncheck-all').click(uncheckAll);
     $('input[type=checkbox]').change(checkboxChange);
