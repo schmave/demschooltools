@@ -479,8 +479,8 @@ function Case(id, el) {
     this.el = el;
     this.old_findings = null;
 
+    // eslint-disable-next-line
     if (config.track_writer) {
-        // eslint-disable-line
         this.writer_chooser = new people_chooser.PeopleChooser(
             el.find('.writer'),
             function (person) {
