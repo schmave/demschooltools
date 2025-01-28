@@ -35,6 +35,9 @@ class CustodiaUser(AbstractUser):
         ALTER TABLE overseer.users ADD COLUMN is_staff bool NOT NULL default false;
         ALTER TABLE overseer.users ADD COLUMN is_active bool NOT NULL default true;
 
+    Add unique ID to students_required_minutes table
+        ALTER TABLE overseer.students_required_minutes ADD COLUMN id SERIAL PRIMARY KEY;
+
 
     Also need to deal with the fact that passwords are not in the right format.
     Django bcrypt looks like:
@@ -72,7 +75,6 @@ class StudentRequiredMinutes(models.Model):
         Student,
         on_delete=models.PROTECT,
         related_name="required_minutes",
-        primary_key=True,  # This is not true. (student, fromdate) is unique
     )
     fromdate = models.DateField()
     required_minutes = models.IntegerField()

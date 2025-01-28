@@ -257,7 +257,7 @@ class StudentDataView(APIView):
     def put(self, request: Request, student_id: int) -> Response:
         student = Student.objects.get(id=student_id)
         if start_date_str := request.data["start_date"]:
-            student.start_date = datetime.fromtimestamp(start_date_str).date()
+            student.start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date()
 
         local_now = datetime.now(pytz.timezone(student.school.timezone))
         StudentRequiredMinutes.objects.update_or_create(
@@ -367,6 +367,9 @@ def get_student_data(
     total_overrides = 0
     total_short = 0
     for day in school_days:
+        if student.start_date and day < student.start_date:
+            continue
+
         if (
             required_minutes_i + 1 < len(required_minutes)
             and day >= required_minutes[required_minutes_i + 1].fromdate
@@ -461,6 +464,7 @@ def get_student_data(
         "total_excused": total_excused,
         "total_overrides": total_overrides,
         "total_short": total_short,
+        "start_date": student.start_date.isoformat() if student.start_date else None,
         "last_swipe_type": (
             "in" if last_swipe and last_swipe.out_time is None else "out"
         ),

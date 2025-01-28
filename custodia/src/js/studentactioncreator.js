@@ -26,8 +26,8 @@ export const loadStudent = function (id) {
 export const updateStudent = function (id, start_date, minutes) {
   return ajax
     .put("/students/" + id, {
-      start_date: start_date,
-      minutes: minutes,
+        start_date,
+        minutes,
     })
     .then(function (data) {
       dispatcher.dispatch({

@@ -1,9 +1,10 @@
-var React = require("react"),
-  ReactDOM = require("react-dom"),
-  dispatcher = require("../appdispatcher"),
-  constants = require("../appconstants"),
-  actionCreator = require("../studentactioncreator"),
-  Modal = require("../modal.jsx");
+const React = require("react");
+const ReactDOM = require("react-dom");
+const dispatcher = require("../appdispatcher");
+const constants = require("../appconstants");
+const actionCreator = require("../studentactioncreator");
+const Modal = require("../modal.jsx");
+const moment = require("moment");
 
 module.exports = class extends React.Component {
   static displayName = "StudentEditor";
@@ -22,7 +23,7 @@ module.exports = class extends React.Component {
     this.state = {
       saving: false,
       student: { start_date: null },
-      startdate_datepicker: new Date(),
+      startdate_datepicker: null,
     };
   }
 
@@ -42,7 +43,9 @@ module.exports = class extends React.Component {
     e.preventDefault();
     this.savingShow();
     const { startdate_datepicker } = this.state;
-    const timestamp = startdate_datepicker ? startdate_datepicker.getTime() : null;
+    const timestamp = startdate_datepicker
+      ? moment(startdate_datepicker).format("YYYY-MM-DD")
+      : null;
     actionCreator
       .updateStudent(
         this.state.student._id,
@@ -53,10 +56,10 @@ module.exports = class extends React.Component {
   };
 
   edit = (student) => {
-    var s = jQuery.extend({}, student);
+    const s = jQuery.extend({}, student);
     this.setState({
       student: s,
-      startdate_datepicker: s.start_date ? new Date(s.start_date) : null,
+      startdate_datepicker: s.start_date ? new Date(s.start_date + "T00:00:00") : null,
     });
     this.refs.studentEditor.show();
   };
@@ -75,7 +78,7 @@ module.exports = class extends React.Component {
     const target = event.target;
     const value = target.type === "checkbox" ? target.checked : target.value;
     const name = target.id;
-    var partialState = this.state.student;
+    const partialState = this.state.student;
     partialState[name] = value;
     this.setState(partialState);
   };
@@ -92,6 +95,7 @@ module.exports = class extends React.Component {
             </div>
           ) : (
             <form className="form">
+              <p>To change this student's name, visit the People tab in DemSchoolTools.</p>
               <div className="form-group">
                 <label htmlFor="required_minutes">Required Minutes:</label>
                 <input
