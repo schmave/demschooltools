@@ -259,16 +259,15 @@ class StudentDataView(APIView):
         if start_date_str := request.data["start_date"]:
             student.start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date()
 
-        local_now = datetime.now(pytz.timezone(student.school.timezone))
         StudentRequiredMinutes.objects.update_or_create(
             student=student,
-            fromdate=local_now.date(),
+            fromdate=timezone.localdate(),
             defaults=dict(required_minutes=request.data["minutes"]),
         )
 
         student.save()
 
-        return student_data_view(student.id)
+        return student_data_view(student.id, request.user.school)
 
     def get(self, request: Request, student_id: int) -> Response:
         return student_data_view(student_id, request.user.school)
@@ -352,7 +351,6 @@ def get_student_data(
     excused_days: set[date],
     day_to_swipes: dict[date, list[Swipe]],
 ) -> dict:
-
     required_minutes = list(
         StudentRequiredMinutes.objects.filter(student=student).order_by("fromdate")
     )

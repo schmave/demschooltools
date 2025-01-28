@@ -4,7 +4,7 @@ const dispatcher = require("../appdispatcher");
 const constants = require("../appconstants");
 const actionCreator = require("../studentactioncreator");
 const Modal = require("../modal.jsx");
-const moment = require("moment");
+const dayjs = require("dayjs");
 
 module.exports = class extends React.Component {
   static displayName = "StudentEditor";
@@ -39,17 +39,19 @@ module.exports = class extends React.Component {
     this.setState({ saving: false });
   };
 
+  formatDate = () => {
+    const { startdate_datepicker } = this.state;
+    return startdate_datepicker ? startdate_datepicker.format("YYYY-MM-DD") : null;
+  };
+
   saveChange = (e) => {
     e.preventDefault();
     this.savingShow();
     const { startdate_datepicker } = this.state;
-    const timestamp = startdate_datepicker
-      ? moment(startdate_datepicker).format("YYYY-MM-DD")
-      : null;
     actionCreator
       .updateStudent(
         this.state.student._id,
-        timestamp,
+        this.formatDate(),
         parseInt(ReactDOM.findDOMNode(this.refs.required_minutes).value, 10),
       )
       .always(this.savingHide);
@@ -59,7 +61,7 @@ module.exports = class extends React.Component {
     const s = jQuery.extend({}, student);
     this.setState({
       student: s,
-      startdate_datepicker: s.start_date ? new Date(s.start_date + "T00:00:00") : null,
+      startdate_datepicker: s.start_date ? dayjs(s.start_date) : null,
     });
     this.refs.studentEditor.show();
   };
@@ -70,8 +72,8 @@ module.exports = class extends React.Component {
     }
   };
 
-  handleDateChange = (d) => {
-    this.setState({ startdate_datepicker: d });
+  handleDateChange = (e) => {
+    this.setState({ startdate_datepicker: dayjs(e.target.value) });
   };
 
   handleChange = (event) => {
@@ -111,8 +113,9 @@ module.exports = class extends React.Component {
                 <label htmlFor="startdate">Student Start Date:</label>
                 <input
                   type="date"
+                  className="form-control"
                   id="startdate"
-                  value={this.state.startdate_datepicker}
+                  defaultValue={this.formatDate()}
                   onChange={this.handleDateChange}
                   date={true}
                   time={false}
