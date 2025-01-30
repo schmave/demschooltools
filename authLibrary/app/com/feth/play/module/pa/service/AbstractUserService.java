@@ -1,7 +1,6 @@
 package com.feth.play.module.pa.service;
 
 import com.feth.play.module.pa.PlayAuthenticate;
-import com.feth.play.module.pa.user.AuthUser;
 import play.Logger;
 
 public abstract class AbstractUserService implements UserService {
