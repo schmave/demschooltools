@@ -27,8 +27,6 @@ public class PlayAuthenticate {
   public static final String SETTING_KEY_PLAY_AUTHENTICATE = "play-authenticate";
   private static final String SETTING_KEY_AFTER_AUTH_FALLBACK = "afterAuthFallback";
   private static final String SETTING_KEY_AFTER_LOGOUT_FALLBACK = "afterLogoutFallback";
-  private static final String SETTING_KEY_ACCOUNT_MERGE_ENABLED = "accountMergeEnabled";
-  private static final String SETTING_KEY_ACCOUNT_AUTO_LINK = "accountAutoLink";
 
   private final List<Lang> preferredLangs;
   private final Config config;
@@ -109,10 +107,7 @@ public class PlayAuthenticate {
     return session;
   }
 
-  public Session storeUser(Session session, final AuthUser authUser) {
-    // User logged in once more - wanna make some updates?
-    final AuthUser u = getUserService().update(authUser);
-
+  public Session storeUser(Session session, final AuthUser u) {
     session = session.adding(PlayAuthenticate.USER_KEY, u.getId());
     session = session.adding(PlayAuthenticate.PROVIDER_KEY, u.getProvider());
     if (u.expires() != AuthUser.NO_EXPIRATION) {
@@ -176,14 +171,6 @@ public class PlayAuthenticate {
     } else {
       return null;
     }
-  }
-
-  public boolean isAccountAutoLink() {
-    return getConfiguration().getBoolean(SETTING_KEY_ACCOUNT_AUTO_LINK);
-  }
-
-  public boolean isAccountMergeEnabled() {
-    return getConfiguration().getBoolean(SETTING_KEY_ACCOUNT_MERGE_ENABLED);
   }
 
   public Session storeInCache(final Session session, final String key, final Object o) {
@@ -277,92 +264,14 @@ public class PlayAuthenticate {
       } else if (o instanceof Result) {
         return (Result) o;
       } else if (o instanceof AuthUser) {
-
         final AuthUser newUser = (AuthUser) o;
-        final Session session = request.session();
-
-        // We might want to do merging here:
-        // Adapted from:
-        // http://stackoverflow.com/questions/6666267/architecture-for-merging-multiple-user-accounts-together
-        // 1. The account is linked to a local account and no session
-        // cookie is present --> Login
-        // 2. The account is linked to a local account and a session
-        // cookie is present --> Merge
-        // 3. The account is not linked to a local account and no
-        // session cookie is present --> Signup
-        // 4. The account is not linked to a local account and a session
-        // cookie is present --> Linking Additional account
-
-        // get the user with which we are logged in - is null if we
-        // are
-        // not logged in (does NOT check expiration)
-
-        AuthUser oldUser = getUser(session);
-
-        // checks if the user is logged in (also checks the expiration!)
-        boolean isLoggedIn = isLoggedIn(session);
-
-        Object oldIdentity = null;
-
-        // check if local user still exists - it might have been
-        // deactivated/deleted,
-        // so this is a signup, not a link
-        if (isLoggedIn) {
-          oldIdentity = getUserService().getLocalIdentity(oldUser);
-          isLoggedIn = oldIdentity != null;
-          if (!isLoggedIn) {
-            // if isLoggedIn is false here, then the local user has
-            // been deleted/deactivated
-            // so kill the session
-            logout(session);
-            oldUser = null;
-          }
-        }
-
         final Object loginIdentity = getUserService().getLocalIdentity(newUser);
-        final boolean isLinked = loginIdentity != null;
 
-        final AuthUser loginUser;
-        if (isLinked && !isLoggedIn) {
-          // 1. -> Login
-          loginUser = newUser;
-
-        } else if (isLinked) {
-          // 2. -> Merge
-
-          // merge the two identities and return the AuthUser we want
-          // to use for the log in
-          if (isAccountMergeEnabled() && !loginIdentity.equals(oldIdentity)) {
-            throw new UnsupportedOperationException("account merge is disabled");
-            // account merge is enabled
-            // and
-            // The currently logged in user and the one to log in
-            // are not the same, so shall we merge?
-          } else {
-            // the currently logged in user and the new login belong
-            // to the same local user,
-            // or Account merge is disabled, so just change the log
-            // in to the new user
-            loginUser = newUser;
-          }
-
-        } else if (!isLoggedIn) {
-          // 3. -> Signup
-          loginUser = signupUser(newUser, request, ap);
-        } else {
-          // !isLinked && isLoggedIn:
-
-          // 4. -> Link additional
-          if (isAccountAutoLink()) {
-            // Account auto linking is enabled
-
-            loginUser = getUserService().link(oldUser, newUser);
-          } else {
-            throw new UnsupportedOperationException("link suggestion page is disabled");
-          }
+        if (loginIdentity == null) {
+          signupUser(newUser, request, ap);
         }
 
-        return loginAndRedirect(request, loginUser);
+        return loginAndRedirect(request, newUser);
       } else {
         return Controller.internalServerError(
             messagesApi.preferred(preferredLangs).at("playauthenticate.core.exception.general"));
