@@ -28,10 +28,4 @@ public abstract class AbstractUserService implements UserService {
     }
     this.auth.setUserService(this);
   }
-
-  @Override
-  public AuthUser update(AuthUser knownUser) {
-    // Default: just do nothing when user logs in again
-    return knownUser;
-  }
 }

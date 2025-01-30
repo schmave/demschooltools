@@ -64,18 +64,4 @@ public class MyUserService extends AbstractUserService {
       return null;
     }
   }
-
-  @Override
-  public AuthUser merge(final AuthUser newUser, final AuthUser oldUser) {
-    if (!oldUser.equals(newUser)) {
-      User.merge(oldUser, newUser);
-    }
-    return oldUser;
-  }
-
-  @Override
-  public AuthUser link(final AuthUser oldUser, final AuthUser newUser) {
-    User.addLinkedAccount(oldUser, newUser);
-    return null;
-  }
 }
