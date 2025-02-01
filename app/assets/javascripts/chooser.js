@@ -4,19 +4,29 @@ const utils = require('./utils');
 
 const result_template_str =
     '<div class="result" data-id="{{id}}">' +
-        '<span class="label label-success">{{name}}</span>' +
-        '<img src="/assets/images/x.png">' +
+    '<span class="label label-success">{{name}}</span>' +
+    '<img src="/assets/images/x.png">' +
     '</div>';
 
 const result_template = Handlebars.compile(result_template_str);
 
-const Chooser = function(el, allowMultiple, minLength, source, getLabel, onClick, onChange, onAdd, onRemove) {
+const Chooser = function (
+    el,
+    allowMultiple,
+    minLength,
+    source,
+    getLabel,
+    onClick,
+    onChange,
+    onAdd,
+    onRemove,
+) {
     this.el = el;
     const self = this;
 
     this.results = [];
 
-    this.search_box = el.find(".search");
+    this.search_box = el.find('.search');
     this.search_box.autocomplete({
         autoFocus: true,
         delay: 0,
@@ -24,7 +34,7 @@ const Chooser = function(el, allowMultiple, minLength, source, getLabel, onClick
         source,
     });
 
-    this.search_box.bind( "autocompleteselect", function(event, ui) {
+    this.search_box.bind('autocompleteselect', function (event, ui) {
         const success = self.addResult(ui.item.id, ui.item.label);
 
         if (success) {
@@ -40,9 +50,9 @@ const Chooser = function(el, allowMultiple, minLength, source, getLabel, onClick
         event.preventDefault(); // keep jquery from inserting name into textbox
     });
 
-    this.addResult = function(id, title, select_next) {
+    this.addResult = function (id, title, select_next) {
         if (select_next === undefined) {
-          select_next = true;
+            select_next = true;
         }
         // Don't add results that have already been added.
         for (const i in self.results) {
@@ -54,27 +64,29 @@ const Chooser = function(el, allowMultiple, minLength, source, getLabel, onClick
         if (!allowMultiple) {
             self.search_box.hide();
             if (select_next) {
-              utils.selectNextInput(self.search_box);
+                utils.selectNextInput(self.search_box);
             }
         }
 
         self.results.push(id);
 
         const result_el = $(result_template({ name: title, id }));
-        self.el.find(".results").append(result_el);
+        self.el.find('.results').append(result_el);
 
         if (onClick) {
-            result_el.find(".label").click(function() {
+            result_el.find('.label').click(function () {
                 onClick(id);
             });
         }
 
-        result_el.find("img").click(function() { self.removeResult(result_el); });
+        result_el.find('img').click(function () {
+            self.removeResult(result_el);
+        });
 
         return true;
     };
 
-    this.removeResult = function(result_el) {
+    this.removeResult = function (result_el) {
         $(result_el).remove();
 
         for (const i in self.results) {
@@ -95,13 +107,13 @@ const Chooser = function(el, allowMultiple, minLength, source, getLabel, onClick
         }
     };
 
-    this.clear = function() {
+    this.clear = function () {
         self.results = [];
-    }
+    };
 
-    this.loadData = function(json) {
+    this.loadData = function (json) {
         self.clear();
-        self.el.find(".results").html("");
+        self.el.find('.results').html('');
         if (allowMultiple) {
             for (const i in json) {
                 self.addResult(json[i].id, getLabel(json[i]), false);
@@ -110,8 +122,8 @@ const Chooser = function(el, allowMultiple, minLength, source, getLabel, onClick
             self.addResult(json.id, getLabel(json), false);
         }
     };
-}
+};
 
 module.exports = {
-    Chooser
-}
+    Chooser,
+};

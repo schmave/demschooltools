@@ -45,18 +45,4 @@ public class MyResolver extends Resolver {
 
     return super.onException(e);
   }
-
-  @Override
-  public Call askLink() {
-    // We don't support moderated account linking in this sample.
-    // See the play-authenticate-usage project for an example
-    return null;
-  }
-
-  @Override
-  public Call askMerge() {
-    // We don't support moderated account merging in this sample.
-    // See the play-authenticate-usage project for an example
-    return null;
-  }
 }

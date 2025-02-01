@@ -22,7 +22,6 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 import play.Logger;
 import play.api.libs.mailer.MailerClient;
-import play.i18n.Messages;
 import play.i18n.MessagesApi;
 import play.libs.Files.TemporaryFile;
 import play.libs.Json;
@@ -375,9 +374,22 @@ public class Application extends Controller {
     return peopleByTagType("showInAttendance", org);
   }
 
+  public static List<Person> rolesPeople(Organization org) {
+    return peopleByTagType("showInRoles", org);
+  }
+
   public static String attendancePeopleJson(Organization org) {
-    List<Map<String, String>> result = new ArrayList<>();
     List<Person> people = attendancePeople(org);
+    return peopleToJson(people);
+  }
+
+  public static String rolesPeopleJson(Organization org) {
+    List<Person> people = rolesPeople(org);
+    return peopleToJson(people);
+  }
+
+  private static String peopleToJson(List<Person> people) {
+    List<Map<String, String>> result = new ArrayList<>();
     for (Person p : people) {
       HashMap<String, String> values = new HashMap<>();
       values.put("label", p.getDisplayName());
@@ -400,20 +412,29 @@ public class Application extends Controller {
   static Logger.ALogger sLogger = Logger.of("application");
 
   public Result index(Http.Request request) {
+    final boolean isLoggedIn = isCurrentUserLoggedIn(currentUsername(request));
     return ok(
         cached_page.render(
             new CachedPage(
-                CachedPage.JC_INDEX, "JC database", "jc", "jc_home", Utils.getOrg(request)) {
+                isLoggedIn ? CachedPage.JC_INDEX : CachedPage.JC_INDEX_LOGGED_OUT,
+                "JC database",
+                "jc",
+                "jc_home",
+                Utils.getOrg(request)) {
               @Override
               String render() {
-                List<Meeting> meetings =
+                ExpressionList<Meeting> meetingQuery =
                     Meeting.find
                         .query()
                         .fetch("cases")
                         .where()
-                        .eq("organization", Utils.getOrg(request))
-                        .orderBy("date DESC")
-                        .findList();
+                        .eq("organization", Utils.getOrg(request));
+
+                if (!isLoggedIn) {
+                  meetingQuery = meetingQuery.ge("date", ModelUtils.getStartOfYear());
+                }
+
+                List<Meeting> meetings = meetingQuery.orderBy("date DESC").findList();
 
                 List<Tag> tags =
                     Tag.find
@@ -461,8 +482,6 @@ public class Application extends Controller {
                 }
 
                 entries_with_charges.sort(Entry.SORT_NUMBER);
-
-                debugMessages(request);
 
                 return jc_index
                     .render(
@@ -608,11 +627,12 @@ public class Application extends Controller {
   }
 
   public Result viewMeeting(int meeting_id, Http.Request request) {
-    return ok(
-        view_meeting.render(
-            Meeting.findById(meeting_id, Utils.getOrg(request)),
-            request,
-            mMessagesApi.preferred(request)));
+    Meeting m = Meeting.findById(meeting_id, Utils.getOrg(request));
+    if (isCurrentUserLoggedIn(currentUsername(request))
+        || (m != null && m.getDate().compareTo(ModelUtils.getStartOfYear()) >= 0)) {
+      return ok(view_meeting.render(m, request, mMessagesApi.preferred(request)));
+    }
+    return ok("You must be logged in to view this meeting");
   }
 
   public Result printMeeting(int meeting_id, Http.Request request) throws Exception {
@@ -1251,18 +1271,7 @@ public class Application extends Controller {
         multi_meetings.render(meetings, request, mMessagesApi.preferred(request)).toString());
   }
 
-  void debugMessages(Http.Request request) {
-    Messages messages = mMessagesApi.preferred(request);
-    sLogger.debug(
-        "messages lang: {}, one string: {}, transient lang: {}",
-        messages.lang(),
-        messages.at("erase_case_confirmation"),
-        request.transientLang());
-  }
-
   public Result viewWeeklyReport(String date_string, Http.Request request) {
-    debugMessages(request);
-
     Calendar start_date = Utils.parseDateOrNow(date_string);
     Organization org = Utils.getOrg(request);
     Utils.adjustToPreviousDay(start_date, org.getJcResetDay() + 1);
@@ -1488,6 +1497,9 @@ public class Application extends Controller {
   }
 
   public static String forDateInput(Date d) {
+    if (d == null) {
+      return null;
+    }
     return new SimpleDateFormat("yyyy-MM-dd").format(d);
   }
 

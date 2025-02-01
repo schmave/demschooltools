@@ -23,31 +23,4 @@ public interface UserService {
    * @return
    */
   public Object getLocalIdentity(final AuthUserIdentity identity);
-
-  /**
-   * Merges two user accounts after a login with an auth provider/id that is linked to a different
-   * account than the login from before Returns the user to generate the session information from
-   *
-   * @param newUser
-   * @param oldUser
-   * @return
-   */
-  public AuthUser merge(final AuthUser newUser, final AuthUser oldUser);
-
-  /**
-   * Links a new account to an exsting local user. Returns the auth user to log in with
-   *
-   * @param oldUser
-   * @param newUser
-   */
-  public AuthUser link(final AuthUser oldUser, final AuthUser newUser);
-
-  /**
-   * Gets called when a user logs in - you might make profile updates here with data coming from the
-   * login provider or bump a last-logged-in date
-   *
-   * @param knownUser
-   * @return
-   */
-  public AuthUser update(final AuthUser knownUser);
 }

@@ -31,6 +31,9 @@
 			Include archived
 		</label>
 		<br>
+		<input type="date" name="start_date" value="@Application.forDateInput(model.start_date)"> to
+		<input type="date" name="end_date" value="@Application.forDateInput(model.end_date)">
+		<br><br>
 		<button type="submit" name="action" value="fetch" class="transactions-fetch">Fetch transactions</button>
 		<button type="submit" name="action" value="download"class="transactions-fetch">Fetch and download as csv</button>
 		<br>

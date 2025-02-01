@@ -34,6 +34,7 @@ public class Organization extends Model {
   private Boolean showAttendance;
   private Boolean showElectronicSignin;
   private Boolean showAccounting;
+  private Boolean showRoles;
 
   private Boolean enableCaseReferences;
 
@@ -47,12 +48,19 @@ public class Organization extends Model {
   private Integer attendanceReportLateFeeInterval_2;
   private Boolean attendanceShowPercent;
   private Boolean attendanceShowWeightedPercent;
+  private Boolean attendanceShowRateInCheckin;
   private Boolean attendanceEnablePartialDays;
   private Time attendanceDayLatestStartTime;
   private Time attendanceDayEarliestDepartureTime;
   private Double attendanceDayMinHours;
   private BigDecimal attendancePartialDayValue;
   private String attendanceAdminPin;
+  private String attendanceDefaultAbsenceCode;
+  private Time attendanceDefaultAbsenceCodeTime;
+
+  private String rolesIndividualTerm;
+  private String rolesCommitteeTerm;
+  private String rolesGroupTerm;
 
   @OneToMany(mappedBy = "organization")
   @JsonIgnore
@@ -82,6 +90,18 @@ public class Organization extends Model {
 
   public String formatAttendanceReportLatestDepartureTime_2() {
     return formatTime(attendanceReportLatestDepartureTime_2);
+  }
+
+  public String getRolesIndividualTermPlural() {
+    return rolesIndividualTerm + "s";
+  }
+
+  public String getRolesCommitteeTermPlural() {
+    return rolesCommitteeTerm + "s";
+  }
+
+  public String getRolesGroupTermPlural() {
+    return rolesGroupTerm + "s";
   }
 
   public void updateFromForm(Map<String, String[]> values, Organization org) {
@@ -159,6 +179,12 @@ public class Organization extends Model {
       } else {
         this.attendanceShowWeightedPercent = false;
       }
+      if (values.containsKey("attendanceShowRateInCheckin")) {
+        this.attendanceShowRateInCheckin =
+            ModelUtils.getBooleanFromFormValue(values.get("attendanceShowRateInCheckin")[0]);
+      } else {
+        this.attendanceShowRateInCheckin = false;
+      }
       if (values.containsKey("attendanceEnablePartialDays")) {
         this.attendanceEnablePartialDays =
             ModelUtils.getBooleanFromFormValue(values.get("attendanceEnablePartialDays")[0]);
@@ -233,6 +259,17 @@ public class Organization extends Model {
         this.attendanceReportLateFeeInterval_2 =
             Integer.parseInt(values.get("attendanceReportLateFeeInterval_2")[0]);
       }
+      if (values.containsKey("attendanceDefaultAbsenceCode")) {
+        this.attendanceDefaultAbsenceCode = values.get("attendanceDefaultAbsenceCode")[0];
+      } else {
+        this.attendanceDefaultAbsenceCode = null;
+      }
+      if (values.containsKey("attendanceDefaultAbsenceCodeTime")) {
+        this.attendanceDefaultAbsenceCodeTime =
+            AttendanceDay.parseTime(values.get("attendanceDefaultAbsenceCodeTime")[0]);
+      } else {
+        this.attendanceDefaultAbsenceCodeTime = null;
+      }
     }
     if (values.containsKey("accounting_settings")) {
       if (values.containsKey("showAccounting")) {
@@ -242,6 +279,28 @@ public class Organization extends Model {
         }
       } else {
         this.showAccounting = false;
+      }
+    }
+    if (values.containsKey("roles_settings")) {
+      if (values.containsKey("showRoles")) {
+        this.showRoles = ModelUtils.getBooleanFromFormValue(values.get("showRoles")[0]);
+      } else {
+        this.showRoles = false;
+      }
+      if (values.containsKey("rolesIndividualTerm")) {
+        this.rolesIndividualTerm = values.get("rolesIndividualTerm")[0];
+      } else {
+        this.rolesIndividualTerm = "";
+      }
+      if (values.containsKey("rolesCommitteeTerm")) {
+        this.rolesCommitteeTerm = values.get("rolesCommitteeTerm")[0];
+      } else {
+        this.rolesCommitteeTerm = "";
+      }
+      if (values.containsKey("rolesGroupTerm")) {
+        this.rolesGroupTerm = values.get("rolesGroupTerm")[0];
+      } else {
+        this.rolesGroupTerm = "";
       }
     }
     this.save();

@@ -1,5 +1,4 @@
 bcrypt # Used to support old bcrypt passwords from overseer
-django-extensions
 django
 djangorestframework
 django-silk

@@ -14,6 +14,7 @@ import models.*;
 public abstract class CachedPage {
   public static final String ATTENDANCE_INDEX = "Attendance-index-";
   public static final String JC_INDEX = "Application-index-";
+  public static final String JC_INDEX_LOGGED_OUT = "Application-index-lo-";
   public static final String MANUAL_INDEX = "Application-viewManual-";
   public static final String RECENT_COMMENTS = "CRM-recentComments-";
 

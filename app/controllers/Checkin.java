@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.*;
 import models.*;
+import org.apache.commons.lang3.StringUtils;
 import play.libs.Json;
 import play.mvc.*;
 
@@ -29,7 +30,8 @@ public class Checkin extends Controller {
     Map<Person, AttendanceStats> person_to_stats =
         Attendance.mapPeopleToStats(start_date, end_date, organization);
 
-    boolean show_weighted_percent = organization.getAttendanceShowWeightedPercent();
+    boolean show_attendance_rate = organization.getAttendanceShowRateInCheckin();
+    boolean use_weighted_attendance_rate = organization.getAttendanceShowWeightedPercent();
 
     List<CheckinPerson> people =
         Application.attendancePeople(organization).stream()
@@ -41,15 +43,39 @@ public class Checkin extends Controller {
                         p,
                         AttendanceDay.findCurrentDay(date, p.getPersonId(), organization),
                         person_to_stats.get(p),
-                        show_weighted_percent))
+                        show_attendance_rate,
+                        use_weighted_attendance_rate))
             .collect(Collectors.toList());
+
+    // Automatically set absence code if someone hasn't signed in by a certain time
+    String defaultAbsenceCode = organization.getAttendanceDefaultAbsenceCode();
+    Time defaultAbsenceCodeTime = organization.getAttendanceDefaultAbsenceCodeTime();
+    Time currentTime =
+        new Time((new SimpleDateFormat("h:mm:ss a").parse(time.split(", ")[1])).getTime());
+    if (StringUtils.isNotBlank(defaultAbsenceCode)
+        && currentTime.getTime() > defaultAbsenceCodeTime.getTime()) {
+      for (CheckinPerson person : people) {
+        if (StringUtils.isBlank(person.current_day_code)
+            && StringUtils.isBlank(person.current_day_start_time)
+            && StringUtils.isBlank(person.current_day_end_time)) {
+          AttendanceDay attendance_day =
+              AttendanceDay.findCurrentDay(date, person.personId, organization);
+          if (attendance_day != null) {
+            attendance_day.setCode(defaultAbsenceCode);
+            attendance_day.update();
+          }
+        }
+      }
+    }
 
     // add admin
     Person admin = new Person();
     admin.setPersonId(-1);
     admin.setFirstName("Admin");
     admin.setPin(organization.getAttendanceAdminPin());
-    people.add(0, new CheckinPerson(admin, null, null, show_weighted_percent));
+    people.add(
+        0,
+        new CheckinPerson(admin, null, null, show_attendance_rate, use_weighted_attendance_rate));
 
     List<String> absence_codes =
         AttendanceCode.all(organization).stream()

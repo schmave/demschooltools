@@ -29,10 +29,10 @@ See [the wiki](https://github.com/schmave/demschooltools/wiki/) for more informa
 
 1.  Run `npm install` to install the Javascript libraries.
 
-1.  Start PostgreSQL and create a database named "school_crm".
+1.  Start PostgreSQL and create a database named "school_crm". You'll also need to set the password for the user named "postgres" to "123", or change the database username and password in conf/base.conf.
 
 1.  Set the environment variables APPLICATION_SECRET, GOOGLE_CLIENT_SECRET,
-    FACEBOOK_CLIENT_SECRET, ROLLBAR_TOKEN, and SES_PASSWORD to empty values. You can run the
+    FACEBOOK_CLIENT_SECRET, ROLLBAR_TOKEN, CUSTODIA_PASSWORD, and SES_PASSWORD to empty values. You can run the
     "set_keys_blank.sh" script to do this on Mac/Linux.
 
 1.  Run sbt `./sbt.sh`, then execute the `run` command in the sbt/play console.
