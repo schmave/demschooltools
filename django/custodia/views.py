@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.views import redirect_to_login
 from django.db.models import Max
 from django.db.transaction import atomic
-from django.http import HttpResponse
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views import View
@@ -160,10 +160,13 @@ class DeleteSwipeView(APIView):
 
 
 class LogoutView(View):
-    def get(self, request):
+    def get(self, request: HttpRequest):
         if request.user.is_authenticated:
             logout(request)
-        return redirect("/")
+
+        response = redirect("/")
+        response.set_cookie("PLAY_SESSION", "", max_age=0)
+        return response
 
 
 class IsAdminView(APIView):
