@@ -108,22 +108,6 @@ $(function () {
     });
 });
 
-window.initCustodiaAdmin = function (url, username, password) {
-    $.ajax({
-        url: url + '/users/login',
-        data: {
-            password,
-            username,
-        },
-        method: 'POST',
-        xhrFields: {
-            withCredentials: true,
-        },
-    }).always(function () {
-        $('iframe').attr('src', url);
-    });
-};
-
 window.initPeopleChooser = function (selector, onAdd, onRemove) {
     return new people_chooser.PeopleChooser(
         $(selector),

@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 
+from django.conf.global_settings import X_FRAME_OPTIONS
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -66,7 +68,6 @@ MIDDLEWARE = (["silk.middleware.SilkyMiddleware"] if SILK_ENABLED else []) + [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "demschooltools.auth.PlaySessionMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "demschooltools.middleware.TimezoneMiddleware",
     # "pyinstrument.middleware.ProfilerMiddleware",
 ]
