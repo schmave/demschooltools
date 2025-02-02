@@ -1,3 +1,4 @@
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
@@ -107,3 +108,45 @@ class Meeting(models.Model):
 
     organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
     date = models.DateField()
+
+
+class User(AbstractUser):
+    """
+    Changes from the public.users table currently being used in production:
+
+        ALTER TABLE public.users ADD COLUMN date_joined timestamptz NULL default NULL;
+        ALTER TABLE public.users ADD COLUMN last_login timestamptz NULL default NULL;
+        ALTER TABLE public.users ADD COLUMN first_name varchar(150) NOT NULL default '';
+        ALTER TABLE public.users ADD COLUMN last_name varchar(150) NOT NULL default '';
+        ALTER TABLE public.users ADD COLUMN is_superuser bool NOT NULL default false;
+        ALTER TABLE public.users ADD COLUMN is_staff bool NOT NULL default false;
+        ALTER TABLE public.users ADD COLUMN is_active bool NOT NULL default true;
+        ALTER TABLE public.users ADD COLUMN username varchar(150) NOT NULL default '';
+
+
+    Also need to deal with the fact that passwords are not in the right format.
+    Django bcrypt looks like:
+       bcrypt$$2b$12$kHtLdeD00SoRqyuqgXZgfevdO0Gy7PAGRFqw0cX49FGLInWRwHZDS
+
+    """
+
+    password = models.TextField(db_column="hashed_password")
+
+    class Meta:
+        db_table = 'public"."users'
+
+    # organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
+    school = models.ForeignKey(
+        "custodia.School", db_column="organization_id", on_delete=models.PROTECT
+    )
+
+
+class LinkedAccount(models.Model):
+    class Meta:
+        db_table = 'public"."linked_account'
+
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="linked_accounts"
+    )
+    provider_user_id = models.TextField()
+    provider_key = models.TextField()

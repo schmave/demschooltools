@@ -20,38 +20,6 @@ class School(models.Model):
     late_time = models.TimeField()
 
 
-class CustodiaUser(AbstractUser):
-    """
-    Changes from the overseer.users table currently being used in production:
-
-        ALTER TABLE overseer.users RENAME COLUMN user_id TO id;
-        ALTER TABLE overseer.users RENAME COLUMN inserted_date TO date_joined;
-
-        ALTER TABLE overseer.users ADD COLUMN last_login timestamptz NULL default now();
-        ALTER TABLE overseer.users ADD COLUMN is_superuser bool NOT NULL default false;
-        ALTER TABLE overseer.users ADD COLUMN first_name varchar(150) NOT NULL default '';
-        ALTER TABLE overseer.users ADD COLUMN last_name varchar(150) NOT NULL default '';
-        ALTER TABLE overseer.users ADD COLUMN email varchar(254) NOT NULL default '';
-        ALTER TABLE overseer.users ADD COLUMN is_staff bool NOT NULL default false;
-        ALTER TABLE overseer.users ADD COLUMN is_active bool NOT NULL default true;
-
-    Add unique ID to students_required_minutes table
-        ALTER TABLE overseer.students_required_minutes ADD COLUMN id SERIAL PRIMARY KEY;
-
-
-    Also need to deal with the fact that passwords are not in the right format.
-    Django bcrypt looks like:
-       bcrypt$$2b$12$kHtLdeD00SoRqyuqgXZgfevdO0Gy7PAGRFqw0cX49FGLInWRwHZDS
-
-    """
-
-    class Meta:
-        db_table = 'overseer"."users'
-
-    school = models.ForeignKey(School, on_delete=models.PROTECT)
-    roles = models.TextField()
-
-
 class Student(models.Model):
     class Meta:
         db_table = "students"
@@ -68,6 +36,11 @@ class Student(models.Model):
 
 
 class StudentRequiredMinutes(models.Model):
+    """
+    Add unique ID to students_required_minutes table
+        ALTER TABLE overseer.students_required_minutes ADD COLUMN id SERIAL PRIMARY KEY;
+    """
+
     class Meta:
         db_table = "students_required_minutes"
 

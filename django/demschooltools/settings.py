@@ -46,8 +46,12 @@ INSTALLED_APPS = [
     "django_extensions",
 ] + (["silk"] if SILK_ENABLED else [])
 
-AUTH_USER_MODEL = "custodia.CustodiaUser"
+AUTH_USER_MODEL = "dst.User"
 LOGIN_URL = "/users/login"
+
+AUTHENTICATION_BACKENDS = ["demschooltools.auth.PlaySessionBackend"]
+
+JWT_KEY = "asdlkfjhasldkjfhqo28329384u29q384asldkjfahslkdfj891"
 
 REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": ("drf_orjson_renderer.renderers.ORJSONRenderer",),
@@ -60,6 +64,7 @@ MIDDLEWARE = (["silk.middleware.SilkyMiddleware"] if SILK_ENABLED else []) + [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "demschooltools.auth.PlaySessionMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "demschooltools.middleware.TimezoneMiddleware",

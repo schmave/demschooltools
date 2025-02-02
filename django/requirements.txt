@@ -54,6 +54,8 @@ pygments==2.19.1
     # via ipython
 pyinstrument==5.0.1
     # via -r requirements.in
+pyjwt==2.10.1
+    # via -r requirements.in
 sqlparse==0.5.3
     # via
     #   django

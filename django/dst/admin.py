@@ -13,6 +13,7 @@ from dst.models import (
     PersonTagChange,
     Section,
     Tag,
+    User,
 )
 
 admin.site.register(AttendanceDay)
@@ -27,3 +28,4 @@ admin.site.register(Person)
 admin.site.register(PersonTagChange)
 admin.site.register(Section)
 admin.site.register(Tag)
+admin.site.register(User)

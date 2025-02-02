@@ -6,4 +6,5 @@ drf-orjson-renderer
 ipython
 psycopg
 pyinstrument
+pyjwt
 tabulate

@@ -1,7 +1,6 @@
 from django.contrib import admin
 
 from custodia.models import (
-    CustodiaUser,
     Student,
     StudentRequiredMinutes,
     Swipe,
@@ -10,4 +9,3 @@ from custodia.models import (
 admin.site.register(Swipe)
 admin.site.register(Student)
 admin.site.register(StudentRequiredMinutes)
-admin.site.register(CustodiaUser)
