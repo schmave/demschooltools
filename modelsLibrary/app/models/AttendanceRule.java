@@ -1,12 +1,9 @@
 package models;
 
-import com.fasterxml.jackson.annotation.*;
 import io.ebean.*;
-import java.math.*;
 import java.sql.Time;
 import java.text.*;
 import java.util.*;
-import java.util.stream.*;
 import javax.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

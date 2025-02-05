@@ -1,32 +1,36 @@
 import scala.sys.process._
 
 name := "DemSchoolTools"
-ThisBuild / scalaVersion := "2.13.10"
+ThisBuild / scalaVersion := "2.13.16"
 ThisBuild / version := "1.1"
 ThisBuild / javacOptions ++= Seq("-Xlint:unchecked", "-Xlint:deprecation")
 
-lazy val authLibrary = (project in file("authLibrary")).enablePlugins(PlayJava)
+ThisBuild / EclipseKeys.skipParents := false
+
+lazy val authLibrary = (project in file("authLibrary"))
+  .enablePlugins(PlayJava)
   .settings(
-  libraryDependencies ++= Seq(
-    "org.apache.httpcomponents" % "httpclient" % "4.5.14",
-    "org.apache.commons" % "commons-lang3" % "3.12.0",
-    javaWs,
-    ehcache,
-  )
+    libraryDependencies ++= Seq(
+      "org.apache.httpcomponents" % "httpclient" % "4.5.14",
+      "org.apache.commons" % "commons-lang3" % "3.12.0",
+      javaWs,
+      ehcache
+    )
   )
 
-lazy val modelsLibrary = (project in file("modelsLibrary")).enablePlugins(PlayJava, PlayEbean)
-.settings(
-  libraryDependencies ++= Seq(
-    "com.typesafe.play" %% "play-mailer" % "8.0.1",
-    "org.projectlombok" % "lombok" % "1.18.26",
+lazy val modelsLibrary = (project in file("modelsLibrary"))
+  .enablePlugins(PlayJava, PlayEbean)
+  .settings(
+    libraryDependencies ++= Seq(
+      "com.typesafe.play" %% "play-mailer" % "8.0.1",
+      "org.projectlombok" % "lombok" % "1.18.26"
+    )
   )
-).aggregate(authLibrary)
+  .aggregate(authLibrary)
   .dependsOn(authLibrary)
 
-
 lazy val root = (project in file("."))
-	.enablePlugins(PlayJava, PlayEbean)
+  .enablePlugins(PlayJava, PlayEbean)
   .aggregate(modelsLibrary, authLibrary)
   .dependsOn(modelsLibrary, authLibrary)
 
@@ -36,8 +40,6 @@ modelsLibrary / Compile / doc / sources := Seq.empty
 modelsLibrary / Compile / packageDoc / publishArtifact := false
 root / Compile / doc / sources := Seq.empty
 root / Compile / packageDoc / publishArtifact := false
-
-
 
 javacOptions ++= Seq("-Xlint:unchecked", "-Xlint:deprecation")
 pipelineStages := Seq(digest, gzip)
@@ -55,7 +57,7 @@ libraryDependencies ++= Seq(
   "com.github.spullara.mustache.java" % "compiler" % "0.9.10",
   "org.apache.poi" % "poi-ooxml" % "5.2.2",
   "org.mindrot" % "jbcrypt" % "0.4",
-  "com.rollbar" % "rollbar-java" % "1.10.0",
+  "com.rollbar" % "rollbar-java" % "1.10.0"
 )
 
 // Run webpack
@@ -66,13 +68,14 @@ def runWebpack(file: File) = {
   val os = sys.props("os.name").toLowerCase
   val makeCmd = os match {
     case x if x contains "windows" => Seq("cmd", "/C") ++ command
-    case _ => command
+    case _                         => command
   }
   makeCmd.!
 }
 
 webpack := {
-  if(runWebpack(baseDirectory.value) != 0) throw new Exception("Something went wrong when running webpack.")
+  if (runWebpack(baseDirectory.value) != 0)
+    throw new Exception("Something went wrong when running webpack.")
 }
 
 dist := (dist dependsOn webpack).value
