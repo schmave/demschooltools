@@ -12,3 +12,8 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-gzip" % "1.0.2")
 addSbtPlugin("com.typesafe.sbt" % "sbt-less" % "1.1.2")
 
 addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.10.0-RC1")
+
+// This lets us run the "eclipse" command at the sbt shell
+// in order to generate files that are used by the VS Code Java
+// language server.
+addSbtPlugin("com.github.sbt" % "sbt-eclipse" % "6.0.0")

@@ -36,3 +36,12 @@ __pycache__/
 
 # Mac stuff
 .DS_Store
+
+# Metals stuff
+.metals/
+.bloop/
+.ammonite/
+metals.sbt
+
+# Eclipse stuff
+.settings/

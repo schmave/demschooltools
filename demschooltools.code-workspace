@@ -1,59 +1,68 @@
 {
-  "folders": [
-    {
-      "path": "."
-    }
-  ],
-  "settings": {
-    "[python]": {
-      "editor.formatOnSave": true,
-      "editor.defaultFormatter": "charliermarsh.ruff",
-      "editor.codeActionsOnSave": {
-        "source.fixAll": "always",
-        "source.organizeImports": "always"
-      }
-    },
-    "[javascript]": {
-      "editor.formatOnSave": true,
-      "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[javascriptreact]": {
-      "editor.formatOnSave": true,
-      "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[json]": {
-      "editor.formatOnSave": true,
-      "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[jsonc]": {
-      "editor.formatOnSave": true,
-      "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "prettier.prettierPath": "",
-    "[java]": {
-      "editor.formatOnSave": false,
-      "editor.formatOnPaste": false
-    },
-    "python.analysis.autoImportCompletions": true,
-    "python.analysis.packageIndexDepths": [
-      {
-        "name": "django",
-        "depth": 4
-      },
-      {
-        "name": "rest_framework",
-        "depth": 4,
-        "includeAllSymbols": true
-      }
+    "folders": [
+        {
+            "path": "."
+        }
     ],
-    "python.analysis.extraPaths": ["./django"],
-    "python.autoComplete.extraPaths": ["./django"],
-    "python.defaultInterpreterPath": "./django/.venv/bin/python",
-    "python.analysis.typeCheckingMode": "standard",
-    "editor.formatOnSave": true,
-    "editor.formatOnPaste": true,
-    "files.watcherExclude": {
-      "**/target": true
+    "settings": {
+        "[python]": {
+            "editor.formatOnSave": true,
+            "editor.defaultFormatter": "charliermarsh.ruff",
+            "editor.codeActionsOnSave": {
+                "source.fixAll": "always",
+                "source.organizeImports": "always"
+            }
+        },
+        "[javascript]": {
+            "editor.formatOnSave": true,
+            "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[javascriptreact]": {
+            "editor.formatOnSave": true,
+            "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[json]": {
+            "editor.formatOnSave": true,
+            "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[jsonc]": {
+            "editor.formatOnSave": true,
+            "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "prettier.prettierPath": "",
+        "[java]": {
+            "editor.formatOnSave": false,
+            "editor.formatOnPaste": false
+        },
+        "python.analysis.autoImportCompletions": true,
+        "python.analysis.packageIndexDepths": [
+            {
+                "name": "django",
+                "depth": 4
+            },
+            {
+                "name": "rest_framework",
+                "depth": 4,
+                "includeAllSymbols": true
+            }
+        ],
+        "python.analysis.extraPaths": ["./django"],
+        "python.autoComplete.extraPaths": ["./django"],
+        "python.defaultInterpreterPath": "./django/.venv/bin/python",
+        "python.analysis.typeCheckingMode": "standard",
+        "editor.formatOnSave": true,
+        "editor.formatOnPaste": true,
+        "files.watcherExclude": {
+            "**/target": true
+        }
+    },
+    "extensions": {
+        "recommendations": [
+            "scalameta.metals",
+            "ms-python.vscode-pylance",
+            "redhat.java",
+            "lcjuves.vscode-gjf",
+            "esbenp.prettier-vscode"
+        ]
     }
-  }
 }
