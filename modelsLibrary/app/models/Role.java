@@ -2,14 +2,11 @@ package models;
 
 import com.fasterxml.jackson.annotation.*;
 import io.ebean.*;
-import java.math.*;
-import java.text.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import play.data.*;
 
 @Getter
 @Setter

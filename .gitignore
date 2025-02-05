@@ -45,3 +45,5 @@ metals.sbt
 
 # Eclipse stuff
 .settings/
+.classpath
+.project
