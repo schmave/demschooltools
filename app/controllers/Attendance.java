@@ -846,8 +846,6 @@ public class Attendance extends Controller {
     Map<String, Object> scopes = new HashMap<>();
     Config conf = Public.sConfig.getConfig("school_crm");
     scopes.put("custodiaUrl", conf.getString("custodia_url"));
-    scopes.put("custodiaUsername", Utils.getOrg(request).getShortName() + "-admin");
-    scopes.put("custodiaPassword", conf.getString("custodiaPassword"));
     return ok(
         main_with_mustache.render(
             "Sign in system",

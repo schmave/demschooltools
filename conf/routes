@@ -91,7 +91,8 @@ GET /editEntry/:id		controllers.ApplicationEditing.editEntry(id : Integer, reque
 POST /saveEntry		controllers.ApplicationEditing.saveEntry(request: Request)
 POST /renderMarkdown	controllers.Application.renderMarkdown(request: Request)
 
-GET     /custodia                   controllers.Attendance.viewCustodiaAdmin(request: Request)
+GET     /custodia-admin             controllers.Attendance.viewCustodiaAdmin(request: Request)
+GET     /custodia                   controllers.Proxy.proxy(request: Request)
 
 GET     /jsonPeople               controllers.CRM.jsonPeople(term ?= "", request: Request)
 GET     /people                   controllers.CRM.recentComments(request: Request)

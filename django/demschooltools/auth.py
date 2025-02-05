@@ -6,7 +6,8 @@ from django.contrib.auth.backends import BaseBackend
 from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest
 
-from dst.models import User
+from custodia.models import School
+from dst.models import Organization, User
 
 
 class PlaySessionBackend(BaseBackend):
@@ -54,19 +55,24 @@ class PlaySessionMiddleware(MiddlewareMixin):
     AuthenticationMiddleware is required so that request.user exists.
     """
 
-    def process_request(self, request):
+    def process_request(self, request: HttpRequest):
         new_user = get_user_for_play_session(request)
         if new_user is None and request.user.is_authenticated:
             print("jwt user went away, logging out")
             auth.logout(request)
             return
 
-        # If the user is already authenticated and that user is the user we are
-        # getting passed in the headers, then the correct user is already
-        # persisted in the session and we don't need to continue.
-        if new_user is not None and request.user.id != new_user.id:
-            print("got a new jwt user, logging them in")
-            auth.logout(request)
-            auth.login(request, new_user)
+        if new_user is not None:
+            if request.user.id != new_user.id:
+                # If the user is already authenticated and that user is the user we are
+                # getting passed in the headers, then the correct user is already
+                # persisted in the session and we don't need to continue.
+                print("got a new jwt user, logging them in")
+                auth.logout(request)
+                auth.login(request, new_user, "demschooltools.auth.PlaySessionBackend")
+
+            print(f"looking for {request.get_host()=}")
+            org_id = Organization.objects.get(hosts__host=request.get_host()).id
+            request.school = School.objects.get(id=org_id)
 
         print(f"PlaySessionMiddleware ends with {request.user=}, {request.user.id=}")

@@ -36,7 +36,6 @@ from demschooltools.settings import SILK_ENABLED
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", IndexView.as_view()),
     path("users/login", LoginView.as_view()),
     path("users/logout", LogoutView.as_view()),
     path("users/is-admin", IsAdminView.as_view()),
@@ -51,6 +50,8 @@ urlpatterns = [
     path("reports/years", ReportYears.as_view()),
     path("reports/<str:year_name>/<int:class_id>", ReportView.as_view()),
     path("reports/<str:year_name>", ReportView.as_view()),
+    path("", IndexView.as_view()),
+    path("custodia-viewer/", IndexView.as_view()),
 ]
 
 if SILK_ENABLED:

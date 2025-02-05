@@ -10,6 +10,16 @@ class Organization(models.Model):
     short_name = models.TextField()
 
 
+class OrganizationHost(models.Model):
+    class Meta:
+        db_table = "organization_hosts"
+
+    host = models.TextField(primary_key=True)
+    organization = models.ForeignKey(
+        "Organization", on_delete=models.PROTECT, related_name="hosts"
+    )
+
+
 class Tag(models.Model):
     class Meta:
         db_table = "tag"
@@ -135,10 +145,7 @@ class User(AbstractUser):
     class Meta:
         db_table = 'public"."users'
 
-    # organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
-    school = models.ForeignKey(
-        "custodia.School", db_column="organization_id", on_delete=models.PROTECT
-    )
+    organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
 
 
 class LinkedAccount(models.Model):

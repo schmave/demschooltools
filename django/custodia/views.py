@@ -24,8 +24,6 @@ from custodia.models import (
     Year,
 )
 
-# TODO? This used to be configurable via the classes table, but
-# even PFS hasn't configured it. Maybe make this a DST setting for Custodia.
 DEFAULT_REQUIRED_MINUTES = 345
 
 
@@ -82,21 +80,21 @@ def student_to_dict(
 
 class AbsentView(APIView):
     def post(self, request: Request, student_id: int) -> Response:
-        student = Student.objects.get(id=student_id, school=request.user.school)
+        student = Student.objects.get(id=student_id, school=request.school)
         student.show_as_absent = timezone.localdate()
         student.save()
 
-        return student_data_view(student_id, request.user.school)
+        return student_data_view(student_id, request.school)
 
 
 class ExcuseView(APIView):
     def post(self, request: Request, student_id: int) -> Response:
-        student = Student.objects.get(id=student_id, school=request.user.school)
+        student = Student.objects.get(id=student_id, school=request.school)
         date: str = request.data["day"]  # type: ignore
 
         Excuse.objects.create(student=student, date=date)
 
-        return student_data_view(student_id, request.user.school)
+        return student_data_view(student_id, request.school)
 
 
 class OverrideView(APIView):
@@ -106,16 +104,16 @@ class OverrideView(APIView):
 
         Override.objects.create(student=student, date=date)
 
-        return student_data_view(student_id, request.user.school)
+        return student_data_view(student_id, request.school)
 
 
 class SwipeView(APIView):
     def post(self, request: Request, student_id: int) -> Response:
-        student = Student.objects.get(id=student_id, school=request.user.school)
+        student = Student.objects.get(id=student_id, school=request.school)
 
         direction = request.data["direction"]  # type: ignore
 
-        school: School = request.user.school
+        school: School = request.school
         swipe_time = timezone.localtime()
 
         if request.data.get("overrideDate"):  # type: ignore
@@ -156,7 +154,7 @@ class DeleteSwipeView(APIView):
     def post(self, request: Request, student_id: int) -> Response:
         swipe_id = request.data["swipe"]["_id"]  # type: ignore
         Swipe.objects.get(id=swipe_id).delete()
-        return student_data_view(student_id, request.user.school)
+        return student_data_view(student_id, request.school)
 
 
 class LogoutView(View):
@@ -171,7 +169,7 @@ class LogoutView(View):
 
 class IsAdminView(APIView):
     def get(self, request: Request) -> Response:
-        school: School = request.user.school
+        school: School = request.school
         return Response(
             {
                 "admin": "overseer.roles/admin"
@@ -200,7 +198,7 @@ def format_time(dt: datetime | None) -> str:
 
 class StudentsTodayView(APIView):
     def get(self, request: Request):
-        school = request.user.school
+        school = request.school
         today = timezone.localdate()
 
         student_infos = []
@@ -270,10 +268,10 @@ class StudentDataView(APIView):
 
         student.save()
 
-        return student_data_view(student.id, request.user.school)
+        return student_data_view(student.id, request.school)
 
     def get(self, request: Request, student_id: int) -> Response:
-        return student_data_view(student_id, request.user.school)
+        return student_data_view(student_id, request.school)
 
 
 def get_year_start_end(year: Year | None) -> tuple[datetime, datetime]:
@@ -475,7 +473,7 @@ def get_student_data(
 
 class ReportYears(APIView):
     def get(self, request: Request) -> Response:
-        school: School = request.user.school
+        school: School = request.school
         years: list[str] = []
 
         now = timezone.localtime()
@@ -513,7 +511,7 @@ class ReportYears(APIView):
         to_date = parse_date(request.data["to_date"])  # type: ignore
 
         year, _ = Year.objects.get_or_create(
-            school=request.user.school,
+            school=request.school,
             from_time=timezone.make_aware(
                 datetime(from_date.year, from_date.month, from_date.day)
             ),
@@ -538,14 +536,14 @@ class ReportYears(APIView):
         return from_date.strftime("%B %-d, %Y")
 
     def delete(self, request: Request, year_name: str) -> Response:
-        Year.objects.filter(school=request.user.school, name=year_name).delete()
+        Year.objects.filter(school=request.school, name=year_name).delete()
 
         return self.get(request)
 
 
 class ReportView(APIView):
     def get(self, request: Request, year_name: str, class_id: int = -1) -> Response:
-        school = request.user.school
+        school = request.school
         year = Year.objects.get(school=school, name=year_name)
 
         show_attended = request.query_params.get("filterStudents") == "all"
