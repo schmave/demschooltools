@@ -35,7 +35,15 @@ See [the wiki](https://github.com/schmave/demschooltools/wiki/) for more informa
     FACEBOOK_CLIENT_SECRET, ROLLBAR_TOKEN, CUSTODIA_PASSWORD, and SES_PASSWORD to empty values. You can run the
     "set_keys_blank.sh" script to do this on Mac/Linux.
 
-1.  Run sbt `./sbt.sh`, then execute the `run` command in the sbt/play console.
+1.  Run sbt `./sbt.sh`, then execute the `eclipse` and `run` command in the sbt/play console:
+
+        [DemSchoolTools] $ eclipse
+        [info] About to create Eclipse project files for your project(s).
+        [info] Successfully created Eclipse project files for project(s):
+        [info] DemSchoolTools
+        [info] authLibrary
+        [info] modelsLibrary
+        [DemSchoolTools] $ run
 
 1.  Navigate to [http://localhost:9000](http://localhost:9000) in your browser
     and wait while DemSchoolTools is compiled.
