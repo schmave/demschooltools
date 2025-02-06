@@ -51,7 +51,7 @@ urlpatterns = [
     path("reports/<str:year_name>/<int:class_id>", ReportView.as_view()),
     path("reports/<str:year_name>", ReportView.as_view()),
     path("", IndexView.as_view()),
-    path("custodia-viewer/", IndexView.as_view()),
+    path("custodia/", IndexView.as_view()),
 ]
 
 if SILK_ENABLED:

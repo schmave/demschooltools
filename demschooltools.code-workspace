@@ -38,8 +38,8 @@
         "python.analysis.packageIndexDepths": [
             {
                 "name": "django",
-        "depth": 4,
-        "includeAllSymbols": true
+                "depth": 4,
+                "includeAllSymbols": true
             },
             {
                 "name": "rest_framework",
@@ -49,13 +49,14 @@
         ],
         "python.analysis.extraPaths": ["./django"],
         "python.autoComplete.extraPaths": ["./django"],
-    "python.defaultInterpreterPath": "./django/venv/bin/python",
+        "python.defaultInterpreterPath": "./django/venv/bin/python",
         "python.analysis.typeCheckingMode": "standard",
         "editor.formatOnSave": true,
         "editor.formatOnPaste": true,
         "files.watcherExclude": {
             "**/target": true
-        }
+        },
+        "java.compile.nullAnalysis.mode": "automatic"
     },
     "extensions": {
         "recommendations": [
