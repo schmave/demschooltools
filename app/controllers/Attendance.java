@@ -843,16 +843,13 @@ public class Attendance extends Controller {
   }
 
   public Result viewCustodiaAdmin(Http.Request request) {
-    Map<String, Object> scopes = new HashMap<>();
-    Config conf = Public.sConfig.getConfig("school_crm");
-    scopes.put("custodiaUrl", conf.getString("custodia_url"));
     return ok(
         main_with_mustache.render(
             "Sign in system",
             "custodia",
             "",
             "custodia_admin.html",
-            scopes,
+            new HashMap<>(),
             request,
             mMessagesApi.preferred(request)));
   }

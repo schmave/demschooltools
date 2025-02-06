@@ -4,27 +4,29 @@ import akka.util.ByteString;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import play.mvc.*;
 
 /** A sample controller that proxies incoming requests to another server. */
 public class Proxy extends Controller {
-
-  // Define the list of hop-by-hop headers that we do not forward in the response.
-  private static final List<String> EXCLUDED_RESPONSE_HEADERS =
+  private static final List<String> HOP_BY_HOP_HEADERS =
       Arrays.asList("content-encoding", "content-length", "transfer-encoding", "connection");
 
-    public Result proxy0(Http.Request request) {
-      return this.proxy(request, "");
-    }
+  public Result proxy0(Http.Request request) {
+    return this.proxy(request, "");
+  }
 
   public Result proxy(Http.Request request, String extraPath) {
     System.out.println("proxy: " + request.uri());
@@ -36,59 +38,68 @@ public class Proxy extends Controller {
       targetUrlBuilder.append("/");
     }
     targetUrlBuilder.append(path);
-    // targetUrlBuilder.append(request.queryString());
 
     String targetUrl = targetUrlBuilder.toString();
+    RequestConfig requestConfig = RequestConfig.custom().setRedirectsEnabled(false).build();
 
-    try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+    try (CloseableHttpClient httpClient =
+        HttpClients.custom().setDefaultRequestConfig(requestConfig).build()) {
+      HttpUriRequestBase proxiedRequest;
 
-      // Build the proxied request using the same HTTP method.
-      RequestBuilder reqBuilder = RequestBuilder.create(request.method()).setUri(targetUrl);
+      // Determine HTTP method
+      if ("POST".equalsIgnoreCase(request.method())) {
+        proxiedRequest = new HttpPost(targetUrl);
+      } else if ("GET".equalsIgnoreCase(request.method())) {
+        proxiedRequest = new HttpGet(targetUrl);
+      } else if ("PUT".equalsIgnoreCase(request.method())) {
+        proxiedRequest = new HttpPut(targetUrl);
+      } else if ("DELETE".equalsIgnoreCase(request.method())) {
+        proxiedRequest = new HttpDelete(targetUrl);
+      } else {
+        throw new RuntimeException("Unknown method");
+      }
 
-      // Copy all headers from the original request except the "Host" header.
       for (Map.Entry<String, List<String>> entry : request.getHeaders().asMap().entrySet()) {
         String headerName = entry.getKey();
         for (String headerValue : entry.getValue()) {
-          reqBuilder.addHeader(headerName, headerValue);
+          if (HOP_BY_HOP_HEADERS.stream().anyMatch(h -> h.equalsIgnoreCase(headerName))) {
+            continue;
+          }
+          proxiedRequest.addHeader(headerName, headerValue);
         }
       }
 
-      // If the original request has a body (e.g. for POST or PUT), set it on the new request.
-      // Play’s request().body().asBytes() returns a byte array (or null if none).
+      // Handle request body if present
       ByteString body = request.body().asBytes();
-      if (body != null && body.size() > 0) {
-        reqBuilder.setEntity(new ByteArrayEntity(body.toArray()));
+      if (body != null && body.size() > 0 && proxiedRequest instanceof HttpPost) {
+        HttpEntity entity = new ByteArrayEntity(body.toArray(), null);
+        ((HttpPost) proxiedRequest).setEntity(entity);
       }
 
-      HttpUriRequest proxiedRequest = reqBuilder.build();
-      HttpResponse proxiedResponse = httpClient.execute(proxiedRequest);
+      try (CloseableHttpResponse proxiedResponse = httpClient.execute(proxiedRequest)) {
+        HttpEntity entity = proxiedResponse.getEntity();
+        byte[] responseBody = entity != null ? EntityUtils.toByteArray(entity) : new byte[0];
 
-      // Read the response body as a byte array.
-      HttpEntity entity = proxiedResponse.getEntity();
-      byte[] responseBody = entity != null ? EntityUtils.toByteArray(entity) : new byte[0];
+        int statusCode = proxiedResponse.getCode();
+        Result result = Results.status(statusCode, responseBody);
 
-      // Build the Play response with the same status code.
-      int statusCode = proxiedResponse.getStatusLine().getStatusCode();
-      Result result = Results.status(statusCode, responseBody);
-
-      // Copy all headers from the proxied response, excluding hop-by-hop headers.
-      for (Header header : proxiedResponse.getAllHeaders()) {
-        String headerName = header.getName();
-        if (EXCLUDED_RESPONSE_HEADERS.stream().anyMatch(h -> h.equalsIgnoreCase(headerName))) {
-          continue;
+        for (Header header : proxiedResponse.getHeaders()) {
+          String headerName = header.getName();
+          if (HOP_BY_HOP_HEADERS.stream().anyMatch(h -> h.equalsIgnoreCase(headerName))) {
+            continue;
+          }
+          final String headerValue = header.getValue();
+          if ("Set-Cookie".equalsIgnoreCase(headerName)) {
+            System.out.println("response header: " + headerName + ", value: " + headerValue);
+          }
+          if ("content-type".equalsIgnoreCase(headerName)) {
+            result = result.as(headerValue);
+          } else {
+            result = result.withHeader(headerName, headerValue);
+          }
         }
-        final String headerValue = header.getValue();
-        if ("content-type".equalsIgnoreCase(headerName)) {
-          // Instead of using withHeader, set the content type with .as()
-          result = result.as(headerValue);
-        } else {
-          // Note: If the same header occurs more than once, you may need to handle that
-          // accordingly.
-          result = result.withHeader(headerName, headerValue);
-        }
+        return result;
       }
-      return result;
-
     } catch (Exception e) {
       e.printStackTrace();
       return internalServerError("Proxy error: " + e.getMessage());

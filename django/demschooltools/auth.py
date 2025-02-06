@@ -1,10 +1,9 @@
-from django.contrib import auth
-from django.utils.deprecation import MiddlewareMixin
 import jwt
 from django.conf import settings
+from django.contrib import auth
 from django.contrib.auth.backends import BaseBackend
-from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest
+from django.utils.deprecation import MiddlewareMixin
 
 from custodia.models import School
 from dst.models import Organization, User
@@ -24,7 +23,6 @@ class PlaySessionBackend(BaseBackend):
 
 def get_user_for_play_session(request) -> User | None:
     raw_token = request.COOKIES.get("PLAY_SESSION")
-    print(f"{raw_token=}")
     if not raw_token:
         return None
     try:
@@ -33,7 +31,7 @@ def get_user_for_play_session(request) -> User | None:
         print(e)
         return None
 
-    print(f"{data=}")
+    print(f"Decoded JWT {data=}")
     inner_data = data["data"]
     pa_user_id = inner_data.get("pa.u.id")
     pa_provider_id = inner_data.get("pa.p.id")

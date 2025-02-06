@@ -31,6 +31,11 @@ lazy val modelsLibrary = (project in file("modelsLibrary"))
 
 lazy val root = (project in file("."))
   .enablePlugins(PlayJava, PlayEbean)
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.apache.httpcomponents.client5" % "httpclient5" % "5.4.2"
+    )
+  )
   .aggregate(modelsLibrary, authLibrary)
   .dependsOn(modelsLibrary, authLibrary)
 

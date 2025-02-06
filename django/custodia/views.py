@@ -23,6 +23,8 @@ from custodia.models import (
     Swipe,
     Year,
 )
+from demschooltools.settings import LOGIN_URL
+from dst.models import User, UserRole
 
 DEFAULT_REQUIRED_MINUTES = 345
 
@@ -162,7 +164,8 @@ class LogoutView(View):
         if request.user.is_authenticated:
             logout(request)
 
-        response = redirect("/")
+        response = redirect(LOGIN_URL)
+        print("setting PLAY_SESSION cookie")
         response.set_cookie("PLAY_SESSION", "", max_age=0)
         return response
 
@@ -170,10 +173,11 @@ class LogoutView(View):
 class IsAdminView(APIView):
     def get(self, request: Request) -> Response:
         school: School = request.school
+        user: User = request.user
         return Response(
             {
                 "admin": "overseer.roles/admin"
-                if "overseer.roles/admin" in request.user.roles
+                if user.hasRole(UserRole.ATTENDANCE)
                 else None,
                 "school": {
                     "_id": school.id,

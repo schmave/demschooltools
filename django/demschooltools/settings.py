@@ -47,7 +47,7 @@ INSTALLED_APPS = [
 ] + (["silk"] if SILK_ENABLED else [])
 
 AUTH_USER_MODEL = "dst.User"
-LOGIN_URL = "/users/login"
+LOGIN_URL = "/custodia/login"
 
 AUTHENTICATION_BACKENDS = ["demschooltools.auth.PlaySessionBackend"]
 

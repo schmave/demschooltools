@@ -147,6 +147,54 @@ class User(AbstractUser):
 
     organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
 
+    def hasRole(self, desired_role: str) -> bool:
+        for role in self.roles.values_list("role", flat=True):
+            if role_includes(role, desired_role):
+                return True
+        return False
+
+
+def role_includes(greater_role: str, lesser_role: str) -> bool:
+    if greater_role == UserRole.ALL_ACCESS:
+        return True
+    elif greater_role == UserRole.EDIT_ALL_JC:
+        return lesser_role in {
+            UserRole.EDIT_31_DAY_JC,
+            UserRole.EDIT_7_DAY_JC,
+            UserRole.VIEW_JC,
+            UserRole.EDIT_RESOLUTION_PLANS,
+        }
+    elif greater_role == UserRole.EDIT_31_DAY_JC:
+        return lesser_role in {
+            UserRole.EDIT_7_DAY_JC,
+            UserRole.VIEW_JC,
+            UserRole.EDIT_RESOLUTION_PLANS,
+        }
+    elif greater_role == UserRole.EDIT_7_DAY_JC:
+        return lesser_role in {UserRole.VIEW_JC, UserRole.EDIT_RESOLUTION_PLANS}
+
+    return False
+
+
+class UserRole(models.Model):
+    ACCOUNTING = "accounting"
+    ROLES = "edit-roles"
+    ATTENDANCE = "attendance"
+    VIEW_JC = "view-jc"
+    EDIT_MANUAL = "edit-manual"
+    EDIT_RESOLUTION_PLANS = "edit-rps"
+    EDIT_7_DAY_JC = "edit-recent-jc"
+    EDIT_31_DAY_JC = "edit-recent-31-jc"
+    EDIT_ALL_JC = "edit-all-jc"
+    ALL_ACCESS = "all-access"
+    CHECKIN_APP = "checkin-app"
+
+    class Meta:
+        db_table = 'public"."user_role'
+
+    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="roles")
+    role = models.TextField()
+
 
 class LinkedAccount(models.Model):
     class Meta:

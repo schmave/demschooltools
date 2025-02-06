@@ -4,14 +4,16 @@ const myhistory = require("./myhistory.js").default;
 const dispatcher = require("./appdispatcher");
 
 export const loadStudents = () => {
-  $.ajax({
-    url: "/students",
-  }).then(function (data) {
-    dispatcher.dispatch({
-      type: constants.studentEvents.LOADED,
-      data,
+  ajax
+    .get({
+      url: "/students",
+    })
+    .then(function (data) {
+      dispatcher.dispatch({
+        type: constants.studentEvents.LOADED,
+        data,
+      });
     });
-  });
 };
 
 export const loadStudent = function (id) {
@@ -26,8 +28,8 @@ export const loadStudent = function (id) {
 export const updateStudent = function (id, start_date, minutes) {
   return ajax
     .put("/students/" + id, {
-        start_date,
-        minutes,
+      start_date,
+      minutes,
     })
     .then(function (data) {
       dispatcher.dispatch({

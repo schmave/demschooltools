@@ -36,22 +36,33 @@ from demschooltools.settings import SILK_ENABLED
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("users/login", LoginView.as_view()),
-    path("users/logout", LogoutView.as_view()),
-    path("users/is-admin", IsAdminView.as_view()),
-    path("students", StudentsTodayView.as_view()),
-    path("students/<int:student_id>/swipe/delete", DeleteSwipeView.as_view()),
-    path("students/<int:student_id>/swipe", SwipeView.as_view()),
-    path("students/<int:student_id>/absent", AbsentView.as_view()),
-    path("students/<int:student_id>/excuse", ExcuseView.as_view()),
-    path("students/<int:student_id>/override", OverrideView.as_view()),
-    path("students/<int:student_id>", StudentDataView.as_view()),
-    path("reports/years/<str:year_name>", ReportYears.as_view()),
-    path("reports/years", ReportYears.as_view()),
-    path("reports/<str:year_name>/<int:class_id>", ReportView.as_view()),
-    path("reports/<str:year_name>", ReportView.as_view()),
+    path(
+        "custodia-api/",
+        (
+            [
+                path("users/is-admin", IsAdminView.as_view()),
+                path("students", StudentsTodayView.as_view()),
+                path(
+                    "students/<int:student_id>/swipe/delete", DeleteSwipeView.as_view()
+                ),
+                path("students/<int:student_id>/swipe", SwipeView.as_view()),
+                path("students/<int:student_id>/absent", AbsentView.as_view()),
+                path("students/<int:student_id>/excuse", ExcuseView.as_view()),
+                path("students/<int:student_id>/override", OverrideView.as_view()),
+                path("students/<int:student_id>", StudentDataView.as_view()),
+                path("reports/years/<str:year_name>", ReportYears.as_view()),
+                path("reports/years", ReportYears.as_view()),
+                path("reports/<str:year_name>/<int:class_id>", ReportView.as_view()),
+                path("reports/<str:year_name>", ReportView.as_view()),
+            ],
+            "custodia-api",
+            "custodia-api",
+        ),
+    ),
     path("", IndexView.as_view()),
     path("custodia/", IndexView.as_view()),
+    path("custodia/login", LoginView.as_view()),
+    path("custodia/logout", LogoutView.as_view()),
 ]
 
 if SILK_ENABLED:
