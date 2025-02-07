@@ -132,12 +132,6 @@ class User(AbstractUser):
         ALTER TABLE public.users ADD COLUMN is_staff bool NOT NULL default false;
         ALTER TABLE public.users ADD COLUMN is_active bool NOT NULL default true;
         ALTER TABLE public.users ADD COLUMN username varchar(150) NOT NULL default '';
-
-
-    Also need to deal with the fact that passwords are not in the right format.
-    Django bcrypt looks like:
-       bcrypt$$2b$12$kHtLdeD00SoRqyuqgXZgfevdO0Gy7PAGRFqw0cX49FGLInWRwHZDS
-
     """
 
     password = models.TextField(db_column="hashed_password")

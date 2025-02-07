@@ -18,7 +18,7 @@
     <nav class="navbar" role="navigation">
       <div class="container">
         <div class="navbar-header">
-          <a class="navbar-brand" href="/users/login">Custodia</a>
+          <a class="navbar-brand" href="/custodia/login">Custodia</a>
         </div>
         <div id="navbar">
         </div><!--/.nav-collapse -->
@@ -68,7 +68,7 @@
               Existing Users:
             </div>
             <div class="panel-body">
-              <form method="POST" action="/users/login">
+              <form method="POST" action="/custodia/login">
                 {% csrf_token %}
                 <div class="form-group">
                   <label for="username" class="control-label">Username</label>
