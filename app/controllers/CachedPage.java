@@ -102,14 +102,12 @@ public abstract class CachedPage {
     remove(JC_INDEX, org);
     remove(MANUAL_INDEX, org);
     remove(RECENT_COMMENTS, org);
-    Utils.updateCustodia();
   }
 
   public static void onPeopleChanged(Organization org) {
     remove(ATTENDANCE_INDEX, org);
     remove(JC_INDEX, org);
     remove(RECENT_COMMENTS, org);
-    Utils.updateCustodia();
   }
 
   public static void onAttendanceChanged(Organization org) {
