@@ -1,4 +1,3 @@
-from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
@@ -19,6 +18,9 @@ class School(models.Model):
     use_display_name = models.BooleanField()
     late_time = models.TimeField()
 
+    def __str__(self):
+        return self.name
+
 
 class Student(models.Model):
     class Meta:
@@ -33,6 +35,9 @@ class Student(models.Model):
     name = models.TextField()
     show_as_absent = models.DateField()
     school = models.ForeignKey(School, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return self.name
 
 
 class StudentRequiredMinutes(models.Model):
