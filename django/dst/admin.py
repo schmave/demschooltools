@@ -16,6 +16,13 @@ from dst.models import (
     User,
 )
 
+
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    list_display = ["id", "organization_id", "name", "email"]
+    list_filter = ["organization_id"]
+
+
 admin.site.register(AttendanceDay)
 admin.site.register(Chapter)
 admin.site.register(Comment)
@@ -28,4 +35,3 @@ admin.site.register(Person)
 admin.site.register(PersonTagChange)
 admin.site.register(Section)
 admin.site.register(Tag)
-admin.site.register(User)

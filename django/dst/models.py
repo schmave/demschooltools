@@ -9,6 +9,9 @@ class Organization(models.Model):
     name = models.TextField()
     short_name = models.TextField()
 
+    def __str__(self):
+        return self.name
+
 
 class OrganizationHost(models.Model):
     class Meta:
@@ -140,6 +143,11 @@ class User(AbstractUser):
         db_table = 'public"."users'
 
     organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
+    name = models.TextField()
+
+    # Disable Django's normal group & permission setup for admin access.
+    groups = None
+    user_permissions = None
 
     def hasRole(self, desired_role: str) -> bool:
         for role in self.roles.values_list("role", flat=True):
@@ -186,7 +194,7 @@ class UserRole(models.Model):
     class Meta:
         db_table = 'public"."user_role'
 
-    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="roles")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="roles")
     role = models.TextField()
 
 
