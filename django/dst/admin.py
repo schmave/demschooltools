@@ -22,6 +22,7 @@ from dst.models import (
 class UserAdmin(admin.ModelAdmin):
     list_display = ["id", "organization_id", "name", "email"]
     list_filter = ["organization_id"]
+    search_fields = ["name", "email"]
 
 
 admin.site.register(AttendanceDay)

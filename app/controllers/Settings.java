@@ -72,7 +72,7 @@ public class Settings extends Controller {
     String username = org.getShortName();
     User user = User.findByEmail(username);
     if (user == null) {
-      user = User.create(username, "Check-in app user", org);
+      user = User.create(username, User.CHECKIN_USERNAME, org);
     }
     user.setHashedPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
     user.save();
@@ -218,7 +218,7 @@ public class Settings extends Controller {
     for (User user : users) {
       // Hide dummy users and the check-in app user
       if (!user.getName().equals(User.DUMMY_USERNAME)
-          && !user.getEmail().equals(org.getShortName())) {
+          && !user.getName().equals(User.CHECKIN_USERNAME)) {
         users_to_show.add(user);
       }
     }

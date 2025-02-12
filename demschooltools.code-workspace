@@ -60,7 +60,6 @@
     },
     "extensions": {
         "recommendations": [
-            "scalameta.metals",
             "ms-python.vscode-pylance",
             "redhat.java",
             "lcjuves.vscode-gjf",
