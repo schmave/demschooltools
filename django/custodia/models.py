@@ -2,12 +2,6 @@ from django.db import models
 
 
 class School(models.Model):
-    """
-    Changes from the overseer.schools table currently being used in production:
-
-    alter table overseer.schools add column late_time time DEFAULT '10:15:00'::time without time zone NULL;
-    """
-
     class Meta:
         db_table = "schools"
 
@@ -41,11 +35,6 @@ class Student(models.Model):
 
 
 class StudentRequiredMinutes(models.Model):
-    """
-    Add unique ID to students_required_minutes table
-        ALTER TABLE overseer.students_required_minutes ADD COLUMN id SERIAL PRIMARY KEY;
-    """
-
     class Meta:
         db_table = "students_required_minutes"
 

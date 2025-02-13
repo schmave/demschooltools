@@ -124,19 +124,6 @@ class Meeting(models.Model):
 
 
 class User(AbstractUser):
-    """
-    Changes from the public.users table currently being used in production:
-
-        ALTER TABLE public.users ADD COLUMN date_joined timestamptz NULL default NULL;
-        ALTER TABLE public.users ADD COLUMN last_login timestamptz NULL default NULL;
-        ALTER TABLE public.users ADD COLUMN first_name varchar(150) NOT NULL default '';
-        ALTER TABLE public.users ADD COLUMN last_name varchar(150) NOT NULL default '';
-        ALTER TABLE public.users ADD COLUMN is_superuser bool NOT NULL default false;
-        ALTER TABLE public.users ADD COLUMN is_staff bool NOT NULL default false;
-        ALTER TABLE public.users ADD COLUMN is_active bool NOT NULL default true;
-        ALTER TABLE public.users ADD COLUMN username varchar(150) NOT NULL default '';
-    """
-
     password = models.TextField(db_column="hashed_password")
 
     class Meta:
