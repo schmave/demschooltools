@@ -144,6 +144,7 @@ class User(AbstractUser):
 
     organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
     name = models.TextField()
+    email = models.TextField()  # override this so that emails aren't validated
 
     # Disable Django's normal group & permission setup for admin access.
     groups = None
