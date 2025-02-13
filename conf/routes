@@ -94,6 +94,7 @@ POST /renderMarkdown	controllers.Application.renderMarkdown(request: Request)
 GET      /custodia-admin            controllers.Attendance.viewCustodiaAdmin(request: Request)
 GET      /custodia                  controllers.Proxy.proxy0(request: Request)
 GET      /custodia*extra            controllers.Proxy.proxy(request: Request, extra: String)
+POST     /custodia*extra            controllers.Proxy.proxy(request: Request, extra: String)
 
 GET      /admin                     controllers.Proxy.proxy0(request: Request)
 GET      /admin*extra               controllers.Proxy.proxy(request: Request, extra: String)

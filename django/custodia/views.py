@@ -1,7 +1,8 @@
 from collections import defaultdict
 from datetime import date, datetime, time
 
-from django.contrib.auth import authenticate, login, logout
+import requests
+from django.contrib.auth import logout
 from django.contrib.auth.views import redirect_to_login
 from django.db.models import Max
 from django.db.transaction import atomic
@@ -41,15 +42,30 @@ class LoginView(View):
     def get(self, request):
         return render(request, "login.html")
 
-    def post(self, request):
-        user = authenticate(
-            request,
-            username=request.POST["username"],
-            password=request.POST["password"],
+    def post(self, request: HttpRequest):
+        login_response = requests.post(
+            ("https://" if request.is_secure() else "http://")
+            + request.get_host()
+            + "/login",
+            data={
+                "email": request.POST["username"],
+                "password": request.POST["password"],
+            },
+            allow_redirects=False,
         )
-        if user is not None:
-            login(request, user)
-            return redirect("/")
+
+        if (
+            login_response.status_code == 303
+            and login_response.headers.get("Location") != "/login"
+        ):
+            # successful login
+            response = redirect("/custodia")
+            for cookie in login_response.cookies:
+                response.set_cookie(
+                    key=cookie.name,
+                    value=cookie.value,
+                )
+                return response
 
         return redirect_to_login("")
 

@@ -8,9 +8,13 @@ autopep8==2.3.2
     # via django-silk
 bcrypt==4.2.1
     # via -r requirements.in
+certifi==2025.1.31
+    # via requests
+charset-normalizer==3.4.1
+    # via requests
 decorator==5.1.1
     # via ipython
-django==5.1.5
+django==5.1.6
     # via
     #   -r requirements.in
     #   django-silk
@@ -28,6 +32,8 @@ executing==2.2.0
     # via stack-data
 gprof2dot==2024.6.6
     # via django-silk
+idna==3.10
+    # via requests
 ipython==8.32.0
     # via -r requirements.in
 jedi==0.19.2
@@ -56,6 +62,8 @@ pyinstrument==5.0.1
     # via -r requirements.in
 pyjwt==2.10.1
     # via -r requirements.in
+requests==2.32.3
+    # via -r requirements.in
 sqlparse==0.5.3
     # via
     #   django
@@ -70,5 +78,7 @@ traitlets==5.14.3
     #   matplotlib-inline
 typing-extensions==4.12.2
     # via psycopg
+urllib3==2.3.0
+    # via requests
 wcwidth==0.2.13
     # via prompt-toolkit

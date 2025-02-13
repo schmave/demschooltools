@@ -10,10 +10,6 @@ from dst.models import Organization, User
 
 
 class PlaySessionBackend(BaseBackend):
-    """
-    Authenticate using a JWT sent as the cookie named "PLAY_SESSION".
-    """
-
     def authenticate(self, request: HttpRequest, username=None, password=None):
         raise NotImplementedError("PlaySessionBackend doesn't do authenticate()")
 
@@ -51,6 +47,8 @@ class PlaySessionMiddleware(MiddlewareMixin):
     """
     Based on django.contrib.auth.RemoteUserMiddleware
     AuthenticationMiddleware is required so that request.user exists.
+
+    Authenticate using a JWT sent as the cookie named "PLAY_SESSION".
     """
 
     def process_request(self, request: HttpRequest):
