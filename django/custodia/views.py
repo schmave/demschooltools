@@ -10,7 +10,9 @@ from django.http import HttpRequest
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views import View
+from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.generics import QuerySet
+from rest_framework.permissions import BasePermission
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -63,11 +65,33 @@ class LoginView(View):
             for cookie in login_response.cookies:
                 response.set_cookie(
                     key=cookie.name,
-                    value=cookie.value,
+                    value=cookie.value,  # type: ignore
                 )
                 return response
 
         return redirect_to_login("")
+
+
+class LogoutView(View):
+    def get(self, request: HttpRequest):
+        if request.user.is_authenticated:
+            logout(request)
+
+        response = redirect(LOGIN_URL)
+        print("setting PLAY_SESSION cookie")
+        response.set_cookie("PLAY_SESSION", "", max_age=0)
+        return response
+
+
+def is_custodia_admin(user: User) -> bool:
+    return user.hasRole(UserRole.ATTENDANCE)
+
+
+class RequireAdmin(BasePermission):
+    message = "You must have the permission to modify attendance records"
+
+    def has_permission(self, request, view):  # type: ignore
+        return is_custodia_admin(request.user)
 
 
 def student_to_dict(
@@ -96,9 +120,22 @@ def student_to_dict(
     }
 
 
+def get_student(request: Request, student_id: int):
+    if getattr(request, "school") is None:
+        raise PermissionDenied()
+
+    student = Student.objects.filter(id=student_id, school=request.school).first()
+    if student is None:
+        raise NotFound()
+
+    return student
+
+
 class AbsentView(APIView):
+    permission_classes = [RequireAdmin]
+
     def post(self, request: Request, student_id: int) -> Response:
-        student = Student.objects.get(id=student_id, school=request.school)
+        student = get_student(request, student_id)
         student.show_as_absent = timezone.localdate()
         student.save()
 
@@ -106,8 +143,11 @@ class AbsentView(APIView):
 
 
 class ExcuseView(APIView):
+    permission_classes = [RequireAdmin]
+
+    @atomic
     def post(self, request: Request, student_id: int) -> Response:
-        student = Student.objects.get(id=student_id, school=request.school)
+        student = get_student(request, student_id)
         date: str = request.data["day"]  # type: ignore
 
         Excuse.objects.create(student=student, date=date)
@@ -116,8 +156,11 @@ class ExcuseView(APIView):
 
 
 class OverrideView(APIView):
+    permission_classes = [RequireAdmin]
+
+    @atomic
     def post(self, request: Request, student_id: int) -> Response:
-        student = Student.objects.get(id=student_id)
+        student = get_student(request, student_id)
         date: str = request.data["day"]  # type: ignore
 
         Override.objects.create(student=student, date=date)
@@ -126,8 +169,9 @@ class OverrideView(APIView):
 
 
 class SwipeView(APIView):
+    @atomic
     def post(self, request: Request, student_id: int) -> Response:
-        student = Student.objects.get(id=student_id, school=request.school)
+        student = get_student(request, student_id)
 
         direction = request.data["direction"]  # type: ignore
 
@@ -135,7 +179,7 @@ class SwipeView(APIView):
         swipe_time = timezone.localtime()
 
         if request.data.get("overrideDate"):  # type: ignore
-            the_date = datetime.fromisoformat(request.data["overrideDate"])
+            the_date = datetime.fromisoformat(request.data["overrideDate"])  # type: ignore
             the_time = time.fromisoformat(
                 request.data["overrideTime"]  # type: ignore
             )
@@ -169,21 +213,14 @@ class SwipeView(APIView):
 
 
 class DeleteSwipeView(APIView):
+    permission_classes = [RequireAdmin]
+
+    @atomic
     def post(self, request: Request, student_id: int) -> Response:
+        student = get_student(request, student_id)
         swipe_id = request.data["swipe"]["_id"]  # type: ignore
-        Swipe.objects.get(id=swipe_id).delete()
-        return student_data_view(student_id, request.school)
-
-
-class LogoutView(View):
-    def get(self, request: HttpRequest):
-        if request.user.is_authenticated:
-            logout(request)
-
-        response = redirect(LOGIN_URL)
-        print("setting PLAY_SESSION cookie")
-        response.set_cookie("PLAY_SESSION", "", max_age=0)
-        return response
+        Swipe.objects.get(id=swipe_id, student=student).delete()
+        return student_data_view(student.id, request.school)
 
 
 class IsAdminView(APIView):
@@ -192,9 +229,7 @@ class IsAdminView(APIView):
         user: User = request.user
         return Response(
             {
-                "admin": "overseer.roles/admin"
-                if user.hasRole(UserRole.ATTENDANCE)
-                else None,
+                "admin": "overseer.roles/admin" if is_custodia_admin(user) else None,
                 "school": {
                     "_id": school.id,
                     "name": school.name,
@@ -275,15 +310,17 @@ def get_start_of_school_year() -> datetime:
 
 
 class StudentDataView(APIView):
+    @atomic
     def put(self, request: Request, student_id: int) -> Response:
-        student = Student.objects.get(id=student_id)
-        if start_date_str := request.data["start_date"]:
+        student = get_student(request, student_id)
+        start_date_str: str
+        if start_date_str := request.data["start_date"]:  # type: ignore
             student.start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date()
 
         StudentRequiredMinutes.objects.update_or_create(
             student=student,
             fromdate=timezone.localdate(),
-            defaults=dict(required_minutes=request.data["minutes"]),
+            defaults=dict(required_minutes=request.data["minutes"]),  # type: ignore
         )
 
         student.save()
@@ -291,6 +328,7 @@ class StudentDataView(APIView):
         return student_data_view(student.id, request.school)
 
     def get(self, request: Request, student_id: int) -> Response:
+        get_student(request, student_id)  # just call this for auth
         return student_data_view(student_id, request.school)
 
 
@@ -497,6 +535,8 @@ def get_student_data(
 
 
 class ReportYears(APIView):
+    permission_classes = [RequireAdmin]
+
     def get(self, request: Request) -> Response:
         school: School = request.school
         years: list[str] = []
@@ -560,6 +600,7 @@ class ReportYears(APIView):
 
         return from_date.strftime("%B %-d, %Y")
 
+    @atomic
     def delete(self, request: Request, year_name: str) -> Response:
         Year.objects.filter(school=request.school, name=year_name).delete()
 
@@ -567,6 +608,8 @@ class ReportYears(APIView):
 
 
 class ReportView(APIView):
+    permission_classes = [RequireAdmin]
+
     def get(self, request: Request, year_name: str, class_id: int = -1) -> Response:
         school = request.school
         year = Year.objects.get(school=school, name=year_name)
