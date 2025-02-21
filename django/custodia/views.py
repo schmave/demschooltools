@@ -78,7 +78,6 @@ class LogoutView(View):
             logout(request)
 
         response = redirect(LOGIN_URL)
-        print("setting PLAY_SESSION cookie")
         response.set_cookie("PLAY_SESSION", "", max_age=0)
         return response
 

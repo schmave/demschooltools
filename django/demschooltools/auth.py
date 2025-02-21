@@ -1,3 +1,5 @@
+import logging
+
 import jwt
 from django.conf import settings
 from django.contrib import auth
@@ -7,6 +9,8 @@ from django.utils.deprecation import MiddlewareMixin
 
 from custodia.models import School
 from dst.models import Organization, User
+
+LOGGER = logging.getLogger(__name__)
 
 
 class PlaySessionBackend(BaseBackend):
@@ -27,7 +31,7 @@ def get_user_for_play_session(request) -> User | None:
         print(e)
         return None
 
-    print(f"Decoded JWT {data=}")
+    LOGGER.debug(f"Decoded JWT {data=}")
     inner_data = data["data"]
     pa_user_id = inner_data.get("pa.u.id")
     pa_provider_id = inner_data.get("pa.p.id")
@@ -67,6 +71,6 @@ class PlaySessionMiddleware(MiddlewareMixin):
                 auth.logout(request)
                 auth.login(request, new_user, "demschooltools.auth.PlaySessionBackend")
 
-            print(f"looking for {request.get_host()=}")
             org_id = Organization.objects.get(hosts__host=request.get_host()).id
             request.school = School.objects.get(id=org_id)
+            LOGGER.info(f"host={request.get_host()}, school={request.school.name}")
