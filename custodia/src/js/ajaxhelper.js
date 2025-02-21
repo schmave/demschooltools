@@ -11,7 +11,12 @@ const CSRF_HEADER = {
   "X-CSRFToken": getCookie("csrftoken"),
 };
 
-const modifyUrl = (url) => `/custodia-api${url}`;
+const modifyUrl = (url) => {
+  if (url.indexOf("/") === 0) {
+    return `/custodia-api${url}`;
+  }
+  return `/custodia-api/${url}`;
+};
 
 const exports = {
   post: function (url, data) {

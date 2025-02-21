@@ -70,5 +70,3 @@ class PlaySessionMiddleware(MiddlewareMixin):
             print(f"looking for {request.get_host()=}")
             org_id = Organization.objects.get(hosts__host=request.get_host()).id
             request.school = School.objects.get(id=org_id)
-
-        print(f"PlaySessionMiddleware ends with {request.user=}, {request.user.id=}")

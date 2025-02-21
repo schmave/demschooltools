@@ -6,7 +6,7 @@ from django.contrib.auth import logout
 from django.contrib.auth.views import redirect_to_login
 from django.db.models import Max
 from django.db.transaction import atomic
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views import View
@@ -35,7 +35,7 @@ class IndexView(View):
         if not request.user.is_authenticated:
             return redirect_to_login("")
 
-        return HttpResponse(open("static/index.html").read())
+        return render(request, "index.html")
 
 
 class LoginView(View):

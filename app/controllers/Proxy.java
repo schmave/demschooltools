@@ -96,7 +96,7 @@ public class Proxy extends Controller {
   }
 
   public Result proxy(Http.Request request, String extraPath) {
-    System.out.println("proxy: " + request.uri());
+    System.out.println("proxy: " + request.method() + " " + request.uri());
 
     final String path = request.uri();
     StringBuilder targetUrlBuilder = new StringBuilder();
