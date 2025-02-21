@@ -38,6 +38,7 @@ class StudentRequiredMinutes(models.Model):
     class Meta:
         db_table = "students_required_minutes"
 
+    student_id: int
     student = models.ForeignKey(
         Student,
         on_delete=models.PROTECT,

@@ -353,6 +353,12 @@ def get_student_batch_data(
     ):
         swipes[swipe.student_id][swipe.swipe_day].append(swipe)
 
+    required_minutes: dict[int, list[StudentRequiredMinutes]] = defaultdict(list)
+    for srm in StudentRequiredMinutes.objects.filter(student__in=students).order_by(
+        "fromdate"
+    ):
+        required_minutes[srm.student_id].append(srm)
+
     result: dict[int, dict] = {}
     for student in students:
         result[student.id] = get_student_data(
@@ -361,6 +367,7 @@ def get_student_batch_data(
             overrides[student.id],
             excuses[student.id],
             dict(swipes[student.id]),
+            required_minutes[student.id],
         )
     return result
 
@@ -371,10 +378,8 @@ def get_student_data(
     override_days: set[date],
     excused_days: set[date],
     day_to_swipes: dict[date, list[Swipe]],
+    required_minutes: list[StudentRequiredMinutes],
 ) -> dict:
-    required_minutes = list(
-        StudentRequiredMinutes.objects.filter(student=student).order_by("fromdate")
-    )
     required_minutes_i = -1
     current_required_minutes = DEFAULT_REQUIRED_MINUTES
 

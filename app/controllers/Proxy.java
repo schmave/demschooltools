@@ -138,9 +138,13 @@ public class Proxy extends Controller {
 
       // Handle request body if present
       ByteString body = request.body().asBytes();
-      if (body != null && body.size() > 0 && proxiedRequest instanceof HttpPost) {
+      if (body != null && body.size() > 0) {
         HttpEntity entity = new ByteArrayEntity(body.toArray(), null);
-        ((HttpPost) proxiedRequest).setEntity(entity);
+        if (proxiedRequest instanceof HttpPost) {
+          ((HttpPost) proxiedRequest).setEntity(entity);
+        } else if (proxiedRequest instanceof HttpPut) {
+          ((HttpPut) proxiedRequest).setEntity(entity);
+        }
       }
 
       try (CloseableHttpResponse proxiedResponse = httpClient.execute(proxiedRequest)) {
