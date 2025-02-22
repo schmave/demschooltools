@@ -25,6 +25,32 @@ class UserAdmin(admin.ModelAdmin):
     search_fields = ["name", "email"]
 
 
+@admin.register(Person)
+class PersonAdmin(admin.ModelAdmin):
+    readonly_fields = ["id", "organization", "tags"]
+
+    list_display = ["first_name", "last_name", "email", "organization"]
+    list_filter = ["organization_id"]
+    search_fields = ["name", "email"]
+
+
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    readonly_fields = ["id", "organization"]
+
+    list_display = [
+        "title",
+        "use_student_display",
+        "show_in_jc",
+        "show_in_attendance",
+        "show_in_menu",
+        "show_in_account_balances",
+        "show_in_roles",
+    ]
+    list_filter = ["organization_id"]
+    search_fields = ["title"]
+
+
 admin.site.register(AttendanceDay)
 admin.site.register(Chapter)
 admin.site.register(Comment)
@@ -33,10 +59,8 @@ admin.site.register(Entry)
 admin.site.register(ManualChange)
 admin.site.register(Meeting)
 admin.site.register(Organization)
-admin.site.register(Person)
 admin.site.register(PersonTagChange)
 admin.site.register(Section)
-admin.site.register(Tag)
 
 
 @admin.register(Session)

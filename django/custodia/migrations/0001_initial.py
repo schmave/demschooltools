@@ -7,12 +7,58 @@ class Migration(migrations.Migration):
     dependencies = []
 
     operations = [
-        # This has to be run before the django.contrib.admin migrations. If
-        # not, then the django_admin_log table will reference overseer.users
-        # instead of public.users.
         migrations.RunSQL(
-            "ALTER TABLE overseer.users rename to old_users",
-            "ALTER TABLE overseer.old_users rename to users",
+            """
+--- This has to be run before the django.contrib.admin migrations. If
+--- not, then the django_admin_log table will reference overseer.users
+--- instead of public.users.
+ALTER TABLE overseer.users rename to old_users;
+
+ALTER TABLE overseer.classes rename to old_classes;
+ALTER TABLE overseer.classes_x_students rename to old_classes_x_students;
+ALTER TABLE overseer.session_store rename to old_session_store;
+            """,
+        ),
+        migrations.RunSQL("""
+ALTER TABLE public.person ADD COLUMN custodia_show_as_absent date NULL;
+ALTER TABLE public.person ADD COLUMN custodia_start_date date NULL;
+
+UPDATE public.person p set custodia_show_as_absent=s.show_as_absent
+   FROM overseer.students s where s.dst_id=p.person_id;
+UPDATE public.person p set custodia_start_date=s.start_date
+   FROM overseer.students s where s.dst_id=p.person_id;
+"""),
+        migrations.RunSQL(
+            """
+alter table overseer.excuses add column person_id  int4 null;
+ALTER TABLE overseer.excuses ADD CONSTRAINT fk_excuses_person FOREIGN KEY (person_id) REFERENCES public.person(person_id);
+alter table overseer.swipes add column person_id  int4 null;
+ALTER TABLE overseer.swipes ADD CONSTRAINT fk_person FOREIGN KEY (person_id) REFERENCES public.person(person_id);
+alter table overseer.students_required_minutes add column person_id  int4 null;
+ALTER TABLE overseer.students_required_minutes ADD CONSTRAINT fk_person FOREIGN KEY (person_id) REFERENCES public.person(person_id);
+alter table overseer.overrides add column person_id  int4 null;
+ALTER TABLE overseer.overrides ADD CONSTRAINT fk_person FOREIGN KEY (person_id) REFERENCES public.person(person_id);
+
+UPDATE overseer.excuses e set person_id=s.dst_id
+   FROM overseer.students s, public.person p where s._id=e.student_id and s.dst_id=p.person_id;
+delete FROM overseer.excuses where person_id is null;
+UPDATE overseer.swipes e set person_id=s.dst_id
+   FROM overseer.students s, public.person p where s._id=e.student_id and s.dst_id=p.person_id;
+delete FROM overseer.swipes where person_id is null;
+UPDATE overseer.students_required_minutes e set person_id=s.dst_id
+   FROM overseer.students s, public.person p where s._id=e.student_id and s.dst_id=p.person_id;
+delete FROM overseer.students_required_minutes where person_id is null;
+UPDATE overseer.overrides e set person_id=s.dst_id
+   FROM overseer.students s, public.person p where s._id=e.student_id and s.dst_id=p.person_id;
+delete FROM overseer.overrides where person_id is null;
+
+ALTER TABLE overseer.students rename to old_students;
+
+alter table overseer.excuses alter column person_id set not null;
+alter table overseer.swipes alter column person_id set not null;
+alter table overseer.students_required_minutes alter column person_id set not null;
+alter table overseer.overrides alter column person_id set not null;
+                                """
         ),
         # Add fields needed for django auth/user
         migrations.RunSQL("""
@@ -26,6 +72,7 @@ ALTER TABLE public.users ADD COLUMN is_active bool NOT NULL default true;
 ALTER TABLE public.users ADD COLUMN username varchar(150) NOT NULL default '';
 """),
         # Set late_time at the school level instead of class level
+        # TODO: Do this on public.organization instead of school
         migrations.RunSQL("""
 alter table overseer.schools add column late_time time DEFAULT '10:15:00'::time without time zone NULL;
 """),

@@ -6,11 +6,12 @@ class Organization(models.Model):
     class Meta:
         db_table = "organization"
 
+    id: int
     name = models.TextField()
     short_name = models.TextField()
 
     def __str__(self):
-        return self.name
+        return f"{self.id}-{self.name}"
 
 
 class OrganizationHost(models.Model):
@@ -30,17 +31,48 @@ class Tag(models.Model):
     organization = models.ForeignKey("Organization", on_delete=models.PROTECT)
 
     title = models.TextField()
+    use_student_display = models.BooleanField()
+
     show_in_jc = models.BooleanField()
     show_in_attendance = models.BooleanField()
+    show_in_menu = models.BooleanField()
+    show_in_account_balances = models.BooleanField()
+    show_in_roles = models.BooleanField()
 
 
 class Person(models.Model):
     class Meta:
         db_table = "person"
 
+    first_name = models.CharField()
+    last_name = models.CharField()
+    display_name = models.CharField()
+
+    def get_name(self):
+        return self.display_name or f"{self.first_name} {self.last_name}"
+
+    email = models.CharField()
+
+    gender = models.CharField()
+    address = models.CharField()
+    city = models.CharField()
+    state = models.CharField()
+    zip = models.CharField()
+    neighborhood = models.CharField()
+
     id = models.IntegerField(primary_key=True, db_column="person_id")
+    organization_id: int
     organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
     tags = models.ManyToManyField(Tag, db_table="person_tag")
+
+    custodia_show_as_absent = models.DateField()
+    custodia_start_date = models.DateField()
+
+    def is_teacher(self):
+        return not self.tags.filter(use_student_display=True).exists()
+
+    def __str__(self):
+        return f'{self.first_name} {self.last_name} "{self.display_name}" [Org {self.organization_id}]'
 
 
 class Comment(models.Model):
@@ -132,6 +164,8 @@ class User(AbstractUser):
     organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
     name = models.TextField()
     email = models.TextField()  # override this so that emails aren't validated
+
+    roles: "models.Manager[UserRole]"
 
     # Disable Django's normal group & permission setup for admin access.
     groups = None

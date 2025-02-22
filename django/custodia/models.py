@@ -1,5 +1,7 @@
 from django.db import models
 
+from dst.models import Person
+
 
 class School(models.Model):
     class Meta:
@@ -13,34 +15,34 @@ class School(models.Model):
     late_time = models.TimeField()
 
     def __str__(self):
-        return self.name
+        return f"{self.id}-{self.name}"
 
 
-class Student(models.Model):
-    class Meta:
-        db_table = "students"
+# class Student(models.Model):
+#     class Meta:
+#         db_table = "students"
 
-    id = models.AutoField(db_column="_id", primary_key=True)
-    person = models.ForeignKey(
-        "dst.Person", db_column="dst_id", on_delete=models.PROTECT
-    )
-    start_date = models.DateField()
-    is_teacher = models.BooleanField()
-    name = models.TextField()
-    show_as_absent = models.DateField()
-    school = models.ForeignKey(School, on_delete=models.PROTECT)
+#     id = models.AutoField(db_column="_id", primary_key=True)
+#     person = models.ForeignKey(
+#         "dst.Person", db_column="dst_id", on_delete=models.PROTECT
+#     )
+#     start_date = models.DateField()
+#     is_teacher = models.BooleanField()
+#     name = models.TextField()
+#     show_as_absent = models.DateField()
+#     school = models.ForeignKey(School, on_delete=models.PROTECT)
 
-    def __str__(self):
-        return self.name
+#     def __str__(self):
+#         return self.name
 
 
 class StudentRequiredMinutes(models.Model):
     class Meta:
         db_table = "students_required_minutes"
 
-    student_id: int
-    student = models.ForeignKey(
-        Student,
+    person_id: int
+    person = models.ForeignKey(
+        Person,
         on_delete=models.PROTECT,
         related_name="required_minutes",
     )
@@ -61,8 +63,8 @@ class Swipe(models.Model):
         db_table = "swipes"
 
     id = models.AutoField(db_column="_id", primary_key=True)
-    student = models.ForeignKey(Student, on_delete=models.PROTECT)
-    student_id: int
+    person = models.ForeignKey(Person, on_delete=models.PROTECT)
+    person_id: int
     swipe_day = models.DateField()
 
     in_time = models.DateTimeField(null=True)
@@ -73,14 +75,15 @@ class Override(models.Model):
     """
     Recommended changes from the overseer.overrides table currently being used in production:
 
-    Add unique (student, date) constraint
+    Add unique (person, date) constraint
     """
 
     class Meta:
         db_table = "overrides"
 
     id = models.AutoField(db_column="_id", primary_key=True)
-    student = models.ForeignKey(Student, on_delete=models.PROTECT)
+    person = models.ForeignKey(Person, on_delete=models.PROTECT)
+    person_id: int
     inserted_date = models.DateTimeField(auto_now_add=True)
 
     date = models.DateField()
@@ -90,14 +93,15 @@ class Excuse(models.Model):
     """
     Recommended changes from the overseer.excuses table currently being used in production:
 
-    Add unique (student, date) constraint
+    Add unique (person, date) constraint
     """
 
     class Meta:
         db_table = "excuses"
 
     id = models.AutoField(db_column="_id", primary_key=True)
-    student = models.ForeignKey(Student, on_delete=models.PROTECT)
+    person = models.ForeignKey(Person, on_delete=models.PROTECT)
+    person_id: int
     inserted_date = models.DateTimeField(auto_now_add=True)
 
     date = models.DateField()

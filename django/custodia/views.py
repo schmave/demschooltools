@@ -21,13 +21,12 @@ from custodia.models import (
     Excuse,
     Override,
     School,
-    Student,
     StudentRequiredMinutes,
     Swipe,
     Year,
 )
 from demschooltools.settings import LOGIN_URL
-from dst.models import User, UserRole
+from dst.models import Person, User, UserRole
 
 DEFAULT_REQUIRED_MINUTES = 345
 
@@ -94,7 +93,7 @@ class RequireAdmin(BasePermission):
 
 
 def student_to_dict(
-    student: Student,
+    student: Person,
     school: School,
     last_swipe: Swipe | None,
     in_today_time: datetime | None,
@@ -105,72 +104,74 @@ def student_to_dict(
     in_today = last_swipe and last_swipe.swipe_day == today
     return {
         "_id": student.id,
-        "name": student.name,
+        "name": student.get_name(),
         "last_swipe_type": (
             "in" if last_swipe and last_swipe.out_time is None else "out"
         ),
         "swiped_today_late": (
             in_today_time and in_today_time.time() > school.late_time
         ),
-        "is_teacher": student.is_teacher,
+        "is_teacher": student.is_teacher(),
         "in_today": in_today,
-        "absent_today": student.show_as_absent == today,
+        "absent_today": student.custodia_show_as_absent == today,
         "last_swipe_date": last_swipe and format_date(last_swipe.swipe_day),
     }
 
 
-def get_student(request: Request, student_id: int):
+def get_person(request: Request, person_id: int):
     if getattr(request, "school") is None:
         raise PermissionDenied()
 
-    student = Student.objects.filter(id=student_id, school=request.school).first()
-    if student is None:
+    person = Person.objects.filter(
+        id=person_id, organization_id=request.school.id
+    ).first()
+    if person is None:
         raise NotFound()
 
-    return student
+    return person
 
 
 class AbsentView(APIView):
     permission_classes = [RequireAdmin]
 
-    def post(self, request: Request, student_id: int) -> Response:
-        student = get_student(request, student_id)
-        student.show_as_absent = timezone.localdate()
+    def post(self, request: Request, person_id: int) -> Response:
+        student = get_person(request, person_id)
+        student.custodia_show_as_absent = timezone.localdate()
         student.save()
 
-        return student_data_view(student_id, request.school)
+        return student_data_view(person_id, request.school)
 
 
 class ExcuseView(APIView):
     permission_classes = [RequireAdmin]
 
     @atomic
-    def post(self, request: Request, student_id: int) -> Response:
-        student = get_student(request, student_id)
+    def post(self, request: Request, person_id: int) -> Response:
+        student = get_person(request, person_id)
         date: str = request.data["day"]  # type: ignore
 
         Excuse.objects.create(student=student, date=date)
 
-        return student_data_view(student_id, request.school)
+        return student_data_view(person_id, request.school)
 
 
 class OverrideView(APIView):
     permission_classes = [RequireAdmin]
 
     @atomic
-    def post(self, request: Request, student_id: int) -> Response:
-        student = get_student(request, student_id)
+    def post(self, request: Request, person_id: int) -> Response:
+        student = get_person(request, person_id)
         date: str = request.data["day"]  # type: ignore
 
         Override.objects.create(student=student, date=date)
 
-        return student_data_view(student_id, request.school)
+        return student_data_view(person_id, request.school)
 
 
 class SwipeView(APIView):
     @atomic
-    def post(self, request: Request, student_id: int) -> Response:
-        student = get_student(request, student_id)
+    def post(self, request: Request, person_id: int) -> Response:
+        person = get_person(request, person_id)
 
         direction = request.data["direction"]  # type: ignore
 
@@ -188,13 +189,13 @@ class SwipeView(APIView):
 
         if direction == "in":
             swipe = Swipe.objects.create(
-                student=student,
+                person=person,
                 swipe_day=swipe_time.date(),
                 in_time=swipe_time,
             )
         elif direction == "out":
             swipe = Swipe.objects.get(
-                student=student, swipe_day=swipe_time.date(), out_time=None
+                person=person, swipe_day=swipe_time.date(), out_time=None
             )
             swipe.out_time = swipe_time
             swipe.save()
@@ -202,21 +203,21 @@ class SwipeView(APIView):
             assert False, "invalid direction"
 
         in_time_today = (
-            Swipe.objects.filter(student=student, swipe_day=timezone.localdate())
+            Swipe.objects.filter(person=person, swipe_day=timezone.localdate())
             .order_by("in_time")
             .values_list("in_time", flat=True)
             .first()
         )
 
-        return Response(student_to_dict(student, school, swipe, in_time_today))
+        return Response(student_to_dict(person, school, swipe, in_time_today))
 
 
 class DeleteSwipeView(APIView):
     permission_classes = [RequireAdmin]
 
     @atomic
-    def post(self, request: Request, student_id: int) -> Response:
-        student = get_student(request, student_id)
+    def post(self, request: Request, person_id: int) -> Response:
+        student = get_person(request, person_id)
         swipe_id = request.data["swipe"]["_id"]  # type: ignore
         Swipe.objects.get(id=swipe_id, student=student).delete()
         return student_data_view(student.id, request.school)
@@ -257,32 +258,32 @@ class StudentsTodayView(APIView):
 
         student_infos = []
 
-        students = list(
-            Student.objects.filter(
-                person__tags__show_in_attendance=True, school=school
+        people = list(
+            Person.objects.filter(
+                tags__show_in_attendance=True, organization_id=school.id
             ).annotate(max_swipe_id=Max("swipe__id"))
         )
 
         student_to_last_swipe = {
-            x.student_id: x
+            x.person_id: x
             for x in Swipe.objects.filter(
-                id__in=[x.max_swipe_id for x in students]  # type: ignore
+                id__in=[x.max_swipe_id for x in people]  # type: ignore
             )
         }
 
         student_to_in_time: dict[int, datetime] = {}
-        for student_id, in_time in (
+        for person_id, in_time in (
             Swipe.objects.filter(
-                student__in=students,
+                person__in=people,
                 swipe_day=today,
             )
             .order_by("in_time")
-            .values_list("student_id", "in_time")
+            .values_list("person_id", "in_time")
         ):
-            if student_id not in student_to_in_time:
-                student_to_in_time[student_id] = in_time
+            if person_id not in student_to_in_time:
+                student_to_in_time[person_id] = in_time
 
-        for student in students:
+        for student in people:
             last_swipe = student_to_last_swipe[student.id]
             student_infos.append(
                 student_to_dict(
@@ -310,11 +311,13 @@ def get_start_of_school_year() -> datetime:
 
 class StudentDataView(APIView):
     @atomic
-    def put(self, request: Request, student_id: int) -> Response:
-        student = get_student(request, student_id)
+    def put(self, request: Request, person_id: int) -> Response:
+        student = get_person(request, person_id)
         start_date_str: str
         if start_date_str := request.data["start_date"]:  # type: ignore
-            student.start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date()
+            student.custodia_start_date = datetime.strptime(
+                start_date_str, "%Y-%m-%d"
+            ).date()
 
         StudentRequiredMinutes.objects.update_or_create(
             student=student,
@@ -326,9 +329,9 @@ class StudentDataView(APIView):
 
         return student_data_view(student.id, request.school)
 
-    def get(self, request: Request, student_id: int) -> Response:
-        get_student(request, student_id)  # just call this for auth
-        return student_data_view(student_id, request.school)
+    def get(self, request: Request, person_id: int) -> Response:
+        get_person(request, person_id)  # just call this for auth
+        return student_data_view(person_id, request.school)
 
 
 def get_year_start_end(year: Year | None) -> tuple[datetime, datetime]:
@@ -343,7 +346,7 @@ def get_year_start_end(year: Year | None) -> tuple[datetime, datetime]:
 def get_school_days(school: School, start: datetime, end: datetime) -> list[date]:
     return sorted(
         Swipe.objects.filter(
-            student__school=school,
+            person__organization_id=school.id,
             swipe_day__gte=start.date(),
             swipe_day__lte=end.date(),
         )
@@ -353,48 +356,49 @@ def get_school_days(school: School, start: datetime, end: datetime) -> list[date
 
 
 def student_data_view(
-    student_id: int, school: School, year: Year | None = None
+    person_id: int, school: School, year: Year | None = None
 ) -> Response:
     return Response(
         {
             "student": get_student_batch_data(
-                Student.objects.filter(id=student_id, school=school), year
-            )[student_id]
+                Person.objects.filter(id=person_id, organization_id=school.id),
+                year,
+                school,
+            )[person_id]
         }
     )
 
 
 def get_student_batch_data(
-    students: QuerySet[Student], year: Year | None
+    students: QuerySet[Person], year: Year | None, school: School
 ) -> dict[int, dict]:
-    school = students[0].school
     year_start, year_end = get_year_start_end(year)
     school_days = get_school_days(school, year_start, year_end)
 
     overrides: dict[int, set[date]] = defaultdict(set)
-    for student_id, the_date in Override.objects.filter(
-        student__in=students
-    ).values_list("student_id", "date"):
-        overrides[student_id].add(the_date)
+    for person_id, the_date in Override.objects.filter(person__in=students).values_list(
+        "person_id", "date"
+    ):
+        overrides[person_id].add(the_date)
 
     excuses: dict[int, set[date]] = defaultdict(set)
-    for student_id, the_date in Excuse.objects.filter(student__in=students).values_list(
-        "student_id", "date"
+    for person_id, the_date in Excuse.objects.filter(person__in=students).values_list(
+        "person_id", "date"
     ):
-        excuses[student_id].add(the_date)
+        excuses[person_id].add(the_date)
 
     swipes: dict[int, dict[date, list[Swipe]]] = defaultdict(lambda: defaultdict(list))
 
     for swipe in Swipe.objects.filter(
-        student__in=students, swipe_day__gte=year_start, swipe_day__lte=year_end
+        person__in=students, swipe_day__gte=year_start, swipe_day__lte=year_end
     ):
-        swipes[swipe.student_id][swipe.swipe_day].append(swipe)
+        swipes[swipe.person_id][swipe.swipe_day].append(swipe)
 
     required_minutes: dict[int, list[StudentRequiredMinutes]] = defaultdict(list)
-    for srm in StudentRequiredMinutes.objects.filter(student__in=students).order_by(
+    for srm in StudentRequiredMinutes.objects.filter(person__in=students).order_by(
         "fromdate"
     ):
-        required_minutes[srm.student_id].append(srm)
+        required_minutes[srm.person_id].append(srm)
 
     result: dict[int, dict] = {}
     for student in students:
@@ -410,7 +414,7 @@ def get_student_batch_data(
 
 
 def get_student_data(
-    student: Student,
+    person: Person,
     school_days: list[date],
     override_days: set[date],
     excused_days: set[date],
@@ -428,7 +432,7 @@ def get_student_data(
     total_overrides = 0
     total_short = 0
     for day in school_days:
-        if student.start_date and day < student.start_date:
+        if person.custodia_start_date and day < person.custodia_start_date:
             continue
 
         if (
@@ -453,7 +457,7 @@ def get_student_data(
                     "day": format_date(day),
                     "nice_in_time": format_time(swipe.in_time),
                     "nice_out_time": format_time(swipe.out_time),
-                    "student_id": student.id,
+                    "student_id": person.id,
                     "out_time": swipe.out_time and swipe.out_time.isoformat(),
                     "in_time": swipe.in_time and swipe.in_time.isoformat(),
                 }
@@ -510,22 +514,24 @@ def get_student_data(
 
     last_swipe_date = max(day_to_swipes) if day_to_swipes else None
     return {
-        "_id": student.id,
-        "absent_today": student.show_as_absent == today,
-        "days": day_data,
-        "name": student.name,
+        "_id": person.id,
+        "absent_today": person.custodia_show_as_absent == today,
+        "days": reversed(day_data),
+        "name": person.get_name(),
         "required_minutes": required_minutes[-1].required_minutes
         if required_minutes
         else DEFAULT_REQUIRED_MINUTES,
         "total_hours": total_seconds / 3600,
-        "is_teacher": student.is_teacher,
+        "is_teacher": person.is_teacher(),
         "last_swipe_date": format_date(last_swipe_date) if last_swipe_date else None,
         "total_abs": total_abs,
         "total_days": total_days,
         "total_excused": total_excused,
         "total_overrides": total_overrides,
         "total_short": total_short,
-        "start_date": student.start_date.isoformat() if student.start_date else None,
+        "start_date": person.custodia_start_date.isoformat()
+        if person.custodia_start_date
+        else None,
         "last_swipe_type": (
             "in" if last_swipe and last_swipe.out_time is None else "out"
         ),
@@ -613,28 +619,17 @@ class ReportView(APIView):
         school = request.school
         year = Year.objects.get(school=school, name=year_name)
 
-        show_attended = request.query_params.get("filterStudents") == "all"
-        if show_attended:
-            students = Student.objects.filter(school=school).order_by("name")
-        else:
-            students = Student.objects.filter(
-                person__tags__show_in_attendance=True, school=school
-            ).order_by("name")
+        people = Person.objects.filter(
+            tags__show_in_attendance=True, organization_id=school.id
+        ).order_by("first_name")
 
         student_info = []
-        batch_data = get_student_batch_data(students, year)
-        for student in students:
-            student_data = batch_data[student.id]
-            if (
-                show_attended
-                and student_data["total_days"] == 0
-                and student_data["total_short"] == 0
-                and student_data["total_overrides"] == 0
-            ):
-                continue
+        batch_data = get_student_batch_data(people, year, school)
+        for person in people:
+            student_data = batch_data[person.id]
             student_info.append(
                 {
-                    "student_id": student_data["_id"],
+                    "person_id": student_data["_id"],
                     "_id": student_data["_id"],
                     "name": student_data["name"],
                     "total_hours": student_data["total_hours"],

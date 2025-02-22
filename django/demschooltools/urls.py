@@ -43,13 +43,13 @@ urlpatterns = [
                 path("users/is-admin", IsAdminView.as_view()),
                 path("students", StudentsTodayView.as_view()),
                 path(
-                    "students/<int:student_id>/swipe/delete", DeleteSwipeView.as_view()
+                    "students/<int:person_id>/swipe/delete", DeleteSwipeView.as_view()
                 ),
-                path("students/<int:student_id>/swipe", SwipeView.as_view()),
-                path("students/<int:student_id>/absent", AbsentView.as_view()),
-                path("students/<int:student_id>/excuse", ExcuseView.as_view()),
-                path("students/<int:student_id>/override", OverrideView.as_view()),
-                path("students/<int:student_id>", StudentDataView.as_view()),
+                path("students/<int:person_id>/swipe", SwipeView.as_view()),
+                path("students/<int:person_id>/absent", AbsentView.as_view()),
+                path("students/<int:person_id>/excuse", ExcuseView.as_view()),
+                path("students/<int:person_id>/override", OverrideView.as_view()),
+                path("students/<int:person_id>", StudentDataView.as_view()),
                 path("reports/years/<str:year_name>", ReportYears.as_view()),
                 path("reports/years", ReportYears.as_view()),
                 path("reports/<str:year_name>/<int:class_id>", ReportView.as_view()),
