@@ -1,5 +1,6 @@
 const React = require("react");
 const Heatmapmonth = require("./heatmapmonth.jsx");
+const moment = require("moment");
 
 Array.prototype.concatAll = function () {
   const results = [];
@@ -34,26 +35,29 @@ module.exports = class Heatmap extends React.Component {
     const minutes = this.props.requiredMinutes;
     const sortedDates = Object.keys(groupedDays).sort();
 
-    let i;
-    let j;
+    let i = 0;
     let temparray;
-    const chunk = 4;
     const maps = [];
-    for (i = 0, j = sortedDates.length; i < j; i += chunk) {
-      temparray = sortedDates.slice(i, i + chunk);
+    while (i < sortedDates.length) {
+      // Find up to four months worth of dates, which we will send
+      // to Heatmapmonth in one batch.
+      let j = i + 1;
+      const lastDate = moment(sortedDates[i]).add(4, "months");
+      while (j < sortedDates.length && moment(sortedDates[j]).isBefore(lastDate)) {
+        j++;
+      }
+
+      temparray = sortedDates.slice(i, j);
+      i = j;
       const dates = temparray
         .map(function (d) {
           return groupedDays[d];
         })
         .concatAll();
-      const m = this.makeHeatmapRow(dates, minutes, i);
-      maps.push(m);
+
+      maps.push(<Heatmapmonth key={i} index={i} requiredMinutes={minutes} days={dates} />);
     }
     return maps;
-  };
-
-  makeHeatmapRow = (dates, minutes, key) => {
-    return <Heatmapmonth key={key} index={key} requiredMinutes={minutes} days={dates} />;
   };
 
   render() {

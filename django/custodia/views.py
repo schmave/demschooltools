@@ -619,14 +619,27 @@ class ReportView(APIView):
         school = request.school
         year = Year.objects.get(school=school, name=year_name)
 
-        people = Person.objects.filter(
-            tags__show_in_attendance=True, organization_id=school.id
-        ).order_by("first_name")
+        show_attended = request.query_params.get("filterStudents") == "all"
+        if show_attended:
+            people = Person.objects.filter(organization_id=school.id)
+        else:
+            people = Person.objects.filter(
+                tags__show_in_attendance=True, organization_id=school.id
+            )
+
+        people = people.order_by("first_name")
 
         student_info = []
         batch_data = get_student_batch_data(people, year, school)
         for person in people:
             student_data = batch_data[person.id]
+            if (
+                show_attended
+                and student_data["total_days"] == 0
+                and student_data["total_short"] == 0
+                and student_data["total_overrides"] == 0
+            ):
+                continue
             student_info.append(
                 {
                     "person_id": student_data["_id"],
