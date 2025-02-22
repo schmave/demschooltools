@@ -12,7 +12,7 @@ certifi==2025.1.31
     # via requests
 charset-normalizer==3.4.1
     # via requests
-decorator==5.1.1
+decorator==5.2.0
     # via ipython
 django==5.1.6
     # via
@@ -61,6 +61,8 @@ pygments==2.19.1
 pyinstrument==5.0.1
     # via -r requirements.in
 pyjwt==2.10.1
+    # via -r requirements.in
+pywatchman==2.0.0
     # via -r requirements.in
 requests==2.32.3
     # via -r requirements.in

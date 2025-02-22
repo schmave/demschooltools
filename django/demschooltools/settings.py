@@ -106,7 +106,7 @@ LOGGING = {
         },
     },
     "loggers": {
-        "django.server": {  # request logs when using manage.py runserver
+        "django": {
             "handlers": ["console"],
             "level": "INFO",
         },
