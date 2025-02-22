@@ -1,4 +1,5 @@
 import zoneinfo
+
 from django.utils import timezone
 
 
@@ -7,8 +8,8 @@ class TimezoneMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        if hasattr(request.user, "school"):
-            timezone.activate(zoneinfo.ZoneInfo(request.user.school.timezone))
+        if hasattr(request, "school"):
+            timezone.activate(zoneinfo.ZoneInfo(request.school.timezone))
         else:
             timezone.deactivate()
 
