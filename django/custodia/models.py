@@ -51,14 +51,6 @@ class StudentRequiredMinutes(models.Model):
 
 
 class Swipe(models.Model):
-    """
-    Changes from the overseer.users table currently being used in production:
-
-    * all time fields currently use a time zone. migrate the DB to use UTC instead
-    * drop rounded_in_time and rounded_out_time columns
-    * create index on overseer.swipes (student_id, swipe_day)
-    """
-
     class Meta:
         db_table = "swipes"
 
@@ -72,12 +64,6 @@ class Swipe(models.Model):
 
 
 class Override(models.Model):
-    """
-    Recommended changes from the overseer.overrides table currently being used in production:
-
-    Add unique (person, date) constraint
-    """
-
     class Meta:
         db_table = "overrides"
 
@@ -90,12 +76,6 @@ class Override(models.Model):
 
 
 class Excuse(models.Model):
-    """
-    Recommended changes from the overseer.excuses table currently being used in production:
-
-    Add unique (person, date) constraint
-    """
-
     class Meta:
         db_table = "excuses"
 

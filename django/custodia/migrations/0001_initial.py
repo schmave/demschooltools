@@ -58,6 +58,21 @@ alter table overseer.excuses alter column person_id set not null;
 alter table overseer.swipes alter column person_id set not null;
 alter table overseer.students_required_minutes alter column person_id set not null;
 alter table overseer.overrides alter column person_id set not null;
+
+alter table overseer.excuses add constraint uniq_excuses_person_date unique(person_id, inserted_date);
+alter table overseer.overrides add constraint uniq_overrides_person_date unique(person_id, inserted_date);
+
+alter table overseer.swipes drop column rounded_in_time;
+alter table overseer.swipes drop column rounded_out_time;
+alter table overseer.swipes drop column intervalmin;
+create index on overseer.swipes (person_id, swipe_day);
+create index on overseer.swipes (swipe_day, person_id);
+alter table overseer.swipes alter column swipe_day set not null;
+
+alter table overseer.excuses drop column student_id;
+alter table overseer.swipes drop column student_id cascade;
+alter table overseer.students_required_minutes drop column student_id cascade;
+alter table overseer.overrides drop column student_id;
                                 """
         ),
         # Add fields needed for django auth/user
