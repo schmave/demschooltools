@@ -56,7 +56,11 @@
         "files.watcherExclude": {
             "**/target": true
         },
-        "java.compile.nullAnalysis.mode": "automatic"
+        "java.compile.nullAnalysis.mode": "automatic",
+        "search.exclude": {
+            "custodia/resources/public/js/*": true,
+            "django/static/js/*": true
+        }
     },
     "extensions": {
         "recommendations": [

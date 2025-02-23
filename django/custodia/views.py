@@ -171,7 +171,6 @@ class SwipeView(APIView):
 
         direction = request.data["direction"]  # type: ignore
 
-        org: Organization = request.org
         swipe_time = timezone.localtime()
 
         if request.data.get("overrideDate"):  # type: ignore
@@ -198,14 +197,7 @@ class SwipeView(APIView):
         else:
             assert False, "invalid direction"
 
-        in_time_today = (
-            Swipe.objects.filter(person=person, swipe_day=timezone.localdate())
-            .order_by("in_time")
-            .values_list("in_time", flat=True)
-            .first()
-        )
-
-        return Response(student_to_dict(person, org, swipe, in_time_today))
+        return StudentsTodayView().get(request)
 
 
 class DeleteSwipeView(APIView):
