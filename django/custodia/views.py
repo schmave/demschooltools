@@ -1,5 +1,5 @@
 from collections import defaultdict
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 
 import requests
 from django.contrib.auth import logout
@@ -19,8 +19,8 @@ from rest_framework.views import APIView
 
 from custodia.models import (
     Excuse,
+    Organization,
     Override,
-    School,
     StudentRequiredMinutes,
     Swipe,
     Year,
@@ -94,7 +94,7 @@ class RequireAdmin(BasePermission):
 
 def student_to_dict(
     student: Person,
-    school: School,
+    org: Organization,
     last_swipe: Swipe | None,
     in_today_time: datetime | None,
 ):
@@ -108,9 +108,7 @@ def student_to_dict(
         "last_swipe_type": (
             "in" if last_swipe and last_swipe.out_time is None else "out"
         ),
-        "swiped_today_late": (
-            in_today_time and in_today_time.time() > school.late_time
-        ),
+        "swiped_today_late": (in_today_time and in_today_time.time() > org.late_time),
         "is_teacher": student.is_teacher(),
         "in_today": in_today,
         "absent_today": student.custodia_show_as_absent == today,
@@ -119,12 +117,10 @@ def student_to_dict(
 
 
 def get_person(request: Request, person_id: int):
-    if getattr(request, "school") is None:
+    if getattr(request, "org") is None:
         raise PermissionDenied()
 
-    person = Person.objects.filter(
-        id=person_id, organization_id=request.school.id
-    ).first()
+    person = Person.objects.filter(id=person_id, organization=request.org).first()
     if person is None:
         raise NotFound()
 
@@ -139,7 +135,7 @@ class AbsentView(APIView):
         student.custodia_show_as_absent = timezone.localdate()
         student.save()
 
-        return student_data_view(person_id, request.school)
+        return student_data_view(person_id, request.org)
 
 
 class ExcuseView(APIView):
@@ -152,7 +148,7 @@ class ExcuseView(APIView):
 
         Excuse.objects.create(student=student, date=date)
 
-        return student_data_view(person_id, request.school)
+        return student_data_view(person_id, request.org)
 
 
 class OverrideView(APIView):
@@ -165,7 +161,7 @@ class OverrideView(APIView):
 
         Override.objects.create(student=student, date=date)
 
-        return student_data_view(person_id, request.school)
+        return student_data_view(person_id, request.org)
 
 
 class SwipeView(APIView):
@@ -175,7 +171,7 @@ class SwipeView(APIView):
 
         direction = request.data["direction"]  # type: ignore
 
-        school: School = request.school
+        org: Organization = request.org
         swipe_time = timezone.localtime()
 
         if request.data.get("overrideDate"):  # type: ignore
@@ -209,7 +205,7 @@ class SwipeView(APIView):
             .first()
         )
 
-        return Response(student_to_dict(person, school, swipe, in_time_today))
+        return Response(student_to_dict(person, org, swipe, in_time_today))
 
 
 class DeleteSwipeView(APIView):
@@ -220,21 +216,20 @@ class DeleteSwipeView(APIView):
         student = get_person(request, person_id)
         swipe_id = request.data["swipe"]["_id"]  # type: ignore
         Swipe.objects.get(id=swipe_id, student=student).delete()
-        return student_data_view(student.id, request.school)
+        return student_data_view(student.id, request.org)
 
 
 class IsAdminView(APIView):
     def get(self, request: Request) -> Response:
-        school: School = request.school
+        org: Organization = request.org
         user: User = request.user
         return Response(
             {
                 "admin": "overseer.roles/admin" if is_custodia_admin(user) else None,
-                "school": {
-                    "_id": school.id,
-                    "name": school.name,
-                    "timezone": school.timezone,
-                    "use_display_name": school.use_display_name,
+                "org": {
+                    "_id": org.id,
+                    "name": org.name,
+                    "timezone": org.timezone,
                 },
             }
         )
@@ -253,14 +248,14 @@ def format_time(dt: datetime | None) -> str:
 
 class StudentsTodayView(APIView):
     def get(self, request: Request):
-        school = request.school
+        org = request.org
         today = timezone.localdate()
 
         student_infos = []
 
         people = list(
             Person.objects.filter(
-                tags__show_in_attendance=True, organization_id=school.id
+                tags__show_in_attendance=True, organization=org
             ).annotate(max_swipe_id=Max("swipe__id"))
         )
 
@@ -288,7 +283,7 @@ class StudentsTodayView(APIView):
             student_infos.append(
                 student_to_dict(
                     student,
-                    school,
+                    org,
                     last_swipe,
                     student_to_in_time.get(student.id),
                 )
@@ -327,11 +322,11 @@ class StudentDataView(APIView):
 
         student.save()
 
-        return student_data_view(student.id, request.school)
+        return student_data_view(student.id, request.org)
 
     def get(self, request: Request, person_id: int) -> Response:
         get_person(request, person_id)  # just call this for auth
-        return student_data_view(person_id, request.school)
+        return student_data_view(person_id, request.org)
 
 
 def get_year_start_end(year: Year | None) -> tuple[datetime, datetime]:
@@ -343,10 +338,10 @@ def get_year_start_end(year: Year | None) -> tuple[datetime, datetime]:
     )
 
 
-def get_school_days(school: School, start: datetime, end: datetime) -> list[date]:
+def get_school_days(org: Organization, start: datetime, end: datetime) -> list[date]:
     return sorted(
         Swipe.objects.filter(
-            person__organization_id=school.id,
+            person__organization=org,
             swipe_day__gte=start.date(),
             swipe_day__lte=end.date(),
         )
@@ -356,24 +351,24 @@ def get_school_days(school: School, start: datetime, end: datetime) -> list[date
 
 
 def student_data_view(
-    person_id: int, school: School, year: Year | None = None
+    person_id: int, org: Organization, year: Year | None = None
 ) -> Response:
     return Response(
         {
             "student": get_student_batch_data(
-                Person.objects.filter(id=person_id, organization_id=school.id),
+                Person.objects.filter(id=person_id, organization=org),
                 year,
-                school,
+                org,
             )[person_id]
         }
     )
 
 
 def get_student_batch_data(
-    students: QuerySet[Person], year: Year | None, school: School
+    students: QuerySet[Person], year: Year | None, org: Organization
 ) -> dict[int, dict]:
     year_start, year_end = get_year_start_end(year)
-    school_days = get_school_days(school, year_start, year_end)
+    school_days = get_school_days(org, year_start, year_end)
 
     overrides: dict[int, set[date]] = defaultdict(set)
     for person_id, the_date in Override.objects.filter(person__in=students).values_list(
@@ -543,26 +538,22 @@ class ReportYears(APIView):
     permission_classes = [RequireAdmin]
 
     def get(self, request: Request) -> Response:
-        school: School = request.school
+        org: Organization = request.org
         years: list[str] = []
 
         now = timezone.localtime()
 
         current_year = None
-        for year in Year.objects.filter(school=school).order_by("from_time", "to_time"):
+        for year in Year.objects.filter(organization=org).order_by(
+            "from_time", "to_time"
+        ):
             if current_year is None and now > year.from_time and now < year.to_time:
                 current_year = year.name
             years.append(year.name)
 
         if current_year is None:
-            from_date = get_start_of_school_year().date()
-            to_date = date(from_date.year + 1, 7, 31)
-            year = Year.objects.create(
-                school=school,
-                from_time=from_date,
-                to_time=to_date,
-                name=self.make_period_name(from_date, to_date),
-            )
+            from_date = get_start_of_school_year()
+            year = self.create_year(org, from_date, date(from_date.year + 1, 8, 1))
             current_year = year.name
 
         return Response(
@@ -572,6 +563,22 @@ class ReportYears(APIView):
             }
         )
 
+    def create_year(self, org: Organization, from_date: date, to_date: date) -> Year:
+        to_time = timezone.make_aware(
+            datetime(to_date.year, to_date.month, to_date.day) - timedelta(seconds=1)
+        )
+
+        year, _ = Year.objects.get_or_create(
+            organization=org,
+            from_time=timezone.make_aware(
+                datetime(from_date.year, from_date.month, from_date.day)
+            ),
+            to_time=to_time,
+            name=self.make_period_name(from_date, to_time),
+        )
+
+        return year
+
     @atomic
     def post(self, request: Request) -> Response:
         def parse_date(date_str: str) -> date:
@@ -580,16 +587,7 @@ class ReportYears(APIView):
         from_date = parse_date(request.data["from_date"])  # type: ignore
         to_date = parse_date(request.data["to_date"])  # type: ignore
 
-        year, _ = Year.objects.get_or_create(
-            school=request.school,
-            from_time=timezone.make_aware(
-                datetime(from_date.year, from_date.month, from_date.day)
-            ),
-            to_time=timezone.make_aware(
-                datetime(to_date.year, to_date.month, to_date.day)
-            ),
-            name=self.make_period_name(from_date, to_date),
-        )
+        year = self.create_year(request.org, from_date, to_date + timedelta(days=1))
 
         return Response({"made": {"name": year.name}})
 
@@ -607,8 +605,7 @@ class ReportYears(APIView):
 
     @atomic
     def delete(self, request: Request, year_name: str) -> Response:
-        Year.objects.filter(school=request.school, name=year_name).delete()
-
+        Year.objects.filter(organization=request.org, name=year_name).delete()
         return self.get(request)
 
 
@@ -616,21 +613,21 @@ class ReportView(APIView):
     permission_classes = [RequireAdmin]
 
     def get(self, request: Request, year_name: str, class_id: int = -1) -> Response:
-        school = request.school
-        year = Year.objects.get(school=school, name=year_name)
+        org = request.org
+        year = Year.objects.get(organization=org, name=year_name)
 
         show_attended = request.query_params.get("filterStudents") == "all"
         if show_attended:
-            people = Person.objects.filter(organization_id=school.id)
+            people = Person.objects.filter(organization=org)
         else:
             people = Person.objects.filter(
-                tags__show_in_attendance=True, organization_id=school.id
+                tags__show_in_attendance=True, organization=org
             )
 
         people = people.order_by("first_name")
 
         student_info = []
-        batch_data = get_student_batch_data(people, year, school)
+        batch_data = get_student_batch_data(people, year, org)
         for person in people:
             student_data = batch_data[person.id]
             if (

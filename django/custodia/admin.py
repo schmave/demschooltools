@@ -3,16 +3,10 @@ from django.contrib import admin
 from custodia.models import (
     Excuse,
     Override,
-    School,
     StudentRequiredMinutes,
     Swipe,
     Year,
 )
-
-
-@admin.register(School)
-class SchoolAdmin(admin.ModelAdmin):
-    list_display = ["id", "name", "timezone", "late_time", "use_display_name"]
 
 
 @admin.register(Swipe)
@@ -21,13 +15,6 @@ class SwipeAdmin(admin.ModelAdmin):
     list_filter = ["swipe_day", "person__organization"]
 
     readonly_fields = ["person"]
-
-
-# @admin.register(Student)
-# class StudentAdmin(admin.ModelAdmin):
-#     list_display = ["id", "name", "school", "start_date", "is_teacher"]
-#     list_filter = ["is_teacher", "school"]
-#     readonly_fields = ["school", "person"]
 
 
 @admin.register(StudentRequiredMinutes)
@@ -53,6 +40,13 @@ class ExcuseAdmin(admin.ModelAdmin):
 
 @admin.register(Year)
 class YearAdmin(admin.ModelAdmin):
-    list_display = ["id", "name", "school", "inserted_date"]
-    list_filter = ["inserted_date", "school"]
-    readonly_fields = ["school"]
+    list_display = [
+        "id",
+        "name",
+        "organization",
+        "from_time",
+        "to_time",
+        "inserted_date",
+    ]
+    list_filter = ["inserted_date", "organization"]
+    readonly_fields = ["organization"]

@@ -1,39 +1,6 @@
 from django.db import models
 
-from dst.models import Person
-
-
-class School(models.Model):
-    class Meta:
-        db_table = "schools"
-
-    id = models.AutoField(db_column="_id", primary_key=True)
-    name = models.TextField()
-    timezone = models.TextField()
-    inserted_date = models.DateTimeField()
-    use_display_name = models.BooleanField()
-    late_time = models.TimeField()
-
-    def __str__(self):
-        return f"{self.id}-{self.name}"
-
-
-# class Student(models.Model):
-#     class Meta:
-#         db_table = "students"
-
-#     id = models.AutoField(db_column="_id", primary_key=True)
-#     person = models.ForeignKey(
-#         "dst.Person", db_column="dst_id", on_delete=models.PROTECT
-#     )
-#     start_date = models.DateField()
-#     is_teacher = models.BooleanField()
-#     name = models.TextField()
-#     show_as_absent = models.DateField()
-#     school = models.ForeignKey(School, on_delete=models.PROTECT)
-
-#     def __str__(self):
-#         return self.name
+from dst.models import Organization, Person
 
 
 class StudentRequiredMinutes(models.Model):
@@ -88,12 +55,6 @@ class Excuse(models.Model):
 
 
 class Year(models.Model):
-    """
-    Recommended changes from the overseer.years table currently being used in production:
-
-      * add unique(school, name) constraint
-    """
-
     class Meta:
         db_table = "years"
 
@@ -104,4 +65,4 @@ class Year(models.Model):
 
     inserted_date = models.DateTimeField(auto_now_add=True)
     name = models.TextField()
-    school = models.ForeignKey(School, on_delete=models.PROTECT)
+    organization = models.ForeignKey(Organization, on_delete=models.PROTECT)

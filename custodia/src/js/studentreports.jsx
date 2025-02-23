@@ -221,6 +221,10 @@ class StudentReports extends React.Component {
         </div>
         {grid}
         <Modal ref="newSchoolYear" title="Create new period">
+          <p>
+            The start date, end date, and all dates in between the two will be included in the
+            report.
+          </p>
           <form className="form">
             <div className="form-group" style={{ display: "flex" }}>
               <div className="margined">

@@ -9,6 +9,8 @@ class Organization(models.Model):
     id: int
     name = models.TextField()
     short_name = models.TextField()
+    timezone = models.TextField()
+    late_time = models.TimeField()
 
     def __str__(self):
         return f"{self.id}-{self.name}"

@@ -8,9 +8,9 @@ class TimezoneMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        if hasattr(request, "school"):
-            timezone.activate(zoneinfo.ZoneInfo(request.school.timezone))
+        if hasattr(request, "org"):
+            timezone.activate(zoneinfo.ZoneInfo(request.org.timezone))
         else:
-            timezone.deactivate()
+            timezone.activate(zoneinfo.ZoneInfo("America/New_York"))
 
         return self.get_response(request)

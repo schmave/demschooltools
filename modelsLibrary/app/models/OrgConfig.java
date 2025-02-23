@@ -39,6 +39,10 @@ public class OrgConfig {
 
   public Organization org;
 
+  // TODO: Delete this and all overrides of it in subclasses of OrgConfig.
+  // As of the Custodia -> DST merger, this value is now stored in the
+  // Organization model. Be sure that the database is up to date with
+  // these values.
   public TimeZone time_zone = TimeZone.getTimeZone("US/Eastern");
 
   public String getReferralDestination(Charge c) {

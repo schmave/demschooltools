@@ -75,6 +75,42 @@ alter table overseer.students_required_minutes drop column student_id cascade;
 alter table overseer.overrides drop column student_id;
                                 """
         ),
+        # Combine overseer.schools with public.organization, and fix a bunch of things
+        # about the years table.
+        migrations.RunSQL(
+            """
+ALTER TABLE organization ADD COLUMN	timezone varchar(255) DEFAULT 'America/New_York' NOT NULL;
+UPDATE organization o set timezone=s.timezone FROM overseer.schools s where s._id=o.id;
+
+ALTER TABLE overseer.years ALTER COLUMN school_id rename to organization_id;
+ALTER TABLE overseer.years DROP CONSTRAINT fk_class_school;
+ALTER TABLE overseer.years ADD CONSTRAINT fk_org FOREIGN KEY (organization_id) REFERENCES organization(id);
+ALTER TABLE overseer.years ALTER COLUMN organization_id DROP DEFAULT;
+ALTER TABLE overseer.years ALTER COLUMN name SET NOT NULL;
+ALTER TABLE overseer.years ALTER COLUMN inserted_date SET NOT NULL;
+ALTER TABLE overseer.years ALTER COLUMN inserted_date DROP DEFAULT;
+ALTER TABLE overseer.years ALTER COLUMN inserted_date type timestamp with time zone;
+
+delete from overseer.years where from_date is null or to_date is null;
+ALTER TABLE overseer.years ALTER COLUMN from_date SET NOT NULL;
+ALTER TABLE overseer.years ALTER COLUMN to_date SET NOT NULL;
+
+-- Delete duplicate organization_id, name
+DELETE FROM overseer.years a USING (
+    SELECT MIN(ctid) as ctid, organization_id, name
+    FROM overseer.years
+    GROUP BY organization_id, name HAVING COUNT(*) > 1
+) b
+WHERE a.organization_id = b.organization_id and a.name=b.name
+AND a.ctid <> b.ctid;
+ALTER TABLE overseer.years ADD CONSTRAINT unique_name UNIQUE (organization_id, name);
+
+ALTER TABLE overseer.schools rename to old_schools;
+
+ALTER TABLE organization ADD COLUMN late_time TIME DEFAULT '10:15:00'::time without time zone NULL;
+ALTER TABLE organization ALTER COLUMN late_time DROP DEFAULT;
+"""
+        ),
         # Add fields needed for django auth/user
         migrations.RunSQL("""
 ALTER TABLE public.users ADD COLUMN date_joined timestamptz NOT NULL default '2000-01-01';
@@ -89,7 +125,6 @@ ALTER TABLE public.users ADD COLUMN username varchar(150) NOT NULL default '';
         # Set late_time at the school level instead of class level
         # TODO: Do this on public.organization instead of school
         migrations.RunSQL("""
-alter table overseer.schools add column late_time time DEFAULT '10:15:00'::time without time zone NULL;
 """),
         # Add unique ID to students_required_minutes table
         migrations.RunSQL("""
