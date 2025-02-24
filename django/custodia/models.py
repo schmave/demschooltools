@@ -26,8 +26,11 @@ class Swipe(models.Model):
     person_id: int
     swipe_day = models.DateField()
 
-    in_time = models.DateTimeField(null=True, blank=True)
+    in_time = models.DateTimeField()
     out_time = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"ID-{self.id} {self.in_time}-{self.out_time}"
 
 
 class Override(models.Model):

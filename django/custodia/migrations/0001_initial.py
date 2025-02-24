@@ -111,6 +111,13 @@ ALTER TABLE organization ADD COLUMN late_time TIME DEFAULT '10:15:00'::time with
 ALTER TABLE organization ALTER COLUMN late_time DROP DEFAULT;
 """
         ),
+        # Disallow null in times for swipes
+        migrations.RunSQL(
+            """
+DELETE FROM overseer.swipes WHERE in_time is NULL;
+ALTER TABLE overseer.swipes ALTER COLUMN in_time SET NOT NULL;
+            """
+        ),
         # Add fields needed for django auth/user
         migrations.RunSQL("""
 ALTER TABLE public.users ADD COLUMN date_joined timestamptz NOT NULL default '2000-01-01';

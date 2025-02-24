@@ -247,24 +247,28 @@ class StudentsTodayView(APIView):
 
         people = list(
             Person.objects.filter(
-                tags__show_in_attendance=True, organization=org
+                tags__show_in_attendance=True,
+                tags__organization=org,
             ).distinct()
         )
 
-        person_to_max_swipe = {
-            x.person_id: x
-            for x in Swipe.objects.filter(
-                person__in=people,
-                swipe_day__gt=today - timedelta(days=10),
-            )
-            .distinct("person")
-            .order_by("person", "-in_time")
-        }
+        person_to_max_swipe: dict[int, Swipe] = {}
+        for swipe in Swipe.objects.filter(
+            person__in=people,
+            # We will only try to fill in missing swipes if the missing swipe
+            # happened in the last 10 days.
+            swipe_day__gt=today - timedelta(days=10),
+        ):
+            if (
+                swipe.person_id not in person_to_max_swipe
+                or person_to_max_swipe[swipe.person_id].in_time < swipe.in_time
+            ):
+                person_to_max_swipe[swipe.person_id] = swipe
 
         student_ids = set(
             Person.objects.filter(
                 id__in=[x.id for x in people],
-                organization=org,
+                tags__organization=org,
                 tags__use_student_display=True,
             ).values_list("id", flat=True)
         )
@@ -282,7 +286,7 @@ class StudentsTodayView(APIView):
                 student_to_in_time[person_id] = in_time
 
         for person in people:
-            last_swipe = person_to_max_swipe[person.id]
+            last_swipe = person_to_max_swipe.get(person.id)
             student_infos.append(
                 student_to_dict(
                     person,
@@ -624,7 +628,8 @@ class ReportView(APIView):
             people = Person.objects.filter(organization=org)
         else:
             people = Person.objects.filter(
-                tags__show_in_attendance=True, organization=org
+                tags__show_in_attendance=True,
+                tags__organization=org,
             )
 
         people = people.order_by("first_name").distinct()
