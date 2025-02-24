@@ -70,6 +70,5 @@ class PlaySessionMiddleware(MiddlewareMixin):
                 auth.logout(request)
                 auth.login(request, new_user, "demschooltools.auth.PlaySessionBackend")
 
-            org_id = Organization.objects.get(hosts__host=request.get_host()).id
-            request.org = Organization.objects.get(id=org_id)
+            request.org = Organization.objects.get(hosts__host=request.get_host())
             LOGGER.info(f"host={request.get_host()}, organization={request.org}")

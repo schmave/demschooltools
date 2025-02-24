@@ -70,9 +70,6 @@ class Person(models.Model):
     custodia_show_as_absent = models.DateField()
     custodia_start_date = models.DateField()
 
-    def is_teacher(self):
-        return not self.tags.filter(use_student_display=True).exists()
-
     def __str__(self):
         return f'{self.first_name} {self.last_name} "{self.display_name}" [Org {self.organization_id}]'
 

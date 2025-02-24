@@ -4,7 +4,6 @@ from datetime import date, datetime, time, timedelta
 import requests
 from django.contrib.auth import logout
 from django.contrib.auth.views import redirect_to_login
-from django.db.models import Max
 from django.db.transaction import atomic
 from django.http import HttpRequest
 from django.shortcuts import redirect, render
@@ -97,6 +96,7 @@ def student_to_dict(
     org: Organization,
     last_swipe: Swipe | None,
     in_today_time: datetime | None,
+    is_teacher: bool,
 ):
     today = timezone.localdate()
     if in_today_time:
@@ -109,7 +109,7 @@ def student_to_dict(
             "in" if last_swipe and last_swipe.out_time is None else "out"
         ),
         "swiped_today_late": (in_today_time and in_today_time.time() > org.late_time),
-        "is_teacher": student.is_teacher(),
+        "is_teacher": is_teacher,
         "in_today": in_today,
         "absent_today": student.custodia_show_as_absent == today,
         "last_swipe_date": last_swipe and format_date(last_swipe.swipe_day),
@@ -248,15 +248,26 @@ class StudentsTodayView(APIView):
         people = list(
             Person.objects.filter(
                 tags__show_in_attendance=True, organization=org
-            ).annotate(max_swipe_id=Max("swipe__id"))
+            ).distinct()
         )
 
-        student_to_last_swipe = {
+        person_to_max_swipe = {
             x.person_id: x
             for x in Swipe.objects.filter(
-                id__in=[x.max_swipe_id for x in people]  # type: ignore
+                person__in=people,
+                swipe_day__gt=today - timedelta(days=10),
             )
+            .distinct("person")
+            .order_by("person", "-swipe_day")
         }
+
+        student_ids = set(
+            Person.objects.filter(
+                id__in=[x.id for x in people],
+                organization=org,
+                tags__use_student_display=True,
+            ).values_list("id", flat=True)
+        )
 
         student_to_in_time: dict[int, datetime] = {}
         for person_id, in_time in (
@@ -270,14 +281,15 @@ class StudentsTodayView(APIView):
             if person_id not in student_to_in_time:
                 student_to_in_time[person_id] = in_time
 
-        for student in people:
-            last_swipe = student_to_last_swipe[student.id]
+        for person in people:
+            last_swipe = person_to_max_swipe[person.id]
             student_infos.append(
                 student_to_dict(
-                    student,
+                    person,
                     org,
                     last_swipe,
-                    student_to_in_time.get(student.id),
+                    student_to_in_time.get(person.id),
+                    person.id not in student_ids,
                 )
             )
 
@@ -509,7 +521,6 @@ def get_student_data(
         if required_minutes
         else DEFAULT_REQUIRED_MINUTES,
         "total_hours": total_seconds / 3600,
-        "is_teacher": person.is_teacher(),
         "last_swipe_date": format_date(last_swipe_date) if last_swipe_date else None,
         "total_abs": total_abs,
         "total_days": total_days,
@@ -616,7 +627,7 @@ class ReportView(APIView):
                 tags__show_in_attendance=True, organization=org
             )
 
-        people = people.order_by("first_name")
+        people = people.order_by("first_name").distinct()
 
         student_info = []
         batch_data = get_student_batch_data(people, year, org)
