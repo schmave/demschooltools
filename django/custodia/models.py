@@ -26,8 +26,8 @@ class Swipe(models.Model):
     person_id: int
     swipe_day = models.DateField()
 
-    in_time = models.DateTimeField(null=True)
-    out_time = models.DateTimeField(null=True)
+    in_time = models.DateTimeField(null=True, blank=True)
+    out_time = models.DateTimeField(null=True, blank=True)
 
 
 class Override(models.Model):

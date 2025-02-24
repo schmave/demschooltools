@@ -146,7 +146,7 @@ class ExcuseView(APIView):
         student = get_person(request, person_id)
         date: str = request.data["day"]  # type: ignore
 
-        Excuse.objects.create(student=student, date=date)
+        Excuse.objects.create(person=student, date=date)
 
         return student_data_view(person_id, request.org)
 
@@ -159,7 +159,7 @@ class OverrideView(APIView):
         student = get_person(request, person_id)
         date: str = request.data["day"]  # type: ignore
 
-        Override.objects.create(student=student, date=date)
+        Override.objects.create(person=student, date=date)
 
         return student_data_view(person_id, request.org)
 
@@ -207,7 +207,7 @@ class DeleteSwipeView(APIView):
     def post(self, request: Request, person_id: int) -> Response:
         student = get_person(request, person_id)
         swipe_id = request.data["swipe"]["_id"]  # type: ignore
-        Swipe.objects.get(id=swipe_id, student=student).delete()
+        Swipe.objects.get(id=swipe_id, person=student).delete()
         return student_data_view(student.id, request.org)
 
 
@@ -218,7 +218,7 @@ class IsAdminView(APIView):
         return Response(
             {
                 "admin": "overseer.roles/admin" if is_custodia_admin(user) else None,
-                "org": {
+                "school": {
                     "_id": org.id,
                     "name": org.name,
                     "timezone": org.timezone,
@@ -258,7 +258,7 @@ class StudentsTodayView(APIView):
                 swipe_day__gt=today - timedelta(days=10),
             )
             .distinct("person")
-            .order_by("person", "-swipe_day")
+            .order_by("person", "-in_time")
         }
 
         student_ids = set(
@@ -319,7 +319,7 @@ class StudentDataView(APIView):
             ).date()
 
         StudentRequiredMinutes.objects.update_or_create(
-            student=student,
+            person=student,
             fromdate=timezone.localdate(),
             defaults=dict(required_minutes=request.data["minutes"]),  # type: ignore
         )
