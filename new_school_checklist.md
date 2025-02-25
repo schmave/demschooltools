@@ -7,15 +7,19 @@
 1. Create new entry in organization table (ID, name, short_name):
 
     ```sql
-    INSERT INTO organization(name, shortname) VALUES ('Tall Sudbury School', 'TSS');
+    INSERT INTO organization(name, shortname)
+        VALUES ('Tall Sudbury School', 'TSS');
     ```
 
 1. Create new entry in organization_hosts table, plus new basic tags:
 
     ```sql
-    INSERT INTO organization_hosts(host, organization_id) VALUES ('foo.demschooltools.com', newId);
-    INSERT INTO tag(title, use_student_display, organization_id, show_in_jc) VALUES ('Current Student', true, newId, true);
-    INSERT INTO tag(title, use_student_display, organization_id, show_in_jc) VALUES ('Staff', false, newId, true);
+    INSERT INTO organization_hosts(host, organization_id)
+        VALUES ('foo.demschooltools.com', newId);
+    INSERT INTO tag(title, use_student_display, organization_id, show_in_jc, show_in_attendance)
+        VALUES ('Current Student', true, newId, true, true);
+    INSERT INTO tag(title, use_student_display, organization_id, show_in_jc, show_in_attendance)
+        VALUES ('Staff', false, newId, true, true);
     ```
 
 1. Run:
