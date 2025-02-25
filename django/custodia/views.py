@@ -403,8 +403,11 @@ def get_student_batch_data(
     ):
         required_minutes[srm.person_id].append(srm)
 
+    all_ids = set(
+        overrides.keys() | excuses.keys() | swipes.keys() | required_minutes.keys()
+    )
     result: dict[int, dict] = {}
-    for student in students:
+    for student in Person.objects.filter(id__in=all_ids):
         result[student.id] = get_student_data(
             student,
             school_days,
@@ -636,11 +639,9 @@ class ReportView(APIView):
 
         student_info = []
         batch_data = get_student_batch_data(people, year, org)
-        for person in people:
-            student_data = batch_data[person.id]
+        for student_data in batch_data.values():
             if (
-                show_attended
-                and student_data["total_days"] == 0
+                student_data["total_days"] == 0
                 and student_data["total_short"] == 0
                 and student_data["total_overrides"] == 0
             ):
@@ -658,5 +659,7 @@ class ReportView(APIView):
                     "unexcused": student_data["total_abs"],
                 }
             )
+
+        student_info.sort(key=lambda x: x["name"])
 
         return Response(student_info)
