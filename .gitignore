@@ -1,7 +1,6 @@
 syntax:glob
 
 logs
-project/project
 project/target
 target
 dist
@@ -37,3 +36,14 @@ __pycache__/
 
 # Mac stuff
 .DS_Store
+
+# Metals stuff
+.metals/
+.bloop/
+.ammonite/
+metals.sbt
+
+# Eclipse stuff
+.settings/
+.classpath
+.project
