@@ -199,7 +199,7 @@ class Student extends React.Component {
 
   showingStudentName = () => {
     return (
-      <div className="col-sm-8" id="studentName">
+      <div className="col-sm-6" id="studentName">
         <span id="edit-name">
           <h1 className="pull-left">{this.state.student.name}</h1>
           <span className="fa fa-pencil edit-student"></span>
@@ -215,11 +215,6 @@ class Student extends React.Component {
   render() {
     if (this.state.student) {
       const activeDate = this.getActiveDay(this.state.student);
-      const attended =
-        (this.state.student.total_days + this.state.student.total_short).toString() +
-        " (" +
-        this.state.student.total_short +
-        ")";
       const requiredMinutes = this.state.student.required_minutes;
       return (
         <div className="row">
@@ -231,9 +226,13 @@ class Student extends React.Component {
               <div className="panel-heading">
                 <div className="row" onClick={this.toggleEdit}>
                   {this.showingStudentName()}
-                  <div className="col-sm-4">
+                  <div className="col-sm-6">
                     <div id="hd-attended" className="col-sm-6">
-                      <b>Attended:</b> {attended}
+                      <b>Attended:</b>{" "}
+                      {this.state.student.total_days + this.state.student.total_short}
+                    </div>
+                    <div className="col-sm-6">
+                      <b>Short:</b> {this.state.student.total_short}
                     </div>
                     <div id="hd-absent" className="col-sm-6">
                       <b>Unexcused:</b> {this.state.student.total_abs}

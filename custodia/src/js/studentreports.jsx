@@ -41,11 +41,8 @@ class StudentTotalComponent extends React.Component {
 
 class StudentAttendedComponent extends React.Component {
   render() {
-    let good = this.props.rowData.good;
-    const short = this.props.rowData.short;
-
-    good = good + short + " (" + short + ")";
-    return <span>{good}</span>;
+    const { good, short } = this.props.rowData;
+    return <span>{good + short}</span>;
   }
 }
 
@@ -136,7 +133,7 @@ class StudentReports extends React.Component {
           id="test"
           results={this.state.rows}
           resultsPerPage="200"
-          columns={["name", "good", "overrides", "unexcused", "excuses", "short", "total_hours"]}
+          columns={["name", "good", "short", "overrides", "unexcused", "excuses", "total_hours"]}
           columnMetadata={[
             {
               displayName: "Name",
