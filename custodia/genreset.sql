@@ -1,9 +1,0 @@
-SELECT SETVAL('overseer.classes__id_seq', COALESCE(MAX(_id), 1) ) FROM overseer.classes;
-SELECT SETVAL('overseer.excuses__id_seq', COALESCE(MAX(_id), 1) ) FROM overseer.excuses;
-SELECT SETVAL('overseer.excuses_student_id_seq', COALESCE(MAX(student_id), 1) ) FROM overseer.excuses;
-SELECT SETVAL('overseer.overrides__id_seq', COALESCE(MAX(_id), 1) ) FROM overseer.overrides;
-SELECT SETVAL('overseer.overrides_student_id_seq', COALESCE(MAX(student_id), 1) ) FROM overseer.overrides;
-SELECT SETVAL('overseer.students__id_seq', COALESCE(MAX(_id), 1) ) FROM overseer.students;
-SELECT SETVAL('overseer.swipes__id_seq', COALESCE(MAX(_id), 1) ) FROM overseer.swipes;
-SELECT SETVAL('overseer.swipes_student_id_seq', COALESCE(MAX(student_id), 1) ) FROM overseer.swipes;
-SELECT SETVAL('overseer.years__id_seq', COALESCE(MAX(_id), 1) ) FROM overseer.years;
