@@ -2,6 +2,14 @@ from django.db import models
 
 from dst.models import Organization, Person
 
+# class Student(models.Model):
+#     class Meta:
+#         db_table = "old_students"
+
+#     id = models.AutoField(db_column="_id", primary_key=True)
+#     name = models.TextField()
+#     person = models.ForeignKey(Person, on_delete=models.PROTECT, db_column="dst_id")
+
 
 class StudentRequiredMinutes(models.Model):
     class Meta:
