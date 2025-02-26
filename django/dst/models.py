@@ -154,15 +154,23 @@ class Meeting(models.Model):
     date = models.DateField()
 
 
+CHECKIN_USERNAME = "Check-in app user"
+
+
 class User(AbstractUser):
     password = models.TextField(db_column="hashed_password")
 
     class Meta:
         db_table = 'public"."users'
 
+    is_active = models.BooleanField(
+        default=True,
+        db_column="active",
+    )
     organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
     name = models.TextField()
     email = models.TextField()  # override this so that emails aren't validated
+    email_validated = models.BooleanField(default=False)
 
     roles: "models.Manager[UserRole]"
 

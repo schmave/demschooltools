@@ -11,6 +11,17 @@ from dst.models import Organization, Person
 #     person = models.ForeignKey(Person, on_delete=models.PROTECT, db_column="dst_id")
 
 
+class OldUsers(models.Model):
+    class Meta:
+        db_table = "old_users"
+
+    id = models.AutoField(db_column="user_id", primary_key=True)
+    username = models.TextField()
+    roles = models.TextField()
+    password = models.TextField()
+    school_id = models.IntegerField()
+
+
 class StudentRequiredMinutes(models.Model):
     class Meta:
         db_table = "students_required_minutes"
