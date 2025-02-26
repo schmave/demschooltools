@@ -8,21 +8,15 @@
     "watch": "webpack serve --mode development"
   },
   "dependencies": {
-    "cal-heatmap": "3.5.4",
-    "d3": "3.5.6",
+    "cal-heatmap": "^3.6.2",
     "dayjs": "^1.11.11",
     "flux": "2.1.1",
     "griddle-react": "0.8.x",
-    "history": "3.x",
-    "moment": "2.10.6",
-    "object-assign": "3.0.0",
-    "prop-types": "15.x",
     "react": "16.x",
     "react-dom": "16.x",
     "react-notification-system": "0.2.x",
     "react-router": "3.x",
-    "react-skylight": "0.5.1",
-    "underscore": "1.8.3"
+    "react-skylight": "0.5.1"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.26.7",

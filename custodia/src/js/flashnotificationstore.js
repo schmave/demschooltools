@@ -1,6 +1,5 @@
 var EventEmitter = require("events").EventEmitter,
   dispatcher = require("./appdispatcher"),
-  assign = require("object-assign"),
   constants = require("./appconstants");
 
 var CHANGE_EVENT = "change";
@@ -12,7 +11,7 @@ function getLatest() {
   return { message: latest, level: level };
 }
 
-var exports = assign({}, EventEmitter.prototype, {
+var exports = Object.assign({}, EventEmitter.prototype, {
   getLatest: getLatest,
   emitChange: function () {
     this.emit(CHANGE_EVENT);

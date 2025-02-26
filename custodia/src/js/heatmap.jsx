@@ -1,6 +1,6 @@
 const React = require("react");
 const Heatmapmonth = require("./heatmapmonth.jsx");
-const moment = require("moment");
+const dayjs = require("dayjs");
 
 Array.prototype.concatAll = function () {
   const results = [];
@@ -42,8 +42,8 @@ module.exports = class Heatmap extends React.Component {
       // Find up to four months worth of dates, which we will send
       // to Heatmapmonth in one batch.
       let j = i + 1;
-      const lastDate = moment(sortedDates[i]).add(4, "months");
-      while (j < sortedDates.length && moment(sortedDates[j]).isBefore(lastDate)) {
+      const lastDate = dayjs(sortedDates[i]).add(4, "months");
+      while (j < sortedDates.length && dayjs(sortedDates[j]).isBefore(lastDate)) {
         j++;
       }
 
