@@ -15,24 +15,10 @@ app/assets/checkin/app.html
 .eslintcache
 npm-debug.log
 
-# School-specific files
-fairhaven/*
-the_circle_school/*
-trvs/*
-makarios_learning_community/*
-
 *~
-
-# Sublime Text files
-*.sublime-workspace
-
 conf/generated.keystore
 
 __pycache__/
-
-# Clojure VS Code plugin stuff
-/.clj-kondo
-/.lsp
 
 # Mac stuff
 .DS_Store
@@ -47,3 +33,5 @@ metals.sbt
 .settings/
 .classpath
 .project
+
+django.tgz

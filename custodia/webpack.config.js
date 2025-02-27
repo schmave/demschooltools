@@ -1,12 +1,12 @@
 const path = require("path");
-const webpack = require("webpack");
 
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 
-const isDevelopment = process.env.NODE_ENV !== "production";
 const DEV_SERVER_PORT = 8081;
 
 module.exports = function (env, argv) {
+  const isDevelopment = argv.mode !== "production";
   return {
     mode: isDevelopment ? "development" : "production",
     devtool: "source-map",
@@ -70,10 +70,8 @@ module.exports = function (env, argv) {
       ],
     },
     output: {
-      // path: path.resolve(__dirname, "../django/static/js/gen/"),
-      clean: true,
-      filename: "[name].js",
-      sourceMapFilename: "[file].[chunkhash].map[query]",
+      filename: isDevelopment ? "[name].js" : "[name].[chunkhash].js",
+      sourceMapFilename: "[file].map",
     },
     resolve: {
       extensions: ["", ".js", ".jsx"],
@@ -90,19 +88,17 @@ module.exports = function (env, argv) {
           },
         }),
 
-      //   new ESLintPlugin({
-      //     fix: true,
-      //     useEslintrc: true,
-      //   }),
-      //   new HtmlWebpackPlugin({
-      //     filename: "../../checkin/app.html",
-      //     template: "checkin/template.html",
-      //     hash: argv.mode != "production",
-      //     chunks: ["checkin"],
-      //     templateParameters: {
-      //       rollbarEnvironment: argv.mode == "production" ? "production" : "development",
-      //     },
-      //   }),
+      new HtmlWebpackPlugin({
+        filename: "index.html",
+        template: "../../django/custodia/templates/index.html",
+        hash: argv.mode != "production",
+        chunks: ["app"],
+        publicPath: "/django-static/js/",
+        scriptLoading: "blocking",
+        templateParameters: {
+          rollbarEnvironment: argv.mode == "production" ? "production" : "development",
+        },
+      }),
     ].filter(Boolean),
   };
 };

@@ -4,8 +4,8 @@
   "description": "Classroom attendance management.",
   "main": "index.js",
   "scripts": {
-    "compile": "webpack --mode production",
-    "watch": "webpack serve --mode development"
+    "compile": "webpack --mode=production",
+    "watch": "webpack serve --mode=development"
   },
   "dependencies": {
     "cal-heatmap": "^3.6.2",
@@ -29,7 +29,7 @@
     "babel-preset-react": "6.x",
     "babel-preset-stage-1": "latest",
     "eslint-webpack-plugin": "^4.2.0",
-    "html-webpack-plugin": "^5.6.0",
+    "html-webpack-plugin": "^5.6.3",
     "prettier": "^3.2.5",
     "react-refresh": "^0.14.2",
     "webpack": "^5.91.0",

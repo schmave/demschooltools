@@ -24,7 +24,7 @@ from custodia.models import (
     Swipe,
     Year,
 )
-from demschooltools.settings import LOGIN_URL
+from demschooltools.settings import CUSTODIA_JS_LINK, LOGIN_URL
 from dst.models import Person, User, UserRole
 
 DEFAULT_REQUIRED_MINUTES = 345
@@ -35,7 +35,7 @@ class IndexView(View):
         if not request.user.is_authenticated:
             return redirect_to_login("")
 
-        return render(request, "index.html")
+        return render(request, "index.html", {"dev_js_link": CUSTODIA_JS_LINK})
 
 
 class LoginView(View):

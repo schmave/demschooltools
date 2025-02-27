@@ -21,10 +21,10 @@
 <body>
     {% csrf_token %}
     <div id="react_container"/>
+    <script src="/django-static/js/polyfill.js?v=2"></script>
+    <script src="/django-static/js/jquery.js?v=2"></script>
+    <script src="/django-static/js/bootstrap.min.js?v=2"></script>
+    {{ dev_js_link | safe}}
 </body>
 
-<script src="/django-static/js/polyfill.js?v=2"></script>
-<script src="/django-static/js/jquery.js?v=2"></script>
-<script src="/django-static/js/bootstrap.min.js?v=2"></script>
-<script src="http://localhost:8081/app.js"></script>
 </html>
