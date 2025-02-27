@@ -173,6 +173,7 @@ class OrgConfigs {
     register(new SligoSudburySchool());
     register(new LearningProjectIbiza());
     register(new Wilmington());
+    register(new SouthJersey());
   }
 }
 
@@ -529,6 +530,24 @@ class Wilmington extends OrgConfig {
 
     str_manual_title = "Lawbook";
     str_manual_title_short = "Lawbook";
+    str_res_plan_short = "Sentence";
+    str_res_plan = "sentence";
+    str_res_plan_cap = "Sentence";
+    str_res_plans = "sentences";
+    str_res_plans_cap = "Sentences";
+
+    track_writer = true;
+    use_year_in_case_number = true;
+  }
+}
+
+class SouthJersey extends OrgConfig {
+  public SouthJersey() {
+    name = "South Jersey Sudbury School";
+    people_url = "https://sjss.demschooltools.com";
+
+    str_manual_title = "Rulebook";
+    str_manual_title_short = "Rulebook";
     str_res_plan_short = "Sentence";
     str_res_plan = "sentence";
     str_res_plan_cap = "Sentence";
