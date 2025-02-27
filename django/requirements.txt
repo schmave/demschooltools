@@ -62,8 +62,6 @@ pyinstrument==5.0.1
     # via -r requirements.in
 pyjwt==2.10.1
     # via -r requirements.in
-pywatchman==2.0.0
-    # via -r requirements.in
 requests==2.32.3
     # via -r requirements.in
 sqlparse==0.5.3

@@ -7,6 +7,5 @@ ipython
 psycopg
 pyinstrument
 pyjwt
-pywatchman
 requests
 tabulate
