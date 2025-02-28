@@ -34,3 +34,5 @@ DATABASES = {
         "CONN_MAX_AGE": 60,
     },
 }
+
+STATIC_ROOT = "/www/django-static/"
