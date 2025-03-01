@@ -6,15 +6,21 @@ requires-python = "~=3.12"
 dependencies = [
     "bcrypt~=4.3",
     "django~=5.1",
-    "django-extensions~=3.2",
-    "django-silk~=5.3",
     "djangorestframework~=3.15",
-    "drf-orjson-renderer>=1.7.3",
-    "gunicorn>=23.0.0",
+    "drf-orjson-renderer~=1.7",
     "psycopg2~=2.9",
-    "pyinstrument~=5.0",
     "pyjwt~=2.10",
     "requests~=2.32",
+]
+
+[dependency-groups]
+prod = [
+    "gunicorn~=23.0",
+]
+dev = [
+    "django-extensions~=3.2",
+    "django-silk~=5.3",
+    "pyinstrument~=5.0",
     "tabulate~=0.9",
 ]
 

@@ -124,33 +124,43 @@ source = { virtual = "." }
 dependencies = [
     { name = "bcrypt" },
     { name = "django" },
-    { name = "django-extensions" },
-    { name = "django-silk" },
     { name = "djangorestframework" },
     { name = "drf-orjson-renderer" },
-    { name = "gunicorn" },
     { name = "psycopg2" },
-    { name = "pyinstrument" },
     { name = "pyjwt" },
     { name = "requests" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "django-extensions" },
+    { name = "django-silk" },
+    { name = "pyinstrument" },
     { name = "tabulate" },
+]
+prod = [
+    { name = "gunicorn" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "bcrypt", specifier = "~=4.3" },
     { name = "django", specifier = "~=5.1" },
-    { name = "django-extensions", specifier = "~=3.2" },
-    { name = "django-silk", specifier = "~=5.3" },
     { name = "djangorestframework", specifier = "~=3.15" },
-    { name = "drf-orjson-renderer", specifier = ">=1.7.3" },
-    { name = "gunicorn", specifier = ">=23.0.0" },
+    { name = "drf-orjson-renderer", specifier = "~=1.7" },
     { name = "psycopg2", specifier = "~=2.9" },
-    { name = "pyinstrument", specifier = "~=5.0" },
     { name = "pyjwt", specifier = "~=2.10" },
     { name = "requests", specifier = "~=2.32" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "django-extensions", specifier = "~=3.2" },
+    { name = "django-silk", specifier = "~=5.3" },
+    { name = "pyinstrument", specifier = "~=5.0" },
     { name = "tabulate", specifier = "~=0.9" },
 ]
+prod = [{ name = "gunicorn", specifier = "~=23.0" }]
 
 [[package]]
 name = "django"
