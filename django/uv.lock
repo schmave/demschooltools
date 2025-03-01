@@ -158,7 +158,7 @@ dev = [
     { name = "django-extensions", specifier = "~=3.2" },
     { name = "django-silk", specifier = "~=5.3" },
     { name = "pyinstrument", specifier = "~=5.0" },
-    { name = "tabulate", specifier = "~=0.9" },
+    { name = "tabulate" },
 ]
 prod = [{ name = "gunicorn", specifier = "~=23.0" }]
 
