@@ -1,19 +1,11 @@
-To set up virtual environment:
-
-    python3.12 -m pip install -U uv
-    python3.12 -m uv venv venv
-    source venv/bin/activate
-    uv pip install -r requirements.txt
+This project uses [uv](https://docs.astral.sh/uv/) to manage its dependencies. Install it using the standalone installer [described here](https://docs.astral.sh/uv/getting-started/installation/#standalone-installer).
 
 To run the dev server:
 
-    source .venv/bin/activate
-    ./manage.py runserver
+    uv run manage.py runserver
 
-    You'll also need to follow the instructions in custodia/README.md to
-    build the frontend
+You'll also need to follow the instructions in custodia/README.md to build the frontend
 
 To run a script:
 
-    source .venv/bin/activate
-    ./manage.py runscript print_stats --script-args 2024
+    uv run manage.py runscript print_stats --script-args 2024
