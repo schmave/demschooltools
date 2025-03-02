@@ -5,7 +5,6 @@ from demschooltools.settings import *  # noqa: F403
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "OPTIONS": {"options": "-c search_path=public,overseer"},
         "NAME": "school_crm",
         "PORT": "5433",
         "HOST": "localhost",

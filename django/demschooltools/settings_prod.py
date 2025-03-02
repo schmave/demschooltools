@@ -1,7 +1,5 @@
 import os
 
-from django.conf.global_settings import SECURE_SSL_REDIRECT
-
 from demschooltools.settings import *  # noqa: F403
 
 CUSTODIA_JS_LINK = ""
@@ -25,8 +23,7 @@ JWT_KEY = os.environ["APPLICATION_SECRET"]
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "OPTIONS": {"options": "-c search_path=public,overseer"},
-        "NAME": "school_crm_from_prod",
+        "NAME": "school_crm",
         "PORT": "5432",
         "HOST": "localhost",
         "USER": "postgres",

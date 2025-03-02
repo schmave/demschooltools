@@ -126,12 +126,11 @@ LOGGING = {
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "OPTIONS": {"options": "-c search_path=public,overseer"},
-        "NAME": "school_crm_from_prod",
+        "NAME": "school_crm",
         "PORT": "5432",
         "HOST": "localhost",
         "USER": "postgres",
-        "PASSWORD": "abc123",
+        "PASSWORD": "123",
         "CONN_MAX_AGE": 60,
     },
 }

@@ -73,6 +73,6 @@ Then run:
 
 ### Frontend code
 
-    cd custodia
-    npm install
-    npm run watch
+cd custodia
+npm install
+npm run watch
