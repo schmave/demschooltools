@@ -14,16 +14,12 @@
     <link href="/django-static/css/bootstrap.min.css?v=2" rel="stylesheet">
     <link href="/django-static/css/bootstrap-theme.min.css?v=2" rel="stylesheet">
 
-    <link href="/django-static/css/cal-heatmap.css?v=2" rel="stylesheet">
     <link href="/django-static/starter-template.css" rel="stylesheet">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 </head>
 <body>
     {% csrf_token %}
     <div id="react_container"/>
-    <script src="/django-static/js/polyfill.js?v=2"></script>
-    <script src="/django-static/js/jquery.js?v=2"></script>
-    <script src="/django-static/js/bootstrap.min.js?v=2"></script>
     {{ dev_js_link | safe}}
 </body>
 

@@ -31,6 +31,15 @@ module.exports = function (env, argv) {
     module: {
       rules: [
         {
+          test: /\.css$/i,
+          use: [
+            // Creates `style` nodes from JS strings
+            "style-loader",
+            // Translates CSS into CommonJS
+            "css-loader",
+          ],
+        },
+        {
           test: /\.s[ac]ss$/i,
           use: [
             // Creates `style` nodes from JS strings

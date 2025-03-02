@@ -5,6 +5,7 @@ const constants = require("../appconstants");
 const actionCreator = require("../studentactioncreator");
 const Modal = require("../modal.jsx");
 const dayjs = require("dayjs");
+const $ = require("jquery");
 
 module.exports = class extends React.Component {
   static displayName = "StudentEditor";
@@ -58,7 +59,7 @@ module.exports = class extends React.Component {
   };
 
   edit = (student) => {
-    const s = jQuery.extend({}, student);
+    const s = $.extend({}, student);
     this.setState({
       student: s,
       startdate_datepicker: s.start_date ? dayjs(s.start_date) : null,

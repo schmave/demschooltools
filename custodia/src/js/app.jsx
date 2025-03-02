@@ -5,6 +5,7 @@ import { IndexRoute, Route, Router } from "react-router";
 import Flash from "./flashnotification.jsx";
 import myhistory from "./myhistory.js";
 import Nav from "./nav.jsx";
+import "./polyfill.js";
 import Student from "./student.jsx";
 import StudentReports from "./studentreports.jsx";
 import StudentTable from "./studenttable.jsx";

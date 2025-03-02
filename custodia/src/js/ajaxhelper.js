@@ -1,3 +1,5 @@
+const $ = require("jquery");
+
 function getCookie(name) {
   const cookie = {};
   document.cookie.split(";").forEach(function (el) {

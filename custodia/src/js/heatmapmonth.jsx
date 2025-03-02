@@ -1,6 +1,9 @@
 const React = require("react");
 const heatmap = require("cal-heatmap");
+require("cal-heatmap/cal-heatmap.css");
+
 const dayjs = require("dayjs");
+const $ = require("jquery");
 
 class HeatmapMonth extends React.Component {
   map = null;
