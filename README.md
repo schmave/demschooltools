@@ -49,18 +49,28 @@ Now that you've got the code, you'll need to run three separate programs for eac
 1.  When it loads, you should see a message saying
     "Database 'default' needs evolution!". Click "Apply this script now."
 
+1.  Wait until you see the message "Unknown organization" in your browser window.
+
 1.  Connect to your Postgres database and run this SQL:
 
-        INSERT INTO organization_hosts(host, organization_id) VALUES ('localhost:9000', 1);
-        INSERT INTO tag(title, use_student_display, organization_id, show_in_jc) VALUES ('Current Student', true, 1, true);
-        INSERT INTO tag(title, use_student_display, organization_id, show_in_jc) VALUES ('Staff', false, 1, true);
+    ```sql
+        INSERT INTO organization_hosts(host, organization_id)
+            VALUES ('localhost:9000', 1);
+        INSERT INTO tag(title, use_student_display, organization_id, show_in_jc)
+            VALUES ('Current Student', true, 1, true);
+        INSERT INTO tag(title, use_student_display, organization_id, show_in_jc)
+            VALUES ('Staff', false, 1, true);
 
-1.  Create a user for logging in:
-    Go to `https://www.browserling.com/tools/bcrypt` to encrypt a password
-    In pgAdmin run the following query (replacing names and passwords): `INSERT INTO users(email, name, active, email_validated, hashed_password) VALUES ('EMAIL', 'NAME', true, true, 'PASSWORDHERE');`
-    In pgAdmin run the following query (replacing the user_id with the user you just created): `INSERT INTO public.user_role (user_id, role) VALUES (USERID, 'all-access');`
+        INSERT INTO users(email, name, active, email_validated,
+                        is_staff, is_superuser, hashed_password)
+            VALUES ('admin@demschooltools.com', 'Admin User', true, true, true, true,
+                '$2a$10$sHAtPc.yeZg2AWMr7EZZbuu.sYaOPgFsMZiAY62q/URbjMxU3jB.q');
 
-1.  Navigate to [http://localhost:9000](http://localhost:9000). You will see
+        INSERT INTO user_role (user_id, role)
+            SELECT id, 'all-access' from users;
+    ```
+
+1.  Reload [http://localhost:9000](http://localhost:9000). Login with Email `admin@demschooltools.com` and password `nopassword`. You will see
     a page with headings "People", "Attendance", "JC", etc.
 
 ### Django code
@@ -69,10 +79,13 @@ The Django code uses [uv](https://docs.astral.sh/uv/) to manage its dependencies
 
 Then run:
 
+    uv run manage.py migrate
     uv run manage.py runserver
 
 ### Frontend code
 
-cd custodia
-npm install
-npm run watch
+To enable the Custodia attendance system locally, run:
+
+    cd custodia
+    npm install
+    npm run watch

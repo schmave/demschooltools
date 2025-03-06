@@ -84,7 +84,6 @@ alter table overseer.overrides drop column student_id;
 -- Combine overseer.schools with public.organization, and fix a bunch of things
 -- about the years table.
 
-ALTER TABLE organization ADD COLUMN	timezone varchar(255) DEFAULT 'America/New_York' NOT NULL;
 UPDATE organization o set timezone=s.timezone FROM overseer.schools s where s._id=o.id;
 
 ALTER TABLE overseer.years RENAME COLUMN school_id to organization_id;
@@ -125,9 +124,6 @@ WHERE a.organization_id = b.organization_id and a.name=b.name
 AND a.ctid <> b.ctid;
 ALTER TABLE overseer.years ADD CONSTRAINT unique_name UNIQUE (organization_id, name);
 
-ALTER TABLE organization ADD COLUMN late_time TIME DEFAULT '10:15:00'::time without time zone NULL;
-ALTER TABLE organization ALTER COLUMN late_time DROP DEFAULT;
-
 -- Add unique ID to students_required_minutes table
 ALTER TABLE overseer.students_required_minutes ADD COLUMN id SERIAL PRIMARY KEY;
 
@@ -153,18 +149,5 @@ ALTER TABLE swipes RENAME TO custodia_swipe;
 ALTER TABLE overrides RENAME TO custodia_override;
 ALTER TABLE excuses RENAME TO custodia_excuse;
 ALTER TABLE years RENAME TO custodia_year;
-
-
-
--- Add fields for Django user stuff
-ALTER TABLE users ADD COLUMN date_joined timestamptz NOT NULL default '2000-01-01';
-ALTER TABLE users ADD COLUMN last_login timestamptz NULL default NULL;
-ALTER TABLE users ADD COLUMN first_name varchar(150) NOT NULL default '';
-ALTER TABLE users ADD COLUMN last_name varchar(150) NOT NULL default '';
-ALTER TABLE users ADD COLUMN is_superuser bool NOT NULL default false;
-ALTER TABLE users ADD COLUMN is_staff bool NOT NULL default false;
-ALTER TABLE users ADD COLUMN username varchar(150) NOT NULL default '';
-
-INSERT INTO organization_hosts(host, organization_id) VALUES ('localhost:9000', 1) ON CONFLICT DO NOTHING;
 
 COMMIT;
