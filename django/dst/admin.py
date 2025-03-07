@@ -21,7 +21,7 @@ from dst.models import (
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = ["id", "organization_id", "name", "email"]
-    list_filter = ["organization_id"]
+    list_filter = ["organization_id", "is_superuser", "is_staff"]
     search_fields = ["name", "email"]
 
 

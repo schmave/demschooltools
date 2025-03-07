@@ -17,21 +17,17 @@ Now that you've got the code, you'll need to run three separate programs for eac
 
 ### Play Framework code
 
-1.  [Download](https://openjdk.org/) and install OpenJDK version 11.x and set the JAVA_HOME environment variable to be the location that you installed it.
+1.  [Download](https://openjdk.org/) and install OpenJDK version 11.x. Set the JAVA_HOME environment variable to be the location that you installed it, meaning that $JAVA_HOME/bin/java should be the path to the java binary.
 
 1.  Install [sbt 1.10](https://www.scala-sbt.org/download/). If you use a Mac, I recommend using [homebrew](https://brew.sh/) to install it.
 
-1.  [Download](http://www.postgresql.org/download/) and install PostgreSQL.
+1.  [Download](http://www.postgresql.org/download/) and install PostgreSQL. If you use a Mac, I recommend installing [the "Postgres" app](https://postgresapp.com/) instead.
 
 1.  [Download](https://nodejs.org/en/download/releases/) and install Node v18.
 
 1.  Run `npm install` to install the Javascript libraries.
 
 1.  Start PostgreSQL and create a database named "school_crm". You'll also need to set the password for the user named "postgres" to "123", or change the database username and password in conf/base.conf.
-
-1.  Set the environment variables APPLICATION_SECRET, GOOGLE_CLIENT_SECRET,
-    FACEBOOK_CLIENT_SECRET, ROLLBAR_TOKEN, CUSTODIA_PASSWORD, and SES_PASSWORD to empty values. You can run the
-    "set_keys_blank.sh" script to do this on Mac/Linux.
 
 1.  Run `./sbt.sh`, then execute the `eclipse` and `run` command in the sbt/play console:
 
@@ -63,14 +59,14 @@ Now that you've got the code, you'll need to run three separate programs for eac
 
         INSERT INTO users(email, name, active, email_validated,
                         is_staff, is_superuser, hashed_password)
-            VALUES ('admin@demschooltools.com', 'Admin User', true, true, true, true,
+            VALUES ('admin@asdf.com', 'Admin User', true, true, true, true,
                 '$2a$10$sHAtPc.yeZg2AWMr7EZZbuu.sYaOPgFsMZiAY62q/URbjMxU3jB.q');
 
         INSERT INTO user_role (user_id, role)
             SELECT id, 'all-access' from users;
     ```
 
-1.  Reload [http://localhost:9000](http://localhost:9000). Login with Email `admin@demschooltools.com` and password `nopassword`. You will see
+1.  Reload [http://localhost:9000](http://localhost:9000). Login with Email `admin@asdf.com` and password `nopassword`. You will see
     a page with headings "People", "Attendance", "JC", etc.
 
 ### Django code

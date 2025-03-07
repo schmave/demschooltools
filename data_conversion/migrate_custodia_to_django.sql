@@ -12,9 +12,6 @@
 BEGIN;
 
 -- Copy over columns from overseer.students to person
-ALTER TABLE person ADD COLUMN custodia_show_as_absent date NULL;
-ALTER TABLE person ADD COLUMN custodia_start_date date NULL;
-
 UPDATE person p set custodia_show_as_absent=s.show_as_absent
    FROM overseer.students s where s.dst_id=p.person_id;
 UPDATE person p set custodia_start_date=s.start_date
