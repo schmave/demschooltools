@@ -79,6 +79,23 @@ class Comment(models.Model):
         db_table = "comments"
 
     created = models.DateTimeField()
+    person = models.ForeignKey(Person, on_delete=models.PROTECT)
+
+
+class TaskList(models.Model):
+    class Meta:
+        db_table = "task_list"
+
+    title = models.CharField(max_length=255)
+    tag = models.ForeignKey(Tag, on_delete=models.PROTECT)
+    organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
+
+
+class Task(models.Model):
+    class Meta:
+        db_table = "task"
+
+    task_list = models.ForeignKey(TaskList, on_delete=models.PROTECT)
 
 
 class CompletedTask(models.Model):
@@ -87,6 +104,22 @@ class CompletedTask(models.Model):
 
     comment = models.ForeignKey(Comment, on_delete=models.PROTECT)
     person = models.ForeignKey(Person, on_delete=models.PROTECT)
+    task = models.ForeignKey(Task, on_delete=models.PROTECT)
+
+
+class NotificationRule(models.Model):
+    class Meta:
+        db_table = "notification_rule"
+
+    tag = models.ForeignKey(Tag, on_delete=models.PROTECT)
+    organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
+
+
+class MailchimpSync(models.Model):
+    class Meta:
+        db_table = "mailchimp_sync"
+
+    tag = models.ForeignKey(Tag, on_delete=models.PROTECT)
 
 
 class AttendanceDay(models.Model):
@@ -95,6 +128,20 @@ class AttendanceDay(models.Model):
 
     person = models.ForeignKey(Person, on_delete=models.PROTECT)
     day = models.DateField()
+
+
+class AttendanceWeek(models.Model):
+    class Meta:
+        db_table = "attendance_week"
+
+    person = models.ForeignKey(Person, on_delete=models.PROTECT)
+
+
+class Charge(models.Model):
+    class Meta:
+        db_table = "charge"
+
+    person = models.ForeignKey(Person, on_delete=models.PROTECT)
 
 
 class PersonTagChange(models.Model):
@@ -146,12 +193,66 @@ class ManualChange(models.Model):
     date_entered = models.DateTimeField()
 
 
+class Account(models.Model):
+    class Meta:
+        db_table = "account"
+
+    organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
+
+
+class Transaction(models.Model):
+    class Meta:
+        db_table = "transactions"
+
+    organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
+
+
 class Meeting(models.Model):
     class Meta:
         db_table = "meeting"
 
     organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
     date = models.DateField()
+
+
+class Case(models.Model):
+    class Meta:
+        db_table = "case"
+
+    meeting = models.ForeignKey(Meeting, on_delete=models.PROTECT)
+
+
+class ChargeReference(models.Model):
+    class Meta:
+        db_table = "charge_reference"
+
+    charge = models.ForeignKey(
+        Charge, on_delete=models.PROTECT, db_column="referenced_charge"
+    )
+    the_case = models.ForeignKey(
+        Case, on_delete=models.PROTECT, db_column="referencing_case"
+    )
+
+
+class PersonAtMeeting(models.Model):
+    class Meta:
+        db_table = "person_at_meeting"
+
+    person = models.ForeignKey(Person, on_delete=models.PROTECT)
+
+
+class PersonAtCase(models.Model):
+    class Meta:
+        db_table = "person_at_case"
+
+    person = models.ForeignKey(Person, on_delete=models.PROTECT)
+
+
+class PersonChange(models.Model):
+    class Meta:
+        db_table = "person_change"
+
+    person = models.ForeignKey(Person, on_delete=models.PROTECT)
 
 
 CHECKIN_USERNAME = "Check-in app user"

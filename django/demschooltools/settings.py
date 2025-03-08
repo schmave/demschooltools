@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "custodia",
     "dst",
-    "django_extensions",
 ] + (["silk"] if SILK_ENABLED else [])
 
 AUTH_USER_MODEL = "dst.User"

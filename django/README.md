@@ -1,3 +1,3 @@
 To run a script:
 
-    uv run manage.py runscript print_stats --script-args 2024
+    uv run manage.py print_stats --year 2024

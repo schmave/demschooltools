@@ -17,6 +17,8 @@ ALTER TABLE users ADD COLUMN is_superuser bool NOT NULL default false;
 ALTER TABLE users ADD COLUMN is_staff bool NOT NULL default false;
 ALTER TABLE users ADD COLUMN username varchar(150) NOT NULL default '';
 
+--- Add primary keys where there were none
+ALTER TABLE person_change ADD COLUMN id SERIAL PRIMARY KEY;
 
 
 # --- !Downs
