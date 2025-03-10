@@ -19,7 +19,11 @@ ALTER TABLE users ADD COLUMN username varchar(150) NOT NULL default '';
 
 --- Add primary keys where there were none
 ALTER TABLE person_change ADD COLUMN id SERIAL PRIMARY KEY;
-
+ALTER TABLE charge_reference ADD COLUMN id SERIAL PRIMARY KEY;
+ALTER TABLE charge_reference ADD CONSTRAINT uk_charge_case UNIQUE (referenced_charge, referencing_case);
+ALTER TABLE case_reference ADD COLUMN id SERIAL PRIMARY KEY;
+ALTER TABLE case_reference ADD CONSTRAINT uk_case_case UNIQUE (referenced_case, referencing_case);
+ALTER TABLE role_record_member ADD COLUMN id SERIAL PRIMARY KEY;
 
 # --- !Downs
 

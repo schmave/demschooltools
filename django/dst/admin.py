@@ -3,7 +3,9 @@ from django.contrib.sessions.models import Session
 
 from dst.models import (
     AttendanceDay,
+    Case,
     Chapter,
+    Charge,
     Comment,
     CompletedTask,
     Entry,
@@ -49,6 +51,22 @@ class TagAdmin(admin.ModelAdmin):
     ]
     list_filter = ["organization_id"]
     search_fields = ["title"]
+
+
+@admin.register(Case)
+class CaseAdmin(admin.ModelAdmin):
+    readonly_fields = ["meeting"]
+
+    list_display = [
+        "meeting",
+    ]
+
+
+@admin.register(Charge)
+class ChargeAdmin(admin.ModelAdmin):
+    readonly_fields = ["person", "case"]
+
+    list_display = ["person", "case"]
 
 
 admin.site.register(AttendanceDay)

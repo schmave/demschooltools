@@ -49,6 +49,9 @@ class Person(models.Model):
     first_name = models.CharField()
     last_name = models.CharField()
     display_name = models.CharField()
+    family_person = models.ForeignKey(
+        "self", on_delete=models.PROTECT, null=True, blank=True
+    )
 
     def get_name(self):
         return self.display_name or f"{self.first_name} {self.last_name}"
@@ -72,6 +75,39 @@ class Person(models.Model):
 
     def __str__(self):
         return f'{self.first_name} {self.last_name} "{self.display_name}" [Org {self.organization_id}]'
+
+
+class Role(models.Model):
+    class Meta:
+        db_table = "role"
+
+    organization_id: int
+    organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
+
+
+class RoleRecord(models.Model):
+    class Meta:
+        db_table = "role_record"
+
+    role = models.ForeignKey(Role, on_delete=models.PROTECT)
+
+
+class RoleRecordMember(models.Model):
+    class Meta:
+        db_table = "role_record_member"
+
+    role_record = models.ForeignKey(
+        RoleRecord, on_delete=models.PROTECT, db_column="record_id"
+    )
+    person = models.ForeignKey(Person, on_delete=models.PROTECT)
+
+
+class AttendanceRule(models.Model):
+    class Meta:
+        db_table = "attendance_rule"
+
+    organization_id: int
+    organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
 
 
 class Comment(models.Model):
@@ -133,13 +169,6 @@ class AttendanceDay(models.Model):
 class AttendanceWeek(models.Model):
     class Meta:
         db_table = "attendance_week"
-
-    person = models.ForeignKey(Person, on_delete=models.PROTECT)
-
-
-class Charge(models.Model):
-    class Meta:
-        db_table = "charge"
 
     person = models.ForeignKey(Person, on_delete=models.PROTECT)
 
@@ -222,8 +251,19 @@ class Case(models.Model):
     meeting = models.ForeignKey(Meeting, on_delete=models.PROTECT)
 
 
+class Charge(models.Model):
+    class Meta:
+        db_table = "charge"
+
+    case = models.ForeignKey(Case, on_delete=models.PROTECT)
+    person = models.ForeignKey(Person, on_delete=models.PROTECT)
+
+
 class ChargeReference(models.Model):
     class Meta:
+        constraints = [
+            models.UniqueConstraint("charge", "the_case", name="uk_charge_case")
+        ]
         db_table = "charge_reference"
 
     charge = models.ForeignKey(
@@ -231,6 +271,26 @@ class ChargeReference(models.Model):
     )
     the_case = models.ForeignKey(
         Case, on_delete=models.PROTECT, db_column="referencing_case"
+    )
+
+
+class CaseReference(models.Model):
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                "referenced_case", "referencing_case", name="uk_case_case"
+            )
+        ]
+        db_table = "case_reference"
+
+    referenced_case = models.ForeignKey(
+        Case, on_delete=models.PROTECT, db_column="referenced_case"
+    )
+    referencing_case = models.ForeignKey(
+        Case,
+        on_delete=models.PROTECT,
+        db_column="referencing_case",
+        related_name="case_reference_cases",
     )
 
 
