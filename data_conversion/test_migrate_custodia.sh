@@ -18,8 +18,7 @@ psql school_crm << 'EOF'
 \set ON_ERROR_STOP 1
 INSERT INTO organization_hosts(host, organization_id)
     VALUES ('localhost:9000', 2) ON CONFLICT DO NOTHING;
-UPDATE users set is_staff=True where organization_id is null;
-UPDATE users set is_superuser=True where organization_id is null;
+UPDATE users set is_staff=true, is_superuser=true where organization_id is null;
 EOF
 
 uv run manage.py migrate custodia --fake
