@@ -27,9 +27,9 @@ Now that you've got the code, you'll need to run three separate programs for eac
 
 1.  Run `npm install` to install the Javascript libraries.
 
-1.  Start PostgreSQL and create a database named "school_crm". You'll also need to set the password for the user named "postgres" to "123", or change the database username and password in conf/base.conf.
+1.  Start PostgreSQL and create a database named "school_crm". You'll also need to set the password for the user named "postgres" to "123", or change the database username and password in [conf/base.conf](conf/base.conf) and [django/demschooltools/settings.py](django/demschooltools/settings.py).
 
-1.  Run `./sbt.sh`, then execute the `eclipse` and `run` command in the sbt/play console:
+1.  Run `./sbt.sh`, then execute the `eclipse` and `run` command in the sbt console:
 
         [DemSchoolTools] $ eclipse
         [info] About to create Eclipse project files for your project(s).
@@ -64,6 +64,11 @@ Now that you've got the code, you'll need to run three separate programs for eac
 
         INSERT INTO user_role (user_id, role)
             SELECT id, 'all-access' from users;
+
+        UPDATE organization set
+            show_custodia=true, show_accounting=true,
+            enable_case_references=true, show_electronic_signin=true,
+            show_roles=true;
     ```
 
 1.  Reload [http://localhost:9000](http://localhost:9000). Login with Email `admin@asdf.com` and password `nopassword`. You will see
