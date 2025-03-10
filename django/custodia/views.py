@@ -25,7 +25,7 @@ from custodia.models import (
     Year,
 )
 from demschooltools.settings import CUSTODIA_JS_LINK, LOGIN_URL
-from dst.models import Person, User, UserRole
+from dst.models import AttendanceDay, AttendanceWeek, Person, User, UserRole
 
 DEFAULT_REQUIRED_MINUTES = 345
 
@@ -164,6 +164,32 @@ class OverrideView(APIView):
         return student_data_view(person_id, request.org)
 
 
+def get_previous_monday(given_date: date) -> date:
+    days_to_subtract = (given_date.weekday() - 0) % 7
+    previous_monday = given_date - timedelta(days=days_to_subtract)
+    return previous_monday
+
+
+def sync_custodia_and_dst(person: Person, day: date):
+    swipes = Swipe.objects.filter(person=person, swipe_day=day)
+    min_in = min((x.in_time for x in swipes), default=None)
+    max_out = max((x.out_time for x in swipes if x.out_time), default=None)
+
+    monday = get_previous_monday(day)
+    unused_week, created_week = AttendanceWeek.objects.get_or_create(
+        monday=monday, person=person
+    )
+
+    if created_week:
+        for i in range(5):
+            AttendanceDay.objects.create(person=person, day=monday + timedelta(days=i))
+
+    attendance_day = AttendanceDay.objects.get(person=person, day=day)
+    attendance_day.start_time = min_in and timezone.localtime(min_in).timetz()
+    attendance_day.end_time = max_out and timezone.localtime(max_out).timetz()
+    attendance_day.save()
+
+
 class SwipeView(APIView):
     @atomic
     def post(self, request: Request, person_id: int) -> Response:
@@ -197,6 +223,8 @@ class SwipeView(APIView):
         else:
             assert False, "invalid direction"
 
+        sync_custodia_and_dst(person, swipe_time.date())
+
         return StudentsTodayView().get(request)
 
 
@@ -207,7 +235,9 @@ class DeleteSwipeView(APIView):
     def post(self, request: Request, person_id: int) -> Response:
         student = get_person(request, person_id)
         swipe_id = request.data["swipe"]["_id"]  # type: ignore
-        Swipe.objects.get(id=swipe_id, person=student).delete()
+        swipe = Swipe.objects.get(id=swipe_id, person=student)
+        swipe.delete()
+        sync_custodia_and_dst(student, swipe.swipe_day)
         return student_data_view(student.id, request.org)
 
 
@@ -367,13 +397,19 @@ def student_data_view(
                 Person.objects.filter(id=person_id, organization=org),
                 year,
                 org,
+                # Pass include_all=True so that in case this student has no swipes, they are
+                # still included in the output.
+                include_all=True,
             )[person_id]
         }
     )
 
 
 def get_student_batch_data(
-    students: QuerySet[Person], year: Year | None, org: Organization
+    students: QuerySet[Person],
+    year: Year | None,
+    org: Organization,
+    include_all: bool = False,
 ) -> dict[int, dict]:
     year_start, year_end = get_year_start_end(year)
     school_days = get_school_days(org, year_start, year_end)
@@ -403,9 +439,12 @@ def get_student_batch_data(
     ):
         required_minutes[srm.person_id].append(srm)
 
-    all_ids = set(
-        overrides.keys() | excuses.keys() | swipes.keys() | required_minutes.keys()
-    )
+    if include_all:
+        all_ids = students.values_list("id", flat=True)
+    else:
+        all_ids = set(
+            overrides.keys() | excuses.keys() | swipes.keys() | required_minutes.keys()
+        )
     result: dict[int, dict] = {}
     for student in Person.objects.filter(id__in=all_ids):
         result[student.id] = get_student_data(

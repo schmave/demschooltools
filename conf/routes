@@ -150,8 +150,6 @@ POST    /attendance/deletePersonWeek  controllers.Attendance.deletePersonWeek(pe
 POST    /attendance/saveWeek          controllers.Attendance.saveWeek(week_id : Integer, extraHours : Double, request: Request)
 POST    /attendance/saveDay           controllers.Attendance.saveDay(day_id : Integer, code ?= "", startTime ?= "", endTime ?= "", request: Request)
 
-POST    /attendance/importFromCustodia     controllers.Attendance.importFromCustodia(request: Request)
-
 GET 	/accounting/transaction/:id		  			controllers.Accounting.transaction(id: Integer, request: Request)
 GET 	/accounting/createTransaction				controllers.Accounting.newTransaction(request: Request)
 POST 	/accounting/createTransaction				controllers.Accounting.makeNewTransaction(request: Request)

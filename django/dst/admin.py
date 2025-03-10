@@ -3,6 +3,7 @@ from django.contrib.sessions.models import Session
 
 from dst.models import (
     AttendanceDay,
+    AttendanceWeek,
     Case,
     Chapter,
     Charge,
@@ -69,7 +70,22 @@ class ChargeAdmin(admin.ModelAdmin):
     list_display = ["person", "case"]
 
 
-admin.site.register(AttendanceDay)
+@admin.register(AttendanceDay)
+class AttendanceDayAdmin(admin.ModelAdmin):
+    readonly_fields = ["person", "day"]
+
+    list_filter = ["day"]
+    list_display = ["person", "day"]
+
+
+@admin.register(AttendanceWeek)
+class AttendanceWeekAdmin(admin.ModelAdmin):
+    readonly_fields = ["person", "monday"]
+
+    list_filter = ["monday"]
+    list_display = ["person", "monday"]
+
+
 admin.site.register(Chapter)
 admin.site.register(Comment)
 admin.site.register(CompletedTask)

@@ -25,6 +25,11 @@ ALTER TABLE case_reference ADD COLUMN id SERIAL PRIMARY KEY;
 ALTER TABLE case_reference ADD CONSTRAINT uk_case_case UNIQUE (referenced_case, referencing_case);
 ALTER TABLE role_record_member ADD COLUMN id SERIAL PRIMARY KEY;
 
+-- Add indexes where there should have been some
+create index attendance_day_day_idx on attendance_day ("day");
+create index attendance_week_monday_idx on attendance_week ("monday");
+
+
 # --- !Downs
 
 ALTER TABLE organization DROP COLUMN timezone;

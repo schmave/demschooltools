@@ -161,16 +161,34 @@ class MailchimpSync(models.Model):
 class AttendanceDay(models.Model):
     class Meta:
         db_table = "attendance_day"
+        constraints = [
+            models.UniqueConstraint("person", "day", name="u_attendance_day")
+        ]
+        indexes = [models.Index("day", name="attendance_day_day_idx")]
 
     person = models.ForeignKey(Person, on_delete=models.PROTECT)
     day = models.DateField()
+    code = models.CharField(max_length=64, null=True, blank=True)
+
+    start_time = models.TimeField(null=True, blank=True)
+    end_time = models.TimeField(null=True, blank=True)
+
+    off_campus_departure_time = models.TimeField(null=True, blank=True)
+    off_campus_return_time = models.TimeField(null=True, blank=True)
+    off_campus_minutes_exempted = models.IntegerField(null=True, blank=True)
 
 
 class AttendanceWeek(models.Model):
     class Meta:
         db_table = "attendance_week"
+        constraints = [
+            models.UniqueConstraint("person", "monday", name="u_attendance_week")
+        ]
+        indexes = [models.Index("monday", name="attendance_week_monday_idx")]
 
     person = models.ForeignKey(Person, on_delete=models.PROTECT)
+    monday = models.DateField()
+    extra_hours = models.FloatField(default=0)
 
 
 class PersonTagChange(models.Model):
