@@ -32,15 +32,4 @@ create index attendance_week_monday_idx on attendance_week ("monday");
 
 # --- !Downs
 
-ALTER TABLE organization DROP COLUMN timezone;
-ALTER TABLE organization DROP COLUMN late_time;
-ALTER TABLE person DROP COLUMN custodia_show_as_absent;
-ALTER TABLE person DROP COLUMN custodia_start_date;
-
-ALTER TABLE USERS drop column date_joined;
-ALTER TABLE USERS drop column last_login;
-ALTER TABLE USERS drop column first_name;
-ALTER TABLE USERS drop column last_name;
-ALTER TABLE USERS drop column is_superuser;
-ALTER TABLE USERS drop column is_staff;
-ALTER TABLE USERS drop column username;
+--- There are no downs.
