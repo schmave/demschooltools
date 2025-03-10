@@ -52,10 +52,10 @@ Now that you've got the code, you'll need to run three separate programs for eac
     ```sql
         INSERT INTO organization_hosts(host, organization_id)
             VALUES ('localhost:9000', 1);
+        INSERT INTO tag(title, use_student_display, organization_id, show_in_jc, show_in_attendance, show_in_account_balances, show_in_roles)
+            VALUES ('Current Student', true, 1, true, true, true, true);
         INSERT INTO tag(title, use_student_display, organization_id, show_in_jc)
-            VALUES ('Current Student', true, 1, true);
-        INSERT INTO tag(title, use_student_display, organization_id, show_in_jc)
-            VALUES ('Staff', false, 1, true);
+            VALUES ('Staff', false, 1, true, true, true, true);
 
         INSERT INTO users(email, name, active, email_validated,
                         is_staff, is_superuser, hashed_password)
