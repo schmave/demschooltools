@@ -1,9 +1,11 @@
 from collections import defaultdict
 from datetime import date, datetime, time, timedelta
+from typing import Type
 
 import requests
 from django.contrib.auth import logout
 from django.contrib.auth.views import redirect_to_login
+from django.db.models import Model
 from django.db.transaction import atomic
 from django.http import HttpRequest
 from django.shortcuts import redirect, render
@@ -138,17 +140,29 @@ class AbsentView(APIView):
         return student_data_view(person_id, request.org)
 
 
+def excuse_override_view(
+    request: Request, person_id: int, model: Type[Model]
+) -> Response:
+    student = get_person(request, person_id)
+    date: str = request.data["day"]  # type: ignore
+    undo: bool = request.data["undo"]  # type: ignore
+
+    filter_args = dict(person=student, date=date)
+    if undo:
+        for obj in model.objects.filter(**filter_args):
+            obj.delete()
+    else:
+        model.objects.create(**filter_args)
+
+    return student_data_view(person_id, request.org)
+
+
 class ExcuseView(APIView):
     permission_classes = [RequireAdmin]
 
     @atomic
     def post(self, request: Request, person_id: int) -> Response:
-        student = get_person(request, person_id)
-        date: str = request.data["day"]  # type: ignore
-
-        Excuse.objects.create(person=student, date=date)
-
-        return student_data_view(person_id, request.org)
+        return excuse_override_view(request, person_id, Excuse)
 
 
 class OverrideView(APIView):
@@ -156,12 +170,7 @@ class OverrideView(APIView):
 
     @atomic
     def post(self, request: Request, person_id: int) -> Response:
-        student = get_person(request, person_id)
-        date: str = request.data["day"]  # type: ignore
-
-        Override.objects.create(person=student, date=date)
-
-        return student_data_view(person_id, request.org)
+        return excuse_override_view(request, person_id, Override)
 
 
 def get_previous_monday(given_date: date) -> date:
@@ -666,6 +675,7 @@ class ReportView(APIView):
         year = Year.objects.get(organization=org, name=year_name)
 
         show_attended = request.query_params.get("filterStudents") == "all"
+        show_current_students = not show_attended
         if show_attended:
             people = Person.objects.filter(organization=org)
         else:
@@ -677,10 +687,13 @@ class ReportView(APIView):
         people = people.order_by("first_name").distinct()
 
         student_info = []
-        batch_data = get_student_batch_data(people, year, org)
+        batch_data = get_student_batch_data(
+            people, year, org, include_all=show_current_students
+        )
         for student_data in batch_data.values():
             if (
-                student_data["total_days"] == 0
+                show_attended
+                and student_data["total_days"] == 0
                 and student_data["total_short"] == 0
                 and student_data["total_overrides"] == 0
             ):

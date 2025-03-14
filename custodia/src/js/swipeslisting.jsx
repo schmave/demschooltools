@@ -14,25 +14,16 @@ class SwipesListing extends React.Component {
     }
   };
 
-  componentWillReceiveProps(newProps) {
-    this.setState({ day: this.getCurrentDay(newProps.student, newProps.day) });
-  }
-
   deleteSwipe = (swipe) => {
     actionCreator.deleteSwipe(swipe, this.props.student);
   };
 
-  swipesAreEmpty = (swipes) => {
-    return (
-      swipes.length === 0 ||
-      (swipes.length === 1 && swipes[0].in_time === null && swipes[0].out_time === null)
-    );
-  };
-
   getSwipesForDay = () => {
+    const currentDay = this.getCurrentDay(this.props.student, this.props.day);
+
     const swipeRows = [];
-    if (this.state.day && !this.swipesAreEmpty(this.state.day.swipes)) {
-      this.state.day.swipes.map(
+    if (currentDay?.swipes?.length) {
+      currentDay.swipes.map(
         function (swipe) {
           if (swipe.nice_in_time || swipe.nice_out_time) {
             swipeRows.push(
@@ -59,30 +50,25 @@ class SwipesListing extends React.Component {
     return swipeRows;
   };
 
-  excuse = (swipe) => {
-    actionCreator.excuse(this.props.student._id, this.props.day);
+  onExcuse = (e) => {
+    actionCreator.excuse(this.props.student._id, this.props.day, !e.target.checked);
   };
 
-  override = () => {
-    actionCreator.override(this.props.student._id, this.props.day);
+  onOverride = (e) => {
+    actionCreator.override(this.props.student._id, this.props.day, !e.target.checked);
   };
-
-  state = { day: this.getCurrentDay(this.props.student, this.props.day) };
 
   render() {
-    if (!this.state.day) {
+    const currentDay = this.getCurrentDay(this.props.student, this.props.day);
+
+    if (!currentDay) {
       return null;
     }
-    this.state.day.round_mins = parseFloat(this.state.day.total_mins).toFixed(0);
-    const showOverrideExcuseButtons =
-      this.state.day &&
-      !this.state.day.override &&
-      !this.state.day.excused &&
-      !this.state.day.valid;
+    currentDay.round_mins = parseFloat(currentDay.total_mins).toFixed(0);
     return (
       <span>
-        <div>Day: {this.state.day.day}</div>
-        <div>Minutes: {this.state.day.round_mins}</div>
+        <div>Day: {currentDay.day}</div>
+        <div>Minutes: {currentDay.round_mins}</div>
         <table className="table table-striped center swipes-table">
           <thead>
             <tr>
@@ -92,24 +78,31 @@ class SwipesListing extends React.Component {
           </thead>
           <tbody>{this.getSwipesForDay()}</tbody>
         </table>
-        {showOverrideExcuseButtons ? (
+        {!(currentDay.valid && !currentDay.override && !currentDay.excused) && (
           <AdminItem>
             <div className="action-buttons">
-              <button
-                type="button"
-                id="override"
-                onClick={this.override}
-                className="btn btn-sm btn-info"
-              >
-                Override {this.state.day.day}
-              </button>
-              <button type="button" onClick={this.excuse} className="btn btn-sm btn-info">
-                Excuse {this.state.day.day}
-              </button>
+              <label for="override">
+                <input
+                  id="override"
+                  type="checkbox"
+                  onChange={this.onOverride}
+                  checked={currentDay.override}
+                  disabled={currentDay.excused}
+                />{" "}
+                Override {currentDay.day}
+              </label>
+              <label for="excuse">
+                <input
+                  id="excuse"
+                  type="checkbox"
+                  onChange={this.onExcuse}
+                  checked={currentDay.excused}
+                  disabled={currentDay.override}
+                />{" "}
+                Excuse {currentDay.day}
+              </label>
             </div>
           </AdminItem>
-        ) : (
-          ""
         )}
       </span>
     );

@@ -16,13 +16,15 @@ export const loadStudents = () => {
     });
 };
 
-export const loadStudent = function (id) {
-  ajax.get("/students/" + id).then(function (data) {
-    dispatcher.dispatch({
-      type: constants.studentEvents.STUDENT_LOADED,
-      data: data.student,
-    });
+function loadStudentData(requestData) {
+  dispatcher.dispatch({
+    type: constants.studentEvents.STUDENT_LOADED,
+    data: requestData.student,
   });
+}
+
+export const loadStudent = function (id) {
+  ajax.get("/students/" + id).then(loadStudentData);
 };
 
 export const updateStudent = function (id, start_date, minutes) {
@@ -31,12 +33,7 @@ export const updateStudent = function (id, start_date, minutes) {
       start_date,
       minutes,
     })
-    .then(function (data) {
-      dispatcher.dispatch({
-        type: constants.studentEvents.STUDENT_LOADED,
-        data: data.student,
-      });
-    });
+    .then(loadStudentData);
 };
 
 export const swipeStudent = function (student, direction, overrideTime) {
@@ -78,24 +75,11 @@ export const markAbsent = function (student) {
   );
 };
 export const deleteSwipe = function (swipe, student) {
-  ajax.post("/students/" + student._id + "/swipe/delete", { swipe }).then(function (data) {
-    dispatcher.dispatch({
-      type: constants.studentEvents.STUDENT_LOADED,
-      data: data.student,
-    });
-  });
+  ajax.post("/students/" + student._id + "/swipe/delete", { swipe }).then(loadStudentData);
 };
-export const excuse = function (studentId, day) {
-  ajax.post("students/" + studentId + "/excuse", { day }).then(
-    function () {
-      this.loadStudent(studentId);
-    }.bind(this),
-  );
+export const excuse = function (studentId, day, undo) {
+  ajax.post("students/" + studentId + "/excuse", { day, undo }).then(loadStudentData);
 };
-export const override = function (studentId, day) {
-  ajax.post("/students/" + studentId + "/override", { day }).then(
-    function () {
-      this.loadStudent(studentId);
-    }.bind(this),
-  );
+export const override = function (studentId, day, undo) {
+  ajax.post("/students/" + studentId + "/override", { day, undo }).then(loadStudentData);
 };
