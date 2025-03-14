@@ -57,7 +57,7 @@ class HeatmapMonth extends React.Component {
       this.map.init({
         itemSelector: selector,
         onClick: function (d, nb) {
-          $(makeDateId(d))[0].click();
+          $(makeDateId(d))[0]?.click();
         },
         data,
         start: dayjs(this.props.days[0].day).startOf("month").toDate(),
