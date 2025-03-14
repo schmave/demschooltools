@@ -3,6 +3,7 @@ from datetime import date, datetime, time, timedelta
 from typing import Type
 
 import requests
+from django.conf import settings
 from django.contrib.auth import logout
 from django.contrib.auth.views import redirect_to_login
 from django.db.models import Model
@@ -26,7 +27,6 @@ from custodia.models import (
     Swipe,
     Year,
 )
-from demschooltools.settings import CUSTODIA_JS_LINK, LOGIN_URL
 from dst.models import AttendanceDay, AttendanceWeek, Person, User, UserRole
 
 DEFAULT_REQUIRED_MINUTES = 345
@@ -37,7 +37,14 @@ class IndexView(View):
         if not request.user.is_authenticated:
             return redirect_to_login("")
 
-        return render(request, "index.html", {"dev_js_link": CUSTODIA_JS_LINK})
+        return render(
+            request,
+            "index.html",
+            {
+                "dev_js_link": settings.CUSTODIA_JS_LINK,
+                "rollbar_environment": settings.ROLLBAR_ENVIRONMENT,
+            },
+        )
 
 
 class LoginView(View):

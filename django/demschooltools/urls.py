@@ -14,6 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 
@@ -32,7 +33,6 @@ from custodia.views import (
     StudentsTodayView,
     SwipeView,
 )
-from demschooltools.settings import SILK_ENABLED
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -65,5 +65,5 @@ urlpatterns = [
     path("custodia/logout", LogoutView.as_view()),
 ]
 
-if SILK_ENABLED:
+if settings.SILK_ENABLED:
     urlpatterns += [path("silk/", include("silk.urls", namespace="silk"))]
