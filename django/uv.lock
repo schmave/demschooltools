@@ -129,6 +129,7 @@ dependencies = [
     { name = "psycopg2" },
     { name = "pyjwt" },
     { name = "requests" },
+    { name = "rollbar" },
 ]
 
 [package.dev-dependencies]
@@ -150,6 +151,7 @@ requires-dist = [
     { name = "psycopg2", specifier = "~=2.9" },
     { name = "pyjwt", specifier = "~=2.10" },
     { name = "requests", specifier = "~=2.32" },
+    { name = "rollbar", specifier = ">=1.2.0" },
 ]
 
 [package.metadata.requires-dev]
@@ -358,6 +360,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/63/70/2bf7780ad2d390a8d301ad0b550f1581eadbd9a20f896afe06353c2a2913/requests-2.32.3.tar.gz", hash = "sha256:55365417734eb18255590a9ff9eb97e9e1da868d4ccd6402399eaf68af20a760", size = 131218 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f9/9b/335f9764261e915ed497fcdeb11df5dfd6f7bf257d4a6a2a686d80da4d54/requests-2.32.3-py3-none-any.whl", hash = "sha256:70761cfe03c773ceb22aa2f671b4757976145175cdfca038c02654d061d6dcc6", size = 64928 },
+]
+
+[[package]]
+name = "rollbar"
+version = "1.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "requests" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c7/59/57c0563b7e28b5b43f385ea4880cd9a0a4524088a46f9d1c90ac6287b9a5/rollbar-1.2.0.tar.gz", hash = "sha256:991e6600374d8065e1e56accce7ab5f075fff521ce570a7a7ab700d2fa5e4bd5", size = 84913 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/7c/9e/b0092930efdef284bde3032c076d903db744c37477a304629347906a671d/rollbar-1.2.0-py3-none-any.whl", hash = "sha256:5f64084fa2335e5dcfd10354829dee5228237bbb145648914fa02d8c09c4b296", size = 116780 },
 ]
 
 [[package]]

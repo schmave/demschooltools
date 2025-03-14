@@ -6,6 +6,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -53,6 +54,7 @@ JWT_KEY = "asdlkfjhasldkjfhqo28329384u29q384asldkjfahslkdfj891"
 REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": ("drf_orjson_renderer.renderers.ORJSONRenderer",),
     "DEFAULT_PARSER_CLASSES": ("drf_orjson_renderer.parsers.ORJSONParser",),
+    "EXCEPTION_HANDLER": "rollbar.contrib.django_rest_framework.post_exception_handler",
 }
 
 MIDDLEWARE = (["silk.middleware.SilkyMiddleware"] if SILK_ENABLED else []) + [
@@ -66,7 +68,15 @@ MIDDLEWARE = (["silk.middleware.SilkyMiddleware"] if SILK_ENABLED else []) + [
     "django.contrib.messages.middleware.MessageMiddleware",
     "demschooltools.middleware.TimezoneMiddleware",
     # "pyinstrument.middleware.ProfilerMiddleware",
+    "rollbar.contrib.django.middleware.RollbarNotifierMiddlewareExcluding404",
 ]
+
+ROLLBAR = {
+    "access_token": os.environ.get("ROLLBAR_TOKEN", ""),
+    "environment": "development" if DEBUG else "production",
+    "branch": "main",
+    "root": os.path.abspath(os.path.join(__file__, "..", "..")),
+}
 
 ROOT_URLCONF = "demschooltools.urls"
 

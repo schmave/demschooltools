@@ -11,6 +11,7 @@ dependencies = [
     "psycopg2~=2.9",
     "pyjwt~=2.10",
     "requests~=2.32",
+    "rollbar>=1.2.0",
 ]
 
 [dependency-groups]
