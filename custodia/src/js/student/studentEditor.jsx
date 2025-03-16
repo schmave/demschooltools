@@ -5,11 +5,8 @@ const constants = require("../appconstants");
 const actionCreator = require("../studentactioncreator");
 const Modal = require("../modal.jsx");
 const dayjs = require("dayjs");
-const $ = require("jquery");
 
-module.exports = class extends React.Component {
-  static displayName = "StudentEditor";
-
+class StudentEditor extends React.Component {
   constructor(props) {
     super(props);
     this.dispatchToken = dispatcher.register((action) => {
@@ -59,7 +56,7 @@ module.exports = class extends React.Component {
   };
 
   edit = (student) => {
-    const s = $.extend({}, student);
+    const s = Object.assign({}, student);
     this.setState({
       student: s,
       startdate_datepicker: s.start_date ? dayjs(s.start_date) : null,
@@ -74,7 +71,7 @@ module.exports = class extends React.Component {
   };
 
   handleDateChange = (e) => {
-    this.setState({ startdate_datepicker: dayjs(e.target.value) });
+    this.setState({ startdate_datepicker: e.target.value ? dayjs(e.target.value) : null });
   };
 
   handleChange = (event) => {
@@ -93,7 +90,7 @@ module.exports = class extends React.Component {
           {this.state.saving ? (
             <div>
               <p style={{ textAlign: "center" }}>
-                <img src="/static/images/spinner.gif" />
+                <img src="/django-static/images/spinner.gif" />
               </p>
             </div>
           ) : (
@@ -118,8 +115,6 @@ module.exports = class extends React.Component {
                   id="startdate"
                   defaultValue={this.formatDate()}
                   onChange={this.handleDateChange}
-                  date={true}
-                  time={false}
                 />
               </div>
               <button onClick={this.saveChange} type="submit" className="btn btn-success">
@@ -134,10 +129,6 @@ module.exports = class extends React.Component {
       </div>
     );
   }
+}
 
-  _onChange = () => {
-    if (this.refs.studentEditor) {
-      this.refs.studentEditor.hide();
-    }
-  };
-};
+module.exports = StudentEditor;

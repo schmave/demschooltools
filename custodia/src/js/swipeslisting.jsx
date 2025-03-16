@@ -81,7 +81,7 @@ class SwipesListing extends React.Component {
         {!(currentDay.valid && !currentDay.override && !currentDay.excused) && (
           <AdminItem>
             <div className="action-buttons">
-              <label for="override">
+              <label htmlFor="override">
                 <input
                   id="override"
                   type="checkbox"
@@ -91,7 +91,7 @@ class SwipesListing extends React.Component {
                 />{" "}
                 Override {currentDay.day}
               </label>
-              <label for="excuse">
+              <label htmlFor="excuse">
                 <input
                   id="excuse"
                   type="checkbox"
