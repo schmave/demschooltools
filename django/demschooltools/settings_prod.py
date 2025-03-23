@@ -7,7 +7,7 @@ SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 
 DEBUG = False
 
-ALLOWED_HOSTS = ["*.demschooltools.com"]
+ALLOWED_HOSTS = [".demschooltools.com"]
 
 # Profiling
 assert "silk" not in INSTALLED_APPS
