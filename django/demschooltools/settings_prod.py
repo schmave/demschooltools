@@ -7,14 +7,17 @@ SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 
 DEBUG = False
 
-ALLOWED_HOSTS = ["*.demschooltools.com"]
+ALLOWED_HOSTS = [".demschooltools.com"]
 
 # Profiling
 assert "silk" not in INSTALLED_APPS
 
 CSRF_COOKIE_SECURE = True
+CSRF_TRUSTED_ORIGINS = ["https://demschooltools.com", "https://*.demschooltools.com"]
 SESSION_COOKIE_SECURE = True
-SECURE_SSL_REDIRECT = True
+
+# Requiring SSL is handled by nginx
+SECURE_SSL_REDIRECT = False
 
 AUTHENTICATION_BACKENDS = ["demschooltools.auth.PlaySessionBackend"]
 
@@ -26,7 +29,7 @@ DATABASES = {
         "NAME": "school_crm",
         "PORT": "5432",
         "HOST": "localhost",
-        "USER": "postgres",
+        "USER": "evan",
         "PASSWORD": os.environ["DB_PASSWORD"],
         "CONN_MAX_AGE": 60,
     },

@@ -2,6 +2,9 @@
 
 set -ex
 
+# Make sure that there are no uncommitted changes
+git diff-index --quiet HEAD --
+
 ### Play Framework stuff
 npm install
 ./sbt.sh clean dist
@@ -14,6 +17,7 @@ rm -rf custodia/dist
 
 git ls-tree -r --name-only head django | xargs zip django
 
+mkdir -p django/static/js
 cp custodia/dist/*.js django/static/js/
 cp custodia/dist/index.html django/custodia/templates/
 zip django django/static/js/*.js
