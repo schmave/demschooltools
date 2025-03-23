@@ -14,8 +14,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+from django.conf import settings
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
 
 from custodia.views import (
     AbsentView,
@@ -35,19 +36,34 @@ from custodia.views import (
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path(
+        "custodia-api/",
+        (
+            [
+                path("users/is-admin", IsAdminView.as_view()),
+                path("students", StudentsTodayView.as_view()),
+                path(
+                    "students/<int:person_id>/swipe/delete", DeleteSwipeView.as_view()
+                ),
+                path("students/<int:person_id>/swipe", SwipeView.as_view()),
+                path("students/<int:person_id>/absent", AbsentView.as_view()),
+                path("students/<int:person_id>/excuse", ExcuseView.as_view()),
+                path("students/<int:person_id>/override", OverrideView.as_view()),
+                path("students/<int:person_id>", StudentDataView.as_view()),
+                path("reports/years/<str:year_name>", ReportYears.as_view()),
+                path("reports/years", ReportYears.as_view()),
+                path("reports/<str:year_name>/<int:class_id>", ReportView.as_view()),
+                path("reports/<str:year_name>", ReportView.as_view()),
+            ],
+            "custodia-api",
+            "custodia-api",
+        ),
+    ),
     path("", IndexView.as_view()),
-    path("users/login", LoginView.as_view()),
-    path("users/logout", LogoutView.as_view()),
-    path("users/is-admin", IsAdminView.as_view()),
-    path("students", StudentsTodayView.as_view()),
-    path("students/<int:student_id>/swipe/delete", DeleteSwipeView.as_view()),
-    path("students/<int:student_id>/swipe", SwipeView.as_view()),
-    path("students/<int:student_id>/absent", AbsentView.as_view()),
-    path("students/<int:student_id>/excuse", ExcuseView.as_view()),
-    path("students/<int:student_id>/override", OverrideView.as_view()),
-    path("students/<int:student_id>", StudentDataView.as_view()),
-    path("reports/years/<str:year_name>", ReportYears.as_view()),
-    path("reports/years", ReportYears.as_view()),
-    path("reports/<str:year_name>/<int:class_id>", ReportView.as_view()),
-    path("reports/<str:year_name>", ReportView.as_view()),
+    path("custodia/", IndexView.as_view()),
+    path("custodia/login", LoginView.as_view()),
+    path("custodia/logout", LogoutView.as_view()),
 ]
+
+if settings.SILK_ENABLED:
+    urlpatterns += [path("silk/", include("silk.urls", namespace="silk"))]

@@ -1,4 +1,4 @@
-var exports = {
+const exports = {
   studentEvents: {
     LOADED: "STUDENTEVENTS.LOADED",
     STUDENT_LOADED: "STUDENTEVENTS.STUDENTLOADED",

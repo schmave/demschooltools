@@ -1,6 +1,9 @@
 const React = require("react");
 const heatmap = require("cal-heatmap");
-const moment = require("moment");
+require("cal-heatmap/cal-heatmap.css");
+
+const dayjs = require("dayjs");
+const $ = require("jquery");
 
 class HeatmapMonth extends React.Component {
   map = null;
@@ -8,11 +11,11 @@ class HeatmapMonth extends React.Component {
   formatDays = (days, requiredMinutes) => {
     const formatted = {};
     days.forEach(function (day) {
-      formatted[moment(day.day).unix()] = day.total_mins;
+      formatted[dayjs(day.day).unix()] = day.total_mins;
       if (day.excused || day.override) {
-        formatted[moment(day.day).unix()] = requiredMinutes;
+        formatted[dayjs(day.day).unix()] = requiredMinutes;
       } else if (!day.absent && day.total_mins == 0) {
-        formatted[moment(day.day).unix()] = 1;
+        formatted[dayjs(day.day).unix()] = 1;
       }
     });
     return formatted;
@@ -22,7 +25,7 @@ class HeatmapMonth extends React.Component {
     const hights = [];
     days.forEach(function (day) {
       if (day.excused) {
-        hights.push(moment(day.day).toDate());
+        hights.push(dayjs(day.day).toDate());
       }
     });
     return hights;
@@ -54,10 +57,10 @@ class HeatmapMonth extends React.Component {
       this.map.init({
         itemSelector: selector,
         onClick: function (d, nb) {
-          $(makeDateId(d))[0].click();
+          $(makeDateId(d))[0]?.click();
         },
         data,
-        start: moment(this.props.days[0].day).startOf("month").toDate(),
+        start: dayjs(this.props.days[0].day).startOf("month").toDate(),
         domain: "month",
         subDomain: "x_day",
         subDomainTextFormat: "%d",
@@ -80,9 +83,7 @@ class HeatmapMonth extends React.Component {
   };
 
   render() {
-    return (
-      <div id={"heatmap" + this.props.index} className="col-sm-4" style={{ float: "none" }}></div>
-    );
+    return <div id={"heatmap" + this.props.index} style={{ float: "none" }}></div>;
   }
 
   componentDidMount() {

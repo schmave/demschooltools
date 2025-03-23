@@ -15,21 +15,25 @@ const exports = {
         });
       });
   },
-  loadReport: function (year, classId) {
+  loadReport: function (year, classId, filterStudents) {
     const classRouteId = classId ? "/" + classId : "";
     ajax
       .get({
-        url: "/reports/" + encodeURIComponent(year) + classRouteId,
+        url:
+          "/reports/" +
+          encodeURIComponent(year) +
+          classRouteId +
+          `?filterStudents=${filterStudents}`,
       })
       .then(function (data) {
         dispatcher.dispatch({
           type: constants.reportEvents.REPORT_LOADED,
-          data: { year, report: data, classId },
+          data: { year, report: data, classId, filterStudents },
         });
       });
   },
   createPeriod: function (start, end) {
-    ajax.post("/reports/years", { from_date: start, to_date: end }).then(function (data) {
+    return ajax.post("/reports/years", { from_date: start, to_date: end }).then(function (data) {
       dispatcher.dispatch({
         type: constants.systemEvents.FLASH,
         message: "Successfully created report period " + data.made.name,
@@ -37,6 +41,7 @@ const exports = {
       dispatcher.dispatch({
         type: constants.reportEvents.PERIOD_CREATED,
       });
+      return data.made.name;
     });
   },
   deletePeriod: function (period) {

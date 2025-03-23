@@ -1,15 +1,13 @@
 var EventEmitter = require("events").EventEmitter,
-  assign = require("object-assign"),
   ajax = require("./ajaxhelper");
 
 var isAdmin;
-var isSuper;
 var users = [];
 var schools = [];
 var currentSchool;
 var CHANGE_EVENT = "CHANGE!";
 
-var exports = assign({}, EventEmitter.prototype, {
+var exports = Object.assign({}, EventEmitter.prototype, {
   isAdmin: function () {
     return isAdmin;
   },

@@ -29,7 +29,6 @@ public class Organization extends Model {
   private Boolean showHistoryInPrint;
 
   private String shortName;
-  private String custodiaPassword;
   private Boolean showCustodia;
   private Boolean showAttendance;
   private Boolean showElectronicSignin;

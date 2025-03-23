@@ -1,13 +1,2 @@
-.idea/
-*.dump
-*.iml
-*.log
-*.swp
-/.lein-deps-sum
-/.lein-env
-/.lein-failures
-/.lein-repl-history
-/log/app.log
 /node_modules/
-/profiles.clj
 /resources/public/js/gen

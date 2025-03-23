@@ -38,15 +38,8 @@ $(function() {
 </script>
 
 <h3>Editing week of @Application.yymmddDate(Utils.getOrgConfig(request), monday)</h3>
-<form method="POST" action="@routes.Attendance.importFromCustodia()">
-
 <p><a class="btn btn-success" href="@routes.Attendance.viewWeek()?date=@Application.forDateInput(monday)">Done editing; return to viewing</a>
-@if( Utils.getOrgConfig(request).org.getShowCustodia() ) {
-  <input type="hidden" name="monday" value="@Application.forDateInput(monday)">
-  <button class="btn btn-primary">Import from Custodia</button>
-}
 </p>
-</form>
 <table id="attendance-editing" class="table attendance-view sortable">
 <thead><tr>
     <th>First<br/>Name</th>

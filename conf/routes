@@ -91,7 +91,22 @@ GET /editEntry/:id		controllers.ApplicationEditing.editEntry(id : Integer, reque
 POST /saveEntry		controllers.ApplicationEditing.saveEntry(request: Request)
 POST /renderMarkdown	controllers.Application.renderMarkdown(request: Request)
 
-GET     /custodia                   controllers.Attendance.viewCustodiaAdmin(request: Request)
+GET      /custodia-admin            controllers.Attendance.viewCustodiaAdmin(request: Request)
+GET      /custodia                  controllers.Proxy.proxy0(request: Request)
+GET      /custodia*extra            controllers.Proxy.proxy(request: Request, extra: String)
+POST     /custodia*extra            controllers.Proxy.proxy(request: Request, extra: String)
+
+GET      /silk*extra                controllers.Proxy.proxy(request: Request, extra: String)
+POST     /silk*extra                controllers.Proxy.proxy(request: Request, extra: String)
+GET      /admin                     controllers.Proxy.proxy0(request: Request)
+GET      /admin*extra               controllers.Proxy.proxy(request: Request, extra: String)
+POST     /admin*extra               controllers.Proxy.proxy(request: Request, extra: String)
+GET      /django-static/*extra      controllers.Proxy.proxy(request: Request, extra: String)
+
+GET      /custodia-api/*extra       controllers.Proxy.proxy(request: Request, extra: String)
+POST     /custodia-api/*extra       controllers.Proxy.proxy(request: Request, extra: String)
+PUT      /custodia-api/*extra       controllers.Proxy.proxy(request: Request, extra: String)
+DELETE   /custodia-api/*extra       controllers.Proxy.proxy(request: Request, extra: String)
 
 GET     /jsonPeople               controllers.CRM.jsonPeople(term ?= "", request: Request)
 GET     /people                   controllers.CRM.recentComments(request: Request)
@@ -134,8 +149,6 @@ POST    /attendance/createPersonWeek  controllers.Attendance.createPersonWeek(re
 POST    /attendance/deletePersonWeek  controllers.Attendance.deletePersonWeek(personId : Integer, monday : String, request: Request)
 POST    /attendance/saveWeek          controllers.Attendance.saveWeek(week_id : Integer, extraHours : Double, request: Request)
 POST    /attendance/saveDay           controllers.Attendance.saveDay(day_id : Integer, code ?= "", startTime ?= "", endTime ?= "", request: Request)
-
-POST    /attendance/importFromCustodia     controllers.Attendance.importFromCustodia(request: Request)
 
 GET 	/accounting/transaction/:id		  			controllers.Accounting.transaction(id: Integer, request: Request)
 GET 	/accounting/createTransaction				controllers.Accounting.newTransaction(request: Request)

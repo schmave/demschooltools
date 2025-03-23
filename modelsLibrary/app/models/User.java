@@ -15,6 +15,8 @@ import lombok.Setter;
 @Table(name = "users")
 public class User extends Model {
   public static final String DUMMY_USERNAME = "__DUMMY_USERNAME__";
+  public static final String CHECKIN_USERNAME = "Check-in app user";
+
   private static final long serialVersionUID = 1L;
 
   @ManyToOne() private Organization organization;

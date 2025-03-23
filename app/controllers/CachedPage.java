@@ -12,7 +12,6 @@ import java.util.zip.GZIPOutputStream;
 import models.*;
 
 public abstract class CachedPage {
-  public static final String ATTENDANCE_INDEX = "Attendance-index-";
   public static final String JC_INDEX = "Application-index-";
   public static final String JC_INDEX_LOGGED_OUT = "Application-index-lo-";
   public static final String MANUAL_INDEX = "Application-viewManual-";
@@ -98,21 +97,14 @@ public abstract class CachedPage {
   abstract String render();
 
   public static void clearAll(Organization org) {
-    remove(ATTENDANCE_INDEX, org);
     remove(JC_INDEX, org);
     remove(MANUAL_INDEX, org);
     remove(RECENT_COMMENTS, org);
-    Utils.updateCustodia();
   }
 
   public static void onPeopleChanged(Organization org) {
-    remove(ATTENDANCE_INDEX, org);
     remove(JC_INDEX, org);
     remove(RECENT_COMMENTS, org);
-    Utils.updateCustodia();
   }
 
-  public static void onAttendanceChanged(Organization org) {
-    remove(ATTENDANCE_INDEX, org);
-  }
 }

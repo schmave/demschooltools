@@ -38,7 +38,8 @@
         "python.analysis.packageIndexDepths": [
             {
                 "name": "django",
-                "depth": 4
+                "depth": 4,
+                "includeAllSymbols": true
             },
             {
                 "name": "rest_framework",
@@ -54,11 +55,14 @@
         "editor.formatOnPaste": true,
         "files.watcherExclude": {
             "**/target": true
+        },
+        "java.compile.nullAnalysis.mode": "automatic",
+        "search.exclude": {
+            "django/static/js/*": true
         }
     },
     "extensions": {
         "recommendations": [
-            "scalameta.metals",
             "ms-python.vscode-pylance",
             "redhat.java",
             "lcjuves.vscode-gjf",

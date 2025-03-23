@@ -41,7 +41,7 @@ module.exports = class Nav extends React.Component {
             </ul>
             <ul className="nav navbar-nav">
               <li>
-                <a href="/users/logout">Logout</a>
+                <a href="/custodia/logout">Logout</a>
               </li>
             </ul>
           </div>
