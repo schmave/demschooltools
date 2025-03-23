@@ -53,7 +53,7 @@ class LoginView(View):
 
     def post(self, request: HttpRequest):
         login_response = requests.post(
-            ("https://" if request.is_secure() else "http://")
+            ("http://" if settings.DEBUG else "https://")
             + request.get_host()
             + "/login",
             data={
@@ -84,7 +84,7 @@ class LogoutView(View):
         if request.user.is_authenticated:
             logout(request)
 
-        response = redirect(LOGIN_URL)
+        response = redirect(settings.LOGIN_URL)
         response.set_cookie("PLAY_SESSION", "", max_age=0)
         return response
 
@@ -137,8 +137,6 @@ def get_person(request: Request, person_id: int):
 
 
 class AbsentView(APIView):
-    permission_classes = [RequireAdmin]
-
     def post(self, request: Request, person_id: int) -> Response:
         student = get_person(request, person_id)
         student.custodia_show_as_absent = timezone.localdate()
@@ -187,6 +185,10 @@ def get_previous_monday(given_date: date) -> date:
 
 
 def sync_custodia_and_dst(person: Person, day: date):
+    # The Attendance tab can't handle Saturday or Sunday sign-ins, so ignore them.
+    if day.weekday() in (5, 6):
+        return
+
     swipes = Swipe.objects.filter(person=person, swipe_day=day)
     min_in = min((x.in_time for x in swipes), default=None)
     max_out = max((x.out_time for x in swipes if x.out_time), default=None)
