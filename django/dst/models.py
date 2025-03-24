@@ -54,7 +54,7 @@ class Person(models.Model):
     )
 
     def get_name(self):
-        return self.display_name or f"{self.first_name} {self.last_name}"
+        return self.display_name or self.first_name
 
     email = models.CharField()
 
