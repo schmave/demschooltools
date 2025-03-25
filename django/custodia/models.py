@@ -50,6 +50,7 @@ class Swipe(models.Model):
             models.Index("person", "swipe_day", name="swipes_person_id_swipe_day_idx"),
             models.Index("swipe_day", "person", name="swipes_swipe_day_person_id_idx"),
         ]
+        # TODO: add a unique constraint on person,swipe_day where out_time is null
 
 
 class Override(models.Model):

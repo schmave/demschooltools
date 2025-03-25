@@ -226,16 +226,16 @@ class SwipeView(APIView):
                 the_date.replace(hour=the_time.hour, minute=the_time.minute)
             )
 
+        swipe_filter = dict(person=person, swipe_day=swipe_time.date())
         if direction == "in":
-            swipe = Swipe.objects.create(
-                person=person,
-                swipe_day=swipe_time.date(),
-                in_time=swipe_time,
-            )
+            # Check to see if the user has somehow already swiped in for the day.
+            # This will prevent there from being two swipes for the same person/day
+            # where there is an in time but no out time.
+            has_in_swipe = Swipe.objects.filter(**swipe_filter, out_time=None).exists()
+            if not has_in_swipe:
+                Swipe.objects.create(**swipe_filter, in_time=swipe_time)
         elif direction == "out":
-            swipe = Swipe.objects.get(
-                person=person, swipe_day=swipe_time.date(), out_time=None
-            )
+            swipe = Swipe.objects.get(**swipe_filter, out_time=None)
             swipe.out_time = swipe_time
             swipe.save()
         else:
