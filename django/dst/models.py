@@ -56,14 +56,14 @@ class Person(models.Model):
     def get_name(self):
         return self.display_name or self.first_name
 
-    email = models.CharField()
+    email = models.CharField(blank=True)
 
-    gender = models.CharField()
-    address = models.CharField()
-    city = models.CharField()
-    state = models.CharField()
-    zip = models.CharField()
-    neighborhood = models.CharField()
+    gender = models.CharField(blank=True)
+    address = models.CharField(blank=True)
+    city = models.CharField(blank=True)
+    state = models.CharField(blank=True)
+    zip = models.CharField(blank=True)
+    neighborhood = models.CharField(blank=True)
 
     id = models.IntegerField(primary_key=True, db_column="person_id")
     organization_id: int
