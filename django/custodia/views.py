@@ -235,9 +235,11 @@ class SwipeView(APIView):
             if not has_in_swipe:
                 Swipe.objects.create(**swipe_filter, in_time=swipe_time)
         elif direction == "out":
-            swipe = Swipe.objects.get(**swipe_filter, out_time=None)
-            swipe.out_time = swipe_time
-            swipe.save()
+            swipe = Swipe.objects.filter(**swipe_filter, out_time=None).first()
+            # The user may have already swiped out, in which case there is nothing more to do.
+            if swipe:
+                swipe.out_time = swipe_time
+                swipe.save()
         else:
             assert False, "invalid direction"
 
