@@ -13,6 +13,10 @@
                 "source.organizeImports": "always"
             }
         },
+        "[html]": {
+            "editor.formatOnSave": false,
+            "editor.formatOnPaste": false
+        },
         "[javascript]": {
             "editor.formatOnSave": true,
             "editor.defaultFormatter": "esbenp.prettier-vscode"
