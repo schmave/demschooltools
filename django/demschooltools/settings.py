@@ -84,7 +84,7 @@ ROOT_URLCONF = "demschooltools.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "demschooltools" / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
