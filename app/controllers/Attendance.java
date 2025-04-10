@@ -1,7 +1,6 @@
 package controllers;
 
 import com.csvreader.CsvWriter;
-import com.typesafe.config.Config;
 import io.ebean.DB;
 import io.ebean.Expr;
 import io.ebean.SqlRow;
@@ -68,20 +67,19 @@ public class Attendance extends Controller {
       next_date = null;
     }
 
-    return attendance_index
-        .render(
-            all_people,
-            person_to_stats,
-            all_codes,
-            codes_map,
-            Application.attendancePeople(org),
-            start_date,
-            end_date,
-            is_custom_date,
-            prev_date,
-            next_date,
-            request,
-            mMessagesApi.preferred(request));
+    return attendance_index.render(
+        all_people,
+        person_to_stats,
+        all_codes,
+        codes_map,
+        Application.attendancePeople(org),
+        start_date,
+        end_date,
+        is_custom_date,
+        prev_date,
+        next_date,
+        request,
+        mMessagesApi.preferred(request));
   }
 
   public Result index(
