@@ -36,7 +36,6 @@ module.exports = class Heatmap extends React.Component {
     const sortedDates = Object.keys(groupedDays).sort();
 
     let i = 0;
-    let temparray;
     const maps = [];
     while (i < sortedDates.length) {
       // Find up to four months worth of dates, which we will send
@@ -47,13 +46,13 @@ module.exports = class Heatmap extends React.Component {
         j++;
       }
 
-      temparray = sortedDates.slice(i, j);
-      i = j;
-      const dates = temparray
+      const dates = sortedDates
+        .slice(i, j)
         .map(function (d) {
           return groupedDays[d];
         })
         .concatAll();
+      i = j;
 
       maps.push(<Heatmapmonth key={i} index={i} requiredMinutes={minutes} days={dates} />);
     }

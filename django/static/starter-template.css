@@ -118,8 +118,9 @@ a {
         width: 1300px;
     }
 }
-rect.highlight {
+rect.highlight, rect.highlight-now {
     fill: orange !important;
+    stroke: #444 !important;
 }
 
 .graph-rect {

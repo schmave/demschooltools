@@ -21,19 +21,11 @@ class HeatmapMonth extends React.Component {
     return formatted;
   };
 
-  getHighlights = (days, requiredMinutes) => {
-    const hights = [];
-    days.forEach(function (day) {
-      if (day.excused) {
-        hights.push(dayjs(day.day).toDate());
-      }
-    });
-    return hights;
-  };
+  getHighlights = (days) => days.filter((day) => day.excused).map((day) => dayjs(day.day).toDate());
 
   loadHeatmap = () => {
     const data = this.formatDays(this.props.days, this.props.requiredMinutes);
-    const highlight = this.getHighlights(this.props.days, this.props.requiredMinutes);
+    const highlight = this.getHighlights(this.props.days);
 
     const doUpdate = this.map !== null;
     if (!doUpdate) {
@@ -53,6 +45,7 @@ class HeatmapMonth extends React.Component {
     };
     if (doUpdate) {
       this.map.update(data);
+      this.map.highlight(highlight);
     } else {
       this.map.init({
         itemSelector: selector,
