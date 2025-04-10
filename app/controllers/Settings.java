@@ -81,7 +81,7 @@ public class Settings extends Controller {
     }
     UserRole.create(user, UserRole.ROLE_CHECKIN_APP);
     UserRole.create(user, UserRole.ROLE_VIEW_JC);
-}
+  }
 
   public Result editNotifications(Http.Request request) {
     final Map<String, String[]> values = request.body().asFormUrlEncoded();

@@ -34,7 +34,9 @@ class PersonAdmin(admin.ModelAdmin):
 
     list_display = ["first_name", "last_name", "email", "organization"]
     list_filter = ["organization_id"]
-    search_fields = ["first_name", "last_name", "email"]
+    search_fields = ["first_name", "last_name", "display_name", "email"]
+
+    autocomplete_fields = ["family_person"]
 
 
 @admin.register(Tag)

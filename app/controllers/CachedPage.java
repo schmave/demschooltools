@@ -106,5 +106,4 @@ public abstract class CachedPage {
     remove(JC_INDEX, org);
     remove(RECENT_COMMENTS, org);
   }
-
 }

@@ -22,69 +22,67 @@ import play.mvc.*;
 import play.mvc.Http.Cookie;
 import play.mvc.Http.Cookie.SameSite;
 
-
 class CookieParser {
-    public static Cookie parseSetCookieHeader(String headerValue) {
-        String[] parts = headerValue.split(";");
-        String[] nameValue = parts[0].split("=", 2);
-        if (nameValue.length < 2) {
-            throw new IllegalArgumentException("Invalid Set-Cookie header: " + headerValue);
-        }
-
-        String name = nameValue[0].trim();
-        String value = nameValue[1].trim();
-        String domain = null;
-        String path = "/";
-        boolean secure = false;
-        boolean httpOnly = false;
-        Integer maxAge = null;
-        SameSite sameSite = null;
-
-        for (int i = 1; i < parts.length; i++) {
-            String[] attribute = parts[i].trim().split("=", 2);
-            String attrName = attribute[0].trim().toLowerCase();
-            String attrValue = attribute.length > 1 ? attribute[1].trim() : "";
-
-            switch (attrName) {
-                case "domain":
-                    domain = attrValue;
-                    break;
-                case "path":
-                    path = attrValue;
-                    break;
-                case "secure":
-                    secure = true;
-                    break;
-                case "httponly":
-                    httpOnly = true;
-                    break;
-                case "max-age":
-                    try {
-                        maxAge = Integer.parseInt(attrValue);
-                    } catch (NumberFormatException ignored) {
-                    }
-                    break;
-                case "samesite":
-                    sameSite = parseSameSite(attrValue);
-                    break;
-            }
-        }
-
-        return new Cookie(name, value, maxAge, path, domain, secure, httpOnly, sameSite);
+  public static Cookie parseSetCookieHeader(String headerValue) {
+    String[] parts = headerValue.split(";");
+    String[] nameValue = parts[0].split("=", 2);
+    if (nameValue.length < 2) {
+      throw new IllegalArgumentException("Invalid Set-Cookie header: " + headerValue);
     }
 
-    private static SameSite parseSameSite(String value) {
-        if (value.equalsIgnoreCase("strict")) {
-            return SameSite.STRICT;
-        } else if (value.equalsIgnoreCase("lax")) {
-            return SameSite.LAX;
-        } else if (value.equalsIgnoreCase("none")) {
-            return SameSite.NONE;
-        }
-        return null; // Default to null if not specified or invalid
+    String name = nameValue[0].trim();
+    String value = nameValue[1].trim();
+    String domain = null;
+    String path = "/";
+    boolean secure = false;
+    boolean httpOnly = false;
+    Integer maxAge = null;
+    SameSite sameSite = null;
+
+    for (int i = 1; i < parts.length; i++) {
+      String[] attribute = parts[i].trim().split("=", 2);
+      String attrName = attribute[0].trim().toLowerCase();
+      String attrValue = attribute.length > 1 ? attribute[1].trim() : "";
+
+      switch (attrName) {
+        case "domain":
+          domain = attrValue;
+          break;
+        case "path":
+          path = attrValue;
+          break;
+        case "secure":
+          secure = true;
+          break;
+        case "httponly":
+          httpOnly = true;
+          break;
+        case "max-age":
+          try {
+            maxAge = Integer.parseInt(attrValue);
+          } catch (NumberFormatException ignored) {
+          }
+          break;
+        case "samesite":
+          sameSite = parseSameSite(attrValue);
+          break;
+      }
     }
+
+    return new Cookie(name, value, maxAge, path, domain, secure, httpOnly, sameSite);
+  }
+
+  private static SameSite parseSameSite(String value) {
+    if (value.equalsIgnoreCase("strict")) {
+      return SameSite.STRICT;
+    } else if (value.equalsIgnoreCase("lax")) {
+      return SameSite.LAX;
+    } else if (value.equalsIgnoreCase("none")) {
+      return SameSite.NONE;
+    }
+    return null; // Default to null if not specified or invalid
+  }
 }
-
 
 /** A sample controller that proxies incoming requests to another server. */
 public class Proxy extends Controller {

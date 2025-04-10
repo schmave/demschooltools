@@ -13,9 +13,9 @@ from custodia.models import (
 class SwipeAdmin(admin.ModelAdmin):
     list_display = ["id", "person", "swipe_day", "in_time", "out_time"]
     list_filter = ["swipe_day", "person__organization"]
-    search_fields = ["person__first_name", "person__display_name"]
+    search_fields = ["person__first_name", "person__last_name", "person__display_name"]
 
-    readonly_fields = ["person"]
+    autocomplete_fields = ["person"]
 
 
 @admin.register(StudentRequiredMinutes)
