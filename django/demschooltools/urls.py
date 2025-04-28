@@ -21,6 +21,7 @@ from django.urls import include, path
 from custodia.views import (
     AbsentView,
     DeleteSwipeView,
+    ErrorTestView,
     ExcuseView,
     IndexView,
     IsAdminView,
@@ -61,6 +62,7 @@ urlpatterns = [
     ),
     path("", IndexView.as_view()),
     path("custodia/", IndexView.as_view()),
+    path("custodia/error-test", ErrorTestView.as_view()),
     path("custodia/login", LoginView.as_view()),
     path("custodia/logout", LogoutView.as_view()),
 ]
