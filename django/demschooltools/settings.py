@@ -71,11 +71,13 @@ MIDDLEWARE = (["silk.middleware.SilkyMiddleware"] if SILK_ENABLED else []) + [
     "rollbar.contrib.django.middleware.RollbarNotifierMiddlewareExcluding404",
 ]
 
-ROLLBAR_ENVIRONMENT = "development" if DEBUG else "production"
+ROLLBAR_FRONTEND_TOKEN = os.environ.get("ROLLBAR_FRONTEND_TOKEN", "")
 ROLLBAR = {
     "access_token": os.environ.get("ROLLBAR_TOKEN", ""),
-    "environment": ROLLBAR_ENVIRONMENT,
     "branch": "main",
+    "capture_username": True,
+    "capture_email": True,
+    "environment": "development",
     "root": os.path.abspath(os.path.join(__file__, "..", "..")),
 }
 
@@ -115,6 +117,10 @@ LOGGING = {
         },
     },
     "loggers": {
+        # "rollbar": {
+        #     "handlers": ["console"],
+        #     "level": "DEBUG",
+        # },
         "django": {
             "handlers": ["console"],
             "level": "INFO",

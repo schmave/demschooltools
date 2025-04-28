@@ -35,4 +35,6 @@ DATABASES = {
     },
 }
 
+ROLLBAR = dict(ROLLBAR, environment="production")
+
 STATIC_ROOT = "/www/django-static/"

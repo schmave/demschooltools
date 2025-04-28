@@ -32,6 +32,11 @@ from dst.models import AttendanceDay, AttendanceWeek, Person, User, UserRole
 DEFAULT_REQUIRED_MINUTES = 345
 
 
+class ErrorTestView(View):
+    def get(self, request):
+        raise Exception("rollbar test")
+
+
 class IndexView(View):
     def get(self, request):
         if not request.user.is_authenticated:
@@ -43,6 +48,7 @@ class IndexView(View):
             {
                 "dev_js_link": settings.CUSTODIA_JS_LINK,
                 "rollbar_environment": settings.ROLLBAR_ENVIRONMENT,
+                "rollbar_token": settings.ROLLBAR_FRONTEND_TOKEN,
             },
         )
 
