@@ -72,12 +72,13 @@ MIDDLEWARE = (["silk.middleware.SilkyMiddleware"] if SILK_ENABLED else []) + [
 ]
 
 ROLLBAR_FRONTEND_TOKEN = os.environ.get("ROLLBAR_FRONTEND_TOKEN", "")
+ROLLBAR_ENVIRONMENT = "development"
 ROLLBAR = {
     "access_token": os.environ.get("ROLLBAR_TOKEN", ""),
     "branch": "main",
     "capture_username": True,
     "capture_email": True,
-    "environment": "development",
+    "environment": ROLLBAR_ENVIRONMENT,
     "root": os.path.abspath(os.path.join(__file__, "..", "..")),
 }
 
