@@ -12,7 +12,7 @@ Printed on {% yymmddDate %}.
 	<div class="man-section-header">
 	  <a name="section_{{ section.id }}"></a>{{ section.number }} {{ section.title }} <a class="no-print man-edit" href="/editSection/{{ section.id }}">Edit</a>
 	</div>
-	<p><a class="no-print" href="/addEntry/{{ section.id }}">Add entry in {{ chapter.num }}{{ section.number }} {{ section.title }}</a></p>
+	<p><a class="no-print" href="/addEntry/{{ section.id }}">Add entry in {{ section.number }} {{ section.title }}</a></p>
 	{% for entry in section.entries.all %}
 	<div class="man-entry">
 		<a name="entry_{{ entry.id }}"></a>
@@ -25,6 +25,7 @@ Printed on {% yymmddDate %}.
 		</p>
 		<div class="man-entry-content">{{ entry.content|markdown }}
 
+			<!-- TODO no changes are being rendered -->
 			{% with entry.changes as defined_changes %}
 			{% if defined_changes|length > 1 %}
 			<p class="man-entry-change-history {% if not org_config.org.show_history_in_print %}no-print{% endif %}">

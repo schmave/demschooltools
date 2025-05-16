@@ -7,6 +7,7 @@ from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
+from demschooltools.form_renderer import BootstrapFormRenderer
 from dst.models import Chapter, Entry, Section
 from dst.org_config import get_org_config
 
@@ -84,6 +85,8 @@ def view_chapter(request: HttpRequest, chapter_id: int):
 
 
 class ChapterForm(ModelForm):
+    default_renderer = BootstrapFormRenderer()
+
     class Meta:
         model = Chapter
         fields = ["id", "num", "title", "deleted"]

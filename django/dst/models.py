@@ -283,7 +283,7 @@ class ManualChange(models.Model):
     class Meta:
         db_table = "manual_change"
 
-    entry = models.ForeignKey(Entry, on_delete=models.PROTECT)
+    entry = models.ForeignKey(Entry, on_delete=models.PROTECT, related_name="changes")
     date_entered = models.DateTimeField()
 
 
