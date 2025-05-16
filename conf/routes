@@ -80,9 +80,10 @@ GET /thisWeekReport	controllers.Application.thisWeekReport(request: Request)
 GET /viewWeeklyReport/:date	controllers.Application.viewWeeklyReport(date : String, request: Request)
 
 
-GET /addChapter			controllers.ApplicationEditing.addChapter(request: Request)
-GET /editChapter/:id		controllers.ApplicationEditing.editChapter(id : Integer, request: Request)
-POST /saveChapter	controllers.ApplicationEditing.saveChapter(request: Request)
+GET /editChapter		controllers.Proxy.proxy0(request: Request)
+POST /editChapter		controllers.Proxy.proxy0(request: Request)
+GET /editChapter*extra		controllers.Proxy.proxy(request: Request, extra: String)
+
 GET /addSection/:chapterId		controllers.ApplicationEditing.addSection(chapterId : Integer, request: Request)
 GET /editSection/:id		controllers.ApplicationEditing.editSection(id : Integer, request: Request)
 POST /saveSection	controllers.ApplicationEditing.saveSection(request: Request)

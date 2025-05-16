@@ -383,35 +383,6 @@ public class ApplicationEditing extends Controller {
   }
 
   @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
-  public Result addChapter(Http.Request request) {
-    Form<Chapter> form = mFormFactory.form(Chapter.class);
-    return ok(edit_chapter.render(form, true, request, mMessagesApi.preferred(request)));
-  }
-
-  @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
-  public Result editChapter(Integer id, Http.Request request) {
-    Form<Chapter> filled_form =
-        mFormFactory.form(Chapter.class).fill(Chapter.findById(id, Utils.getOrg(request)));
-    return ok(edit_chapter.render(filled_form, false, request, mMessagesApi.preferred(request)));
-  }
-
-  @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
-  public Result saveChapter(Http.Request request) {
-    Form<Chapter> form = mFormFactory.form(Chapter.class).bindFromRequest(request);
-
-    Chapter c;
-    if (form.field("id").value().isPresent()) {
-      c = Chapter.findById(Integer.parseInt(form.field("id").value().get()), Utils.getOrg(request));
-      c.updateFromForm(form);
-    } else {
-      c = Chapter.create(form, Utils.getOrg(request));
-    }
-
-    onManualChange(Utils.getOrg(request));
-    return redirect("/viewChapter/" + c.getId());
-  }
-
-  @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
   public Result addSection(Integer chapterId, Http.Request request) {
     Form<Section> form = mFormFactory.form(Section.class);
     Section section = new Section();

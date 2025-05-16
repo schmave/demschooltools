@@ -8,7 +8,7 @@
 Printed on @Application.yymmddDate(Utils.getOrgConfig(request)).
 </div>
 
-<div class="man-chapter">@chapter.getNum() @chapter.getTitle() <a class="man-edit no-print" href="@routes.ApplicationEditing.editChapter(chapter.getId())">Edit</a></div>
+<div class="man-chapter">@chapter.getNum() @chapter.getTitle()</div>
 <p><a class="no-print" href="@routes.ApplicationEditing.addSection(chapter.getId())">Add section in @chapter.getNum() @chapter.getTitle()</a></p>
 
 @for(section <- chapter.sections) {

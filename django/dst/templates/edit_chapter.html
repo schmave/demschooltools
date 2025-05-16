@@ -1,4 +1,4 @@
-@(form: Form[Chapter], is_new : Boolean)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
+<!-- @(form: Form[Chapter], is_new : Boolean)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 @implicitField = @{ helper.FieldConstructor(myConstructor.f) }
 @main("Edit a chapter", "manual") {
 
@@ -19,4 +19,17 @@
 		@helper.checkbox(form("deleted"), Symbol("_label") -> "Check this to delete")
         @save_button("Save")
 }
-}
+} -->
+{% if form.title.value %}
+<h2>Edit chapter "{{ form.title.value }}"</h2>
+{% else %}
+<h2>New Chapter</h2>
+{% endif %}
+
+<form action="/editChapter" method="post" class="form-horizontal">
+    {% csrf_token %}
+
+    {{ form }}
+
+    {% include "save_button.html" %}
+</form>

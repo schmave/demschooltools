@@ -102,6 +102,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "demschooltools.wsgi.application"
 
+# Form renderer configuration
+FORM_RENDERER = "demschooltools.form_renderer.BootstrapFormRenderer"
+
 
 LOGGING = {
     "version": 1,
