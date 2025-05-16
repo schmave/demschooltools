@@ -1,0 +1,54 @@
+{% load dst_tags %}
+
+<div id="footer">
+Printed on {% yymmddDate %}.
+</div>
+
+<div class="man-chapter">{{ chapter.num }} {{ chapter.title }} <a class="man-edit no-print" href="/editChapter/{{ chapter.id }}">Edit</a></div>
+<p><a class="no-print" href="/addSection/{{ chapter.id }}">Add section in {{ chapter.num }} {{ chapter.title }}</a></p>
+
+{% for section in chapter.sections.all %}
+<div class="man-section">
+	<div class="man-section-header">
+	  <a name="section_{{ section.id }}"></a>{{ section.number }} {{ section.title }} <a class="no-print man-edit" href="/editSection/{{ section.id }}">Edit</a>
+	</div>
+	<p><a class="no-print" href="/addEntry/{{ section.id }}">Add entry in {{ chapter.num }}{{ section.number }} {{ section.title }}</a></p>
+	{% for entry in section.entries.all %}
+	<div class="man-entry">
+		<a name="entry_{{ entry.id }}"></a>
+		<p class="man-entry-num">{{ entry.number }} {{ entry.title }} <a class="no-print man-edit" href="/editEntry/{{ entry.id }}">Edit</a>
+			{% if entry.changes|length > 0 %}
+				<span class="man-last-modify-date {% if not org_config.org.show_last_modified_in_print %}no-print{% endif %}">
+                    changed {% yymmddDate entry.changes.last.date_entered %}
+                </span>
+			{% endif %}
+		</p>
+		<div class="man-entry-content">{{ entry.content|markdown }}
+
+			{% with entry.changes as defined_changes %}
+			{% if defined_changes|length > 1 %}
+			<p class="man-entry-change-history {% if not org_config.org.show_history_in_print %}no-print{% endif %}">
+				{% for change_detail in defined_changes %}
+                    {% comment %}
+                        The original Scala code displays information if it's the first change item,
+                        or if the date (day, month, year) of the current change item is different
+                        from the date of the previous change item.
+                        Django's {% ifchanged change_detail.date_entered.date %} achieves this behavior.
+                        It assumes 'change_detail.date_entered' is a datetime object and '.date'
+                        accesses its date part for comparison.
+                    {% endcomment %}
+                    {% ifchanged change_detail.date_entered.date %}
+                        {% if change_detail.was_created %} Adopted
+                        {% elif change_detail.was_deleted %} Repealed
+                        {% else %} Amended {% endif %}
+                        {% yymmddDate change_detail.date_entered %};
+                    {% endifchanged %}
+                {% endfor %}
+			</p>
+			{% endif %}
+			{% endwith %}
+		</div>
+	</div>
+	{% endfor %}
+</div>
+{% endfor %}

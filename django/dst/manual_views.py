@@ -45,3 +45,21 @@ def view_manual(request: HttpRequest):
             },
         ),
     )
+
+
+def view_chapter(request: HttpRequest, chapter_id: int):
+    # Render the manual template to a string
+    return render_main_template(
+        request,
+        render_to_string(
+            "view_chapter.html",
+            {
+                "chapter": Chapter.objects.filter(
+                    id=chapter_id, organization=request.org
+                )
+                .prefetch_related("sections__entries")
+                .first(),
+                "org_config": get_org_config(request.org),
+            },
+        ),
+    )

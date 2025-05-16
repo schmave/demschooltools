@@ -408,7 +408,7 @@ public class ApplicationEditing extends Controller {
     }
 
     onManualChange(Utils.getOrg(request));
-    return redirect(routes.Application.viewChapter(c.getId()));
+    return redirect("/viewChapter/" + c.getId());
   }
 
   @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
@@ -455,7 +455,7 @@ public class ApplicationEditing extends Controller {
 
     onManualChange(Utils.getOrg(request));
     return redirect(
-        routes.Application.viewChapter(s.getChapter().getId()).url() + "#section_" + s.getId());
+      "/viewChapter/" + s.getChapter().getId()+ "#section_" + s.getId());
   }
 
   @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
@@ -502,8 +502,8 @@ public class ApplicationEditing extends Controller {
 
     onManualChange(Utils.getOrg(request));
     return redirect(
-        routes.Application.viewChapter(e.getSection().getChapter().getId()).url()
-            + "#entry_"
+      "/viewChapter/" + e.getSection().getChapter().getId()+
+             "#entry_"
             + e.getId());
   }
 }

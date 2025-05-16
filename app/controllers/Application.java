@@ -998,20 +998,6 @@ public class Application extends Controller {
     }
   }
 
-  public Result viewChapter(Integer id, Http.Request request) {
-    Chapter c =
-        Chapter.find
-            .query()
-            .fetch("sections", FetchConfig.ofQuery())
-            .fetch("sections.entries", FetchConfig.ofQuery())
-            .where()
-            .eq("organization", Utils.getOrg(request))
-            .eq("id", id)
-            .findOne();
-
-    return ok(view_chapter.render(c, request, mMessagesApi.preferred(request)));
-  }
-
   public Result searchManual(String searchString, Http.Request request) {
     Map<String, Object> scopes = new HashMap<>();
     scopes.put("searchString", searchString);

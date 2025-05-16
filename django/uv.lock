@@ -126,6 +126,7 @@ dependencies = [
     { name = "django" },
     { name = "djangorestframework" },
     { name = "drf-orjson-renderer" },
+    { name = "mistletoe" },
     { name = "psycopg2" },
     { name = "pyjwt" },
     { name = "requests" },
@@ -148,6 +149,7 @@ requires-dist = [
     { name = "django", specifier = "~=5.1" },
     { name = "djangorestframework", specifier = "~=3.15" },
     { name = "drf-orjson-renderer", specifier = "~=1.7" },
+    { name = "mistletoe", specifier = ">=1.4.0" },
     { name = "psycopg2", specifier = "~=2.9" },
     { name = "pyjwt", specifier = "~=2.10" },
     { name = "requests", specifier = "~=2.32" },
@@ -245,6 +247,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/f1/70/7703c29685631f5a7590aa73f1f1d3fa9a380e654b86af429e0934a32f7d/idna-3.10.tar.gz", hash = "sha256:12f65c9b470abda6dc35cf8e63cc574b1c52b11df2c86030af0ac09b01b13ea9", size = 190490 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/76/c6/c88e154df9c4e1a2a66ccf0005a88dfb2650c1dffb6f5ce603dfbd452ce3/idna-3.10-py3-none-any.whl", hash = "sha256:946d195a0d259cbba61165e88e65941f16e9b36ea6ddb97f00452bae8b1287d3", size = 70442 },
+]
+
+[[package]]
+name = "mistletoe"
+version = "1.4.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/11/96/ea46a376a7c4cd56955ecdfff0ea68de43996a4e6d1aee4599729453bd11/mistletoe-1.4.0.tar.gz", hash = "sha256:1630f906e5e4bbe66fdeb4d29d277e2ea515d642bb18a9b49b136361a9818c9d", size = 107203 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2a/0f/b5e545f0c7962be90366af3418989b12cf441d9da1e5d89d88f2f3e5cf8f/mistletoe-1.4.0-py3-none-any.whl", hash = "sha256:44a477803861de1237ba22e375c6b617690a31d2902b47279d1f8f7ed498a794", size = 51304 },
 ]
 
 [[package]]
