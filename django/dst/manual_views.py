@@ -1,12 +1,13 @@
 from datetime import datetime
 
+from django.db.models import Prefetch, QuerySet
 from django.forms import ModelForm, TextInput
 from django.http import HttpRequest
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
-from dst.models import Chapter
+from dst.models import Chapter, Entry, Section
 from dst.org_config import get_org_config
 
 
@@ -34,9 +35,7 @@ def render_main_template(
 
 
 def view_manual(request: HttpRequest):
-    chapters = Chapter.objects.filter(organization=request.org).prefetch_related(
-        "sections__entries"
-    )
+    chapters = chapter_with_entries().filter(organization=request.org, deleted=False)
 
     return render_main_template(
         request,
@@ -53,11 +52,22 @@ def view_manual(request: HttpRequest):
     )
 
 
+def chapter_with_entries() -> QuerySet[Chapter]:
+    return Chapter.objects.prefetch_related(
+        Prefetch(
+            "sections",
+            Section.objects.order_by("num")
+            .filter(deleted=False)
+            .prefetch_related(
+                Prefetch("entries", Entry.objects.filter(deleted=False).order_by("num"))
+            ),
+        )
+    ).order_by("num")
+
+
 def view_chapter(request: HttpRequest, chapter_id: int):
     chapter = (
-        Chapter.objects.filter(id=chapter_id, organization=request.org)
-        .prefetch_related("sections__entries")
-        .first()
+        chapter_with_entries().filter(id=chapter_id, organization=request.org).first()
     )
 
     return render_main_template(
@@ -85,17 +95,21 @@ class ChapterForm(ModelForm):
 
 
 def edit_chapter(request: HttpRequest, chapter_id: int | None = None):
+    existing_chapter = Chapter.objects.filter(
+        id=chapter_id, organization=request.org
+    ).first()
+
     if request.method == "POST":
-        form = ChapterForm(request.POST)
+        form = ChapterForm(request.POST, instance=existing_chapter)
         if form.is_valid():
-            chapter = form.save()
+            chapter = form.save(commit=False)
+            if chapter.organization_id is None:
+                chapter.organization = request.org
+            chapter.save()
             # TODO: Call onManualChange();
             return redirect(f"/viewChapter/{chapter.id}")
     else:
-        chapter = Chapter.objects.filter(
-            id=chapter_id, organization=request.org
-        ).first()
-        form = ChapterForm(instance=chapter)
+        form = ChapterForm(instance=existing_chapter)
 
     return render_main_template(
         request,
@@ -104,6 +118,7 @@ def edit_chapter(request: HttpRequest, chapter_id: int | None = None):
             {
                 "org_config": get_org_config(request.org),
                 "form": form,
+                "is_new": existing_chapter is None,
             },
             request=request,
         ),

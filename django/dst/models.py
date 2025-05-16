@@ -259,6 +259,9 @@ class Section(models.Model):
     )
     deleted = models.BooleanField()
 
+    def number(self):
+        return self.chapter.num + self.num
+
 
 class Entry(models.Model):
     class Meta:
@@ -271,6 +274,9 @@ class Entry(models.Model):
     )
     deleted = models.BooleanField()
     content = models.TextField()
+
+    def number(self):
+        return self.section.number() + "." + self.num
 
 
 class ManualChange(models.Model):
