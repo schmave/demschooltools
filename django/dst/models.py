@@ -12,6 +12,43 @@ class Organization(models.Model):
     timezone = models.TextField()
     late_time = models.TimeField()
 
+    printer_email = models.TextField(null=True, blank=True)
+    jc_reset_day = models.IntegerField(null=True, blank=True)
+    show_last_modified_in_print = models.BooleanField(default=False)
+    show_history_in_print = models.BooleanField(default=False)
+    show_custodia = models.BooleanField(default=False)
+    show_attendance = models.BooleanField(default=False)
+    show_electronic_signin = models.BooleanField(default=False)
+    show_accounting = models.BooleanField(default=False)
+    show_roles = models.BooleanField(default=False)
+    enable_case_references = models.BooleanField(default=False)
+    attendance_enable_off_campus = models.BooleanField(default=False)
+    attendance_show_reports = models.BooleanField(default=False)
+    attendance_report_latest_departure_time = models.TimeField(null=True, blank=True)
+    attendance_report_latest_departure_time_2 = models.TimeField(null=True, blank=True)
+    attendance_report_late_fee = models.IntegerField(null=True, blank=True)
+    attendance_report_late_fee_2 = models.IntegerField(null=True, blank=True)
+    attendance_report_late_fee_interval = models.IntegerField(null=True, blank=True)
+    attendance_report_late_fee_interval_2 = models.IntegerField(null=True, blank=True)
+    attendance_show_percent = models.BooleanField(default=False)
+    attendance_show_weighted_percent = models.BooleanField(default=False)
+    attendance_show_rate_in_checkin = models.BooleanField(default=False)
+    attendance_enable_partial_days = models.BooleanField(default=False)
+    attendance_day_latest_start_time = models.TimeField(null=True, blank=True)
+    attendance_day_earliest_departure_time = models.TimeField(null=True, blank=True)
+    attendance_day_min_hours = models.FloatField(null=True, blank=True)
+    attendance_partial_day_value = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True
+    )
+    attendance_admin_pin = models.CharField(max_length=255, null=True, blank=True)
+    attendance_default_absence_code = models.CharField(
+        max_length=255, null=True, blank=True
+    )
+    attendance_default_absence_code_time = models.TimeField(null=True, blank=True)
+    roles_individual_term = models.TextField(null=True, blank=True)
+    roles_committee_term = models.TextField(null=True, blank=True)
+    roles_group_term = models.TextField(null=True, blank=True)
+
     def __str__(self):
         return f"{self.id}-{self.name}"
 
@@ -217,7 +254,9 @@ class Section(models.Model):
 
     title = models.TextField()
     num = models.TextField()
-    chapter = models.ForeignKey(Chapter, on_delete=models.PROTECT)
+    chapter = models.ForeignKey(
+        Chapter, on_delete=models.PROTECT, related_name="sections"
+    )
     deleted = models.BooleanField()
 
 
@@ -227,7 +266,9 @@ class Entry(models.Model):
 
     title = models.TextField()
     num = models.TextField()
-    section = models.ForeignKey(Section, on_delete=models.PROTECT)
+    section = models.ForeignKey(
+        Section, on_delete=models.PROTECT, related_name="entries"
+    )
     deleted = models.BooleanField()
     content = models.TextField()
 

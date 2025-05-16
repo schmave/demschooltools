@@ -816,10 +816,6 @@ public class Application extends Controller {
             "attachment; filename=" + Utils.getOrgConfig(org).str_res_plans + ".csv");
   }
 
-  public Result viewManual(Http.Request request) {
-    return ok(renderManualTOC(Utils.getOrg(request), request));
-  }
-
   public Result viewManualChanges(String begin_date_string, Http.Request request) {
     Date begin_date;
 

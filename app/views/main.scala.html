@@ -74,7 +74,7 @@ var _rollbarConfig = {
                 <a href="@routes.Application.index()">@Utils.getOrgConfig(request).str_jc_name_short</a>
             </li>
             <li @if(menu.equals("manual")) { class="active" }>
-                <a href="@routes.Application.viewManual()">@Utils.getOrgConfig(request).str_manual_title_short</a>
+                <a href="/viewManual">@Utils.getOrgConfig(request).str_manual_title_short</a>
             </li>
             @if(Utils.getOrgConfig(request).org.getShowRoles()) {
                 <li @if(menu.equals("roles")) { class="active" }>
@@ -271,7 +271,7 @@ var _rollbarConfig = {
         <div class="tab-pane active" id="manual">
             <div class="subnav">
                 <a @if(selectedBtn.equals("toc")) { class="active" }
-                    href="@routes.Application.viewManual()">Table of Contents</a>
+                    href="/viewManual">Table of Contents</a>
                 <a @if(selectedBtn.equals("manual_print")) { class="active" }
                     href="@routes.Application.printManual()">Print</a>
                 <a @if(selectedBtn.equals("manual_changes")) { class="active" }

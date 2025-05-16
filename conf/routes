@@ -67,7 +67,7 @@ POST /generateChargeFromReference   controllers.ApplicationEditing.generateCharg
 GET /getLastRp/:personId/:ruleId	controllers.Application.getLastRp(personId : Integer, ruleId : Integer, request: Request)
 
 
-GET /viewManual       controllers.Application.viewManual(request: Request)
+GET /viewManual       controllers.Proxy.proxy0(request: Request)
 GET /viewManualChanges       controllers.Application.viewManualChanges(begin_date : String ?= "", request: Request)
 GET /viewChapter/:id       controllers.Application.viewChapter(id : Integer, request: Request)
 GET /searchManual       controllers.Application.searchManual(searchString : String ?= "", request: Request)
