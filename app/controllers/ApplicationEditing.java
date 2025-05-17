@@ -372,7 +372,6 @@ public class ApplicationEditing extends Controller {
   }
 
   void onManualChange(Organization org) {
-    CachedPage.remove(CachedPage.MANUAL_INDEX, org);
     try {
       Connection conn = mDatabase.getConnection();
       conn.prepareStatement("REFRESH MATERIALIZED VIEW entry_index WITH DATA").execute();

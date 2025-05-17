@@ -1,5 +1,8 @@
 from datetime import datetime
 
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.models import AbstractUser
+from django.db import connection
 from django.db.models import Prefetch, QuerySet
 from django.forms import ModelForm, TextInput
 from django.http import HttpRequest
@@ -8,8 +11,15 @@ from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
 from demschooltools.form_renderer import BootstrapFormRenderer
-from dst.models import Chapter, Entry, Section
+from dst.models import Chapter, Entry, ManualChange, Section, User, UserRole
 from dst.org_config import get_org_config
+
+
+# TODO: login_required and user_passes_test in this file should redirect
+# to the Play framework login page, not the Custodia one.
+def can_edit_manual(user: AbstractUser) -> bool:
+    assert isinstance(user, User)
+    return user.hasRole(UserRole.EDIT_MANUAL)
 
 
 def render_main_template(
@@ -35,6 +45,7 @@ def render_main_template(
     )
 
 
+@login_required()
 def view_manual(request: HttpRequest):
     chapters = chapter_with_entries().filter(organization=request.org, deleted=False)
 
@@ -60,12 +71,22 @@ def chapter_with_entries() -> QuerySet[Chapter]:
             Section.objects.order_by("num")
             .filter(deleted=False)
             .prefetch_related(
-                Prefetch("entries", Entry.objects.filter(deleted=False).order_by("num"))
+                Prefetch(
+                    "entries",
+                    Entry.objects.filter(deleted=False)
+                    .order_by("num")
+                    .prefetch_related(
+                        Prefetch(
+                            "changes", ManualChange.objects.order_by("date_entered")
+                        )
+                    ),
+                )
             ),
         )
     ).order_by("num")
 
 
+@login_required()
 def view_chapter(request: HttpRequest, chapter_id: int):
     chapter = (
         chapter_with_entries().filter(id=chapter_id, organization=request.org).first()
@@ -97,6 +118,12 @@ class ChapterForm(ModelForm):
         widgets = {"num": TextInput(), "title": TextInput()}
 
 
+def on_manual_change():
+    with connection.cursor() as cursor:
+        cursor.execute("REFRESH MATERIALIZED VIEW entry_index WITH DATA")
+
+
+@user_passes_test(can_edit_manual)
 def edit_chapter(request: HttpRequest, chapter_id: int | None = None):
     existing_chapter = Chapter.objects.filter(
         id=chapter_id, organization=request.org
@@ -109,7 +136,7 @@ def edit_chapter(request: HttpRequest, chapter_id: int | None = None):
             if chapter.organization_id is None:
                 chapter.organization = request.org
             chapter.save()
-            # TODO: Call onManualChange();
+            on_manual_change()
             return redirect(f"/viewChapter/{chapter.id}")
     else:
         form = ChapterForm(instance=existing_chapter)

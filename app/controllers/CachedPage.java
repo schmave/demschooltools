@@ -14,7 +14,6 @@ import models.*;
 public abstract class CachedPage {
   public static final String JC_INDEX = "Application-index-";
   public static final String JC_INDEX_LOGGED_OUT = "Application-index-lo-";
-  public static final String MANUAL_INDEX = "Application-viewManual-";
   public static final String RECENT_COMMENTS = "CRM-recentComments-";
 
   public String title;
@@ -98,7 +97,6 @@ public abstract class CachedPage {
 
   public static void clearAll(Organization org) {
     remove(JC_INDEX, org);
-    remove(MANUAL_INDEX, org);
     remove(RECENT_COMMENTS, org);
   }
 

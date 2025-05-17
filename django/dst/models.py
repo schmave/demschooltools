@@ -284,7 +284,16 @@ class ManualChange(models.Model):
         db_table = "manual_change"
 
     entry = models.ForeignKey(Entry, on_delete=models.PROTECT, related_name="changes")
-    date_entered = models.DateTimeField()
+    date_entered = models.DateTimeField(auto_now_add=True)
+
+    was_deleted = models.BooleanField()
+    was_created = models.BooleanField()
+    old_content = models.TextField(null=True, blank=True)
+    new_content = models.TextField(null=True, blank=True)
+    old_title = models.CharField()
+    new_title = models.CharField()
+    old_num = models.CharField()
+    new_num = models.CharField()
 
 
 class Account(models.Model):

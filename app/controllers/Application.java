@@ -955,22 +955,9 @@ public class Application extends Controller {
   }
 
   play.twirl.api.Html renderManualTOC(Organization org, Http.Request request) {
-    return cached_page.render(
-        new CachedPage(
-            CachedPage.MANUAL_INDEX,
-            Utils.getOrgConfig(org).str_manual_title,
-            "manual",
-            "toc",
-            org) {
-          @Override
-          String render() {
-            return view_manual
-                .render(Chapter.all(org), request, mMessagesApi.preferred(request))
-                .toString();
-          }
-        },
-        request,
-        mMessagesApi.preferred(request));
+    return main.render(Utils.getOrgConfig(org).str_manual_title, "manual", "toc", view_manual
+    .render(Chapter.all(org), request, mMessagesApi.preferred(request))
+, request, mMessagesApi.preferred(request));
   }
 
   public Result printManualChapter(Integer id, Http.Request request) throws Exception {
