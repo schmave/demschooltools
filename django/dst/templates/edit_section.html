@@ -11,7 +11,10 @@
             <div class="form-group">
                 <label for="id_num" class="col-sm-3 control-label">Number</label>
                 <div class="col-sm-6">
-                    {{chapter_num}}<input type="text" id="id_num" name="num" value="{{field.value|default:""}}" size="10">
+                    <div class="input-group">
+                        <span class="input-group-addon">{{chapter_num}}</span>
+                        <input type="text" class="form-control" id="id_num" name="num" value="{{field.value|default:""}}">
+                    </div>
                 </div>
             </div>
         {% else %}
