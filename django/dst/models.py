@@ -238,25 +238,43 @@ class PersonTagChange(models.Model):
     tag = models.ForeignKey(Tag, on_delete=models.PROTECT)
 
 
+class ManualManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted=False).order_by("num")
+
+
 class Chapter(models.Model):
     class Meta:
         db_table = "chapter"
 
+    objects = ManualManager()
+    all_objects = models.Manager()
+
+    id: int
     title = models.TextField()
     num = models.TextField()
     organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
+    organization_id: int
     deleted = models.BooleanField()
+
+    def __str__(self):
+        return f"{self.num} {self.title}"
 
 
 class Section(models.Model):
     class Meta:
         db_table = "section"
 
+    objects = ManualManager()
+    all_objects = models.Manager()
+
+    id: int
     title = models.TextField()
     num = models.TextField()
     chapter = models.ForeignKey(
-        Chapter, on_delete=models.PROTECT, related_name="sections"
+        Chapter, on_delete=models.PROTECT, related_name="sections", blank=False
     )
+    chapter_id: int
     deleted = models.BooleanField()
 
     def number(self):
@@ -267,6 +285,10 @@ class Entry(models.Model):
     class Meta:
         db_table = "entry"
 
+    objects = ManualManager()
+    all_objects = models.Manager()
+
+    id: int
     title = models.TextField()
     num = models.TextField()
     section = models.ForeignKey(

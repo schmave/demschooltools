@@ -382,53 +382,6 @@ public class ApplicationEditing extends Controller {
   }
 
   @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
-  public Result addSection(Integer chapterId, Http.Request request) {
-    Form<Section> form = mFormFactory.form(Section.class);
-    Section section = new Section();
-    section.setChapter(Chapter.findById(chapterId, Utils.getOrg(request)));
-    form = form.fill(section);
-    return ok(
-        edit_section.render(
-            form,
-            Chapter.findById(chapterId, Utils.getOrg(request)),
-            true,
-            Chapter.all(Utils.getOrg(request)),
-            request,
-            mMessagesApi.preferred(request)));
-  }
-
-  @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
-  public Result editSection(Integer id, Http.Request request) {
-    Section existing_section = Section.findById(id, Utils.getOrg(request));
-    Form<Section> filled_form = mFormFactory.form(Section.class).fill(existing_section);
-    return ok(
-        edit_section.render(
-            filled_form,
-            existing_section.getChapter(),
-            false,
-            Chapter.all(Utils.getOrg(request)),
-            request,
-            mMessagesApi.preferred(request)));
-  }
-
-  @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
-  public Result saveSection(Http.Request request) {
-    Form<Section> form = mFormFactory.form(Section.class).bindFromRequest(request);
-
-    Section s;
-    if (form.field("id").value().isPresent()) {
-      s = Section.findById(Integer.parseInt(form.field("id").value().get()), Utils.getOrg(request));
-      s.updateFromForm(form);
-    } else {
-      s = Section.create(form);
-    }
-
-    onManualChange(Utils.getOrg(request));
-    return redirect(
-      "/viewChapter/" + s.getChapter().getId()+ "#section_" + s.getId());
-  }
-
-  @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
   public Result addEntry(Integer sectionId, Http.Request request) {
     Form<Entry> form = mFormFactory.form(Entry.class);
     Entry entry = new Entry();

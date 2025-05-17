@@ -1,0 +1,22 @@
+{% if is_new %}
+<h2>New section</h2>
+{% else %}
+<h2>Edit section "{{ form.title.value }}"</h2>
+{% endif %}
+
+<form action="" method="post" class="form-horizontal">
+    {% csrf_token %}
+    {% for field in form %}
+        {% if field.id_for_label == "id_num" %}
+            <div class="form-group">
+                <label for="id_num" class="col-sm-3 control-label">Number</label>
+                <div class="col-sm-6">
+                {{chapter_num}}<input type="text" id="id_num" name="num" value="{{field.value|default:""}}" size="10">
+                </div>
+            </div>
+        {% else %}
+            {% include "bootstrap_field.html" %}
+        {% endif %}
+    {% endfor %}
+    {% include "save_button.html" %}
+</form>

@@ -34,7 +34,12 @@ from custodia.views import (
     StudentsTodayView,
     SwipeView,
 )
-from dst.manual_views import EditUpdateChapter, view_chapter, view_manual
+from dst.manual_views import (
+    CreateUpdateChapter,
+    CreateUpdateSection,
+    view_chapter,
+    view_manual,
+)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -63,9 +68,12 @@ urlpatterns = [
     ),
     path("viewManual", view_manual),
     path("viewChapter/<int:chapter_id>", view_chapter),
-    path("addChapter", EditUpdateChapter.as_view()),
-    path("editChapter", EditUpdateChapter.as_view()),
-    path("editChapter/<int:object_id>", EditUpdateChapter.as_view()),
+    path("addChapter", CreateUpdateChapter.as_view()),
+    path("editChapter", CreateUpdateChapter.as_view()),
+    path("editChapter/<int:object_id>", CreateUpdateChapter.as_view()),
+    path("addSection/<int:chapter_id>", CreateUpdateSection.as_view()),
+    path("editSection", CreateUpdateSection.as_view()),
+    path("editSection/<int:object_id>", CreateUpdateSection.as_view()),
     path("", IndexView.as_view()),
     path("custodia/", IndexView.as_view()),
     path("custodia/error-test", ErrorTestView.as_view()),

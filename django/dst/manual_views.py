@@ -14,7 +14,15 @@ from django.utils.safestring import mark_safe
 from django.views import View
 
 from demschooltools.form_renderer import BootstrapFormRenderer
-from dst.models import Chapter, Entry, ManualChange, Section, User, UserRole
+from dst.models import (
+    Chapter,
+    Entry,
+    ManualChange,
+    Organization,
+    Section,
+    User,
+    UserRole,
+)
 from dst.org_config import get_org_config
 
 # TODO: login_required in this file should redirect
@@ -46,7 +54,7 @@ def render_main_template(
 
 @login_required()
 def view_manual(request: HttpRequest):
-    chapters = chapter_with_entries().filter(organization=request.org, deleted=False)
+    chapters = chapter_with_entries(request.org)
 
     return render_main_template(
         request,
@@ -63,18 +71,14 @@ def view_manual(request: HttpRequest):
     )
 
 
-def chapter_with_entries() -> QuerySet[Chapter]:
-    return Chapter.objects.prefetch_related(
+def chapter_with_entries(org: Organization) -> QuerySet[Chapter]:
+    return Chapter.objects.filter(organization=org).prefetch_related(
         Prefetch(
             "sections",
-            Section.objects.order_by("num")
-            .filter(deleted=False)
-            .prefetch_related(
+            Section.objects.prefetch_related(
                 Prefetch(
                     "entries",
-                    Entry.objects.filter(deleted=False)
-                    .order_by("num")
-                    .prefetch_related(
+                    Entry.objects.prefetch_related(
                         Prefetch(
                             "changes", ManualChange.objects.order_by("date_entered")
                         )
@@ -82,14 +86,12 @@ def chapter_with_entries() -> QuerySet[Chapter]:
                 )
             ),
         )
-    ).order_by("num")
+    )
 
 
 @login_required()
 def view_chapter(request: HttpRequest, chapter_id: int):
-    chapter = (
-        chapter_with_entries().filter(id=chapter_id, organization=request.org).first()
-    )
+    chapter = chapter_with_entries(request.org).filter(id=chapter_id).first()
 
     return render_main_template(
         request,
@@ -104,19 +106,6 @@ def view_chapter(request: HttpRequest, chapter_id: int):
     )
 
 
-class ChapterForm(ModelForm):
-    default_renderer = BootstrapFormRenderer()
-
-    class Meta:
-        model = Chapter
-        fields = ["id", "num", "title", "deleted"]
-        labels = {
-            "num": "Number",
-            "deleted": "Check this to delete",
-        }
-        widgets = {"num": TextInput(), "title": TextInput()}
-
-
 def on_manual_change(*args, **kwargs):
     with connection.cursor() as cursor:
         cursor.execute("REFRESH MATERIALIZED VIEW entry_index WITH DATA")
@@ -127,24 +116,45 @@ post_save.connect(on_manual_change, sender=Section)
 post_save.connect(on_manual_change, sender=Entry)
 
 
-class EditUpdateView(View):
-    form: Type[ModelForm] = ModelForm
-    model: Type[Model] = Model
+class CreateUpdateView(View):
+    form_class: Type[ModelForm] = ModelForm
     template_name = ""
     object_name = ""
     view_url_base = ""
     role = ""  # value from UserRole, e.g. UserRole.EDIT_MANUAL
+
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        self.existing_object = None
+
+    def get_success_url(self, instance: Model):
+        raise NotImplementedError("get_success_url is not overriden")
+
+    def set_defaults_on_create(self, request: HttpRequest, instance: Model):
+        pass
+
+    def get_initial_for_create(self, request: HttpRequest, **kwargs):
+        return {}
+
+    def get_form_context(
+        self, request: HttpRequest, form: ModelForm, context: dict
+    ) -> dict:
+        return context
 
     def render(self, request: HttpRequest, form: ModelForm):
         return render_main_template(
             request,
             render_to_string(
                 self.template_name,
-                {
-                    "org_config": get_org_config(request.org),
-                    "form": form,
-                    "is_new": self.existing_object is None,
-                },
+                self.get_form_context(
+                    request,
+                    form,
+                    {
+                        "org_config": get_org_config(request.org),
+                        "form": form,
+                        "is_new": self.existing_object is None,
+                    },
+                ),
                 request=request,
             ),
             f"Edit a {self.object_name}"
@@ -152,31 +162,39 @@ class EditUpdateView(View):
             else f"Add new {self.object_name}",
         )
 
-    def load_object(self, request: HttpRequest, object_id: int | None):
-        self.existing_object = self.model.objects.filter(
-            id=object_id, organization=request.org
-        ).first()
+    def load_object(self, request: HttpRequest, object_id: int):
+        assert self.form_class._meta.model is not None, (
+            "Your form must include a model in class Meta"
+        )
+        self.existing_object = self.form_class._meta.model.objects.get(id=object_id)
 
-    def post(self, request: HttpRequest, object_id: int | None = None):
-        if request.method == "POST":
-            form = self.form(request.POST, instance=self.existing_object)
-            if form.is_valid():
-                new_object = form.save(commit=False)
-                if new_object.organization_id is None:
-                    new_object.organization = request.org
-                new_object.save()
+    def post(self, request: HttpRequest, **kwargs):
+        form = self.form_class(request.POST, instance=self.existing_object)
+        if form.is_valid():
+            new_object = form.save(commit=False)
+            if self.existing_object is None:
+                self.set_defaults_on_create(request, new_object)
+            new_object.save()
 
-                return redirect(f"{self.view_url_base}/{new_object.id}")
+            return redirect(self.get_success_url(new_object))
+
+        return self.render(request, form)
+
+    def get(self, request: HttpRequest, **kwargs):
+        if self.existing_object:
+            form = self.form_class(instance=self.existing_object)
         else:
-            form = self.form(instance=self.existing_object)
+            form = self.form_class(
+                initial=self.get_initial_for_create(request, **kwargs)
+            )
+        return self.render(request, form)
 
-    def get(self, request: HttpRequest, object_id: int | None = None):
-        return self.render(request, self.form(instance=self.existing_object))
+    def can_edit(self, request: HttpRequest, instance: Model):
+        return True
 
     def dispatch(
         self,
         request: HttpRequest,
-        *args: Any,
         object_id: int | None = None,
         **kwargs: Any,
     ) -> HttpResponse:
@@ -185,14 +203,89 @@ class EditUpdateView(View):
         assert isinstance(request.user, User)
         if not request.user.hasRole(self.role):
             raise PermissionError()
-        self.load_object(request, object_id)
-        return super().dispatch(request, *args, **kwargs)
+
+        if object_id is not None:
+            self.load_object(request, object_id)
+
+            if not self.can_edit(request, self.existing_object):
+                raise PermissionError()
+
+        return super().dispatch(request, object_id=object_id, **kwargs)
 
 
-class EditUpdateChapter(EditUpdateView):
-    form = ChapterForm
-    model = Chapter
+class ChapterForm(ModelForm):
+    default_renderer = BootstrapFormRenderer()
+
+    class Meta:
+        model = Chapter
+        fields = ["num", "title", "deleted"]
+        labels = {
+            "num": "Number",
+            "deleted": "Check this to delete",
+        }
+        widgets = {"num": TextInput(), "title": TextInput()}
+
+
+class CreateUpdateChapter(CreateUpdateView):
+    form_class = ChapterForm
     template_name = "edit_chapter.html"
     object_name = "chapter"
-    view_url_base = "/viewChapter"
     role = UserRole.EDIT_MANUAL
+
+    def get_success_url(self, instance):
+        assert isinstance(instance, Chapter)
+        return f"/viewChapter/{instance.id}"
+
+    def can_edit(self, request: HttpRequest, instance: Model):
+        assert isinstance(instance, Chapter)
+        return instance.organization_id == request.org.id
+
+    def set_defaults_on_create(self, request: HttpRequest, instance: Model):
+        assert isinstance(instance, Chapter)
+        if instance.organization_id is None:
+            instance.organization = request.org
+
+
+class SectionForm(ModelForm):
+    default_renderer = BootstrapFormRenderer()
+
+    class Meta:
+        model = Section
+        fields = ["chapter", "num", "title", "deleted"]
+        labels = {
+            "num": "Number",
+            "deleted": "Check this to delete",
+        }
+        widgets = {"num": TextInput(), "title": TextInput()}
+
+
+class CreateUpdateSection(CreateUpdateView):
+    form_class = SectionForm
+    template_name = "edit_section.html"
+    object_name = "section"
+    role = UserRole.EDIT_MANUAL
+
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        self.chapter = None
+
+    def get_success_url(self, instance):
+        assert isinstance(instance, Section)
+        return f"/viewChapter/{instance.chapter_id}#section_{instance.id}"
+
+    def can_edit(self, request: HttpRequest, instance: Model):
+        assert isinstance(instance, Section)
+        return instance.chapter.organization_id == request.org.id
+
+    def get_initial_for_create(self, request: HttpRequest, **kwargs):
+        self.chapter = Chapter.objects.get(
+            organization=request.org, id=kwargs.get("chapter_id")
+        )
+        return {"chapter": self.chapter}
+
+    def get_form_context(
+        self, request: HttpRequest, form: ModelForm, context: dict
+    ) -> dict:
+        chapter = self.chapter or form.instance.chapter
+        context["chapter_num"] = chapter.num
+        return context
