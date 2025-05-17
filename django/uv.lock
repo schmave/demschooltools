@@ -136,6 +136,7 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "django-silk" },
+    { name = "djhtml" },
     { name = "pyinstrument" },
     { name = "tabulate" },
 ]
@@ -159,6 +160,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "django-silk", specifier = "~=5.3" },
+    { name = "djhtml", specifier = ">=3.0.7" },
     { name = "pyinstrument", specifier = "~=5.0" },
     { name = "tabulate" },
 ]
@@ -204,6 +206,12 @@ sdist = { url = "https://files.pythonhosted.org/packages/2c/ce/31482eb688bdb4e27
 wheels = [
     { url = "https://files.pythonhosted.org/packages/7c/b6/fa99d8f05eff3a9310286ae84c4059b08c301ae4ab33ae32e46e8ef76491/djangorestframework-3.15.2-py3-none-any.whl", hash = "sha256:2b8871b062ba1aefc2de01f773875441a961fefbf79f5eed1e32b2f096944b20", size = 1071235 },
 ]
+
+[[package]]
+name = "djhtml"
+version = "3.0.7"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/9f/e8/1919adec35e3a7e02ec874b7a95b811f03ad6dc9efcfe72d18e0a359f12a/djhtml-3.0.7.tar.gz", hash = "sha256:558c905b092a0c8afcbed27dea2f50aa6eb853a658b309e4e0f2bb378bdf6178", size = 27322 }
 
 [[package]]
 name = "drf-orjson-renderer"
