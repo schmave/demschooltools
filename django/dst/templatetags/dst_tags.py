@@ -24,3 +24,8 @@ def yymmddDate(context, d: datetime | None = None):
 @register.filter
 def markdown(text):
     return mark_safe(mistletoe.markdown(text))
+
+
+@register.filter(name="list")
+def my_list(obj):
+    return list(obj)

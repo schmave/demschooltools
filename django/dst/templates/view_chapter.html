@@ -14,17 +14,19 @@ Printed on {% yymmddDate %}.
 	</div>
 	<p><a class="no-print" href="/addEntry/{{ section.id }}">Add entry in {{ section.number }} {{ section.title }}</a></p>
 	{% for entry in section.entries.all %}
+	{% with entry.changes.all|list as defined_changes %}
 	<div class="man-entry">
 		<a name="entry_{{ entry.id }}"></a>
 		<p class="man-entry-num">{{ entry.number }} {{ entry.title }} <a class="no-print man-edit" href="/editEntry/{{ entry.id }}">Edit</a>
-			{% if entry.changes.all|length > 0 %}
+			{% if defined_changes|length > 0 %}
 				<span class="man-last-modify-date {% if not org_config.org.show_last_modified_in_print %}no-print{% endif %}">
-                    changed {% yymmddDate entry.changes.last.date_entered %}
+					{% with defined_changes|last as last_change %}
+                        changed {% yymmddDate last_change.date_entered %}
+					{% endwith %}
                 </span>
 			{% endif %}
 		</p>
 		<div class="man-entry-content">{{ entry.content|markdown }}
-			{% with entry.changes.all as defined_changes %}
 			{% if defined_changes|length > 1 %}
 				<p class="man-entry-change-history {% if not org_config.org.show_history_in_print %}no-print{% endif %}">
 				{% for change_detail in defined_changes %}
@@ -39,9 +41,9 @@ Printed on {% yymmddDate %}.
                 {% endfor %}
 				</p>
 			{% endif %}
-			{% endwith %}
 		</div>
 	</div>
+	{% endwith %}
 	{% endfor %}
 </div>
 {% endfor %}
