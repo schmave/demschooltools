@@ -272,13 +272,16 @@ class Section(models.Model):
     title = models.TextField()
     num = models.TextField()
     chapter = models.ForeignKey(
-        Chapter, on_delete=models.PROTECT, related_name="sections", blank=False
+        Chapter, on_delete=models.PROTECT, related_name="sections"
     )
     chapter_id: int
     deleted = models.BooleanField()
 
     def number(self):
         return self.chapter.num + self.num
+
+    def __str__(self):
+        return f"{self.number()} {self.title}"
 
 
 class Entry(models.Model):
@@ -299,6 +302,11 @@ class Entry(models.Model):
 
     def number(self):
         return self.section.number() + "." + self.num
+
+    def changes_for_render(self) -> list["ManualChange"]:
+        if self.id:
+            return list(self.changes.all())
+        return []
 
 
 class ManualChange(models.Model):

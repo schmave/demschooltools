@@ -1531,17 +1531,6 @@ public class Application extends Controller {
     }
   }
 
-  public Result renderMarkdown(Http.Request request) {
-    Map<String, String[]> form_data = request.body().asFormUrlEncoded();
-
-    if (form_data == null || form_data.get("markdown") == null) {
-      return ok("");
-    }
-
-    String markdown = form_data.get("markdown")[0];
-    return ok(markdown(markdown));
-  }
-
   @Secured.Auth(UserRole.ROLE_ALL_ACCESS)
   public Result fileSharing(Http.Request request) {
     Map<String, Object> scopes = new HashMap<>();

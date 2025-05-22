@@ -4,17 +4,16 @@
     <h2>Edit section "{{ form.title.value }}"</h2>
 {% endif %}
 
-<form action="" method="post" class="form-horizontal">
+<div class="row">
+<form action="" method="post" class="django-form col-sm-6">
     {% csrf_token %}
     {% for field in form %}
         {% if field.id_for_label == "id_num" %}
             <div class="form-group">
-                <label for="id_num" class="col-sm-3 control-label">Number</label>
-                <div class="col-sm-6">
-                    <div class="input-group">
-                        <span class="input-group-addon">{{chapter_num}}</span>
-                        <input type="text" class="form-control" id="id_num" name="num" value="{{field.value|default:""}}">
-                    </div>
+                <label for="{{field.id_for_label}}" class="control-label">Number</label>
+                <div class="input-group">
+                    <span class="input-group-addon">{{chapter_num}}</span>
+                    {{ field }}
                 </div>
             </div>
         {% else %}
@@ -23,3 +22,4 @@
     {% endfor %}
     {% include "save_button.html" %}
 </form>
+</div>

@@ -1,0 +1,75 @@
+<div class="row">
+    <h2 class="col-sm-10">
+        {% if is_new %}
+        New entry
+        {% else %}
+        Edit entry "{{ form.title.value }}"
+        {% endif %}
+    </h2>
+</div>
+
+<div class="row">
+<div class="col-sm-6">
+<form action="" method="post" class="django-form">
+    {% csrf_token %}
+    {% for field in form %}
+        {% if field.id_for_label == "id_num" %}
+            <div class="form-group">
+                <label for="{{field.id_for_label}}" class="control-label">Number</label>
+                <div class="input-group">
+                    <span class="input-group-addon">{{section_number}}</span>
+                    {{ field }}
+                </div>
+            </div>
+        {% else %}
+            {% include "bootstrap_field.html" %}
+        {% endif %}
+    {% endfor %}
+    {% include "save_button.html" %}
+
+</form>
+</div>
+
+
+<div class="col-sm-6">
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a href="#live-preview" aria-controls="live-preview" role="tab" data-toggle="tab">
+            Live preview
+        </a></li>
+        <li role="presentation"><a href="#help" aria-controls="help" role="tab" data-toggle="tab">
+            Formatting help
+        </a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane padded active" id="live-preview">
+            <div id="markdown_preview">
+                {% include "view_entry.html" with entry=form.instance %}
+            </div>
+        </div>
+
+        <div role="tabpanel" class="tab-pane padded" id="help">
+            <p>_alpha_ or *alpha* --> <em>alpha</em>
+            <p>__beta__ or **beta** --> <strong>beta</strong>
+            <p>Make bullet lists with asterisks, like this:
+            <pre>
+* an item
+* another item
+* final item</pre>
+            <p>Make numbered lists with numbers, like this (the 1s will be replaced with the correct numbers):
+            <pre>
+1. the first
+1. the second
+1. the third</pre>
+        <p>If you want a nested list, or sub-list, put four spaces in front of the number or asterisk, like this:
+            <pre>
+1. the first
+    1. sub-item
+    2. second sub-item
+    3. third sub-item
+2. the second
+    </pre>
+        </div>
+      </div>
+    </div>
+</div>

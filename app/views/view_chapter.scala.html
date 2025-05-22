@@ -16,11 +16,11 @@ Printed on @Application.yymmddDate(Utils.getOrgConfig(request)).
 	<div class="man-section-header">
 	  <a name="section_@section.getId()"></a>@section.getNumber() @section.getTitle()
 	</div>
-	<p><a class="no-print" href="@routes.ApplicationEditing.addEntry(section.getId())">Add entry in @chapter.getNum()@section.getNum() @section.getTitle()</a></p>
+	<p></p>
 	@for(entry <- section.entries) {
 	<div class="man-entry">
 		<a name="entry_@entry.getId()"></a>
-		<p class="man-entry-num">@entry.getNumber() @entry.getTitle() <a class="no-print man-edit" href="@routes.ApplicationEditing.editEntry(entry.getId())">Edit</a>
+		<p class="man-entry-num">@entry.getNumber() @entry.getTitle()
 			@if( entry.changes.size() > 0 ) {
 				<span class="man-last-modify-date @if(!Utils.getOrgConfig(request).org.getShowLastModifiedInPrint()){no-print}">
                     changed @Application.yymmddDate(Utils.getOrgConfig(request), entry.changes.get(entry.changes.size()-1).getDateEntered())

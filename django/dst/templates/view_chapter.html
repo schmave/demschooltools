@@ -14,36 +14,7 @@
         </div>
         <p><a class="no-print" href="/addEntry/{{ section.id }}">Add entry in {{ section.number }} {{ section.title }}</a></p>
         {% for entry in section.entries.all %}
-            {% with entry.changes.all|list as defined_changes %}
-                <div class="man-entry">
-                    <a name="entry_{{ entry.id }}"></a>
-                    <p class="man-entry-num">{{ entry.number }} {{ entry.title }} <a class="no-print man-edit" href="/editEntry/{{ entry.id }}">Edit</a>
-                        {% if defined_changes|length > 0 %}
-                            <span class="man-last-modify-date {% if not org_config.org.show_last_modified_in_print %}no-print{% endif %}">
-                                {% with defined_changes|last as last_change %}
-                                    changed {% yymmddDate last_change.date_entered %}
-                                {% endwith %}
-                            </span>
-                        {% endif %}
-                    </p>
-                    <div class="man-entry-content">{{ entry.content|markdown }}
-                        {% if defined_changes|length > 1 %}
-                            <p class="man-entry-change-history {% if not org_config.org.show_history_in_print %}no-print{% endif %}">
-                                {% for change_detail in defined_changes %}
-                                    {% ifchanged change_detail.date_entered.date %}
-                                        {% if change_detail.was_created %} Adopted
-                                        {% elif change_detail.was_deleted %} Repealed
-                                        {% else %} Amended
-                                        {% endif %}
-
-                                        {% yymmddDate change_detail.date_entered %};
-                                    {% endifchanged %}
-                                {% endfor %}
-                            </p>
-                        {% endif %}
-                    </div>
-                </div>
-            {% endwith %}
+            {% include "view_entry.html" %}
         {% endfor %}
     </div>
 {% endfor %}

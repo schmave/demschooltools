@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.db import connection
 from django.db.models import Model, Prefetch, QuerySet
 from django.db.models.signals import post_save
-from django.forms import ModelForm, TextInput
+from django.forms import ModelForm, Textarea, TextInput
 from django.http import HttpRequest
 from django.http.response import HttpResponse as HttpResponse
 from django.shortcuts import redirect, render
@@ -289,3 +289,72 @@ class CreateUpdateSection(CreateUpdateView):
         chapter = self.chapter or form.instance.chapter
         context["chapter_num"] = chapter.num
         return context
+
+
+class EntryForm(ModelForm):
+    default_renderer = BootstrapFormRenderer()
+
+    class Meta:
+        model = Entry
+        fields = ["section", "num", "title", "deleted", "content"]
+        labels = {
+            "num": "Number",
+            "deleted": "Check this to delete",
+        }
+        widgets = {
+            "num": TextInput(),
+            "title": TextInput(),
+            "content": Textarea(
+                {
+                    "hx-post": "/viewEntry",
+                    "hx-target": "#markdown_preview",
+                    "hx-trigger": "keyup throttle:500ms, cut, paste, change",
+                }
+            ),
+        }
+
+
+class CreateUpdateEntry(CreateUpdateView):
+    form_class = EntryForm
+    template_name = "edit_entry.html"
+    object_name = "entry"
+    role = UserRole.EDIT_MANUAL
+
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        self.section = None
+
+    def get_success_url(self, instance):
+        assert isinstance(instance, Entry)
+        return f"/viewChapter/{instance.section.chapter_id}#entry_{instance.id}"
+
+    def can_edit(self, request: HttpRequest, instance: Model):
+        assert isinstance(instance, Entry)
+        return instance.section.chapter.organization_id == request.org.id
+
+    def get_initial_for_create(self, request: HttpRequest, **kwargs):
+        self.section = Section.objects.get(
+            chapter__organization=request.org, id=kwargs.get("section_id")
+        )
+        return {"section": self.section}
+
+    def get_form_context(
+        self, request: HttpRequest, form: ModelForm, context: dict
+    ) -> dict:
+        section = self.section or form.instance.section
+        context["section_number"] = section.number()
+        return context
+
+
+@login_required
+def view_entry(request: HttpRequest):
+    temp_entry = EntryForm(request.POST).save(commit=False)
+    print(vars(temp_entry))
+    return render(
+        request,
+        "view_entry.html",
+        {
+            "entry": temp_entry,
+            "org_config": get_org_config(request.org),
+        },
+    )

@@ -36,8 +36,10 @@ from custodia.views import (
 )
 from dst.manual_views import (
     CreateUpdateChapter,
+    CreateUpdateEntry,
     CreateUpdateSection,
     view_chapter,
+    view_entry,
     view_manual,
 )
 
@@ -67,13 +69,20 @@ urlpatterns = [
         ),
     ),
     path("viewManual", view_manual),
+    # chapters
     path("viewChapter/<int:chapter_id>", view_chapter),
     path("addChapter", CreateUpdateChapter.as_view()),
     path("editChapter", CreateUpdateChapter.as_view()),
     path("editChapter/<int:object_id>", CreateUpdateChapter.as_view()),
+    # sections
     path("addSection/<int:chapter_id>", CreateUpdateSection.as_view()),
     path("editSection", CreateUpdateSection.as_view()),
     path("editSection/<int:object_id>", CreateUpdateSection.as_view()),
+    # entries
+    path("addEntry/<int:section_id>", CreateUpdateEntry.as_view()),
+    path("editEntry", CreateUpdateEntry.as_view()),
+    path("editEntry/<int:object_id>", CreateUpdateEntry.as_view()),
+    path("viewEntry", view_entry),
     path("", IndexView.as_view()),
     path("custodia/", IndexView.as_view()),
     path("custodia/error-test", ErrorTestView.as_view()),

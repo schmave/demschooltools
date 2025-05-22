@@ -4,8 +4,12 @@
     <h2>Edit chapter "{{ form.title.value }}"</h2>
 {% endif %}
 
-<form action="" method="post" class="form-horizontal">
+<div class="row">
+<div class="col-sm-6">
+<form action="" method="post" class="django-form">
     {% csrf_token %}
     {{ form }}
     {% include "save_button.html" %}
 </form>
+</div>
+</div>

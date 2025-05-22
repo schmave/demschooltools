@@ -364,6 +364,14 @@ label {
   font-weight: normal;
 }
 
+.django-form label {
+  font-weight: bold;
+}
+
+.tab-pane.padded {
+  padding-top: 1em;
+}
+
 body {
   font-size: 12px;
     padding-top: 10px;
@@ -747,10 +755,10 @@ hr {
 
 @media screen and (min-width: 8in) {
   .man-section {
-      width: 7in;
+      max-width: 7in;
   }
   .man-entry-content {
-    width: 6in;
+    max-width: 6in;
   }
 }
 
@@ -786,12 +794,6 @@ hr {
 .entry-content-edit {
   float: left;
   width: 75%;
-}
-
-.markdown-guidelines {
-  float: right;
-  width: 25%;
-  padding-left: 20px;
 }
 
 .change_log {

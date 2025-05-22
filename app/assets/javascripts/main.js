@@ -4,11 +4,11 @@ require('jquery-ui/ui/widgets/autocomplete');
 require('jquery-ui/ui/widgets/datepicker');
 require('jquery-ui/ui/widgets/dialog');
 require('spectrum-colorpicker');
+require('htmx.org');
 
 const utils = require('./utils');
 require('./edit_attendance_week');
 require('./attendance_person');
-require('./edit_entry');
 require('./edit_minutes');
 require('./edit_rp_list');
 const feedback_modal = require('./feedback_modal');
