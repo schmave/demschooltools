@@ -1,11 +1,12 @@
 from datetime import datetime
 from typing import Any, Type
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db import connection
 from django.db.models import Model, Prefetch, QuerySet
 from django.db.models.signals import post_save
-from django.forms import ModelForm, Textarea, TextInput
+from django.forms import ModelForm, TextInput
 from django.http import HttpRequest
 from django.http.response import HttpResponse as HttpResponse
 from django.shortcuts import redirect, render
@@ -48,6 +49,7 @@ def render_main_template(
             else None,
             "is_user_logged_in": request.user.is_authenticated,
             "org_config": get_org_config(request.org),
+            "rollbar_environment": settings.ROLLBAR_ENVIRONMENT,
         },
     )
 
@@ -301,17 +303,7 @@ class EntryForm(ModelForm):
             "num": "Number",
             "deleted": "Check this to delete",
         }
-        widgets = {
-            "num": TextInput(),
-            "title": TextInput(),
-            "content": Textarea(
-                {
-                    "hx-post": "/viewEntry",
-                    "hx-target": "#markdown_preview",
-                    "hx-trigger": "keyup throttle:500ms, cut, paste, change",
-                }
-            ),
-        }
+        widgets = {"num": TextInput(), "title": TextInput()}
 
 
 class CreateUpdateEntry(CreateUpdateView):
