@@ -268,31 +268,36 @@ public class Settings extends Controller {
   public Result saveUser(Http.Request request) {
     Form<User> user_form = mFormFactory.form(User.class);
     Form<User> filled_form = user_form.bindFromRequest(request);
-    User u = filled_form.get();
+    User formUser = filled_form.get();
     Map<String, String[]> form_data = request.body().asFormUrlEncoded();
 
-    User orig_user = User.findById(u.getId(), Utils.getOrg(request));
+    User origUser = User.findById(formUser.getId(), Utils.getOrg(request));
 
-    for (UserRole r : orig_user.roles) {
+    for (UserRole r : origUser.roles) {
       r.delete();
     }
 
     for (String role : UserRole.ALL_ROLES) {
       if (form_data.containsKey(role) && form_data.get(role)[0].equals("true")) {
-        UserRole.create(u, role);
+        UserRole.create(origUser, role);
       }
     }
 
+    origUser.setName(formUser.getName());
+
+    if (!origUser.getEmail().equals(formUser.getEmail())) {
+      DB.deleteAll(origUser.linkedAccounts);
+      origUser.setEmail(formUser.getEmail());
+    }
+
     if (filled_form.apply("active").value().get().equals("false")) {
-      u.setActive(false);
-      DB.deleteAll(orig_user.linkedAccounts);
+      origUser.setActive(false);
+      DB.deleteAll(origUser.linkedAccounts);
+    } else {
+      origUser.setActive(true);
     }
 
-    if (!orig_user.getEmail().equals(u.getEmail())) {
-      DB.deleteAll(orig_user.linkedAccounts);
-    }
-
-    u.update();
+    origUser.update();
 
     return redirect(routes.Settings.viewAccess());
   }

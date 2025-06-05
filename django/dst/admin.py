@@ -21,9 +21,13 @@ from dst.models import (
 )
 
 
+def has_password(user: User) -> bool:
+    return bool(user.password)
+
+
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ["id", "organization_id", "name", "email"]
+    list_display = ["id", "organization_id", "name", "email", has_password]
     list_filter = ["organization_id", "is_superuser", "is_staff"]
     search_fields = ["name", "email"]
 
