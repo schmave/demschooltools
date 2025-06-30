@@ -1,20 +1,41 @@
+"""
+$ psql
+    CREATE DATABASE for_export;
+
+$ pg_restore -O -d for_export ~/Downloads/backup_2025_06_30/db.dump
+
+$ psql for_export
+   truncate allowed_ips;
+   truncate django_admin_log;
+   truncate django_session;
+   truncate donation;
+   truncate linked_account;
+   truncate organization_hosts;
+
+$ DST_DB_NAME=for_export uv run manage.py remove_all_but_one_org --org_id <N>
+$ pg_dump -O for_export -f <school-name>.sql
+"""
+
 from typing import Type
 
 from django.core.management.base import BaseCommand
 from django.db.models import Model, Q
 
-from custodia.models import Excuse, Override, StudentRequiredMinutes, Swipe
+from custodia.models import Excuse, Override, StudentRequiredMinutes, Swipe, Year
 from dst.models import (
     Account,
+    AttendanceCode,
     AttendanceDay,
     AttendanceRule,
     AttendanceWeek,
     Case,
     CaseReference,
+    Chapter,
     Charge,
     ChargeReference,
     Comment,
     CompletedTask,
+    Entry,
     MailchimpSync,
     Meeting,
     NotificationRule,
@@ -27,10 +48,12 @@ from dst.models import (
     Role,
     RoleRecord,
     RoleRecordMember,
+    Section,
     Tag,
     Task,
     TaskList,
     Transaction,
+    User,
 )
 
 
@@ -44,7 +67,9 @@ class Command(BaseCommand):
         assert Organization.objects.filter(id=org_id).exists()
 
         def org_filter(model: Type[Model]):
-            return model.objects.exclude(organization_id=org_id)
+            return model.objects.filter(
+                ~Q(organization_id=org_id) | Q(organization_id=None)
+            )
 
         people = org_filter(Person)
 
@@ -67,8 +92,10 @@ class Command(BaseCommand):
 
         MailchimpSync.objects.filter(tag__in=tags).delete()
 
+        org_filter(AttendanceCode).delete()
         delete_for_people(AttendanceDay)
         delete_for_people(AttendanceWeek)
+        org_filter(Year).delete()
         delete_for_people(Swipe)
         delete_for_people(Excuse)
         delete_for_people(Override)
@@ -80,13 +107,13 @@ class Command(BaseCommand):
         meetings = org_filter(Meeting)
         charges = Charge.objects.filter(case__meeting__in=meetings)
         ChargeReference.objects.filter(charge__in=charges).delete()
-        charges.delete()
+        charges._raw_delete(charges.db)
 
         cases = Case.objects.filter(meeting__in=meetings)
         CaseReference.objects.filter(
             Q(referenced_case__in=cases) | Q(referencing_case__in=cases)
         ).delete()
-        cases.delete()
+        cases._raw_delete(cases.db)
         meetings.delete()
 
         delete_for_people(Comment)
@@ -104,3 +131,15 @@ class Command(BaseCommand):
 
         people.exclude(family_person=None).delete()
         people.delete()
+
+        chapters = org_filter(Chapter)
+        sections = Section.objects.filter(chapter__in=chapters)
+        entries = Entry.objects.filter(section__in=sections)
+        entries.delete()
+        sections.delete()
+        chapters.delete()
+
+        users = org_filter(User)
+        Comment.objects.filter(user__in=users).delete()
+        users.delete()
+        Organization.objects.exclude(id=org_id).delete()

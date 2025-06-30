@@ -143,7 +143,7 @@ LOGGING = {
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "school_crm",
+        "NAME": os.environ.get("DST_DB_NAME", "school_crm"),
         "PORT": "5432",
         "HOST": "localhost",
         "USER": "postgres",
