@@ -93,46 +93,6 @@ public class Entry extends Model implements Comparable<Entry> {
     return section.getNumber() + "." + num;
   }
 
-  void updateFromForm(Form<Entry> form, boolean make_change_record) {
-    String oldNum = (make_change_record ? getNumber() : "");
-    String oldTitle = title;
-    String oldContent = content;
-
-    title = form.field("title").value().get();
-    content = form.field("content").value().get();
-    num = form.field("num").value().get();
-    String deleted_val = form.field("deleted").value().get();
-
-    boolean previous_deleted = deleted;
-    deleted = deleted_val != null && deleted_val.equals("true");
-
-    section = Section.find.byId(Integer.parseInt(form.field("section.id").value().get()));
-
-    if (make_change_record) {
-      if (!previous_deleted && deleted) {
-        ManualChange.recordEntryDelete(this);
-      } else if (previous_deleted && !deleted) {
-        ManualChange.recordEntryCreate(this);
-      } else {
-        ManualChange.recordEntryChange(this, oldNum, oldTitle, oldContent);
-      }
-    }
-
-    save();
-  }
-
-  public void updateFromForm(Form<Entry> form) {
-    updateFromForm(form, true);
-  }
-
-  public static Entry create(Form<Entry> form) {
-    Entry result = form.get();
-    result.updateFromForm(form, false);
-    ManualChange.recordEntryCreate(result);
-    result.save();
-    return result;
-  }
-
   public int compareTo(Entry other) {
     return title.compareTo(other.title);
   }

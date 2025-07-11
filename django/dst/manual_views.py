@@ -1,3 +1,4 @@
+from copy import deepcopy
 from datetime import datetime
 from typing import Any, Type
 
@@ -77,8 +78,9 @@ def view_manual(request: DstHttpRequest):
     )
 
 
-def chapter_with_entries(org: Organization) -> QuerySet[Chapter]:
-    return Chapter.objects.filter(organization=org).prefetch_related(
+def chapter_with_entries(org: Organization, include_deleted=False) -> QuerySet[Chapter]:
+    manager = Chapter.all_objects if include_deleted else Chapter.objects
+    return manager.filter(organization=org).prefetch_related(
         Prefetch(
             "sections",
             Section.objects.prefetch_related(
@@ -97,7 +99,11 @@ def chapter_with_entries(org: Organization) -> QuerySet[Chapter]:
 
 @login_required()
 def view_chapter(request: DstHttpRequest, chapter_id: int):
-    chapter = chapter_with_entries(request.org).filter(id=chapter_id).first()
+    chapter = (
+        chapter_with_entries(request.org, include_deleted=True)
+        .filter(id=chapter_id)
+        .first()
+    )
     if chapter is None:
         return HttpResponseNotFound()
 
@@ -138,11 +144,14 @@ class CreateUpdateView(View):
     def get_success_url(self, instance: Model):
         raise NotImplementedError("get_success_url is not overriden")
 
-    def set_defaults_on_create(self, request: DstHttpRequest, instance: Model):
-        pass
-
     def get_initial_for_create(self, request: DstHttpRequest, **kwargs):
         return {}
+
+    def pre_save(self, request: DstHttpRequest, instance: Model):
+        pass
+
+    def post_save(self, request: DstHttpRequest, instance: Model):
+        pass
 
     def get_form_context(
         self, request: DstHttpRequest, form: ModelForm, context: dict
@@ -174,15 +183,17 @@ class CreateUpdateView(View):
         assert self.form_class._meta.model is not None, (
             "Your form must include a model in class Meta"
         )
-        self.existing_object = self.form_class._meta.model.objects.get(id=object_id)
+        # Use all_objects so that this works even for deleted items
+        self.existing_object = self.form_class._meta.model.all_objects.get(id=object_id)  # type: ignore
 
     def post(self, request: DstHttpRequest, **kwargs):
-        form = self.form_class(request.POST, instance=self.existing_object)
+        # Pass a copy into the form so that self.existing_object remains unchanged
+        form = self.form_class(request.POST, instance=deepcopy(self.existing_object))
         if form.is_valid():
             new_object = form.save(commit=False)
-            if self.existing_object is None:
-                self.set_defaults_on_create(request, new_object)
+            self.pre_save(request, new_object)
             new_object.save()
+            self.post_save(request, new_object)
 
             return redirect(self.get_success_url(new_object))
 
@@ -190,7 +201,7 @@ class CreateUpdateView(View):
 
     def get(self, request: DstHttpRequest, **kwargs):
         if self.existing_object:
-            form = self.form_class(instance=self.existing_object)
+            form = self.form_class(instance=deepcopy(self.existing_object))
         else:
             form = self.form_class(
                 initial=self.get_initial_for_create(request, **kwargs)
@@ -249,7 +260,7 @@ class CreateUpdateChapter(CreateUpdateView):
         assert isinstance(instance, Chapter)
         return instance.organization_id == request.org.id
 
-    def set_defaults_on_create(self, request: DstHttpRequest, instance: Model):
+    def pre_save(self, request: DstHttpRequest, instance: Model):
         assert isinstance(instance, Chapter)
         if instance.organization_id is None:
             instance.organization = request.org
@@ -344,11 +355,39 @@ class CreateUpdateEntry(CreateUpdateView):
         context["section_number"] = section.number()
         return context
 
+    def post_save(self, request: DstHttpRequest, instance: Model):
+        assert isinstance(instance, Entry)
+        assert self.existing_object is None or isinstance(self.existing_object, Entry)
+
+        common_data = dict(
+            entry=instance,
+            new_content=instance.content,
+            new_num=instance.number(),
+            new_title=instance.title,
+        )
+
+        if self.existing_object is None:
+            ManualChange.objects.create(was_created=True, **common_data)
+        else:
+            common_data.update(
+                old_content=self.existing_object.content,
+                old_num=self.existing_object.number(),
+                old_title=self.existing_object.title,
+            )
+            if instance.deleted and not self.existing_object.deleted:
+                ManualChange.objects.create(was_deleted=True, **common_data)
+            else:
+                if (
+                    common_data["old_content"] != common_data["new_content"]
+                    or common_data["old_title"] != common_data["new_title"]
+                    or common_data["old_num"] != common_data["new_num"]
+                ):
+                    ManualChange.objects.create(**common_data)
+
 
 @login_required
 def view_entry(request: DstHttpRequest):
     temp_entry = EntryForm(request.POST).save(commit=False)
-    print(vars(temp_entry))
     return render(
         request,
         "view_entry.html",

@@ -313,11 +313,17 @@ class ManualChange(models.Model):
     class Meta:
         db_table = "manual_change"
 
+    chapter = models.ForeignKey(
+        Chapter, on_delete=models.PROTECT, related_name="changes"
+    )
+    section = models.ForeignKey(
+        Section, on_delete=models.PROTECT, related_name="changes"
+    )
     entry = models.ForeignKey(Entry, on_delete=models.PROTECT, related_name="changes")
     date_entered = models.DateTimeField(auto_now_add=True)
 
-    was_deleted = models.BooleanField()
-    was_created = models.BooleanField()
+    was_deleted = models.BooleanField(default=False)
+    was_created = models.BooleanField(default=False)
     old_content = models.TextField(null=True, blank=True)
     new_content = models.TextField(null=True, blank=True)
     old_title = models.CharField()
