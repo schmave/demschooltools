@@ -1,1 +1,1 @@
-<input type="checkbox" name="{{ widget.name }}" value="{{ widget.value|default:"" }}" {% include "django/forms/widgets/attrs.html" %} />
+<input type="{{ widget.type }}" name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}{% if widget.attrs.class %} class="{{ widget.attrs.class }}{% endif %}" />
