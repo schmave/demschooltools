@@ -816,31 +816,6 @@ public class Application extends Controller {
             "attachment; filename=" + Utils.getOrgConfig(org).str_res_plans + ".csv");
   }
 
-  public Result viewManualChanges(String begin_date_string, Http.Request request) {
-    Date begin_date;
-
-    try {
-      begin_date = new SimpleDateFormat("yyyy-M-d").parse(begin_date_string);
-    } catch (ParseException e) {
-      begin_date = new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7);
-      begin_date.setHours(0);
-      begin_date.setMinutes(0);
-    }
-
-    List<ManualChange> changes =
-        ManualChange.find
-            .query()
-            .where()
-            .gt("dateEntered", begin_date)
-            .eq("entry.section.chapter.organization", Utils.getOrg(request))
-            .findList();
-
-    changes.sort(ManualChange.SORT_NUM_DATE);
-
-    return ok(
-        view_manual_changes.render(
-            forDateInput(begin_date), changes, request, mMessagesApi.preferred(request)));
-  }
 
   public Result printManual(Http.Request request) {
     return ok(

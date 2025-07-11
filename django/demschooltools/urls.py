@@ -41,6 +41,7 @@ from dst.manual_views import (
     view_chapter,
     view_entry,
     view_manual,
+    view_manual_changes,
 )
 
 urlpatterns = [
@@ -69,6 +70,7 @@ urlpatterns = [
         ),
     ),
     path("viewManual", view_manual),
+    path("viewManualChanges", view_manual_changes),
     # chapters
     path("viewChapter/<int:chapter_id>", view_chapter),
     path("addChapter", CreateUpdateChapter.as_view()),

@@ -1,5 +1,5 @@
 from copy import deepcopy
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any, Type
 
 from django.conf import settings
@@ -12,6 +12,7 @@ from django.http import HttpRequest, HttpResponseNotFound
 from django.http.response import HttpResponse as HttpResponse
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
+from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.views import View
 
@@ -63,6 +64,8 @@ def render_main_template(
 def view_manual(request: DstHttpRequest):
     chapters = chapter_with_entries(request.org)
 
+    org_config = get_org_config(request.org)
+
     return render_main_template(
         request,
         render_to_string(
@@ -70,11 +73,53 @@ def view_manual(request: DstHttpRequest):
             {
                 "chapters": chapters,
                 "current_date": datetime.now().strftime("%Y-%m-%d"),
-                "org_config": get_org_config(request.org),
+                "org_config": org_config,
             },
         ),
-        f"{request.org.short_name} Manual",
+        f"{request.org.short_name} {org_config.str_manual_title}",
         selected_button="toc",
+    )
+
+
+@login_required()
+def view_manual_changes(request: DstHttpRequest):
+    begin_date = None
+    try:
+        begin_date = datetime.strptime(request.GET["begin_date"], "%Y-%m-%d")
+    except:
+        begin_date = timezone.now().replace(
+            hour=0, minute=0, second=0, microsecond=0
+        ) - timedelta(days=7)
+
+    changes = list(
+        ManualChange.objects.filter(
+            date_entered__gt=begin_date,
+            entry__section__chapter__organization=request.org,
+        )
+    )
+
+    changes.sort(
+        key=lambda change: (
+            change.date_entered.date(),
+            change.new_num or change.old_num,
+            change.date_entered,
+        )
+    )
+
+    org_config = get_org_config(request.org)
+
+    return render_main_template(
+        request,
+        render_to_string(
+            "view_manual_changes.html",
+            {
+                "begin_date": begin_date.strftime("%Y-%m-%d"),
+                "changes": changes,
+                "org_config": org_config,
+            },
+        ),
+        org_config.str_manual_title + " changes",
+        "manual_changes",
     )
 
 

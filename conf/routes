@@ -68,7 +68,8 @@ GET /getLastRp/:personId/:ruleId	controllers.Application.getLastRp(personId : In
 
 
 GET /viewManual       controllers.Proxy.proxy0(request: Request)
-GET /viewManualChanges       controllers.Application.viewManualChanges(begin_date : String ?= "", request: Request)
+GET /viewManualChanges       controllers.Proxy.proxy0(request: Request)
+GET /viewManualChanges*extra       controllers.Proxy.proxy(request: Request, extra: String)
 GET /viewChapter*extra       controllers.Proxy.proxy(request: Request, extra: String)
 GET /searchManual       controllers.Application.searchManual(searchString : String ?= "", request: Request)
 
