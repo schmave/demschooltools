@@ -431,6 +431,45 @@ class CreateUpdateEntry(CreateUpdateView):
 
 
 @login_required
+def search_manual(request: DstHttpRequest):
+    search_string = request.GET.get("searchString", "")
+
+    entries_with_headlines = []
+    if search_string:
+        entries_with_headlines = list(
+            Entry.objects.filter(section__chapter__organization=request.org)
+            .extra(
+                where=[
+                    "EXISTS (SELECT 1 FROM entry_index ei WHERE ei.id = entry.id AND ei.document @@ plainto_tsquery(%s))"
+                ],
+                params=[search_string],
+                select={
+                    "headline": "ts_headline(entry.content, plainto_tsquery(%s), 'MaxFragments=5')",
+                    "search_rank": "ts_rank((SELECT ei.document FROM entry_index ei WHERE ei.id = entry.id), plainto_tsquery(%s), 0)",
+                },
+                select_params=[search_string, search_string],
+                order_by=["-search_rank"],
+            )
+            .select_related("section__chapter")
+        )
+
+    org_config = get_org_config(request.org)
+
+    return render_main_template(
+        request,
+        render_to_string(
+            "manual_search.html",
+            {
+                "searchString": search_string,
+                "entries": entries_with_headlines,
+                "org_config": org_config,
+            },
+        ),
+        f"{org_config.str_manual_title} Search: {search_string}",
+    )
+
+
+@login_required
 def view_entry(request: DstHttpRequest):
     temp_entry = EntryForm(request.POST).save(commit=False)
     return render(

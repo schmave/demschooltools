@@ -1,21 +1,20 @@
 <h3>Manual Search</h3>
 
-<h4>You searched for <b>{{searchString}}</b> and got {{entries.size}} matches.</h4>
+<h4>You searched for <b>{{ searchString }}</b> and got {{ entries|length }} matches.</h4>
 
-{{#entries}}
+{% for entry in entries %}
 <div class="man-entry">
     <p class="man-entry-num">
-        <a href="/viewChapter/{{entry.section.chapter.id}}#entry_{{entry.id}}">
-            {{entry.getNumber}} {{entry.title}}
+        <a href="/viewChapter/{{ entry.section.chapter.id }}#entry_{{ entry.id }}">
+            {{ entry.number }} {{ entry.title }}
         </a>
-        <a class="no-print man-edit" href="/editEntry/{{entry.id}}">Edit</a>
+        <a class="no-print man-edit" href="/editEntry/{{ entry.id }}">Edit</a>
     </p>
     <p class="man-entry-content">
-        {{{headline}}}
+        {{ entry.headline|safe }}
     </p>
 </div>
-{{/entries}}
-{{^entries}}
+{% empty %}
 <br>
 <h4>Why didn't I get any results?</h4>
 <p>Here are a few guidelines to help with searching the manual:</p>
@@ -25,4 +24,4 @@
     <li>Singular/plural and other variations of a word do match (e.g. "apples" will find rules containing the word "apple", and "runs" matches "running")</li>
     <li>Common words like "the", "or", "and", etc. are automatically removed from your search terms</li>
 </ul>
-{{/entries}}
+{% endfor %}
