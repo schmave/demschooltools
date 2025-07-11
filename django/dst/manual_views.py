@@ -7,7 +7,7 @@ from django.db import connection
 from django.db.models import Model, Prefetch, QuerySet
 from django.db.models.signals import post_save
 from django.forms import ModelForm, TextInput
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponseNotFound
 from django.http.response import HttpResponse as HttpResponse
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
@@ -30,8 +30,12 @@ from dst.org_config import get_org_config
 # to the Play framework login page, not the Custodia one.
 
 
+class DstHttpRequest(HttpRequest):
+    org: Organization
+
+
 def render_main_template(
-    request: HttpRequest,
+    request: DstHttpRequest,
     content: str,
     title: str,
     selected_button: str | None = None,
@@ -55,7 +59,7 @@ def render_main_template(
 
 
 @login_required()
-def view_manual(request: HttpRequest):
+def view_manual(request: DstHttpRequest):
     chapters = chapter_with_entries(request.org)
 
     return render_main_template(
@@ -92,8 +96,10 @@ def chapter_with_entries(org: Organization) -> QuerySet[Chapter]:
 
 
 @login_required()
-def view_chapter(request: HttpRequest, chapter_id: int):
+def view_chapter(request: DstHttpRequest, chapter_id: int):
     chapter = chapter_with_entries(request.org).filter(id=chapter_id).first()
+    if chapter is None:
+        return HttpResponseNotFound()
 
     return render_main_template(
         request,
@@ -132,18 +138,18 @@ class CreateUpdateView(View):
     def get_success_url(self, instance: Model):
         raise NotImplementedError("get_success_url is not overriden")
 
-    def set_defaults_on_create(self, request: HttpRequest, instance: Model):
+    def set_defaults_on_create(self, request: DstHttpRequest, instance: Model):
         pass
 
-    def get_initial_for_create(self, request: HttpRequest, **kwargs):
+    def get_initial_for_create(self, request: DstHttpRequest, **kwargs):
         return {}
 
     def get_form_context(
-        self, request: HttpRequest, form: ModelForm, context: dict
+        self, request: DstHttpRequest, form: ModelForm, context: dict
     ) -> dict:
         return context
 
-    def render(self, request: HttpRequest, form: ModelForm):
+    def render(self, request: DstHttpRequest, form: ModelForm):
         return render_main_template(
             request,
             render_to_string(
@@ -164,13 +170,13 @@ class CreateUpdateView(View):
             else f"Add new {self.object_name}",
         )
 
-    def load_object(self, request: HttpRequest, object_id: int):
+    def load_object(self, request: DstHttpRequest, object_id: int):
         assert self.form_class._meta.model is not None, (
             "Your form must include a model in class Meta"
         )
         self.existing_object = self.form_class._meta.model.objects.get(id=object_id)
 
-    def post(self, request: HttpRequest, **kwargs):
+    def post(self, request: DstHttpRequest, **kwargs):
         form = self.form_class(request.POST, instance=self.existing_object)
         if form.is_valid():
             new_object = form.save(commit=False)
@@ -182,7 +188,7 @@ class CreateUpdateView(View):
 
         return self.render(request, form)
 
-    def get(self, request: HttpRequest, **kwargs):
+    def get(self, request: DstHttpRequest, **kwargs):
         if self.existing_object:
             form = self.form_class(instance=self.existing_object)
         else:
@@ -191,12 +197,12 @@ class CreateUpdateView(View):
             )
         return self.render(request, form)
 
-    def can_edit(self, request: HttpRequest, instance: Model):
+    def can_edit(self, request: DstHttpRequest, instance: Model) -> bool:
         return True
 
     def dispatch(
         self,
-        request: HttpRequest,
+        request: DstHttpRequest,
         object_id: int | None = None,
         **kwargs: Any,
     ) -> HttpResponse:
@@ -208,6 +214,7 @@ class CreateUpdateView(View):
 
         if object_id is not None:
             self.load_object(request, object_id)
+            assert self.existing_object is not None
 
             if not self.can_edit(request, self.existing_object):
                 raise PermissionError()
@@ -216,7 +223,7 @@ class CreateUpdateView(View):
 
 
 class ChapterForm(ModelForm):
-    default_renderer = BootstrapFormRenderer()
+    default_renderer = BootstrapFormRenderer
 
     class Meta:
         model = Chapter
@@ -238,18 +245,18 @@ class CreateUpdateChapter(CreateUpdateView):
         assert isinstance(instance, Chapter)
         return f"/viewChapter/{instance.id}"
 
-    def can_edit(self, request: HttpRequest, instance: Model):
+    def can_edit(self, request: DstHttpRequest, instance: Model):
         assert isinstance(instance, Chapter)
         return instance.organization_id == request.org.id
 
-    def set_defaults_on_create(self, request: HttpRequest, instance: Model):
+    def set_defaults_on_create(self, request: DstHttpRequest, instance: Model):
         assert isinstance(instance, Chapter)
         if instance.organization_id is None:
             instance.organization = request.org
 
 
 class SectionForm(ModelForm):
-    default_renderer = BootstrapFormRenderer()
+    default_renderer = BootstrapFormRenderer
 
     class Meta:
         model = Section
@@ -275,18 +282,18 @@ class CreateUpdateSection(CreateUpdateView):
         assert isinstance(instance, Section)
         return f"/viewChapter/{instance.chapter_id}#section_{instance.id}"
 
-    def can_edit(self, request: HttpRequest, instance: Model):
+    def can_edit(self, request: DstHttpRequest, instance: Model):
         assert isinstance(instance, Section)
         return instance.chapter.organization_id == request.org.id
 
-    def get_initial_for_create(self, request: HttpRequest, **kwargs):
+    def get_initial_for_create(self, request: DstHttpRequest, **kwargs):
         self.chapter = Chapter.objects.get(
             organization=request.org, id=kwargs.get("chapter_id")
         )
         return {"chapter": self.chapter}
 
     def get_form_context(
-        self, request: HttpRequest, form: ModelForm, context: dict
+        self, request: DstHttpRequest, form: ModelForm, context: dict
     ) -> dict:
         chapter = self.chapter or form.instance.chapter
         context["chapter_num"] = chapter.num
@@ -294,7 +301,7 @@ class CreateUpdateSection(CreateUpdateView):
 
 
 class EntryForm(ModelForm):
-    default_renderer = BootstrapFormRenderer()
+    default_renderer = BootstrapFormRenderer
 
     class Meta:
         model = Entry
@@ -320,18 +327,18 @@ class CreateUpdateEntry(CreateUpdateView):
         assert isinstance(instance, Entry)
         return f"/viewChapter/{instance.section.chapter_id}#entry_{instance.id}"
 
-    def can_edit(self, request: HttpRequest, instance: Model):
+    def can_edit(self, request: DstHttpRequest, instance: Model):
         assert isinstance(instance, Entry)
         return instance.section.chapter.organization_id == request.org.id
 
-    def get_initial_for_create(self, request: HttpRequest, **kwargs):
+    def get_initial_for_create(self, request: DstHttpRequest, **kwargs):
         self.section = Section.objects.get(
             chapter__organization=request.org, id=kwargs.get("section_id")
         )
         return {"section": self.section}
 
     def get_form_context(
-        self, request: HttpRequest, form: ModelForm, context: dict
+        self, request: DstHttpRequest, form: ModelForm, context: dict
     ) -> dict:
         section = self.section or form.instance.section
         context["section_number"] = section.number()
@@ -339,7 +346,7 @@ class CreateUpdateEntry(CreateUpdateView):
 
 
 @login_required
-def view_entry(request: HttpRequest):
+def view_entry(request: DstHttpRequest):
     temp_entry = EntryForm(request.POST).save(commit=False)
     print(vars(temp_entry))
     return render(
