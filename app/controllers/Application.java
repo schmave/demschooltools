@@ -817,12 +817,6 @@ public class Application extends Controller {
   }
 
 
-  public Result printManual(Http.Request request) {
-    return ok(
-        print_manual.render(
-            Chapter.all(Utils.getOrg(request)), request, mMessagesApi.preferred(request)));
-  }
-
   static Path print_temp_dir;
 
   public static void copyPrintingAssetsToTempDir() throws IOException {
@@ -925,37 +919,6 @@ public class Application extends Controller {
     } finally {
       if (html_file != null) {
         html_file.delete();
-      }
-    }
-  }
-
-  play.twirl.api.Html renderManualTOC(Organization org, Http.Request request) {
-    return main.render(Utils.getOrgConfig(org).str_manual_title, "manual", "toc", view_manual
-    .render(Chapter.all(org), request, mMessagesApi.preferred(request))
-, request, mMessagesApi.preferred(request));
-  }
-
-  public Result printManualChapter(Integer id, Http.Request request) throws Exception {
-
-    Organization org = Utils.getOrg(request);
-    if (id == -1) {
-      ArrayList<String> documents = new ArrayList<>();
-      // render TOC
-      documents.add(renderManualTOC(org, request).toString());
-      // then render all chapters
-      for (Chapter chapter : Chapter.all(org)) {
-        documents.add(
-            view_chapter.render(chapter, request, mMessagesApi.preferred(request)).toString());
-      }
-      return renderToPDF(documents);
-    } else {
-      if (id == -2) {
-        return renderToPDF(renderManualTOC(org, request).toString());
-
-      } else {
-        Chapter chapter = Chapter.findById(id, org);
-        return renderToPDF(
-            view_chapter.render(chapter, request, mMessagesApi.preferred(request)).toString());
       }
     }
   }

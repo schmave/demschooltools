@@ -26,7 +26,12 @@ from dst.models import (
     User,
     UserRole,
 )
-from dst.org_config import get_org_config
+from dst.org_config import OrgConfig, get_org_config
+from dst.pdf_utils import (
+    create_pdf_response,
+    render_html_to_pdf,
+    render_multiple_html_to_pdf,
+)
 
 # TODO: login_required in this file should redirect
 # to the Play framework login page, not the Custodia one.
@@ -58,6 +63,10 @@ def render_main_template(
             "rollbar_environment": settings.ROLLBAR_ENVIRONMENT,
         },
     )
+
+
+def render_main_template_to_string(*args, **kwargs) -> str:
+    return render_main_template(*args, **kwargs).content.decode("utf-8")
 
 
 @login_required()
@@ -430,6 +439,28 @@ class CreateUpdateEntry(CreateUpdateView):
                     ManualChange.objects.create(**common_data)
 
 
+@login_required()
+def print_manual(request: DstHttpRequest):
+    """
+    Display the print manual page with download links for PDF versions.
+    """
+    chapters = chapter_with_entries(request.org)
+    org_config = get_org_config(request.org)
+
+    return render_main_template(
+        request,
+        render_to_string(
+            "print_manual.html",
+            {
+                "chapters": chapters,
+                "org_config": org_config,
+            },
+        ),
+        f"Download {org_config.str_manual_title} as a PDF",
+        selected_button="manual_print",
+    )
+
+
 @login_required
 def search_manual(request: DstHttpRequest):
     search_string = request.GET.get("searchString", "")
@@ -480,3 +511,82 @@ def view_entry(request: DstHttpRequest):
             "org_config": get_org_config(request.org),
         },
     )
+
+
+def get_chapter_html(
+    chapter: Chapter, request: DstHttpRequest, org_config: OrgConfig
+) -> str:
+    return render_main_template_to_string(
+        request,
+        render_to_string(
+            "view_chapter.html",
+            {"chapter": chapter, "org_config": org_config},
+        ),
+        "",
+        "",
+    )
+
+
+@login_required()
+def print_manual_chapter(request: DstHttpRequest, chapter_id: int):
+    org = request.org
+    org_config = get_org_config(org)
+
+    if chapter_id == -1:
+        # Render complete manual (TOC + all chapters)
+        documents = []
+
+        chapters = chapter_with_entries(org)
+        toc_html = render_main_template_to_string(
+            request,
+            render_to_string(
+                "view_manual.html",
+                {
+                    "chapters": chapters,
+                    "current_date": datetime.now().strftime("%Y-%m-%d"),
+                    "org_config": org_config,
+                },
+            ),
+            f"{org.short_name} {org_config.str_manual_title}",
+            selected_button="toc",
+        )
+        documents.append(toc_html)
+
+        for chapter in chapters:
+            documents.append(get_chapter_html(chapter, request, org_config))
+
+        return create_pdf_response(
+            render_multiple_html_to_pdf(documents), f"{org.short_name}_Manual.pdf"
+        )
+
+    elif chapter_id == -2:
+        # Render TOC only
+        chapters = chapter_with_entries(org)
+        toc_html = render_main_template_to_string(
+            request,
+            render_to_string(
+                "view_manual.html",
+                {
+                    "chapters": chapters,
+                    "current_date": datetime.now().strftime("%Y-%m-%d"),
+                    "org_config": org_config,
+                },
+            ),
+            f"{org.short_name} {org_config.str_manual_title}",
+            selected_button="toc",
+        )
+
+        return create_pdf_response(
+            render_html_to_pdf(toc_html), f"{org.short_name}_Manual_TOC.pdf"
+        )
+
+    else:
+        # Render specific chapter
+        chapter = chapter_with_entries(org).filter(id=chapter_id).first()
+        if chapter is None:
+            return HttpResponseNotFound()
+
+        pdf_bytes = render_html_to_pdf(get_chapter_html(chapter, request, org_config))
+        return create_pdf_response(
+            pdf_bytes, f"{org.short_name}_Chapter_{chapter.num}.pdf"
+        )

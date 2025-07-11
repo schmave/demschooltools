@@ -16,7 +16,7 @@ Including another URLconf
 
 from django.conf import settings
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, register_converter
 
 from custodia.views import (
     AbsentView,
@@ -38,12 +38,28 @@ from dst.manual_views import (
     CreateUpdateChapter,
     CreateUpdateEntry,
     CreateUpdateSection,
+    print_manual,
+    print_manual_chapter,
     search_manual,
     view_chapter,
     view_entry,
     view_manual,
     view_manual_changes,
 )
+
+
+class NegativeIntConverter:
+    regex = r"-?\d+"
+
+    def to_python(self, value):
+        return int(value)
+
+    def to_url(self, value):
+        return "%d" % value
+
+
+register_converter(NegativeIntConverter, "negint")
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -73,6 +89,8 @@ urlpatterns = [
     path("viewManual", view_manual),
     path("viewManualChanges", view_manual_changes),
     path("searchManual", search_manual),
+    path("printManual", print_manual),
+    path("printManualChapter/<negint:chapter_id>", print_manual_chapter),
     # chapters
     path("viewChapter/<int:chapter_id>", view_chapter),
     path("addChapter", CreateUpdateChapter.as_view()),

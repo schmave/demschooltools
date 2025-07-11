@@ -73,8 +73,8 @@ GET /viewManualChanges*extra       controllers.Proxy.proxy(request: Request, ext
 GET /viewChapter*extra       controllers.Proxy.proxy(request: Request, extra: String)
 GET /searchManual       controllers.Proxy.proxy0(request: Request)
 
-GET /printManual	controllers.Application.printManual(request: Request)
-GET /printManualChapter/:id	controllers.Application.printManualChapter(id : Integer, request: Request)
+GET /printManual	controllers.Proxy.proxy0(request: Request)
+GET /printManualChapter/*extra       controllers.Proxy.proxy(request: Request, extra: String)
 
 
 GET /thisWeekReport	controllers.Application.thisWeekReport(request: Request)
