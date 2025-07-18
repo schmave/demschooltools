@@ -95,6 +95,7 @@ POST /addEntry*extra		controllers.Proxy.proxy(request: Request, extra: String)
 GET /editEntry*extra		controllers.Proxy.proxy(request: Request, extra: String)
 POST /editEntry*extra		controllers.Proxy.proxy(request: Request, extra: String)
 POST /viewEntry             controllers.Proxy.proxy0(request: Request)
+POST /viewEntry*extra		controllers.Proxy.proxy(request: Request, extra: String)
 
 GET      /custodia-admin            controllers.Attendance.viewCustodiaAdmin(request: Request)
 GET      /custodia                  controllers.Proxy.proxy0(request: Request)

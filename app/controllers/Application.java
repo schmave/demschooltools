@@ -892,37 +892,6 @@ public class Application extends Controller {
     }
   }
 
-  public static Result renderToPDF(List<String> orig_htmls) throws Exception {
-    File html_file = null;
-    try {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      ITextRenderer renderer = new ITextRenderer();
-
-      boolean first = true;
-      for (String orig_html : orig_htmls) {
-        html_file = prepareTempHTML(orig_html);
-        renderer.setDocument(html_file);
-        renderer.layout();
-        if (first) {
-          renderer.createPDF(baos, false);
-        } else {
-          renderer.writeNextDocument();
-        }
-        html_file.delete();
-        html_file = null;
-
-        first = false;
-      }
-
-      renderer.finishPDF();
-      return ok(baos.toByteArray()).as("application/pdf");
-    } finally {
-      if (html_file != null) {
-        html_file.delete();
-      }
-    }
-  }
-
   static List<Charge> getLastWeekCharges(Person p) {
     List<Charge> last_week_charges = new ArrayList<>();
 

@@ -378,6 +378,37 @@ class EntryForm(ModelForm):
         widgets = {"num": TextInput(), "title": TextInput()}
 
 
+def get_manual_change_for_entry(
+    old_instance: Entry | None, new_instance: Entry
+) -> ManualChange | None:
+    common_data = dict(
+        entry=new_instance,
+        new_content=new_instance.content,
+        new_num=new_instance.number(),
+        new_title=new_instance.title,
+    )
+
+    if old_instance is None:
+        return ManualChange(was_created=True, **common_data)
+    else:
+        common_data.update(
+            old_content=old_instance.content,
+            old_num=old_instance.number(),
+            old_title=old_instance.title,
+        )
+        if new_instance.deleted and not old_instance.deleted:
+            return ManualChange(was_deleted=True, **common_data)
+        else:
+            if (
+                common_data["old_content"] != common_data["new_content"]
+                or common_data["old_title"] != common_data["new_title"]
+                or common_data["old_num"] != common_data["new_num"]
+            ):
+                return ManualChange(**common_data)
+
+    return None
+
+
 class CreateUpdateEntry(CreateUpdateView):
     form_class = EntryForm
     template_name = "edit_entry.html"
@@ -413,30 +444,8 @@ class CreateUpdateEntry(CreateUpdateView):
         assert isinstance(instance, Entry)
         assert self.existing_object is None or isinstance(self.existing_object, Entry)
 
-        common_data = dict(
-            entry=instance,
-            new_content=instance.content,
-            new_num=instance.number(),
-            new_title=instance.title,
-        )
-
-        if self.existing_object is None:
-            ManualChange.objects.create(was_created=True, **common_data)
-        else:
-            common_data.update(
-                old_content=self.existing_object.content,
-                old_num=self.existing_object.number(),
-                old_title=self.existing_object.title,
-            )
-            if instance.deleted and not self.existing_object.deleted:
-                ManualChange.objects.create(was_deleted=True, **common_data)
-            else:
-                if (
-                    common_data["old_content"] != common_data["new_content"]
-                    or common_data["old_title"] != common_data["new_title"]
-                    or common_data["old_num"] != common_data["new_num"]
-                ):
-                    ManualChange.objects.create(**common_data)
+        if new_change := get_manual_change_for_entry(self.existing_object, instance):
+            new_change.save()
 
 
 @login_required()
@@ -501,8 +510,20 @@ def search_manual(request: DstHttpRequest):
 
 
 @login_required
-def view_entry(request: DstHttpRequest):
-    temp_entry = EntryForm(request.POST).save(commit=False)
+def view_entry(request: DstHttpRequest, object_id: int | None = None):
+    existing = None
+    if object_id:
+        existing = Entry.all_objects.filter(id=object_id).first()
+
+    temp_entry: Entry = EntryForm(request.POST, instance=deepcopy(existing)).save(
+        commit=False
+    )
+    changes = temp_entry.changes_for_render()
+    if new_change := get_manual_change_for_entry(existing, temp_entry):
+        changes.append(new_change)
+
+    temp_entry.changes_for_render = lambda *args: changes
+
     return render(
         request,
         "view_entry.html",

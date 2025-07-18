@@ -303,6 +303,7 @@ class Entry(models.Model):
     def number(self):
         return self.section.number() + "." + self.num
 
+    # TODO: get rid of this. use a template filter instead? this is ugly
     def changes_for_render(self) -> list["ManualChange"]:
         if self.id:
             return list(self.changes.all())
