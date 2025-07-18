@@ -23,6 +23,7 @@ prod = [
 dev = [
     "django-silk~=5.3",
     "djhtml>=3.0.7",
+    "ipython>=9.4.0",
     "pyinstrument~=5.0",
     "tabulate",
 ]
