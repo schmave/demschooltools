@@ -2,6 +2,7 @@ from copy import deepcopy
 from datetime import datetime, timedelta
 from typing import Any, Type
 
+from django import forms
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db import connection
@@ -368,6 +369,8 @@ class CreateUpdateSection(CreateUpdateView):
 class EntryForm(ModelForm):
     default_renderer = BootstrapFormRenderer
 
+    effective_date = forms.DateField(initial=timezone.now().date())
+
     class Meta:
         model = Entry
         fields = ["section", "num", "title", "deleted", "content"]
@@ -379,13 +382,17 @@ class EntryForm(ModelForm):
 
 
 def get_manual_change_for_entry(
-    old_instance: Entry | None, new_instance: Entry
+    request: DstHttpRequest, old_instance: Entry | None, new_instance: Entry
 ) -> ManualChange | None:
     common_data = dict(
+        effective_date=datetime.strptime(
+            request.POST["effective_date"], "%Y-%m-%d"
+        ).date(),
         entry=new_instance,
         new_content=new_instance.content,
         new_num=new_instance.number(),
         new_title=new_instance.title,
+        user=request.user,
     )
 
     if old_instance is None:
@@ -444,7 +451,9 @@ class CreateUpdateEntry(CreateUpdateView):
         assert isinstance(instance, Entry)
         assert self.existing_object is None or isinstance(self.existing_object, Entry)
 
-        if new_change := get_manual_change_for_entry(self.existing_object, instance):
+        if new_change := get_manual_change_for_entry(
+            request, self.existing_object, instance
+        ):
             new_change.save()
 
 
@@ -519,7 +528,8 @@ def view_entry(request: DstHttpRequest, object_id: int | None = None):
         commit=False
     )
     changes = temp_entry.changes_for_render()
-    if new_change := get_manual_change_for_entry(existing, temp_entry):
+
+    if new_change := get_manual_change_for_entry(request, existing, temp_entry):
         changes.append(new_change)
 
     temp_entry.changes_for_render = lambda *args: changes

@@ -9,7 +9,7 @@
             {% if defined_changes|length > 0 %}
                 <span class="man-last-modify-date {% if not org_config.org.show_last_modified_in_print %}no-print{% endif %}">
                     {% with defined_changes|last as last_change %}
-                        changed {% yymmddDate last_change.date_entered %}
+                        last change recorded on {% yymmddDate last_change.date_entered %}
                     {% endwith %}
                 </span>
             {% endif %}
@@ -24,7 +24,11 @@
                             {% else %} Amended
                             {% endif %}
 
+                            {% if change_detail.effective_date %}
+                            {% yymmddDate change_detail.effective_date %};
+                            {% else %}
                             {% yymmddDate change_detail.date_entered %};
+                            {% endif %}
                         {% endifchanged %}
                     {% endfor %}
                 </p>

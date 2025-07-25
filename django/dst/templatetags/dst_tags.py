@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 
 import mistletoe
 from django import template
@@ -11,10 +11,12 @@ register = template.Library()
 
 
 @register.simple_tag(takes_context=True)
-def yymmddDate(context, d: datetime | None = None):
+def yymmddDate(context, d: datetime | date | None = None):
     org_config: OrgConfig = context["org_config"]
 
-    d = timezone.localtime(d)
+    if d is None or isinstance(d, datetime):
+        d = timezone.localtime(d)
+
     if org_config.euro_dates:
         return d.strftime("%d-%m-%Y")
 
