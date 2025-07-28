@@ -15,10 +15,6 @@
 }
 
 @page {
-    @bottom-right {
-/*      content: "Page " counter(page) " of " counter(pages);*/
-        font-size: 10px;
-    }
     @bottom-center {
         content: element(footer);
     }
@@ -50,6 +46,6 @@ body {
     font-size: 13px;
 }
 
-.man-last-modify-date, .man-entry-change-history {
+.man-entry-change-history {
     font-style: italic;
 }

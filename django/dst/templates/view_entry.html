@@ -6,16 +6,9 @@
         <p class="man-entry-num">
             {{ entry.number }} {{ entry.title }}
             {% if entry.id %}<a class="no-print man-edit" href="/editEntry/{{ entry.id }}">Edit</a>{% endif %}
-            {% if defined_changes|length > 0 %}
-                <span class="man-last-modify-date {% if not org_config.org.show_last_modified_in_print %}no-print{% endif %}">
-                    {% with defined_changes|last as last_change %}
-                        last change recorded on {% yymmddDate last_change.date_entered %}
-                    {% endwith %}
-                </span>
-            {% endif %}
         </p>
         <div class="man-entry-content">{{ entry.content|markdown }}
-            {% if defined_changes|length > 1 %}
+            {% if defined_changes %}
                 <p class="man-entry-change-history {% if not org_config.org.show_history_in_print %}no-print{% endif %}">
                     {% for change_detail in defined_changes %}
                         {% ifchanged change_detail.date_entered.date %}
