@@ -323,7 +323,7 @@ class ManualChange(models.Model):
     entry = models.ForeignKey(Entry, on_delete=models.PROTECT, related_name="changes")
     date_entered = models.DateTimeField(auto_now_add=True)
     effective_date = models.DateField()
-    user = models.ForeignKey("User", on_delete=models.PROTECT)
+    user = models.ForeignKey("dst.User", on_delete=models.PROTECT)
 
     was_deleted = models.BooleanField(default=False)
     was_created = models.BooleanField(default=False)
@@ -457,6 +457,9 @@ class User(AbstractUser):
             if role_includes(role, desired_role):
                 return True
         return False
+
+    def __str__(self):
+        return self.name
 
 
 def role_includes(greater_role: str, lesser_role: str) -> bool:

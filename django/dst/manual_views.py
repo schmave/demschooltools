@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.db import connection
 from django.db.models import Model, Prefetch, QuerySet
 from django.db.models.signals import post_save
-from django.forms import ModelForm, TextInput
+from django.forms import Form, ModelForm, TextInput
 from django.http import HttpRequest, HttpResponseNotFound
 from django.http.response import HttpResponse as HttpResponse
 from django.shortcuts import redirect, render
@@ -91,12 +91,17 @@ def view_manual(request: DstHttpRequest):
     )
 
 
+class ManualChangesForm(Form):
+    begin_date = forms.DateField()
+
+
 @login_required()
 def view_manual_changes(request: DstHttpRequest):
+    form = ManualChangesForm(request.GET)
     begin_date = None
-    try:
-        begin_date = datetime.strptime(request.GET["begin_date"], "%Y-%m-%d")
-    except:
+    if form.is_valid():
+        begin_date = form.cleaned_data["begin_date"]
+    else:
         begin_date = timezone.now().replace(
             hour=0, minute=0, second=0, microsecond=0
         ) - timedelta(days=7)
@@ -105,7 +110,7 @@ def view_manual_changes(request: DstHttpRequest):
         ManualChange.objects.filter(
             date_entered__gt=begin_date,
             entry__section__chapter__organization=request.org,
-        )
+        ).prefetch_related("user")
     )
 
     changes.sort(
@@ -243,25 +248,27 @@ class CreateUpdateView(View):
 
     def post(self, request: DstHttpRequest, **kwargs):
         # Pass a copy into the form so that self.existing_object remains unchanged
-        form = self.form_class(request.POST, instance=deepcopy(self.existing_object))
-        if form.is_valid():
-            new_object = form.save(commit=False)
+        self.form = self.form_class(
+            request.POST, instance=deepcopy(self.existing_object)
+        )
+        if self.form.is_valid():
+            new_object = self.form.save(commit=False)
             self.pre_save(request, new_object)
             new_object.save()
             self.post_save(request, new_object)
 
             return redirect(self.get_success_url(new_object))
 
-        return self.render(request, form)
+        return self.render(request, self.form)
 
     def get(self, request: DstHttpRequest, **kwargs):
         if self.existing_object:
-            form = self.form_class(instance=deepcopy(self.existing_object))
+            self.form = self.form_class(instance=deepcopy(self.existing_object))
         else:
-            form = self.form_class(
+            self.form = self.form_class(
                 initial=self.get_initial_for_create(request, **kwargs)
             )
-        return self.render(request, form)
+        return self.render(request, self.form)
 
     def can_edit(self, request: DstHttpRequest, instance: Model) -> bool:
         return True
@@ -380,19 +387,21 @@ class EntryForm(ModelForm):
         }
         widgets = {"num": TextInput(), "title": TextInput()}
 
+    def clean_content(self):
+        content = self.cleaned_data.get("content", "")
+        return content.replace("\r\n", "\n").replace("\r", "\n")
+
 
 def get_manual_change_for_entry(
-    request: DstHttpRequest, old_instance: Entry | None, new_instance: Entry
+    user: User, entry_form: EntryForm, old_instance: Entry | None, new_instance: Entry
 ) -> ManualChange | None:
     common_data = dict(
-        effective_date=datetime.strptime(
-            request.POST["effective_date"], "%Y-%m-%d"
-        ).date(),
+        effective_date=entry_form.cleaned_data["effective_date"],
         entry=new_instance,
         new_content=new_instance.content,
         new_num=new_instance.number(),
         new_title=new_instance.title,
-        user=request.user,
+        user=user,
     )
 
     if old_instance is None:
@@ -450,9 +459,11 @@ class CreateUpdateEntry(CreateUpdateView):
     def post_save(self, request: DstHttpRequest, instance: Model):
         assert isinstance(instance, Entry)
         assert self.existing_object is None or isinstance(self.existing_object, Entry)
+        assert isinstance(self.form, EntryForm)
+        assert isinstance(request.user, User)
 
         if new_change := get_manual_change_for_entry(
-            request, self.existing_object, instance
+            request.user, self.form, self.existing_object, instance
         ):
             new_change.save()
 
@@ -524,12 +535,13 @@ def view_entry(request: DstHttpRequest, object_id: int | None = None):
     if object_id:
         existing = Entry.all_objects.filter(id=object_id).first()
 
-    temp_entry: Entry = EntryForm(request.POST, instance=deepcopy(existing)).save(
-        commit=False
-    )
+    entry_form = EntryForm(request.POST, instance=deepcopy(existing))
+    temp_entry: Entry = entry_form.save(commit=False)
     changes = temp_entry.changes_for_render()
 
-    if new_change := get_manual_change_for_entry(request, existing, temp_entry):
+    if new_change := get_manual_change_for_entry(
+        request.user, entry_form, existing, temp_entry
+    ):
         changes.append(new_change)
 
     temp_entry.changes_for_render = lambda *args: changes

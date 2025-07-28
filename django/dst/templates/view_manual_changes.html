@@ -13,7 +13,7 @@
 {% for c in changes %}
   <div class="change_log">
     <div class="dateEntered">
-      {% yymmddDate c.date_entered %}
+      {% dateAndTime c.date_entered %} {% if c.user_id %} &middot; {{ c.user }} {% endif %}
     </div>
     {% if c.was_created %}
       <table cellpadding="20">
