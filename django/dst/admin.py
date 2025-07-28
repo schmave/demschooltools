@@ -90,7 +90,7 @@ class AttendanceWeekAdmin(admin.ModelAdmin):
 
 @admin.register(ManualChange)
 class ManualChangeAdmin(admin.ModelAdmin):
-    readonly_fields = ["entry"]
+    readonly_fields = ["entry", "chapter", "section", "date_entered"]
     list_display = ["id", "entry_id", "date_entered", "was_created", "was_deleted"]
 
 

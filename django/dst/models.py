@@ -309,6 +309,9 @@ class Entry(models.Model):
             return list(self.changes.all())
         return []
 
+    def __str__(self):
+        return f"{self.num} {self.title}"
+
 
 class ManualChange(models.Model):
     class Meta:
@@ -322,7 +325,7 @@ class ManualChange(models.Model):
     )
     entry = models.ForeignKey(Entry, on_delete=models.PROTECT, related_name="changes")
     date_entered = models.DateTimeField(auto_now_add=True)
-    effective_date = models.DateField()
+    effective_date = models.DateField(blank=True)
     user = models.ForeignKey("dst.User", on_delete=models.PROTECT)
 
     was_deleted = models.BooleanField(default=False)
