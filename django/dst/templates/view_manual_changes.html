@@ -3,17 +3,21 @@
 <h3>Changes to the {{ org_config.str_manual_title }}</h3>
 
 <form method="GET">
-  <p class="highlight">
-    Show changes since
+  <p class="highlight" style="margin-bottom: 3em">
+    Show changes between
     <input type="date" name="begin_date" value="{{ begin_date }}">
-    <input type="submit">
+    and
+    <input type="date" name="end_date" value="{{ end_date }}">.
+    <input class="btn btn-primary" type="submit">
   </p>
 </form>
 
 {% for c in changes %}
   <div class="change_log">
     <div class="dateEntered">
-      {% dateAndTime c.date_entered %} {% if c.user_id %} &middot; {{ c.user }} {% endif %}
+      {% dateAndTime c.date_entered %}
+      {% if c.user_id %} &middot; {{ c.user }} {% endif %}
+      {% if c.effective_date %} &middot; effective {{ c.effective_date }} {% endif %}
     </div>
     {% if c.was_created %}
       <table cellpadding="20">

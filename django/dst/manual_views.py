@@ -1,12 +1,12 @@
 from copy import deepcopy
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 from typing import Any, Type
 
 from django import forms
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db import connection
-from django.db.models import Model, Prefetch, QuerySet
+from django.db.models import Model, Prefetch, Q, QuerySet
 from django.db.models.signals import post_save
 from django.forms import Form, ModelForm, TextInput
 from django.http import HttpRequest, HttpResponseNotFound
@@ -93,24 +93,39 @@ def view_manual(request: DstHttpRequest):
 
 class ManualChangesForm(Form):
     begin_date = forms.DateField()
+    end_date = forms.DateField(required=False)
 
 
 @login_required()
 def view_manual_changes(request: DstHttpRequest):
     form = ManualChangesForm(request.GET)
-    begin_date = None
+
+    end_date = timezone.localtime().replace(hour=0, minute=0, second=0, microsecond=0)
+    begin_date = end_date - timedelta(days=7)
+    end_date += timedelta(days=1, microseconds=-1)
+
     if form.is_valid():
-        begin_date = form.cleaned_data["begin_date"]
-    else:
-        begin_date = timezone.now().replace(
-            hour=0, minute=0, second=0, microsecond=0
-        ) - timedelta(days=7)
+        begin_date = timezone.make_aware(
+            datetime.combine(form.cleaned_data["begin_date"], time())
+        )
+        if form.cleaned_data["end_date"]:
+            end_date = timezone.make_aware(
+                datetime.combine(form.cleaned_data["end_date"], time())
+            ) + timedelta(days=1, microseconds=-1)
+    print(begin_date, end_date)
 
     changes = list(
         ManualChange.objects.filter(
-            date_entered__gt=begin_date,
             entry__section__chapter__organization=request.org,
-        ).prefetch_related("user")
+        )
+        .filter(
+            Q(date_entered__gte=begin_date, date_entered__lte=end_date)
+            | Q(
+                effective_date__gte=begin_date.date(),
+                effective_date__lte=end_date.date(),
+            )
+        )
+        .prefetch_related("user")
     )
 
     changes.sort(
@@ -129,6 +144,7 @@ def view_manual_changes(request: DstHttpRequest):
             "view_manual_changes.html",
             {
                 "begin_date": begin_date.strftime("%Y-%m-%d"),
+                "end_date": end_date.strftime("%Y-%m-%d"),
                 "changes": changes,
                 "org_config": org_config,
             },
