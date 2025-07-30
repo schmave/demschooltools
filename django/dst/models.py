@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -336,6 +338,9 @@ class ManualChange(models.Model):
     new_title = models.CharField()
     old_num = models.CharField()
     new_num = models.CharField()
+
+    def effective_date_with_fallback(self) -> date:
+        return self.effective_date or self.date_entered.date()
 
 
 class Account(models.Model):

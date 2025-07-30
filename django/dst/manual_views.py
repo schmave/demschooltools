@@ -4,7 +4,7 @@ from typing import Any, Type
 
 from django import forms
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required as django_login_required
 from django.db import connection
 from django.db.models import Model, Prefetch, Q, QuerySet
 from django.db.models.signals import post_save
@@ -34,8 +34,9 @@ from dst.pdf_utils import (
     render_multiple_html_to_pdf,
 )
 
-# TODO: login_required in this file should redirect
-# to the Play framework login page, not the Custodia one.
+
+def login_required():
+    return django_login_required(login_url="/login")
 
 
 class DstHttpRequest(HttpRequest):
@@ -296,10 +297,11 @@ class CreateUpdateView(View):
         **kwargs: Any,
     ) -> HttpResponse:
         if not request.user.is_authenticated:
-            raise PermissionError()
+            raise PermissionError("You need to be logged in.")
         assert isinstance(request.user, User)
+        assert self.role
         if not request.user.hasRole(self.role):
-            raise PermissionError()
+            raise PermissionError("You don't have privileges to access this item")
 
         if object_id is not None:
             self.load_object(request, object_id)
@@ -412,6 +414,7 @@ def get_manual_change_for_entry(
     user: User, entry_form: EntryForm, old_instance: Entry | None, new_instance: Entry
 ) -> ManualChange | None:
     common_data = dict(
+        date_entered=timezone.localtime(),
         effective_date=entry_form.cleaned_data["effective_date"],
         entry=new_instance,
         new_content=new_instance.content,
@@ -506,7 +509,7 @@ def print_manual(request: DstHttpRequest):
     )
 
 
-@login_required
+@login_required()
 def search_manual(request: DstHttpRequest):
     search_string = request.GET.get("searchString", "")
 
@@ -545,8 +548,8 @@ def search_manual(request: DstHttpRequest):
     )
 
 
-@login_required
-def view_entry(request: DstHttpRequest, object_id: int | None = None):
+@login_required()
+def preview_entry(request: DstHttpRequest, object_id: int | None = None):
     existing = None
     if object_id:
         existing = Entry.all_objects.filter(id=object_id).first()
@@ -568,6 +571,7 @@ def view_entry(request: DstHttpRequest, object_id: int | None = None):
         {
             "entry": temp_entry,
             "org_config": get_org_config(request.org),
+            "is_preview": True,
         },
     )
 

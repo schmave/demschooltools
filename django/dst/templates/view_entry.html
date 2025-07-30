@@ -5,23 +5,19 @@
         <a name="entry_{{ entry.id }}"></a>
         <p class="man-entry-num">
             {{ entry.number }} {{ entry.title }}
-            {% if entry.id %}<a class="no-print man-edit" href="/editEntry/{{ entry.id }}">Edit</a>{% endif %}
+            {% if entry.id and not is_preview %}<a class="no-print man-edit" href="/editEntry/{{ entry.id }}">Edit</a>{% endif %}
         </p>
         <div class="man-entry-content">{{ entry.content|markdown }}
             {% if defined_changes %}
                 <p class="man-entry-change-history {% if not org_config.org.show_history_in_print %}no-print{% endif %}">
                     {% for change_detail in defined_changes %}
-                        {% ifchanged change_detail.date_entered.date %}
+                        {% ifchanged change_detail.effective_date_with_fallback %}
                             {% if change_detail.was_created %} Adopted
                             {% elif change_detail.was_deleted %} Repealed
                             {% else %} Amended
                             {% endif %}
 
-                            {% if change_detail.effective_date %}
-                            {% yymmddDate change_detail.effective_date %};
-                            {% else %}
-                            {% yymmddDate change_detail.date_entered %};
-                            {% endif %}
+                            {% yymmddDate change_detail.effective_date_with_fallback %};
                         {% endifchanged %}
                     {% endfor %}
                 </p>

@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 
 <html>
@@ -21,13 +23,12 @@
             // End Rollbar Snippet
         </script>
         <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
-        {% comment %} TODO: This bundle.js file is versioned in production {% endcomment %}
         <script type="text/javascript"
-                src="/assets/javascripts/gen/bundle.js"></script>
+                src="{% static 'js/bundle.js' %}"></script>
 
-        <link rel="stylesheet" media="all" href="/assets/stylesheets/main.css" />
+        <link rel="stylesheet" media="all" href="{% static 'css/main.css' %}" />
 
-        <link rel="shortcut icon" type="image/png" href="/assets/images/favicon.png" />
+        <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.png' %}" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
     </head>
     <body>

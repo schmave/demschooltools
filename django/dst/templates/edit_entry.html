@@ -15,10 +15,6 @@
               hx-target="#markdown_preview"
               hx-trigger="input change, textarea change, select change delay:300ms">
             {% csrf_token %}
-            {% comment %}
-            TODO: Make a custom widget for this so that we don't have to special
-            case this field here and also in edit_section.html
-            {% endcomment %}
             {% for field in form %}
                 {% if field.id_for_label == "id_num" %}
                     <div class="form-group">
@@ -53,7 +49,7 @@
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <div id="markdown_preview">
-                            {% include "view_entry.html" with entry=form.instance %}
+                            {% include "view_entry.html" with entry=form.instance is_preview=True %}
                         </div>
                     </div>
                 </div>

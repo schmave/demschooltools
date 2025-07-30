@@ -39,3 +39,8 @@ ROLLBAR_ENVIRONMENT = "production"
 ROLLBAR = dict(ROLLBAR, environment=ROLLBAR_ENVIRONMENT)
 
 STATIC_ROOT = "/www/django-static/"
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
+    },
+}

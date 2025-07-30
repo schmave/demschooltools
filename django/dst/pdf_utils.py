@@ -9,30 +9,18 @@ from playwright.sync_api import sync_playwright
 
 
 def copy_print_assets_to_temp_dir(temp_dir: Path) -> None:
-    stylesheets_dir = temp_dir / "stylesheets"
-    stylesheets_dir.mkdir(exist_ok=True)
+    compiled_css_file = Path(settings.STATICFILES_DIRS[0]) / "css" / "main.css"
 
-    # TODO: Configure this differently in dev & prod
-    compiled_css_file = (
-        Path(settings.BASE_DIR)
-        / ".."
-        / "target"
-        / "web"
-        / "public"
-        / "main"
-        / "stylesheets"
-        / "main.css"
-    )
-
-    shutil.copy2(compiled_css_file, stylesheets_dir)
+    shutil.copy2(compiled_css_file, temp_dir)
 
 
 def prepare_html_for_pdf(html_content: str, temp_dir: Path) -> str:
-    return html_content.replace("/assets/", "")
+    return html_content.replace(f"{settings.STATIC_URL}css/", "")
 
 
 def render_html_to_pdf(html_content: str) -> bytes:
-    with tempfile.TemporaryDirectory() as temp_dir_str:
+    DEBUG = True
+    with tempfile.TemporaryDirectory(delete=not DEBUG) as temp_dir_str:
         temp_dir = Path(temp_dir_str)
         copy_print_assets_to_temp_dir(temp_dir)
 
@@ -40,6 +28,11 @@ def render_html_to_pdf(html_content: str) -> bytes:
 
         html_file = temp_dir / "document.html"
         html_file.write_text(prepared_html, encoding="utf-8")
+
+        if DEBUG:
+            import os
+
+            os.system(f"open '{temp_dir}'")
 
         with sync_playwright() as p:
             browser = p.chromium.launch()
