@@ -1,7 +1,6 @@
 package models;
 
 import io.ebean.*;
-import java.util.Comparator;
 import java.util.Date;
 import javax.persistence.*;
 import lombok.Getter;

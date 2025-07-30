@@ -816,7 +816,6 @@ public class Application extends Controller {
             "attachment; filename=" + Utils.getOrgConfig(org).str_res_plans + ".csv");
   }
 
-
   static Path print_temp_dir;
 
   public static void copyPrintingAssetsToTempDir() throws IOException {

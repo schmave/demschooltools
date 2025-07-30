@@ -2,14 +2,12 @@ package controllers;
 
 import io.ebean.DB;
 import io.ebean.SqlUpdate;
-import java.sql.Connection;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.inject.Inject;
 import models.*;
 import play.api.libs.mailer.MailerClient;
-import play.data.Form;
 import play.data.FormFactory;
 import play.db.Database;
 import play.i18n.MessagesApi;
