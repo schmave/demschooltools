@@ -13,7 +13,7 @@
         <form action="" method="post" class="django-form"
               hx-post="/viewEntry/{{ form.instance.id|default:"" }}"
               hx-target="#markdown_preview"
-              hx-trigger="input change, textarea change, select change delay:300ms">
+              hx-trigger="change from:form, input from:form delay:300ms">
             {% csrf_token %}
             {% include "form_non_field_errors.html" %}
             {% for field in form %}

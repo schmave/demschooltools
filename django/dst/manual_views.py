@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required as django_login_requir
 from django.db import connection
 from django.db.models import Model, Prefetch, Q, QuerySet
 from django.db.models.signals import post_save
+from django.db.transaction import atomic
 from django.forms import Form, ModelForm, TextInput, ValidationError
 from django.http import HttpRequest, HttpResponseNotFound
 from django.http.response import HttpResponse as HttpResponse
@@ -164,7 +165,10 @@ def chapter_with_entries(org: Organization, include_deleted=False) -> QuerySet[C
                     "entries",
                     Entry.objects.prefetch_related(
                         Prefetch(
-                            "changes", ManualChange.objects.order_by("date_entered")
+                            "changes",
+                            ManualChange.objects.order_by("date_entered").filter(
+                                show_date_in_history=True
+                            ),
                         )
                     ),
                 )
@@ -262,6 +266,7 @@ class CreateUpdateView(View):
         # Use all_objects so that this works even for deleted items
         self.existing_object = self.form_class._meta.model.all_objects.get(id=object_id)  # type: ignore
 
+    @atomic
     def post(self, request: DstHttpRequest, **kwargs):
         if self.existing_object:
             # Pass a copy into the form so that self.existing_object remains unchanged
@@ -421,6 +426,11 @@ class EntryForm(ModelForm):
     default_renderer = BootstrapFormRenderer
 
     effective_date = forms.DateField(initial=timezone.now().date())
+    show_date_in_history = forms.BooleanField(
+        required=False,
+        initial=True,
+        help_text="Uncheck this box to prevent the date from being be added to the list of dates shown beneath the rule. This could be useful when you are making a minor formatting change or you don't know the correct date to enter. A record of this change will always be preserved.",
+    )
 
     class Meta:
         model = Entry
@@ -446,6 +456,7 @@ def get_manual_change_for_entry(
         new_num=new_instance.number(),
         new_title=new_instance.title,
         user=user,
+        show_date_in_history=entry_form.cleaned_data["show_date_in_history"],
     )
 
     if old_instance is None:
@@ -586,7 +597,8 @@ def preview_entry(request: DstHttpRequest, object_id: int | None = None):
     if new_change := get_manual_change_for_entry(
         request.user, entry_form, existing, temp_entry
     ):
-        changes.append(new_change)
+        if new_change.show_date_in_history:
+            changes.append(new_change)
 
     temp_entry.changes_for_render = lambda *args: changes
 

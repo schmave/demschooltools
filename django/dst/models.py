@@ -328,6 +328,7 @@ class ManualChange(models.Model):
     entry = models.ForeignKey(Entry, on_delete=models.PROTECT, related_name="changes")
     date_entered = models.DateTimeField(auto_now_add=True)
     effective_date = models.DateField(blank=True)
+    show_date_in_history = models.BooleanField(null=False, default=True)
     user = models.ForeignKey("dst.User", on_delete=models.PROTECT)
 
     was_deleted = models.BooleanField(default=False)
