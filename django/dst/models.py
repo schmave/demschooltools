@@ -155,6 +155,7 @@ class Comment(models.Model):
 
     created = models.DateTimeField()
     person = models.ForeignKey(Person, on_delete=models.PROTECT)
+    user = models.ForeignKey("User", on_delete=models.PROTECT)
 
 
 class TaskList(models.Model):
@@ -195,6 +196,13 @@ class MailchimpSync(models.Model):
         db_table = "mailchimp_sync"
 
     tag = models.ForeignKey(Tag, on_delete=models.PROTECT)
+
+
+class AttendanceCode(models.Model):
+    class Meta:
+        db_table = "attendance_code"
+
+    organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
 
 
 class AttendanceDay(models.Model):
