@@ -3,25 +3,25 @@
 <h4>You searched for <b>{{ searchString }}</b> and got {{ entries|length }} matches.</h4>
 
 {% for entry in entries %}
-<div class="man-entry">
-    <p class="man-entry-num">
-        <a href="/viewChapter/{{ entry.section.chapter.id }}#entry_{{ entry.id }}">
-            {{ entry.number }} {{ entry.title }}
-        </a>
-        <a class="no-print man-edit" href="/editEntry/{{ entry.id }}">Edit</a>
-    </p>
-    <p class="man-entry-content">
-        {{ entry.headline|safe }}
-    </p>
-</div>
+    <div class="man-entry">
+        <p class="man-entry-num">
+            <a href="/viewChapter/{{ entry.section.chapter.id }}#entry_{{ entry.id }}">
+                {{ entry.number }} {{ entry.title }}
+            </a>
+            <a class="no-print man-edit" href="/editEntry/{{ entry.id }}">Edit</a>
+        </p>
+        <p class="man-entry-content">
+            {{ entry.headline|safe }}
+        </p>
+    </div>
 {% empty %}
-<br>
-<h4>Why didn't I get any results?</h4>
-<p>Here are a few guidelines to help with searching the manual:</p>
-<ul>
-    <li>Every term in your search query must appear in the rule in order for it to match (e.g. searching for "JC school meeting" will only match rules that contain all three of those words)</li>
-    <li>You must search for full words (e.g. searching for "mes" will not find rules containing the word "mess")</li>
-    <li>Singular/plural and other variations of a word do match (e.g. "apples" will find rules containing the word "apple", and "runs" matches "running")</li>
-    <li>Common words like "the", "or", "and", etc. are automatically removed from your search terms</li>
-</ul>
+    <br>
+    <h4>Why didn't I get any results?</h4>
+    <p>Here are a few guidelines to help with searching the manual:</p>
+    <ul>
+        <li>Every term in your search query must appear in the rule in order for it to match (e.g. searching for "JC school meeting" will only match rules that contain all three of those words)</li>
+        <li>You must search for full words (e.g. searching for "mes" will not find rules containing the word "mess")</li>
+        <li>Singular/plural and other variations of a word do match (e.g. "apples" will find rules containing the word "apple", and "runs" matches "running")</li>
+        <li>Common words like "the", "or", "and", etc. are automatically removed from your search terms</li>
+    </ul>
 {% endfor %}
