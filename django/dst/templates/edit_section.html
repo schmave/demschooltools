@@ -7,6 +7,7 @@
 <div class="row">
     <form action="" method="post" class="django-form col-sm-6">
         {% csrf_token %}
+        {% include "form_non_field_errors.html" %}
         {% for field in form %}
             {% if field.id_for_label == "id_num" %}
                 <div class="form-group">
@@ -20,6 +21,6 @@
                 {% include "bootstrap_field.html" %}
             {% endif %}
         {% endfor %}
-        {% include "save_button.html" %}
+        {% include "save_and_delete.html" with is_new=is_new %}
     </form>
 </div>

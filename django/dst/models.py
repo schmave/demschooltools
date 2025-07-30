@@ -257,7 +257,7 @@ class Chapter(models.Model):
     num = models.TextField()
     organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
     organization_id: int
-    deleted = models.BooleanField()
+    deleted = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.num} {self.title}"
@@ -277,7 +277,7 @@ class Section(models.Model):
         Chapter, on_delete=models.PROTECT, related_name="sections"
     )
     chapter_id: int
-    deleted = models.BooleanField()
+    deleted = models.BooleanField(default=False)
 
     def number(self):
         return self.chapter.num + self.num
@@ -299,7 +299,7 @@ class Entry(models.Model):
     section = models.ForeignKey(
         Section, on_delete=models.PROTECT, related_name="entries"
     )
-    deleted = models.BooleanField()
+    deleted = models.BooleanField(default=False)
     content = models.TextField()
 
     def number(self):

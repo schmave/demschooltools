@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required as django_login_requir
 from django.db import connection
 from django.db.models import Model, Prefetch, Q, QuerySet
 from django.db.models.signals import post_save
-from django.forms import Form, ModelForm, TextInput
+from django.forms import Form, ModelForm, TextInput, ValidationError
 from django.http import HttpRequest, HttpResponseNotFound
 from django.http.response import HttpResponse as HttpResponse
 from django.shortcuts import redirect, render
@@ -113,7 +113,6 @@ def view_manual_changes(request: DstHttpRequest):
             end_date = timezone.make_aware(
                 datetime.combine(form.cleaned_data["end_date"], time())
             ) + timedelta(days=1, microseconds=-1)
-    print(begin_date, end_date)
 
     changes = list(
         ManualChange.objects.filter(
@@ -264,10 +263,17 @@ class CreateUpdateView(View):
         self.existing_object = self.form_class._meta.model.all_objects.get(id=object_id)  # type: ignore
 
     def post(self, request: DstHttpRequest, **kwargs):
-        # Pass a copy into the form so that self.existing_object remains unchanged
-        self.form = self.form_class(
-            request.POST, instance=deepcopy(self.existing_object)
-        )
+        if self.existing_object:
+            # Pass a copy into the form so that self.existing_object remains unchanged
+            new_instance = deepcopy(self.existing_object)
+            assert hasattr(new_instance, "deleted")
+            # Set deleted here so that form validation can take it into account
+            new_instance.deleted = request.POST.get("action") == "delete"
+        else:
+            new_instance = None
+
+        self.form = self.form_class(request.POST, instance=new_instance)
+
         if self.form.is_valid():
             new_object = self.form.save(commit=False)
             self.pre_save(request, new_object)
@@ -318,12 +324,16 @@ class ChapterForm(ModelForm):
 
     class Meta:
         model = Chapter
-        fields = ["num", "title", "deleted"]
+        fields = ["num", "title"]
         labels = {
             "num": "Number",
-            "deleted": "Check this to delete",
         }
         widgets = {"num": TextInput(), "title": TextInput()}
+
+    def clean(self) -> dict[str, Any]:
+        result = super().clean()
+        check_for_children(self.instance, "chapter", "sections")
+        return result
 
 
 class CreateUpdateChapter(CreateUpdateView):
@@ -346,17 +356,33 @@ class CreateUpdateChapter(CreateUpdateView):
             instance.organization = request.org
 
 
+def check_for_children(instance: Chapter | Section | None, name: str, child_name: str):
+    if instance and instance.deleted and getattr(instance, child_name).exists():
+        child_titles = [
+            f'"{x}"'
+            for x in getattr(instance, child_name).values_list("title", flat=True)
+        ]
+        child_titles_str = ", ".join(child_titles)
+        raise ValidationError(
+            f"This {name} cannot be deleted because it isn't empty. To delete it, first remove all {child_name} from within it. The current {child_name} are: {child_titles_str}."
+        )
+
+
 class SectionForm(ModelForm):
     default_renderer = BootstrapFormRenderer
 
     class Meta:
         model = Section
-        fields = ["chapter", "num", "title", "deleted"]
+        fields = ["chapter", "num", "title"]
         labels = {
             "num": "Number",
-            "deleted": "Check this to delete",
         }
         widgets = {"num": TextInput(), "title": TextInput()}
+
+    def clean(self) -> dict[str, Any]:
+        result = super().clean()
+        check_for_children(self.instance, "section", "entries")
+        return result
 
 
 class CreateUpdateSection(CreateUpdateView):
@@ -398,10 +424,9 @@ class EntryForm(ModelForm):
 
     class Meta:
         model = Entry
-        fields = ["section", "num", "title", "deleted", "content"]
+        fields = ["section", "num", "title", "content"]
         labels = {
             "num": "Number",
-            "deleted": "Check this to delete",
         }
         widgets = {"num": TextInput(), "title": TextInput()}
 

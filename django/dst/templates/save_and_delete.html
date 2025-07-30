@@ -1,0 +1,9 @@
+<div class="form-group">
+    <button type="submit" class="btn btn-primary">Save</button>
+
+    {% if not is_new %}
+        <button type="submit" class="btn btn-danger" name="action" value="delete" style="float:right"
+                onclick="return confirm('Are you sure you want to delete? This is hard to undo');">
+            Delete</button>
+    {% endif %}
+</div>
