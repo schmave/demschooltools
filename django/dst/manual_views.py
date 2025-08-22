@@ -209,8 +209,13 @@ post_save.connect(on_manual_change, sender=Section)
 post_save.connect(on_manual_change, sender=Entry)
 
 
+class ModelFormWithOrg(ModelForm):
+    def __init__(self, *args, organization=None, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+
 class CreateUpdateView(View):
-    form_class: Type[ModelForm] = ModelForm
+    form_class: Type[ModelFormWithOrg] = ModelFormWithOrg
     template_name = ""
     object_name = ""
     view_url_base = ""
@@ -276,7 +281,9 @@ class CreateUpdateView(View):
         else:
             new_instance = None
 
-        self.form = self.form_class(request.POST, instance=new_instance)
+        self.form = self.form_class(
+            request.POST, instance=new_instance, organization=request.org
+        )
 
         if self.form.is_valid():
             new_object = self.form.save(commit=False)
@@ -290,10 +297,13 @@ class CreateUpdateView(View):
 
     def get(self, request: DstHttpRequest, **kwargs):
         if self.existing_object:
-            self.form = self.form_class(instance=deepcopy(self.existing_object))
+            self.form = self.form_class(
+                instance=deepcopy(self.existing_object), organization=request.org
+            )
         else:
             self.form = self.form_class(
-                initial=self.get_initial_for_create(request, **kwargs)
+                initial=self.get_initial_for_create(request, **kwargs),
+                organization=request.org,
             )
         return self.render(request, self.form)
 
@@ -323,7 +333,7 @@ class CreateUpdateView(View):
         return super().dispatch(request, object_id=object_id, **kwargs)
 
 
-class ChapterForm(ModelForm):
+class ChapterForm(ModelFormWithOrg):
     default_renderer = BootstrapFormRenderer
 
     class Meta:
@@ -372,8 +382,14 @@ def check_for_children(instance: Chapter | Section | None, name: str, child_name
         )
 
 
-class SectionForm(ModelForm):
+class SectionForm(ModelFormWithOrg):
     default_renderer = BootstrapFormRenderer
+
+    def __init__(self, *args, organization=None, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.fields["chapter"].queryset = Chapter.objects.filter(
+            organization=organization
+        )
 
     class Meta:
         model = Section
@@ -421,7 +437,7 @@ class CreateUpdateSection(CreateUpdateView):
         return context
 
 
-class EntryForm(ModelForm):
+class EntryForm(ModelFormWithOrg):
     default_renderer = BootstrapFormRenderer
 
     effective_date = forms.DateField(initial=timezone.now().date())
@@ -430,6 +446,12 @@ class EntryForm(ModelForm):
         initial=True,
         help_text="Uncheck this box to prevent the date from being be added to the list of dates shown beneath the rule. This could be useful when you are making a minor formatting change or you don't know the correct date to enter. A record of this change will always be preserved.",
     )
+
+    def __init__(self, *args, organization=None, **kwargs) -> None:
+        super().__init__(*args, organization=organization, **kwargs)
+        self.fields["section"].queryset = Section.objects.filter(
+            chapter__organization=organization
+        )
 
     class Meta:
         model = Entry
