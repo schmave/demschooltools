@@ -359,6 +359,8 @@ class CreateUpdateChapter(CreateUpdateView):
 
     def get_success_url(self, instance):
         assert isinstance(instance, Chapter)
+        if instance.deleted:
+            return "/viewManual"
         return f"/viewChapter/{instance.id}"
 
     def can_edit(self, request: DstHttpRequest, instance: Model):
@@ -514,6 +516,8 @@ class CreateUpdateEntry(CreateUpdateView):
 
     def get_success_url(self, instance):
         assert isinstance(instance, Entry)
+        if instance.deleted:
+            return f"/viewChapter/{instance.section.chapter_id}#section_{instance.section_id}"
         return f"/viewChapter/{instance.section.chapter_id}#entry_{instance.id}"
 
     def can_edit(self, request: DstHttpRequest, instance: Model):
