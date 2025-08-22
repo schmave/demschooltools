@@ -7,7 +7,7 @@
         <title>{{ title }}</title>
         <script>
             var _rollbarConfig = {
-                accessToken: "d1b7a9d6c29f4f4e90c50123b40c9227",
+                accessToken: '{{rollbar_token | escapejs}}',
                 captureUncaught: true,
                 captureUnhandledRejections: true,
                 payload: {

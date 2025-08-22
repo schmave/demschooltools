@@ -19,7 +19,7 @@ def prepare_html_for_pdf(html_content: str, temp_dir: Path) -> str:
 
 
 def render_html_to_pdf(html_content: str) -> bytes:
-    DEBUG = True
+    DEBUG = False
     with tempfile.TemporaryDirectory(delete=not DEBUG) as temp_dir_str:
         temp_dir = Path(temp_dir_str)
         copy_print_assets_to_temp_dir(temp_dir)

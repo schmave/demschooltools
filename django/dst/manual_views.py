@@ -64,6 +64,7 @@ def render_main_template(
             "is_user_logged_in": request.user.is_authenticated,
             "org_config": get_org_config(request.org),
             "rollbar_environment": settings.ROLLBAR_ENVIRONMENT,
+            "rollbar_token": settings.ROLLBAR_FRONTEND_TOKEN,
         },
     )
 
