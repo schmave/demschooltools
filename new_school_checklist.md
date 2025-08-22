@@ -7,7 +7,7 @@
 1. Create new entry in organization table (ID, name, short_name):
 
     ```sql
-    INSERT INTO organization(name, shortname)
+    INSERT INTO organization(name, short_name)
         VALUES ('Tall Sudbury School', 'TSS');
     ```
 
