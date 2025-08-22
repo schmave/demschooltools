@@ -211,6 +211,7 @@ post_save.connect(on_manual_change, sender=Entry)
 
 class ModelFormWithOrg(ModelForm):
     def __init__(self, *args, organization=None, **kwargs) -> None:
+        assert organization is not None
         super().__init__(*args, **kwargs)
 
 
@@ -611,7 +612,9 @@ def preview_entry(request: DstHttpRequest, object_id: int | None = None):
     if object_id:
         existing = Entry.all_objects.filter(id=object_id).first()
 
-    entry_form = EntryForm(request.POST, instance=deepcopy(existing))
+    entry_form = EntryForm(
+        request.POST, instance=deepcopy(existing), organization=request.org
+    )
     temp_entry: Entry = entry_form.save(commit=False)
     changes = temp_entry.changes_for_render()
 
