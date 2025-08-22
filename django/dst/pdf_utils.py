@@ -9,13 +9,16 @@ from playwright.sync_api import sync_playwright
 
 
 def copy_print_assets_to_temp_dir(temp_dir: Path) -> None:
-    compiled_css_file = Path(settings.STATICFILES_DIRS[0]) / "css" / "main.css"
-
-    shutil.copy2(compiled_css_file, temp_dir)
+    shutil.copytree(
+        # In production, we want to copy the files from STATIC_ROOT because
+        # they have the hash included in them. In dev, STATIC_ROOT is None
+        Path(settings.STATIC_ROOT or settings.STATICFILES_DIRS[0]) / "css",
+        temp_dir / "css",
+    )
 
 
 def prepare_html_for_pdf(html_content: str, temp_dir: Path) -> str:
-    return html_content.replace(f"{settings.STATIC_URL}css/", "")
+    return html_content.replace(f"{settings.STATIC_URL}css/", "css/")
 
 
 def render_html_to_pdf(html_content: str) -> bytes:

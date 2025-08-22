@@ -12,7 +12,10 @@ module.exports = function (env, argv) {
     devtool: "source-map",
     context: path.join(__dirname, "/src"),
     entry: {
-      app: "./js/app.jsx",
+      custodia: "./js/app.jsx",
+    },
+    output: {
+      path: path.resolve(__dirname, "..", "django", "static", "js"),
     },
     devServer: {
       client: {
@@ -78,10 +81,6 @@ module.exports = function (env, argv) {
         },
       ],
     },
-    output: {
-      filename: isDevelopment ? "[name].js" : "[name].[chunkhash].js",
-      sourceMapFilename: "[file].map",
-    },
     resolve: {
       extensions: ["", ".js", ".jsx"],
       fallback: {
@@ -96,18 +95,6 @@ module.exports = function (env, argv) {
             sockPort: DEV_SERVER_PORT,
           },
         }),
-
-      new HtmlWebpackPlugin({
-        filename: "index.html",
-        template: "../../django/custodia/templates/index.html",
-        hash: argv.mode != "production",
-        chunks: ["app"],
-        publicPath: "/django-static/js/",
-        scriptLoading: "blocking",
-        templateParameters: {
-          rollbarEnvironment: argv.mode == "production" ? "production" : "development",
-        },
-      }),
     ].filter(Boolean),
   };
 };

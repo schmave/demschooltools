@@ -9,7 +9,6 @@
         <meta name="description" content="">
         <meta name="author" content="">
         <meta name="robots" content="noindex">
-        <link rel="icon" href="{% static 'favicon.ico' %}">
 
         <script>
             var _rollbarConfig = {
@@ -35,7 +34,11 @@
     <body>
         {% csrf_token %}
         <div id="react_container"/>
-        {{ dev_js_link | safe}}
+        {% if dev_js_link %}
+            {{ dev_js_link | safe}}
+        {% else %}
+            <script src="{% static 'js/custodia.js' %}"></script>
+        {% endif %}
     </body>
 
 </html>
