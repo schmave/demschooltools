@@ -33,5 +33,3 @@ metals.sbt
 .settings/
 .classpath
 .project
-
-django.tgz

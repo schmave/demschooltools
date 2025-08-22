@@ -23,5 +23,6 @@ export DJANGO_SETTINGS_MODULE="demschooltools.settings_prod"
 
 uv run manage.py migrate
 uv run manage.py collectstatic --noinput
+sudo uv run playwright install-deps
 uv run playwright install chromium
 nohup uv run --group prod gunicorn --threads 4 --pid $PID_FILE demschooltools.wsgi >> ../dst-django.log 2>&1 &
