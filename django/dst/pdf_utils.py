@@ -1,7 +1,6 @@
 import shutil
 import tempfile
 from pathlib import Path
-from typing import List
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -51,12 +50,6 @@ def render_html_to_pdf(html_content: str) -> bytes:
 
             browser.close()
             return pdf_bytes
-
-
-def render_multiple_html_to_pdf(html_contents: List[str]) -> bytes:
-    return render_html_to_pdf(
-        '<div style="page-break-before: always;"/>'.join(html_contents)
-    )
 
 
 def create_pdf_response(pdf_bytes: bytes, filename: str) -> HttpResponse:

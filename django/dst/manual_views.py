@@ -32,7 +32,6 @@ from dst.org_config import OrgConfig, get_org_config
 from dst.pdf_utils import (
     create_pdf_response,
     render_html_to_pdf,
-    render_multiple_html_to_pdf,
 )
 
 
@@ -85,7 +84,6 @@ def view_manual(request: DstHttpRequest):
             "view_manual.html",
             {
                 "chapters": chapters,
-                "current_date": datetime.now().strftime("%Y-%m-%d"),
                 "org_config": org_config,
             },
         ),
@@ -635,29 +633,23 @@ def print_manual_chapter(request: DstHttpRequest, chapter_id: int):
 
     if chapter_id == -1:
         # Render complete manual (TOC + all chapters)
-        documents = []
-
         chapters = chapter_with_entries(org)
-        toc_html = render_main_template_to_string(
+        html = render_main_template_to_string(
             request,
             render_to_string(
                 "view_manual.html",
                 {
                     "chapters": chapters,
-                    "current_date": datetime.now().strftime("%Y-%m-%d"),
                     "org_config": org_config,
+                    "include_content": True,
                 },
             ),
             f"{org.short_name} {org_config.str_manual_title}",
             selected_button="toc",
         )
-        documents.append(toc_html)
-
-        for chapter in chapters:
-            documents.append(get_chapter_html(chapter, request, org_config))
 
         return create_pdf_response(
-            render_multiple_html_to_pdf(documents), f"{org.short_name}_Manual.pdf"
+            render_html_to_pdf(html), f"{org.short_name}_Manual.pdf"
         )
 
     elif chapter_id == -2:
@@ -669,7 +661,6 @@ def print_manual_chapter(request: DstHttpRequest, chapter_id: int):
                 "view_manual.html",
                 {
                     "chapters": chapters,
-                    "current_date": datetime.now().strftime("%Y-%m-%d"),
                     "org_config": org_config,
                 },
             ),
