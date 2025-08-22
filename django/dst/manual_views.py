@@ -389,7 +389,7 @@ class SectionForm(ModelFormWithOrg):
     default_renderer = BootstrapFormRenderer
 
     def __init__(self, *args, organization=None, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, organization=organization, **kwargs)
         self.fields["chapter"].queryset = Chapter.objects.filter(
             organization=organization
         )
