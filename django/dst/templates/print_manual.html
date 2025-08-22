@@ -1,0 +1,11 @@
+<h2>Download {{ org_config.str_manual_title }} as a PDF</h2>
+
+<p><a href="/printManualChapter/-1">Entire manual</a></p>
+
+<p>Chapters:</p>
+<ul>
+    <li><a href="/printManualChapter/-2">Table of Contents</a></li>
+    {% for chapter in chapters %}
+        <li><a href="/printManualChapter/{{ chapter.id }}">{{ chapter.num }} {{ chapter.title }}</a></li>
+    {% endfor %}
+</ul>

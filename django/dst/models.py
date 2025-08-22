@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -11,6 +13,43 @@ class Organization(models.Model):
     short_name = models.TextField()
     timezone = models.TextField()
     late_time = models.TimeField()
+
+    printer_email = models.TextField(null=True, blank=True)
+    jc_reset_day = models.IntegerField(null=True, blank=True)
+    show_last_modified_in_print = models.BooleanField(default=False)
+    show_history_in_print = models.BooleanField(default=False)
+    show_custodia = models.BooleanField(default=False)
+    show_attendance = models.BooleanField(default=False)
+    show_electronic_signin = models.BooleanField(default=False)
+    show_accounting = models.BooleanField(default=False)
+    show_roles = models.BooleanField(default=False)
+    enable_case_references = models.BooleanField(default=False)
+    attendance_enable_off_campus = models.BooleanField(default=False)
+    attendance_show_reports = models.BooleanField(default=False)
+    attendance_report_latest_departure_time = models.TimeField(null=True, blank=True)
+    attendance_report_latest_departure_time_2 = models.TimeField(null=True, blank=True)
+    attendance_report_late_fee = models.IntegerField(null=True, blank=True)
+    attendance_report_late_fee_2 = models.IntegerField(null=True, blank=True)
+    attendance_report_late_fee_interval = models.IntegerField(null=True, blank=True)
+    attendance_report_late_fee_interval_2 = models.IntegerField(null=True, blank=True)
+    attendance_show_percent = models.BooleanField(default=False)
+    attendance_show_weighted_percent = models.BooleanField(default=False)
+    attendance_show_rate_in_checkin = models.BooleanField(default=False)
+    attendance_enable_partial_days = models.BooleanField(default=False)
+    attendance_day_latest_start_time = models.TimeField(null=True, blank=True)
+    attendance_day_earliest_departure_time = models.TimeField(null=True, blank=True)
+    attendance_day_min_hours = models.FloatField(null=True, blank=True)
+    attendance_partial_day_value = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True
+    )
+    attendance_admin_pin = models.CharField(max_length=255, null=True, blank=True)
+    attendance_default_absence_code = models.CharField(
+        max_length=255, null=True, blank=True
+    )
+    attendance_default_absence_code_time = models.TimeField(null=True, blank=True)
+    roles_individual_term = models.TextField(null=True, blank=True)
+    roles_committee_term = models.TextField(null=True, blank=True)
+    roles_group_term = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.id}-{self.name}"
@@ -209,43 +248,108 @@ class PersonTagChange(models.Model):
     tag = models.ForeignKey(Tag, on_delete=models.PROTECT)
 
 
+class ManualManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted=False).order_by("num")
+
+
 class Chapter(models.Model):
     class Meta:
         db_table = "chapter"
 
+    objects = ManualManager()
+    all_objects = models.Manager()
+
+    id: int
     title = models.TextField()
     num = models.TextField()
     organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
-    deleted = models.BooleanField()
+    organization_id: int
+    deleted = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.num} {self.title}"
 
 
 class Section(models.Model):
     class Meta:
         db_table = "section"
 
+    objects = ManualManager()
+    all_objects = models.Manager()
+
+    id: int
     title = models.TextField()
     num = models.TextField()
-    chapter = models.ForeignKey(Chapter, on_delete=models.PROTECT)
-    deleted = models.BooleanField()
+    chapter = models.ForeignKey(
+        Chapter, on_delete=models.PROTECT, related_name="sections"
+    )
+    chapter_id: int
+    deleted = models.BooleanField(default=False)
+
+    def number(self):
+        return self.chapter.num + self.num
+
+    def __str__(self):
+        return f"{self.number()} {self.title}"
 
 
 class Entry(models.Model):
     class Meta:
         db_table = "entry"
 
+    objects = ManualManager()
+    all_objects = models.Manager()
+
+    id: int
     title = models.TextField()
     num = models.TextField()
-    section = models.ForeignKey(Section, on_delete=models.PROTECT)
-    deleted = models.BooleanField()
+    section = models.ForeignKey(
+        Section, on_delete=models.PROTECT, related_name="entries"
+    )
+    deleted = models.BooleanField(default=False)
     content = models.TextField()
+
+    def number(self):
+        return self.section.number() + "." + self.num
+
+    # TODO: get rid of this. use a template filter instead? this is ugly
+    def changes_for_render(self) -> list["ManualChange"]:
+        if self.id:
+            return list(self.changes.all())
+        return []
+
+    def __str__(self):
+        return f"{self.num} {self.title}"
 
 
 class ManualChange(models.Model):
     class Meta:
         db_table = "manual_change"
 
-    entry = models.ForeignKey(Entry, on_delete=models.CASCADE)
-    date_entered = models.DateTimeField()
+    chapter = models.ForeignKey(
+        Chapter, on_delete=models.PROTECT, related_name="changes"
+    )
+    section = models.ForeignKey(
+        Section, on_delete=models.PROTECT, related_name="changes"
+    )
+    entry = models.ForeignKey(Entry, on_delete=models.PROTECT, related_name="changes")
+    date_entered = models.DateTimeField(auto_now_add=True)
+    effective_date = models.DateField(blank=True)
+    show_date_in_history = models.BooleanField(null=False, default=True)
+    user = models.ForeignKey("dst.User", on_delete=models.PROTECT)
+
+    was_deleted = models.BooleanField(default=False)
+    was_created = models.BooleanField(default=False)
+    old_content = models.TextField(null=True, blank=True)
+    new_content = models.TextField(null=True, blank=True)
+    old_title = models.CharField()
+    new_title = models.CharField()
+    old_num = models.CharField()
+    new_num = models.CharField()
+
+    def effective_date_with_fallback(self) -> date:
+        return self.effective_date or self.date_entered.date()
 
 
 class Account(models.Model):
@@ -370,6 +474,9 @@ class User(AbstractUser):
             if role_includes(role, desired_role):
                 return True
         return False
+
+    def __str__(self):
+        return self.name
 
 
 def role_includes(greater_role: str, lesser_role: str) -> bool:

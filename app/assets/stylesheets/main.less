@@ -364,6 +364,15 @@ label {
   font-weight: normal;
 }
 
+.django-form label {
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.tab-pane >.panel {
+  border-top: none;
+}
+
 body {
   font-size: 12px;
     padding-top: 10px;
@@ -747,10 +756,10 @@ hr {
 
 @media screen and (min-width: 8in) {
   .man-section {
-      width: 7in;
+      max-width: 7in;
   }
   .man-entry-content {
-    width: 6in;
+    max-width: 6in;
   }
 }
 
@@ -770,13 +779,6 @@ hr {
     color: #999;
 }
 
-.man-last-modify-date {
-    color: #999;
-    font-weight: normal;
-    padding-left: 100px;
-    float: right;
-}
-
 .man-edit {
   font-weight: normal;
   font-size: 10px;
@@ -786,12 +788,6 @@ hr {
 .entry-content-edit {
   float: left;
   width: 75%;
-}
-
-.markdown-guidelines {
-  float: right;
-  width: 25%;
-  padding-left: 20px;
 }
 
 .change_log {

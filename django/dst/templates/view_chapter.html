@@ -1,0 +1,20 @@
+{% load dst_tags %}
+
+<div id="footer">
+    Printed on {% yymmddDate %}
+</div>
+
+<div class="man-chapter">{{ chapter.num }} {{ chapter.title }} <a class="man-edit no-print" href="/editChapter/{{ chapter.id }}">Edit</a></div>
+<p><a class="no-print" href="/addSection/{{ chapter.id }}">Add section in {{ chapter.num }} {{ chapter.title }}</a></p>
+
+{% for section in chapter.sections.all %}
+    <div class="man-section">
+        <div class="man-section-header">
+            <a name="section_{{ section.id }}"></a>{{ section.number }} {{ section.title }} <a class="no-print man-edit" href="/editSection/{{ section.id }}">Edit</a>
+        </div>
+        <p><a class="no-print" href="/addEntry/{{ section.id }}">Add entry in {{ section.number }} {{ section.title }}</a></p>
+        {% for entry in section.entries.all %}
+            {% include "view_entry.html" %}
+        {% endfor %}
+    </div>
+{% endfor %}

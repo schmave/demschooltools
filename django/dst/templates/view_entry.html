@@ -1,0 +1,27 @@
+{% load dst_tags %}
+
+{% with entry.changes_for_render as defined_changes %}
+    <div class="man-entry">
+        <a name="entry_{{ entry.id }}"></a>
+        <p class="man-entry-num">
+            {{ entry.number }} {{ entry.title }}
+            {% if entry.id and not is_preview %}<a class="no-print man-edit" href="/editEntry/{{ entry.id }}">Edit</a>{% endif %}
+        </p>
+        <div class="man-entry-content">{{ entry.content|markdown }}
+            {% if defined_changes %}
+                <p class="man-entry-change-history {% if not org_config.org.show_history_in_print %}no-print{% endif %}">
+                    {% for change_detail in defined_changes %}
+                        {% ifchanged change_detail.effective_date_with_fallback %}
+                            {% if change_detail.was_created %} Adopted
+                            {% elif change_detail.was_deleted %} Repealed
+                            {% else %} Amended
+                            {% endif %}
+
+                            {% yymmddDate change_detail.effective_date_with_fallback %};
+                        {% endifchanged %}
+                    {% endfor %}
+                </p>
+            {% endif %}
+        </div>
+    </div>
+{% endwith %}

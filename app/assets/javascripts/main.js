@@ -8,7 +8,6 @@ require('spectrum-colorpicker');
 const utils = require('./utils');
 require('./edit_attendance_week');
 require('./attendance_person');
-require('./edit_entry');
 require('./edit_minutes');
 require('./edit_rp_list');
 const feedback_modal = require('./feedback_modal');

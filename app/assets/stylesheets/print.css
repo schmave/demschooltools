@@ -4,16 +4,17 @@
 
 #footer {
     display: block;
-    position: running(footer);
+    position: fixed;
+    bottom: 0in;
+    left: 0;
+    right: 0;
     font-size: 10px;
     text-align: center;
+    background: white;
+    z-index: 1000;
 }
 
 @page {
-    @bottom-right {
-/*      content: "Page " counter(page) " of " counter(pages);*/
-        font-size: 10px;
-    }
     @bottom-center {
         content: element(footer);
     }
@@ -37,7 +38,7 @@ a[href]:after {
 }
 
 body, h1, h2, h3, h4, h5, h6 {
-    font-family: "Garamond";
+    font-family: "Noto Sans", sans-serif;
     font-weight: normal;
 }
 
@@ -45,6 +46,6 @@ body {
     font-size: 13px;
 }
 
-.man-last-modify-date, .man-entry-change-history {
+.man-entry-change-history {
     font-style: italic;
 }

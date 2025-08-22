@@ -1,0 +1,88 @@
+<div class="row">
+    <h2 class="col-sm-10">
+        {% if is_new %}
+            New entry
+        {% else %}
+            Edit entry "{{ form.title.value }}"
+        {% endif %}
+    </h2>
+</div>
+
+<div class="row">
+    <div class="col-sm-6">
+        <form action="" method="post" class="django-form"
+              hx-post="/viewEntry/{{ form.instance.id|default:"" }}"
+              hx-target="#markdown_preview"
+              hx-trigger="change from:form, input from:form delay:300ms">
+            {% csrf_token %}
+            {% include "form_non_field_errors.html" %}
+            {% for field in form %}
+                {% if field.id_for_label == "id_num" %}
+                    <div class="form-group">
+                        <label for="{{field.id_for_label}}" class="control-label">Number</label>
+                        <div class="input-group">
+                            <span class="input-group-addon">{{section_number}}.</span>
+                            {{ field }}
+                        </div>
+                    </div>
+                {% else %}
+                    {% include "bootstrap_field.html" %}
+                {% endif %}
+            {% endfor %}
+            {% include "save_and_delete.html" with is_new=is_new %}
+
+        </form>
+    </div>
+
+
+    <div class="col-sm-6">
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#live-preview" aria-controls="live-preview" role="tab" data-toggle="tab">
+                Live preview
+            </a></li>
+            <li role="presentation"><a href="#help" aria-controls="help" role="tab" data-toggle="tab">
+                How do I make bold, italic, lists, etc?
+            </a></li>
+        </ul>
+
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="live-preview">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div id="markdown_preview">
+                            {% include "view_entry.html" with entry=form.instance is_preview=True %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div role="tabpanel" class="tab-pane" id="help">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <p>Put asterisks around a word for italics: <code>*alpha*</code> is rendered as <em>alpha</em></p>
+                        <p>Put double asterisks around a word for bold: <code>**beta**</code> is rendered as <strong>beta</strong></p>
+                        <p>Make bullet lists with asterisks, like this:
+            <pre>
+* an item
+* another item
+* final item</pre></p>
+                        <p>Make numbered lists with numbers, like this (the 1s will be replaced with the correct numbers):
+            <pre>
+1. the first
+1. the second
+1. the third</pre></p>
+                        <p>If you want a nested list, or sub-list, put four spaces in front of the number or asterisk, like this:
+            <pre>
+1. the first
+    1. sub-item
+    2. second sub-item
+    3. third sub-item
+2. the second
+    </pre></p>
+                    For even more formatting options, <a href="https://commonmark.org/help/" target="_blank">read the docs here</a>.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

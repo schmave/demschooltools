@@ -4,7 +4,7 @@
 
 <html>
     <head>
-<script>
+        <script>
 var _rollbarConfig = {
     accessToken: "d1b7a9d6c29f4f4e90c50123b40c9227",
     captureUncaught: true,
@@ -22,6 +22,7 @@ var _rollbarConfig = {
 // End Rollbar Snippet
 </script>
         <title>@title</title>
+        <script src="https://unpkg.com/htmx.org@@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
         <script type="text/javascript"
             src="@routes.Assets.versioned("javascripts/gen/bundle.js")"></script>
 
@@ -74,7 +75,7 @@ var _rollbarConfig = {
                 <a href="@routes.Application.index()">@Utils.getOrgConfig(request).str_jc_name_short</a>
             </li>
             <li @if(menu.equals("manual")) { class="active" }>
-                <a href="@routes.Application.viewManual()">@Utils.getOrgConfig(request).str_manual_title_short</a>
+                <a href="/viewManual">@Utils.getOrgConfig(request).str_manual_title_short</a>
             </li>
             @if(Utils.getOrgConfig(request).org.getShowRoles()) {
                 <li @if(menu.equals("roles")) { class="active" }>
@@ -271,14 +272,14 @@ var _rollbarConfig = {
         <div class="tab-pane active" id="manual">
             <div class="subnav">
                 <a @if(selectedBtn.equals("toc")) { class="active" }
-                    href="@routes.Application.viewManual()">Table of Contents</a>
+                    href="/viewManual">Table of Contents</a>
                 <a @if(selectedBtn.equals("manual_print")) { class="active" }
-                    href="@routes.Application.printManual()">Print</a>
+                    href="/printManual">Print</a>
                 <a @if(selectedBtn.equals("manual_changes")) { class="active" }
-                    href="@routes.Application.viewManualChanges()">
+                    href="/viewManualChanges">
                     Changes since a date</a>
                 <a>
-                    <form method="GET" style="display:inline;" action="@routes.Application.searchManual()">
+                    <form method="GET" style="display:inline;" action="/searchManual">
                         <input name="searchString" type="search" placeholder="Search the manual..."/>
                         <input type="submit" value="Search"/>
                     </form>

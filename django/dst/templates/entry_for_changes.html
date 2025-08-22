@@ -1,0 +1,14 @@
+{% load dst_tags %}
+
+<div class="man-entry">
+  <p class="man-entry-num">
+    {% if deleted %}<strike>{% endif %}
+    {{ num }} {{ title }}
+    {% if deleted %}</strike>{% endif %}
+  </p>
+  <div class="man-entry-content">
+    {% if deleted %}<strike>{% endif %}
+    {{ content|markdown }}
+    {% if deleted %}</strike>{% endif %}
+  </div>
+</div>

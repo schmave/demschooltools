@@ -8,6 +8,8 @@ dependencies = [
     "django~=5.1",
     "djangorestframework~=3.15",
     "drf-orjson-renderer~=1.7",
+    "mistletoe>=1.4.0",
+    "playwright~=1.49",
     "psycopg2~=2.9",
     "pyjwt~=2.10",
     "requests~=2.32",
@@ -20,6 +22,8 @@ prod = [
 ]
 dev = [
     "django-silk~=5.3",
+    "djhtml>=3.0.7",
+    "ipython>=9.4.0",
     "pyinstrument~=5.0",
     "tabulate",
 ]
