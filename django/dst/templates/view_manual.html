@@ -1,5 +1,7 @@
-<div id="footer">
-    Printed on {{ current_date }}
+{% load dst_tags %}
+
+<div id="footer" class="only-print">
+    Printed on {% yymmddDate %}
 </div>
 
 <h1>{{ org_config.org.short_name }} {{ org_config.str_manual_title }}</h1>
@@ -21,3 +23,10 @@
         </ul>
     {% endfor %}
 </ul>
+
+{% if include_content %}
+    {% for c in chapters %}
+        <div style="page-break-before: always;"/>
+        {% include "view_chapter.html" with chapter=c hide_footer=True %}
+    {% endfor %}
+{% endif %}

@@ -304,6 +304,7 @@ class Entry(models.Model):
     id: int
     title = models.TextField()
     num = models.TextField()
+    section_id: int
     section = models.ForeignKey(
         Section, on_delete=models.PROTECT, related_name="entries"
     )

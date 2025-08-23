@@ -62,12 +62,6 @@
     font-size: 14px;
 }
 
-@media screen {
-  #footer {
-    display: none;
-  }
-}
-
 .center {
   text-align: center;
 }
@@ -106,6 +100,11 @@
 
 .subnav a.active {
     background-color: yellow;
+}
+
+.dst-nav,
+.subnav {
+  font-size: 12px;
 }
 
 .dst-nav {
@@ -374,10 +373,9 @@ label {
 }
 
 body {
-  font-size: 12px;
-    padding-top: 10px;
-    margin-left: 20px;
-    margin-right: 20px;
+  padding-top: 10px;
+  margin-left: 20px;
+  margin-right: 20px;
 }
 
 #attendance-student-picker {
@@ -1069,6 +1067,10 @@ input[type="checkbox"].absence-checkbox {
  * End copy from stackoverflow
  **************************************************************************/
 
+
+.only-print {
+  display: none;
+}
 
 @media print {
   @import (inline) "print.css";

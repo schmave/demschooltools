@@ -38,6 +38,9 @@ def dateAndTime(context, d: datetime | date | None = None):
 
 @register.filter
 def markdown(text):
+    if text is None:
+        return ""
+    assert isinstance(text, str)
     return mark_safe(mistletoe.markdown(text))
 
 

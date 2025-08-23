@@ -32,7 +32,6 @@ from dst.org_config import OrgConfig, get_org_config
 from dst.pdf_utils import (
     create_pdf_response,
     render_html_to_pdf,
-    render_multiple_html_to_pdf,
 )
 
 
@@ -85,7 +84,6 @@ def view_manual(request: DstHttpRequest):
             "view_manual.html",
             {
                 "chapters": chapters,
-                "current_date": datetime.now().strftime("%Y-%m-%d"),
                 "org_config": org_config,
             },
         ),
@@ -211,8 +209,14 @@ post_save.connect(on_manual_change, sender=Section)
 post_save.connect(on_manual_change, sender=Entry)
 
 
+class ModelFormWithOrg(ModelForm):
+    def __init__(self, *args, organization=None, **kwargs) -> None:
+        assert organization is not None
+        super().__init__(*args, **kwargs)
+
+
 class CreateUpdateView(View):
-    form_class: Type[ModelForm] = ModelForm
+    form_class: Type[ModelFormWithOrg] = ModelFormWithOrg
     template_name = ""
     object_name = ""
     view_url_base = ""
@@ -278,7 +282,9 @@ class CreateUpdateView(View):
         else:
             new_instance = None
 
-        self.form = self.form_class(request.POST, instance=new_instance)
+        self.form = self.form_class(
+            request.POST, instance=new_instance, organization=request.org
+        )
 
         if self.form.is_valid():
             new_object = self.form.save(commit=False)
@@ -292,10 +298,13 @@ class CreateUpdateView(View):
 
     def get(self, request: DstHttpRequest, **kwargs):
         if self.existing_object:
-            self.form = self.form_class(instance=deepcopy(self.existing_object))
+            self.form = self.form_class(
+                instance=deepcopy(self.existing_object), organization=request.org
+            )
         else:
             self.form = self.form_class(
-                initial=self.get_initial_for_create(request, **kwargs)
+                initial=self.get_initial_for_create(request, **kwargs),
+                organization=request.org,
             )
         return self.render(request, self.form)
 
@@ -325,7 +334,7 @@ class CreateUpdateView(View):
         return super().dispatch(request, object_id=object_id, **kwargs)
 
 
-class ChapterForm(ModelForm):
+class ChapterForm(ModelFormWithOrg):
     default_renderer = BootstrapFormRenderer
 
     class Meta:
@@ -350,6 +359,8 @@ class CreateUpdateChapter(CreateUpdateView):
 
     def get_success_url(self, instance):
         assert isinstance(instance, Chapter)
+        if instance.deleted:
+            return "/viewManual"
         return f"/viewChapter/{instance.id}"
 
     def can_edit(self, request: DstHttpRequest, instance: Model):
@@ -374,8 +385,14 @@ def check_for_children(instance: Chapter | Section | None, name: str, child_name
         )
 
 
-class SectionForm(ModelForm):
+class SectionForm(ModelFormWithOrg):
     default_renderer = BootstrapFormRenderer
+
+    def __init__(self, *args, organization=None, **kwargs) -> None:
+        super().__init__(*args, organization=organization, **kwargs)
+        self.fields["chapter"].queryset = Chapter.objects.filter(
+            organization=organization
+        ).order_by("num")
 
     class Meta:
         model = Section
@@ -423,7 +440,7 @@ class CreateUpdateSection(CreateUpdateView):
         return context
 
 
-class EntryForm(ModelForm):
+class EntryForm(ModelFormWithOrg):
     default_renderer = BootstrapFormRenderer
 
     effective_date = forms.DateField(initial=timezone.now().date())
@@ -432,6 +449,12 @@ class EntryForm(ModelForm):
         initial=True,
         help_text="Uncheck this box to prevent the date from being be added to the list of dates shown beneath the rule. This could be useful when you are making a minor formatting change or you don't know the correct date to enter. A record of this change will always be preserved.",
     )
+
+    def __init__(self, *args, organization=None, **kwargs) -> None:
+        super().__init__(*args, organization=organization, **kwargs)
+        self.fields["section"].queryset = Section.objects.filter(
+            chapter__organization=organization
+        ).order_by("chapter__num", "num")
 
     class Meta:
         model = Entry
@@ -493,6 +516,8 @@ class CreateUpdateEntry(CreateUpdateView):
 
     def get_success_url(self, instance):
         assert isinstance(instance, Entry)
+        if instance.deleted:
+            return f"/viewChapter/{instance.section.chapter_id}#section_{instance.section_id}"
         return f"/viewChapter/{instance.section.chapter_id}#entry_{instance.id}"
 
     def can_edit(self, request: DstHttpRequest, instance: Model):
@@ -591,7 +616,9 @@ def preview_entry(request: DstHttpRequest, object_id: int | None = None):
     if object_id:
         existing = Entry.all_objects.filter(id=object_id).first()
 
-    entry_form = EntryForm(request.POST, instance=deepcopy(existing))
+    entry_form = EntryForm(
+        request.POST, instance=deepcopy(existing), organization=request.org
+    )
     temp_entry: Entry = entry_form.save(commit=False)
     changes = temp_entry.changes_for_render()
 
@@ -635,29 +662,23 @@ def print_manual_chapter(request: DstHttpRequest, chapter_id: int):
 
     if chapter_id == -1:
         # Render complete manual (TOC + all chapters)
-        documents = []
-
         chapters = chapter_with_entries(org)
-        toc_html = render_main_template_to_string(
+        html = render_main_template_to_string(
             request,
             render_to_string(
                 "view_manual.html",
                 {
                     "chapters": chapters,
-                    "current_date": datetime.now().strftime("%Y-%m-%d"),
                     "org_config": org_config,
+                    "include_content": True,
                 },
             ),
             f"{org.short_name} {org_config.str_manual_title}",
             selected_button="toc",
         )
-        documents.append(toc_html)
-
-        for chapter in chapters:
-            documents.append(get_chapter_html(chapter, request, org_config))
 
         return create_pdf_response(
-            render_multiple_html_to_pdf(documents), f"{org.short_name}_Manual.pdf"
+            render_html_to_pdf(html), f"{org.short_name}_Manual.pdf"
         )
 
     elif chapter_id == -2:
@@ -669,7 +690,6 @@ def print_manual_chapter(request: DstHttpRequest, chapter_id: int):
                 "view_manual.html",
                 {
                     "chapters": chapters,
-                    "current_date": datetime.now().strftime("%Y-%m-%d"),
                     "org_config": org_config,
                 },
             ),
