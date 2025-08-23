@@ -392,7 +392,7 @@ class SectionForm(ModelFormWithOrg):
         super().__init__(*args, organization=organization, **kwargs)
         self.fields["chapter"].queryset = Chapter.objects.filter(
             organization=organization
-        )
+        ).order_by("num")
 
     class Meta:
         model = Section
@@ -454,7 +454,7 @@ class EntryForm(ModelFormWithOrg):
         super().__init__(*args, organization=organization, **kwargs)
         self.fields["section"].queryset = Section.objects.filter(
             chapter__organization=organization
-        )
+        ).order_by("chapter__num", "num")
 
     class Meta:
         model = Entry
