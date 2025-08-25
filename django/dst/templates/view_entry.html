@@ -5,7 +5,7 @@
         <a name="entry_{{ entry.id }}"></a>
         <p class="man-entry-num">
             {{ entry.number }} {{ entry.title }}
-            {% if entry.id and not is_preview %}<a class="no-print man-edit" href="/editEntry/{{ entry.id }}">Edit</a>{% endif %}
+            {% if entry.id and not is_preview and can_edit %}<a class="no-print man-edit" href="/editEntry/{{ entry.id }}">Edit</a>{% endif %}
         </p>
         <div class="man-entry-content">{{ entry.content|markdown }}
             {% if defined_changes %}

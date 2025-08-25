@@ -6,15 +6,26 @@
     </div>
 {% endif %}
 
-<div class="man-chapter">{{ chapter.num }} {{ chapter.title }} <a class="man-edit no-print" href="/editChapter/{{ chapter.id }}">Edit</a></div>
-<p><a class="no-print" href="/addSection/{{ chapter.id }}">Add section in {{ chapter.num }} {{ chapter.title }}</a></p>
+<div class="man-chapter">{{ chapter.num }} {{ chapter.title }}
+    {% if can_edit %}
+        <a class="man-edit no-print" href="/editChapter/{{ chapter.id }}">Edit</a>
+    {% endif %}
+</div>
+{% if can_edit %}
+    <p><a class="no-print" href="/addSection/{{ chapter.id }}">Add section in {{ chapter.num }} {{ chapter.title }}</a></p>
+{% endif %}
 
 {% for section in chapter.sections.all %}
     <div class="man-section">
         <div class="man-section-header">
-            <a name="section_{{ section.id }}"></a>{{ section.number }} {{ section.title }} <a class="no-print man-edit" href="/editSection/{{ section.id }}">Edit</a>
+            <a name="section_{{ section.id }}"></a>{{ section.number }} {{ section.title }}
+            {% if can_edit %}
+                <a class="no-print man-edit" href="/editSection/{{ section.id }}">Edit</a>
+            {% endif %}
         </div>
-        <p><a class="no-print" href="/addEntry/{{ section.id }}">Add entry in {{ section.number }} {{ section.title }}</a></p>
+        {% if can_edit %}
+            <p><a class="no-print" href="/addEntry/{{ section.id }}">Add entry in {{ section.number }} {{ section.title }}</a></p>
+        {% endif %}
         {% for entry in section.entries.all %}
             {% include "view_entry.html" %}
         {% endfor %}
