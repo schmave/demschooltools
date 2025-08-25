@@ -531,3 +531,11 @@ class LinkedAccount(models.Model):
     )
     provider_user_id = models.TextField()
     provider_key = models.TextField()
+
+
+class AllowedIp(models.Model):
+    class Meta:
+        db_table = "allowed_ips"
+
+    ip = models.TextField()
+    organization = models.ForeignKey(Organization, on_delete=models.PROTECT)

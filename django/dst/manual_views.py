@@ -193,6 +193,7 @@ def view_chapter(request: DstHttpRequest, chapter_id: int):
             {
                 "chapter": chapter,
                 "org_config": get_org_config(request.org),
+                "can_edit": request.user.hasRole(UserRole.EDIT_MANUAL),
             },
         ),
         f"{chapter.num} {chapter.title}",
