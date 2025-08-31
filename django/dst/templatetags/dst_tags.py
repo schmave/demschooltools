@@ -1,3 +1,4 @@
+import re
 from datetime import date, datetime
 
 import mistletoe
@@ -41,6 +42,11 @@ def markdown(text):
     if text is None:
         return ""
     assert isinstance(text, str)
+    # Replace bullets at the beginning of lines with asterisks so that if
+    # you copy paste content
+    # from a PDF (or something?) and it has a real bullet character in it,
+    # we will render it as a list properly. TCS has some rules like this.
+    text = re.sub(r"^(\s*)• ", "\\1* ", text, flags=re.MULTILINE)
     return mark_safe(mistletoe.markdown(text))
 
 
