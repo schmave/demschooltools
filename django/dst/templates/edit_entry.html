@@ -48,7 +48,7 @@
         <div class="tab-content">
             <div role="tabpanel" class="tab-pane active" id="live-preview">
                 <div class="panel panel-default">
-                    <div class="panel-body">
+                    <div class="panel-body" style="max-height: calc(100vh - 250px); overflow-y: auto">
                         <div id="markdown_preview">
                             {% include "view_entry.html" with entry=form.instance is_preview=True %}
                         </div>
