@@ -28,7 +28,7 @@ from dst.models import (
     User,
     UserRole,
 )
-from dst.org_config import OrgConfig, get_org_config
+from dst.org_config import get_org_config
 from dst.pdf_utils import (
     create_pdf_response,
     render_html_to_pdf,
@@ -68,20 +68,20 @@ def render_main_template(
     )
 
 
-def render_main_template_to_string(*args, **kwargs) -> str:
-    return render_main_template(*args, **kwargs).content.decode("utf-8")
+def get_html_from_response(response: HttpResponse) -> str:
+    return response.content.decode("utf-8")
 
 
 @login_required()
 def view_manual(request: DstHttpRequest):
-    chapters = chapter_with_entries(request.org)
+    chapters = chapters_with_entries(request.org)
 
     org_config = get_org_config(request.org)
 
     return render_main_template(
         request,
         render_to_string(
-            "view_manual.html",
+            "view_manual_toc.html",
             {
                 "chapters": chapters,
                 "org_config": org_config,
@@ -154,7 +154,9 @@ def view_manual_changes(request: DstHttpRequest):
     )
 
 
-def chapter_with_entries(org: Organization, include_deleted=False) -> QuerySet[Chapter]:
+def chapters_with_entries(
+    org: Organization, include_deleted=False
+) -> QuerySet[Chapter]:
     manager = Chapter.all_objects if include_deleted else Chapter.objects
     return manager.filter(organization=org).prefetch_related(
         Prefetch(
@@ -179,25 +181,14 @@ def chapter_with_entries(org: Organization, include_deleted=False) -> QuerySet[C
 @login_required()
 def view_chapter(request: DstHttpRequest, chapter_id: int):
     chapter = (
-        chapter_with_entries(request.org, include_deleted=True)
+        chapters_with_entries(request.org, include_deleted=True)
         .filter(id=chapter_id)
         .first()
     )
     if chapter is None:
         return HttpResponseNotFound()
 
-    return render_main_template(
-        request,
-        render_to_string(
-            "view_chapter.html",
-            {
-                "chapter": chapter,
-                "org_config": get_org_config(request.org),
-                "can_edit": request.user.hasRole(UserRole.EDIT_MANUAL),
-            },
-        ),
-        f"{chapter.num} {chapter.title}",
-    )
+    return get_chapter_response(chapter, request)
 
 
 def on_manual_change(*args, **kwargs):
@@ -555,7 +546,7 @@ def print_manual(request: DstHttpRequest):
     """
     Display the print manual page with download links for PDF versions.
     """
-    chapters = chapter_with_entries(request.org)
+    chapters = chapters_with_entries(request.org)
     org_config = get_org_config(request.org)
 
     return render_main_template(
@@ -642,17 +633,18 @@ def preview_entry(request: DstHttpRequest, object_id: int | None = None):
     )
 
 
-def get_chapter_html(
-    chapter: Chapter, request: DstHttpRequest, org_config: OrgConfig
-) -> str:
-    return render_main_template_to_string(
+def get_chapter_response(chapter: Chapter, request: DstHttpRequest) -> HttpResponse:
+    return render_main_template(
         request,
         render_to_string(
             "view_chapter.html",
-            {"chapter": chapter, "org_config": org_config},
+            {
+                "chapter": chapter,
+                "org_config": get_org_config(request.org),
+                "can_edit": request.user.hasRole(UserRole.EDIT_MANUAL),
+            },
         ),
-        "",
-        "",
+        f"{chapter.num} {chapter.title}",
     )
 
 
@@ -663,19 +655,20 @@ def print_manual_chapter(request: DstHttpRequest, chapter_id: int):
 
     if chapter_id == -1:
         # Render complete manual (TOC + all chapters)
-        chapters = chapter_with_entries(org)
-        html = render_main_template_to_string(
-            request,
-            render_to_string(
-                "view_manual.html",
-                {
-                    "chapters": chapters,
-                    "org_config": org_config,
-                    "include_content": True,
-                },
-            ),
-            f"{org.short_name} {org_config.str_manual_title}",
-            selected_button="toc",
+        chapters = chapters_with_entries(org)
+        html = get_html_from_response(
+            render_main_template(
+                request,
+                render_to_string(
+                    "view_manual_toc.html",
+                    {
+                        "chapters": chapters,
+                        "org_config": org_config,
+                        "include_content": True,
+                    },
+                ),
+                "",
+            )
         )
 
         return create_pdf_response(
@@ -684,18 +677,18 @@ def print_manual_chapter(request: DstHttpRequest, chapter_id: int):
 
     elif chapter_id == -2:
         # Render TOC only
-        chapters = chapter_with_entries(org)
-        toc_html = render_main_template_to_string(
-            request,
-            render_to_string(
-                "view_manual.html",
-                {
-                    "chapters": chapters,
-                    "org_config": org_config,
-                },
-            ),
-            f"{org.short_name} {org_config.str_manual_title}",
-            selected_button="toc",
+        toc_html = get_html_from_response(
+            render_main_template(
+                request,
+                render_to_string(
+                    "view_manual_toc.html",
+                    {
+                        "chapters": chapters_with_entries(org),
+                        "org_config": org_config,
+                    },
+                ),
+                "",
+            )
         )
 
         return create_pdf_response(
@@ -704,11 +697,13 @@ def print_manual_chapter(request: DstHttpRequest, chapter_id: int):
 
     else:
         # Render specific chapter
-        chapter = chapter_with_entries(org).filter(id=chapter_id).first()
+        chapter = chapters_with_entries(org).filter(id=chapter_id).first()
         if chapter is None:
             return HttpResponseNotFound()
 
-        pdf_bytes = render_html_to_pdf(get_chapter_html(chapter, request, org_config))
+        pdf_bytes = render_html_to_pdf(
+            get_html_from_response(get_chapter_response(chapter, request))
+        )
         return create_pdf_response(
             pdf_bytes, f"{org.short_name}_Chapter_{chapter.num}.pdf"
         )
