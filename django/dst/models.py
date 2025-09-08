@@ -148,6 +148,23 @@ class AttendanceRule(models.Model):
     organization_id: int
     organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
 
+    category = models.CharField(max_length=255, null=True, blank=True)
+    person = models.ForeignKey(Person, on_delete=models.PROTECT, null=True, blank=True)
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
+
+    monday = models.BooleanField(default=False)
+    tuesday = models.BooleanField(default=False)
+    wednesday = models.BooleanField(default=False)
+    thursday = models.BooleanField(default=False)
+    friday = models.BooleanField(default=False)
+
+    absence_code = models.CharField(max_length=255, null=True, blank=True)
+    min_hours = models.FloatField(null=True, blank=True)
+    latest_start_time = models.TimeField(null=True, blank=True)
+    earliest_departure_time = models.TimeField(null=True, blank=True)
+    exempt_from_fees = models.BooleanField(default=False)
+
 
 class Comment(models.Model):
     class Meta:
@@ -203,6 +220,11 @@ class AttendanceCode(models.Model):
         db_table = "attendance_code"
 
     organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
+    code = models.CharField(max_length=255, default="")
+    description = models.CharField(max_length=255, default="")
+    color = models.CharField(max_length=7, default="#000000")
+    counts_toward_attendance = models.BooleanField(default=False)
+    not_counted = models.BooleanField(default=False)
 
 
 class AttendanceDay(models.Model):
