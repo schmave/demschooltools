@@ -5,6 +5,8 @@ import mistletoe
 from django import template
 from django.utils import timezone
 from django.utils.safestring import mark_safe
+from mistletoe.html_renderer import HtmlRenderer
+from mistletoe.span_token import SpanToken
 
 from dst.org_config import OrgConfig
 
@@ -37,6 +39,18 @@ def dateAndTime(context, d: datetime | date | None = None):
     return d.strftime("%Y-%m-%d %-I:%M%p")
 
 
+class SearchHighlightToken(SpanToken):
+    pattern = re.compile(r"\[\[([^]]*)\]\]")
+
+
+class DstRenderer(HtmlRenderer):
+    def __init__(self):
+        super().__init__(SearchHighlightToken, process_html_tokens=False)
+
+    def render_search_highlight_token(self, token):
+        return f'<span class="man-search-highlight">{self.render_inner(token)}</span>'
+
+
 @register.filter
 def markdown(text):
     if text is None:
@@ -47,7 +61,9 @@ def markdown(text):
     # from a PDF (or something?) and it has a real bullet character in it,
     # we will render it as a list properly. TCS has some rules like this.
     text = re.sub(r"^(\s*)• ", "\\1* ", text, flags=re.MULTILINE)
-    return mark_safe(mistletoe.markdown(text))
+
+    with DstRenderer() as renderer:
+        return mark_safe(renderer.render(mistletoe.Document(text)))
 
 
 @register.filter(name="list")

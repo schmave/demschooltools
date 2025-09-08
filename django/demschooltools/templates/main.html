@@ -287,12 +287,17 @@
                                     <a {% if selectedBtn == "manual_changes" %}class="active"{% endif %}
                                        href="/viewManualChanges">
                                         Changes since a date</a>
-                                    <a>
-                                        <form method="GET" style="display:inline;" action="/searchManual">
-                                            <input name="searchString" type="search" placeholder="Search the manual..."/>
-                                            <input type="submit" value="Search"/>
-                                        </form>
-                                    </a>
+
+                                    {% if selectedBtn == "search" %}
+                                        <a class="active">Search</a>
+                                    {% else %}
+                                        <a style="text-decoration: none">
+                                            <form method="GET" style="display:inline;" action="/searchManual">
+                                                <input name="search_string" type="search" placeholder="Search the manual..."/>
+                                                <input type="submit" class="btn btn-primary btn-xs" value="Search"/>
+                                            </form>
+                                        </a>
+                                    {% endif %}
                                 </div>
                             </div>
                         {% endif %}

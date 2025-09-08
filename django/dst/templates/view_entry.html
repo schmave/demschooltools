@@ -1,7 +1,7 @@
 {% load dst_tags %}
 
 {% with entry.changes_for_render as defined_changes %}
-    <div class="man-entry">
+    <div class="man-entry {% if entry.deleted %}deleted{% endif %}">
         <a name="entry_{{ entry.id }}"></a>
         <p class="man-entry-num">
             {{ entry.number }} {{ entry.title }}
@@ -11,7 +11,7 @@
             {% if defined_changes %}
                 <p class="man-entry-change-history {% if not org_config.org.show_history_in_print %}no-print{% endif %}">
                     {% for change_detail in defined_changes %}
-                        {% ifchanged change_detail.effective_date_with_fallback %}
+                        {% ifchanged change_detail.effective_date_with_fallback change_detail.was_created change_detail.was_deleted %}
                             {% if change_detail.was_created %} Adopted
                             {% elif change_detail.was_deleted %} Repealed
                             {% else %} Amended

@@ -720,7 +720,11 @@ hr {
   border-top: 1px solid #999;
 }
 
-.man-chapter {
+.man-entry + .man-chapter {
+  margin-top: 2em;
+}
+
+.man-chapter  {
    font-size: 18px;
    font-weight: bold;
 }
@@ -761,7 +765,13 @@ hr {
   }
 }
 
-.man-entry {
+.man-search-highlight {
+  background-color: #ff6;
+}
+
+.man-entry.deleted {
+  text-decoration: line-through;
+  background-color: #eee;
 }
 
 .man-entry-num {
