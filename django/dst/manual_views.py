@@ -1,3 +1,4 @@
+import re
 from copy import deepcopy
 from datetime import datetime, time, timedelta
 from typing import Any, Type
@@ -5,9 +6,8 @@ from typing import Any, Type
 from django import forms
 from django.conf import settings
 from django.contrib.auth.decorators import login_required as django_login_required
-from django.db import connection
-from django.db.models import Model, Prefetch, Q, QuerySet
-from django.db.models.signals import post_save
+from django.db.models import CharField, Model, Prefetch, Q, QuerySet, Value
+from django.db.models.functions import Concat
 from django.db.transaction import atomic
 from django.forms import Form, ModelForm, TextInput, ValidationError
 from django.http import HttpRequest, HttpResponseNotFound
@@ -15,6 +15,7 @@ from django.http.response import HttpResponse as HttpResponse
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
 from django.utils import timezone
+from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.views import View
 
@@ -28,7 +29,7 @@ from dst.models import (
     User,
     UserRole,
 )
-from dst.org_config import OrgConfig, get_org_config
+from dst.org_config import get_org_config
 from dst.pdf_utils import (
     create_pdf_response,
     render_html_to_pdf,
@@ -68,20 +69,20 @@ def render_main_template(
     )
 
 
-def render_main_template_to_string(*args, **kwargs) -> str:
-    return render_main_template(*args, **kwargs).content.decode("utf-8")
+def get_html_from_response(response: HttpResponse) -> str:
+    return response.content.decode("utf-8")
 
 
 @login_required()
 def view_manual(request: DstHttpRequest):
-    chapters = chapter_with_entries(request.org)
+    chapters = chapters_with_entries(request.org)
 
     org_config = get_org_config(request.org)
 
     return render_main_template(
         request,
         render_to_string(
-            "view_manual.html",
+            "view_manual_toc.html",
             {
                 "chapters": chapters,
                 "org_config": org_config,
@@ -154,7 +155,9 @@ def view_manual_changes(request: DstHttpRequest):
     )
 
 
-def chapter_with_entries(org: Organization, include_deleted=False) -> QuerySet[Chapter]:
+def chapters_with_entries(
+    org: Organization, include_deleted=False
+) -> QuerySet[Chapter]:
     manager = Chapter.all_objects if include_deleted else Chapter.objects
     return manager.filter(organization=org).prefetch_related(
         Prefetch(
@@ -179,35 +182,14 @@ def chapter_with_entries(org: Organization, include_deleted=False) -> QuerySet[C
 @login_required()
 def view_chapter(request: DstHttpRequest, chapter_id: int):
     chapter = (
-        chapter_with_entries(request.org, include_deleted=True)
+        chapters_with_entries(request.org, include_deleted=True)
         .filter(id=chapter_id)
         .first()
     )
     if chapter is None:
         return HttpResponseNotFound()
 
-    return render_main_template(
-        request,
-        render_to_string(
-            "view_chapter.html",
-            {
-                "chapter": chapter,
-                "org_config": get_org_config(request.org),
-                "can_edit": request.user.hasRole(UserRole.EDIT_MANUAL),
-            },
-        ),
-        f"{chapter.num} {chapter.title}",
-    )
-
-
-def on_manual_change(*args, **kwargs):
-    with connection.cursor() as cursor:
-        cursor.execute("REFRESH MATERIALIZED VIEW entry_index WITH DATA")
-
-
-post_save.connect(on_manual_change, sender=Chapter)
-post_save.connect(on_manual_change, sender=Section)
-post_save.connect(on_manual_change, sender=Entry)
+    return get_chapter_response(chapter, request)
 
 
 class ModelFormWithOrg(ModelForm):
@@ -555,7 +537,7 @@ def print_manual(request: DstHttpRequest):
     """
     Display the print manual page with download links for PDF versions.
     """
-    chapters = chapter_with_entries(request.org)
+    chapters = chapters_with_entries(request.org)
     org_config = get_org_config(request.org)
 
     return render_main_template(
@@ -572,28 +554,115 @@ def print_manual(request: DstHttpRequest):
     )
 
 
+def highlight_matches_markdown(value: str, pattern: re.Pattern) -> str:
+    return pattern.sub(r"[[\1]]", value)
+
+
+def highlight_matches_html(value: str, pattern: re.Pattern) -> str:
+    # Unicode values that have no meaning
+    open_tag = "\ue000"
+    close_tag = "\ue001"
+
+    value = pattern.sub(open_tag + r"\1" + close_tag, value)
+
+    value = escape(value)
+    value = value.replace(open_tag, '<span class="man-search-highlight">')
+    value = value.replace(close_tag, "</span>")
+    return mark_safe(value)
+
+
+class SearchForm(Form):
+    default_renderer = BootstrapFormRenderer
+
+    search_string = forms.CharField(
+        required=False,
+        label="Search for",
+        help_text="Chapter, section, and entry numbers and titles are searched. If a chapter or section matches, all rules in that chapter or section are displayed.",
+    )
+    include_deleted = forms.BooleanField(
+        required=False, label="Include deleted/repealed entries?"
+    )
+    whole_words = forms.BooleanField(
+        required=False,
+        label="Match whole words only?",
+        help_text="e.g. if you search for 'and', don't show items containing the word 'sand'",
+    )
+
+
 @login_required()
 def search_manual(request: DstHttpRequest):
-    search_string = request.GET.get("searchString", "")
+    form = SearchForm(request.GET)
+    assert form.is_valid()
+    search_string = form.cleaned_data["search_string"]
+    search_words = [x for x in re.split(r"\s+", search_string) if x]
 
-    entries_with_headlines = []
-    if search_string:
-        entries_with_headlines = list(
-            Entry.objects.filter(section__chapter__organization=request.org)
-            .extra(
-                where=[
-                    "EXISTS (SELECT 1 FROM entry_index ei WHERE ei.id = entry.id AND ei.document @@ plainto_tsquery(%s))"
-                ],
-                params=[search_string],
-                select={
-                    "headline": "ts_headline(entry.content, plainto_tsquery(%s), 'MaxFragments=5')",
-                    "search_rank": "ts_rank((SELECT ei.document FROM entry_index ei WHERE ei.id = entry.id), plainto_tsquery(%s), 0)",
-                },
-                select_params=[search_string, search_string],
-                order_by=["-search_rank"],
+    entries = []
+
+    if search_words:
+        space = Value(" ")
+        entry_query = (
+            Entry.all_objects.filter(
+                section__chapter__organization=request.org,
+            )
+            .annotate(
+                full_content=Concat(
+                    "section__chapter__num",
+                    "section__num",
+                    Value("."),
+                    "num",
+                    space,
+                    "content",
+                    space,
+                    "title",
+                    space,
+                    "section__title",
+                    space,
+                    "section__chapter__title",
+                    output_field=CharField(),
+                )
             )
             .select_related("section__chapter")
+            .prefetch_related(
+                Prefetch(
+                    "changes",
+                    ManualChange.objects.order_by("date_entered").filter(
+                        show_date_in_history=True
+                    ),
+                ),
+            )
+            .order_by("section__chapter__num", "section__num", "num")
         )
+        if not form.cleaned_data["include_deleted"]:
+            entry_query = entry_query.filter(
+                deleted=False,
+                section__deleted=False,
+                section__chapter__deleted=False,
+            )
+        for word in search_words:
+            if form.cleaned_data["whole_words"]:
+                entry_query = entry_query.filter(full_content__iregex=rf"\y{word}\y")
+            else:
+                entry_query = entry_query.filter(full_content__icontains=word)
+        entries = list(entry_query)
+
+    words_sorted = sorted(search_words, key=len, reverse=True)
+    elements = [re.escape(word) for word in words_sorted]
+    if form.cleaned_data["whole_words"]:
+        elements = [rf"\b{x}\b" for x in elements]
+    pattern = re.compile("(" + "|".join(elements) + ")", re.IGNORECASE)
+
+    for entry in entries:
+        entry.number = highlight_matches_html(entry.number(), pattern)
+        entry.section.number = highlight_matches_html(entry.section.number(), pattern)
+        entry.section.chapter.num = highlight_matches_html(
+            entry.section.chapter.num, pattern
+        )
+        entry.title = highlight_matches_html(entry.title, pattern)
+        entry.section.title = highlight_matches_html(entry.section.title, pattern)
+        entry.section.chapter.title = highlight_matches_html(
+            entry.section.chapter.title, pattern
+        )
+        entry.content = highlight_matches_markdown(entry.content, pattern)
 
     org_config = get_org_config(request.org)
 
@@ -602,12 +671,15 @@ def search_manual(request: DstHttpRequest):
         render_to_string(
             "manual_search.html",
             {
-                "searchString": search_string,
-                "entries": entries_with_headlines,
+                "search_string": " ".join(search_words),
+                "entries": entries,
                 "org_config": org_config,
+                "can_edit": request.user.hasRole(UserRole.EDIT_MANUAL),
+                "form": form,
             },
         ),
         f"{org_config.str_manual_title} Search: {search_string}",
+        "search",
     )
 
 
@@ -616,6 +688,8 @@ def preview_entry(request: DstHttpRequest, object_id: int | None = None):
     existing = None
     if object_id:
         existing = Entry.all_objects.filter(id=object_id).first()
+        # When previewing edits to a deleted entry, show it as undeleted
+        existing.deleted = False
 
     entry_form = EntryForm(
         request.POST, instance=deepcopy(existing), organization=request.org
@@ -642,17 +716,18 @@ def preview_entry(request: DstHttpRequest, object_id: int | None = None):
     )
 
 
-def get_chapter_html(
-    chapter: Chapter, request: DstHttpRequest, org_config: OrgConfig
-) -> str:
-    return render_main_template_to_string(
+def get_chapter_response(chapter: Chapter, request: DstHttpRequest) -> HttpResponse:
+    return render_main_template(
         request,
         render_to_string(
             "view_chapter.html",
-            {"chapter": chapter, "org_config": org_config},
+            {
+                "chapter": chapter,
+                "org_config": get_org_config(request.org),
+                "can_edit": request.user.hasRole(UserRole.EDIT_MANUAL),
+            },
         ),
-        "",
-        "",
+        f"{chapter.num} {chapter.title}",
     )
 
 
@@ -663,19 +738,20 @@ def print_manual_chapter(request: DstHttpRequest, chapter_id: int):
 
     if chapter_id == -1:
         # Render complete manual (TOC + all chapters)
-        chapters = chapter_with_entries(org)
-        html = render_main_template_to_string(
-            request,
-            render_to_string(
-                "view_manual.html",
-                {
-                    "chapters": chapters,
-                    "org_config": org_config,
-                    "include_content": True,
-                },
-            ),
-            f"{org.short_name} {org_config.str_manual_title}",
-            selected_button="toc",
+        chapters = chapters_with_entries(org)
+        html = get_html_from_response(
+            render_main_template(
+                request,
+                render_to_string(
+                    "view_manual_toc.html",
+                    {
+                        "chapters": chapters,
+                        "org_config": org_config,
+                        "include_content": True,
+                    },
+                ),
+                "",
+            )
         )
 
         return create_pdf_response(
@@ -684,18 +760,18 @@ def print_manual_chapter(request: DstHttpRequest, chapter_id: int):
 
     elif chapter_id == -2:
         # Render TOC only
-        chapters = chapter_with_entries(org)
-        toc_html = render_main_template_to_string(
-            request,
-            render_to_string(
-                "view_manual.html",
-                {
-                    "chapters": chapters,
-                    "org_config": org_config,
-                },
-            ),
-            f"{org.short_name} {org_config.str_manual_title}",
-            selected_button="toc",
+        toc_html = get_html_from_response(
+            render_main_template(
+                request,
+                render_to_string(
+                    "view_manual_toc.html",
+                    {
+                        "chapters": chapters_with_entries(org),
+                        "org_config": org_config,
+                    },
+                ),
+                "",
+            )
         )
 
         return create_pdf_response(
@@ -704,11 +780,13 @@ def print_manual_chapter(request: DstHttpRequest, chapter_id: int):
 
     else:
         # Render specific chapter
-        chapter = chapter_with_entries(org).filter(id=chapter_id).first()
+        chapter = chapters_with_entries(org).filter(id=chapter_id).first()
         if chapter is None:
             return HttpResponseNotFound()
 
-        pdf_bytes = render_html_to_pdf(get_chapter_html(chapter, request, org_config))
+        pdf_bytes = render_html_to_pdf(
+            get_html_from_response(get_chapter_response(chapter, request))
+        )
         return create_pdf_response(
             pdf_bytes, f"{org.short_name}_Chapter_{chapter.num}.pdf"
         )

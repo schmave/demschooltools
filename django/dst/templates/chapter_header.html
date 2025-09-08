@@ -1,0 +1,8 @@
+<div class="man-chapter">{{ chapter.num }} {{ chapter.title }}
+    {% if can_edit %}
+        <a class="man-edit no-print" href="/editChapter/{{ chapter.id }}">Edit</a>
+    {% endif %}
+</div>
+{% if can_edit %}
+    <p><a class="no-print" href="/addSection/{{ chapter.id }}">Add section in {{ chapter.num }} {{ chapter.title }}</a></p>
+{% endif %}

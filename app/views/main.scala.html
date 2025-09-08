@@ -268,26 +268,6 @@ var _rollbarConfig = {
         </div>
         }
 
-        @if(menu.equals("manual")) {
-        <div class="tab-pane active" id="manual">
-            <div class="subnav">
-                <a @if(selectedBtn.equals("toc")) { class="active" }
-                    href="/viewManual">Table of Contents</a>
-                <a @if(selectedBtn.equals("manual_print")) { class="active" }
-                    href="/printManual">Print</a>
-                <a @if(selectedBtn.equals("manual_changes")) { class="active" }
-                    href="/viewManualChanges">
-                    Changes since a date</a>
-                <a>
-                    <form method="GET" style="display:inline;" action="/searchManual">
-                        <input name="searchString" type="search" placeholder="Search the manual..."/>
-                        <input type="submit" value="Search"/>
-                    </form>
-                </a>
-            </div>
-        </div>
-        }
-
         @if(menu.equals("settings")) {
         <div class="tab-pane active" id="settings">
             <div class="subnav">

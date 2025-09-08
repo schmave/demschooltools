@@ -1,0 +1,11 @@
+<div class="man-section">
+    <div class="man-section-header">
+        <a name="section_{{ section.id }}"></a>{{ section.number }} {{ section.title }}
+        {% if can_edit %}
+            <a class="no-print man-edit" href="/editSection/{{ section.id }}">Edit</a>
+        {% endif %}
+    </div>
+    {% if can_edit %}
+        <p><a class="no-print" href="/addEntry/{{ section.id }}">Add entry in {{ section.number }} {{ section.title }}</a></p>
+    {% endif %}
+</div>
