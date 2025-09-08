@@ -69,3 +69,44 @@ def markdown(text):
 @register.filter(name="list")
 def my_list(obj):
     return list(obj)
+
+
+@register.filter
+def lookup(dictionary, key):
+    """Template filter to look up a value in a dictionary"""
+    if hasattr(dictionary, "get"):
+        return dictionary.get(key)
+    elif hasattr(dictionary, "__getitem__"):
+        try:
+            return dictionary[key]
+        except (KeyError, IndexError, TypeError):
+            return None
+    return None
+
+
+@register.filter
+def format_number(value):
+    """Format a number to 1 decimal place"""
+    try:
+        return f"{float(value):.1f}"
+    except (ValueError, TypeError):
+        return "0.0"
+
+
+@register.filter
+def format_as_percent(value):
+    """Format a value as a percentage"""
+    try:
+        return f"{float(value) * 100:.1f}%"
+    except (ValueError, TypeError):
+        return "0.0%"
+
+
+@register.filter
+def format_date_for_input(d):
+    """Format date for HTML date input"""
+    if d is None:
+        return ""
+    if isinstance(d, datetime):
+        d = d.date()
+    return d.strftime("%Y-%m-%d")

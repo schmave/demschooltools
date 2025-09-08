@@ -1,0 +1,159 @@
+{% load dst_tags %}
+
+<script type="text/javascript">
+var fixHighlights = function() {
+	var els = $('.attendance-view tr');
+	els.removeClass('shade');
+	var even = false;
+	for (var i = 0; i < els.length; i++) {
+		if ($(els[i]).css('display') !== 'none') {
+			if (even) {
+				$(els[i]).addClass('shade');
+			}
+			even = !even;
+		}
+	}
+};
+
+$(function() {
+	if ($('input[value=current]').prop('checked')) {
+		$('.attendance-view tr.inactive').hide();
+	}
+	fixHighlights();
+
+	$('.sortable thead').click(fixHighlights);
+
+	$('input[value=current]').click(function() {
+		$('.attendance-view tr.inactive').hide();
+		fixHighlights();
+	});
+	$('input[value=all]').click(function() {
+		$('.attendance-view tr').show();
+		fixHighlights();
+	});
+});
+</script>
+
+<h3>Attendance Summary</h3>
+{% if not is_custom_date %}
+	<h4>For one year starting {{ start_date|format_date_for_input}}
+	    <a href="/attendance/download?start_date={{ start_date|format_date_for_input }}"class="download-link">
+	        <span class="glyphicon glyphicon-download-alt"></span>Download as spreadsheet
+	    </a>
+	</h4>
+	<p>
+	    <a href="/attendance?start_date={{ prev_date|format_date_for_input }}">⇐ Previous Year</a>
+	    {% if next_date %}
+	        <a href="/attendance?start_date={{ next_date|format_date_for_input}}"
+	           style="margin-left: 100px;">Next Year ⇒</a>
+	    {% endif %}
+	</p>
+{% endif %}
+
+<form method="GET">
+	<p>Showing
+		<input type="date" name="start_date" value="{{ start_date|format_date_for_input }}"> to
+		<input type="date" name="end_date" value="{{ end_date|format_date_for_input}}">
+		<input type="hidden" name="is_custom_date" value="true">
+		<input class="btn btn-xs btn-primary" type="submit">
+	</p>
+</form>
+
+{% if not next_date or is_custom_date %}
+	<div id="attendance-student-picker">
+		<label><input type="radio" name="type" value="current"> Show only current students and staff</label><br>
+		<label>
+			<input type="radio" name="type" value="all" checked> Show all people who have attended
+			{% if is_custom_date %} during the date range {% else %} this school year {% endif %}
+		</label>
+	</div>
+{% endif %}
+
+<p style="margin-bottom: 30px;">Click on a column title to sort by that column. Click again to sort in the opposite direction.</p>
+
+<table class="attendance-view table sortable">
+<thead>
+    <th class="sorttable_sorted_reverse">First<br/>Name<span id="sorttable_sortrevind">&nbsp;▴</span></th>
+    <th>Last<br/>Name</th>
+	{% for code in codes %}
+		{% with code_obj=codes_map|lookup:code %}
+			<th width=100 class="attendance-code" style="background-color:{{ code_obj.color }}">
+			{{ code_obj.description }}
+			</th>
+		{% endwith %}
+	{% endfor %}
+	<th width=100 class="attendance-code">Unknown/missing code</th>
+	<th width=100>{% if org_config.org.attendance_enable_partial_days %}Full Days{% else %}Days Present{% endif %}</th>
+	{% if org_config.org.attendance_enable_partial_days %}
+		<th width=100>Partial Days</th>
+	{% endif %}
+	<th width=100>Total hours</th>
+	<th width=100>Avg. hours per day</th>
+	{% if org_config.org.attendance_show_percent %}
+		<th width=100>Attendance Rate</th>
+	{% endif %}
+	{% if org_config.org.attendance_show_weighted_percent %}
+		{% if not is_custom_date %}
+			<th width=100>
+				Weighted Att. Rate
+				<span class="help-icon-wrapper">
+					<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip"
+						title="Weighted attendance rate counts recent days as worth more, and distant past days as worth less, with a smooth transition in between. This is only computed for the full school year.">
+					</span>
+				</span>
+			</th>
+		{% endif %}
+	{% endif %}
+</thead>
+
+{% for person in people %}
+<tr{% if person not in current_people %} class="inactive"{% endif %}>
+	<td>
+		{% if not next_date %}
+			<a href="/attendance/person/{{ person.id }}">
+		{% else %}
+			<a href="/attendance/person/{{ person.id }}?start_date={{ start_date|format_date_for_input }}&end_date={{ next_date|format_date_for_input}}">
+		{% endif %}
+		{{ person.first_name }}</a>
+	</td>
+	<td>{{ person.last_name }}</td>
+	{% with stats=person_to_stats|lookup:person %}
+		{% for code in codes %}
+			{% with code_obj=codes_map|lookup:code %}
+				{% with count=stats.absence_counts|lookup:code_obj %}
+					{% if count %}
+						<td align="center">{{ count }}</td>
+					{% else %}
+						<td align="center" class="empty">0</td>
+					{% endif %}
+				{% endwith %}
+			{% endwith %}
+		{% endfor %}
+		{% with unknown_count=stats.absence_counts|lookup:None %}
+			{% if unknown_count %}
+				<td align="center">{{ unknown_count }}</td>
+			{% else %}
+				<td align="center" class="empty">0</td>
+			{% endif %}
+		{% endwith %}
+		<td align="center">{{ stats.days_present }}</td>
+		{% if org_config.org.attendance_enable_partial_days %}
+			<td align="center">{{ stats.partial_days_present }}</td>
+		{% endif %}
+		<td align="center">{{ stats.total_hours|format_number }}</td>
+		<td align="center">{{ stats.average_hours_per_day|format_number }}</td>
+		{% if org_config.org.attendance_show_percent %}
+			<td align="center">{{ stats.attendance_rate|format_as_percent }}</td>
+		{% endif %}
+		{% if org_config.org.attendance_show_weighted_percent %}
+			{% if not is_custom_date %}
+				<td align="center" class="attendance-weighted-value">
+					{{ stats.weighted_attendance_rate|format_as_percent }}
+				</td>
+			{% endif %}
+		{% endif %}
+	{% endwith %}
+</tr>
+{% endfor %}
+
+</table>

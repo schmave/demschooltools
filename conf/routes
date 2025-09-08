@@ -122,7 +122,15 @@ GET     /people/:id               controllers.CRM.person(id: Integer, request: R
 POST    /people                   controllers.CRM.makeNewPerson(request: Request)
 POST    /people/:id/delete        controllers.CRM.deletePerson(id: Integer)
 
-GET     /attendance		  controllers.Attendance.index(start_date ?= "", end_date: String ?= "", is_custom_date: Boolean ?= false, request: Request)
+GET     /old/attendance		  controllers.Attendance.index(start_date ?= "", end_date: String ?= "", is_custom_date: Boolean ?= false, request: Request)
+GET     /old/attendance/download      controllers.Attendance.download(start_of_year ?= "", request: Request)
+
+GET /attendance       controllers.Proxy.proxy0(request: Request)
+GET /attendance?*extra controllers.Proxy.proxy(request: Request, extra: String)
+GET /attendance/download       controllers.Proxy.proxy0(request: Request)
+GET /attendance/download*extra controllers.Proxy.proxy(request: Request, extra: String)
+
+
 GET     /attendance/jsonPeople               controllers.Attendance.jsonPeople(term ?= "", request: Request)
 GET     /attendance/viewWeek	  controllers.Attendance.viewWeek(date : String ?= "", request: Request)
 GET     /attendance/editWeek      controllers.Attendance.editWeek(date : String ?= "", request: Request)
@@ -148,7 +156,6 @@ POST	/attendance/newCode        controllers.Attendance.newCode(request: Request)
 GET	/attendance/editCode/:id   controllers.Attendance.editCode(id : Integer, request: Request)
 POST	/attendance/saveCode      controllers.Attendance.saveCode(request: Request)
 GET     /attendance/codes         controllers.Attendance.viewCodes(request: Request)
-GET     /attendance/download      controllers.Attendance.download(start_of_year ?= "", request: Request)
 GET     /attendance/forPerson/:id controllers.Attendance.viewPersonReport(id : Integer, start_date : String ?= "", end_date : String ?= "", request: Request)
 
 POST    /attendance/createPersonWeek  controllers.Attendance.createPersonWeek(request: Request)

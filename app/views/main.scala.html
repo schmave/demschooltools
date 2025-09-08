@@ -63,7 +63,7 @@ var _rollbarConfig = {
             </li>
             @if(Utils.getOrgConfig(request).org.getShowAttendance()) {
                 <li @if(menu.equals("attendance")) { class="active" }>
-                    <a href="@routes.Attendance.index()">Attendance</a>
+                    <a href="/attendance">Attendance</a>
                 </li>
             }
             @if(Utils.getOrgConfig(request).org.getShowCustodia()) {
@@ -165,7 +165,7 @@ var _rollbarConfig = {
         <div class="tab-pane active" id="attendance">
             <div class="subnav">
             <a @if(selectedBtn.equals("attendance_home")) { class="active" }
-                href="@routes.Attendance.index("")">By year
+                href="/attendance">By year
             </a><a class="not-link @if(selectedBtn.equals("week")) { active }">
                 View/edit week of: <input class="date attendance-week" type="textfield"></input>
             </a><a class="not-link @if(selectedBtn.equals("person")) { active }">
