@@ -73,10 +73,6 @@ class AttendanceStats:
     def process_day(
         self, day: AttendanceDay, day_index: int, codes_map: Dict[str, AttendanceCode]
     ):
-        """Process a single attendance day and update statistics"""
-        if day is None:
-            return
-
         if day.code or not day.start_time or not day.end_time:
             self._increment_code_count(codes_map.get(day.code), day_index)
         else:
@@ -204,7 +200,6 @@ def parse_date_or_now(date_str: str) -> date:
 def get_codes_map(
     include_no_school: bool, org: Organization
 ) -> Dict[str, AttendanceCode]:
-    """Get mapping of attendance codes"""
     codes = {}
 
     for code in AttendanceCode.objects.filter(organization=org):
@@ -224,8 +219,7 @@ def get_codes_map(
 def map_people_to_stats(
     start_date: date, end_date: date, org: Organization
 ) -> Dict[Person, AttendanceStats]:
-    """Create mapping of people to their attendance statistics"""
-    person_to_stats = {}
+    person_to_stats = defaultdict(lambda: AttendanceStats(org))
     codes_map = get_codes_map(False, org)
 
     # Get all school days in the date range
@@ -233,11 +227,7 @@ def map_people_to_stats(
 
     for day_index, school_day in enumerate(school_days):
         for day in school_day:
-            if day.person not in person_to_stats:
-                person_to_stats[day.person] = AttendanceStats(org)
-
-            stats = person_to_stats[day.person]
-            stats.process_day(day, day_index, codes_map)
+            person_to_stats[day.person].process_day(day, day_index, codes_map)
 
     # Add extra hours from attendance weeks
     weeks = AttendanceWeek.objects.filter(
@@ -245,9 +235,6 @@ def map_people_to_stats(
     )
 
     for week in weeks:
-        if week.person not in person_to_stats:
-            person_to_stats[week.person] = AttendanceStats(org)
-
         person_to_stats[week.person].total_hours += week.extra_hours
 
     return person_to_stats
@@ -316,7 +303,6 @@ def attendance_index(request: DstHttpRequest):
         # Default to one year from start date
         end_date = date(start_date.year + 1, start_date.month, start_date.day)
 
-    # Get data
     person_to_stats = map_people_to_stats(start_date, end_date, request.org)
     codes_map = get_codes_map(False, request.org)
 
@@ -326,7 +312,6 @@ def attendance_index(request: DstHttpRequest):
     all_codes = list(codes_map.keys())
     current_people = get_attendance_people(request.org)
 
-    # Calculate navigation dates
     prev_date = date(start_date.year - 1, start_date.month, start_date.day)
     next_date = date(start_date.year + 1, start_date.month, start_date.day)
 

@@ -107,6 +107,8 @@ def view_manual_changes(request: DstHttpRequest):
     end_date += timedelta(days=1, microseconds=-1)
 
     if form.is_valid():
+        # TODO Make a form field type that accepts a Date but localizes it and adds time. Then use that
+        # on attendance index page as well
         begin_date = timezone.make_aware(
             datetime.combine(form.cleaned_data["begin_date"], time())
         )
