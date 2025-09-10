@@ -63,7 +63,7 @@ Now that you've got the code, you'll need to run three separate programs for eac
                 '$2a$10$sHAtPc.yeZg2AWMr7EZZbuu.sYaOPgFsMZiAY62q/URbjMxU3jB.q');
 
         INSERT INTO user_role (user_id, role)
-            SELECT id, 'all-access' from users;
+            SELECT id, 'all-access' from users where is_superuser=true;
 
         UPDATE organization set
             show_custodia=true, show_accounting=true,
