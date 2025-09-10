@@ -1,6 +1,6 @@
 import re
 from copy import deepcopy
-from datetime import datetime, time, timedelta
+from datetime import timedelta
 from typing import Any, Type
 
 from django import forms
@@ -20,6 +20,7 @@ from django.utils.safestring import mark_safe
 from django.views import View
 
 from demschooltools.form_renderer import BootstrapFormRenderer
+from dst.fields import DateToDatetimeField
 from dst.models import (
     Chapter,
     Entry,
@@ -94,8 +95,8 @@ def view_manual(request: DstHttpRequest):
 
 
 class ManualChangesForm(Form):
-    begin_date = forms.DateField()
-    end_date = forms.DateField(required=False)
+    begin_date = DateToDatetimeField()
+    end_date = DateToDatetimeField(required=False)
 
 
 @login_required()
@@ -107,15 +108,11 @@ def view_manual_changes(request: DstHttpRequest):
     end_date += timedelta(days=1, microseconds=-1)
 
     if form.is_valid():
-        # TODO Make a form field type that accepts a Date but localizes it and adds time. Then use that
-        # on attendance index page as well
-        begin_date = timezone.make_aware(
-            datetime.combine(form.cleaned_data["begin_date"], time())
-        )
+        begin_date = form.cleaned_data["begin_date"]
         if form.cleaned_data["end_date"]:
-            end_date = timezone.make_aware(
-                datetime.combine(form.cleaned_data["end_date"], time())
-            ) + timedelta(days=1, microseconds=-1)
+            end_date = form.cleaned_data["end_date"] + timedelta(
+                days=1, microseconds=-1
+            )
 
     changes = list(
         ManualChange.objects.filter(

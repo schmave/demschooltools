@@ -6,6 +6,7 @@ from collections import defaultdict
 from datetime import date, datetime
 from typing import Dict, List, Optional
 
+from django import forms
 from django.contrib.auth.decorators import login_required as django_login_required
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
@@ -13,6 +14,7 @@ from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
 from custodia.views import get_start_of_school_year
+from dst.fields import DateToDatetimeField
 from dst.models import (
     AttendanceCode,
     AttendanceDay,
@@ -280,24 +282,29 @@ def get_attendance_people(org: Organization) -> List[Person]:
     )
 
 
+class AttendanceIndexForm(forms.Form):
+    start_date = DateToDatetimeField(required=False)
+    end_date = DateToDatetimeField(required=False)
+    is_custom_date = forms.BooleanField(required=False)
+
+
 @login_required()
 def attendance_index(request: DstHttpRequest):
     """Main attendance index view"""
     if not request.user.hasRole(UserRole.ATTENDANCE):
         return HttpResponse("Access denied", status=403)
 
-    # Parse parameters
-    start_date_str = request.GET.get("start_date", "")
-    end_date_str = request.GET.get("end_date", "")
-    is_custom_date = request.GET.get("is_custom_date") == "true"
+    form = AttendanceIndexForm(request.GET)
+    assert form.is_valid()
 
-    if not start_date_str:
+    is_custom_date = form.cleaned_data["is_custom_date"]
+
+    if form.cleaned_data["start_date"]:
+        start_date = form.cleaned_data["start_date"]
+        end_date = form.cleaned_data["end_date"]
+    else:
         start_date = get_start_of_school_year()
         end_date = None
-        is_custom_date = False
-    else:
-        start_date = parse_date_or_now(start_date_str)
-        end_date = parse_date_or_now(end_date_str) if end_date_str else None
 
     if end_date is None:
         # Default to one year from start date
