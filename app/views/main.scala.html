@@ -62,8 +62,8 @@ var _rollbarConfig = {
                 <a href="@routes.CRM.recentComments()">People</a>
             </li>
             @if(Utils.getOrgConfig(request).org.getShowAttendance()) {
-                <li @if(menu.equals("attendance")) { class="active" }>
-                    <a href="/attendance">Attendance</a>
+                <li class="@if(menu.equals("attendance")) { active } old">
+                    <a href="@routes.Attendance.index()">Attendance</a>
                 </li>
             }
             @if(Utils.getOrgConfig(request).org.getShowCustodia()) {
@@ -163,9 +163,9 @@ var _rollbarConfig = {
 
         @if(menu.equals("attendance")) {
         <div class="tab-pane active" id="attendance">
-            <div class="subnav">
+            <div class="subnav old">
             <a @if(selectedBtn.equals("attendance_home")) { class="active" }
-                href="/attendance">By year
+                href="@routes.Attendance.index("")">By year
             </a><a class="not-link @if(selectedBtn.equals("week")) { active }">
                 View/edit week of: <input class="date attendance-week" type="textfield"></input>
             </a><a class="not-link @if(selectedBtn.equals("person")) { active }">
