@@ -3,58 +3,31 @@ import io
 import math
 import zipfile
 from collections import defaultdict
-from datetime import date, datetime
+from datetime import date, datetime, time
 from typing import Dict, List, Optional
 
 from django import forms
-from django.contrib.auth.decorators import login_required as django_login_required
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render
+from django.db.models import Q
+from django.http import HttpResponse
 from django.template.loader import render_to_string
-from django.utils.safestring import mark_safe
 
 from custodia.views import get_start_of_school_year
-from dst.fields import DateToDatetimeField
 from dst.models import (
     AttendanceCode,
     AttendanceDay,
+    AttendanceRule,  # noqa: F401
     AttendanceWeek,
     Organization,
     Person,
     UserRole,
 )
 from dst.org_config import get_org_config
-
-
-def login_required():
-    return django_login_required(login_url="/login")
-
-
-class DstHttpRequest(HttpRequest):
-    org: Organization
-
-
-def render_main_template(
-    request: DstHttpRequest,
-    content: str,
-    title: str,
-    selected_button: str | None = None,
-):
-    return render(
-        request,
-        "main.html",
-        {
-            "title": title,
-            "menu": "attendance",
-            "selectedBtn": selected_button,
-            "content": mark_safe(content),
-            "current_username": request.user.email
-            if request.user.is_authenticated
-            else None,
-            "is_user_logged_in": request.user.is_authenticated,
-            "org_config": get_org_config(request.org),
-        },
-    )
+from dst.utils import (
+    DateToDatetimeField,
+    DstHttpRequest,
+    login_required,
+    render_main_template,
+)
 
 
 class AttendanceStats:
@@ -106,22 +79,90 @@ class AttendanceStats:
             self.values[index] = 1.0
 
     def _is_partial_day(self, day: AttendanceDay, hours: float) -> bool:
-        if not self.org.attendance_day_min_hours:
+        """
+        Determine if a day is partial based on Java AttendanceDay.isPartial() logic.
+        Checks hours, start time, and end time against organization and rule-based thresholds.
+        """
+        if not self.org.attendance_enable_partial_days:
             return False
-        return hours < self.org.attendance_day_min_hours
+
+        # Get default values from organization
+        min_hours = self.org.attendance_day_min_hours
+        latest_start_time = self.org.attendance_day_latest_start_time
+        earliest_departure_time = self.org.attendance_day_earliest_departure_time
+
+        # Get current attendance rules for this person and day
+        rules = self._get_current_attendance_rules(day)
+
+        # Apply rule overrides (person-specific rules override org defaults)
+        for rule in rules:
+            if self._rule_matches_day(rule, day.day):
+                if rule.min_hours is not None:
+                    min_hours = rule.min_hours
+                if rule.latest_start_time is not None:
+                    latest_start_time = rule.latest_start_time
+                if rule.earliest_departure_time is not None:
+                    earliest_departure_time = rule.earliest_departure_time
+
+        # Check the three partial day conditions
+        if min_hours is not None and hours < min_hours:
+            return True
+
+        if latest_start_time is not None and day.start_time:
+            if self._time_to_seconds(day.start_time) > self._time_to_seconds(
+                latest_start_time
+            ):
+                return True
+
+        if earliest_departure_time is not None and day.end_time:
+            if self._time_to_seconds(day.end_time) < self._time_to_seconds(
+                earliest_departure_time
+            ):
+                return True
+
+        return False
+
+    def _get_current_attendance_rules(self, day: AttendanceDay) -> List[AttendanceRule]:
+        """Get attendance rules that apply to this person and day"""
+        return list(
+            AttendanceRule.objects.filter(
+                organization=self.org,
+                person=day.person,
+            ).filter(
+                Q(start_date__lte=day.day, end_date__gte=day.day)
+                | Q(start_date__lte=day.day, end_date__isnull=True)
+                | Q(start_date__isnull=True, end_date__gte=day.day)
+                | Q(start_date__isnull=True, end_date__isnull=True)
+            )
+        )
+
+    def _rule_matches_day(self, rule: AttendanceRule, day_date: date) -> bool:
+        """Check if an attendance rule matches the given day of week"""
+        weekday = day_date.weekday()  # Monday=0, Sunday=6
+
+        # Map Python weekday to rule fields
+        day_fields = [
+            rule.monday,  # 0 = Monday
+            rule.tuesday,  # 1 = Tuesday
+            rule.wednesday,  # 2 = Wednesday
+            rule.thursday,  # 3 = Thursday
+            rule.friday,  # 4 = Friday
+            False,  # 5 = Saturday (not supported)
+            False,  # 6 = Sunday (not supported)
+        ]
+
+        return weekday < 5 and day_fields[weekday]
+
+    def _time_to_seconds(self, time_obj: time) -> int:
+        """Convert time object to seconds since midnight"""
+        return time_obj.hour * 3600 + time_obj.minute * 60 + time_obj.second
 
     def _calculate_hours(self, day: AttendanceDay) -> float:
         if not day.start_time or not day.end_time:
             return 0.0
 
-        start_seconds = (
-            day.start_time.hour * 3600
-            + day.start_time.minute * 60
-            + day.start_time.second
-        )
-        end_seconds = (
-            day.end_time.hour * 3600 + day.end_time.minute * 60 + day.end_time.second
-        )
+        start_seconds = self._time_to_seconds(day.start_time)
+        end_seconds = self._time_to_seconds(day.end_time)
 
         if end_seconds <= start_seconds:
             return 0.0
@@ -130,16 +171,8 @@ class AttendanceStats:
 
         # Subtract off-campus time if applicable
         if day.off_campus_departure_time and day.off_campus_return_time:
-            off_start = (
-                day.off_campus_departure_time.hour * 3600
-                + day.off_campus_departure_time.minute * 60
-                + day.off_campus_departure_time.second
-            )
-            off_end = (
-                day.off_campus_return_time.hour * 3600
-                + day.off_campus_return_time.minute * 60
-                + day.off_campus_return_time.second
-            )
+            off_start = self._time_to_seconds(day.off_campus_departure_time)
+            off_end = self._time_to_seconds(day.off_campus_return_time)
 
             if off_end > off_start:
                 off_hours = (off_end - off_start) / 3600.0
@@ -152,9 +185,10 @@ class AttendanceStats:
         return max(0.0, hours)
 
     def average_hours_per_day(self) -> float:
-        if self.days_present == 0:
+        total_days_attended = self.days_present + self.partial_days_present
+        if total_days_attended == 0:
             return 0.0
-        return self.total_hours / self.days_present
+        return self.total_hours / total_days_attended
 
     def attendance_rate(self) -> float:
         if not self.values:
@@ -331,6 +365,7 @@ def attendance_index(request: DstHttpRequest):
 
     return render_main_template(
         request,
+        "attendance",
         render_to_string(
             "attendance_index.html",
             {
@@ -353,11 +388,8 @@ def attendance_index(request: DstHttpRequest):
 
 
 def get_daily_hours_file(
-    all_dates: List[date],
-    person_date_attendance: Dict[str, Dict[date, AttendanceDay]],
-    org_config,
+    all_dates: List[date], person_date_attendance: Dict[str, Dict[date, AttendanceDay]]
 ) -> bytes:
-    """Generate daily hours CSV file matching Java implementation"""
     csv_buffer = io.StringIO()
     writer = csv.writer(csv_buffer)
 
@@ -433,44 +465,53 @@ def get_daily_signins_file(
 
 
 def _calculate_day_hours(day: AttendanceDay) -> float:
-    """Calculate hours for a single day (helper function)"""
+    """Calculate hours for a single day (helper function) - matches Java getHours() exactly"""
     if not day.start_time or not day.end_time:
         return 0.0
 
-    start_seconds = (
-        day.start_time.hour * 3600 + day.start_time.minute * 60 + day.start_time.second
+    # Convert to milliseconds to match Java Time.getTime() behavior
+    start_millis = (
+        day.start_time.hour * 3600000
+        + day.start_time.minute * 60000
+        + day.start_time.second * 1000
+        + day.start_time.microsecond // 1000
     )
-    end_seconds = (
-        day.end_time.hour * 3600 + day.end_time.minute * 60 + day.end_time.second
+    end_millis = (
+        day.end_time.hour * 3600000
+        + day.end_time.minute * 60000
+        + day.end_time.second * 1000
+        + day.end_time.microsecond // 1000
     )
 
-    if end_seconds <= start_seconds:
+    if end_millis <= start_millis:
         return 0.0
 
-    hours = (end_seconds - start_seconds) / 3600.0
-
-    # Subtract off-campus time if applicable
+    # Calculate off-campus time in milliseconds
+    off_campus_time = 0
     if day.off_campus_departure_time and day.off_campus_return_time:
-        off_start = (
-            day.off_campus_departure_time.hour * 3600
-            + day.off_campus_departure_time.minute * 60
-            + day.off_campus_departure_time.second
+        off_start_millis = (
+            day.off_campus_departure_time.hour * 3600000
+            + day.off_campus_departure_time.minute * 60000
+            + day.off_campus_departure_time.second * 1000
+            + day.off_campus_departure_time.microsecond // 1000
         )
-        off_end = (
-            day.off_campus_return_time.hour * 3600
-            + day.off_campus_return_time.minute * 60
-            + day.off_campus_return_time.second
+        off_end_millis = (
+            day.off_campus_return_time.hour * 3600000
+            + day.off_campus_return_time.minute * 60000
+            + day.off_campus_return_time.second * 1000
+            + day.off_campus_return_time.microsecond // 1000
         )
 
-        if off_end > off_start:
-            off_hours = (off_end - off_start) / 3600.0
-            hours -= off_hours
+        off_campus_time = off_end_millis - off_start_millis
 
-        # Add back exempted minutes
+        # Subtract exempted minutes (convert to milliseconds)
         if day.off_campus_minutes_exempted:
-            hours += day.off_campus_minutes_exempted / 60.0
+            off_campus_time -= day.off_campus_minutes_exempted * 60 * 1000
+            if off_campus_time < 0:
+                off_campus_time = 0
 
-    return max(0.0, hours)
+    # Match Java calculation exactly: (endTime.getTime() - startTime.getTime() - off_campus_time) / (1000.0 * 60 * 60)
+    return (end_millis - start_millis - off_campus_time) / (1000.0 * 60 * 60)
 
 
 @login_required()
@@ -558,9 +599,7 @@ def attendance_download(request: DstHttpRequest):
             person_date_attendance[name][day.day] = day
 
         # File 2: Daily hours matrix (daily_hours.csv)
-        daily_hours_content = get_daily_hours_file(
-            all_dates, person_date_attendance, org_config
-        )
+        daily_hours_content = get_daily_hours_file(all_dates, person_date_attendance)
         zip_file.writestr("attendance/daily_hours.csv", daily_hours_content)
 
         # File 3: Daily sign-ins matrix (daily_signins.csv)

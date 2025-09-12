@@ -27,7 +27,7 @@ DEBUG = True
 ALLOWED_HOSTS = ["localhost"]
 
 # Profiling
-SILK_ENABLED = False
+SILK_ENABLED = True
 PYINSTRUMENT_PROFILE_DIR = "profiles"  # also add pyinstrument to MIDDLEWARE
 
 # Application definition

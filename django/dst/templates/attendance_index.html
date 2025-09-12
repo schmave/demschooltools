@@ -110,9 +110,9 @@ $(function() {
 <tr{% if person not in current_people %} class="inactive"{% endif %}>
 	<td>
 		{% if not next_date %}
-			<a href="/attendance/person/{{ person.id }}">
+			<a href="/attendance/forPerson/{{ person.id }}">
 		{% else %}
-			<a href="/attendance/person/{{ person.id }}?start_date={{ start_date|format_date_for_input }}&end_date={{ next_date|format_date_for_input}}">
+			<a href="/attendance/forPerson/{{ person.id }}?start_date={{ start_date|format_date_for_input }}&end_date={{ next_date|format_date_for_input}}">
 		{% endif %}
 		{{ person.first_name }}</a>
 	</td>

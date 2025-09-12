@@ -4,13 +4,11 @@ from datetime import timedelta
 from typing import Any, Type
 
 from django import forms
-from django.conf import settings
-from django.contrib.auth.decorators import login_required as django_login_required
 from django.db.models import CharField, Model, Prefetch, Q, QuerySet, Value
 from django.db.models.functions import Concat
 from django.db.transaction import atomic
 from django.forms import Form, ModelForm, TextInput, ValidationError
-from django.http import HttpRequest, HttpResponseNotFound
+from django.http import HttpResponseNotFound
 from django.http.response import HttpResponse as HttpResponse
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
@@ -20,7 +18,6 @@ from django.utils.safestring import mark_safe
 from django.views import View
 
 from demschooltools.form_renderer import BootstrapFormRenderer
-from dst.fields import DateToDatetimeField
 from dst.models import (
     Chapter,
     Entry,
@@ -35,43 +32,13 @@ from dst.pdf_utils import (
     create_pdf_response,
     render_html_to_pdf,
 )
-
-
-def login_required():
-    return django_login_required(login_url="/login")
-
-
-class DstHttpRequest(HttpRequest):
-    org: Organization
-
-
-def render_main_template(
-    request: DstHttpRequest,
-    content: str,
-    title: str,
-    selected_button: str | None = None,
-):
-    return render(
-        request,
-        "main.html",
-        {
-            "title": title,
-            "menu": "manual",
-            "selectedBtn": selected_button,
-            "content": mark_safe(content),
-            "current_username": request.user.email
-            if request.user.is_authenticated
-            else None,
-            "is_user_logged_in": request.user.is_authenticated,
-            "org_config": get_org_config(request.org),
-            "rollbar_environment": settings.ROLLBAR_ENVIRONMENT,
-            "rollbar_token": settings.ROLLBAR_FRONTEND_TOKEN,
-        },
-    )
-
-
-def get_html_from_response(response: HttpResponse) -> str:
-    return response.content.decode("utf-8")
+from dst.utils import (
+    DateToDatetimeField,
+    DstHttpRequest,
+    get_html_from_response,
+    login_required,
+    render_main_template,
+)
 
 
 @login_required()
@@ -82,6 +49,7 @@ def view_manual(request: DstHttpRequest):
 
     return render_main_template(
         request,
+        "manual",
         render_to_string(
             "view_manual_toc.html",
             {
@@ -140,6 +108,7 @@ def view_manual_changes(request: DstHttpRequest):
 
     return render_main_template(
         request,
+        "manual",
         render_to_string(
             "view_manual_changes.html",
             {
@@ -228,6 +197,7 @@ class CreateUpdateView(View):
     def render(self, request: DstHttpRequest, form: ModelForm):
         return render_main_template(
             request,
+            "manual",
             render_to_string(
                 self.template_name,
                 self.get_form_context(
@@ -541,6 +511,7 @@ def print_manual(request: DstHttpRequest):
 
     return render_main_template(
         request,
+        "manual",
         render_to_string(
             "print_manual.html",
             {
@@ -667,6 +638,7 @@ def search_manual(request: DstHttpRequest):
 
     return render_main_template(
         request,
+        "manual",
         render_to_string(
             "manual_search.html",
             {
@@ -718,6 +690,7 @@ def preview_entry(request: DstHttpRequest, object_id: int | None = None):
 def get_chapter_response(chapter: Chapter, request: DstHttpRequest) -> HttpResponse:
     return render_main_template(
         request,
+        "manual",
         render_to_string(
             "view_chapter.html",
             {
@@ -741,6 +714,7 @@ def print_manual_chapter(request: DstHttpRequest, chapter_id: int):
         html = get_html_from_response(
             render_main_template(
                 request,
+                "manual",
                 render_to_string(
                     "view_manual_toc.html",
                     {
@@ -762,6 +736,7 @@ def print_manual_chapter(request: DstHttpRequest, chapter_id: int):
         toc_html = get_html_from_response(
             render_main_template(
                 request,
+                "manual",
                 render_to_string(
                     "view_manual_toc.html",
                     {

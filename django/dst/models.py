@@ -236,6 +236,7 @@ class AttendanceDay(models.Model):
         indexes = [models.Index("day", name="attendance_day_day_idx")]
 
     person = models.ForeignKey(Person, on_delete=models.PROTECT)
+    person_id: int
     day = models.DateField()
     code = models.CharField(max_length=64, null=True, blank=True)
 
