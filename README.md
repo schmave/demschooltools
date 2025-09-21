@@ -90,3 +90,26 @@ To enable the Custodia attendance system locally, run:
     cd custodia
     npm install
     npm run watch
+
+### Database Cleanup
+
+For use when you're resetting your database, Can be run in PGAdmin or other query tool
+```
+-- Drop contents of public schema in school_crm database
+BEGIN;
+DROP SCHEMA IF EXISTS public CASCADE;
+CREATE SCHEMA public AUTHORIZATION postgres;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO public;
+COMMIT;
+
+-- Remove the content owned by the custodia role, and delete the role
+DO $$
+BEGIN
+	IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'custodia') THEN
+		DROP OWNED BY "custodia" CASCADE;
+		DROP ROLE IF EXISTS "custodia";
+    END IF;
+END
+$$;
+```
