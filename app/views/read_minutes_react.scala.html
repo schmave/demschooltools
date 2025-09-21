@@ -6,26 +6,26 @@
     <div id="react-root"></div>
 
     <script type="text/javascript">
-    initialData = {}
-    initialData.meeting_id = @meeting.getId();
-    initialData.ROLE_JC_CHAIR = @PersonAtMeeting.ROLE_JC_CHAIR
-    initialData.ROLE_JC_MEMBER = @PersonAtMeeting.ROLE_JC_MEMBER
-    initialData.ROLE_NOTE_TAKER = @PersonAtMeeting.ROLE_NOTE_TAKER
-    initialData.ROLE_JC_SUB = @PersonAtMeeting.ROLE_JC_SUB
-    initialData.ROLE_RUNNER = @PersonAtMeeting.ROLE_RUNNER
-    initialData.ROLE_TESTIFIER = @PersonAtCase.ROLE_TESTIFIER
-    initialData.ROLE_WRITER = @PersonAtCase.ROLE_WRITER
+      window.initialData = {}
+      window.initialData.meeting_id = @meeting.getId();
+      window.initialData.ROLE_JC_CHAIR = @PersonAtMeeting.ROLE_JC_CHAIR
+      window.initialData.ROLE_JC_MEMBER = @PersonAtMeeting.ROLE_JC_MEMBER
+      window.initialData.ROLE_NOTE_TAKER = @PersonAtMeeting.ROLE_NOTE_TAKER
+      window.initialData.ROLE_JC_SUB = @PersonAtMeeting.ROLE_JC_SUB
+      window.initialData.ROLE_RUNNER = @PersonAtMeeting.ROLE_RUNNER
+      window.initialData.ROLE_TESTIFIER = @PersonAtCase.ROLE_TESTIFIER
+      window.initialData.ROLE_WRITER = @PersonAtCase.ROLE_WRITER
 
-    initialData.people = @Html(Application.jcPeople("", Utils.getOrgConfig(request).org))
-    initialData.rules = @Html(Application.jsonRules(false, Utils.getOrgConfig(request).org))
-    initialData.cases = @Html(Application.jsonCases("", Utils.getOrgConfig(request).org))
+      window.initialData.people = @Html(Application.jcPeople("", Utils.getOrgConfig(request).org))
+      window.initialData.rules = @Html(Application.jsonRules(false, Utils.getOrgConfig(request).org))
+      window.initialData.cases = @Html(Application.jsonCases("", Utils.getOrgConfig(request).org))
 
-    initialData.committee = @Html(meeting.getJsonPeople(PersonAtMeeting.ROLE_JC_MEMBER));
-    initialData.chair = @Html(meeting.getJsonPeople(PersonAtMeeting.ROLE_JC_CHAIR));
-    initialData.notetaker = @Html(meeting.getJsonPeople(PersonAtMeeting.ROLE_NOTE_TAKER));
-    initialData.sub = @Html(meeting.getJsonPeople(PersonAtMeeting.ROLE_JC_SUB));
-    initialData.runners = @Html(meeting.getJsonPeople(PersonAtMeeting.ROLE_RUNNER));
-    initialData.config = @Html(Utils.toJson(Utils.getOrgConfig(request)));
+      window.initialData.committee = @Html(meeting.getJsonPeople(PersonAtMeeting.ROLE_JC_MEMBER));
+      window.initialData.chair = @Html(meeting.getJsonPeople(PersonAtMeeting.ROLE_JC_CHAIR));
+      window.initialData.notetaker = @Html(meeting.getJsonPeople(PersonAtMeeting.ROLE_NOTE_TAKER));
+      window.initialData.sub = @Html(meeting.getJsonPeople(PersonAtMeeting.ROLE_JC_SUB));
+      window.initialData.runners = @Html(meeting.getJsonPeople(PersonAtMeeting.ROLE_RUNNER));
+      window.initialData.config = @Html(Utils.toJson(Utils.getOrgConfig(request)));
     </script>
     <script type="text/javascript"
     src="@routes.Assets.versioned("javascripts/gen/reactapp.js")"></script>
