@@ -6,7 +6,7 @@ const EditMinutesPage = () => {
 
   return (
     <>
-      <div className="div-test"><Typography>Edit Minutes View, Now in React Folder, React Structure</Typography></div>
+      <div className="div-test"><Typography>Edit Minutes View, Now in React Folder, React Structure, changed, less</Typography></div>
       {people.map((person) => (
         <div key={person.id}><Typography>{person.label}</Typography></div>
       ))}

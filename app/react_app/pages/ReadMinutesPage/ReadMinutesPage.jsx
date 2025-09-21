@@ -13,7 +13,7 @@ const ReadMinutesPage = () => {
 
   return (
     <>
-      <div className="div-test"><Typography>Read Minutes View, AKA a Second Page</Typography></div>
+      <div className="div-test"><Typography>Read Minutes View, AKA a Second Page,, new changes!</Typography></div>
       {cases.map((caseData) => (
         <div key={caseData.label}><Typography>I am case #{caseData.label}</Typography></div>
       ))}

@@ -27,6 +27,5 @@
       window.initialData.runners = @Html(meeting.getJsonPeople(PersonAtMeeting.ROLE_RUNNER));
       window.initialData.config = @Html(Utils.toJson(Utils.getOrgConfig(request)));
     </script>
-    <script type="text/javascript"
-    src="@routes.Assets.versioned("javascripts/gen/reactapp.js")"></script>
+  @views.html.tags.react_bundle_loader()
 }
