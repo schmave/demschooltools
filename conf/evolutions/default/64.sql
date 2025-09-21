@@ -15,7 +15,7 @@ update organization set short_name='HSS' where id=7;
 update organization set short_name='CSS' where id=8;
 update organization set short_name='Sandbox' where id=9;
 
-create role custodia login password '123';
+create role if not exists custodia login password '123';
 
 grant select on all tables in schema public to custodia;
 
