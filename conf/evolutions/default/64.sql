@@ -15,13 +15,7 @@ update organization set short_name='HSS' where id=7;
 update organization set short_name='CSS' where id=8;
 update organization set short_name='Sandbox' where id=9;
 
-DO $$
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'custodia') THEN
-        CREATE ROLE custodia WITH LOGIN PASSWORD '123';
-    END IF;
-END
-$$;
+CREATE ROLE custodia WITH LOGIN PASSWORD '123';
 
 grant select on all tables in schema public to custodia;
 
