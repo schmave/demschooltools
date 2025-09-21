@@ -1,129 +1,101 @@
-from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models import Q
+
+from dst.models import Organization, Person
+
+# class OldStudent(models.Model):
+#     class Meta:
+#         db_table = 'overseer"."old_students'
+
+#     id = models.AutoField(db_column="_id", primary_key=True)
+#     name = models.TextField()
+#     person = models.ForeignKey(Person, on_delete=models.PROTECT, db_column="dst_id")
 
 
-class School(models.Model):
-    class Meta:
-        db_table = "schools"
+# class OldUsers(models.Model):
+#     class Meta:
+#         db_table = 'overseer"."users'
 
-    id = models.AutoField(db_column="_id", primary_key=True)
-    name = models.TextField()
-    timezone = models.TextField()
-    inserted_date = models.DateTimeField()
-    use_display_name = models.BooleanField()
-
-
-class CustodiaUser(AbstractUser):
-    """
-    Changes from the overseer.users table currently being used in production:
-
-        ALTER TABLE overseer.users RENAME COLUMN user_id TO id;
-        ALTER TABLE overseer.users RENAME COLUMN inserted_date TO date_joined;
-
-        ALTER TABLE overseer.users ADD COLUMN last_login timestamptz NULL default now();
-        ALTER TABLE overseer.users ADD COLUMN is_superuser bool NOT NULL default false;
-        ALTER TABLE overseer.users ADD COLUMN first_name varchar(150) NOT NULL default '';
-        ALTER TABLE overseer.users ADD COLUMN last_name varchar(150) NOT NULL default '';
-        ALTER TABLE overseer.users ADD COLUMN email varchar(254) NOT NULL default '';
-        ALTER TABLE overseer.users ADD COLUMN is_staff bool NOT NULL default false;
-        ALTER TABLE overseer.users ADD COLUMN is_active bool NOT NULL default true;
+#     id = models.AutoField(db_column="user_id", primary_key=True)
+#     username = models.TextField()
+#     roles = models.TextField()
+#     password = models.TextField()
+#     school_id = models.IntegerField()
 
 
-    Also need to deal with the fact that passwords are not in the right format.
-    Django bcrypt looks like:
-       bcrypt$$2b$12$kHtLdeD00SoRqyuqgXZgfevdO0Gy7PAGRFqw0cX49FGLInWRwHZDS
-
-    """
-
-    class Meta:
-        db_table = 'overseer"."users'
-
-    school = models.ForeignKey(School, on_delete=models.PROTECT)
-    roles = models.TextField()
-
-
-class Student(models.Model):
-    class Meta:
-        db_table = "students"
-
-    id = models.AutoField(db_column="_id", primary_key=True)
+class StudentRequiredMinutes(models.Model):
+    person_id: int
     person = models.ForeignKey(
-        "dst.Person", db_column="dst_id", on_delete=models.PROTECT
+        Person,
+        on_delete=models.PROTECT,
+        related_name="required_minutes",
     )
-    is_teacher = models.BooleanField()
-    name = models.TextField()
-    show_as_absent = models.DateField()
-    school = models.ForeignKey(School, on_delete=models.PROTECT)
+    fromdate = models.DateField()
+    required_minutes = models.IntegerField()
 
 
 class Swipe(models.Model):
-    """
-    Changes from the overseer.users table currently being used in production:
-
-    * all time fields currently use a time zone. migrate the DB to use UTC instead
-    * drop rounded_in_time and rounded_out_time columns
-    """
-
-    class Meta:
-        db_table = "swipes"
-
-    id = models.AutoField(db_column="_id", primary_key=True)
-    student = models.ForeignKey(Student, on_delete=models.PROTECT)
+    id = models.AutoField(primary_key=True)
+    person = models.ForeignKey(Person, on_delete=models.PROTECT)
+    person_id: int
     swipe_day = models.DateField()
 
     in_time = models.DateTimeField()
-    out_time = models.DateTimeField()
+    out_time = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"ID-{self.id} {self.in_time}-{self.out_time}"
+
+    class Meta:
+        indexes = [
+            models.Index("person", "swipe_day", name="swipes_person_id_swipe_day_idx"),
+            models.Index("swipe_day", "person", name="swipes_swipe_day_person_id_idx"),
+        ]
+
+        constraints = [
+            models.UniqueConstraint(
+                "person",
+                "swipe_day",
+                condition=Q(out_time=None),
+                name="person_swipe_day_empty_out_unique",
+            )
+        ]
 
 
 class Override(models.Model):
-    """
-    Recommended changes from the overseer.overrides table currently being used in production:
-
-    Add unique (student, date) constraint
-    """
-
-    class Meta:
-        db_table = "overrides"
-
-    id = models.AutoField(db_column="_id", primary_key=True)
-    student = models.ForeignKey(Student, on_delete=models.PROTECT)
+    id = models.AutoField(primary_key=True)
+    person = models.ForeignKey(Person, on_delete=models.PROTECT)
+    person_id: int
     inserted_date = models.DateTimeField(auto_now_add=True)
 
     date = models.DateField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint("person", "date", name="uniq_overrides_person_date")
+        ]
 
 
 class Excuse(models.Model):
-    """
-    Recommended changes from the overseer.excuses table currently being used in production:
-
-    Add unique (student, date) constraint
-    """
-
-    class Meta:
-        db_table = "excuses"
-
-    id = models.AutoField(db_column="_id", primary_key=True)
-    student = models.ForeignKey(Student, on_delete=models.PROTECT)
+    id = models.AutoField(primary_key=True)
+    person = models.ForeignKey(Person, on_delete=models.PROTECT)
+    person_id: int
     inserted_date = models.DateTimeField(auto_now_add=True)
 
     date = models.DateField()
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint("person", "date", name="uniq_excuses_person_date")
+        ]
+
 
 class Year(models.Model):
-    """
-    Recommended changes from the overseer.years table currently being used in production:
+    id = models.AutoField(primary_key=True)
 
-    Figure out timezone of from_date and to_date columns
-    """
-
-    class Meta:
-        db_table = "years"
-
-    id = models.AutoField(db_column="_id", primary_key=True)
-
-    from_date = models.DateTimeField()
-    to_date = models.DateTimeField()
+    from_time = models.DateTimeField()
+    to_time = models.DateTimeField()
 
     inserted_date = models.DateTimeField(auto_now_add=True)
     name = models.TextField()
-    school = models.ForeignKey(School, on_delete=models.PROTECT)
+    organization = models.ForeignKey(Organization, on_delete=models.PROTECT)

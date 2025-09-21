@@ -1,0 +1,32 @@
+{% load dst_tags %}
+
+<div id="footer" class="only-print">
+    Printed on {% yymmddDate %}
+</div>
+
+<h1>{{ org_config.org.short_name }} {{ org_config.str_manual_title }}</h1>
+
+<p class="no-print"><a class="btn btn-primary" href="/editChapter">Add new chapter</a></p>
+
+<ul>
+    {% for c in chapters %}
+        <li><a href="/viewChapter/{{ c.id }}">{{ c.num }} {{ c.title }}</a></li>
+        <ul>
+            {% for section in c.sections.all %}
+                <li><a href="/viewChapter/{{ c.id }}#section_{{ section.id }}">{{ c.num }}{{ section.num }} {{ section.title }}</a></li>
+                <ul>
+                    {% for entry in section.entries.all %}
+                        <li><a href="/viewChapter/{{ c.id }}#entry_{{ entry.id }}">{{ c.num }}{{ section.num }}.{{ entry.num }} {{ entry.title }}</a></li>
+                    {% endfor %}
+                </ul>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+</ul>
+
+{% if include_content %}
+    {% for c in chapters %}
+        <div style="page-break-before: always;"/>
+        {% include "view_chapter.html" with chapter=c hide_footer=True %}
+    {% endfor %}
+{% endif %}

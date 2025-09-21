@@ -36,20 +36,6 @@ public abstract class Resolver {
   public abstract Call auth(final String provider);
 
   /**
-   * If you set the accountAutoMerge setting to true, you might return null for this.
-   *
-   * @return
-   */
-  public abstract Call askMerge();
-
-  /**
-   * If you set the accountAutoLink setting to true, you might return null for this
-   *
-   * @return
-   */
-  public abstract Call askLink();
-
-  /**
    * Route to redirect to after logout has been finished. If you return null here, the user will get
    * redirected to the URL of the setting afterLogoutFallback You can use this to redirect to an
    * external URL for example.

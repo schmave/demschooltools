@@ -1,0 +1,55 @@
+@(report: RolesReport)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
+
+@import helper._
+
+@main("Roles Records", "roles", "roles_records") {
+
+	@helper.form(routes.Roles.records()) {
+
+        <table class="roles-report-settings">
+			<tr>
+				<th>Person</th>
+				<td id="roles-report-person"></td>
+				<td colspan="2"><button type="submit" class="btn-submit">Fetch Records</button></td>
+			</tr>
+		</table>
+	}
+
+	@if(report.person != null) {
+        <h4><span>@report.person.getDisplayName()</span>'s Roles</h4>
+		<div class="roles-report-results">
+			<table class="table">
+				<tr>
+					<th>Role</th>
+					<th></th>
+					<th>Start Date</th>
+					<th>End Date</th>
+				</tr>
+				@for(entry <- report.entries) {
+					@for((subEntry, i) <- entry.subEntries.view.zipWithIndex) {
+						@for((date, j) <- subEntry.dates.view.zipWithIndex) {
+							<tr>
+								@if(i == 0 && j == 0) {
+									<td class="roles-report-entry" rowspan="@entry.getTotalDates()">@entry.roleName</td>
+								}
+								@if(j == 0) {
+									<td class="roles-report-subentry" rowspan="@subEntry.dates.size()">@subEntry.description</td>
+								}
+								<td>@date.formatStartDate</td>
+								<td>@date.formatEndDate</td>
+							</tr>		
+						}	
+					}
+				}
+			</table>
+		</div>
+	}
+
+	<br>
+	<br>
+}
+
+<script type="text/javascript">
+    var peopleJson = @Html(Application.rolesPeopleJson(Utils.getOrgConfig(request).org));
+	initRolesRecordsReport(peopleJson);
+</script>

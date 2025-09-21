@@ -2,14 +2,12 @@ package controllers;
 
 import io.ebean.DB;
 import io.ebean.SqlUpdate;
-import java.sql.Connection;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.inject.Inject;
 import models.*;
 import play.api.libs.mailer.MailerClient;
-import play.data.Form;
 import play.data.FormFactory;
 import play.db.Database;
 import play.i18n.MessagesApi;
@@ -431,141 +429,5 @@ public class ApplicationEditing extends Controller {
     c.save();
 
     return redirect(routes.ApplicationEditing.enterSchoolMeetingDecisions());
-  }
-
-  void onManualChange(Organization org) {
-    CachedPage.remove(CachedPage.MANUAL_INDEX, org);
-    try {
-      Connection conn = mDatabase.getConnection();
-      conn.prepareStatement("REFRESH MATERIALIZED VIEW entry_index WITH DATA").execute();
-      conn.close();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
-
-  @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
-  public Result addChapter(Http.Request request) {
-    Form<Chapter> form = mFormFactory.form(Chapter.class);
-    return ok(edit_chapter.render(form, true, request, mMessagesApi.preferred(request)));
-  }
-
-  @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
-  public Result editChapter(Integer id, Http.Request request) {
-    Form<Chapter> filled_form =
-        mFormFactory.form(Chapter.class).fill(Chapter.findById(id, Utils.getOrg(request)));
-    return ok(edit_chapter.render(filled_form, false, request, mMessagesApi.preferred(request)));
-  }
-
-  @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
-  public Result saveChapter(Http.Request request) {
-    Form<Chapter> form = mFormFactory.form(Chapter.class).bindFromRequest(request);
-
-    Chapter c;
-    if (form.field("id").value().isPresent()) {
-      c = Chapter.findById(Integer.parseInt(form.field("id").value().get()), Utils.getOrg(request));
-      c.updateFromForm(form);
-    } else {
-      c = Chapter.create(form, Utils.getOrg(request));
-    }
-
-    onManualChange(Utils.getOrg(request));
-    return redirect(routes.Application.viewChapter(c.getId()));
-  }
-
-  @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
-  public Result addSection(Integer chapterId, Http.Request request) {
-    Form<Section> form = mFormFactory.form(Section.class);
-    Section section = new Section();
-    section.setChapter(Chapter.findById(chapterId, Utils.getOrg(request)));
-    form = form.fill(section);
-    return ok(
-        edit_section.render(
-            form,
-            Chapter.findById(chapterId, Utils.getOrg(request)),
-            true,
-            Chapter.all(Utils.getOrg(request)),
-            request,
-            mMessagesApi.preferred(request)));
-  }
-
-  @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
-  public Result editSection(Integer id, Http.Request request) {
-    Section existing_section = Section.findById(id, Utils.getOrg(request));
-    Form<Section> filled_form = mFormFactory.form(Section.class).fill(existing_section);
-    return ok(
-        edit_section.render(
-            filled_form,
-            existing_section.getChapter(),
-            false,
-            Chapter.all(Utils.getOrg(request)),
-            request,
-            mMessagesApi.preferred(request)));
-  }
-
-  @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
-  public Result saveSection(Http.Request request) {
-    Form<Section> form = mFormFactory.form(Section.class).bindFromRequest(request);
-
-    Section s;
-    if (form.field("id").value().isPresent()) {
-      s = Section.findById(Integer.parseInt(form.field("id").value().get()), Utils.getOrg(request));
-      s.updateFromForm(form);
-    } else {
-      s = Section.create(form);
-    }
-
-    onManualChange(Utils.getOrg(request));
-    return redirect(
-        routes.Application.viewChapter(s.getChapter().getId()).url() + "#section_" + s.getId());
-  }
-
-  @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
-  public Result addEntry(Integer sectionId, Http.Request request) {
-    Form<Entry> form = mFormFactory.form(Entry.class);
-    Entry entry = new Entry();
-    entry.setSection(Section.findById(sectionId, Utils.getOrg(request)));
-    form = form.fill(entry);
-    return ok(
-        edit_entry.render(
-            form,
-            Section.findById(sectionId, Utils.getOrg(request)),
-            true,
-            Chapter.all(Utils.getOrg(request)),
-            request,
-            mMessagesApi.preferred(request)));
-  }
-
-  @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
-  public Result editEntry(Integer id, Http.Request request) {
-    Entry e = Entry.findById(id, Utils.getOrg(request));
-    Form<Entry> filled_form = mFormFactory.form(Entry.class).fill(e);
-    return ok(
-        edit_entry.render(
-            filled_form,
-            e.getSection(),
-            false,
-            Chapter.all(Utils.getOrg(request)),
-            request,
-            mMessagesApi.preferred(request)));
-  }
-
-  @Secured.Auth(UserRole.ROLE_EDIT_MANUAL)
-  public Result saveEntry(Http.Request request) {
-    Form<Entry> form = mFormFactory.form(Entry.class).bindFromRequest(request);
-
-    Entry e;
-    if (form.field("id").value().isPresent()) {
-      e = Entry.findById(Integer.parseInt(form.field("id").value().get()), Utils.getOrg(request));
-      e.updateFromForm(form);
-    } else {
-      e = Entry.create(form);
-    }
-
-    onManualChange(Utils.getOrg(request));
-    return redirect(
-        routes.Application.viewChapter(e.getSection().getChapter().getId()).url()
-            + "#entry_"
-            + e.getId());
   }
 }

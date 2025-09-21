@@ -62,12 +62,6 @@
     font-size: 14px;
 }
 
-@media screen {
-  #footer {
-    display: none;
-  }
-}
-
 .center {
   text-align: center;
 }
@@ -106,6 +100,11 @@
 
 .subnav a.active {
     background-color: yellow;
+}
+
+.dst-nav,
+.subnav {
+  font-size: 12px;
 }
 
 .dst-nav {
@@ -364,11 +363,19 @@ label {
   font-weight: normal;
 }
 
+.django-form label {
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.tab-pane >.panel {
+  border-top: none;
+}
+
 body {
-  font-size: 12px;
-    padding-top: 10px;
-    margin-left: 20px;
-    margin-right: 20px;
+  padding-top: 10px;
+  margin-left: 20px;
+  margin-right: 20px;
 }
 
 #attendance-student-picker {
@@ -389,7 +396,7 @@ body {
 
 #attendance-editing {
   td {
-    padding: 1px;
+    padding: 6px 1px;
   }
   .color-bar {
     width: 60px;
@@ -407,7 +414,6 @@ body {
 }
 
 td.attendance-error {
-  font-size: 18px;
   text-align: center;
   color: red;
   font-weight: bold;
@@ -463,7 +469,7 @@ td.attendance-error {
     }
 }
 
-.attendance-edit-rule-person-selected {
+.autocomplete-selected {
   display: none;
   margin-top: 3px;
 
@@ -714,7 +720,11 @@ hr {
   border-top: 1px solid #999;
 }
 
-.man-chapter {
+.man-entry + .man-chapter {
+  margin-top: 2em;
+}
+
+.man-chapter  {
    font-size: 18px;
    font-weight: bold;
 }
@@ -748,14 +758,20 @@ hr {
 
 @media screen and (min-width: 8in) {
   .man-section {
-      width: 7in;
+      max-width: 7in;
   }
   .man-entry-content {
-    width: 6in;
+    max-width: 6in;
   }
 }
 
-.man-entry {
+.man-search-highlight {
+  background-color: #ff6;
+}
+
+.man-entry.deleted {
+  text-decoration: line-through;
+  background-color: #eee;
 }
 
 .man-entry-num {
@@ -771,13 +787,6 @@ hr {
     color: #999;
 }
 
-.man-last-modify-date {
-    color: #999;
-    font-weight: normal;
-    padding-left: 100px;
-    float: right;
-}
-
 .man-edit {
   font-weight: normal;
   font-size: 10px;
@@ -787,12 +796,6 @@ hr {
 .entry-content-edit {
   float: left;
   width: 75%;
-}
-
-.markdown-guidelines {
-  float: right;
-  width: 25%;
-  padding-left: 20px;
 }
 
 .change_log {
@@ -844,7 +847,125 @@ input.date {
   background: #deeff8;
 }
 
-.attendance-pins-table {
+.roles-main {
+    overflow-x: auto;
+    overflow-y: auto;
+    // 82px is the height of the site header plus body top padding
+    height: ~"calc(100vh - 82px)";
+}
+
+.roles-editor {
+    display: none;
+    float: right;
+    overflow-y: scroll;
+    width: 550px;
+    // 82px is the height of the site header plus body top padding
+    height: ~"calc(100vh - 82px)";
+    margin-left: 10px;
+    padding: 20px;
+    padding-top: 0;
+    border-left: 5px solid #e8e8e8;
+    background: #f8f8f8;
+}
+
+.roles-tab {
+    display: inline-block;
+    background: #eee;
+    padding: 6px 12px;
+    min-width: 80px;
+    text-align: center;
+    border: 1px solid #bbb;
+    border-bottom: none;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    cursor: pointer;
+
+    &.active, &:hover {
+        background: #c3f4d8;
+        border-color: #94bea6;
+    }
+}
+
+.roles-index-table {
+    width: auto;
+    tr:nth-child(even) {
+        background: #eee;
+    }
+    tr.selected {
+      background: #d9f0ff;
+    }
+    th {
+        cursor: pointer;
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+    td {
+        padding: 6px 12px !important;
+        border-left: 1px solid #d6d6d6;
+        white-space: nowrap;
+    }
+    a {
+        cursor: pointer;
+    }
+    .roles-chairs {
+      font-weight: bold;
+    }
+    .roles-verbose {
+      color: #999;
+    }
+}
+
+.roles-edit-table {
+  width: 100%;
+  select {
+      width: auto;
+  }
+  input {
+      width: 400px;
+      &.autocomplete-text {
+        width: auto;
+        margin-right: 6px;
+        margin-top: 5px;
+      }
+  }
+  .autocomplete-item {
+    display: inline-block;
+  }
+  .autocomplete-selected {
+    margin-right: 6px;
+  }
+}
+
+.roles-editor-people {
+  line-height: 2.5;
+  border-top: 1px solid #bbb;
+  padding-bottom: 4px;
+}
+
+.roles-report-settings {
+  margin-bottom: 15px;
+  border-spacing: 7px;
+  border-collapse: separate;
+}
+
+.roles-report-results .table {
+  width: auto;
+
+  td {
+    border-top-color: #ccc;
+  }
+
+  .roles-report-entry {
+    background: #e6e6e6;
+  }
+
+  .roles-report-subentry {
+    background: #f2f2f2;
+  }
+}
+
+.attendance-pins-table, .roles-edit-table {
   border-collapse: separate;
   border-spacing: 8px 3px;
 }
@@ -859,23 +980,6 @@ input.date {
 
 .attendance-off-campus-time {
   width: 90px;
-}
-
-.attendance-off-campus-person {
-  width: 120px;
-}
-
-.attendance-off-campus-person-selected {
-  display: none;
-  margin-top: 3px;
-
-  .label {
-    margin-left: 0;
-  }
-
-  img {
-    margin-left: -4px;
-  }
 }
 
 .alert-warning {
@@ -973,6 +1077,10 @@ input[type="checkbox"].absence-checkbox {
  * End copy from stackoverflow
  **************************************************************************/
 
+
+.only-print {
+  display: none;
+}
 
 @media print {
   @import (inline) "print.css";

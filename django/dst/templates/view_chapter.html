@@ -1,0 +1,16 @@
+{% load dst_tags %}
+
+{% if not hide_footer %}
+    <div id="footer" class="only-print">
+        Printed on {% yymmddDate %}
+    </div>
+{% endif %}
+
+{% include "chapter_header.html" %}
+
+{% for section in chapter.sections.all %}
+    {% include "section_header.html" %}
+    {% for entry in section.entries.all %}
+        {% include "view_entry.html" %}
+    {% endfor %}
+{% endfor %}

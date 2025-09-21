@@ -2,9 +2,11 @@
 
 @defining(people.filter(_.getRole() == role)) { selected_people =>
 	@if( selected_people.size() > 0) {
-		@Html(selected_people.map { p =>
-			p.getPerson().getDisplayName()
-		}.mkString(", "));
+		@selected_people.map { p =>
+			@* Calling Html() here is safe because the result of mkString
+               will be escaped again. Without @Html, the person's name is
+               escaped twice. *@
+			@Html(p.getPerson().getDisplayName())}.mkString(", ");
 	} else {
 		<i>None</i>;
 	}

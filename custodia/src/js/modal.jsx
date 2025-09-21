@@ -1,5 +1,6 @@
 const React = require("react");
 const Skylight = require("react-skylight").default;
+const $ = require("jquery");
 
 module.exports = class extends React.Component {
   static displayName = "Modal";

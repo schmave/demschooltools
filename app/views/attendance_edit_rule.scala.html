@@ -32,14 +32,7 @@ enable_late_fees : Boolean
 				Person
 				<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip" title="The person this rule applies to. Leave blank to apply the rule to everyone."></span>
 			</th>
-			<td class="js-person">
-				<div class="attendance-edit-rule-person-selected js-person-name-selected name">
-					<span class="js-person-name-selected-text label label-primary"></span>
-					<img src="/assets/images/x.png">
-				</div>
-				<input type="text" class="js-person-name">
-				<input type="hidden" class="js-person-id" name="personId"/>
-			</td>
+			<td id="attendance-edit-rule-person"></td>
 		</tr>
 		<tr>
 			<th>
@@ -126,6 +119,10 @@ enable_late_fees : Boolean
 
 <script type="text/javascript">
 	var people = @Html(people_json);
-	var selectedPersonId = @Html(if (rule.getPerson() != null) Integer.toString(rule.getPerson().getPersonId()) else "null");
-	initAttendanceRule(selectedPersonId, people);
+	var selectedPersonId, selectedPersonName;
+	@if(rule.getPerson() != null) {
+		selectedPersonId = @Html(Integer.toString(rule.getPerson().getPersonId()));
+		selectedPersonName = "@Html(rule.getPerson().getDisplayName())";
+	}
+	initAttendanceRule(selectedPersonId, selectedPersonName, people);
 </script>

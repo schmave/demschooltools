@@ -22,7 +22,6 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 import play.Logger;
 import play.api.libs.mailer.MailerClient;
-import play.i18n.Messages;
 import play.i18n.MessagesApi;
 import play.libs.Files.TemporaryFile;
 import play.libs.Json;
@@ -375,9 +374,22 @@ public class Application extends Controller {
     return peopleByTagType("showInAttendance", org);
   }
 
+  public static List<Person> rolesPeople(Organization org) {
+    return peopleByTagType("showInRoles", org);
+  }
+
   public static String attendancePeopleJson(Organization org) {
-    List<Map<String, String>> result = new ArrayList<>();
     List<Person> people = attendancePeople(org);
+    return peopleToJson(people);
+  }
+
+  public static String rolesPeopleJson(Organization org) {
+    List<Person> people = rolesPeople(org);
+    return peopleToJson(people);
+  }
+
+  private static String peopleToJson(List<Person> people) {
+    List<Map<String, String>> result = new ArrayList<>();
     for (Person p : people) {
       HashMap<String, String> values = new HashMap<>();
       values.put("label", p.getDisplayName());
@@ -400,20 +412,29 @@ public class Application extends Controller {
   static Logger.ALogger sLogger = Logger.of("application");
 
   public Result index(Http.Request request) {
+    final boolean isLoggedIn = isCurrentUserLoggedIn(currentUsername(request));
     return ok(
         cached_page.render(
             new CachedPage(
-                CachedPage.JC_INDEX, "JC database", "jc", "jc_home", Utils.getOrg(request)) {
+                isLoggedIn ? CachedPage.JC_INDEX : CachedPage.JC_INDEX_LOGGED_OUT,
+                "JC database",
+                "jc",
+                "jc_home",
+                Utils.getOrg(request)) {
               @Override
               String render() {
-                List<Meeting> meetings =
+                ExpressionList<Meeting> meetingQuery =
                     Meeting.find
                         .query()
                         .fetch("cases")
                         .where()
-                        .eq("organization", Utils.getOrg(request))
-                        .orderBy("date DESC")
-                        .findList();
+                        .eq("organization", Utils.getOrg(request));
+
+                if (!isLoggedIn) {
+                  meetingQuery = meetingQuery.ge("date", ModelUtils.getStartOfYear());
+                }
+
+                List<Meeting> meetings = meetingQuery.orderBy("date DESC").findList();
 
                 List<Tag> tags =
                     Tag.find
@@ -461,8 +482,6 @@ public class Application extends Controller {
                 }
 
                 entries_with_charges.sort(Entry.SORT_NUMBER);
-
-                debugMessages(request);
 
                 return jc_index
                     .render(
@@ -608,11 +627,12 @@ public class Application extends Controller {
   }
 
   public Result viewMeeting(int meeting_id, Http.Request request) {
-    return ok(
-        view_meeting.render(
-            Meeting.findById(meeting_id, Utils.getOrg(request)),
-            request,
-            mMessagesApi.preferred(request)));
+    Meeting m = Meeting.findById(meeting_id, Utils.getOrg(request));
+    if (isCurrentUserLoggedIn(currentUsername(request))
+        || (m != null && m.getDate().compareTo(ModelUtils.getStartOfYear()) >= 0)) {
+      return ok(view_meeting.render(m, request, mMessagesApi.preferred(request)));
+    }
+    return ok("You must be logged in to view this meeting");
   }
 
   public Result printMeeting(int meeting_id, Http.Request request) throws Exception {
@@ -796,42 +816,6 @@ public class Application extends Controller {
             "attachment; filename=" + Utils.getOrgConfig(org).str_res_plans + ".csv");
   }
 
-  public Result viewManual(Http.Request request) {
-    return ok(renderManualTOC(Utils.getOrg(request), request));
-  }
-
-  public Result viewManualChanges(String begin_date_string, Http.Request request) {
-    Date begin_date;
-
-    try {
-      begin_date = new SimpleDateFormat("yyyy-M-d").parse(begin_date_string);
-    } catch (ParseException e) {
-      begin_date = new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7);
-      begin_date.setHours(0);
-      begin_date.setMinutes(0);
-    }
-
-    List<ManualChange> changes =
-        ManualChange.find
-            .query()
-            .where()
-            .gt("dateEntered", begin_date)
-            .eq("entry.section.chapter.organization", Utils.getOrg(request))
-            .findList();
-
-    changes.sort(ManualChange.SORT_NUM_DATE);
-
-    return ok(
-        view_manual_changes.render(
-            forDateInput(begin_date), changes, request, mMessagesApi.preferred(request)));
-  }
-
-  public Result printManual(Http.Request request) {
-    return ok(
-        print_manual.render(
-            Chapter.all(Utils.getOrg(request)), request, mMessagesApi.preferred(request)));
-  }
-
   static Path print_temp_dir;
 
   public static void copyPrintingAssetsToTempDir() throws IOException {
@@ -905,161 +889,6 @@ public class Application extends Controller {
         html_file.delete();
       }
     }
-  }
-
-  public static Result renderToPDF(List<String> orig_htmls) throws Exception {
-    File html_file = null;
-    try {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      ITextRenderer renderer = new ITextRenderer();
-
-      boolean first = true;
-      for (String orig_html : orig_htmls) {
-        html_file = prepareTempHTML(orig_html);
-        renderer.setDocument(html_file);
-        renderer.layout();
-        if (first) {
-          renderer.createPDF(baos, false);
-        } else {
-          renderer.writeNextDocument();
-        }
-        html_file.delete();
-        html_file = null;
-
-        first = false;
-      }
-
-      renderer.finishPDF();
-      return ok(baos.toByteArray()).as("application/pdf");
-    } finally {
-      if (html_file != null) {
-        html_file.delete();
-      }
-    }
-  }
-
-  play.twirl.api.Html renderManualTOC(Organization org, Http.Request request) {
-    return cached_page.render(
-        new CachedPage(
-            CachedPage.MANUAL_INDEX,
-            Utils.getOrgConfig(org).str_manual_title,
-            "manual",
-            "toc",
-            org) {
-          @Override
-          String render() {
-            return view_manual
-                .render(Chapter.all(org), request, mMessagesApi.preferred(request))
-                .toString();
-          }
-        },
-        request,
-        mMessagesApi.preferred(request));
-  }
-
-  public Result printManualChapter(Integer id, Http.Request request) throws Exception {
-
-    Organization org = Utils.getOrg(request);
-    if (id == -1) {
-      ArrayList<String> documents = new ArrayList<>();
-      // render TOC
-      documents.add(renderManualTOC(org, request).toString());
-      // then render all chapters
-      for (Chapter chapter : Chapter.all(org)) {
-        documents.add(
-            view_chapter.render(chapter, request, mMessagesApi.preferred(request)).toString());
-      }
-      return renderToPDF(documents);
-    } else {
-      if (id == -2) {
-        return renderToPDF(renderManualTOC(org, request).toString());
-
-      } else {
-        Chapter chapter = Chapter.findById(id, org);
-        return renderToPDF(
-            view_chapter.render(chapter, request, mMessagesApi.preferred(request)).toString());
-      }
-    }
-  }
-
-  public Result viewChapter(Integer id, Http.Request request) {
-    Chapter c =
-        Chapter.find
-            .query()
-            .fetch("sections", FetchConfig.ofQuery())
-            .fetch("sections.entries", FetchConfig.ofQuery())
-            .where()
-            .eq("organization", Utils.getOrg(request))
-            .eq("id", id)
-            .findOne();
-
-    return ok(view_chapter.render(c, request, mMessagesApi.preferred(request)));
-  }
-
-  public Result searchManual(String searchString, Http.Request request) {
-    Map<String, Object> scopes = new HashMap<>();
-    scopes.put("searchString", searchString);
-
-    String sql =
-        "SELECT ei.id "
-            + "FROM entry_index ei "
-            + "WHERE ei.document @@ plainto_tsquery(:searchString) "
-            + "and ei.organization_id=:orgId "
-            + "ORDER BY ts_rank(ei.document, plainto_tsquery(:searchString), 0) DESC";
-
-    OrgConfig orgConfig = Utils.getOrgConfig(Utils.getOrg(request));
-    SqlQuery sqlQuery = DB.sqlQuery(sql);
-    sqlQuery.setParameter("orgId", orgConfig.org.getId());
-    sqlQuery.setParameter("searchString", searchString);
-
-    List<SqlRow> result = sqlQuery.findList();
-    List<Integer> entryIds = new ArrayList<>();
-    for (SqlRow sqlRow : result) {
-      entryIds.add(sqlRow.getInteger("id"));
-    }
-
-    Map<Integer, String> entryToHeadline = new HashMap<>();
-    if (entryIds.size() > 0) {
-      sql =
-          "SELECT e.id, ts_headline(e.content, plainto_tsquery(:searchString), 'MaxFragments=5') as"
-              + " headline FROM entry e WHERE e.id IN (:entryIds)";
-      sqlQuery = DB.sqlQuery(sql);
-      sqlQuery.setParameter("searchString", searchString);
-      sqlQuery.setParameter("entryIds", entryIds);
-      List<SqlRow> headlines = sqlQuery.findList();
-      for (SqlRow headline : headlines) {
-        entryToHeadline.put(headline.getInteger("id"), headline.getString("headline"));
-      }
-    }
-
-    Map<Integer, Entry> entries =
-        Entry.find
-            .query()
-            .fetch("section", FetchConfig.ofQuery())
-            .fetch("section.chapter", FetchConfig.ofQuery())
-            .where()
-            .in("id", entryIds)
-            .findMap();
-
-    ArrayList<Map<String, Object>> entriesList = new ArrayList<>();
-    for (SqlRow sqlRow : result) {
-      Map<String, Object> entryInfo = new HashMap<>();
-      int entryId = sqlRow.getInteger("id");
-      entryInfo.put("entry", entries.get(entryId));
-      entryInfo.put("headline", entryToHeadline.get(entryId));
-      entriesList.add(entryInfo);
-    }
-    scopes.put("entries", entriesList);
-
-    return ok(
-        main_with_mustache.render(
-            "Manual Search: " + searchString,
-            "manual",
-            "",
-            "manual_search.html",
-            scopes,
-            request,
-            mMessagesApi.preferred(request)));
   }
 
   static List<Charge> getLastWeekCharges(Person p) {
@@ -1251,18 +1080,7 @@ public class Application extends Controller {
         multi_meetings.render(meetings, request, mMessagesApi.preferred(request)).toString());
   }
 
-  void debugMessages(Http.Request request) {
-    Messages messages = mMessagesApi.preferred(request);
-    sLogger.debug(
-        "messages lang: {}, one string: {}, transient lang: {}",
-        messages.lang(),
-        messages.at("erase_case_confirmation"),
-        request.transientLang());
-  }
-
   public Result viewWeeklyReport(String date_string, Http.Request request) {
-    debugMessages(request);
-
     Calendar start_date = Utils.parseDateOrNow(date_string);
     Organization org = Utils.getOrg(request);
     Utils.adjustToPreviousDay(start_date, org.getJcResetDay() + 1);
@@ -1488,6 +1306,9 @@ public class Application extends Controller {
   }
 
   public static String forDateInput(Date d) {
+    if (d == null) {
+      return null;
+    }
     return new SimpleDateFormat("yyyy-MM-dd").format(d);
   }
 
@@ -1548,17 +1369,6 @@ public class Application extends Controller {
     } catch (IOException e) {
       return e + "<br><br>" + input;
     }
-  }
-
-  public Result renderMarkdown(Http.Request request) {
-    Map<String, String[]> form_data = request.body().asFormUrlEncoded();
-
-    if (form_data == null || form_data.get("markdown") == null) {
-      return ok("");
-    }
-
-    String markdown = form_data.get("markdown")[0];
-    return ok(markdown(markdown));
   }
 
   @Secured.Auth(UserRole.ROLE_ALL_ACCESS)

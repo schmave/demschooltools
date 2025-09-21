@@ -1,7 +1,6 @@
 package controllers;
 
 import com.csvreader.CsvWriter;
-import com.typesafe.config.Config;
 import io.ebean.DB;
 import io.ebean.Expr;
 import io.ebean.SqlRow;
@@ -27,6 +26,7 @@ import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
+import play.twirl.api.Html;
 import views.html.*;
 
 @Secured.Auth(UserRole.ROLE_ATTENDANCE)
@@ -41,7 +41,7 @@ public class Attendance extends Controller {
     mMessagesApi = messagesApi;
   }
 
-  String renderIndexContent(
+  Html renderIndexContent(
       Date start_date,
       Date end_date,
       Boolean is_custom_date,
@@ -67,65 +67,35 @@ public class Attendance extends Controller {
       next_date = null;
     }
 
-    return attendance_index
-        .render(
-            all_people,
-            person_to_stats,
-            all_codes,
-            codes_map,
-            Application.attendancePeople(org),
-            start_date,
-            end_date,
-            is_custom_date,
-            prev_date,
-            next_date,
-            request,
-            mMessagesApi.preferred(request))
-        .toString();
+    return attendance_index.render(
+        all_people,
+        person_to_stats,
+        all_codes,
+        codes_map,
+        Application.attendancePeople(org),
+        start_date,
+        end_date,
+        is_custom_date,
+        prev_date,
+        next_date,
+        request,
+        mMessagesApi.preferred(request));
   }
 
   public Result index(
       String start_date_str, String end_date_str, Boolean is_custom_date, Http.Request request) {
     if (start_date_str.equals("")) {
       return ok(
-          cached_page.render(
-              new CachedPage(
-                  CachedPage.ATTENDANCE_INDEX,
-                  "Attendance",
-                  "attendance",
-                  "attendance_home",
-                  Utils.getOrg(request)) {
-                @Override
-                String render() {
-                  return renderIndexContent(
-                      ModelUtils.getStartOfYear(), null, false, Utils.getOrg(request), request);
-                }
-              },
-              request,
-              mMessagesApi.preferred(request)));
+          renderIndexContent(
+              ModelUtils.getStartOfYear(), null, false, Utils.getOrg(request), request));
     } else {
+      Date start_date = Utils.parseDateOrNow(start_date_str).getTime();
+      Date end_date = null;
+      if (!end_date_str.equals("")) {
+        end_date = Utils.parseDateOrNow(end_date_str).getTime();
+      }
       return ok(
-          cached_page.render(
-              new CachedPage(
-                  "", "Attendance", "attendance", "attendance_home", Utils.getOrg(request)) {
-                @Override
-                public String getPage() {
-                  Date start_date = Utils.parseDateOrNow(start_date_str).getTime();
-                  Date end_date = null;
-                  if (!end_date_str.equals("")) {
-                    end_date = Utils.parseDateOrNow(end_date_str).getTime();
-                  }
-                  return renderIndexContent(
-                      start_date, end_date, is_custom_date, Utils.getOrg(request), request);
-                }
-
-                @Override
-                String render() {
-                  throw new RuntimeException("This shouldn't be called");
-                }
-              },
-              request,
-              mMessagesApi.preferred(request)));
+          renderIndexContent(start_date, end_date, is_custom_date, Utils.getOrg(request), request));
     }
   }
 
@@ -364,90 +334,7 @@ public class Attendance extends Controller {
             mMessagesApi.preferred(request)));
   }
 
-  public Result importFromCustodia(Http.Request request) {
-    Map<String, String[]> data = request.body().asFormUrlEncoded();
-    Calendar start_date = Utils.parseDateOrNow(data.get("monday")[0]);
-    Calendar end_date = (Calendar) start_date.clone();
-    end_date.add(Calendar.DAY_OF_MONTH, 4);
-
-    Organization org = Utils.getOrg(request);
-    List<AttendanceDay> days =
-        AttendanceDay.find
-            .query()
-            .where()
-            .eq("person.organization", org)
-            .ge("day", start_date.getTime())
-            .le("day", end_date.getTime())
-            .findList();
-
-    Set<Person> people = new HashSet<>();
-    for (AttendanceDay day : days) {
-      people.add(day.getPerson());
-    }
-
-    List<Integer> person_ids = new ArrayList<>();
-    for (Person person : people) {
-      person_ids.add(person.getPersonId());
-    }
-
-    if (!person_ids.isEmpty()) {
-      String sql =
-          "select dst_id, swipe_day, "
-              + "min(in_time) at time zone :time_zone as in_time, "
-              + "max(out_time) at time zone :time_zone as out_time "
-              + "from overseer.swipes sw join overseer.students stu on sw.student_id=stu._id "
-              + "where in_time is not null and out_time is not null "
-              + "and dst_id in (:person_ids) "
-              + "and swipe_day >= :first_date and swipe_day <= :last_date "
-              + "group by dst_id, swipe_day";
-
-      List<SqlRow> custodiaRows =
-          DB.sqlQuery(sql)
-              .setParameter("time_zone", Utils.getOrgConfig(org).time_zone.getID())
-              .setParameter("person_ids", person_ids)
-              .setParameter("first_date", start_date.getTime())
-              .setParameter("last_date", end_date.getTime())
-              .findList();
-
-      Map<Integer, Map<Date, SqlRow>> person_day_custodia = new HashMap<>();
-      for (SqlRow row : custodiaRows) {
-        int personId = row.getInteger("dst_id");
-        Date day = row.getDate("swipe_day");
-        if (!person_day_custodia.containsKey(personId)) {
-          person_day_custodia.put(personId, new HashMap<>());
-        }
-        person_day_custodia.get(personId).put(day, row);
-      }
-
-      for (AttendanceDay day : days) {
-        if (day.getCode() == null
-            && person_day_custodia.containsKey(day.getPerson().getPersonId())
-            && person_day_custodia.get(day.getPerson().getPersonId()).containsKey(day.getDay())) {
-          SqlRow row = person_day_custodia.get(day.getPerson().getPersonId()).get(day.getDay());
-          boolean updated = false;
-          if (day.getStartTime() == null) {
-            day.setStartTime(new Time(row.getDate("in_time").getTime()));
-            updated = true;
-          }
-          if (day.getEndTime() == null) {
-            day.setEndTime(new Time(row.getDate("out_time").getTime()));
-            updated = true;
-          }
-          if (updated) {
-            day.save();
-          }
-        }
-      }
-
-      CachedPage.remove(CachedPage.ATTENDANCE_INDEX, org);
-    }
-
-    return redirect(routes.Attendance.editWeek(Application.forDateInput(start_date.getTime())));
-  }
-
   public Result createPersonWeek(Http.Request request) {
-    CachedPage.remove(CachedPage.ATTENDANCE_INDEX, Utils.getOrg(request));
-
     Map<String, String[]> data = request.body().asFormUrlEncoded();
     Calendar start_date = Utils.parseDateOrNow(data.get("monday")[0]);
 
@@ -511,7 +398,6 @@ public class Attendance extends Controller {
   }
 
   public Result deletePersonWeek(int personId, String monday, Http.Request request) {
-    CachedPage.remove(CachedPage.ATTENDANCE_INDEX, Utils.getOrg(request));
 
     Calendar start_date = Utils.parseDateOrNow(monday);
     Calendar end_date = (Calendar) start_date.clone();
@@ -731,7 +617,6 @@ public class Attendance extends Controller {
   }
 
   public Result saveWeek(Integer week_id, Double extraHours, Http.Request request) {
-    CachedPage.remove(CachedPage.ATTENDANCE_INDEX, Utils.getOrg(request));
 
     AttendanceWeek.find.byId(week_id).edit(extraHours);
     return ok();
@@ -740,7 +625,6 @@ public class Attendance extends Controller {
   public Result saveDay(
       Integer day_id, String code, String startTime, String endTime, Http.Request request)
       throws Exception {
-    CachedPage.remove(CachedPage.ATTENDANCE_INDEX, Utils.getOrg(request));
 
     AttendanceDay.find.byId(day_id).edit(code, startTime, endTime);
     return ok();
@@ -843,18 +727,13 @@ public class Attendance extends Controller {
   }
 
   public Result viewCustodiaAdmin(Http.Request request) {
-    Map<String, Object> scopes = new HashMap<>();
-    Config conf = Public.sConfig.getConfig("school_crm");
-    scopes.put("custodiaUrl", conf.getString("custodia_url"));
-    scopes.put("custodiaUsername", Utils.getOrg(request).getShortName() + "-admin");
-    scopes.put("custodiaPassword", conf.getString("custodiaPassword"));
     return ok(
         main_with_mustache.render(
             "Sign in system",
             "custodia",
             "",
             "custodia_admin.html",
-            scopes,
+            new HashMap<>(),
             request,
             mMessagesApi.preferred(request)));
   }
@@ -903,7 +782,6 @@ public class Attendance extends Controller {
     Form<AttendanceRule> form = mFormFactory.form(AttendanceRule.class);
     Form<AttendanceRule> filledForm = form.bindFromRequest(request);
     AttendanceRule.save(filledForm, Utils.getOrg(request));
-    CachedPage.onAttendanceChanged(Utils.getOrg(request));
     return redirect(routes.Attendance.rules());
   }
 
@@ -1053,8 +931,6 @@ public class Attendance extends Controller {
     Form<AttendanceCode> filled_form = getCodeForm().bindFromRequest(request);
     ac.edit(filled_form);
 
-    CachedPage.remove(CachedPage.ATTENDANCE_INDEX, Utils.getOrg(request));
-
     return redirect(routes.Attendance.viewCodes());
   }
 
@@ -1070,8 +946,6 @@ public class Attendance extends Controller {
         AttendanceCode.findById(
             Integer.parseInt(filled_form.field("id").value().get()), Utils.getOrg(request));
     ac.edit(filled_form);
-
-    CachedPage.remove(CachedPage.ATTENDANCE_INDEX, Utils.getOrg(request));
 
     return redirect(routes.Attendance.viewCodes());
   }

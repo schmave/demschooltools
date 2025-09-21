@@ -25,10 +25,10 @@ function App() {
   const setSnackbar = (props) => {
     const { message, action, severity = "success", duration = 5000 } = props;
     setSnackbarDetails({
-      message: message,
-      duration: duration,
-      action: action,
-      severity: severity,
+      message,
+      duration,
+      action,
+      severity,
     });
     setShowSnackbar(true);
   };

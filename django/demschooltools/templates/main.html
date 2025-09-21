@@ -1,0 +1,352 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>{{ title }}</title>
+        <script>
+            var _rollbarConfig = {
+                accessToken: '{{rollbar_token | escapejs}}',
+                captureUncaught: true,
+                captureUnhandledRejections: true,
+                payload: {
+                    environment: '{{rollbar_environment | escapejs}}',
+                    person: {
+                        id: '@{if (Application.getCurrentUser(request) == null) "" else Application.getCurrentUser(request).getId()}',
+                        username: '@Application.currentUsername(request)'
+                    }
+                }
+            };
+            // Rollbar Snippet
+            !function(r){var e={};function o(n){if(e[n])return e[n].exports;var t=e[n]={i:n,l:!1,exports:{}};return r[n].call(t.exports,t,t.exports,o),t.l=!0,t.exports}o.m=r,o.c=e,o.d=function(r,e,n){o.o(r,e)||Object.defineProperty(r,e,{enumerable:!0,get:n})},o.r=function(r){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(r,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(r,"__esModule",{value:!0})},o.t=function(r,e){if(1&e&&(r=o(r)),8&e)return r;if(4&e&&"object"==typeof r&&r&&r.__esModule)return r;var n=Object.create(null);if(o.r(n),Object.defineProperty(n,"default",{enumerable:!0,value:r}),2&e&&"string"!=typeof r)for(var t in r)o.d(n,t,function(e){return r[e]}.bind(null,t));return n},o.n=function(r){var e=r&&r.__esModule?function(){return r.default}:function(){return r};return o.d(e,"a",e),e},o.o=function(r,e){return Object.prototype.hasOwnProperty.call(r,e)},o.p="",o(o.s=0)}([function(r,e,o){"use strict";var n=o(1),t=o(5);_rollbarConfig=_rollbarConfig||{},_rollbarConfig.rollbarJsUrl=_rollbarConfig.rollbarJsUrl||"https://cdn.rollbar.com/rollbarjs/refs/tags/v2.26.1/rollbar.min.js",_rollbarConfig.async=void 0===_rollbarConfig.async||_rollbarConfig.async;var a=n.setupShim(window,_rollbarConfig),l=t(_rollbarConfig);window.rollbar=n.Rollbar,a.loadFull(window,document,!_rollbarConfig.async,_rollbarConfig,l)},function(r,e,o){"use strict";var n=o(2),t=o(3);function a(r){return function(){try{return r.apply(this,arguments)}catch(r){try{console.error("[Rollbar]: Internal error",r)}catch(r){}}}}var l=0;function i(r,e){this.options=r,this._rollbarOldOnError=null;var o=l++;this.shimId=function(){return o},"undefined"!=typeof window&&window._rollbarShims&&(window._rollbarShims[o]={handler:e,messages:[]})}var s=o(4),d=function(r,e){return new i(r,e)},c=function(r){return new s(d,r)};function u(r){return a((function(){var e=this,o=Array.prototype.slice.call(arguments,0),n={shim:e,method:r,args:o,ts:new Date};window._rollbarShims[this.shimId()].messages.push(n)}))}i.prototype.loadFull=function(r,e,o,n,t){var l=!1,i=e.createElement("script"),s=e.getElementsByTagName("script")[0],d=s.parentNode;i.crossOrigin="",i.src=n.rollbarJsUrl,o||(i.async=!0),i.onload=i.onreadystatechange=a((function(){if(!(l||this.readyState&&"loaded"!==this.readyState&&"complete"!==this.readyState)){i.onload=i.onreadystatechange=null;try{d.removeChild(i)}catch(r){}l=!0,function(){var e;if(void 0===r._rollbarDidLoad){e=new Error("rollbar.js did not load");for(var o,n,a,l,i=0;o=r._rollbarShims[i++];)for(o=o.messages||[];n=o.shift();)for(a=n.args||[],i=0;i<a.length;++i)if("function"==typeof(l=a[i])){l(e);break}}"function"==typeof t&&t(e)}()}})),d.insertBefore(i,s)},i.prototype.wrap=function(r,e,o){try{var n;if(n="function"==typeof e?e:function(){return e||{}},"function"!=typeof r)return r;if(r._isWrap)return r;if(!r._rollbar_wrapped&&(r._rollbar_wrapped=function(){o&&"function"==typeof o&&o.apply(this,arguments);try{return r.apply(this,arguments)}catch(o){var e=o;throw e&&("string"==typeof e&&(e=new String(e)),e._rollbarContext=n()||{},e._rollbarContext._wrappedSource=r.toString(),window._rollbarWrappedError=e),e}},r._rollbar_wrapped._isWrap=!0,r.hasOwnProperty))for(var t in r)r.hasOwnProperty(t)&&(r._rollbar_wrapped[t]=r[t]);return r._rollbar_wrapped}catch(e){return r}};for(var p="log,debug,info,warn,warning,error,critical,global,configure,handleUncaughtException,handleAnonymousErrors,handleUnhandledRejection,captureEvent,captureDomContentLoaded,captureLoad".split(","),f=0;f<p.length;++f)i.prototype[p[f]]=u(p[f]);r.exports={setupShim:function(r,e){if(r){var o=e.globalAlias||"Rollbar";if("object"==typeof r[o])return r[o];r._rollbarShims={},r._rollbarWrappedError=null;var l=new c(e);return a((function(){e.captureUncaught&&(l._rollbarOldOnError=r.onerror,n.captureUncaughtExceptions(r,l,!0),e.wrapGlobalEventHandlers&&t(r,l,!0)),e.captureUnhandledRejections&&n.captureUnhandledRejections(r,l,!0);var a=e.autoInstrument;return!1!==e.enabled&&(void 0===a||!0===a||function(r){return!("object"!=typeof r||void 0!==r.page&&!r.page)}(a))&&r.addEventListener&&(r.addEventListener("load",l.captureLoad.bind(l)),r.addEventListener("DOMContentLoaded",l.captureDomContentLoaded.bind(l))),r[o]=l,l}))()}},Rollbar:c}},function(r,e,o){"use strict";function n(r,e,o,n){r._rollbarWrappedError&&(n[4]||(n[4]=r._rollbarWrappedError),n[5]||(n[5]=r._rollbarWrappedError._rollbarContext),r._rollbarWrappedError=null);var t=e.handleUncaughtException.apply(e,n);o&&o.apply(r,n),"anonymous"===t&&(e.anonymousErrorsPending+=1)}r.exports={captureUncaughtExceptions:function(r,e,o){if(r){var t;if("function"==typeof e._rollbarOldOnError)t=e._rollbarOldOnError;else if(r.onerror){for(t=r.onerror;t._rollbarOldOnError;)t=t._rollbarOldOnError;e._rollbarOldOnError=t}e.handleAnonymousErrors();var a=function(){var o=Array.prototype.slice.call(arguments,0);n(r,e,t,o)};o&&(a._rollbarOldOnError=t),r.onerror=a}},captureUnhandledRejections:function(r,e,o){if(r){"function"==typeof r._rollbarURH&&r._rollbarURH.belongsToShim&&r.removeEventListener("unhandledrejection",r._rollbarURH);var n=function(r){var o,n,t;try{o=r.reason}catch(r){o=void 0}try{n=r.promise}catch(r){n="[unhandledrejection] error getting `promise` from event"}try{t=r.detail,!o&&t&&(o=t.reason,n=t.promise)}catch(r){}o||(o="[unhandledrejection] error getting `reason` from event"),e&&e.handleUnhandledRejection&&e.handleUnhandledRejection(o,n)};n.belongsToShim=o,r._rollbarURH=n,r.addEventListener("unhandledrejection",n)}}}},function(r,e,o){"use strict";function n(r,e,o){if(e.hasOwnProperty&&e.hasOwnProperty("addEventListener")){for(var n=e.addEventListener;n._rollbarOldAdd&&n.belongsToShim;)n=n._rollbarOldAdd;var t=function(e,o,t){n.call(this,e,r.wrap(o),t)};t._rollbarOldAdd=n,t.belongsToShim=o,e.addEventListener=t;for(var a=e.removeEventListener;a._rollbarOldRemove&&a.belongsToShim;)a=a._rollbarOldRemove;var l=function(r,e,o){a.call(this,r,e&&e._rollbar_wrapped||e,o)};l._rollbarOldRemove=a,l.belongsToShim=o,e.removeEventListener=l}}r.exports=function(r,e,o){if(r){var t,a,l="EventTarget,Window,Node,ApplicationCache,AudioTrackList,ChannelMergerNode,CryptoOperation,EventSource,FileReader,HTMLUnknownElement,IDBDatabase,IDBRequest,IDBTransaction,KeyOperation,MediaController,MessagePort,ModalWindow,Notification,SVGElementInstance,Screen,TextTrack,TextTrackCue,TextTrackList,WebSocket,WebSocketWorker,Worker,XMLHttpRequest,XMLHttpRequestEventTarget,XMLHttpRequestUpload".split(",");for(t=0;t<l.length;++t)r[a=l[t]]&&r[a].prototype&&n(e,r[a].prototype,o)}}},function(r,e,o){"use strict";function n(r,e){this.impl=r(e,this),this.options=e,function(r){for(var e=function(r){return function(){var e=Array.prototype.slice.call(arguments,0);if(this.impl[r])return this.impl[r].apply(this.impl,e)}},o="log,debug,info,warn,warning,error,critical,global,configure,handleUncaughtException,handleAnonymousErrors,handleUnhandledRejection,_createItem,wrap,loadFull,shimId,captureEvent,captureDomContentLoaded,captureLoad".split(","),n=0;n<o.length;n++)r[o[n]]=e(o[n])}(n.prototype)}n.prototype._swapAndProcessMessages=function(r,e){var o,n,t;for(this.impl=r(this.options);o=e.shift();)n=o.method,t=o.args,this[n]&&"function"==typeof this[n]&&("captureDomContentLoaded"===n||"captureLoad"===n?this[n].apply(this,[t[0],o.ts]):this[n].apply(this,t));return this},r.exports=n},function(r,e,o){"use strict";r.exports=function(r){return function(e){if(!e&&!window._rollbarInitialized){for(var o,n,t=(r=r||{}).globalAlias||"Rollbar",a=window.rollbar,l=function(r){return new a(r)},i=0;o=window._rollbarShims[i++];)n||(n=o.handler),o.handler._swapAndProcessMessages(l,o.messages);window[t]=n,window._rollbarInitialized=!0}}}}]);
+            // End Rollbar Snippet
+        </script>
+
+        {% comment %}
+        Uncomment this to diagnose htmx syntax errors
+        <script type="text/javascript">
+            document.addEventListener('htmx:syntax:error', function(evt) {
+            console.error("HTMX syntax error:", evt);
+            });
+        </script>
+        {% endcomment %}
+        <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
+
+
+        <script type="text/javascript"
+                src="{% static 'js/bundle.js' %}"></script>
+
+        <link rel="stylesheet" media="all" href="{% static 'css/main.css' %}" />
+
+        <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.png' %}" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+    </head>
+    <body>
+
+        <div id="modal_wrapper">
+            <div id="modal_window">
+
+                <div style="text-align: right;"><a id="modal_close" href="#">close <b>X</b></a></div>
+
+                <h3>Thanks for your feedback!</h3>
+                <p>Please use this form to send a message to DemSchoolTools headquarters with your bug report,
+                    feature request, or other comment.</p>
+
+                <form id="modal_feedback" method="POST" action="/sendFeedbackEmail" accept-charset="UTF-8">
+
+                    <p><label>Your Name<br />
+                        <input type="text" autofocus="true" size="48" name="name" value="" /></label></p>
+                    <p><label>Your Email<br />
+                        <input type="email" title="Please enter a valid email address" size="48" name="email" value="" /></label></p>
+                    <p><label>Feedback<br />
+                        <textarea name="message" cols="48" rows="8"></textarea></label></p>
+                    <p><input type="submit" name="feedbackForm" value="Send Message" /></p>
+                </form>
+            </div></div>
+
+        {% with username=current_username %}
+            {% if username %}
+                <div class="tabbable">
+                    <ul class="dst-nav nav nav-tabs navbar-default no-print">
+                        <li {% if menu == "crm" %}class="active"{% endif %}>
+                            <a href="/people">People</a>
+                        </li>
+                        {% if org_config.org.show_attendance %}
+                            <li {% if menu == "attendance" %}class="active"{% endif %}>
+                                <a href="/attendance">Attendance</a>
+                            </li>
+                        {% endif %}
+                        {% if org_config.org.show_custodia %}
+                            <li {% if menu == "custodia" %}class="active"{% endif %}>
+                                <a href="/custodia-admin">Custodia</a>
+                            </li>
+                        {% endif %}
+                        <li {% if menu == "jc" %}class="active"{% endif %}>
+                            <a href="/">{{ org_config.str_jc_name_short }}</a>
+                        </li>
+                        <li {% if menu == "manual" %}class="active"{% endif %}>
+                            <a href="/viewManual">{{ org_config.str_manual_title_short }}</a>
+                        </li>
+                        {% if org_config.org.show_roles %}
+                            <li {% if menu == "roles" %}class="active"{% endif %}>
+                                <a href="/roles/index">Roles</a>
+                            </li>
+                        {% endif %}
+                        {% if org_config.org.show_accounting %}
+                            <li {% if menu == "accounting" %}class="active"{% endif %}>
+                                <a href="/accounting/balances">Accounting</a>
+                            </li>
+                        {% endif %}
+                        <li {% if menu == "settings" %}class="active"{% endif %} class="dropdown">
+                            <a href="/settings">Settings</a>
+                        </li>
+                        {% if org_config.enable_file_sharing %}
+                            <li {% if menu == "misc" %}class="active"{% endif %} class="dropdown">
+                                <a href="/misc/viewFiles">Misc</a>
+                            </li>
+                        {% endif %}
+                        <li style="float:right;">
+                            {% if is_user_logged_in %}
+                                <a href="/logout">
+                                    Logout</a>
+                            {% else %}
+                                <a href="/login">
+                                    Login</a>
+                            {% endif %}
+                        </li>
+                        <li {% if menu == "account" %}class="username active"{% else %}class="username"{% endif %}><a {% if is_user_logged_in %}
+                                                                                                                      href="/settings/password"
+                                                                                                                  {% endif %} class="username">{{ username }}</a></li>
+                    </ul>
+
+                    <div class="tab-content no-print">
+                        <div class="tab-pane {% if menu == "crm" %}active{% endif %}" id="people">
+                            <div class="subnav">
+                                <a {% if selectedBtn == "recent_comments" %}class="active"{% endif %}
+                                   href="/people">
+                                    Recent comments</a>
+                                <a {% if selectedBtn == "all_people" %}class="active"{% endif %}
+                                   href="/allPeople">
+                                    All people</a>
+                                <span class="dropdown">
+                                    <ul class="dropdown-menu">
+                                        {% for kv in tags_with_prefixes %}
+                                            {% if kv.1|length > 1 %}
+                                                <li class="dropdown-submenu">
+                                                    <a tabindex="-1" href="#">{{ kv.0 }}</a>
+                                                    <ul class="dropdown-menu">
+                                                        {% for t in kv.1 %}
+                                                            <li><a href="/viewTag/{{ t.getId }}">{{ t.getTitle }}</a></li>
+                                                        {% endfor %}
+                                                    </ul></li>
+                                            {% else %}
+                                                {% for t in kv.1 %}
+                                                    <li><a href="/viewTag/{{ t.getId }}">{{ t.getTitle }}</a></li>
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        <li role="separator" class="divider"></li>
+                                        <li><a href="/viewAllTags">All Tags</a></li>
+                                    </ul>
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                        Tags
+                                        <b class="caret"></b>
+                                    </a>
+                                </span>
+                                <span class="dropdown">
+                                    <ul class="dropdown-menu">
+                                        {% for l in task_lists %}
+                                            <li><a href="/viewTaskList/{{ l.getId }}">{{ l.getTitle }}</a></li>
+                                        {% endfor %}
+                                    </ul>
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                        Checklists
+                                        <b class="caret"></b>
+                                    </a>
+                                </span>
+                                <input id="navbar_people_search" type="search" placeholder="Search people..."/>
+                                <a href="/people/new">Add a person</a>
+                            </div>
+                        </div>
+
+                        {% if menu == "attendance" %}
+                            <div class="tab-pane active" id="attendance">
+                                <div class="subnav">
+                                    <a {% if selectedBtn == "attendance_home" %}class="active"{% endif %}
+                                       href="/attendance">By year
+                                    </a><a class="not-link {% if selectedBtn == "week" %}active{% endif %}">
+                                        View/edit week of: <input class="date attendance-week" type="textfield"></input>
+                                    </a><a class="not-link {% if selectedBtn == "person" %}active{% endif %}">
+                                        By person:
+                                        <input id="navbar_attendance_people_search" type="search" placeholder="Search people..."/>
+                                    </a><a {% if selectedBtn == "attendance_codes" %}class="active"{% endif %}
+                                           href="/attendance/codes">Absence codes
+                                    </a>
+                                    <a {% if selectedBtn == "attendance_rules" %}class="active"{% endif %}
+                                       href="/attendance/rules">Rules
+                                    </a>
+                                    {% if org_config.org.attendance_enable_off_campus %}
+                                        <a {% if selectedBtn == "off_campus_time" %}class="active"{% endif %}
+                                           href="/attendance/offCampusTime">Off campus time
+                                        </a>
+                                    {% endif %}
+                                    {% if org_config.org.attendance_show_reports %}
+                                        <a {% if selectedBtn == "reports" %}class="active"{% endif %}
+                                           href="/attendance/reports">Reports
+                                        </a>
+                                    {% endif %}
+                                    {% if org_config.org.show_electronic_signin %}
+                                        <a {% if selectedBtn == "attendance_pins" %}class="active"{% endif %}
+                                           href="/attendance/pins">Assign PINs
+                                        </a>
+                                        <a {% if selectedBtn == "attendance_checkin" %}class="active"{% endif %}
+                                           href="/attendance/checkin">Check-in app
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if menu == "roles" %}
+                            <div class="tab-pane active" id="roles">
+                                <div class="subnav">
+                                    <a {% if selectedBtn == "roles_index" %}class="active"{% endif %}
+                                       href="/roles/index">Roles</a>
+                                    <a {% if selectedBtn == "roles_new" %}class="active"{% endif %}
+                                       href="/roles/newRole">Create Role</a>
+                                    <a {% if selectedBtn == "roles_records" %}class="active"{% endif %}
+                                       href="/roles/records">Records</a>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if menu == "accounting" %}
+                            <div class="tab-pane active" id="finance">
+                                <div class="subnav">
+                                    <a {% if selectedBtn == "new_transaction" %}class="active"{% endif %}
+                                       href="/accounting/createTransaction">Create Transaction</a>
+                                    <a {% if selectedBtn == "accounting_balances" %}class="active"{% endif %}
+                                       href="/accounting/balances">Balances</a>
+                                    <a {% if selectedBtn == "accounting_report" %}class="active"{% endif %}
+                                       href="/accounting/report">Report</a>
+                                    <a {% if selectedBtn == "accounting_accounts" %}class="active"{% endif %}
+                                       href="/accounting/accounts">Manage Accounts</a>
+                                    <a {% if selectedBtn == "accounting_bank_cash_balance" %}class="active"{% endif %}
+                                       href="/accounting/bankCashBalance">Bank Cash Balance</a>
+                                    <a {% if selectedBtn == "accounting_transactions" %}class="active"{% endif %}
+                                       href="/accounting/transactions">Transactions</a>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if menu == "jc" %}
+                            <div class="tab-pane active" id="jc">
+                                <div class="subnav">
+                                    <a {% if selectedBtn == "jc_home" %}class="active"{% endif %}
+                                       href="/">Home</a>
+                                    <span>
+                                        <a href="/viewToday">
+                                            View</a> /
+                                        <a href="/editToday">
+                                            Edit today's minutes</a>
+                                    </span>
+                                    <a {% if selectedBtn == "rps" %}class="active"{% endif %}
+                                       href="/editResolutionPlanList">
+                                        {{ org_config.str_res_plans_cap }}</a>
+                                    <a {% if selectedBtn == "weekly_report" %}class="active"{% endif %}
+                                       href="/thisWeekReport">Weekly Report</a>
+                                    <a {% if selectedBtn == "view_referred" %}class="active"{% endif %}
+                                       href="/viewSchoolMeetingReferrals">
+                                        {{ messages.charges_referred_to_sm }}
+                                        {% with sm_charges=active_school_meeting_referrals %}
+                                            {% if sm_charges|length > 0 %}
+                                                <span class="badge">
+                                                    {{ sm_charges|length }}
+                                                </span>
+                                            {% endif %}
+                                        {% endwith %}
+                                    </a>
+                                    <a {% if selectedBtn == "view_sm" %}class="active"{% endif %}
+                                       href="/viewSchoolMeeting">
+                                        View S.M. decisions</a>
+                                    <a href="/downloadCharges">
+                                        Download charges
+                                    </a>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if menu == "manual" %}
+                            <div class="tab-pane active" id="manual">
+                                <div class="subnav">
+                                    <a {% if selectedBtn == "toc" %}class="active"{% endif %}
+                                       href="/viewManual">Table of Contents</a>
+                                    <a {% if selectedBtn == "manual_print" %}class="active"{% endif %}
+                                       href="/printManual">Print</a>
+                                    <a {% if selectedBtn == "manual_changes" %}class="active"{% endif %}
+                                       href="/viewManualChanges">
+                                        Changes since a date</a>
+
+                                    {% if selectedBtn == "search" %}
+                                        <a class="active">Search</a>
+                                    {% else %}
+                                        <a style="text-decoration: none">
+                                            <form method="GET" style="display:inline;" action="/searchManual">
+                                                <input name="search_string" type="search" placeholder="Search the manual..."/>
+                                                <input type="submit" class="btn btn-primary btn-xs" value="Search"/>
+                                            </form>
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if menu == "settings" %}
+                            <div class="tab-pane active" id="settings">
+                                <div class="subnav">
+                                    <a {% if selectedBtn == "settings" %}class="active"{% endif %}
+                                       href="/settings">Settings</a>
+                                    <a {% if selectedBtn == "settings_checklists" %}class="active"{% endif %}
+                                       href="/settings/checklists">Checklists</a>
+                                    <a {% if selectedBtn == "settings_access" %}class="active"{% endif %}
+                                       href="/settings/access">Users & Access</a>
+                                    <a href="/settings/password">Change Password</a>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if menu == "misc" %}
+                            <div class="tab-pane active" id="settings">
+                                <div class="subnav">
+                                    <a {% if selectedBtn == "view_files" %}class="active"{% endif %}
+                                       href="/misc/viewFiles">Shared Files</a>
+                                    <a {% if selectedBtn == "file_sharing" %}class="active"{% endif %}
+                                       href="/misc/fileSharing">Manage Shared Files</a>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                    </div>
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% if flash_error %}
+            <div class="flash-error"><b>Error</b><br/><br/>{{ flash_error }}</div>
+        {% endif %}
+
+        {{ content|safe }}
+        <div class="no-print feedback_open" id="main_feedback_open">Have Feedback?</div>
+
+        <script id="autocomplete-template" type="text/x-handlebars-template">
+            <div class="autocomplete-selected name">
+            <span class="autocomplete-selected-text label label-primary"></span>
+            <img src="/assets/images/x.png"/>
+            </div>
+            <input type="text" class="autocomplete-text {{textFieldClass}}" name="{{textFieldName}}" size="{{textFieldSize}}"/>
+            <input type="hidden" class="autocomplete-id" name="{{idFieldName}}"/>
+        </script>
+
+    </body>
+</html>

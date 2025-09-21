@@ -1,12 +1,21 @@
 const utils = require('./utils');
+const autocomplete = require('./autocomplete');
 
-export function init(selectedPersonId, people) {
-  $('.js-date').datepicker();
+export function init(selectedPersonId, selectedPersonName, people) {
+    $('.js-date').datepicker();
 
-  $('.js-time').blur(function() {
-    const time = utils.formatTime($(this).val());
-    $(this).val(time);
-  });
+    $('.js-time').blur(function () {
+        const time = utils.formatTime($(this).val());
+        $(this).val(time);
+    });
 
-  utils.registerAutocomplete($('.js-person'), people, false, selectedPersonId);
+    const container = document.getElementById('attendance-edit-rule-person');
+    const startingValues = [
+        { id: selectedPersonId, label: selectedPersonName },
+    ];
+    const opts = {
+        idFieldName: 'personId',
+        textFieldSize: 15,
+    };
+    autocomplete.registerAutocomplete(container, people, startingValues, opts);
 }

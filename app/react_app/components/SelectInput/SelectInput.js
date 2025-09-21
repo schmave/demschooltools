@@ -15,7 +15,7 @@ const SelectInput = (props) => {
   };
 
   return (
-      <FormControl fullWidth={fullWidth} sx={{marginTop: marginTop, marginBottom: marginBottom}}>
+      <FormControl fullWidth={fullWidth} sx={{ marginTop, marginBottom }}>
         {label && (
           <InputLabel id="select-label">{label}</InputLabel>
         )}
@@ -27,9 +27,9 @@ const SelectInput = (props) => {
           {...restOfProps}
         >
           {showClearButton && (
-            <MenuItem key={'clearSelectionOverride'} value={'clearSelectionOverride'} sx={{justifyContent: 'space-between'}}>
+            <MenuItem key={'clearSelectionOverride'} value={'clearSelectionOverride'} sx={{ justifyContent: 'space-between' }}>
               {clearButtonLabel}
-              <CgClose style={{marginRight: '5px'}} color={theme.palette.primary.main} />
+              <CgClose style={{ marginRight: '5px' }} color={theme.palette.primary.main} />
             </MenuItem>
           )}
           {showClearButton && (
@@ -37,7 +37,7 @@ const SelectInput = (props) => {
           )}
           {options.map((option) => {
             return (
-              <MenuItem key={option.value} value={option.value} sx={{color: (showOptionCount && option.count === 0) ? theme.palette.text.disabled : 'auto'}}>
+              <MenuItem key={option.value} value={option.value} sx={{ color: (showOptionCount && option.count === 0) ? theme.palette.text.disabled : 'auto' }}>
                 {option.leftIcon && (
                   option.leftIcon
                 )}

@@ -118,8 +118,9 @@ a {
         width: 1300px;
     }
 }
-rect.highlight {
+rect.highlight, rect.highlight-now {
     fill: orange !important;
+    stroke: #444 !important;
 }
 
 .graph-rect {
@@ -136,6 +137,10 @@ rect.highlight {
 
 .is_teacher {
     font-weight: bold;
+}
+
+.swipes-table td,th {
+    white-space: nowrap;
 }
 
 .student-listing-classes {

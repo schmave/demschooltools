@@ -1,6 +1,6 @@
 const avatarColors = () => {
   const avatarColors = [
-    { 
+    {
       backgroundColor: '#F55127',
       color: 'white',
     },

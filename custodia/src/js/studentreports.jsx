@@ -1,15 +1,21 @@
+const React = require("react");
+const Griddle = require("griddle-react");
+const dayjs = require("dayjs");
+
 const reportStore = require("./reportstore");
 const Modal = require("./modal.jsx");
 const Router = require("react-router");
 const Link = Router.Link;
 const actionCreator = require("./reportactioncreator");
-const React = require("react");
-const Griddle = require("griddle-react");
 
 // Table data as a list of array.
 const getState = function () {
+  const now = dayjs();
   return {
     rows: [],
+    filterStudents: "current",
+    startDate: now.startOf("month").format("YYYY-MM-DD"),
+    endDate: now.endOf("month").format("YYYY-MM-DD"),
     years: reportStore.getSchoolYears(),
   };
 };
@@ -35,11 +41,8 @@ class StudentTotalComponent extends React.Component {
 
 class StudentAttendedComponent extends React.Component {
   render() {
-    let good = this.props.rowData.good;
-    const short = this.props.rowData.short;
-
-    good = good + short + " (" + short + ")";
-    return <span>{good}</span>;
+    const { good, short } = this.props.rowData;
+    return <span>{good + short}</span>;
   }
 }
 
@@ -62,19 +65,12 @@ class StudentReports extends React.Component {
   componentDidMount() {
     reportStore.addChangeListener(this.onReportChange);
     reportStore.getSchoolYears(true);
-    this.fetchReport(this.state.currentYear);
+    this.fetchReport();
   }
 
   componentWillUnmount() {
     reportStore.removeChangeListener(this.onReportChange);
   }
-
-  onClassChange = () => {
-    this.refs.newSchoolYear.hide();
-    const state = this.state;
-    this.setState(state);
-    this.fetchReport(state.currentYear);
-  };
 
   onReportChange = (x) => {
     this.refs.newSchoolYear.hide();
@@ -86,12 +82,11 @@ class StudentReports extends React.Component {
     state.years = years;
     state.currentYear = currentYear;
 
-    this.setState(state);
-    this.fetchReport(currentYear);
+    this.setState(state, this.fetchReport);
   };
 
-  fetchReport = (year) => {
-    const report = reportStore.getReport(year);
+  fetchReport = () => {
+    const report = reportStore.getReport(this.state.currentYear, this.state.filterStudents);
     const rows = report != "loading" ? report : [];
     this.setState({
       loading: report == null || report == "loading",
@@ -101,12 +96,13 @@ class StudentReports extends React.Component {
 
   yearSelected = (event) => {
     const currentYear = event.target.value;
-    this.setState({ currentYear });
-    this.fetchReport(currentYear);
+    this.setState({ currentYear }, this.fetchReport);
   };
 
   createPeriod = () => {
-    actionCreator.createPeriod(this.state.startDate, this.state.endDate);
+    actionCreator.createPeriod(this.state.startDate, this.state.endDate).then((newYearName) => {
+      this.setState({ currentYear: newYearName }, this.fetchReport);
+    });
   };
 
   deletePeriod = () => {
@@ -121,6 +117,12 @@ class StudentReports extends React.Component {
     this.setState({ endDate: e.target.value });
   };
 
+  onFilterStudentsChange = (e) => {
+    if (e.target.checked) {
+      this.setState({ filterStudents: e.target.value }, this.fetchReport);
+    }
+  };
+
   render() {
     let grid = null;
     if (this.state.loading) {
@@ -131,7 +133,7 @@ class StudentReports extends React.Component {
           id="test"
           results={this.state.rows}
           resultsPerPage="200"
-          columns={["name", "good", "overrides", "unexcused", "excuses", "short", "total_hours"]}
+          columns={["name", "good", "short", "overrides", "unexcused", "excuses", "total_hours"]}
           columnMetadata={[
             {
               displayName: "Name",
@@ -159,44 +161,76 @@ class StudentReports extends React.Component {
     return (
       <div>
         <div className="row margined">
-          <div className="pull-left">Report time period:</div>
-          <select className="pull-left" onChange={this.yearSelected} value={this.state.currentYear}>
-            {this.state.years
-              ? this.state.years.years.map(
-                  function (year) {
-                    return (
-                      <option key={year} value={year}>
-                        {year === this.state.years.current_year ? year + " (Current)" : year}
-                      </option>
-                    );
-                  }.bind(this),
-                )
-              : ""}
-          </select>
-          <button
-            className="pull-left delete-button btn btn-small btn-danger fa fa-trash-o"
-            onClick={this.deletePeriod}
-          ></button>
-          <button
-            className="pull-right btn btn-small btn-success"
-            onClick={function () {
-              this.refs.newSchoolYear.show();
-            }.bind(this)}
-          >
-            New Period
-          </button>
+          <div className="col-sm-7 col-md-4">
+            Report time period:
+            <br />
+            <select onChange={this.yearSelected} value={this.state.currentYear}>
+              {this.state.years
+                ? this.state.years.years.map(
+                    function (year) {
+                      return (
+                        <option key={year} value={year}>
+                          {year === this.state.years.current_year ? year + " (Current)" : year}
+                        </option>
+                      );
+                    }.bind(this),
+                  )
+                : ""}
+            </select>
+            <button
+              className="delete-button btn btn-small btn-danger fa fa-trash-o"
+              onClick={this.deletePeriod}
+            ></button>
+          </div>
+          <div className="col-md-2">
+            <button
+              className="btn btn-small btn-success"
+              onClick={function () {
+                this.refs.newSchoolYear.show();
+              }.bind(this)}
+            >
+              New Period
+            </button>
+          </div>
+          <div className="col-sm-12 col-md-5">
+            <label style={{ fontWeight: "normal" }}>
+              <input
+                type="radio"
+                name="filterStudents"
+                value="current"
+                checked={this.state.filterStudents === "current"}
+                onChange={this.onFilterStudentsChange}
+              />{" "}
+              Show only current students and staff
+            </label>
+            <br />
+            <label style={{ fontWeight: "normal" }}>
+              <input
+                type="radio"
+                name="filterStudents"
+                value="all"
+                checked={this.state.filterStudents === "all"}
+                onChange={this.onFilterStudentsChange}
+              />{" "}
+              Show all people who have attended during this period
+            </label>
+          </div>
         </div>
         {grid}
         <Modal ref="newSchoolYear" title="Create new period">
+          <p>
+            The start date, end date, and all dates in between the two will be included in the
+            report.
+          </p>
           <form className="form">
-            <div className="form-group">
+            <div className="form-group" style={{ display: "flex" }}>
               <div className="margined">
                 <label htmlFor="startDate">Start:</label>{" "}
-                <input type="date" onChange={this.onStartDateChange} />
+                <input type="date" value={this.state.startDate} onChange={this.onStartDateChange} />
               </div>
               <div className="margined">
                 <label htmlFor="endDate">End:</label>{" "}
-                <input type="date" onChange={this.onEndDateChange} />
+                <input type="date" value={this.state.endDate} onChange={this.onEndDateChange} />
               </div>
             </div>
             <div className="form-group" style={{ marginLeft: "2em" }}>

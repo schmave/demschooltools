@@ -3,7 +3,6 @@ package controllers;
 import com.fasterxml.jackson.databind.*;
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.MustacheFactory;
-import com.typesafe.config.Config;
 import io.ebean.DB;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
@@ -13,19 +12,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import javax.annotation.Nonnull;
 import javax.inject.Singleton;
 import models.*;
-import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
 import play.Logger;
 import play.data.Form;
 import play.mvc.Http;
@@ -114,79 +103,6 @@ public class Utils {
     return diff < one_day * num_days;
   }
 
-  private static void makeCustodiaPost(
-      CloseableHttpClient client, String url, List<NameValuePair> data) {
-    CloseableHttpResponse response = null;
-    try {
-      try {
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setEntity(new UrlEncodedFormEntity(data));
-        response = client.execute(httpPost);
-        HttpEntity entity = response.getEntity();
-        EntityUtils.consume(entity);
-        if (response.getStatusLine().getStatusCode() != 200) {
-          throw new RuntimeException(
-              "Non-200 result from Custodia: " + response.getStatusLine().getStatusCode());
-        }
-      } finally {
-        if (response != null) {
-          response.close();
-        }
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-  private static void loginToCustodia(CloseableHttpClient client, Config play_config) {
-    Config school_crm_config = play_config.getConfig("school_crm");
-    List<NameValuePair> nvps = new ArrayList<>();
-    nvps.add(new BasicNameValuePair("username", "admin"));
-    nvps.add(new BasicNameValuePair("password", school_crm_config.getString("custodiaPassword")));
-    makeCustodiaPost(client, school_crm_config.getString("custodia_url") + "/users/login", nvps);
-  }
-
-  public static void setCustodiaPassword(String new_password, Organization org) {
-    final OrgConfig config = Utils.getOrgConfig(org);
-    sCustodiaService.submit(
-        () -> {
-          try {
-            CloseableHttpClient httpclient = HttpClients.createDefault();
-            loginToCustodia(httpclient, Public.sConfig);
-
-            List<NameValuePair> nvps = new ArrayList<>();
-            nvps.add(new BasicNameValuePair("username", config.org.getShortName()));
-            nvps.add(new BasicNameValuePair("password", new_password));
-            makeCustodiaPost(
-                httpclient,
-                Public.sConfig.getConfig("school_crm").getString("custodia_url")
-                    + "/users/password",
-                nvps);
-          } catch (Exception e) {
-            e.printStackTrace();
-          }
-        });
-  }
-
-  public static void updateCustodia() {
-    Future<?> result =
-        sCustodiaService.submit(
-            () -> {
-              CloseableHttpClient httpclient = HttpClients.createDefault();
-              loginToCustodia(httpclient, Public.sConfig);
-              makeCustodiaPost(
-                  httpclient,
-                  Public.sConfig.getConfig("school_crm").getString("custodia_url")
-                      + "/updatefromdst",
-                  new ArrayList<>());
-            });
-    try {
-      result.get();
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
-
   public static Date localNow(OrgConfig orgConfig) {
     Date utcNow = new Date();
     return new Date(utcNow.getTime() + orgConfig.time_zone.getOffset(utcNow.getTime()));
@@ -257,6 +173,7 @@ class OrgConfigs {
     register(new SligoSudburySchool());
     register(new LearningProjectIbiza());
     register(new Wilmington());
+    register(new SouthJersey());
   }
 }
 
@@ -613,6 +530,24 @@ class Wilmington extends OrgConfig {
 
     str_manual_title = "Lawbook";
     str_manual_title_short = "Lawbook";
+    str_res_plan_short = "Sentence";
+    str_res_plan = "sentence";
+    str_res_plan_cap = "Sentence";
+    str_res_plans = "sentences";
+    str_res_plans_cap = "Sentences";
+
+    track_writer = true;
+    use_year_in_case_number = true;
+  }
+}
+
+class SouthJersey extends OrgConfig {
+  public SouthJersey() {
+    name = "South Jersey Sudbury School";
+    people_url = "https://sjss.demschooltools.com";
+
+    str_manual_title = "Rulebook";
+    str_manual_title_short = "Rulebook";
     str_res_plan_short = "Sentence";
     str_res_plan = "sentence";
     str_res_plan_cap = "Sentence";

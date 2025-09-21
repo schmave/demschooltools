@@ -93,6 +93,10 @@ public class Person extends Model implements Comparable<Person> {
   @JsonIgnore
   public List<Account> accounts;
 
+  @OneToMany(mappedBy = "person")
+  @JsonIgnore
+  public List<RoleRecordMember> roleRecordMembers;
+
   private String grade = "";
 
   static Set<String> fieldsToUpdateExplicitly = new HashSet<>();

@@ -1,8 +1,8 @@
 @(account : Account)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
 
-@main(account.getTitle(Utils.getOrgConfig(request)), "accounting") {
+@main(account.getTitle(), "accounting") {
 
-	<h2>@account.getTitle(Utils.getOrgConfig(request))</h2>
+	<h2>@account.getTitle()</h2>
 
 	@if(account.getPerson() == null) {
 		<a href="@routes.Accounting.editAccount(account.getId())">Edit Account</a>

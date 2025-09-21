@@ -1,3 +1,3 @@
-import { hashHistory } from "react-router";
+const { hashHistory } = require("react-router");
 
-module.exports = hashHistory;
+export default hashHistory;

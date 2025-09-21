@@ -16,9 +16,6 @@ public class OrgConfig {
   public String str_jc_name = "Judicial Committee";
   public String str_jc_name_short = "JC";
   public String str_findings = "Findings";
-  public String str_corporation = "Corporation";
-  public String str_committee = "Committee";
-  public String str_clerk = "Clerk";
   public String str_guilty = "Guilty";
   public String str_not_guilty = "Not Guilty";
   public String str_na = "N/A";
@@ -42,6 +39,10 @@ public class OrgConfig {
 
   public Organization org;
 
+  // TODO: Delete this and all overrides of it in subclasses of OrgConfig.
+  // As of the Custodia -> DST merger, this value is now stored in the
+  // Organization model. Be sure that the database is up to date with
+  // these values.
   public TimeZone time_zone = TimeZone.getTimeZone("US/Eastern");
 
   public String getReferralDestination(Charge c) {

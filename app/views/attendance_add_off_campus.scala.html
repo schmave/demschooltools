@@ -20,14 +20,7 @@
 	@for( i <- 0 to 9 ) {
 		<tr>
 			<td><input type="textfield" name="day-@i" class="js-date attendance-off-campus-date" value="@current_date"></td>
-			<td class="js-person-row">
-				<div class="js-person-name-selected attendance-off-campus-person-selected name">
-					<span class="js-person-name-selected-text label label-primary"></span>
-					<img src="/assets/images/x.png">
-				</div>
-				<input type="text" class="js-person-name attendance-off-campus-person">
-				<input type="hidden" class="js-person-id" name="personid-@i"/>
-			</td>
+			<td class="js-person-row" data-index="@i"></td>
 			<td><input type="text" class="js-time attendance-off-campus-time" name="departuretime-@i"></td>
 			<td><input type="text" class="js-time attendance-off-campus-time" name="returntime-@i"></td>
 			<td><input type="number" min="0" max="9999" class="attendance-off-campus-time" name="minutesexempted-@i"></td>

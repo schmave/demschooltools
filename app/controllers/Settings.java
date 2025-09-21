@@ -51,9 +51,7 @@ public class Settings extends Controller {
       if (values.containsKey("custodia_student_password")) {
         new_password = values.get("custodia_student_password")[0];
       }
-      if (new_password != null && !new_password.trim().isEmpty()) {
-        Utils.setCustodiaPassword(new_password, org);
-      }
+      setSigninPassword(new_password, org);
     }
 
     {
@@ -61,23 +59,28 @@ public class Settings extends Controller {
       if (values.containsKey("electronic_signin_password")) {
         new_password = values.get("electronic_signin_password")[0];
       }
-      if (new_password != null && !new_password.trim().isEmpty()) {
-        String username = org.getShortName();
-        User user = User.findByEmail(username);
-        if (user == null) {
-          user = User.create(username, "Check-in app user", org);
-        }
-        user.setHashedPassword(BCrypt.hashpw(new_password, BCrypt.gensalt()));
-        user.save();
-        for (UserRole r : user.roles) {
-          r.delete();
-        }
-        UserRole.create(user, UserRole.ROLE_CHECKIN_APP);
-        UserRole.create(user, UserRole.ROLE_VIEW_JC);
-      }
+      setSigninPassword(new_password, org);
     }
 
     return redirect(routes.Settings.viewSettings());
+  }
+
+  public void setSigninPassword(String password, Organization org) {
+    if (password == null || password.trim().isEmpty()) {
+      return;
+    }
+    String username = org.getShortName();
+    User user = User.findByEmail(username);
+    if (user == null) {
+      user = User.create(username, User.CHECKIN_USERNAME, org);
+    }
+    user.setHashedPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
+    user.save();
+    for (UserRole r : user.roles) {
+      r.delete();
+    }
+    UserRole.create(user, UserRole.ROLE_CHECKIN_APP);
+    UserRole.create(user, UserRole.ROLE_VIEW_JC);
   }
 
   public Result editNotifications(Http.Request request) {
@@ -215,7 +218,7 @@ public class Settings extends Controller {
     for (User user : users) {
       // Hide dummy users and the check-in app user
       if (!user.getName().equals(User.DUMMY_USERNAME)
-          && !user.getEmail().equals(org.getShortName())) {
+          && !user.getName().equals(User.CHECKIN_USERNAME)) {
         users_to_show.add(user);
       }
     }
@@ -265,31 +268,36 @@ public class Settings extends Controller {
   public Result saveUser(Http.Request request) {
     Form<User> user_form = mFormFactory.form(User.class);
     Form<User> filled_form = user_form.bindFromRequest(request);
-    User u = filled_form.get();
+    User formUser = filled_form.get();
     Map<String, String[]> form_data = request.body().asFormUrlEncoded();
 
-    User orig_user = User.findById(u.getId(), Utils.getOrg(request));
+    User origUser = User.findById(formUser.getId(), Utils.getOrg(request));
 
-    for (UserRole r : orig_user.roles) {
+    for (UserRole r : origUser.roles) {
       r.delete();
     }
 
     for (String role : UserRole.ALL_ROLES) {
       if (form_data.containsKey(role) && form_data.get(role)[0].equals("true")) {
-        UserRole.create(u, role);
+        UserRole.create(origUser, role);
       }
     }
 
+    origUser.setName(formUser.getName());
+
+    if (!origUser.getEmail().equals(formUser.getEmail())) {
+      DB.deleteAll(origUser.linkedAccounts);
+      origUser.setEmail(formUser.getEmail());
+    }
+
     if (filled_form.apply("active").value().get().equals("false")) {
-      u.setActive(false);
-      DB.deleteAll(orig_user.linkedAccounts);
+      origUser.setActive(false);
+      DB.deleteAll(origUser.linkedAccounts);
+    } else {
+      origUser.setActive(true);
     }
 
-    if (!orig_user.getEmail().equals(u.getEmail())) {
-      DB.deleteAll(orig_user.linkedAccounts);
-    }
-
-    u.update();
+    origUser.update();
 
     return redirect(routes.Settings.viewAccess());
   }

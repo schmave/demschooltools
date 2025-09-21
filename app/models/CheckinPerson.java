@@ -16,13 +16,15 @@ public class CheckinPerson {
       Person person,
       AttendanceDay current_day,
       AttendanceStats stats,
-      boolean show_weighted_percent) {
+      boolean show_attendance_rate,
+      boolean use_weighted_attendance_rate) {
     personId = person.getPersonId();
     pin = person.getPin();
     name = person.getDisplayName();
 
-    if (stats != null && show_weighted_percent) {
-      double rate = stats.weightedAttendanceRate();
+    if (stats != null && show_attendance_rate) {
+      double rate =
+          use_weighted_attendance_rate ? stats.weightedAttendanceRate() : stats.attendanceRate();
       if (!Double.isNaN(rate)) {
         attendance_rate = ModelUtils.formatAsPercent(rate);
       }

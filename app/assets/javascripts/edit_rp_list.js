@@ -3,7 +3,7 @@ const Handlebars = require('handlebars');
 
 let login_message_shown = false;
 
-const insertIntoSortedList = function(charge, list, parent_el) {
+const insertIntoSortedList = function (charge, list, parent_el) {
     if (list.length === 0) {
         parent_el.append(charge.el);
         list.push(charge);
@@ -12,14 +12,14 @@ const insertIntoSortedList = function(charge, list, parent_el) {
 
     // Find first element in list that should appear after charge.
     let i = 0;
-    for ( ; i<list.length; i++) {
+    for (; i < list.length; i++) {
         if (charge.name < list[i].name) {
             break;
         }
     }
 
     if (i == list.length) {
-        list[i-1].el.after(charge.el);
+        list[i - 1].el.after(charge.el);
         list.push(charge);
     } else {
         list[i].el.before(charge.el);
@@ -27,7 +27,7 @@ const insertIntoSortedList = function(charge, list, parent_el) {
     }
 };
 
-const indexOfCharge = function(list, charge) {
+const indexOfCharge = function (list, charge) {
     for (let i = 0; i < list.length; i++) {
         if (list[i].id == charge.id) {
             return i;
@@ -37,69 +37,78 @@ const indexOfCharge = function(list, charge) {
     return -1;
 };
 
-const checkboxChanged = function(charge) {
-    charge.checkbox.prop("disabled", true);
+const checkboxChanged = function (charge) {
+    charge.checkbox.prop('disabled', true);
     let i = indexOfCharge(app.active_rps, charge);
 
-    const url = "/setResolutionPlanComplete?id=" + charge.id +
-        "&complete=" + (i >= 0);
+    const url =
+        '/setResolutionPlanComplete?id=' + charge.id + '&complete=' + (i >= 0);
     $.post(url)
-        .done(function(data) {
+        .done(function (data) {
             // We expect an empty response. If it is not empty, the user
             // probably got redirected to the login page.
-            if (data !== "") {
+            if (data !== '') {
                 if (!login_message_shown) {
-                    alert("Your change was not saved. You may not be logged in.");
+                    alert(
+                        'Your change was not saved. You may not be logged in.',
+                    );
                 }
                 login_message_shown = true;
                 return;
             }
-            charge.el.addClass("rp-moved");
+            charge.el.addClass('rp-moved');
             if (i >= 0) {
-                charge.el.fadeOut("slow", function() {
+                charge.el.fadeOut('slow', function () {
                     charge.el.detach();
                     app.active_rps.splice(i, 1);
-                    insertIntoSortedList(charge, app.completed_rps, $(".completed-rps"));
+                    insertIntoSortedList(
+                        charge,
+                        app.completed_rps,
+                        $('.completed-rps'),
+                    );
                     charge.el.show();
                 });
             } else {
                 i = indexOfCharge(app.completed_rps, charge);
-                charge.el.fadeOut("slow", function() {
+                charge.el.fadeOut('slow', function () {
                     charge.el.detach();
                     app.completed_rps.splice(i, 1);
-                    insertIntoSortedList(charge, app.active_rps, $(".active-rps"));
+                    insertIntoSortedList(
+                        charge,
+                        app.active_rps,
+                        $('.active-rps'),
+                    );
                     charge.el.show();
                 });
             }
         })
-        .fail(function() {
-        })
-        .always(function() {
-            charge.checkbox.prop("disabled", false);
+        .fail(function () {})
+        .always(function () {
+            charge.checkbox.prop('disabled', false);
         });
 };
 
-const Charge = function(data, el) {
+const Charge = function (data, el) {
     const self = this;
 
-    this.removeCharge = function() {
+    this.removeCharge = function () {
         self.el.remove();
-        $.post("/removeCharge?id=" + self.id);
+        $.post('/removeCharge?id=' + self.id);
     };
 
     self.id = data.id;
     self.el = el;
     self.name = utils.displayName(data.person).toLowerCase();
 
-    self.checkbox = el.find("input");
-    self.checkbox.prop("checked", data.rpComplete);
+    self.checkbox = el.find('input');
+    self.checkbox.prop('checked', data.rpComplete);
 
-    self.checkbox.change(function() {
+    self.checkbox.change(function () {
         checkboxChanged(self);
     });
 };
 
-const addCharge = function(data, parent_el) {
+const addCharge = function (data, parent_el) {
     const template_data = {
         name: utils.displayName(data.person),
         caseNumber: data.theCase.caseNumber,
@@ -107,20 +116,25 @@ const addCharge = function(data, parent_el) {
         closed_day_of_week: utils.reformatDate('D', data.theCase.dateClosed),
         sm_date: utils.reformatDate('m/dd', data.smDecisionDate),
         sm_day_of_week: utils.reformatDate('D', data.smDecisionDate),
-        rule_title: data.rule ? data.ruleTitle : window.config.show_entry ? "<No rule>" : "",
+        rule_title: data.rule
+            ? data.ruleTitle
+            : window.config.show_entry
+              ? '<No rule>'
+              : '',
         resolutionPlan: data.resolutionPlan,
         smDecision: data.smDecision,
         findings: data.theCase.compositeFindings,
         smDecisionDate: data.smDecisionDate,
-        referredToSm: data.referredToSm
-        };
+        referredToSm: data.referredToSm,
+    };
 
     if (data.dateClosed) {
         template_data.dateClosed = data.dateClosed;
     }
 
-    const new_charge_el = parent_el.append(
-        app.rp_template(template_data)).children(":last-child");
+    const new_charge_el = parent_el
+        .append(app.rp_template(template_data))
+        .children(':last-child');
 
     return new Charge(data, new_charge_el);
 };
@@ -150,21 +164,30 @@ function loadCharge(charge_data, list, parent_el) {
         charge_data.theCase = id_to_case[charge_data.theCase];
     }
 
-    insertIntoSortedList(
-        addCharge(charge_data, parent_el),
-        list,
-        parent_el);
+    insertIntoSortedList(addCharge(charge_data, parent_el), list, parent_el);
 }
 
-window.initRpList = function() {
-    app.rp_template = Handlebars.compile($("#rp-template").html());
-    for (var i in app.initial_data.active_rps) {
-        loadCharge(app.initial_data.active_rps[i], app.active_rps, $(".active-rps"));
+window.initRpList = function () {
+    app.rp_template = Handlebars.compile($('#rp-template').html());
+    for (const i in app.initial_data.active_rps) {
+        loadCharge(
+            app.initial_data.active_rps[i],
+            app.active_rps,
+            $('.active-rps'),
+        );
     }
-    for (i in app.initial_data.completed_rps) {
-        loadCharge(app.initial_data.completed_rps[i], app.completed_rps, $(".completed-rps"));
+    for (const i in app.initial_data.completed_rps) {
+        loadCharge(
+            app.initial_data.completed_rps[i],
+            app.completed_rps,
+            $('.completed-rps'),
+        );
     }
-    for (i in app.initial_data.nullified_rps) {
-        loadCharge(app.initial_data.nullified_rps[i], app.nullified_rps, $(".nullified-rps"));
+    for (const i in app.initial_data.nullified_rps) {
+        loadCharge(
+            app.initial_data.nullified_rps[i],
+            app.nullified_rps,
+            $('.nullified-rps'),
+        );
     }
-}
+};

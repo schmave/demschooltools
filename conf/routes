@@ -69,31 +69,52 @@ POST /generateChargeFromReference   controllers.ApplicationEditing.generateCharg
 GET /getLastRp/:personId/:ruleId	controllers.Application.getLastRp(personId : Integer, ruleId : Integer, request: Request)
 
 
-GET /viewManual       controllers.Application.viewManual(request: Request)
-GET /viewManualChanges       controllers.Application.viewManualChanges(begin_date : String ?= "", request: Request)
-GET /viewChapter/:id       controllers.Application.viewChapter(id : Integer, request: Request)
-GET /searchManual       controllers.Application.searchManual(searchString : String ?= "", request: Request)
+GET /viewManual       controllers.Proxy.proxy0(request: Request)
+GET /viewManualChanges       controllers.Proxy.proxy0(request: Request)
+GET /viewManualChanges*extra       controllers.Proxy.proxy(request: Request, extra: String)
+GET /viewChapter*extra       controllers.Proxy.proxy(request: Request, extra: String)
+GET /searchManual       controllers.Proxy.proxy0(request: Request)
 
-GET /printManual	controllers.Application.printManual(request: Request)
-GET /printManualChapter/:id	controllers.Application.printManualChapter(id : Integer, request: Request)
+GET /printManual	controllers.Proxy.proxy0(request: Request)
+GET /printManualChapter/*extra       controllers.Proxy.proxy(request: Request, extra: String)
 
 
 GET /thisWeekReport	controllers.Application.thisWeekReport(request: Request)
 GET /viewWeeklyReport/:date	controllers.Application.viewWeeklyReport(date : String, request: Request)
 
 
-GET /addChapter			controllers.ApplicationEditing.addChapter(request: Request)
-GET /editChapter/:id		controllers.ApplicationEditing.editChapter(id : Integer, request: Request)
-POST /saveChapter	controllers.ApplicationEditing.saveChapter(request: Request)
-GET /addSection/:chapterId		controllers.ApplicationEditing.addSection(chapterId : Integer, request: Request)
-GET /editSection/:id		controllers.ApplicationEditing.editSection(id : Integer, request: Request)
-POST /saveSection	controllers.ApplicationEditing.saveSection(request: Request)
-GET /addEntry/:sectionId		controllers.ApplicationEditing.addEntry(sectionId : Integer, request: Request)
-GET /editEntry/:id		controllers.ApplicationEditing.editEntry(id : Integer, request: Request)
-POST /saveEntry		controllers.ApplicationEditing.saveEntry(request: Request)
-POST /renderMarkdown	controllers.Application.renderMarkdown(request: Request)
+GET /editChapter		controllers.Proxy.proxy0(request: Request)
+POST /editChapter		controllers.Proxy.proxy0(request: Request)
+GET /editChapter*extra		controllers.Proxy.proxy(request: Request, extra: String)
+POST /editChapter*extra		controllers.Proxy.proxy(request: Request, extra: String)
 
-GET     /custodia                   controllers.Attendance.viewCustodiaAdmin(request: Request)
+GET /addSection*extra		controllers.Proxy.proxy(request: Request, extra: String)
+POST /addSection*extra		controllers.Proxy.proxy(request: Request, extra: String)
+GET /editSection*extra		controllers.Proxy.proxy(request: Request, extra: String)
+POST /editSection*extra		controllers.Proxy.proxy(request: Request, extra: String)
+GET /addEntry*extra		    controllers.Proxy.proxy(request: Request, extra: String)
+POST /addEntry*extra		controllers.Proxy.proxy(request: Request, extra: String)
+GET /editEntry*extra		controllers.Proxy.proxy(request: Request, extra: String)
+POST /editEntry*extra		controllers.Proxy.proxy(request: Request, extra: String)
+POST /viewEntry             controllers.Proxy.proxy0(request: Request)
+POST /viewEntry*extra		controllers.Proxy.proxy(request: Request, extra: String)
+
+GET      /custodia-admin            controllers.Attendance.viewCustodiaAdmin(request: Request)
+GET      /custodia                  controllers.Proxy.proxy0(request: Request)
+GET      /custodia*extra            controllers.Proxy.proxy(request: Request, extra: String)
+POST     /custodia*extra            controllers.Proxy.proxy(request: Request, extra: String)
+
+GET      /silk*extra                controllers.Proxy.proxy(request: Request, extra: String)
+POST     /silk*extra                controllers.Proxy.proxy(request: Request, extra: String)
+GET      /admin                     controllers.Proxy.proxy0(request: Request)
+GET      /admin*extra               controllers.Proxy.proxy(request: Request, extra: String)
+POST     /admin*extra               controllers.Proxy.proxy(request: Request, extra: String)
+GET      /django-static/*extra      controllers.Proxy.proxy(request: Request, extra: String)
+
+GET      /custodia-api/*extra       controllers.Proxy.proxy(request: Request, extra: String)
+POST     /custodia-api/*extra       controllers.Proxy.proxy(request: Request, extra: String)
+PUT      /custodia-api/*extra       controllers.Proxy.proxy(request: Request, extra: String)
+DELETE   /custodia-api/*extra       controllers.Proxy.proxy(request: Request, extra: String)
 
 GET     /jsonPeople               controllers.CRM.jsonPeople(term ?= "", request: Request)
 GET     /people                   controllers.CRM.recentComments(request: Request)
@@ -137,8 +158,6 @@ POST    /attendance/deletePersonWeek  controllers.Attendance.deletePersonWeek(pe
 POST    /attendance/saveWeek          controllers.Attendance.saveWeek(week_id : Integer, extraHours : Double, request: Request)
 POST    /attendance/saveDay           controllers.Attendance.saveDay(day_id : Integer, code ?= "", startTime ?= "", endTime ?= "", request: Request)
 
-POST    /attendance/importFromCustodia     controllers.Attendance.importFromCustodia(request: Request)
-
 GET 	/accounting/transaction/:id		  			controllers.Accounting.transaction(id: Integer, request: Request)
 GET 	/accounting/createTransaction				controllers.Accounting.newTransaction(request: Request)
 POST 	/accounting/createTransaction				controllers.Accounting.makeNewTransaction(request: Request)
@@ -158,6 +177,13 @@ POST 	/accounting/editAccount			  			controllers.Accounting.saveAccount(request:
 POST 	/accounting/deleteAccount		  			controllers.Accounting.deleteAccount(id: Integer)
 GET 	/accounting/report				  			controllers.Accounting.report(request: Request)
 POST 	/accounting/report				  			controllers.Accounting.runReport(request: Request)
+
+GET 	/roles/index            controllers.Roles.index(request: Request)
+GET 	/roles/records          controllers.Roles.records(request: Request)
+GET 	/roles/newRole          controllers.Roles.newRole(request: Request)
+POST 	/roles/newRole          controllers.Roles.makeNewRole(request: Request)
+POST    /roles/updateRole/:id   controllers.Roles.updateRole(id: Integer, roleJson: String, request: Request)
+POST    /roles/deleteRole/:id   controllers.Roles.deleteRole(id: Integer, request: Request)
 
 GET     /people/edit/:id          controllers.CRM.editPerson(id: Integer, request: Request)
 POST    /people/edit              controllers.CRM.savePersonEdits(request: Request)

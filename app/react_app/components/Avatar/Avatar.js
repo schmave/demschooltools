@@ -6,12 +6,12 @@ import avatarColors from './AvatarColors';
 
 const Avatar = (props) => {
   const [initials, setInitials] = useState('');
-  const [colors, setColors] = useState({color: 'white', backgroundColor: 'black'});
-  
+  const [colors, setColors] = useState({ color: 'white', backgroundColor: 'black' });
+
   const { name, ...restOfProps } = props;
 
   useEffect(() => {
-    if(name?.length > 0) {
+    if (name?.length > 0) {
       const initialsArray = name.split(' ');
       let newInitials = initialsArray[0].charAt(0);
       if (initialsArray.length > 1) {
@@ -24,7 +24,7 @@ const Avatar = (props) => {
     }
   }, [name]);
 
-  if(initials === '') {
+  if (initials === '') {
     return null;
   }
 

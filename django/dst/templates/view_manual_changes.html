@@ -1,0 +1,51 @@
+{% load static dst_tags %}
+
+<h3>Changes to the {{ org_config.str_manual_title }}</h3>
+
+<form method="GET">
+  <p class="highlight" style="margin-bottom: 3em">
+    Show changes between
+    <input type="date" name="begin_date" value="{{ begin_date }}">
+    and
+    <input type="date" name="end_date" value="{{ end_date }}">.
+    <input class="btn btn-primary" type="submit">
+  </p>
+</form>
+
+{% for c in changes %}
+  <div class="change_log">
+    <div class="dateEntered">
+      {% dateAndTime c.date_entered %}
+      {% if c.user_id %} &middot; {{ c.user }} {% endif %}
+      {% if c.effective_date %} &middot; effective {{ c.effective_date }} {% endif %}
+    </div>
+    {% if c.was_created %}
+      <table cellpadding="20">
+        <tr>
+          <td>
+            <img src="{% static 'images/new_icon.png' %}" width="48">
+          </td>
+          <td>
+            {% include "entry_for_changes.html" with num=c.new_num title=c.new_title content=c.new_content deleted=c.was_deleted %}
+          </td>
+        </tr>
+      </table>
+    {% elif c.was_deleted %}
+      {% include "entry_for_changes.html" with num=c.new_num title=c.new_title content=c.new_content deleted=c.was_deleted %}
+    {% else %}
+      <table cellpadding="5">
+        <tr>
+          <td width="50%">
+            {% include "entry_for_changes.html" with num=c.old_num title=c.old_title content=c.old_content deleted=c.was_deleted %}
+          </td>
+          <td>
+            <img src="{% static 'images/change_arrow.png' %}">
+          </td>
+          <td width="50%">
+            {% include "entry_for_changes.html" with num=c.new_num title=c.new_title content=c.new_content deleted=c.was_deleted  %}
+          </td>
+        </tr>
+      </table>
+    {% endif %}
+  </div>
+{% endfor %}

@@ -4,7 +4,7 @@
 
 <html>
     <head>
-<script>
+        <script>
 var _rollbarConfig = {
     accessToken: "d1b7a9d6c29f4f4e90c50123b40c9227",
     captureUncaught: true,
@@ -22,6 +22,7 @@ var _rollbarConfig = {
 // End Rollbar Snippet
 </script>
         <title>@title</title>
+        <script src="https://unpkg.com/htmx.org@@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
         <script type="text/javascript"
             src="@routes.Assets.versioned("javascripts/gen/bundle.js")"></script>
 
@@ -74,8 +75,13 @@ var _rollbarConfig = {
                 <a href="@routes.Application.index()">@Utils.getOrgConfig(request).str_jc_name_short</a>
             </li>
             <li @if(menu.equals("manual")) { class="active" }>
-                <a href="@routes.Application.viewManual()">@Utils.getOrgConfig(request).str_manual_title_short</a>
+                <a href="/viewManual">@Utils.getOrgConfig(request).str_manual_title_short</a>
             </li>
+            @if(Utils.getOrgConfig(request).org.getShowRoles()) {
+                <li @if(menu.equals("roles")) { class="active" }>
+                    <a href="@routes.Roles.index()">Roles</a>
+                </li>
+            }
             @if(Utils.getOrgConfig(request).org.getShowAccounting()) {
                 <li @if(menu.equals("accounting")) { class="active" }>
                     <a href="@routes.Accounting.balances()">Accounting</a>
@@ -193,6 +199,19 @@ var _rollbarConfig = {
         </div>
         }
 
+        @if(menu.equals("roles")) {
+            <div class="tab-pane active" id="roles">
+                <div class="subnav">
+                    <a @if(selectedBtn.equals("roles_index")) { class="active" }
+                        href="@routes.Roles.index()">Roles</a>
+                    <a @if(selectedBtn.equals("roles_new")) { class="active" }
+                        href="@routes.Roles.newRole()">Create Role</a>
+                    <a @if(selectedBtn.equals("roles_records")) { class="active" }
+                        href="@routes.Roles.records()">Records</a>
+                </div>
+            </div>
+        }
+
         @if(menu.equals("accounting")) {
             <div class="tab-pane active" id="finance">
                 <div class="subnav">
@@ -255,26 +274,6 @@ var _rollbarConfig = {
         </div>
         }
 
-        @if(menu.equals("manual")) {
-        <div class="tab-pane active" id="manual">
-            <div class="subnav">
-                <a @if(selectedBtn.equals("toc")) { class="active" }
-                    href="@routes.Application.viewManual()">Table of Contents</a>
-                <a @if(selectedBtn.equals("manual_print")) { class="active" }
-                    href="@routes.Application.printManual()">Print</a>
-                <a @if(selectedBtn.equals("manual_changes")) { class="active" }
-                    href="@routes.Application.viewManualChanges()">
-                    Changes since a date</a>
-                <a>
-                    <form method="GET" style="display:inline;" action="@routes.Application.searchManual()">
-                        <input name="searchString" type="search" placeholder="Search the manual..."/>
-                        <input type="submit" value="Search"/>
-                    </form>
-                </a>
-            </div>
-        </div>
-        }
-
         @if(menu.equals("settings")) {
         <div class="tab-pane active" id="settings">
             <div class="subnav">
@@ -310,6 +309,15 @@ var _rollbarConfig = {
 
         @content
         <div class="no-print feedback_open" id="main_feedback_open">Have Feedback?</div>
+
+        <script id="autocomplete-template" type="text/x-handlebars-template">
+            <div class="autocomplete-selected name">
+                <span class="autocomplete-selected-text label label-primary"></span>
+                <img src="/assets/images/x.png"/>
+            </div>
+            <input type="text" class="autocomplete-text {{textFieldClass}}" name="{{textFieldName}}" size="{{textFieldSize}}"/>
+            <input type="hidden" class="autocomplete-id" name="{{idFieldName}}"/>
+        </script>
 
     </body>
 </html>

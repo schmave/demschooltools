@@ -1,13 +1,19 @@
-#!/usr/bin/env python
+#!/usr/bin/env -S uv run
 """Django's command-line utility for administrative tasks."""
 
 import os
 import sys
 
+ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
+
 
 def main():
     """Run administrative tasks."""
-    os.environ["DJANGO_SETTINGS_MODULE"] = "demschooltools.settings"
+    if ENVIRONMENT_VARIABLE not in os.environ:
+        module = "demschooltools.settings"
+        os.environ[ENVIRONMENT_VARIABLE] = module
+        print(f"\n[manage.py using default {ENVIRONMENT_VARIABLE}={module}]\n")
+
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

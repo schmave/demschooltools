@@ -102,13 +102,18 @@ the other way around.</p>
         <input type="checkbox" name="showElectronicSignin"
             @if(org.getShowElectronicSignin()){ checked }
             class="has-dependents" data-dependent-class="depends-on-electronic-signin">
-        Enable the experimental electronic check-in app (new in Fall 2019)
+        Enable the electronic check-in app
     </label>
 
     <p class="depends-on-electronic-signin">The <a target="_blank" href="@routes.Public.checkin()">electronic check-in app</a> username is
-        "@Utils.getOrgConfig(request).org.getShortName()" (case-sensitive). To reset the password, enter a new one here:
+        "@Utils.getOrgConfig(request).org.getShortName()". To reset the password, enter a new one here:
         <br>
         <input type="text" size="30" placeholder="New password" name="electronic_signin_password" />
+        <br>
+        Have the app automatically assign absence code
+        <input size="7" type="text" name="attendanceDefaultAbsenceCode" value="@org.getAttendanceDefaultAbsenceCode()">
+        if someone doesn't sign in by
+        <input type="time" size="7" name="attendanceDefaultAbsenceCodeTime" value="@org.getAttendanceDefaultAbsenceCodeTime()">
     </p>
 
     <label>
@@ -165,7 +170,15 @@ the other way around.</p>
         Show the "Weighted Attendance Rate" column
     </label>
     &nbsp;<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip"
-        title="Like the Attendance Rate column, except recent days are worth more while distant past days are worth less, with a smooth transition in between. If you are using the check-in app, this value will be shown to the student when they check in each day."></span>
+        title="Like the Attendance Rate column, except recent days are worth more while distant past days are worth less, with a smooth transition in between."></span>
+    <br>
+    <label>
+        <input type="checkbox" name="attendanceShowRateInCheckin" id="attendance-show-rate-in-checkin"
+               @if(org.getAttendanceShowRateInCheckin()){ checked }>
+        Show student's attendance rate to them when they use the electronic check-in app
+    </label>
+    &nbsp;<span class="help-icon glyphicon glyphicon-info-sign" data-toggle="tooltip"
+        title='If you are using the electronic check-in app, this will show each student their own attendance rate when they sign in each day. If the checkbox "Show the Weighted Attendance Rate column" is checked, weighted attendance rate will be used; otherwise normal attendance rate will be used.'></span>
     <br>
     <label>
         <input type="checkbox" name="attendanceEnablePartialDays" id="attendance-enable-partial-days"
@@ -222,14 +235,48 @@ the other way around.</p>
     </label>
 </p>
 <div class="depends-on-custodia">
-    <p>The Custodia <a target="_blank" href="@play_config.getString("custodia_url")">electronic sign-in sheet</a> username is
-        "@Utils.getOrgConfig(request).org.getShortName()" (case-sensitive). To reset the password, enter a new one here:
+    <p>The Custodia <a target="_blank" href="/custodia">electronic sign-in sheet</a> username is
+        "@Utils.getOrgConfig(request).org.getShortName()". To reset the password, enter a new one here:
         <br>
         <input type="text" size="30" placeholder="New password" name="custodia_student_password" />
     </p>
 </div>
 <input type="hidden" name="attendance_settings" value="true"/>
 <input type="submit" value="Save Attendance settings"/>
+}
+
+<hr/>
+<h2>Roles</h2>
+<p class="instructions">This feature allows you to track which people are in which leadership
+roles (Committees, etc.) within DemSchoolTools. The advantage of this is that DemSchoolTools
+tracks changes in role membership over time, allowing you to view a snapshot for a given date
+or generate a resume for a particular person.</p>
+
+@helper.form(routes.Settings.editSettings()) {
+
+    <p>
+        <label>
+            <input type="checkbox" name="showRoles" @if(org.getShowRoles()){ checked }>
+            Enable the "Roles" tab
+        </label>
+    </p>
+    <table>
+        <tr>
+            <td>Individual term</td>
+            <td><input type="text" name="rolesIndividualTerm" value="@org.getRolesIndividualTerm()"></td>
+        </tr>
+        <tr>
+            <td>Committee term</td>
+            <td><input type="text" name="rolesCommitteeTerm" value="@org.getRolesCommitteeTerm()"></td>
+        </tr>
+        <tr>
+            <td>Group term</td>
+            <td><input type="text" name="rolesGroupTerm" value="@org.getRolesGroupTerm()"></td>
+        </tr>
+    </table>
+    <br>
+    <input type="hidden" name="roles_settings" value="true"/>
+    <input type="submit" value="Save Roles settings"/>
 }
 
 <hr/>

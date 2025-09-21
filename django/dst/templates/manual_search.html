@@ -1,0 +1,37 @@
+<h3>Manual Search</h3>
+
+<div class="row">
+    <div class="col-md-8 col-lg-6">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <form method="GET" class="django-form" action="/searchManual">
+                    {{form}}
+                    <input class="btn btn-primary" type="submit" value="Search"/>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if search_string %}
+    <h3>Search Results</h3>
+
+    {% for entry in entries %}
+        {% ifchanged entry.section.chapter %}
+            {% include "chapter_header.html" with chapter=entry.section.chapter%}
+        {% endifchanged %}
+
+        {% ifchanged entry.section %}
+            {% include "section_header.html" with section=entry.section%}
+        {% endifchanged %}
+
+        {% include "view_entry.html" %}
+    {% empty %}
+        <br>
+        <h4>Why didn't I get any results?</h4>
+        <p>Here are a few guidelines to help with searching the manual:</p>
+        <ul>
+            <li>Every term in your search query must appear in the rule in order for it to match (e.g. searching for "JC school meeting" will only match rules that contain all three of those words)</li>
+        </ul>
+    {% endfor %}
+{% endif %}

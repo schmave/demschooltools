@@ -1,7 +1,6 @@
 package com.feth.play.module.pa.service;
 
 import com.feth.play.module.pa.PlayAuthenticate;
-import com.feth.play.module.pa.user.AuthUser;
 import play.Logger;
 
 public abstract class AbstractUserService implements UserService {
@@ -27,11 +26,5 @@ public abstract class AbstractUserService implements UserService {
               + " environment.");
     }
     this.auth.setUserService(this);
-  }
-
-  @Override
-  public AuthUser update(AuthUser knownUser) {
-    // Default: just do nothing when user logs in again
-    return knownUser;
   }
 }
