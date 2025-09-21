@@ -11,6 +11,7 @@ module.exports = function (env, argv) {
         entry: {
             bundle: './javascripts/main.js',
             checkin: './checkin/app.js',
+            reactapp: '../react_app/index.js',
         },
         module: {
             rules: [
