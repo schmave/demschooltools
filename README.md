@@ -104,7 +104,6 @@ GRANT ALL ON SCHEMA public TO public;
 COMMIT;
 
 -- Remove the content owned by the custodia role, and delete the role
--- Note: Should no longer be needed with change to 64.sql
 DO $$
 BEGIN
 	IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'custodia') THEN
