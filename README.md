@@ -105,6 +105,12 @@ COMMIT;
 
 -- Remove the content owned by the custodia role, and delete the role
 -- Note: Should no longer be needed with change to 64.sql
-DROP OWNED BY "custodia" CASCADE;
-DROP ROLE IF EXISTS "custodia";
+DO $$
+BEGIN
+	IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'custodia') THEN
+		DROP OWNED BY "custodia" CASCADE;
+		DROP ROLE IF EXISTS "custodia";
+    END IF;
+END
+$$;
 ```
