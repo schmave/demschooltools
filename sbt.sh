@@ -3,8 +3,6 @@ set -e
 
 JAVA_VERSION=11
 
-. set_keys_blank.sh
-
 if [ -z $JAVA_HOME ]
 then
     echo
