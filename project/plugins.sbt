@@ -17,3 +17,6 @@ addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.10.0-RC1")
 // in order to generate files that are used by the VS Code Java
 // language server.
 addSbtPlugin("com.github.sbt" % "sbt-eclipse" % "6.0.0")
+
+// Load environment variables defined in .env
+addSbtPlugin("nl.gn0s1s" % "sbt-dotenv" % "3.2.0")
