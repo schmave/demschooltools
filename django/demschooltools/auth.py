@@ -74,7 +74,7 @@ def get_user_for_play_session(request) -> User | None:
     if not raw_token:
         return None
     try:
-        data = jwt.decode(raw_token, settings.JWT_KEY, algorithms=["HS256"])
+        data = jwt.decode(raw_token, settings.APPLICATION_SECRET, algorithms=["HS256"])
     except Exception as e:
         print(e)
         return None
