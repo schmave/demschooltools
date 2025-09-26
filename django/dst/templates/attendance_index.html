@@ -117,7 +117,7 @@ $(function() {
 		{{ person.first_name }}</a>
 	</td>
 	<td>{{ person.last_name }}</td>
-	{% with stats=person_to_stats|lookup:person %}
+	{% with stats=person_to_stats|lookup:person.id %}
 		{% for code in codes %}
 			{% with code_obj=codes_map|lookup:code %}
 				{% with count=stats.absence_counts|lookup:code_obj %}

@@ -7,7 +7,6 @@ from datetime import date, datetime, time
 from typing import Dict, List, Optional
 
 from django import forms
-from django.db.models import Q
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 
@@ -44,6 +43,8 @@ class AttendanceStats:
 
         if org.attendance_partial_day_value:
             self.partial_day_value = float(org.attendance_partial_day_value)
+
+        self.rules = list(AttendanceRule.objects.filter(organization=org))
 
     def process_day(
         self, day: AttendanceDay, day_index: int, codes_map: Dict[str, AttendanceCode]
@@ -123,18 +124,15 @@ class AttendanceStats:
         return False
 
     def _get_current_attendance_rules(self, day: AttendanceDay) -> List[AttendanceRule]:
-        """Get attendance rules that apply to this person and day"""
-        return list(
-            AttendanceRule.objects.filter(
-                organization=self.org,
-                person=day.person,
-            ).filter(
-                Q(start_date__lte=day.day, end_date__gte=day.day)
-                | Q(start_date__lte=day.day, end_date__isnull=True)
-                | Q(start_date__isnull=True, end_date__gte=day.day)
-                | Q(start_date__isnull=True, end_date__isnull=True)
+        return [
+            rule
+            for rule in self.rules
+            if (
+                (rule.start_date is None or rule.start_date <= day.day)
+                and (rule.end_date is None or rule.end_date >= day.day)
+                and (rule.person_id is None or rule.person_id == day.person_id)
             )
-        )
+        ]
 
     def _rule_matches_day(self, rule: AttendanceRule, day_date: date) -> bool:
         """Check if an attendance rule matches the given day of week"""
@@ -254,7 +252,7 @@ def get_codes_map(
 
 def map_people_to_stats(
     start_date: date, end_date: date, org: Organization
-) -> Dict[Person, AttendanceStats]:
+) -> Dict[int, AttendanceStats]:
     person_to_stats = defaultdict(lambda: AttendanceStats(org))
     codes_map = get_codes_map(False, org)
 
@@ -263,7 +261,7 @@ def map_people_to_stats(
 
     for day_index, school_day in enumerate(school_days):
         for day in school_day:
-            person_to_stats[day.person].process_day(day, day_index, codes_map)
+            person_to_stats[day.person_id].process_day(day, day_index, codes_map)
 
     # Add extra hours from attendance weeks
     weeks = AttendanceWeek.objects.filter(
@@ -271,7 +269,7 @@ def map_people_to_stats(
     )
 
     for week in weeks:
-        person_to_stats[week.person].total_hours += week.extra_hours
+        person_to_stats[week.person_id].total_hours += week.extra_hours
 
     return person_to_stats
 
@@ -280,13 +278,9 @@ def list_school_days(
     start_date: date, end_date: date, org: Organization
 ) -> List[List[AttendanceDay]]:
     """Get list of school days grouped by date"""
-    days = (
-        AttendanceDay.objects.filter(
-            person__organization=org, day__gte=start_date, day__lte=end_date
-        )
-        .select_related("person")
-        .order_by("-day")
-    )
+    days = AttendanceDay.objects.filter(
+        person__organization=org, day__gte=start_date, day__lte=end_date
+    ).order_by("-day")
 
     # Group by date
     groups = defaultdict(list)
@@ -308,11 +302,11 @@ def list_school_days(
 
 
 def get_attendance_people(org: Organization) -> List[Person]:
-    """Get list of people who have attendance records"""
+    """Get people tagged as being in Attendance"""
     return list(
-        Person.objects.filter(organization=org, attendanceday__isnull=False)
-        .distinct()
-        .order_by("first_name", "last_name")
+        Person.objects.filter(
+            organization=org, tags__show_in_attendance=True
+        ).distinct()
     )
 
 
@@ -347,8 +341,10 @@ def attendance_index(request: DstHttpRequest):
     person_to_stats = map_people_to_stats(start_date, end_date, request.org)
     codes_map = get_codes_map(False, request.org)
 
-    all_people = list(person_to_stats.keys())
-    all_people.sort(key=lambda p: p.first_name)
+    all_people_ids = list(person_to_stats.keys())
+    all_people = Person.objects.filter(id__in=all_people_ids).order_by(
+        "first_name", "last_name"
+    )
 
     all_codes = list(codes_map.keys())
     current_people = get_attendance_people(request.org)

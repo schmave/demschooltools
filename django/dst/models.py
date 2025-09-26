@@ -150,6 +150,7 @@ class AttendanceRule(models.Model):
 
     category = models.CharField(max_length=255, null=True, blank=True)
     person = models.ForeignKey(Person, on_delete=models.PROTECT, null=True, blank=True)
+    person_id: int
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
 
@@ -257,6 +258,7 @@ class AttendanceWeek(models.Model):
         indexes = [models.Index("monday", name="attendance_week_monday_idx")]
 
     person = models.ForeignKey(Person, on_delete=models.PROTECT)
+    person_id: int
     monday = models.DateField()
     extra_hours = models.FloatField(default=0)
 
