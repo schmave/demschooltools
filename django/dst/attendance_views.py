@@ -30,7 +30,7 @@ from dst.utils import (
 
 
 class AttendanceStats:
-    def __init__(self, org: Organization):
+    def __init__(self, org: Organization, rules: List[AttendanceRule]):
         self.org = org
         self.absence_counts: Dict[Optional[AttendanceCode], int] = defaultdict(int)
         self.days_present = 0
@@ -44,7 +44,10 @@ class AttendanceStats:
         if org.attendance_partial_day_value:
             self.partial_day_value = float(org.attendance_partial_day_value)
 
-        self.rules = list(AttendanceRule.objects.filter(organization=org))
+        # Index the rules by person_id so that _get_current_attendance_rules is fast.
+        self.person_to_rules = defaultdict(list)
+        for rule in rules:
+            self.person_to_rules[rule.person_id].append(rule)
 
     def process_day(
         self, day: AttendanceDay, day_index: int, codes_map: Dict[str, AttendanceCode]
@@ -126,11 +129,12 @@ class AttendanceStats:
     def _get_current_attendance_rules(self, day: AttendanceDay) -> List[AttendanceRule]:
         return [
             rule
-            for rule in self.rules
+            for rule in (
+                self.person_to_rules[day.person_id] + self.person_to_rules[None]
+            )
             if (
                 (rule.start_date is None or rule.start_date <= day.day)
                 and (rule.end_date is None or rule.end_date >= day.day)
-                and (rule.person_id is None or rule.person_id == day.person_id)
             )
         ]
 
@@ -253,7 +257,8 @@ def get_codes_map(
 def map_people_to_stats(
     start_date: date, end_date: date, org: Organization
 ) -> Dict[int, AttendanceStats]:
-    person_to_stats = defaultdict(lambda: AttendanceStats(org))
+    rules = list(AttendanceRule.objects.filter(organization=org))
+    person_to_stats = defaultdict(lambda: AttendanceStats(org, rules))
     codes_map = get_codes_map(False, org)
 
     # Get all school days in the date range

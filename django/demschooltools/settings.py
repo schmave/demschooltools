@@ -31,8 +31,8 @@ DEBUG = True
 ALLOWED_HOSTS = ["localhost"]
 
 # Profiling
-SILK_ENABLED = True
-PYINSTRUMENT_PROFILE_DIR = "profiles"  # also add pyinstrument to MIDDLEWARE
+SILK_ENABLED = False
+PYINSTRUMENT_PROFILE_DIR = "pyinstrument"  # also add pyinstrument to MIDDLEWARE
 
 # Application definition
 
@@ -71,7 +71,7 @@ MIDDLEWARE = (["silk.middleware.SilkyMiddleware"] if SILK_ENABLED else []) + [
     "demschooltools.auth.PlaySessionMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "demschooltools.middleware.TimezoneMiddleware",
-    # "pyinstrument.middleware.ProfilerMiddleware",
+    # "pyinstrument.middleware.ProfilerMiddleware",  # add "profile" as a GET arg to see a profile or look in the filesystem
     "rollbar.contrib.django.middleware.RollbarNotifierMiddlewareExcluding404",
 ]
 
