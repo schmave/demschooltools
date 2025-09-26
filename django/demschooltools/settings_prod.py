@@ -21,8 +21,6 @@ SECURE_SSL_REDIRECT = False
 
 AUTHENTICATION_BACKENDS = ["demschooltools.auth.PlaySessionBackend"]
 
-JWT_KEY = os.environ["APPLICATION_SECRET"]
-
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
