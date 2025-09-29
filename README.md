@@ -5,17 +5,17 @@ for [Sudbury](https://en.wikipedia.org/wiki/Sudbury_school)-inspired schools.
 In addition, it does a satisfactory job of tracking people (students, parents,
 donors, and others), student attendance, and the management manual.
 
-## Documentation
+## Documentation for users
 
 See [the wiki](https://github.com/schmave/demschooltools/wiki/) for more information.
 
-## Hacking
+## Running the site locally for development
 
 [Download](https://github.com/schmave/demschooltools/archive/master.zip) the source code, or clone the git repository. `cd` into the root level of the source code.
 
-Now that you've got the code, you'll need to run three separate programs for each of the parts of the site.
+You'll need to run three separate programs for each of the parts of the site.
 
-### Play Framework code
+### (1 of 3) Play Framework code
 
 1.  [Download](https://openjdk.org/) and install OpenJDK version 11.x. Set the JAVA_HOME environment variable to be the location that you installed it, meaning that $JAVA_HOME/bin/java should be the path to the java binary.
 
@@ -43,7 +43,7 @@ Now that you've got the code, you'll need to run three separate programs for eac
     and wait while DemSchoolTools is compiled.
 
 1.  When it loads, you should see a message saying
-    "Database 'default' needs evolution!". Click "Apply this script now."
+    "Database 'default' needs evolution!". Click "Apply this script now." If errors happen after you click "Apply this script now.", look in the "Play database evolutions troubleshooting" section below for advice.
 
 1.  Wait until you see the message "Unknown organization" in your browser window.
 
@@ -74,7 +74,7 @@ Now that you've got the code, you'll need to run three separate programs for eac
 1.  Reload [http://localhost:9000](http://localhost:9000). Login with Email `admin@asdf.com` and password `nopassword`. You will see
     a page with headings "People", "Attendance", "JC", etc.
 
-### Django code
+### (2 of 3) Django code
 
 The Django code uses [uv](https://docs.astral.sh/uv/) to manage its dependencies. I installed uv using using the standalone installer [described here](https://docs.astral.sh/uv/getting-started/installation/#standalone-installer). Once you run it, you'll need to close you terminal window and reopen it before continuing.
 
@@ -83,7 +83,7 @@ Then run:
     uv run manage.py migrate
     uv run manage.py runserver
 
-### Frontend code
+### (3 of 3) Custodia frontend code
 
 To enable the Custodia attendance system locally, run:
 
@@ -91,25 +91,47 @@ To enable the Custodia attendance system locally, run:
     npm install
     npm run watch
 
-### Database Cleanup
+# Play database evolutions troubleshooting
 
-For use when you're resetting your database, Can be run in PGAdmin or other query tool
-```
--- Drop contents of public schema in school_crm database
-BEGIN;
-DROP SCHEMA IF EXISTS public CASCADE;
-CREATE SCHEMA public AUTHORIZATION postgres;
-GRANT ALL ON SCHEMA public TO postgres;
-GRANT ALL ON SCHEMA public TO public;
-COMMIT;
+### 64.sql
 
--- Remove the content owned by the custodia role, and delete the role
-DO $$
-BEGIN
-	IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'custodia') THEN
-		DROP OWNED BY "custodia" CASCADE;
-		DROP ROLE IF EXISTS "custodia";
-    END IF;
-END
-$$;
+If 64.sql fails to apply with the error `role "custodia" already exists`,
+do this:
+
+1. Run the remaining "up" lines from 64.sql:
+
+```sql
+grant select on all tables in schema public to custodia;
+
+create schema if not exists overseer;
+grant all on schema overseer to custodia;
+grant all on all tables in schema overseer to custodia;
+grant all on all sequences in schema overseer to custodia;
+
+create schema if not exists demo;
+grant all on schema demo to custodia;
+grant all on all sequences in schema demo to custodia;
+grant all on all tables in schema demo to custodia;
 ```
+
+2. Click "Mark it resolved".
+
+### 102.sql
+
+If 102.sql fails to apply with the error `relation "custodia_swipe" does not exist`, do this:
+
+1. Run these commands:
+
+```
+cd django
+uv run manage.py migrate
+```
+
+2. Run the "up" line from 102.sql:
+
+```sql
+create unique index person_swipe_day_empty_out_unique
+    on custodia_swipe(person_id, swipe_day) WHERE out_time is null;
+```
+
+3. Click "Mark it resolved".

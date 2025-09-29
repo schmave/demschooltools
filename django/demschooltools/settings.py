@@ -9,6 +9,10 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -49,7 +53,7 @@ LOGIN_URL = "/custodia/login"
 
 AUTHENTICATION_BACKENDS = ["demschooltools.auth.PlaySessionBackend"]
 
-JWT_KEY = "asdlkfjhasldkjfhqo28329384u29q384asldkjfahslkdfj891"
+APPLICATION_SECRET = os.environ["APPLICATION_SECRET"]
 
 REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": ("drf_orjson_renderer.renderers.ORJSONRenderer",),

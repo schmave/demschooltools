@@ -13,10 +13,10 @@
 -- AND a.ctid <> b.ctid;
 
 
--- create unique index person_swipe_day_empty_out_unique on custodia_swipe(person_id, swipe_day) WHERE out_time is null;
+create unique index person_swipe_day_empty_out_unique on custodia_swipe(person_id, swipe_day) WHERE out_time is null;
 
 
 
 # --- !Downs
 
--- drop index person_swipe_day_empty_out_unique;
+drop index person_swipe_day_empty_out_unique;

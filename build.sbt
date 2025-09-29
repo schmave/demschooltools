@@ -5,8 +5,6 @@ ThisBuild / scalaVersion := "2.13.16"
 ThisBuild / version := "1.1"
 ThisBuild / javacOptions ++= Seq("-Xlint:unchecked", "-Xlint:deprecation")
 
-ThisBuild / EclipseKeys.skipParents := false
-
 lazy val authLibrary = (project in file("authLibrary"))
   .enablePlugins(PlayJava)
   .settings(
