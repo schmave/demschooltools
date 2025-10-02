@@ -15,7 +15,7 @@ register = template.Library()
 
 @register.simple_tag(takes_context=True)
 def yymmddDate(context, d: datetime | date | None = None):
-    org_config: "OrgConfig" = context["org_config"]
+    org_config: OrgConfig = context["org_config"]
 
     if d is None or isinstance(d, datetime):
         d = timezone.localtime(d)
