@@ -35,6 +35,7 @@ You'll need to run three separate programs for each of the parts of the site.
 
         cd django
         uv run manage.py migrate
+        uv run manage.py setup_initial_data
         cd ..
 
 1.  Run `./sbt.sh`, then execute the `eclipse` and `run` command in the sbt console:
@@ -50,33 +51,7 @@ You'll need to run three separate programs for each of the parts of the site.
 1.  Navigate to [http://localhost:9000](http://localhost:9000) in your browser
     and wait while DemSchoolTools is compiled.
 
-1.  Wait until you see the message "Unknown organization" in your browser window.
-
-1.  Connect to your Postgres database and run this SQL:
-
-    ```sql
-        INSERT INTO organization_hosts(host, organization_id)
-            VALUES ('localhost:9000', 1);
-        INSERT INTO tag(title, use_student_display, organization_id, show_in_jc, show_in_attendance, show_in_account_balances, show_in_roles)
-            VALUES ('Current Student', true, 1, true, true, true, true);
-        INSERT INTO tag(title, use_student_display, organization_id, show_in_jc, show_in_attendance, show_in_account_balances, show_in_roles)
-            VALUES ('Staff', false, 1, true, true, true, true);
-
-        INSERT INTO users(email, name, active, email_validated,
-                        is_staff, is_superuser, hashed_password)
-            VALUES ('admin@asdf.com', 'Admin User', true, true, true, true,
-                '$2a$10$sHAtPc.yeZg2AWMr7EZZbuu.sYaOPgFsMZiAY62q/URbjMxU3jB.q');
-
-        INSERT INTO user_role (user_id, role)
-            SELECT id, 'all-access' from users;
-
-        UPDATE organization set
-            show_custodia=true, show_accounting=true,
-            enable_case_references=true, show_electronic_signin=true,
-            show_roles=true;
-    ```
-
-1.  Reload [http://localhost:9000](http://localhost:9000). Login with Email `admin@asdf.com` and password `nopassword`. You will see
+1.  Login with Email `admin@asdf.com` and password `nopassword`. You will see
     a page with headings "People", "Attendance", "JC", etc.
 
 ### (2 of 3) Django code

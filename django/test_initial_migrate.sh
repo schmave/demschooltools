@@ -17,3 +17,5 @@ EOF
 # ./manage.py migrate dst 0003 --fake
 ./manage.py migrate
 pg_dump -O --schema-only school_crm > django_migrate.sql
+
+uv run manage.py setup_initial_data

@@ -3,6 +3,7 @@ from decimal import Decimal
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models.functions import Now
 
 
 class Organization(models.Model):
@@ -139,11 +140,11 @@ class Person(models.Model):
     school_district = models.CharField(max_length=255, default="")
 
     # System fields
-    id = models.IntegerField(primary_key=True, db_column="person_id")
+    id = models.AutoField(primary_key=True, db_column="person_id")
     organization_id: int
     organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
     tags = models.ManyToManyField(Tag, db_table="person_tag", blank=True)
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(db_default=Now())
     pin = models.CharField(max_length=10, default="", blank=True)
 
     # Custodia fields
@@ -174,7 +175,7 @@ class Donation(models.Model):
     is_cash = models.BooleanField()
     description = models.TextField()
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
-    date = models.DateTimeField(auto_now_add=True)
+    date = models.DateTimeField(db_default=Now())
 
     thanked = models.BooleanField()
     thanked_by_user = models.ForeignKey(
@@ -271,7 +272,7 @@ class Comment(models.Model):
         db_table = "comments"
 
     message = models.TextField(null=True, blank=True)
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(db_default=Now())
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     user = models.ForeignKey("User", on_delete=models.PROTECT, db_column="user_id")
 
@@ -390,7 +391,7 @@ class PersonTagChange(models.Model):
     creator = models.ForeignKey(
         "User", on_delete=models.PROTECT, db_column="creator_id"
     )
-    time = models.DateTimeField(auto_now_add=True)
+    time = models.DateTimeField(db_default=Now())
     was_add = models.BooleanField()
 
 
@@ -401,7 +402,7 @@ class PersonChange(models.Model):
     person = models.ForeignKey(Person, on_delete=models.PROTECT)
     old_email = models.CharField(max_length=255)
     new_email = models.CharField(max_length=255)
-    time = models.DateTimeField(auto_now_add=True)
+    time = models.DateTimeField(db_default=Now())
 
 
 class ManualManager(models.Manager):
@@ -494,7 +495,7 @@ class ManualChange(models.Model):
     entry = models.ForeignKey(
         Entry, on_delete=models.PROTECT, related_name="changes", null=True, blank=True
     )
-    date_entered = models.DateTimeField(auto_now_add=True)
+    date_entered = models.DateTimeField(db_default=Now())
     effective_date = models.DateField(null=True, blank=True)
     show_date_in_history = models.BooleanField(default=True)
     user = models.ForeignKey("User", on_delete=models.PROTECT, null=True, blank=True)

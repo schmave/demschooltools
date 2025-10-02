@@ -4,15 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('custodia', '0002_auto_20250226_2043'),
-        ('dst', '0001_initial'),
+        ("custodia", "0002_auto_20250226_2043"),
+        ("dst", "0001_initial"),
     ]
 
     operations = [
         migrations.AddConstraint(
-            model_name='swipe',
-            constraint=models.UniqueConstraint(models.F('person'), models.F('swipe_day'), condition=models.Q(('out_time', None)), name='person_swipe_day_empty_out_unique'),
+            model_name="swipe",
+            constraint=models.UniqueConstraint(
+                models.F("person"),
+                models.F("swipe_day"),
+                condition=models.Q(("out_time", None)),
+                name="person_swipe_day_empty_out_unique",
+            ),
         ),
     ]
