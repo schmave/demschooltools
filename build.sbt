@@ -50,7 +50,6 @@ ThisBuild / Compile / playEbeanModels := Seq("models.*")
 
 libraryDependencies ++= Seq(
   javaJdbc,
-  evolutions,
   ehcache,
   guice,
   "org.postgresql" % "postgresql" % "42.5.4",

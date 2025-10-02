@@ -338,7 +338,7 @@ class ManualChange(models.Model):
     date_entered = models.DateTimeField(auto_now_add=True)
     effective_date = models.DateField(blank=True)
     show_date_in_history = models.BooleanField(null=False, default=True)
-    user = models.ForeignKey("dst.User", on_delete=models.PROTECT)
+    user = models.ForeignKey("User", on_delete=models.PROTECT)
 
     was_deleted = models.BooleanField(default=False)
     was_created = models.BooleanField(default=False)
