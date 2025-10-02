@@ -29,6 +29,14 @@ You'll need to run three separate programs for each of the parts of the site.
 
 1.  Start PostgreSQL and create a database named "school_crm". You'll also need to set the password for the user named "postgres" to "123", or change the database username and password in [conf/base.conf](conf/base.conf) and [django/demschooltools/settings.py](django/demschooltools/settings.py).
 
+1.  Install [uv](https://docs.astral.sh/uv/getting-started/installation/#standalone-installer). Once you run it, you'll need to close you terminal window and reopen it before continuing.
+
+1.  Run:
+
+        cd django
+        uv run manage.py migrate
+        cd ..
+
 1.  Run `./sbt.sh`, then execute the `eclipse` and `run` command in the sbt console:
 
         [DemSchoolTools] $ eclipse
@@ -41,9 +49,6 @@ You'll need to run three separate programs for each of the parts of the site.
 
 1.  Navigate to [http://localhost:9000](http://localhost:9000) in your browser
     and wait while DemSchoolTools is compiled.
-
-1.  When it loads, you should see a message saying
-    "Database 'default' needs evolution!". Click "Apply this script now." If errors happen after you click "Apply this script now.", look in the "Play database evolutions troubleshooting" section below for advice.
 
 1.  Wait until you see the message "Unknown organization" in your browser window.
 
@@ -76,11 +81,9 @@ You'll need to run three separate programs for each of the parts of the site.
 
 ### (2 of 3) Django code
 
-The Django code uses [uv](https://docs.astral.sh/uv/) to manage its dependencies. I installed uv using using the standalone installer [described here](https://docs.astral.sh/uv/getting-started/installation/#standalone-installer). Once you run it, you'll need to close you terminal window and reopen it before continuing.
+Run:
 
-Then run:
-
-    uv run manage.py migrate
+    cd django
     uv run manage.py runserver
 
 ### (3 of 3) Custodia frontend code
@@ -90,48 +93,3 @@ To enable the Custodia attendance system locally, run:
     cd custodia
     npm install
     npm run watch
-
-# Play database evolutions troubleshooting
-
-### 64.sql
-
-If 64.sql fails to apply with the error `role "custodia" already exists`,
-do this:
-
-1. Run the remaining "up" lines from 64.sql:
-
-```sql
-grant select on all tables in schema public to custodia;
-
-create schema if not exists overseer;
-grant all on schema overseer to custodia;
-grant all on all tables in schema overseer to custodia;
-grant all on all sequences in schema overseer to custodia;
-
-create schema if not exists demo;
-grant all on schema demo to custodia;
-grant all on all sequences in schema demo to custodia;
-grant all on all tables in schema demo to custodia;
-```
-
-2. Click "Mark it resolved".
-
-### 102.sql
-
-If 102.sql fails to apply with the error `relation "custodia_swipe" does not exist`, do this:
-
-1. Run these commands:
-
-```
-cd django
-uv run manage.py migrate
-```
-
-2. Run the "up" line from 102.sql:
-
-```sql
-create unique index person_swipe_day_empty_out_unique
-    on custodia_swipe(person_id, swipe_day) WHERE out_time is null;
-```
-
-3. Click "Mark it resolved".
