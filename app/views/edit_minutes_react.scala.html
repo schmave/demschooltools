@@ -26,6 +26,32 @@
       window.initialData.sub = @Html(meeting.getJsonPeople(PersonAtMeeting.ROLE_JC_SUB));
       window.initialData.runners = @Html(meeting.getJsonPeople(PersonAtMeeting.ROLE_RUNNER));
       window.initialData.config = @Html(Utils.toJson(Utils.getOrgConfig(request)));
+
+      window.initialData.meetingCases = @Html(Utils.toJson(meeting.getCases()));
+      window.initialData.openCases = @Html(Utils.toJson(open_cases));
+      window.initialData.meetingDate = "@Application.formatMeetingDate(meeting.getDate())";
+      window.initialData.viewPrintableUrl = "@routes.Application.viewMeeting(meeting.getId())";
+
+      @defining({
+        val m = new java.util.LinkedHashMap[String, String]()
+        m.put("committeeMembers", messages("committee_members"))
+        m.put("chargeAgainst", messages("charge_against"))
+        m.put("removeCharge", messages("remove_charge"))
+        m.put("noDeleteReferencedCharge", messages("no_delete_referenced_charge"))
+        m.put("caseTitle", messages("case_title"))
+        m.put("eraseCase", messages("erase_case"))
+        m.put("eraseCaseConfirmation", messages("erase_case_confirmation"))
+        m.put("whoWroteComplaint", messages("who_wrote_complaint"))
+        m.put("whoTestified", messages("who_testified"))
+        m.put("referencedCases", messages("referenced_cases"))
+        m.put("addCharges", messages("add_charges"))
+        m.put("casesToBeContinued", messages("cases_to_be_continued"))
+        m.put("chooseCaseToContinue", messages("choose_case_to_continue"))
+        m.put("addNewCase", messages("add_new_case"))
+        play.libs.Json.stringify(play.libs.Json.toJson(m))
+      }) { messagesJson =>
+        window.initialData.messages = @Html(messagesJson);
+      }
     </script>
   @views.html.tags.react_bundle_loader()
 }

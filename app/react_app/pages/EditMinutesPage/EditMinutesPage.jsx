@@ -1,17 +1,2146 @@
-import React, { useState, useEffect } from "react";
-import { Typography } from "../../components";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Checkbox,
+  EntityPicker,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  Paper,
+  PeoplePicker,
+  Radio,
+  RadioGroup,
+  Stack,
+  TextField,
+  Typography,
+} from '../../components';
+import { DeleteDialog } from '../../containers';
+import { SnackbarContext } from '../../contexts';
+
+const SAVE_DEBOUNCE_MS = 1200;
+const TIME_SERVED_LABEL = 'Time served';
+const defaultSidebarContent = `
+  <div>
+    <p>Click a person's name to view their RC history.</p>
+    <p>Click a rule title to explore related charges.</p>
+    <p>Use the “More info” links for combined person + rule context.</p>
+  </div>
+`;
+
+const createEmptyCharge = (chargeId) => ({
+  id: chargeId,
+  resolutionPlan: '',
+  plea: '',
+  severity: '',
+  referredToSm: false,
+  minorReferralDestination: '',
+  person: null,
+  rule: null,
+  lastResolutionHtml: '',
+  followUpChoice: 'original',
+  referencedSource: null,
+  referencedStatus: {
+    hasGenerated: false,
+  },
+  isReferenced: false,
+});
+
+const safeParse = (value, fallback) => {
+  if (value === undefined || value === null) {
+    return fallback;
+  }
+  if (typeof value === 'string') {
+    try {
+      return JSON.parse(value);
+    } catch (error) {
+      console.error('Failed to parse JSON', error);
+      return fallback;
+    }
+  }
+  return value;
+};
+
+const normalizeOption = (item) => {
+  if (!item) {
+    return null;
+  }
+  const id = item.id ?? item.personId ?? item.person_id ?? item.case_id;
+  if (id === undefined || id === null) {
+    return null;
+  }
+  const label =
+    item.label ||
+    item.name ||
+    item.displayName ||
+    item.caseNumber ||
+    item.title ||
+    '';
+  return {
+    ...item,
+    id: String(id),
+    label,
+  };
+};
+
+const buildOptionMap = (options = []) => {
+  const map = new Map();
+  options.forEach((option) => {
+    map.set(String(option.id), option);
+  });
+  return map;
+};
 
 const EditMinutesPage = () => {
-  const [people, setPeople] = useState(window.initialData.people);
+  const { setSnackbar } = useContext(SnackbarContext);
+
+  const handleError = useCallback(
+    (message, error) => {
+      console.error(message, error);
+      setSnackbar({ message, severity: 'error' });
+    },
+    [setSnackbar],
+  );
+
+  const post = useCallback(
+    async (url, { body, headers, errorMessage } = {}) => {
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          body,
+          headers,
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        return response;
+      } catch (error) {
+        handleError(errorMessage || 'Request failed', error);
+        throw error;
+      }
+    },
+    [handleError],
+  );
+
+  const get = useCallback(
+    async (url, { errorMessage } = {}) => {
+      try {
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        return response;
+      } catch (error) {
+        handleError(errorMessage || 'Request failed', error);
+        throw error;
+      }
+    },
+    [handleError],
+  );
+
+  const meetingId = window.initialData?.meeting_id;
+
+  const initialPeople = useMemo(
+    () => safeParse(window.initialData?.people, []),
+    [],
+  );
+  const peopleOptions = useMemo(
+    () =>
+      initialPeople
+        .map((person) => normalizeOption(person))
+        .filter(Boolean),
+    [initialPeople],
+  );
+  const peopleOptionMap = useMemo(
+    () => buildOptionMap(peopleOptions),
+    [peopleOptions],
+  );
+
+  const ruleOptions = useMemo(() => {
+    const parsedRules = safeParse(window.initialData?.rules, []);
+    return parsedRules
+      .map((rule) => normalizeOption(rule))
+      .filter(Boolean);
+  }, []);
+  const ruleOptionMap = useMemo(
+    () => buildOptionMap(ruleOptions),
+    [ruleOptions],
+  );
+
+  const caseOptions = useMemo(() => {
+    const parsedCases = safeParse(window.initialData?.cases, []);
+    return parsedCases
+      .map((entry) => normalizeOption(entry))
+      .filter(Boolean);
+  }, []);
+
+  const roleIds = useMemo(
+    () => ({
+      chair: window.initialData?.ROLE_JC_CHAIR,
+      committee: window.initialData?.ROLE_JC_MEMBER,
+      noteTaker: window.initialData?.ROLE_NOTE_TAKER,
+      sub: window.initialData?.ROLE_JC_SUB,
+      runner: window.initialData?.ROLE_RUNNER,
+      testifier: window.initialData?.ROLE_TESTIFIER,
+      writer: window.initialData?.ROLE_WRITER,
+    }),
+    [],
+  );
+
+  const config = useMemo(
+    () => safeParse(window.initialData?.config, {}),
+    [],
+  );
+
+  const messages = useMemo(
+    () => safeParse(window.initialData?.messages, {}),
+    [],
+  );
+
+  const mapPersonOption = useCallback(
+    (person) => {
+      if (!person) {
+        return null;
+      }
+
+      if (person.personId !== undefined && person.personId !== null) {
+        const key = String(person.personId);
+        if (peopleOptionMap.has(key)) {
+          return peopleOptionMap.get(key);
+        }
+        const label =
+          person.displayName ||
+          [person.firstName, person.lastName].filter(Boolean).join(' ') ||
+          '';
+        return {
+          id: key,
+          label,
+          personId: person.personId,
+        };
+      }
+
+      if (person.id !== undefined && person.id !== null) {
+        const key = String(person.id);
+        if (peopleOptionMap.has(key)) {
+          return peopleOptionMap.get(key);
+        }
+      }
+
+      return normalizeOption(person);
+    },
+    [peopleOptionMap],
+  );
+
+  const mapRuleOption = useCallback(
+    (rule) => {
+      if (!rule) {
+        return null;
+      }
+      const rawId = rule.id ?? rule.rule_id;
+      if (rawId === undefined || rawId === null) {
+        return null;
+      }
+      const key = String(rawId);
+      if (ruleOptionMap.has(key)) {
+        return ruleOptionMap.get(key);
+      }
+      const label =
+        rule.label ||
+        `${rule.number || rule.num || ''} ${rule.title || ''}`.trim();
+      return {
+        id: key,
+        label,
+      };
+    },
+    [ruleOptionMap],
+  );
+
+  const mapChargeFromServer = useCallback(
+    (charge) => {
+      if (!charge) {
+        return null;
+      }
+      const chargeId = charge.id !== undefined ? Number(charge.id) : undefined;
+      return {
+        id: chargeId,
+        resolutionPlan: charge.resolutionPlan || '',
+        plea:
+          charge.plea && charge.plea !== '<no plea>' ? charge.plea : '',
+        severity: charge.severity || '',
+        referredToSm: Boolean(charge.referredToSm),
+        minorReferralDestination: charge.minorReferralDestination || '',
+        person: mapPersonOption(charge.person),
+        rule: mapRuleOption(charge.rule),
+        lastResolutionHtml: '',
+        followUpChoice:
+          charge.resolutionPlan === TIME_SERVED_LABEL ? 'timeServed' : 'original',
+        referencedSource: null,
+        referencedStatus: {
+          hasGenerated: false,
+        },
+        isReferenced: Boolean(charge.isReferenced),
+      };
+    },
+    [mapPersonOption, mapRuleOption],
+  );
+
+  const mapCaseFromServer = useCallback(
+    (caseData) => {
+      if (!caseData) {
+        return null;
+      }
+
+      const testifierRole = Number(roleIds.testifier);
+      const writerRole = Number(roleIds.writer);
+
+      const peopleAtCase = Array.isArray(caseData.people_at_case)
+        ? caseData.people_at_case
+        : [];
+
+      const testifiers = [];
+      const writers = [];
+
+      peopleAtCase.forEach((pac) => {
+        const option = mapPersonOption(pac.person);
+        if (!option) {
+          return;
+        }
+        if (pac.role === testifierRole) {
+          testifiers.push(option);
+        } else if (pac.role === writerRole) {
+          writers.push(option);
+        }
+      });
+
+      return {
+        id: Number(caseData.id),
+        caseNumber: caseData.caseNumber,
+        location: caseData.location || '',
+        findings: caseData.findings || '',
+        date: caseData.date || '',
+        time: caseData.time || '',
+        continued: caseData.dateClosed === null,
+        charges: Array.isArray(caseData.charges)
+          ? caseData.charges
+              .map((charge) => mapChargeFromServer(charge))
+              .filter(Boolean)
+          : [],
+        testifiers,
+        writers,
+        caseReferences: [],
+        referencesLoading: false,
+        referencesLoaded: false,
+      };
+    },
+    [mapChargeFromServer, mapPersonOption, roleIds.testifier, roleIds.writer],
+  );
+
+  const [committee, setCommittee] = useState(
+    safeParse(window.initialData?.committee, [])
+      .map((person) => normalizeOption(person))
+      .filter(Boolean),
+  );
+  const [chair, setChair] = useState(
+    safeParse(window.initialData?.chair, [])
+      .map((person) => normalizeOption(person))
+      .filter(Boolean),
+  );
+  const [noteTaker, setNoteTaker] = useState(
+    safeParse(window.initialData?.notetaker, [])
+      .map((person) => normalizeOption(person))
+      .filter(Boolean),
+  );
+  const [subs, setSubs] = useState(
+    safeParse(window.initialData?.sub, [])
+      .map((person) => normalizeOption(person))
+      .filter(Boolean),
+  );
+  const [runners, setRunners] = useState(
+    safeParse(window.initialData?.runners, [])
+      .map((person) => normalizeOption(person))
+      .filter(Boolean),
+  );
+
+  const [meetingCases, setMeetingCases] = useState(() => {
+    const parsedCases = safeParse(window.initialData?.meetingCases, []);
+    if (!Array.isArray(parsedCases)) {
+      return [];
+    }
+    return parsedCases
+      .map((caseData) => mapCaseFromServer(caseData))
+      .filter(Boolean);
+  });
+
+  const [openCases, setOpenCases] = useState(() => {
+    const parsedOpenCases = safeParse(window.initialData?.openCases, []);
+    return Array.isArray(parsedOpenCases)
+      ? parsedOpenCases.map((caseData) => ({
+          ...caseData,
+          id: caseData?.id,
+          caseNumber: caseData?.caseNumber,
+        }))
+      : [];
+  });
+
+  const visibleOpenCases = useMemo(() => {
+    const loadedIds = new Set(meetingCases.map((caseItem) => caseItem.id));
+    return openCases.filter((openCase) => !loadedIds.has(openCase.id));
+  }, [meetingCases, openCases]);
+
+  const [sidebarContent, setSidebarContent] = useState(defaultSidebarContent);
+  const [sidebarLoading, setSidebarLoading] = useState(false);
+  const [pendingSaveCount, setPendingSaveCount] = useState(0);
+  const [caseToConfirmClear, setCaseToConfirmClear] = useState(null);
+
+  const pendingSaveKeysRef = useRef(new Set());
+  const caseSaveTimersRef = useRef(new Map());
+  const chargeSaveTimersRef = useRef(new Map());
+  const casesRef = useRef([]);
+
+  useEffect(() => {
+    casesRef.current = meetingCases;
+  }, [meetingCases]);
+
+  useEffect(() => {
+    return () => {
+      caseSaveTimersRef.current.forEach((timeoutId) => {
+        window.clearTimeout(timeoutId);
+      });
+      chargeSaveTimersRef.current.forEach((timeoutId) => {
+        window.clearTimeout(timeoutId);
+      });
+    };
+  }, []);
+
+  const registerPendingSave = useCallback((key) => {
+    const setRef = pendingSaveKeysRef.current;
+    if (!setRef.has(key)) {
+      setRef.add(key);
+      setPendingSaveCount(setRef.size);
+    }
+  }, []);
+
+  const completePendingSave = useCallback((key) => {
+    const setRef = pendingSaveKeysRef.current;
+    if (setRef.delete(key)) {
+      setPendingSaveCount(setRef.size);
+    }
+  }, []);
+
+  const saveCase = useCallback(
+    async (caseItem) => {
+      if (!caseItem?.id) {
+        return;
+      }
+      const formData = new URLSearchParams();
+      formData.append('closed', (!caseItem.continued).toString());
+      formData.append('date', caseItem.date || '');
+      formData.append('findings', caseItem.findings || '');
+      formData.append('location', caseItem.location || '');
+      formData.append('time', caseItem.time || '');
+      await post(`/saveCase?id=${caseItem.id}`, {
+        body: formData,
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        errorMessage: 'Unable to save case',
+      });
+    },
+    [post],
+  );
+
+  const findChargeById = useCallback((chargeId) => {
+    const currentCases = casesRef.current;
+    for (let i = 0; i < currentCases.length; i += 1) {
+      const charge = currentCases[i].charges.find((item) => item.id === chargeId);
+      if (charge) {
+        return { caseItem: currentCases[i], charge };
+      }
+    }
+    return { caseItem: null, charge: null };
+  }, []);
+
+  const saveCharge = useCallback(
+    async (charge) => {
+      if (!charge?.id) {
+        return;
+      }
+
+      const params = new URLSearchParams();
+
+      if (charge.person?.id) {
+        params.append('personId', String(charge.person.id));
+      }
+      params.append('resolutionPlan', charge.resolutionPlan || '');
+
+      if (charge.severity) {
+        params.append('severity', charge.severity);
+      }
+
+      if (charge.plea) {
+        params.append('plea', charge.plea);
+      }
+
+      params.append('referredToSm', charge.referredToSm ? 'true' : 'false');
+
+      if (config.use_minor_referrals) {
+        params.append(
+          'minorReferralDestination',
+          charge.minorReferralDestination || '',
+        );
+      }
+
+      if (charge.rule?.id) {
+        params.append('rule_id', String(charge.rule.id));
+      }
+
+      const query = params.toString();
+      const url = query
+        ? `/saveCharge?id=${charge.id}&${query}`
+        : `/saveCharge?id=${charge.id}`;
+
+      await post(url, {
+        errorMessage: 'Unable to save charge',
+      });
+    },
+    [config.use_minor_referrals, post],
+  );
+
+  const queueCaseSave = useCallback(
+    (caseId) => {
+      if (!caseId) {
+        return;
+      }
+      const key = `case-${caseId}`;
+      registerPendingSave(key);
+
+      if (caseSaveTimersRef.current.has(caseId)) {
+        window.clearTimeout(caseSaveTimersRef.current.get(caseId));
+      }
+
+      const timeoutId = window.setTimeout(async () => {
+        caseSaveTimersRef.current.delete(caseId);
+        try {
+          const currentCases = casesRef.current;
+          const caseItem = currentCases.find((item) => item.id === caseId);
+          if (caseItem) {
+            await saveCase(caseItem);
+          }
+        } finally {
+          completePendingSave(key);
+        }
+      }, SAVE_DEBOUNCE_MS);
+
+      caseSaveTimersRef.current.set(caseId, timeoutId);
+    },
+    [completePendingSave, registerPendingSave, saveCase],
+  );
+
+  const queueChargeSave = useCallback(
+    (chargeId) => {
+      if (!chargeId) {
+        return;
+      }
+      const key = `charge-${chargeId}`;
+      registerPendingSave(key);
+
+      if (chargeSaveTimersRef.current.has(chargeId)) {
+        window.clearTimeout(chargeSaveTimersRef.current.get(chargeId));
+      }
+
+      const timeoutId = window.setTimeout(async () => {
+        chargeSaveTimersRef.current.delete(chargeId);
+        try {
+          const { charge } = findChargeById(chargeId);
+          if (charge) {
+            await saveCharge(charge);
+          }
+        } finally {
+          completePendingSave(key);
+        }
+      }, SAVE_DEBOUNCE_MS);
+
+      chargeSaveTimersRef.current.set(chargeId, timeoutId);
+    },
+    [completePendingSave, findChargeById, registerPendingSave, saveCharge],
+  );
+
+  const updateCase = useCallback(
+    (caseId, updater, { queueSave: shouldQueueSave = false } = {}) => {
+      let updatedCase = null;
+      setMeetingCases((prevCases) =>
+        prevCases.map((caseItem) => {
+          if (caseItem.id !== caseId) {
+            return caseItem;
+          }
+          updatedCase =
+            typeof updater === 'function' ? updater(caseItem) : updater;
+          return updatedCase;
+        }),
+      );
+      if (shouldQueueSave && updatedCase) {
+        queueCaseSave(caseId);
+      }
+    },
+    [queueCaseSave],
+  );
+
+  const updateCharge = useCallback(
+    (
+      caseId,
+      chargeId,
+      updater,
+      { queueSave: shouldQueueSave = false } = {},
+    ) => {
+      let updatedCharge = null;
+      setMeetingCases((prevCases) =>
+        prevCases.map((caseItem) => {
+          if (caseItem.id !== caseId) {
+            return caseItem;
+          }
+          const updatedCharges = caseItem.charges.map((charge) => {
+            if (charge.id !== chargeId) {
+              return charge;
+            }
+            updatedCharge =
+              typeof updater === 'function' ? updater(charge) : updater;
+            return updatedCharge;
+          });
+          return {
+            ...caseItem,
+            charges: updatedCharges,
+          };
+        }),
+      );
+      if (shouldQueueSave && updatedCharge) {
+        queueChargeSave(chargeId);
+      }
+    },
+    [queueChargeSave],
+  );
+
+  const addPersonAtCase = useCallback(
+    async (caseId, person, roleId) => {
+      if (!caseId || !person?.id) {
+        return;
+      }
+      const url = `/addPersonAtCase?case_id=${caseId}&personId=${Number(
+        person.id,
+      )}&role=${roleId}`;
+      await post(url, {
+        errorMessage: 'Unable to add person to case',
+      });
+    },
+    [post],
+  );
+
+  const removePersonAtCase = useCallback(
+    async (caseId, person, roleId) => {
+      if (!caseId || !person?.id) {
+        return;
+      }
+      const url = `/removePersonAtCase?case_id=${caseId}&personId=${Number(
+        person.id,
+      )}&role=${roleId}`;
+      await post(url, {
+        errorMessage: 'Unable to remove person from case',
+      });
+    },
+    [post],
+  );
+
+  const handleAddCharge = useCallback(
+    async (caseId) => {
+      if (!caseId) {
+        return;
+      }
+      const response = await post(`/addCharge?case_id=${caseId}`, {
+        errorMessage: 'Unable to add charge',
+      });
+      const text = await response.text();
+      const chargeId = Number(text);
+      if (Number.isNaN(chargeId)) {
+        handleError('Unable to parse new charge identifier', new Error(text));
+        return;
+      }
+      const newCharge = createEmptyCharge(chargeId);
+      setMeetingCases((prevCases) =>
+        prevCases.map((caseItem) =>
+          caseItem.id === caseId
+            ? { ...caseItem, charges: [...caseItem.charges, newCharge] }
+            : caseItem,
+        ),
+      );
+    },
+    [handleError, post],
+  );
+
+  const handleRemoveCharge = useCallback(
+    async (caseId, chargeId) => {
+      if (!chargeId) {
+        return;
+      }
+      await post(`/removeCharge?id=${chargeId}`, {
+        errorMessage: 'Unable to remove charge',
+      });
+      setMeetingCases((prevCases) =>
+        prevCases.map((caseItem) =>
+          caseItem.id === caseId
+            ? {
+                ...caseItem,
+                charges: caseItem.charges.filter((charge) => charge.id !== chargeId),
+              }
+            : caseItem,
+        ),
+      );
+    },
+    [post],
+  );
+
+  const refreshCaseReferences = useCallback(
+    async (caseId) => {
+      if (!caseId) {
+        return;
+      }
+
+      setMeetingCases((prevCases) =>
+        prevCases.map((caseItem) =>
+          caseItem.id === caseId
+            ? { ...caseItem, referencesLoading: true }
+            : caseItem,
+        ),
+      );
+
+      try {
+        const response = await get(`/getCaseReferencesJson?case_id=${caseId}`, {
+          errorMessage: 'Unable to load case references',
+        });
+        const data = await response.json();
+
+        const referencedMap = new Map();
+        data.forEach((reference) => {
+          reference.charges.forEach((refCharge) => {
+            if (refCharge.generated_charge_id) {
+              referencedMap.set(refCharge.generated_charge_id, {
+                id: refCharge.charge_id,
+                resolutionPlan: refCharge.resolutionPlan,
+                hasDefaultRule: Boolean(refCharge.has_default_rule),
+              });
+            }
+          });
+        });
+
+        setMeetingCases((prevCases) =>
+          prevCases.map((caseItem) => {
+            if (caseItem.id !== caseId) {
+              return caseItem;
+            }
+
+            const updatedCharges = caseItem.charges.map((charge) => {
+              const reference = referencedMap.get(charge.id) || null;
+              let followUpChoice = charge.followUpChoice;
+              if (reference) {
+                if (charge.resolutionPlan === TIME_SERVED_LABEL) {
+                  followUpChoice = 'timeServed';
+                } else if (charge.resolutionPlan) {
+                  followUpChoice = 'newPlan';
+                } else {
+                  followUpChoice = 'original';
+                }
+              }
+              return {
+                ...charge,
+                referencedSource: reference,
+                followUpChoice,
+              };
+            });
+
+            return {
+              ...caseItem,
+              charges: updatedCharges,
+              caseReferences: data,
+              referencesLoaded: true,
+              referencesLoading: false,
+            };
+          }),
+        );
+      } catch (error) {
+        setMeetingCases((prevCases) =>
+          prevCases.map((caseItem) =>
+            caseItem.id === caseId
+              ? { ...caseItem, referencesLoading: false }
+              : caseItem,
+          ),
+        );
+      }
+    },
+    [get],
+  );
+
+  const handleAddReferencedCase = useCallback(
+    async (caseId, referencedCaseId) => {
+      if (!caseId || !referencedCaseId) {
+        return;
+      }
+      await post(
+        `/addReferencedCase?case_id=${caseId}&referenced_case_id=${referencedCaseId}`,
+        {
+          errorMessage: 'Unable to add referenced case',
+        },
+      );
+      await refreshCaseReferences(caseId);
+    },
+    [post, refreshCaseReferences],
+  );
+
+  const handleRemoveReferencedCase = useCallback(
+    async (caseId, referencedCaseId) => {
+      if (!caseId || !referencedCaseId) {
+        return;
+      }
+      await post(
+        `/removeReferencedCase?case_id=${caseId}&referenced_case_id=${referencedCaseId}`,
+        {
+          errorMessage: 'Unable to remove referenced case',
+        },
+      );
+      await refreshCaseReferences(caseId);
+    },
+    [post, refreshCaseReferences],
+  );
+
+  const handleToggleReferencedCharge = useCallback(
+    async (caseId, referencedChargeId, checked) => {
+      if (!caseId || !referencedChargeId) {
+        return;
+      }
+      const baseUrl = checked
+        ? '/addChargeReferenceToCase'
+        : '/removeChargeReferenceFromCase';
+      await post(`${baseUrl}?case_id=${caseId}&charge_id=${referencedChargeId}`, {
+        errorMessage: 'Unable to update referenced charge',
+      });
+      await refreshCaseReferences(caseId);
+    },
+    [post, refreshCaseReferences],
+  );
+
+  const handleGenerateChargeFromReference = useCallback(
+    async (caseId, referenceCharge) => {
+      const referencedChargeId = referenceCharge?.charge_id;
+      if (!caseId || !referencedChargeId) {
+        return;
+      }
+
+      const response = await post(
+        `/generateChargeFromReference?case_id=${caseId}&referenced_charge_id=${referencedChargeId}`,
+        {
+          errorMessage: 'Unable to generate referenced charge',
+        },
+      );
+
+      const payload = await response.json();
+      const mappedCharge =
+        mapChargeFromServer(payload) || createEmptyCharge(payload?.id);
+
+      mappedCharge.referencedSource = {
+        id: referenceCharge.charge_id,
+        resolutionPlan: referenceCharge.resolutionPlan,
+        hasDefaultRule: Boolean(referenceCharge.has_default_rule),
+      };
+      mappedCharge.followUpChoice = mappedCharge.resolutionPlan
+        ? mappedCharge.resolutionPlan === TIME_SERVED_LABEL
+          ? 'timeServed'
+          : 'newPlan'
+        : 'original';
+
+      setMeetingCases((prevCases) =>
+        prevCases.map((caseItem) =>
+          caseItem.id === caseId
+            ? { ...caseItem, charges: [...caseItem.charges, mappedCharge] }
+            : caseItem,
+        ),
+      );
+
+      await refreshCaseReferences(caseId);
+    },
+    [mapChargeFromServer, post, refreshCaseReferences],
+  );
+
+  const handleClearCase = useCallback(
+    async (caseId) => {
+      if (!caseId) {
+        return;
+      }
+
+      const currentCases = casesRef.current;
+      const caseItem = currentCases.find((item) => item.id === caseId);
+      if (!caseItem) {
+        return;
+      }
+
+      await Promise.all(
+        caseItem.charges.map((charge) =>
+          post(`/removeCharge?id=${charge.id}`, {
+            errorMessage: 'Unable to remove charge',
+          }).catch(() => undefined),
+        ),
+      );
+
+      await Promise.all(
+        caseItem.testifiers.map((person) =>
+          removePersonAtCase(caseId, person, Number(roleIds.testifier)).catch(
+            () => undefined,
+          ),
+        ),
+      );
+
+      if (config.track_writer) {
+        await Promise.all(
+          caseItem.writers.map((person) =>
+            removePersonAtCase(caseId, person, Number(roleIds.writer)).catch(
+              () => undefined,
+            ),
+          ),
+        );
+      }
+
+      await post(`/clearAllReferencedCases?case_id=${caseId}`, {
+        errorMessage: 'Unable to clear referenced cases',
+      });
+
+      updateCase(
+        caseId,
+        (existing) => ({
+          ...existing,
+          location: '',
+          findings: '',
+          date: '',
+          time: '',
+          continued: false,
+          charges: [],
+          testifiers: [],
+          writers: [],
+          caseReferences: [],
+          referencesLoaded: false,
+          referencesLoading: false,
+        }),
+        { queueSave: true },
+      );
+    },
+    [
+      config.track_writer,
+      post,
+      removePersonAtCase,
+      roleIds.testifier,
+      roleIds.writer,
+      updateCase,
+    ],
+  );
+
+  const handleAddNewCase = useCallback(async () => {
+    if (!meetingId) {
+      return;
+    }
+    const response = await post(`/newCase?meeting_id=${meetingId}`, {
+      errorMessage: 'Unable to add new case',
+    });
+    const payload = await response.json();
+    const [caseIdRaw, caseNumber] = payload;
+    const caseId = Number(caseIdRaw);
+    const newCase = {
+      id: caseId,
+      caseNumber,
+      location: '',
+      findings: '',
+      date: '',
+      time: '',
+      continued: false,
+      charges: [],
+      testifiers: [],
+      writers: [],
+      caseReferences: [],
+      referencesLoaded: false,
+      referencesLoading: false,
+    };
+    setMeetingCases((prevCases) => [...prevCases, newCase]);
+  }, [meetingId, post]);
+
+  const handleContinueCase = useCallback(
+    async (caseId) => {
+      if (!meetingId || !caseId) {
+        return;
+      }
+      const response = await post(
+        `/continueCase?meeting_id=${meetingId}&case_id=${caseId}`,
+        {
+          errorMessage: 'Unable to continue case',
+        },
+      );
+      const payload = await response.json();
+      const newCase = mapCaseFromServer(payload);
+      if (newCase) {
+        setMeetingCases((prevCases) => [...prevCases, newCase]);
+        setOpenCases((prev) => prev.filter((item) => item.id !== caseId));
+      }
+    },
+    [mapCaseFromServer, meetingId, post],
+  );
+
+  const meetingTitle = config?.str_jc_name || 'RC';
+  const printableUrl = window.initialData?.viewPrintableUrl;
+  const meetingDate = window.initialData?.meetingDate || '';
+  const enableCaseReferences = Boolean(config?.org?.enableCaseReferences);
+
+  const beforeUnloadHandler = useCallback(
+    (event) => {
+      if (pendingSaveKeysRef.current.size > 0) {
+        event.preventDefault();
+        event.returnValue = 'You have unsaved changes.';
+      }
+    },
+    [],
+  );
+
+  const addPersonToMeeting = useCallback(
+    async (person, roleId) => {
+      if (!meetingId || !person?.id) {
+        return;
+      }
+      const url = `/addPersonAtMeeting?meeting_id=${meetingId}&personId=${Number(
+        person.id,
+      )}&role=${roleId}`;
+      await post(url, {
+        errorMessage: 'Unable to add person to meeting',
+      });
+    },
+    [meetingId, post],
+  );
+
+  const removePersonFromMeeting = useCallback(
+    async (person, roleId) => {
+      if (!meetingId || !person?.id) {
+        return;
+      }
+      const url = `/removePersonAtMeeting?meeting_id=${meetingId}&personId=${Number(
+        person.id,
+      )}&role=${roleId}`;
+      await post(url, {
+        errorMessage: 'Unable to remove person from meeting',
+      });
+    },
+    [meetingId, post],
+  );
+
+  const loadSidebarContent = useCallback(
+    async (url) => {
+      if (!url) {
+        return;
+      }
+      setSidebarLoading(true);
+      try {
+        const response = await get(url, {
+          errorMessage: 'Unable to load sidebar content',
+        });
+        const html = await response.text();
+        setSidebarContent(html.replace(/<a\s+nosidebar/gi, '<a'));
+      } finally {
+        setSidebarLoading(false);
+      }
+    },
+    [get],
+  );
+
+  const showPersonHistory = useCallback(
+    (personId) => {
+      if (!personId) {
+        return;
+      }
+      loadSidebarContent(`/personHistory/${personId}`);
+    },
+    [loadSidebarContent],
+  );
+
+  const showRuleHistory = useCallback(
+    (ruleId) => {
+      if (!ruleId) {
+        return;
+      }
+      loadSidebarContent(`/ruleHistory/${ruleId}`);
+    },
+    [loadSidebarContent],
+  );
+
+  const showPersonRuleHistory = useCallback(
+    (personId, ruleId) => {
+      if (!personId || !ruleId) {
+        return;
+      }
+      loadSidebarContent(`/personRuleHistory/${personId}/${ruleId}`);
+    },
+    [loadSidebarContent],
+  );
+
+  const fetchLastResolutionPlan = useCallback(
+    async (personId, ruleId) => {
+      if (!personId || !ruleId) {
+        return '';
+      }
+      try {
+        const response = await get(`/getLastRp/${personId}/${ruleId}`, {
+          errorMessage: 'Unable to load previous resolution plan',
+        });
+        return await response.text();
+      } catch (error) {
+        return '';
+      }
+    },
+    [get],
+  );
+
+  useEffect(() => {
+    window.addEventListener('beforeunload', beforeUnloadHandler);
+    return () => {
+      window.removeEventListener('beforeunload', beforeUnloadHandler);
+    };
+  }, [beforeUnloadHandler]);
 
   return (
-    <>
-      <div className="div-test"><Typography>Edit Minutes View, Now in React Folder, React Structure, changed, less</Typography></div>
-      {people.map((person) => (
-        <div key={person.id}><Typography>{person.label}</Typography></div>
-      ))}
-    </>
+    <Box
+      sx={{
+        display: 'flex',
+        gap: 3,
+        alignItems: 'flex-start',
+        flexWrap: 'wrap',
+      }}
+    >
+      <Box
+        sx={{
+          flex: '1 1 720px',
+          minWidth: '60%',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 3,
+        }}
+      >
+        <Card>
+          <CardHeader
+            title={
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+                spacing={2}
+              >
+                <Typography variant="h5">
+                  {meetingTitle} Minutes — {meetingDate}
+                </Typography>
+                <Button
+                  variant="contained"
+                  onClick={() => {
+                    if (printableUrl) {
+                      window.location.href = printableUrl;
+                    }
+                  }}
+                >
+                  View printable minutes
+                </Button>
+              </Stack>
+            }
+          />
+          <CardContent>
+            <Stack spacing={1.5}>
+              <Typography variant="body2" color="text.secondary">
+                Changes save automatically.
+              </Typography>
+              <Typography
+                variant="body2"
+                color={pendingSaveCount > 0 ? 'warning.main' : 'success.main'}
+              >
+                {pendingSaveCount > 0
+                  ? `Saving ${pendingSaveCount} change${
+                      pendingSaveCount === 1 ? '' : 's'
+                    }…`
+                  : 'All changes saved.'}
+              </Typography>
+            </Stack>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader title="Committee & Roles" />
+          <CardContent>
+            <Stack
+              direction="row"
+              flexWrap="wrap"
+              columnGap={2}
+              rowGap={{ xs: 1, md: 2 }}
+              sx={{
+                '& > *': {
+                  flex: {
+                    xs: '1 1 100%',
+                    md: '1 1 calc(33.333% - 16px)',
+                    lg: '1 1 calc(33.333% - 16px)',
+                  },
+                  minWidth: { xs: '100%', md: 240 },
+                },
+              }}
+            >
+              <PeoplePicker
+                label={messages.committeeMembers || 'Committee members'}
+                options={peopleOptions}
+                selectedPeople={committee}
+                onSelectionChange={setCommittee}
+                onAddPerson={(person) =>
+                  addPersonToMeeting(person, Number(roleIds.committee))
+                }
+                onRemovePerson={(person) =>
+                  removePersonFromMeeting(person, Number(roleIds.committee))
+                }
+                onPersonClick={(person) => showPersonHistory(person.id)}
+              />
+              <PeoplePicker
+                label="Chair"
+                options={peopleOptions}
+                selectedPeople={chair}
+                limitToOne
+                onSelectionChange={setChair}
+                onAddPerson={(person) =>
+                  addPersonToMeeting(person, Number(roleIds.chair))
+                }
+                onRemovePerson={(person) =>
+                  removePersonFromMeeting(person, Number(roleIds.chair))
+                }
+                onPersonClick={(person) => showPersonHistory(person.id)}
+              />
+              <PeoplePicker
+                label="Notetaker"
+                options={peopleOptions}
+                selectedPeople={noteTaker}
+                onSelectionChange={setNoteTaker}
+                onAddPerson={(person) =>
+                  addPersonToMeeting(person, Number(roleIds.noteTaker))
+                }
+                onRemovePerson={(person) =>
+                  removePersonFromMeeting(person, Number(roleIds.noteTaker))
+                }
+                onPersonClick={(person) => showPersonHistory(person.id)}
+              />
+              <PeoplePicker
+                label="Subs"
+                options={peopleOptions}
+                selectedPeople={subs}
+                onSelectionChange={setSubs}
+                onAddPerson={(person) =>
+                  addPersonToMeeting(person, Number(roleIds.sub))
+                }
+                onRemovePerson={(person) =>
+                  removePersonFromMeeting(person, Number(roleIds.sub))
+                }
+                onPersonClick={(person) => showPersonHistory(person.id)}
+              />
+              <PeoplePicker
+                label="Runners"
+                options={peopleOptions}
+                selectedPeople={runners}
+                onSelectionChange={setRunners}
+                onAddPerson={(person) =>
+                  addPersonToMeeting(person, Number(roleIds.runner))
+                }
+                onRemovePerson={(person) =>
+                  removePersonFromMeeting(person, Number(roleIds.runner))
+                }
+                onPersonClick={(person) => showPersonHistory(person.id)}
+              />
+            </Stack>
+          </CardContent>
+        </Card>
+
+        {meetingCases.map((caseItem) => (
+          <CaseCard
+            key={caseItem.id}
+            caseItem={caseItem}
+            config={config}
+            messages={messages}
+            peopleOptions={peopleOptions}
+            ruleOptions={ruleOptions}
+            caseOptions={caseOptions}
+            roleIds={roleIds}
+            enableCaseReferences={enableCaseReferences}
+            onUpdateCase={updateCase}
+            onUpdateCharge={updateCharge}
+            onAddCharge={handleAddCharge}
+            onRemoveCharge={handleRemoveCharge}
+            onAddPersonAtCase={addPersonAtCase}
+            onRemovePersonAtCase={removePersonAtCase}
+            onAddReferencedCase={handleAddReferencedCase}
+            onRemoveReferencedCase={handleRemoveReferencedCase}
+            onToggleReferencedCharge={handleToggleReferencedCharge}
+            onGenerateChargeFromReference={handleGenerateChargeFromReference}
+            onRequestClearCase={setCaseToConfirmClear}
+            onRefreshReferences={refreshCaseReferences}
+            onShowPersonHistory={showPersonHistory}
+            onShowRuleHistory={showRuleHistory}
+            onShowPersonRuleHistory={showPersonRuleHistory}
+            fetchLastResolutionPlan={fetchLastResolutionPlan}
+          />
+        ))}
+
+        <Stack direction="row" spacing={2} justifyContent="flex-start">
+          <Button variant="contained" onClick={handleAddNewCase}>
+            {messages.addNewCase || 'Add new case'}
+          </Button>
+        </Stack>
+
+        {visibleOpenCases.length > 0 && (
+          <Card>
+            <CardHeader
+              title={messages.casesToBeContinued || 'Cases to be continued'}
+            />
+            <CardContent>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                {messages.chooseCaseToContinue || 'Choose a case to continue'}
+              </Typography>
+              <Stack spacing={1.5}>
+                {visibleOpenCases.map((openCase) => (
+                  <Paper
+                    key={openCase.id}
+                    sx={{
+                      p: 1.5,
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Box>
+                      <Typography variant="subtitle2">
+                        {openCase.caseNumber}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {[openCase.location, openCase.findings]
+                          .filter(Boolean)
+                          .map((text) =>
+                            text.length > 80 ? `${text.slice(0, 80)}…` : text,
+                          )
+                          .join(' • ')}
+                      </Typography>
+                    </Box>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      onClick={() => handleContinueCase(openCase.id)}
+                    >
+                      Continue
+                    </Button>
+                  </Paper>
+                ))}
+              </Stack>
+            </CardContent>
+          </Card>
+        )}
+      </Box>
+
+      <Box
+        sx={{
+          flex: '0 0 320px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+        }}
+      >
+        <Paper sx={{ p: 2, minHeight: 320 }}>
+          {sidebarLoading ? (
+            <Typography variant="body2">Loading…</Typography>
+          ) : (
+            <div
+              onClick={(event) => {
+                const infoLink = event.target.closest('.more-info');
+                if (infoLink) {
+                  event.preventDefault();
+                  const personId = infoLink.getAttribute('data-person-id');
+                  const ruleId = infoLink.getAttribute('data-rule-id');
+                  if (personId && ruleId) {
+                    showPersonRuleHistory(personId, ruleId);
+                  }
+                }
+              }}
+              dangerouslySetInnerHTML={{ __html: sidebarContent }}
+            />
+          )}
+        </Paper>
+      </Box>
+
+      <DeleteDialog
+        open={Boolean(caseToConfirmClear)}
+        title={messages.eraseCase || 'Erase case'}
+        message={
+          messages.eraseCaseConfirmation ||
+          'Are you sure you want to erase this case?'
+        }
+        handleClose={() => setCaseToConfirmClear(null)}
+        handleConfirm={async () => {
+          if (!caseToConfirmClear) {
+            setCaseToConfirmClear(null);
+            return;
+          }
+          try {
+            await handleClearCase(caseToConfirmClear);
+          } finally {
+            setCaseToConfirmClear(null);
+          }
+        }}
+      />
+    </Box>
   );
 };
+
+function CaseCard(props) {
+  const {
+    caseItem,
+    config,
+    messages,
+    peopleOptions,
+    ruleOptions,
+    caseOptions,
+    roleIds,
+    enableCaseReferences,
+    onUpdateCase,
+    onUpdateCharge,
+    onAddCharge,
+    onRemoveCharge,
+    onAddPersonAtCase,
+    onRemovePersonAtCase,
+    onAddReferencedCase,
+    onRemoveReferencedCase,
+    onToggleReferencedCharge,
+    onGenerateChargeFromReference,
+    onRequestClearCase,
+    onRefreshReferences,
+    onShowPersonHistory,
+    onShowRuleHistory,
+    onShowPersonRuleHistory,
+    fetchLastResolutionPlan,
+  } = props;
+
+  useEffect(() => {
+    if (enableCaseReferences && !caseItem.referencesLoaded) {
+      onRefreshReferences(caseItem.id);
+    }
+  }, [caseItem.id, caseItem.referencesLoaded, enableCaseReferences, onRefreshReferences]);
+
+  const handleFieldChange = useCallback(
+    (field) => (event) => {
+      const value = event.target.value;
+      onUpdateCase(
+        caseItem.id,
+        (prev) => ({
+          ...prev,
+          [field]: value,
+        }),
+        { queueSave: true },
+      );
+    },
+    [caseItem.id, onUpdateCase],
+  );
+
+  const handleContinuedChange = useCallback(
+    (event) => {
+      const checked = event.target.checked;
+      onUpdateCase(
+        caseItem.id,
+        (prev) => ({
+          ...prev,
+          continued: checked,
+        }),
+        { queueSave: true },
+      );
+    },
+    [caseItem.id, onUpdateCase],
+  );
+
+  const handleTestifierChange = useCallback(
+    (people) => {
+      onUpdateCase(caseItem.id, (prev) => ({ ...prev, testifiers: people }));
+    },
+    [caseItem.id, onUpdateCase],
+  );
+
+  const handleWriterChange = useCallback(
+    (people) => {
+      onUpdateCase(caseItem.id, (prev) => ({ ...prev, writers: people }));
+    },
+    [caseItem.id, onUpdateCase],
+  );
+
+  const handleReferencedCasesChange = useCallback(
+    (options) => {
+      const currentIds = new Set(
+        (caseItem.caseReferences || []).map((reference) => String(reference.id)),
+      );
+      const nextIds = new Set(options.map((option) => String(option.id)));
+
+      options.forEach((option) => {
+        const optionId = String(option.id);
+        const optionCaseId = Number(option.id);
+        if (!currentIds.has(optionId) && optionCaseId !== caseItem.id) {
+          onAddReferencedCase(caseItem.id, optionCaseId);
+        }
+      });
+
+      (caseItem.caseReferences || []).forEach((reference) => {
+        const referenceId = String(reference.id);
+        if (!nextIds.has(referenceId)) {
+          onRemoveReferencedCase(caseItem.id, Number(reference.id));
+        }
+      });
+    },
+    [caseItem.caseReferences, caseItem.id, onAddReferencedCase, onRemoveReferencedCase],
+  );
+
+  const testifierRole = Number(roleIds.testifier);
+  const writerRole = Number(roleIds.writer);
+
+  return (
+    <Card>
+      <CardHeader
+        title={`Case #${caseItem.caseNumber}`}
+        action={
+          <Button color="error" onClick={() => onRequestClearCase(caseItem.id)}>
+            {messages.eraseCase || 'Erase case'}
+          </Button>
+        }
+      />
+      <CardContent>
+        <Stack spacing={3}>
+          <Stack
+            direction={{ xs: 'column', md: 'row' }}
+            spacing={2}
+            alignItems={{ md: 'flex-end' }}
+          >
+            <TextField
+              label="Location"
+              value={caseItem.location}
+              onChange={handleFieldChange('location')}
+              fullWidth
+            />
+            <TextField
+              label="Date of event"
+              type="date"
+              value={caseItem.date || ''}
+              onChange={handleFieldChange('date')}
+              InputLabelProps={{ shrink: true }}
+              sx={{ minWidth: 180 }}
+            />
+            <TextField
+              label="Time"
+              value={caseItem.time}
+              onChange={handleFieldChange('time')}
+              sx={{ minWidth: 140 }}
+            />
+          </Stack>
+
+          <Stack
+            direction={{ xs: 'column', md: 'row' }}
+            spacing={2}
+            alignItems={{ md: 'flex-start' }}
+          >
+            <Box sx={{ flex: '1 1 0', minWidth: { xs: '100%', md: 220 } }}>
+              <PeoplePicker
+                label={messages.whoTestified || 'Who testified'}
+                options={peopleOptions}
+                selectedPeople={caseItem.testifiers}
+                onSelectionChange={handleTestifierChange}
+                onAddPerson={(person) =>
+                  onAddPersonAtCase(caseItem.id, person, testifierRole)
+                }
+                onRemovePerson={(person) =>
+                  onRemovePersonAtCase(caseItem.id, person, testifierRole)
+                }
+                onPersonClick={(person) => onShowPersonHistory(person.id)}
+              />
+            </Box>
+            {config.track_writer && (
+              <Box sx={{ flex: '1 1 0', minWidth: { xs: '100%', md: 220 } }}>
+                <PeoplePicker
+                  label={messages.whoWroteComplaint || 'Who wrote complaint'}
+                  options={peopleOptions}
+                  selectedPeople={caseItem.writers}
+                  onSelectionChange={handleWriterChange}
+                  onAddPerson={(person) =>
+                    onAddPersonAtCase(caseItem.id, person, writerRole)
+                  }
+                  onRemovePerson={(person) =>
+                    onRemovePersonAtCase(caseItem.id, person, writerRole)
+                  }
+                  onPersonClick={(person) => onShowPersonHistory(person.id)}
+                />
+              </Box>
+            )}
+            {enableCaseReferences && (
+              <Box sx={{ flex: '1 1 0', minWidth: { xs: '100%', md: 220 } }}>
+                <EntityPicker
+                  multiple
+                  label={messages.referencedCases || 'Referenced issues'}
+                  placeholder="Search by case number"
+                  options={caseOptions.filter(
+                    (option) => Number(option.id) !== caseItem.id,
+                  )}
+                  value={(caseItem.caseReferences || []).map((reference) => ({
+                    id: String(reference.id),
+                    label: reference.caseNumber,
+                  }))}
+                  onChange={handleReferencedCasesChange}
+                />
+              </Box>
+            )}
+          </Stack>
+
+          <TextField
+            label={config.str_findings || 'Findings'}
+            multiline
+            minRows={3}
+            value={caseItem.findings}
+            onChange={handleFieldChange('findings')}
+          />
+
+          <Stack spacing={2}>
+            {caseItem.charges.map((charge) => (
+              <ChargeCard
+                key={charge.id}
+                caseId={caseItem.id}
+                charge={charge}
+                config={config}
+                messages={messages}
+                peopleOptions={peopleOptions}
+                ruleOptions={ruleOptions}
+                onUpdateCharge={onUpdateCharge}
+                onRemoveCharge={onRemoveCharge}
+                onShowPersonHistory={onShowPersonHistory}
+                onShowRuleHistory={onShowRuleHistory}
+                onShowPersonRuleHistory={onShowPersonRuleHistory}
+                fetchLastResolutionPlan={fetchLastResolutionPlan}
+              />
+            ))}
+          </Stack>
+
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            justifyContent="space-between"
+            alignItems={{ sm: 'center' }}
+            spacing={1.5}
+          >
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={caseItem.continued}
+                  onChange={handleContinuedChange}
+                />
+              }
+              label="To be continued"
+              sx={{ m: 0 }}
+            />
+            <Button onClick={() => onAddCharge(caseItem.id)}>
+              {messages.addCharges || 'Add charge'}
+            </Button>
+          </Stack>
+
+          {enableCaseReferences && (
+            <CaseReferences
+              caseId={caseItem.id}
+              references={caseItem.caseReferences}
+              config={config}
+              onToggleReferencedCharge={onToggleReferencedCharge}
+              onGenerateCharge={onGenerateChargeFromReference}
+            />
+          )}
+        </Stack>
+      </CardContent>
+    </Card>
+  );
+}
+
+function ChargeCard(props) {
+  const {
+    caseId,
+    charge,
+    config,
+    messages,
+    peopleOptions,
+    ruleOptions,
+    onUpdateCharge,
+    onRemoveCharge,
+    onShowPersonHistory,
+    onShowRuleHistory,
+    onShowPersonRuleHistory,
+    fetchLastResolutionPlan,
+  } = props;
+
+  const handlePersonChange = useCallback(
+    (people) => {
+      const person = people[0] || null;
+      onUpdateCharge(
+        caseId,
+        charge.id,
+        (prev) => ({
+          ...prev,
+          person,
+        }),
+        { queueSave: true },
+      );
+
+      if (person?.id && charge.rule?.id) {
+        fetchLastResolutionPlan(person.id, charge.rule.id).then((html) => {
+          onUpdateCharge(caseId, charge.id, (prev) => ({ ...prev, lastResolutionHtml: html }));
+        });
+      } else {
+        onUpdateCharge(caseId, charge.id, (prev) => ({ ...prev, lastResolutionHtml: '' }));
+      }
+    },
+    [caseId, charge.id, charge.rule?.id, fetchLastResolutionPlan, onUpdateCharge],
+  );
+
+  const handleRuleChange = useCallback(
+    (rule) => {
+      const option = rule ? { id: rule.id, label: rule.label } : null;
+      onUpdateCharge(
+        caseId,
+        charge.id,
+        (prev) => ({
+          ...prev,
+          rule: option,
+        }),
+        { queueSave: true },
+      );
+
+      if (charge.person?.id && option?.id) {
+        fetchLastResolutionPlan(charge.person.id, option.id).then((html) => {
+          onUpdateCharge(caseId, charge.id, (prev) => ({ ...prev, lastResolutionHtml: html }));
+        });
+      } else {
+        onUpdateCharge(caseId, charge.id, (prev) => ({ ...prev, lastResolutionHtml: '' }));
+      }
+    },
+    [caseId, charge.id, charge.person?.id, fetchLastResolutionPlan, onUpdateCharge],
+  );
+
+  const handlePleaChange = useCallback(
+    (event) => {
+      const value = event.target.value;
+      onUpdateCharge(
+        caseId,
+        charge.id,
+        (prev) => ({
+          ...prev,
+          plea: value,
+          referredToSm:
+            value === 'Not Guilty'
+              ? true
+              : prev.referredToSm,
+        }),
+        { queueSave: true },
+      );
+    },
+    [caseId, charge.id, onUpdateCharge],
+  );
+
+  const handleSeverityChange = useCallback(
+    (event) => {
+      const value = event.target.value;
+      onUpdateCharge(
+        caseId,
+        charge.id,
+        (prev) => ({ ...prev, severity: value }),
+        { queueSave: true },
+      );
+    },
+    [caseId, charge.id, onUpdateCharge],
+  );
+
+  const handleReferredChange = useCallback(
+    (event) => {
+      const checked = event.target.checked;
+      onUpdateCharge(
+        caseId,
+        charge.id,
+        (prev) => ({ ...prev, referredToSm: checked }),
+        { queueSave: true },
+      );
+    },
+    [caseId, charge.id, onUpdateCharge],
+  );
+
+  const handleMinorReferralChange = useCallback(
+    (event) => {
+      const value = event.target.value;
+      onUpdateCharge(
+        caseId,
+        charge.id,
+        (prev) => ({ ...prev, minorReferralDestination: value }),
+        { queueSave: true },
+      );
+    },
+    [caseId, charge.id, onUpdateCharge],
+  );
+
+  const handleResolutionChange = useCallback(
+    (event) => {
+      const value = event.target.value;
+      onUpdateCharge(
+        caseId,
+        charge.id,
+        (prev) => ({ ...prev, resolutionPlan: value }),
+        { queueSave: true },
+      );
+    },
+    [caseId, charge.id, onUpdateCharge],
+  );
+
+  const handleFollowUpChange = useCallback(
+    (event) => {
+      const value = event.target.value;
+      let nextChoice = 'original';
+      let nextPlan = charge.resolutionPlan;
+
+      if (value === 'timeServed') {
+        nextChoice = 'timeServed';
+        nextPlan = TIME_SERVED_LABEL;
+      } else if (value === 'newPlan') {
+        nextChoice = 'newPlan';
+      }
+
+      if (nextChoice === 'original') {
+        nextPlan = '';
+      }
+
+      onUpdateCharge(
+        caseId,
+        charge.id,
+        (prev) => ({
+          ...prev,
+          followUpChoice: nextChoice,
+          resolutionPlan: nextPlan,
+        }),
+        { queueSave: true },
+      );
+    },
+    [caseId, charge.id, charge.resolutionPlan, onUpdateCharge],
+  );
+
+  useEffect(() => {
+    if (charge.person?.id && charge.rule?.id && !charge.lastResolutionHtml) {
+      fetchLastResolutionPlan(charge.person.id, charge.rule.id).then((html) => {
+        onUpdateCharge(caseId, charge.id, (prev) => ({ ...prev, lastResolutionHtml: html }));
+      });
+    }
+  }, [caseId, charge.id, charge.person?.id, charge.rule?.id, charge.lastResolutionHtml, fetchLastResolutionPlan, onUpdateCharge]);
+
+  const pleaOptions = [
+    { value: 'Guilty', label: config.str_guilty || 'Guilty' },
+  ];
+  if (config.show_no_contest_plea) {
+    pleaOptions.push({ value: 'No Contest', label: 'No Contest' });
+  }
+  pleaOptions.push({ value: 'Not Guilty', label: config.str_not_guilty || 'Not Guilty' });
+  if (config.show_na_plea) {
+    pleaOptions.push({ value: 'N/A', label: config.str_na || 'N/A' });
+  }
+
+  const severityOptions = ['Mild', 'Moderate', 'Serious', 'Severe'];
+  const followUpValue =
+    charge.followUpChoice === 'timeServed'
+      ? 'timeServed'
+      : charge.followUpChoice === 'newPlan'
+      ? 'newPlan'
+      : '';
+
+  const showResolutionInput =
+    !charge.referencedSource || charge.followUpChoice === 'newPlan';
+
+  return (
+    <Paper
+      sx={{
+        p: 2,
+        borderLeft: charge.referencedSource ? '4px solid #1976d2' : '1px solid',
+        borderColor: charge.referencedSource ? 'primary.main' : 'divider',
+        borderRadius: 1,
+      }}
+    >
+      <Stack spacing={2}>
+        <Stack
+          direction={{ xs: 'column', md: 'row' }}
+          spacing={2}
+          alignItems={{ md: 'center' }}
+        >
+          <Box sx={{ flex: 1 }}>
+            <PeoplePicker
+              label={messages.chargeAgainst || 'Charge against'}
+              options={peopleOptions}
+              selectedPeople={charge.person ? [charge.person] : []}
+              limitToOne
+              onSelectionChange={handlePersonChange}
+              onPersonClick={(person) => onShowPersonHistory(person.id)}
+              size="small"
+              fullWidth
+            />
+          </Box>
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={1.5}
+            alignItems={{ sm: 'center' }}
+            sx={{ flexShrink: 0 }}
+          >
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={charge.referredToSm}
+                  onChange={handleReferredChange}
+                />
+              }
+              label="Refer to School Meeting"
+              sx={{ m: 0 }}
+            />
+            {config.use_minor_referrals && (
+              <TextField
+                label="Refer to"
+                value={charge.minorReferralDestination || ''}
+                onChange={handleMinorReferralChange}
+                size="small"
+              />
+            )}
+          </Stack>
+        </Stack>
+
+        {config.show_entry && (
+          <EntityPicker
+            label="Rule"
+            options={ruleOptions}
+            value={charge.rule}
+            onChange={handleRuleChange}
+            placeholder="Search rules"
+          />
+        )}
+
+        {config.show_plea && (
+          <FormControl>
+            <FormLabel>Plea</FormLabel>
+            <RadioGroup
+              row
+              value={charge.plea || ''}
+              onChange={handlePleaChange}
+            >
+              {pleaOptions.map((option) => (
+                <FormControlLabel
+                  key={option.value}
+                  value={option.value}
+                  control={<Radio />}
+                  label={option.label}
+                />
+              ))}
+            </RadioGroup>
+          </FormControl>
+        )}
+
+        {config.show_severity && (
+          <FormControl>
+            <FormLabel>Severity</FormLabel>
+            <RadioGroup
+              row
+              value={charge.severity || ''}
+              onChange={handleSeverityChange}
+            >
+              {severityOptions.map((option) => (
+                <FormControlLabel
+                  key={option}
+                  value={option}
+                  control={<Radio />}
+                  label={option}
+                />
+              ))}
+            </RadioGroup>
+          </FormControl>
+        )}
+
+        {charge.referencedSource && (
+          <Box>
+            <FormLabel>Follow-up</FormLabel>
+            <RadioGroup
+              value={followUpValue}
+              onChange={handleFollowUpChange}
+            >
+              <FormControlLabel
+                value="timeServed"
+                control={<Radio />}
+                label="Time served"
+              />
+              <FormControlLabel
+                value="newPlan"
+                control={<Radio />}
+                label={`Delete & replace original ${
+                  config.str_res_plan || 'resolution plan'
+                }`}
+              />
+            </RadioGroup>
+            <Typography variant="body2" color="text.secondary">
+              Original: {charge.referencedSource.resolutionPlan}
+            </Typography>
+          </Box>
+        )}
+
+        {showResolutionInput && (
+          <TextField
+            label={config.str_res_plan_cap || 'Resolution plan'}
+            multiline
+            minRows={2}
+            value={charge.resolutionPlan}
+            onChange={handleResolutionChange}
+          />
+        )}
+
+        {charge.lastResolutionHtml ? (
+          <Box
+            sx={{ fontSize: 13, color: 'text.secondary' }}
+            onClick={(event) => {
+              const moreInfo = event.target.closest('.more-info');
+              if (moreInfo && charge.person?.id && charge.rule?.id) {
+                event.preventDefault();
+                onShowPersonRuleHistory(charge.person.id, charge.rule.id);
+              }
+            }}
+            dangerouslySetInnerHTML={{ __html: charge.lastResolutionHtml }}
+          />
+        ) : null}
+
+        <Stack direction="row" spacing={1} alignItems="center">
+          <Button
+            color="error"
+            disabled={charge.isReferenced}
+            onClick={() => onRemoveCharge(caseId, charge.id)}
+            size="small"
+          >
+            {messages.removeCharge || 'Remove charge'}
+          </Button>
+          {charge.isReferenced && (
+            <Typography variant="caption" color="text.secondary">
+              {messages.noDeleteReferencedCharge ||
+                'This charge cannot be deleted because it is referenced elsewhere.'}
+            </Typography>
+          )}
+        </Stack>
+      </Stack>
+    </Paper>
+  );
+}
+
+function CaseReferences(props) {
+  const { caseId, references, config, onToggleReferencedCharge, onGenerateCharge } = props;
+
+  const filteredReferences = (references || []).filter(
+    (reference) => reference.id !== caseId,
+  );
+
+  if (filteredReferences.length === 0) {
+    return (
+      <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+        No referenced cases selected.
+      </Typography>
+    );
+  }
+
+  return (
+    <Stack spacing={2} sx={{ mt: 1 }}>
+      {filteredReferences.map((reference) => (
+        <Box
+          key={reference.id}
+          sx={{
+            border: '1px solid',
+            borderColor: 'divider',
+            borderRadius: 1,
+            p: 1.5,
+            backgroundColor: 'background.paper',
+          }}
+        >
+          <Typography variant="subtitle2">{reference.caseNumber}</Typography>
+          <Typography variant="body2" color="text.secondary">
+            {reference.findings}
+          </Typography>
+          <Stack spacing={1.5} sx={{ mt: 1 }}>
+            {reference.charges.map((charge) => {
+              const chargeLabelPrefix = charge.is_sm_decision
+                ? 'and School Meeting decided on'
+                : 'and was assigned';
+              const resolutionLabel = config.str_res_plan || 'resolution plan';
+
+              return (
+                <Box
+                  key={`${reference.id}-${charge.charge_id}`}
+                  sx={{
+                    border: '1px dashed',
+                    borderColor: charge.isReferenced ? 'success.light' : 'divider',
+                    borderRadius: 1,
+                    p: 1,
+                  }}
+                >
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        size="small"
+                        checked={charge.isReferenced}
+                        onChange={(event) =>
+                          onToggleReferencedCharge(
+                            caseId,
+                            charge.charge_id,
+                            event.target.checked,
+                          )
+                        }
+                      />
+                    }
+                    label={
+                      <Typography variant="body2">
+                        {charge.person} was charged with {charge.rule} {chargeLabelPrefix}{' '}
+                        the {resolutionLabel} “{charge.resolutionPlan}”
+                      </Typography>
+                    }
+                  />
+                  <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.5 }}>
+                    {!charge.has_generated ? (
+                      <Button
+                        size="small"
+                        onClick={() => onGenerateCharge(caseId, charge)}
+                      >
+                        Generate charge
+                      </Button>
+                    ) : (
+                      <Typography variant="caption" color="success.main">
+                        Charge generated
+                      </Typography>
+                    )}
+                    {charge.previously_referenced_in_case && (
+                      <Typography variant="caption" color="text.secondary">
+                        Previously referenced in case {charge.previously_referenced_in_case}
+                      </Typography>
+                    )}
+                  </Stack>
+                </Box>
+              );
+            })}
+          </Stack>
+        </Box>
+      ))}
+    </Stack>
+  );
+}
 
 export default EditMinutesPage;
