@@ -3,8 +3,8 @@ import { InputLabel, MenuItem, FormControl, Select, useTheme } from '@mui/materi
 import {
   CgClose
 } from 'react-icons/cg';
-import Divider from '../Divider/Divider';
-import Typography from '../Typography/Typography';
+import Divider from './Divider';
+import Typography from './Typography';
 
 const SelectInput = (props) => {
   const { value, setValue, label, fullWidth = true, options, disabled, marginTop = '10px', marginBottom = '10px', showOptionCount = false, showClearButton = false, clearButtonLabel = 'Clear Selection', ...restOfProps } = props;
