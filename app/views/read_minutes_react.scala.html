@@ -26,6 +26,34 @@
       window.initialData.sub = @Html(meeting.getJsonPeople(PersonAtMeeting.ROLE_JC_SUB));
       window.initialData.runners = @Html(meeting.getJsonPeople(PersonAtMeeting.ROLE_RUNNER));
       window.initialData.config = @Html(Utils.toJson(Utils.getOrgConfig(request)));
+
+      window.initialData.meetingCases = @Html(Utils.toJson(meeting.getCases()));
+      window.initialData.additionalCases = @Html(Utils.toJson(meeting.getAdditionalCases()));
+      window.initialData.meetingDate = "@Application.formatMeetingDate(meeting.getDate())";
+      window.initialData.printMinutesUrl = "@routes.Application.printMeeting(meeting.getId())";
+      window.initialData.viewResolutionPlansUrl = "@routes.Application.viewMeetingResolutionPlans(meeting.getId())";
+      window.initialData.downloadResolutionPlansUrl = "@routes.Application.downloadMeetingResolutionPlans(meeting.getId())";
+      window.initialData.editMinutesUrl = "@routes.ApplicationEditing.editMeeting(meeting.getId())";
+
+      @defining({
+        val m = new java.util.LinkedHashMap[String, String]()
+        m.put("committeeMembers", messages("committee_members"))
+        m.put("caseNotes", messages("case_notes"))
+        m.put("caseTitle", messages("case_title"))
+        m.put("chargesTitle", messages("charges_title"))
+        m.put("whoTestified", messages("who_testified"))
+        m.put("findingsNotShownNoCharges", messages("findings_not_shown_no_charges"))
+        m.put("noCharges", messages("no_charges"))
+        m.put("awaitingSmDecision", messages("awaiting_sm_decision", "{destination}", "{person}", "{rule}"))
+        m.put("chargeAgainst", messages("charge_against"))
+        m.put("referencedCases", messages("referenced_cases"))
+        m.put("casesToBeContinued", messages("cases_to_be_continued"))
+        m.put("chooseCaseToContinue", messages("choose_case_to_continue"))
+        m.put("addNewCase", messages("add_new_case"))
+        play.libs.Json.stringify(play.libs.Json.toJson(m))
+      }) { messagesJson =>
+        window.initialData.messages = @Html(messagesJson);
+      }
     </script>
   @views.html.tags.react_bundle_loader()
 }
