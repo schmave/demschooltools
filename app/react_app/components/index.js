@@ -9,7 +9,6 @@ export { default as Checkbox } from './Checkbox';
 export { default as ConditionalWrapper } from './ConditionalWrapper';
 export { default as DatePicker } from './DatePicker';
 export { default as Divider } from './Divider';
-export { default as EntityPicker } from './EntityPicker';
 export { default as FormControl } from './FormControl';
 export { default as FormControlLabel } from './FormControlLabel';
 export { default as FormLabel } from './FormLabel';
