@@ -18,12 +18,12 @@ import {
   FormControlLabel,
   FormLabel,
   Paper,
-  PeoplePicker,
   Radio,
   RadioGroup,
   Stack,
   TextField,
   Typography,
+  SelectInput,
 } from '../../components';
 import { DeleteDialog } from '../../containers';
 import { SnackbarContext } from '../../contexts';
@@ -1199,71 +1199,100 @@ const EditMinutesPage = () => {
                 },
               }}
             >
-              <PeoplePicker
+              <SelectInput
+                autocomplete
+                multiple
                 label={messages.committeeMembers || 'Committee members'}
-                options={peopleOptions}
-                selectedPeople={committee}
-                onSelectionChange={setCommittee}
-                onAddPerson={(person) =>
-                  addPersonToMeeting(person, Number(roleIds.committee))
-                }
-                onRemovePerson={(person) =>
-                  removePersonFromMeeting(person, Number(roleIds.committee))
-                }
-                onPersonClick={(person) => showPersonHistory(person.id)}
+                options={peopleOptions.map(p => ({ ...p, value: p.id, label: p.label }))}
+                value={committee.map(p => p.id)}
+                onChange={(e, newIds) => {
+                  const newPeople = (Array.isArray(newIds) ? newIds : []).map(id => peopleOptionMap.get(String(id))).filter(Boolean);
+                  // Detect adds / removes
+                  const prevIds = new Set(committee.map(p => p.id));
+                  const nextIds = new Set(newPeople.map(p => p.id));
+                  newPeople.forEach(p => { if (!prevIds.has(p.id)) addPersonToMeeting(p, Number(roleIds.committee)); });
+                  committee.forEach(p => { if (!nextIds.has(p.id)) removePersonFromMeeting(p, Number(roleIds.committee)); });
+                  setCommittee(newPeople);
+                }}
+                placeholder="Search people"
+                size="medium"
+                fullWidth
               />
-              <PeoplePicker
+              <SelectInput
+                autocomplete
                 label="Chair"
-                options={peopleOptions}
-                selectedPeople={chair}
-                limitToOne
-                onSelectionChange={setChair}
-                onAddPerson={(person) =>
-                  addPersonToMeeting(person, Number(roleIds.chair))
-                }
-                onRemovePerson={(person) =>
-                  removePersonFromMeeting(person, Number(roleIds.chair))
-                }
-                onPersonClick={(person) => showPersonHistory(person.id)}
+                options={peopleOptions.map(p => ({ ...p, value: p.id, label: p.label }))}
+                value={chair[0]?.id || ''}
+                onChange={(e, newId) => {
+                  const newPerson = peopleOptionMap.get(String(newId));
+                  const prev = chair[0];
+                  if (newPerson && (!prev || prev.id !== newPerson.id)) {
+                    addPersonToMeeting(newPerson, Number(roleIds.chair));
+                  }
+                  if (prev && (!newPerson || prev.id !== newPerson.id)) {
+                    removePersonFromMeeting(prev, Number(roleIds.chair));
+                  }
+                  setChair(newPerson ? [newPerson] : []);
+                }}
+                placeholder="Search people"
+                size="medium"
+                fullWidth
               />
-              <PeoplePicker
+              <SelectInput
+                autocomplete
                 label="Notetaker"
-                options={peopleOptions}
-                selectedPeople={noteTaker}
-                onSelectionChange={setNoteTaker}
-                onAddPerson={(person) =>
-                  addPersonToMeeting(person, Number(roleIds.noteTaker))
-                }
-                onRemovePerson={(person) =>
-                  removePersonFromMeeting(person, Number(roleIds.noteTaker))
-                }
-                onPersonClick={(person) => showPersonHistory(person.id)}
+                options={peopleOptions.map(p => ({ ...p, value: p.id, label: p.label }))}
+                value={noteTaker[0]?.id || ''}
+                onChange={(e, newId) => {
+                  const newPerson = peopleOptionMap.get(String(newId));
+                  const prev = noteTaker[0];
+                  if (newPerson && (!prev || prev.id !== newPerson.id)) {
+                    addPersonToMeeting(newPerson, Number(roleIds.noteTaker));
+                  }
+                  if (prev && (!newPerson || prev.id !== newPerson.id)) {
+                    removePersonFromMeeting(prev, Number(roleIds.noteTaker));
+                  }
+                  setNoteTaker(newPerson ? [newPerson] : []);
+                }}
+                placeholder="Search people"
+                size="medium"
+                fullWidth
               />
-              <PeoplePicker
+              <SelectInput
+                autocomplete
+                multiple
                 label="Subs"
-                options={peopleOptions}
-                selectedPeople={subs}
-                onSelectionChange={setSubs}
-                onAddPerson={(person) =>
-                  addPersonToMeeting(person, Number(roleIds.sub))
-                }
-                onRemovePerson={(person) =>
-                  removePersonFromMeeting(person, Number(roleIds.sub))
-                }
-                onPersonClick={(person) => showPersonHistory(person.id)}
+                options={peopleOptions.map(p => ({ ...p, value: p.id, label: p.label }))}
+                value={subs.map(p => p.id)}
+                onChange={(e, newIds) => {
+                  const newPeople = (Array.isArray(newIds) ? newIds : []).map(id => peopleOptionMap.get(String(id))).filter(Boolean);
+                  const prevIds = new Set(subs.map(p => p.id));
+                  const nextIds = new Set(newPeople.map(p => p.id));
+                  newPeople.forEach(p => { if (!prevIds.has(p.id)) addPersonToMeeting(p, Number(roleIds.sub)); });
+                  subs.forEach(p => { if (!nextIds.has(p.id)) removePersonFromMeeting(p, Number(roleIds.sub)); });
+                  setSubs(newPeople);
+                }}
+                placeholder="Search people"
+                size="medium"
+                fullWidth
               />
-              <PeoplePicker
+              <SelectInput
+                autocomplete
+                multiple
                 label="Runners"
-                options={peopleOptions}
-                selectedPeople={runners}
-                onSelectionChange={setRunners}
-                onAddPerson={(person) =>
-                  addPersonToMeeting(person, Number(roleIds.runner))
-                }
-                onRemovePerson={(person) =>
-                  removePersonFromMeeting(person, Number(roleIds.runner))
-                }
-                onPersonClick={(person) => showPersonHistory(person.id)}
+                options={peopleOptions.map(p => ({ ...p, value: p.id, label: p.label }))}
+                value={runners.map(p => p.id)}
+                onChange={(e, newIds) => {
+                  const newPeople = (Array.isArray(newIds) ? newIds : []).map(id => peopleOptionMap.get(String(id))).filter(Boolean);
+                  const prevIds = new Set(runners.map(p => p.id));
+                  const nextIds = new Set(newPeople.map(p => p.id));
+                  newPeople.forEach(p => { if (!prevIds.has(p.id)) addPersonToMeeting(p, Number(roleIds.runner)); });
+                  runners.forEach(p => { if (!nextIds.has(p.id)) removePersonFromMeeting(p, Number(roleIds.runner)); });
+                  setRunners(newPeople);
+                }}
+                placeholder="Search people"
+                size="medium"
+                fullWidth
               />
             </Stack>
           </CardContent>
@@ -1276,6 +1305,7 @@ const EditMinutesPage = () => {
             config={config}
             messages={messages}
             peopleOptions={peopleOptions}
+            peopleOptionMap={peopleOptionMap}
             ruleOptions={ruleOptions}
             caseOptions={caseOptions}
             roleIds={roleIds}
@@ -1413,6 +1443,7 @@ function CaseCard(props) {
     config,
     messages,
     peopleOptions,
+    peopleOptionMap,
     ruleOptions,
     caseOptions,
     roleIds,
@@ -1558,34 +1589,45 @@ function CaseCard(props) {
             alignItems={{ md: 'flex-start' }}
           >
             <Box sx={{ flex: '1 1 0', minWidth: { xs: '100%', md: 220 } }}>
-              <PeoplePicker
+              <SelectInput
+                autocomplete
+                multiple
                 label={messages.whoTestified || 'Who testified'}
-                options={peopleOptions}
-                selectedPeople={caseItem.testifiers}
-                onSelectionChange={handleTestifierChange}
-                onAddPerson={(person) =>
-                  onAddPersonAtCase(caseItem.id, person, testifierRole)
-                }
-                onRemovePerson={(person) =>
-                  onRemovePersonAtCase(caseItem.id, person, testifierRole)
-                }
-                onPersonClick={(person) => onShowPersonHistory(person.id)}
+                options={peopleOptions.map(p => ({ ...p, value: p.id, label: p.label }))}
+                value={caseItem.testifiers.map(p => p.id)}
+                onChange={(e, newIds) => {
+                  const newPeople = (Array.isArray(newIds) ? newIds : []).map(id => peopleOptionMap.get(String(id)) || peopleOptions.find(p => p.id === id)).filter(Boolean);
+                  const prevIds = new Set(caseItem.testifiers.map(p => p.id));
+                  const nextIds = new Set(newPeople.map(p => p.id));
+                  // Side effects: add/remove at case
+                  newPeople.forEach(p => { if (!prevIds.has(p.id)) onAddPersonAtCase(caseItem.id, p, testifierRole); });
+                  caseItem.testifiers.forEach(p => { if (!nextIds.has(p.id)) onRemovePersonAtCase(caseItem.id, p, testifierRole); });
+                  handleTestifierChange(newPeople);
+                }}
+                placeholder="Search people"
+                size="medium"
+                fullWidth
               />
             </Box>
             {config.track_writer && (
               <Box sx={{ flex: '1 1 0', minWidth: { xs: '100%', md: 220 } }}>
-                <PeoplePicker
+                <SelectInput
+                  autocomplete
+                  multiple
                   label={messages.whoWroteComplaint || 'Who wrote complaint'}
-                  options={peopleOptions}
-                  selectedPeople={caseItem.writers}
-                  onSelectionChange={handleWriterChange}
-                  onAddPerson={(person) =>
-                    onAddPersonAtCase(caseItem.id, person, writerRole)
-                  }
-                  onRemovePerson={(person) =>
-                    onRemovePersonAtCase(caseItem.id, person, writerRole)
-                  }
-                  onPersonClick={(person) => onShowPersonHistory(person.id)}
+                  options={peopleOptions.map(p => ({ ...p, value: p.id, label: p.label }))}
+                  value={caseItem.writers.map(p => p.id)}
+                  onChange={(e, newIds) => {
+                    const newPeople = (Array.isArray(newIds) ? newIds : []).map(id => peopleOptionMap.get(String(id)) || peopleOptions.find(p => p.id === id)).filter(Boolean);
+                    const prevIds = new Set(caseItem.writers.map(p => p.id));
+                    const nextIds = new Set(newPeople.map(p => p.id));
+                    newPeople.forEach(p => { if (!prevIds.has(p.id)) onAddPersonAtCase(caseItem.id, p, writerRole); });
+                    caseItem.writers.forEach(p => { if (!nextIds.has(p.id)) onRemovePersonAtCase(caseItem.id, p, writerRole); });
+                    handleWriterChange(newPeople);
+                  }}
+                  placeholder="Search people"
+                  size="medium"
+                  fullWidth
                 />
               </Box>
             )}
@@ -1625,6 +1667,7 @@ function CaseCard(props) {
                 config={config}
                 messages={messages}
                 peopleOptions={peopleOptions}
+                peopleOptionMap={peopleOptionMap}
                 ruleOptions={ruleOptions}
                 onUpdateCharge={onUpdateCharge}
                 onRemoveCharge={onRemoveCharge}
@@ -1679,6 +1722,7 @@ function ChargeCard(props) {
     config,
     messages,
     peopleOptions,
+    peopleOptionMap,
     ruleOptions,
     onUpdateCharge,
     onRemoveCharge,
@@ -1885,13 +1929,15 @@ function ChargeCard(props) {
           alignItems={{ md: 'center' }}
         >
           <Box sx={{ flex: 1 }}>
-            <PeoplePicker
+            <SelectInput
+              autocomplete
               label={messages.chargeAgainst || 'Charge against'}
-              options={peopleOptions}
-              selectedPeople={charge.person ? [charge.person] : []}
-              limitToOne
-              onSelectionChange={handlePersonChange}
-              onPersonClick={(person) => onShowPersonHistory(person.id)}
+              options={peopleOptions.map(p => ({ ...p, value: p.id, label: p.label }))}
+              value={charge.person?.id || ''}
+              onChange={(e, newId) => {
+                const person = peopleOptionMap?.get(String(newId)) || peopleOptions.find(p => p.id === String(newId)) || null;
+                handlePersonChange(person ? [person] : []);
+              }}
               size="small"
               fullWidth
             />

@@ -297,7 +297,7 @@ const CaseCard = ({ caseItem, config, messages, roleIds }) => {
           {formatCaseDateTime(caseItem) || '—'} | Location: {formatLocation(caseItem.location)}
         </Typography>
       </Box>
-      <Stack spacing={1.5} sx={{ mt: 1.5 }}>
+      <Stack spacing={1} sx={{ mt: 1 }}>
           {boolFromConfig(config.track_writer) && (
             <Typography variant="body1">
               <strong>Writers:</strong>{' '}
@@ -404,7 +404,7 @@ const ReadMinutesPage = () => {
   };
 
   return (
-    <Stack spacing={1.25} sx={{ mb: 3 }}>
+    <Stack spacing={0.75} sx={{ mb: 2 }}>
       <Card sx={{ borderRadius: 3, boxShadow: '0 4px 18px rgba(15, 30, 60, 0.08)' }}>
         <CardHeader
           title={
@@ -465,8 +465,8 @@ const ReadMinutesPage = () => {
                 sm: 'repeat(2, minmax(0, 1fr))',
                 lg: 'repeat(3, minmax(0, 1fr))',
               },
-              columnGap: 3,
-              rowGap: 1.5,
+              columnGap: 4,
+              rowGap: 0.75,
             }}
           >
             {[
@@ -507,7 +507,7 @@ const ReadMinutesPage = () => {
           <Typography variant="h5" sx={{ mb: 1.5 }}>
             {mergedMessages.caseNotes || 'Case Notes'}
           </Typography>
-          <Stack spacing={1.15}>
+          <Stack spacing={1.25}>
             {filteredCases.map((caseItem) => (
               <CaseCard
                 key={caseItem.id || caseItem.caseNumber}
@@ -530,7 +530,7 @@ const ReadMinutesPage = () => {
             <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
               {mergedMessages.chooseCaseToContinue || 'Choose a case to continue'}
             </Typography>
-            <Stack spacing={1.5} direction={{ xs: 'column', md: 'row' }} flexWrap="wrap" rowGap={1.5} columnGap={2}>
+            <Stack spacing={1} direction={{ xs: 'column', md: 'row' }} flexWrap='wrap' rowGap={1} columnGap={1.5}>
               {additionalCases.map((additionalCase) => {
                 const meetingId = additionalCase?.meeting?.id;
                 const meetingDateShort = additionalCase?.meeting?.date

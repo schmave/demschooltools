@@ -1,6 +1,6 @@
 import { createTheme } from '@mui/material/styles';
 
-// TO-DO: Replace colors here, pulled from a Slalom app
+// TO-DO: Replace colors here to match the rest of the app
 export const darkTheme = createTheme({
   palette: {
     mode: 'dark',

@@ -1,6 +1,5 @@
-import React, { useCallback } from 'react';
-import SingleOrMultiAutocomplete from './SingleOrMultiAutocomplete';
-import Chip from './Chip';
+import React, { useCallback, useMemo } from 'react';
+import SelectInput from './SelectInput';
 
 const defaultGetOptionLabel = (option) => option?.label || option?.name || '';
 const normalizeId = (value) => (value === null || value === undefined ? '' : String(value));
@@ -21,57 +20,57 @@ const EntityPicker = (props) => {
     ...restProps
   } = props;
 
-  const normalizedValue = multiple
-    ? (Array.isArray(value) ? value : []).filter(Boolean)
-    : value || null;
-
-  const handleChange = useCallback(
-    (event, newValue) => {
-      if (!onChange) {
-        return;
-      }
-      if (multiple) {
-        onChange(Array.isArray(newValue) ? newValue.filter(Boolean) : []);
-      } else {
-        onChange(newValue || null);
-      }
-    },
-    [multiple, onChange],
+  const normalizedValue = useMemo(
+    () => (multiple ? (Array.isArray(value) ? value.filter(Boolean) : []) : value || null),
+    [value, multiple],
   );
 
-  const renderTags = multiple
-    ? (tagValue, getTagProps) =>
-        tagValue.map((option, index) => {
-          const tagProps = getTagProps({ index });
-          return (
-            <Chip
-              {...tagProps}
-              key={normalizeId(option.id) || index}
-              label={getOptionLabel(option)}
-              onClick={
-                onOptionClick ? () => onOptionClick(option) : tagProps.onClick
-              }
-            />
-          );
-        })
-    : undefined;
+  // Convert option objects to { value, label } format expected by SelectInput
+  const mappedOptions = useMemo(
+    () => options.map((o) => ({ ...o, value: normalizeId(o.id), label: getOptionLabel(o) })),
+    [options, getOptionLabel],
+  );
+
+  // For new SelectInput autocomplete mode, we pass primitive ids
+  const primitiveValue = useMemo(() => {
+    if (multiple) {
+      return Array.isArray(normalizedValue)
+        ? normalizedValue.map((o) => normalizeId(o.id))
+        : [];
+    }
+    return normalizedValue ? normalizeId(normalizedValue.id) : '';
+  }, [normalizedValue, multiple]);
+
+  const handlePrimitiveChange = useCallback(
+    (event, newPrimitive) => {
+      if (!onChange) return;
+      if (multiple) {
+        const nextObjects = Array.isArray(newPrimitive)
+          ? newPrimitive
+              .map((id) => options.find((o) => normalizeId(o.id) === normalizeId(id)))
+              .filter(Boolean)
+          : [];
+        onChange(nextObjects);
+      } else {
+        const nextObj = options.find((o) => normalizeId(o.id) === normalizeId(newPrimitive)) || null;
+        onChange(nextObj);
+      }
+    },
+    [onChange, multiple, options],
+  );
 
   return (
-    <SingleOrMultiAutocomplete
+    <SelectInput
+      autocomplete
       multiple={multiple}
-      options={options}
-      value={normalizedValue}
-      onChange={handleChange}
+      options={mappedOptions}
+      value={primitiveValue}
+      onChange={handlePrimitiveChange}
       label={label}
       placeholder={placeholder}
       size={size}
       fullWidth={fullWidth}
       disabled={disabled}
-      getOptionLabel={getOptionLabel}
-      renderTags={renderTags}
-      isOptionEqualToValue={(option, selected) =>
-        normalizeId(option?.id) === normalizeId(selected?.id)
-      }
       {...restProps}
     />
   );
