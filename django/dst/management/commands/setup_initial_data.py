@@ -20,8 +20,8 @@ class Command(BaseCommand):
     @atomic
     def handle(self, *args, **kwargs):
         org = Organization.objects.create(
-            short_name="TRVS",
-            name="Three Rivers Village School",
+            short_name="Sandbox",
+            name="DemSchoolTools sandbox area",
             show_custodia=True,
             show_accounting=True,
             enable_case_references=True,
@@ -29,7 +29,7 @@ class Command(BaseCommand):
             show_roles=True,
         )
 
-        OrganizationHost.objects.create(organization=org, host="localhost:9000")
+        OrganizationHost.objects.create(host="localhost:9000", organization=org)
 
         Tag.objects.create(
             title="Current Student",
@@ -58,6 +58,5 @@ class Command(BaseCommand):
             is_superuser=True,
             password="$2a$10$sHAtPc.yeZg2AWMr7EZZbuu.sYaOPgFsMZiAY62q/URbjMxU3jB.q",
         )
-        user.save()
 
         UserRole.objects.create(user=user, role=UserRole.ALL_ACCESS)

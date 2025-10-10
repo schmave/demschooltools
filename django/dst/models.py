@@ -696,14 +696,13 @@ CHECKIN_USERNAME = "Check-in app user"
 
 
 class User(AbstractUser):
-    password = models.TextField(db_column="hashed_password")
-
     class Meta:
         db_table = 'public"."users'
         constraints = [
             models.UniqueConstraint(fields=["email"], name="users_unique_email_1")
         ]
 
+    password = models.TextField(db_column="hashed_password")
     is_active = models.BooleanField(
         default=True,
         db_column="active",
