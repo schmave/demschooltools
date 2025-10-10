@@ -5,6 +5,11 @@ import { Snackbar, Alert } from "@mui/material";
 import { SnackbarContext, DefaultSnackbar } from './contexts';
 import { lightTheme } from "./theme/theme";
 
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
+
 // And Pages:
 import {
   EditMinutesPage,

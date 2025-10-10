@@ -79,7 +79,7 @@ const CaseCard = ({ caseItem, config, messages, roleIds }) => {
       <Box component="li" key={charge.id || `${personName}-${ruleTitle}`}
         sx={{ mb: chargeNotes.length ? 1 : 0 }}
       >
-        <Typography component="span" variant="body2">
+        <Typography>
           {personName !== '???' ? <strong>{personName}</strong> : '???'}
           {ruleTitle && (
             <>
@@ -91,17 +91,13 @@ const CaseCard = ({ caseItem, config, messages, roleIds }) => {
           {severitySuffix}
           {pleaText && (
             <>
-              {' '}
               <strong>{pleaText}</strong>
             </>
           )}
           {resolutionPlan && (
             <>
-              {' '}
               <Typography
-                component="span"
-                variant="body2"
-                sx={{ textDecoration: 'underline', fontWeight: 500 }}
+                sx={{ textDecoration: 'underline' }}
               >
                 {`${resolutionLabel}: ${resolutionPlan}`}
               </Typography>

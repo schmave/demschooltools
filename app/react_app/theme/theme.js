@@ -1,4 +1,4 @@
-import { createTheme } from '@mui/material/styles';
+import { createTheme, responsiveFontSizes } from '@mui/material/styles';
 
 // TO-DO: Replace colors here to match the rest of the app
 export const darkTheme = createTheme({
@@ -22,7 +22,7 @@ export const darkTheme = createTheme({
   },
 });
 
-export const lightTheme = createTheme({
+let lightTheme = createTheme({
   palette: {
     mode: 'light',
     primary: {
@@ -41,4 +41,10 @@ export const lightTheme = createTheme({
       main: '#ffcc00',
     },
   },
+  typography: {
+    fontSize: '1.5rem',
+  },
 });
+lightTheme = responsiveFontSizes(lightTheme);
+export { lightTheme };
+
