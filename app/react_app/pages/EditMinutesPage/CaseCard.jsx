@@ -251,16 +251,26 @@ const CaseCard = ({
                   autocomplete
                   multiple
                   label={messages.referencedCases || 'Referenced issues'}
-                placeholder="Search by case number"
-                options={referencedCaseOptions}
-                value={(caseItem.caseReferences || []).map((reference) => String(reference.id))}
-                onChange={handleReferencedCasesChange}
-                size="medium"
-                showClearButton
-              />
-            </Box>
-          )}
+                  placeholder="Search by case number"
+                  options={referencedCaseOptions}
+                  value={(caseItem.caseReferences || []).map((reference) => String(reference.id))}
+                  onChange={handleReferencedCasesChange}
+                  size="medium"
+                  showClearButton
+                />
+              </Box>
+            )}
           </Stack>
+
+          {enableCaseReferences && (
+            <CaseReferences
+              caseId={caseItem.id}
+              references={caseItem.caseReferences}
+              config={config}
+              onToggleReferencedCharge={onToggleReferencedCharge}
+              onGenerateCharge={onGenerateChargeFromReference}
+            />
+          )}
 
           <TextField
             label={config.str_findings || 'Findings'}
@@ -312,16 +322,6 @@ const CaseCard = ({
               {messages.addCharges || 'Add charge'}
             </Button>
           </Stack>
-
-          {enableCaseReferences && (
-            <CaseReferences
-              caseId={caseItem.id}
-              references={caseItem.caseReferences}
-              config={config}
-              onToggleReferencedCharge={onToggleReferencedCharge}
-              onGenerateCharge={onGenerateChargeFromReference}
-            />
-          )}
         </Stack>
       </CardContent>
     </Card>

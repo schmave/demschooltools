@@ -44,6 +44,7 @@ GET /viewSchoolMeeting controllers.Application.viewSchoolMeetingDecisions(reques
 
 POST /newCase	controllers.ApplicationEditing.createCase(meeting_id : Integer, request: Request)
 POST /saveCase   controllers.ApplicationEditing.saveCase(id : Integer, request: Request)
+POST /deleteCase   controllers.ApplicationEditing.deleteCase(id : Integer, request: Request)
 POST /continueCase	controllers.ApplicationEditing.continueCase(meeting_id : Integer, case_id : Integer, request: Request)
 
 POST /addPersonAtMeeting    controllers.ApplicationEditing.addPersonAtMeeting(meeting_id : Integer, personId : Integer, role : Integer)

@@ -906,63 +906,41 @@ const EditMinutesPage = () => {
         return;
       }
 
-      updateCase(
-        caseId,
-        (existing) => ({
-          ...existing,
-          location: '',
-          findings: '',
-          date: '',
-          time: '',
-          continued: false,
-          charges: [],
-          testifiers: [],
-          writers: [],
-          caseReferences: [],
-          referencesLoaded: false,
-          referencesLoading: false,
-        }),
-        { queueSave: true },
-      );
-
-      await Promise.all(
-        caseItem.charges.map((charge) =>
-          post(`/removeCharge?id=${charge.id}`, {
-            errorMessage: 'Unable to remove charge',
-          }).catch(() => undefined),
-        ),
-      );
-
-      await Promise.all(
-        caseItem.testifiers.map((person) =>
-          removePersonAtCase(caseId, person, Number(roleIds.testifier)).catch(
-            () => undefined,
-          ),
-        ),
-      );
-
-      if (config.track_writer) {
-        await Promise.all(
-          caseItem.writers.map((person) =>
-            removePersonAtCase(caseId, person, Number(roleIds.writer)).catch(
-              () => undefined,
-            ),
-          ),
-        );
+      try {
+        await post(`/deleteCase?id=${caseId}`, {
+          errorMessage: 'Unable to erase case',
+        });
+      } catch (error) {
+        return;
       }
 
-      await post(`/clearAllReferencedCases?case_id=${caseId}`, {
-        errorMessage: 'Unable to clear referenced cases',
+      if (caseSaveTimersRef.current.has(caseId)) {
+        window.clearTimeout(caseSaveTimersRef.current.get(caseId));
+        caseSaveTimersRef.current.delete(caseId);
+      }
+      completePendingSave(`case-${caseId}`);
+
+      caseItem.charges.forEach((charge) => {
+        if (!charge?.id) {
+          return;
+        }
+        if (chargeSaveTimersRef.current.has(charge.id)) {
+          window.clearTimeout(chargeSaveTimersRef.current.get(charge.id));
+          chargeSaveTimersRef.current.delete(charge.id);
+        }
+        completePendingSave(`charge-${charge.id}`);
+      });
+
+      setMeetingCases((prevCases) =>
+        prevCases.filter((item) => item.id !== caseId),
+      );
+
+      setSnackbar({
+        message: messages.caseErased || 'Case erased',
+        severity: 'success',
       });
     },
-    [
-      config.track_writer,
-      post,
-      removePersonAtCase,
-      roleIds.testifier,
-      roleIds.writer,
-      updateCase,
-    ],
+    [completePendingSave, messages.caseErased, post, setSnackbar],
   );
 
   const handleAddNewCase = useCallback(async () => {

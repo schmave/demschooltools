@@ -396,6 +396,60 @@ public class ApplicationEditing extends Controller {
   }
 
   @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
+  public Result deleteCase(Integer id, Http.Request request) {
+    Organization org = Utils.getOrg(request);
+    Case theCase = Case.findById(id, org);
+
+    if (theCase == null) {
+      return notFound();
+    }
+
+    CachedPage.remove(CachedPage.JC_INDEX, org);
+
+    List<Charge> charges =
+        Charge.find.query().where().eq("theCase.id", theCase.getId()).findList();
+
+    for (Charge charge : charges) {
+      if (charge.getId() == null) {
+        continue;
+      }
+
+      DB.sqlUpdate("UPDATE charge SET referenced_charge_id = NULL WHERE referenced_charge_id = :charge_id")
+          .setParameter("charge_id", charge.getId())
+          .execute();
+
+      DB.sqlUpdate("DELETE FROM charge_reference WHERE referenced_charge = :charge_id")
+          .setParameter("charge_id", charge.getId())
+          .execute();
+    }
+
+    DB.sqlUpdate("DELETE FROM charge_reference WHERE referencing_case = :case_id")
+        .setParameter("case_id", theCase.getId())
+        .execute();
+
+    DB.sqlUpdate(
+            "DELETE FROM case_reference WHERE referencing_case = :case_id OR referenced_case = :case_id")
+        .setParameter("case_id", theCase.getId())
+        .execute();
+
+    DB.sqlUpdate("DELETE FROM person_at_case WHERE case_id = :case_id")
+        .setParameter("case_id", theCase.getId())
+        .execute();
+
+    DB.sqlUpdate("DELETE FROM case_meeting WHERE case_id = :case_id")
+        .setParameter("case_id", theCase.getId())
+        .execute();
+
+    for (Charge charge : charges) {
+      charge.delete();
+    }
+
+    theCase.delete();
+
+    return ok();
+  }
+
+  @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
   public Result enterSchoolMeetingDecisions(Http.Request request) {
     return ok(
         enter_sm_decisions.render(
