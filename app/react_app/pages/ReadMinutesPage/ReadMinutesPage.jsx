@@ -75,7 +75,7 @@ const ReadMinutesPage = () => {
 
   return (
     <Stack spacing={0.75} sx={{ mb: 2 }}>
-      <Card sx={{ borderRadius: 3, boxShadow: '0 4px 18px rgba(15, 30, 60, 0.08)' }}>
+      <Card>
         <CardHeader
           title={
             <Typography variant="h4" component="h1" sx={{ mb: 0 }}>
@@ -122,7 +122,7 @@ const ReadMinutesPage = () => {
         </CardContent>
       </Card>
 
-      <Card sx={{ borderRadius: 3 }}>
+      <Card>
         <CardHeader
           title={<Typography variant="h5">Committee &amp; Roles</Typography>}
         />
@@ -154,9 +154,9 @@ const ReadMinutesPage = () => {
                   {label}
                 </Typography>
                 {value && value.length > 0 ? (
-                  <Typography variant="body1">{formatPeopleList(value)}</Typography>
+                  <Typography>{formatPeopleList(value)}</Typography>
                 ) : (
-                  <Typography variant="body1" sx={{ fontStyle: 'italic' }}>
+                  <Typography sx={{ fontStyle: 'italic' }}>
                     None
                   </Typography>
                 )}
@@ -167,7 +167,7 @@ const ReadMinutesPage = () => {
       </Card>
 
       {noMeetingContent && (
-        <Typography variant="body1">
+        <Typography>
           No meeting has happened yet today.
         </Typography>
       )}
@@ -192,12 +192,12 @@ const ReadMinutesPage = () => {
       )}
 
       {additionalCases.length > 0 && (
-        <Card sx={{ borderRadius: 3 }}>
+        <Card>
           <CardHeader
             title={<Typography variant="h5">{mergedMessages.casesToBeContinued || 'Cases to be continued'}</Typography>}
           />
           <CardContent sx={{ pt: 1, pb: 1.5 }}>
-            <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
+            <Typography color="text.secondary" sx={{ mb: 1 }}>
               {mergedMessages.chooseCaseToContinue || 'Choose a case to continue'}
             </Typography>
             <Stack spacing={1} direction={{ xs: 'column', md: 'row' }} flexWrap='wrap' rowGap={1} columnGap={1.5}>
@@ -209,19 +209,13 @@ const ReadMinutesPage = () => {
                 return (
                   <Paper
                     key={additionalCase.id || additionalCase.caseNumber}
-                    sx={{
-                      p: 2,
-                      borderRadius: 2,
-                      border: '1px solid',
-                      borderColor: 'divider',
-                      flex: '1 1 300px',
-                    }}
+                    sx={{ flex: '1 1 300px' }}
                   >
                     <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                       #{additionalCase.caseNumber}
                       {additionalCase.dateClosed === null ? ' (OPEN)' : ''}
                     </Typography>
-                    <Typography variant="body1" color="text.secondary">
+                    <Typography color="text.secondary">
                       Case discussed today, but kept open for further investigation. Latest notes available in meeting held on{' '}
                       {meetingId ? (
                         <a href={`/viewMeeting/${meetingId}`} target="_blank" rel="noopener noreferrer">

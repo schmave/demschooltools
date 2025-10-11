@@ -96,11 +96,9 @@ const CaseCard = ({ caseItem, config, messages, roleIds }) => {
           )}
           {resolutionPlan && (
             <>
-              <Typography
-                sx={{ textDecoration: 'underline' }}
-              >
+              <Box component="span" sx={{ textDecoration: 'underline', fontWeight: 500 }}>
                 {`${resolutionLabel}: ${resolutionPlan}`}
-              </Typography>
+              </Box>
             </>
           )}
         </Typography>
@@ -114,14 +112,7 @@ const CaseCard = ({ caseItem, config, messages, roleIds }) => {
   });
 
   return (
-    <Paper
-      sx={{
-        border: '1px solid',
-        borderColor: 'divider',
-        borderRadius: 2,
-        p: 2.25,
-      }}
-    >
+    <Paper>
       <Box
         sx={{
           display: 'flex',
@@ -140,7 +131,7 @@ const CaseCard = ({ caseItem, config, messages, roleIds }) => {
       </Box>
       <Stack spacing={1} sx={{ mt: 1 }}>
           {boolFromConfig(config.track_writer) && (
-            <Typography variant="body1">
+            <Typography>
               <strong>Writers:</strong>{' '}
               {writerContent ? (
                 writerContent
@@ -151,7 +142,7 @@ const CaseCard = ({ caseItem, config, messages, roleIds }) => {
               )}
             </Typography>
           )}
-          <Typography variant="body1">
+          <Typography>
             <strong>{messages.whoTestified || 'Who testified:'}</strong>{' '}
             {testifierContent ? (
               testifierContent
@@ -161,7 +152,7 @@ const CaseCard = ({ caseItem, config, messages, roleIds }) => {
               </Box>
             )}
           </Typography>
-          <Typography variant="body1" sx={{ whiteSpace: 'pre-line' }}>
+          <Typography sx={{ whiteSpace: 'pre-line' }}>
             {findingsText}
           </Typography>
           <Box>

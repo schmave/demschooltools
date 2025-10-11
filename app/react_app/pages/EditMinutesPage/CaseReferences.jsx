@@ -4,6 +4,7 @@ import {
   Button,
   Checkbox,
   FormControlLabel,
+  Paper,
   Stack,
   Typography,
 } from '../../components';
@@ -24,14 +25,11 @@ const CaseReferences = ({ caseId, references, config, onToggleReferencedCharge, 
   return (
     <Stack spacing={2} sx={{ mt: 1 }}>
       {filteredReferences.map((reference) => (
-        <Box
+        <Paper
           key={reference.id}
           sx={{
-            border: '1px solid',
-            borderColor: 'divider',
-            borderRadius: 1,
             p: 1.5,
-            backgroundColor: 'background.paper',
+            borderRadius: 1,
           }}
         >
           <Typography variant="subtitle2">{reference.caseNumber}</Typography>
@@ -96,7 +94,7 @@ const CaseReferences = ({ caseId, references, config, onToggleReferencedCharge, 
               );
             })}
           </Stack>
-        </Box>
+        </Paper>
       ))}
     </Stack>
   );
