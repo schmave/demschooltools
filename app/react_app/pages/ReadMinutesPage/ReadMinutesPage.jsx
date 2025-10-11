@@ -4,7 +4,6 @@ import {
   Button,
   Card,
   CardContent,
-  CardHeader,
   Paper,
   PageWrapper,
   PageTitle,
@@ -13,6 +12,7 @@ import {
 } from '../../components';
 import { caseIsEmpty, formatPeopleList, safeParse } from '../../utils';
 import CaseCard from './CaseCard';
+import SectionCardHeader from '../EditMinutesPage/SectionCardHeader';
 
 const ReadMinutesPage = () => {
   const config = useMemo(() => safeParse(window.initialData?.config, {}), []);
@@ -114,9 +114,7 @@ const ReadMinutesPage = () => {
         </Stack>
 
         <Card>
-        <CardHeader
-          title={<Typography variant="h5">Committee &amp; Roles</Typography>}
-        />
+        <SectionCardHeader title="Committee &amp; Roles" />
         <CardContent sx={{ pt: 1, pb: 1.5 }}>
           <Box
             sx={{
@@ -181,8 +179,8 @@ const ReadMinutesPage = () => {
 
       {additionalCases.length > 0 && (
         <Card>
-          <CardHeader
-            title={<Typography variant="h5">{mergedMessages.casesToBeContinued || 'Cases to be continued'}</Typography>}
+          <SectionCardHeader
+            title={mergedMessages.casesToBeContinued || 'Cases to be continued'}
           />
           <CardContent sx={{ pt: 1, pb: 1.5 }}>
             <Typography color="text.secondary" sx={{ mb: 1 }}>

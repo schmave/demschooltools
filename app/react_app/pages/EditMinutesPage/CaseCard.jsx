@@ -4,7 +4,6 @@ import {
   Button,
   Card,
   CardContent,
-  CardHeader,
   Checkbox,
   FormControlLabel,
   SelectInput,
@@ -13,6 +12,7 @@ import {
 } from '../../components';
 import ChargeCard from './ChargeCard';
 import CaseReferences from './CaseReferences';
+import SectionCardHeader from './SectionCardHeader';
 
 const CaseCard = ({
   caseItem,
@@ -143,7 +143,7 @@ const CaseCard = ({
 
   return (
     <Card>
-      <CardHeader
+      <SectionCardHeader
         title={`Case #${caseItem.caseNumber}`}
         action={
           <Button color="error" onClick={() => onRequestClearCase(caseItem.id)}>

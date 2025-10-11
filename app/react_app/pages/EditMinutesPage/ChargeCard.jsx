@@ -120,6 +120,8 @@ const ChargeCard = ({
             value === 'Not Guilty'
               ? true
               : prev.referredToSm,
+          minorReferralDestination:
+            value === 'Not Guilty' ? '' : prev.minorReferralDestination,
         }),
         { queueSave: true },
       );
@@ -146,7 +148,11 @@ const ChargeCard = ({
       onUpdateCharge(
         caseId,
         charge.id,
-        (prev) => ({ ...prev, referredToSm: checked }),
+        (prev) => ({
+          ...prev,
+          referredToSm: checked,
+          minorReferralDestination: checked ? '' : prev.minorReferralDestination,
+        }),
         { queueSave: true },
       );
     },
@@ -210,6 +216,10 @@ const ChargeCard = ({
     [caseId, charge.id, charge.resolutionPlan, onUpdateCharge],
   );
 
+  const hasMinorReferralDestination = Boolean(
+    charge.minorReferralDestination && charge.minorReferralDestination.trim(),
+  );
+
   useEffect(() => {
     if (charge.person?.id && charge.rule?.id && !charge.lastResolutionHtml) {
       fetchLastResolutionPlan(charge.person.id, charge.rule.id).then((html) => {
@@ -217,6 +227,17 @@ const ChargeCard = ({
       });
     }
   }, [caseId, charge.id, charge.person?.id, charge.rule?.id, charge.lastResolutionHtml, fetchLastResolutionPlan, onUpdateCharge]);
+
+  useEffect(() => {
+    if (charge.referredToSm && hasMinorReferralDestination) {
+      onUpdateCharge(
+        caseId,
+        charge.id,
+        (prev) => ({ ...prev, minorReferralDestination: '' }),
+        { queueSave: true },
+      );
+    }
+  }, [caseId, charge.id, charge.referredToSm, hasMinorReferralDestination, onUpdateCharge]);
 
   const pleaOptions = useMemo(() => {
     const options = [
@@ -329,6 +350,7 @@ const ChargeCard = ({
               control={
                 <Checkbox
                   checked={charge.referredToSm}
+                  disabled={hasMinorReferralDestination}
                   onChange={handleReferredChange}
                 />
               }
@@ -341,6 +363,7 @@ const ChargeCard = ({
                 value={charge.minorReferralDestination || ''}
                 onChange={handleMinorReferralChange}
                 size="medium"
+                disabled={charge.referredToSm}
               />
             )}
           </Stack>

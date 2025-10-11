@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Paper, Stack, Typography } from '../../components';
+import { Box, Card, CardContent, Stack, Typography } from '../../components';
 import {
   boolFromConfig,
   caseIsEmpty,
@@ -14,6 +14,7 @@ import {
   getResolutionPlanText,
   getRuleTitle,
 } from '../../utils';
+import SectionCardHeader from '../EditMinutesPage/SectionCardHeader';
 
 const CaseCard = ({ caseItem, config, messages, roleIds }) => {
   if (caseIsEmpty(caseItem)) {
@@ -111,25 +112,20 @@ const CaseCard = ({ caseItem, config, messages, roleIds }) => {
     );
   });
 
+  const headerAction = (
+    <Typography variant="body2" color="text.secondary">
+      {formatCaseDateTime(caseItem) || '—'} | Location: {formatLocation(caseItem.location)}
+    </Typography>
+  );
+
   return (
-    <Paper>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'baseline',
-          flexWrap: 'wrap',
-          rowGap: 1,
-        }}
-      >
-        <Typography variant="h6" sx={{ fontWeight: 600 }}>
-          {`Case #${caseItem.caseNumber}${isOpen ? ' (OPEN)' : ''}`}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {formatCaseDateTime(caseItem) || '—'} | Location: {formatLocation(caseItem.location)}
-        </Typography>
-      </Box>
-      <Stack spacing={1} variant="section">
+    <Card>
+      <SectionCardHeader
+        title={`Case #${caseItem.caseNumber}${isOpen ? ' (OPEN)' : ''}`}
+        action={headerAction}
+      />
+      <CardContent>
+        <Stack spacing={1}>
           {boolFromConfig(config.track_writer) && (
             <Typography>
               <strong>Writers:</strong>{' '}
@@ -169,8 +165,9 @@ const CaseCard = ({ caseItem, config, messages, roleIds }) => {
               </Typography>
             )}
           </Box>
-      </Stack>
-    </Paper>
+        </Stack>
+      </CardContent>
+    </Card>
   );
 };
 

@@ -11,7 +11,6 @@ import {
   Button,
   Card,
   CardContent,
-  CardHeader,
   Paper,
   PageWrapper,
   PageTitle,
@@ -24,6 +23,7 @@ import { SnackbarContext } from '../../contexts';
 import { safeParse, normalizeOption, buildOptionMap } from '../../utils';
 import CaseCard from './CaseCard';
 import { TIME_SERVED_LABEL } from './constants';
+import SectionCardHeader from './SectionCardHeader';
 
 const SAVE_DEBOUNCE_MS = 1200;
 const createEmptyCharge = (chargeId) => ({
@@ -1407,7 +1407,7 @@ const EditMinutesPage = () => {
       </Stack>
 
       <Card>
-          <CardHeader title="Committee & Roles" />
+          <SectionCardHeader title="Committee & Roles" />
           <CardContent>
             <Stack
               direction="row"
@@ -1572,7 +1572,7 @@ const EditMinutesPage = () => {
 
       {visibleOpenCases.length > 0 && (
         <Card>
-          <CardHeader
+          <SectionCardHeader
             title={messages.casesToBeContinued || 'Cases to be continued'}
           />
           <CardContent>
