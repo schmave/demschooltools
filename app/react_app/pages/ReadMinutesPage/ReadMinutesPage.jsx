@@ -6,6 +6,8 @@ import {
   CardContent,
   CardHeader,
   Paper,
+  PageWrapper,
+  PageTitle,
   Stack,
   Typography,
 } from '../../components';
@@ -74,55 +76,44 @@ const ReadMinutesPage = () => {
   };
 
   return (
-    <Stack spacing={0.75} sx={{ mb: 2 }}>
-      <Card>
-        <CardHeader
-          title={
-            <Typography variant="h4" component="h1" sx={{ mb: 0 }}>
-              {(config.str_jc_name_short || 'JC')} minutes from {meetingDate}
-            </Typography>
-          }
-        />
-        <CardContent sx={{ pt: 1, pb: 1.5 }}>
-          <Stack
-            direction={{ xs: 'column', sm: 'row' }}
-            spacing={2}
-            alignItems={{ md: 'center' }}
-            flexWrap="wrap"
-          >
+    <PageWrapper surface>
+      <Stack spacing={0.75} sx={{ mb: 2 }}>
+        <Stack
+          spacing={1}
+          direction="row"
+          justifyContent="space-between"
+          alignItems={{ xs: 'flex-start', sm: 'center' }}
+          flexWrap="wrap"
+          rowGap={1}
+        >
+          <PageTitle>
+            {(config.str_jc_name_short || 'JC')} minutes from {meetingDate}
+          </PageTitle>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             {printMinutesUrl && (
               <Button component="a" href={printMinutesUrl} target="_blank" rel="noopener noreferrer" variant="contained">
-                <Typography>
-                  1. Print minutes
-                </Typography>
+                Print minutes
               </Button>
             )}
             {viewResolutionPlansUrl && (
               <Button component="a" href={viewResolutionPlansUrl} target="_blank" rel="noopener noreferrer" variant="contained">
-                <Typography>
-                  2. Print {config.str_res_plans || 'resolution plans'}
-                </Typography>
+                1. Print {config.str_res_plans || 'resolution plans'}
               </Button>
             )}
             {downloadResolutionPlansUrl && (
               <Button component="a" href={downloadResolutionPlansUrl} target="_blank" rel="noopener noreferrer" variant="outlined">
-                <Typography>
-                  Download {config.str_res_plans || 'resolution plans'}
-                </Typography>
+                Download {config.str_res_plans || 'resolution plans'}
               </Button>
             )}
             {editMinutesUrl && (
               <Button component="a" href={editMinutesUrl} variant="outlined">
-                <Typography>
-                  Edit minutes
-                </Typography>
+                Edit minutes
               </Button>
             )}
           </Stack>
-        </CardContent>
-      </Card>
+        </Stack>
 
-      <Card>
+        <Card>
         <CardHeader
           title={<Typography variant="h5">Committee &amp; Roles</Typography>}
         />
@@ -136,7 +127,7 @@ const ReadMinutesPage = () => {
                 lg: 'repeat(3, minmax(0, 1fr))',
               },
               columnGap: 4,
-              rowGap: 0.75,
+              rowGap: 1,
             }}
           >
             {[
@@ -174,9 +165,6 @@ const ReadMinutesPage = () => {
 
       {filteredCases.length > 0 && (
         <Box>
-          <Typography variant="h5" sx={{ mb: 1.5 }}>
-            {mergedMessages.caseNotes || 'Case Notes'}
-          </Typography>
           <Stack spacing={1.25}>
             {filteredCases.map((caseItem) => (
               <CaseCard
@@ -233,7 +221,8 @@ const ReadMinutesPage = () => {
           </CardContent>
         </Card>
       )}
-    </Stack>
+      </Stack>
+    </PageWrapper>
   );
 };
 

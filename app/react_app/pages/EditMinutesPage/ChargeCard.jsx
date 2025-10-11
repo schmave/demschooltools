@@ -6,18 +6,22 @@ import {
   FormControl,
   FormControlLabel,
   FormLabel,
+  IconButton,
   Paper,
   Radio,
   RadioGroup,
   Stack,
   TextField,
+  Tooltip,
   Typography,
   SelectInput,
 } from '../../components';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { TIME_SERVED_LABEL } from './constants';
 
 const ChargeCard = ({
   caseId,
+  caseNumber,
   charge,
   config,
   messages,
@@ -26,6 +30,8 @@ const ChargeCard = ({
   ruleOptions,
   onUpdateCharge,
   onRemoveCharge,
+  onShowPersonHistory,
+  onShowRuleHistory,
   onShowPersonRuleHistory,
   fetchLastResolutionPlan,
 }) => {
@@ -79,6 +85,26 @@ const ChargeCard = ({
       }
     },
     [caseId, charge.id, charge.person?.id, fetchLastResolutionPlan, onUpdateCharge, ruleOptions],
+  );
+
+  const handlePersonInfoClick = useCallback(
+    (event) => {
+      event.stopPropagation();
+      if (charge.person?.id) {
+        onShowPersonHistory?.(charge.person, caseId, caseNumber);
+      }
+    },
+    [caseId, caseNumber, charge.person, onShowPersonHistory],
+  );
+
+  const handleRuleInfoClick = useCallback(
+    (event) => {
+      event.stopPropagation();
+      if (charge.rule?.id) {
+        onShowRuleHistory?.(charge.rule);
+      }
+    },
+    [charge.rule, onShowRuleHistory],
   );
 
   const handlePleaChange = useCallback(
@@ -228,10 +254,41 @@ const ChargeCard = ({
     [ruleOptions],
   );
 
+  const personInfoAdornment =
+    charge.person?.id ? (
+      <Tooltip title="View charge history">
+        <span>
+          <IconButton
+            size="small"
+            sx={{ mr: 0.5 }}
+            onClick={handlePersonInfoClick}
+            onMouseDown={(event) => event.stopPropagation()}
+          >
+            <InfoOutlinedIcon fontSize="small" />
+          </IconButton>
+        </span>
+      </Tooltip>
+    ) : null;
+
+  const ruleInfoAdornment =
+    charge.rule?.id ? (
+      <Tooltip title="View rule details">
+        <span>
+          <IconButton
+            size="small"
+            sx={{ mr: 0.5 }}
+            onClick={handleRuleInfoClick}
+            onMouseDown={(event) => event.stopPropagation()}
+          >
+            <InfoOutlinedIcon fontSize="small" />
+          </IconButton>
+        </span>
+      </Tooltip>
+    ) : null;
+
   return (
     <Paper
       sx={{
-        p: 2,
         borderLeft: charge.referencedSource ? '4px solid #1976d2' : '1px solid',
         borderColor: charge.referencedSource ? 'primary.main' : 'divider',
         borderRadius: 1,
@@ -256,8 +313,10 @@ const ChargeCard = ({
                   null;
                 handlePersonChange(person ? [person] : []);
               }}
-              size="small"
+              size="medium"
               fullWidth
+              startAdornment={personInfoAdornment}
+              showClearButton
             />
           </Box>
           <Stack
@@ -281,42 +340,47 @@ const ChargeCard = ({
                 label="Refer to"
                 value={charge.minorReferralDestination || ''}
                 onChange={handleMinorReferralChange}
-                size="small"
+                size="medium"
               />
             )}
           </Stack>
         </Stack>
 
-        {config.show_entry && (
-          <SelectInput
-            autocomplete
-            label="Rule"
-            options={ruleSelectOptions}
-            value={charge.rule?.id ? String(charge.rule.id) : ''}
-            onChange={handleRuleChange}
-            placeholder="Search rules"
-            size="small"
-          />
-        )}
-
-        {config.show_plea && (
-          <FormControl>
-            <FormLabel>Plea</FormLabel>
-            <RadioGroup
-              row
-              value={charge.plea || ''}
-              onChange={handlePleaChange}
-            >
-              {pleaOptions.map((option) => (
-                <FormControlLabel
-                  key={option.value}
-                  value={option.value}
-                  control={<Radio />}
-                  label={option.label}
+        {(config.show_entry || config.show_plea) && (
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={2}
+            alignItems={{ sm: 'flex-start' }}
+          >
+            {config.show_entry && (
+              <Box sx={{ flex: 1 }}>
+                <SelectInput
+                  autocomplete
+                  label="Rule"
+                  options={ruleSelectOptions}
+                  value={charge.rule?.id ? String(charge.rule.id) : ''}
+                  onChange={handleRuleChange}
+                  placeholder="Search rules"
+                  size="medium"
+                  startAdornment={ruleInfoAdornment}
+                  showClearButton
                 />
-              ))}
-            </RadioGroup>
-          </FormControl>
+              </Box>
+            )}
+            {config.show_plea && (
+              <Box sx={{ flex: 1 }}>
+                <SelectInput
+                  label="Plea"
+                  options={pleaOptions}
+                  value={charge.plea || ''}
+                  onChange={handlePleaChange}
+                  size="medium"
+                  fullWidth
+                  showClearButton
+                />
+              </Box>
+            )}
+          </Stack>
         )}
 
         {config.show_severity && (
@@ -382,7 +446,12 @@ const ChargeCard = ({
               const moreInfo = event.target.closest('.more-info');
               if (moreInfo && charge.person?.id && charge.rule?.id) {
                 event.preventDefault();
-                onShowPersonRuleHistory(charge.person.id, charge.rule.id);
+                onShowPersonRuleHistory(
+                  charge.person.id,
+                  charge.rule.id,
+                  caseId,
+                  caseNumber,
+                );
               }
             }}
             dangerouslySetInnerHTML={{ __html: charge.lastResolutionHtml }}

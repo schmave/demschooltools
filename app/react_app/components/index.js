@@ -14,6 +14,8 @@ export { default as FormControlLabel } from './FormControlLabel';
 export { default as FormLabel } from './FormLabel';
 export { default as IconButton } from './IconButton';
 export { default as Paper } from './Paper';
+export { default as PageWrapper } from './PageWrapper';
+export { default as PageTitle } from './PageTitle';
 export { default as Radio } from './Radio';
 export { default as RadioGroup } from './RadioGroup';
 export { default as SelectInput } from './SelectInput';

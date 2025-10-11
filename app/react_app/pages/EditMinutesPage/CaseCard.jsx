@@ -36,6 +36,8 @@ const CaseCard = ({
   onGenerateChargeFromReference,
   onRequestClearCase,
   onRefreshReferences,
+  onShowPersonHistory,
+  onShowRuleHistory,
   onShowPersonRuleHistory,
   fetchLastResolutionPlan,
 }) => {
@@ -209,6 +211,7 @@ const CaseCard = ({
                 placeholder="Search people"
                 size="medium"
                 fullWidth
+                showClearButton
               />
             </Box>
             {config.track_writer && (
@@ -238,6 +241,7 @@ const CaseCard = ({
                   placeholder="Search people"
                   size="medium"
                   fullWidth
+                  showClearButton
                 />
               </Box>
             )}
@@ -247,14 +251,15 @@ const CaseCard = ({
                   autocomplete
                   multiple
                   label={messages.referencedCases || 'Referenced issues'}
-                  placeholder="Search by case number"
-                  options={referencedCaseOptions}
-                  value={(caseItem.caseReferences || []).map((reference) => String(reference.id))}
-                  onChange={handleReferencedCasesChange}
-                  size="medium"
-                />
-              </Box>
-            )}
+                placeholder="Search by case number"
+                options={referencedCaseOptions}
+                value={(caseItem.caseReferences || []).map((reference) => String(reference.id))}
+                onChange={handleReferencedCasesChange}
+                size="medium"
+                showClearButton
+              />
+            </Box>
+          )}
           </Stack>
 
           <TextField
@@ -270,6 +275,7 @@ const CaseCard = ({
               <ChargeCard
                 key={charge.id}
                 caseId={caseItem.id}
+                caseNumber={caseItem.caseNumber}
                 charge={charge}
                 config={config}
                 messages={messages}
@@ -278,6 +284,8 @@ const CaseCard = ({
                 ruleOptions={ruleOptions}
                 onUpdateCharge={onUpdateCharge}
                 onRemoveCharge={onRemoveCharge}
+                onShowPersonHistory={onShowPersonHistory}
+                onShowRuleHistory={onShowRuleHistory}
                 onShowPersonRuleHistory={onShowPersonRuleHistory}
                 fetchLastResolutionPlan={fetchLastResolutionPlan}
               />

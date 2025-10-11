@@ -39,6 +39,8 @@ const SelectInput = (props) => {
     multiple = false,
     placeholder = '',
     size = 'small',
+    startAdornment,
+    endAdornment,
     ...restOfProps
   } = props;
   const theme = useTheme();
@@ -104,21 +106,63 @@ const SelectInput = (props) => {
     [multiple, propagateValue],
   );
 
+  const hasValue = multiple
+    ? Array.isArray(value) && value.length > 0
+    : value !== undefined && value !== null && value !== '';
+
   const handleClear = useCallback(
-    (e) => {
-      e.stopPropagation();
+    (eventLike) => {
       const cleared = multiple ? [] : '';
-      propagateValue(e, cleared);
+      propagateValue(eventLike, cleared);
     },
     [multiple, propagateValue],
   );
 
-  const isClearVisible = showClearButton && (!multiple ? !!value : Array.isArray(value) && value.length > 0);
+  const isClearVisible = showClearButton && hasValue;
 
   if (autocomplete) {
+    const {
+      componentsProps: incomingComponentsProps,
+      clearIcon: incomingClearIcon,
+      disableClearable: incomingDisableClearable,
+      ...autocompleteRestProps
+    } = restOfProps;
+
+    const clearIndicatorSx = showClearButton
+      ? {
+          color: theme.palette.primary.main,
+          visibility: isClearVisible ? 'visible' : 'hidden',
+          opacity: isClearVisible ? 1 : 0,
+          transition: 'opacity 0.2s',
+        }
+      : {};
+
+    const componentsProps = {
+      ...incomingComponentsProps,
+      clearIndicator: {
+        ...(incomingComponentsProps?.clearIndicator || {}),
+        sx: {
+          ...(incomingComponentsProps?.clearIndicator?.sx || {}),
+          ...clearIndicatorSx,
+        },
+      },
+    };
+
+    const clearIcon = showClearButton
+      ? <CgClose color={theme.palette.primary.main} />
+      : incomingClearIcon;
+
+    const finalDisableClearable =
+      typeof incomingDisableClearable === 'boolean'
+        ? incomingDisableClearable
+        : showClearButton
+        ? false
+        : undefined;
+
     return (
       <FormControl fullWidth={fullWidth} sx={{ marginTop, marginBottom }}>
         <Autocomplete
+          {...autocompleteRestProps}
           multiple={multiple}
           disableCloseOnSelect={multiple}
             // Provide full option objects
@@ -127,6 +171,9 @@ const SelectInput = (props) => {
           onChange={handleAutoChange}
           size={size}
           disabled={disabled || options.length === 0}
+          componentsProps={componentsProps}
+          clearIcon={clearIcon}
+          disableClearable={finalDisableClearable}
           getOptionLabel={(option) => {
             if (!option) return '';
             const base = option.label || '';
@@ -180,20 +227,21 @@ const SelectInput = (props) => {
               placeholder={placeholder}
               InputProps={{
                 ...params.InputProps,
+                startAdornment: startAdornment && hasValue ? (
+                  <>
+                    {startAdornment}
+                    {params.InputProps.startAdornment}
+                  </>
+                ) : params.InputProps.startAdornment,
                 endAdornment: (
                   <>
-                    {isClearVisible && (
-                      <IconButton size="small" onClick={handleClear} aria-label={clearButtonLabel} tabIndex={-1}>
-                        <CgClose color={theme.palette.primary.main} />
-                      </IconButton>
-                    )}
+                    {endAdornment}
                     {params.InputProps.endAdornment}
                   </>
                 ),
               }}
             />
           )}
-          {...restOfProps}
         />
       </FormControl>
     );
@@ -210,6 +258,22 @@ const SelectInput = (props) => {
         disabled={disabled || options.length === 0}
         multiple={multiple}
         size={size}
+        endAdornment={
+          showClearButton && isClearVisible ? (
+            <IconButton
+              size="small"
+              sx={{ mr: 0.5 }}
+              onMouseDown={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleClear(e);
+              }}
+              aria-label={clearButtonLabel}
+            >
+              <CgClose color={theme.palette.primary.main} />
+            </IconButton>
+          ) : undefined
+        }
         renderValue={
           multiple
             ? (selected) => {
@@ -238,17 +302,6 @@ const SelectInput = (props) => {
         }
         {...restOfProps}
       >
-        {showClearButton && (
-          <MenuItem
-            key={"clearSelectionOverride"}
-            value={"clearSelectionOverride"}
-            sx={{ justifyContent: 'space-between' }}
-          >
-            {clearButtonLabel}
-            <CgClose style={{ marginRight: '5px' }} color={theme.palette.primary.main} />
-          </MenuItem>
-        )}
-        {showClearButton && <Divider />}
         {options.map((option) => {
           const disabledOption = showOptionCount && option.count === 0;
           return (

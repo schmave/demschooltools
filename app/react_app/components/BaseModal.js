@@ -1,35 +1,47 @@
 import React from 'react';
-import { Box, Modal } from '@mui/material';
+import { Modal } from '@mui/material';
+import Box from './Box';
+import { combineSx } from '../utils';
 
-const modalContentStyle = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  bgcolor: 'background.paper',
-  border: '2px solid #0c62fb',
-  boxShadow: 24,
-  borderRadius: 5,
-  p: 4,
-  maxHeight: '80vh',
-  minWidth: '30vw',
-  overflowY: 'scroll',
+const mergeContentProps = (contentProps = {}) => {
+  const { sx, variant, ...rest } = contentProps;
+  const variantList = Array.isArray(variant) ? variant : variant ? [variant] : [];
+
+  return {
+    ...rest,
+    variant: ['modalContent', ...variantList],
+    sx,
+  };
 };
 
-const BaseModal = (props) => {
-  const { open, handleClose, children, ...restOfProps } = props;
+const mergeSlotProps = (slotProps = {}) => {
+  const backdrop = slotProps.backdrop || {};
+  return {
+    ...slotProps,
+    backdrop: {
+      ...backdrop,
+      sx: combineSx(
+        {
+          bgcolor: 'rgba(15, 23, 42, 0.45)',
+          backdropFilter: 'blur(2px)',
+        },
+        backdrop.sx,
+      ),
+    },
+  };
+};
+
+const BaseModal = ({ open, handleClose, children, sx, contentProps, slotProps, ...props }) => {
+  const resolvedContentProps = mergeContentProps(contentProps);
+  const mergedSlotProps = mergeSlotProps(slotProps);
 
   return (
-    <Modal
-      open={open}
-      onClose={handleClose}
-      {...restOfProps}
-    >
-      <Box sx={modalContentStyle}>
+    <Modal open={open} onClose={handleClose} slotProps={mergedSlotProps} {...props}>
+      <Box {...resolvedContentProps} sx={combineSx(resolvedContentProps.sx, sx)}>
         {children}
       </Box>
     </Modal>
   );
-}
+};
 
 export default BaseModal;

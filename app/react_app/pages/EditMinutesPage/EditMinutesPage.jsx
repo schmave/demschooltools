@@ -13,25 +13,19 @@ import {
   CardContent,
   CardHeader,
   Paper,
+  PageWrapper,
+  PageTitle,
   Stack,
   Typography,
   SelectInput,
 } from '../../components';
-import { DeleteDialog } from '../../containers';
+import { DeleteDialog, InfoModal } from '../../containers';
 import { SnackbarContext } from '../../contexts';
 import { safeParse, normalizeOption, buildOptionMap } from '../../utils';
 import CaseCard from './CaseCard';
 import { TIME_SERVED_LABEL } from './constants';
 
 const SAVE_DEBOUNCE_MS = 1200;
-const defaultSidebarContent = `
-  <div>
-    <p>Click a person's name to view their RC history.</p>
-    <p>Click a rule title to explore related charges.</p>
-    <p>Use the “More info” links for combined person + rule context.</p>
-  </div>
-`;
-
 const createEmptyCharge = (chargeId) => ({
   id: chargeId,
   resolutionPlan: '',
@@ -49,6 +43,50 @@ const createEmptyCharge = (chargeId) => ({
   },
   isReferenced: false,
 });
+
+const chargeHasContent = (charge) => {
+  if (!charge) {
+    return false;
+  }
+  return (
+    Boolean(charge.person?.id) ||
+    Boolean(charge.rule?.id) ||
+    Boolean(charge.resolutionPlan && charge.resolutionPlan.trim()) ||
+    Boolean(charge.plea && charge.plea.trim()) ||
+    Boolean(charge.severity && charge.severity.trim()) ||
+    Boolean(charge.referredToSm) ||
+    Boolean(charge.minorReferralDestination && charge.minorReferralDestination.trim()) ||
+    charge.followUpChoice !== 'original' ||
+    Boolean(charge.referencedSource) ||
+    Boolean(charge.lastResolutionHtml && charge.lastResolutionHtml.trim())
+  );
+};
+
+const caseHasContent = (caseItem) => {
+  if (!caseItem) {
+    return false;
+  }
+  if (
+    (caseItem.location && caseItem.location.trim()) ||
+    (caseItem.date && String(caseItem.date).trim()) ||
+    (caseItem.time && caseItem.time.trim())
+  ) {
+    return true;
+  }
+  if (caseItem.findings && caseItem.findings.trim()) {
+    return true;
+  }
+  if ((caseItem.testifiers || []).length > 0) {
+    return true;
+  }
+  if ((caseItem.writers || []).length > 0) {
+    return true;
+  }
+  if ((caseItem.caseReferences || []).length > 0) {
+    return true;
+  }
+  return (caseItem.charges || []).some((charge) => chargeHasContent(charge));
+};
 
 
 const EditMinutesPage = () => {
@@ -352,15 +390,24 @@ const EditMinutesPage = () => {
     return openCases.filter((openCase) => !loadedIds.has(openCase.id));
   }, [meetingCases, openCases]);
 
-  const [sidebarContent, setSidebarContent] = useState(defaultSidebarContent);
-  const [sidebarLoading, setSidebarLoading] = useState(false);
   const [pendingSaveCount, setPendingSaveCount] = useState(0);
+  const [saveStatus, setSaveStatus] = useState('idle');
   const [caseToConfirmClear, setCaseToConfirmClear] = useState(null);
+  const [chargeToConfirmDelete, setChargeToConfirmDelete] = useState(null);
+  const [infoDialog, setInfoDialog] = useState({
+    open: false,
+    title: '',
+    content: '',
+    tabs: null,
+    activeTab: null,
+    loading: false,
+  });
 
   const pendingSaveKeysRef = useRef(new Set());
   const caseSaveTimersRef = useRef(new Map());
   const chargeSaveTimersRef = useRef(new Map());
   const casesRef = useRef([]);
+  const hasSavedRef = useRef(false);
 
   useEffect(() => {
     casesRef.current = meetingCases;
@@ -383,12 +430,17 @@ const EditMinutesPage = () => {
       setRef.add(key);
       setPendingSaveCount(setRef.size);
     }
+    hasSavedRef.current = true;
+    setSaveStatus('saving');
   }, []);
 
   const completePendingSave = useCallback((key) => {
     const setRef = pendingSaveKeysRef.current;
     if (setRef.delete(key)) {
       setPendingSaveCount(setRef.size);
+      if (setRef.size === 0) {
+        setSaveStatus(hasSavedRef.current ? 'saved' : 'idle');
+      }
     }
   }, []);
 
@@ -638,7 +690,7 @@ const EditMinutesPage = () => {
     [handleError, post],
   );
 
-  const handleRemoveCharge = useCallback(
+  const removeChargeImmediate = useCallback(
     async (caseId, chargeId) => {
       if (!chargeId) {
         return;
@@ -658,6 +710,18 @@ const EditMinutesPage = () => {
       );
     },
     [post],
+  );
+
+  const handleRemoveCharge = useCallback(
+    (caseId, chargeId) => {
+      const { charge } = findChargeById(chargeId);
+      if (chargeHasContent(charge)) {
+        setChargeToConfirmDelete({ caseId, chargeId });
+        return;
+      }
+      removeChargeImmediate(caseId, chargeId);
+    },
+    [findChargeById, removeChargeImmediate],
   );
 
   const refreshCaseReferences = useCallback(
@@ -842,6 +906,25 @@ const EditMinutesPage = () => {
         return;
       }
 
+      updateCase(
+        caseId,
+        (existing) => ({
+          ...existing,
+          location: '',
+          findings: '',
+          date: '',
+          time: '',
+          continued: false,
+          charges: [],
+          testifiers: [],
+          writers: [],
+          caseReferences: [],
+          referencesLoaded: false,
+          referencesLoading: false,
+        }),
+        { queueSave: true },
+      );
+
       await Promise.all(
         caseItem.charges.map((charge) =>
           post(`/removeCharge?id=${charge.id}`, {
@@ -871,25 +954,6 @@ const EditMinutesPage = () => {
       await post(`/clearAllReferencedCases?case_id=${caseId}`, {
         errorMessage: 'Unable to clear referenced cases',
       });
-
-      updateCase(
-        caseId,
-        (existing) => ({
-          ...existing,
-          location: '',
-          findings: '',
-          date: '',
-          time: '',
-          continued: false,
-          charges: [],
-          testifiers: [],
-          writers: [],
-          caseReferences: [],
-          referencesLoaded: false,
-          referencesLoading: false,
-        }),
-        { queueSave: true },
-      );
     },
     [
       config.track_writer,
@@ -950,6 +1014,19 @@ const EditMinutesPage = () => {
     [mapCaseFromServer, meetingId, post],
   );
 
+  const handleRequestClearCase = useCallback(
+    (caseId) => {
+      const currentCases = casesRef.current;
+      const caseItem = currentCases.find((item) => item.id === caseId);
+      if (caseHasContent(caseItem)) {
+        setCaseToConfirmClear(caseId);
+        return;
+      }
+      handleClearCase(caseId);
+    },
+    [handleClearCase],
+  );
+
   const meetingTitle = config?.str_jc_name || 'RC';
   const printableUrl = window.initialData?.viewPrintableUrl;
   const meetingDate = window.initialData?.meetingDate || '';
@@ -995,54 +1072,304 @@ const EditMinutesPage = () => {
     [meetingId, post],
   );
 
-  const loadSidebarContent = useCallback(
-    async (url) => {
+  const closeInfoDialog = useCallback(() => {
+    setInfoDialog((prev) => ({ ...prev, open: false }));
+  }, []);
+
+  const enhanceHtmlContent = useCallback((rawHtml) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(rawHtml, 'text/html');
+
+    const firstHeading = doc.body.querySelector('h1, h2, h3, h4, h5, h6');
+    let headingText = null;
+    if (firstHeading) {
+      headingText = firstHeading.textContent.trim();
+      firstHeading.remove();
+    }
+
+    // Replace sortable anchors with spans so they don't look interactive
+    doc.body.querySelectorAll('th a').forEach((anchor) => {
+      const span = doc.createElement('span');
+      span.textContent = anchor.textContent;
+      anchor.replaceWith(span);
+    });
+
+    let tabs = null;
+    let activeTab = null;
+
+    const navTabs = doc.body.querySelector('.nav.nav-tabs');
+    const tabContainer = doc.body.querySelector('.tab-content');
+    if (navTabs && tabContainer) {
+      const links = Array.from(navTabs.querySelectorAll('a'));
+      tabs = links
+        .map((link, index) => {
+          const href = link.getAttribute('href') || '';
+          const id = href.startsWith('#') ? href.slice(1) : `tab-${index}`;
+          const label = link.textContent
+            .replace(/\.\.\./g, '')
+            .trim() || `Tab ${index + 1}`;
+          const pane = doc.getElementById(id);
+          const paneHtml = pane ? pane.innerHTML : '';
+          if (pane) {
+            pane.remove();
+          }
+          return {
+            id,
+            label,
+            html: paneHtml,
+          };
+        })
+        .filter((tab) => tab.html);
+
+      navTabs.remove();
+      tabContainer.remove();
+
+      if (tabs.length > 0) {
+        activeTab = tabs[0].id;
+      } else {
+        tabs = null;
+      }
+    }
+
+    return {
+      content: doc.body.innerHTML,
+      tabs,
+      activeTab,
+      heading: headingText,
+    };
+  }, []);
+
+  const showInfoDialog = useCallback(
+    async (title, url, options = {}) => {
       if (!url) {
         return;
       }
-      setSidebarLoading(true);
+      const { errorMessage = 'Unable to load information', useExtractedHeading = true } = options;
+
+      setInfoDialog((prev) => ({
+        ...prev,
+        open: true,
+        title,
+        content: '',
+        tabs: null,
+        activeTab: null,
+        loading: true,
+      }));
       try {
         const response = await get(url, {
-          errorMessage: 'Unable to load sidebar content',
+          errorMessage,
         });
         const html = await response.text();
-        setSidebarContent(html.replace(/<a\s+nosidebar/gi, '<a'));
-      } finally {
-        setSidebarLoading(false);
+        const enhanced = enhanceHtmlContent(html.replace(/<a\s+nosidebar/gi, '<a'));
+        const finalTitle =
+          (useExtractedHeading && enhanced.heading) || title || enhanced.heading || '';
+        setInfoDialog({
+          open: true,
+          title: finalTitle,
+          content: enhanced.content,
+          tabs: enhanced.tabs,
+          activeTab: enhanced.activeTab,
+          loading: false,
+        });
+      } catch (error) {
+        setInfoDialog({
+          open: true,
+          title: title || 'Details',
+          content: '<p>Unable to load information.</p>',
+          tabs: null,
+          activeTab: null,
+          loading: false,
+        });
       }
     },
-    [get],
+    [enhanceHtmlContent, get],
   );
 
   const showPersonHistory = useCallback(
-    (personId) => {
-      if (!personId) {
+    (person, caseId, caseNumber) => {
+      if (!person?.id) {
         return;
       }
-      loadSidebarContent(`/personHistory/${personId}`);
+      const title = caseId
+        ? `More details for Case ${caseNumber || caseId}`
+        : '';
+      showInfoDialog(title, `/personHistory/${person.id}`, {
+        useExtractedHeading: !caseId,
+      });
     },
-    [loadSidebarContent],
+    [showInfoDialog],
   );
 
   const showRuleHistory = useCallback(
-    (ruleId) => {
-      if (!ruleId) {
+    (rule) => {
+      if (!rule?.id) {
         return;
       }
-      loadSidebarContent(`/ruleHistory/${ruleId}`);
+      showInfoDialog('', `/ruleHistory/${rule.id}`);
     },
-    [loadSidebarContent],
+    [showInfoDialog],
   );
 
   const showPersonRuleHistory = useCallback(
-    (personId, ruleId) => {
+    (personId, ruleId, caseId, caseNumber) => {
       if (!personId || !ruleId) {
         return;
       }
-      loadSidebarContent(`/personRuleHistory/${personId}/${ruleId}`);
+      const title = caseId
+        ? `More details for Case ${caseNumber || caseId}`
+        : '';
+      showInfoDialog(title, `/personRuleHistory/${personId}/${ruleId}`, {
+        useExtractedHeading: !caseId,
+      });
     },
-    [loadSidebarContent],
+    [showInfoDialog],
   );
+
+  const infoMainContentRef = useRef(null);
+  const infoTabContentRef = useRef(null);
+
+  const handleInfoContentClick = useCallback(
+    (event) => {
+      const link = event.target.closest('a');
+      if (!link) {
+        return;
+      }
+
+      const href = link.getAttribute('href');
+      if (href && href.startsWith('#')) {
+        event.preventDefault();
+        const tabId = href.slice(1);
+        setInfoDialog((prev) => {
+          if (prev.tabs?.some((tab) => tab.id === tabId)) {
+            return { ...prev, activeTab: tabId };
+          }
+          return prev;
+        });
+        return;
+      }
+
+      if (link.classList.contains('more-info')) {
+        event.preventDefault();
+        const personId = link.getAttribute('data-person-id');
+        const ruleId = link.getAttribute('data-rule-id');
+        if (personId && ruleId) {
+          showPersonRuleHistory(personId, ruleId);
+        }
+      }
+    },
+    [showPersonRuleHistory],
+  );
+
+  useEffect(() => {
+    const cleanupFns = [];
+
+    const initSortableTables = (root) => {
+      if (!root) {
+        return;
+      }
+
+      const tables = root.querySelectorAll('table');
+
+      tables.forEach((table) => {
+        const headers = table.querySelectorAll('th');
+        headers.forEach((th, index) => {
+          const classList = Array.from(th.classList);
+          const sortType = classList.includes('sorttable_numeric')
+            ? 'numeric'
+            : classList.includes('sorttable_school_mmdd')
+            ? 'date'
+            : classList.includes('sorttable_alpha')
+            ? 'alpha'
+            : null;
+
+          if (!sortType) {
+            return;
+          }
+
+          th.style.cursor = 'pointer';
+
+          let indicator = th.querySelector('.sort-indicator');
+          if (!indicator) {
+            indicator = document.createElement('span');
+            indicator.className = 'sort-indicator';
+            indicator.style.marginLeft = '4px';
+            th.appendChild(indicator);
+          }
+
+          const handleSort = () => {
+            const tbody = table.tBodies[0] || table;
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+
+            if (rows.length === 0) {
+              return;
+            }
+
+            const currentDirection = th.dataset.sortDirection || 'none';
+            const nextDirection = currentDirection === 'asc' ? 'desc' : 'asc';
+
+            Array.from(table.querySelectorAll('th')).forEach((header) => {
+              header.dataset.sortDirection = 'none';
+              const span = header.querySelector('.sort-indicator');
+              if (span) {
+                span.textContent = '';
+              }
+            });
+
+            th.dataset.sortDirection = nextDirection;
+            indicator.textContent = nextDirection === 'asc' ? '▲' : '▼';
+
+            const getCellValue = (row) => {
+              const cell = row.cells[index];
+              if (!cell) {
+                return '';
+              }
+              return cell.textContent.trim();
+            };
+
+            const compare = (a, b) => {
+              const valueA = getCellValue(a);
+              const valueB = getCellValue(b);
+
+              if (sortType === 'numeric') {
+                const numA = parseFloat(valueA.replace(/[^0-9.-]+/g, '')) || 0;
+                const numB = parseFloat(valueB.replace(/[^0-9.-]+/g, '')) || 0;
+                return numA - numB;
+              }
+
+              if (sortType === 'date') {
+                const dateA = new Date(valueA);
+                const dateB = new Date(valueB);
+                const timeA = Number.isNaN(dateA.getTime()) ? 0 : dateA.getTime();
+                const timeB = Number.isNaN(dateB.getTime()) ? 0 : dateB.getTime();
+                return timeA - timeB;
+              }
+
+              return valueA.localeCompare(valueB, undefined, { sensitivity: 'base' });
+            };
+
+            rows
+              .sort((rowA, rowB) => {
+                const result = compare(rowA, rowB);
+                return nextDirection === 'asc' ? result : -result;
+              })
+              .forEach((row) => tbody.appendChild(row));
+          };
+
+          th.addEventListener('click', handleSort);
+          cleanupFns.push(() => th.removeEventListener('click', handleSort));
+        });
+      });
+    };
+
+    if (infoDialog.open) {
+      initSortableTables(infoMainContentRef.current);
+      initSortableTables(infoTabContentRef.current);
+    }
+
+    return () => {
+      cleanupFns.forEach((cleanup) => cleanup());
+    };
+  }, [infoDialog.open, infoDialog.content, infoDialog.activeTab]);
 
   const fetchLastResolutionPlan = useCallback(
     async (personId, ruleId) => {
@@ -1068,77 +1395,50 @@ const EditMinutesPage = () => {
     };
   }, [beforeUnloadHandler]);
 
-  return (
-    <Box
-      sx={{
-        display: 'flex',
-        gap: 3,
-        alignItems: 'flex-start',
-        flexWrap: 'wrap',
-      }}
-    >
-      <Box
-        sx={{
-          flex: '1 1 720px',
-          minWidth: '60%',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 3,
-        }}
-      >
-        <Card>
-          <CardHeader
-            title={
-              <Stack
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
-                spacing={2}
-              >
-                <Typography variant="h5">
-                  {meetingTitle} Minutes — {meetingDate}
-                </Typography>
-                <Button
-                  variant="contained"
-                  onClick={() => {
-                    if (printableUrl) {
-                      window.location.href = printableUrl;
-                    }
-                  }}
-                >
-                  View printable minutes
-                </Button>
-              </Stack>
-            }
-          />
-          <CardContent>
-            <Stack spacing={1.5}>
-              <Typography variant="body2" color="text.secondary">
-                Changes save automatically.
-              </Typography>
-              <Typography
-                variant="body2"
-                color={pendingSaveCount > 0 ? 'warning.main' : 'success.main'}
-              >
-                {pendingSaveCount > 0
-                  ? `Saving ${pendingSaveCount} change${
-                      pendingSaveCount === 1 ? '' : 's'
-                    }…`
-                  : 'All changes saved.'}
-              </Typography>
-            </Stack>
-          </CardContent>
-        </Card>
+  const hasSaved = hasSavedRef.current;
+  let statusText = 'All changes saved automatically.';
+  let statusColor = 'text.secondary';
+  if (pendingSaveCount > 0 || saveStatus === 'saving') {
+    statusText = 'Saving…';
+    statusColor = 'warning.main';
+  } else if (saveStatus === 'saved' && hasSaved) {
+    statusText = 'All changes saved.';
+    statusColor = 'success.main';
+  }
 
-        <Card>
+  return (
+    <PageWrapper surface>
+      <Stack spacing={3}>
+        <Stack spacing={1}>
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <PageTitle>{meetingTitle} Minutes — {meetingDate}</PageTitle>
+          <Button
+            variant="contained"
+            onClick={() => {
+              if (printableUrl) {
+                window.location.href = printableUrl;
+              }
+            }}
+          >
+            View printable minutes
+          </Button>
+        </Stack>
+        <Typography variant="body2" color={statusColor}>
+          {statusText}
+        </Typography>
+      </Stack>
+
+      <Card>
           <CardHeader title="Committee & Roles" />
           <CardContent>
             <Stack
               direction="row"
               flexWrap="wrap"
-              columnGap={2}
+              spacing={0}
               rowGap={{ xs: 1, md: 2 }}
+              columnGap={{ xs: 0, md: 2 }}
               sx={{
+                mt: 0,
                 '& > *': {
                   flex: {
                     xs: '1 1 100%',
@@ -1167,6 +1467,7 @@ const EditMinutesPage = () => {
                 placeholder="Search people"
                 size="medium"
                 fullWidth
+                showClearButton
               />
               <SelectInput
                 autocomplete
@@ -1187,6 +1488,7 @@ const EditMinutesPage = () => {
                 placeholder="Search people"
                 size="medium"
                 fullWidth
+                showClearButton
               />
               <SelectInput
                 autocomplete
@@ -1207,6 +1509,7 @@ const EditMinutesPage = () => {
                 placeholder="Search people"
                 size="medium"
                 fullWidth
+                showClearButton
               />
               <SelectInput
                 autocomplete
@@ -1225,6 +1528,7 @@ const EditMinutesPage = () => {
                 placeholder="Search people"
                 size="medium"
                 fullWidth
+                showClearButton
               />
               <SelectInput
                 autocomplete
@@ -1243,11 +1547,13 @@ const EditMinutesPage = () => {
                 placeholder="Search people"
                 size="medium"
                 fullWidth
+                showClearButton
               />
             </Stack>
           </CardContent>
         </Card>
 
+      <Stack spacing={3}>
         {meetingCases.map((caseItem) => (
           <CaseCard
             key={caseItem.id}
@@ -1270,96 +1576,67 @@ const EditMinutesPage = () => {
             onRemoveReferencedCase={handleRemoveReferencedCase}
             onToggleReferencedCharge={handleToggleReferencedCharge}
             onGenerateChargeFromReference={handleGenerateChargeFromReference}
-            onRequestClearCase={setCaseToConfirmClear}
+            onRequestClearCase={handleRequestClearCase}
             onRefreshReferences={refreshCaseReferences}
+            onShowPersonHistory={showPersonHistory}
+            onShowRuleHistory={showRuleHistory}
             onShowPersonRuleHistory={showPersonRuleHistory}
             fetchLastResolutionPlan={fetchLastResolutionPlan}
           />
         ))}
+      </Stack>
 
-        <Stack direction="row" spacing={2} justifyContent="flex-start">
-          <Button variant="contained" onClick={handleAddNewCase}>
-            {messages.addNewCase || 'Add new case'}
-          </Button>
-        </Stack>
+      <Stack direction="row" spacing={2} justifyContent="flex-start">
+        <Button variant="contained" onClick={handleAddNewCase}>
+          {messages.addNewCase || 'Add new case'}
+        </Button>
+      </Stack>
 
-        {visibleOpenCases.length > 0 && (
-          <Card>
-            <CardHeader
-              title={messages.casesToBeContinued || 'Cases to be continued'}
-            />
-            <CardContent>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                {messages.chooseCaseToContinue || 'Choose a case to continue'}
-              </Typography>
-              <Stack spacing={1.5}>
-                {visibleOpenCases.map((openCase) => (
-                  <Paper
-                    key={openCase.id}
-                    sx={{
-                      p: 1.5,
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                    }}
+      {visibleOpenCases.length > 0 && (
+        <Card>
+          <CardHeader
+            title={messages.casesToBeContinued || 'Cases to be continued'}
+          />
+          <CardContent>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+              {messages.chooseCaseToContinue || 'Choose a case to continue'}
+            </Typography>
+            <Stack spacing={1.5}>
+              {visibleOpenCases.map((openCase) => (
+                <Paper
+                  key={openCase.id}
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Box>
+                    <Typography variant="subtitle2">
+                      {openCase.caseNumber}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {[openCase.location, openCase.findings]
+                        .filter(Boolean)
+                        .map((text) =>
+                          text.length > 80 ? `${text.slice(0, 80)}…` : text,
+                        )
+                        .join(' • ')}
+                    </Typography>
+                  </Box>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={() => handleContinueCase(openCase.id)}
                   >
-                    <Box>
-                      <Typography variant="subtitle2">
-                        {openCase.caseNumber}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {[openCase.location, openCase.findings]
-                          .filter(Boolean)
-                          .map((text) =>
-                            text.length > 80 ? `${text.slice(0, 80)}…` : text,
-                          )
-                          .join(' • ')}
-                      </Typography>
-                    </Box>
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      onClick={() => handleContinueCase(openCase.id)}
-                    >
-                      Continue
-                    </Button>
-                  </Paper>
-                ))}
-              </Stack>
-            </CardContent>
-          </Card>
-        )}
-      </Box>
-
-      <Box
-        sx={{
-          flex: '0 0 320px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 2,
-        }}
-      >
-        <Paper sx={{ p: 2, minHeight: 320 }}>
-          {sidebarLoading ? (
-            <Typography variant="body2">Loading…</Typography>
-          ) : (
-            <div
-              onClick={(event) => {
-                const infoLink = event.target.closest('.more-info');
-                if (infoLink) {
-                  event.preventDefault();
-                  const personId = infoLink.getAttribute('data-person-id');
-                  const ruleId = infoLink.getAttribute('data-rule-id');
-                  if (personId && ruleId) {
-                    showPersonRuleHistory(personId, ruleId);
-                  }
-                }
-              }}
-              dangerouslySetInnerHTML={{ __html: sidebarContent }}
-            />
-          )}
-        </Paper>
-      </Box>
+                    Continue
+                  </Button>
+                </Paper>
+              ))}
+            </Stack>
+          </CardContent>
+        </Card>
+      )}
 
       <DeleteDialog
         open={Boolean(caseToConfirmClear)}
@@ -1381,7 +1658,86 @@ const EditMinutesPage = () => {
           }
         }}
       />
-    </Box>
+
+      <DeleteDialog
+        open={Boolean(chargeToConfirmDelete)}
+        title={messages.removeCharge || 'Remove charge'}
+        message={
+          messages.confirmDeleteCharge ||
+          'This charge has details entered. Are you sure you want to remove it?'
+        }
+        handleClose={() => setChargeToConfirmDelete(null)}
+        handleConfirm={async () => {
+          if (!chargeToConfirmDelete) {
+            setChargeToConfirmDelete(null);
+            return;
+          }
+          try {
+            await removeChargeImmediate(
+              chargeToConfirmDelete.caseId,
+              chargeToConfirmDelete.chargeId,
+            );
+          } finally {
+            setChargeToConfirmDelete(null);
+          }
+        }}
+      />
+
+      <InfoModal
+        open={infoDialog.open}
+        onClose={closeInfoDialog}
+        title={infoDialog.title}
+      >
+        {infoDialog.loading ? (
+          <Typography>Loading…</Typography>
+        ) : (
+          <Stack spacing={2}>
+            {infoDialog.content && (
+              <Box
+                ref={infoMainContentRef}
+                variant="richText"
+                onClick={handleInfoContentClick}
+                dangerouslySetInnerHTML={{ __html: infoDialog.content }}
+              />
+            )}
+            {infoDialog.tabs && infoDialog.tabs.length > 0 && (
+              <Stack spacing={1}>
+                <Stack direction="row" spacing={1}>
+                  {infoDialog.tabs.map((tab) => (
+                    <Button
+                      key={tab.id}
+                      size="small"
+                      variant={infoDialog.activeTab === tab.id ? 'contained' : 'outlined'}
+                      onClick={() =>
+                        setInfoDialog((prev) => ({
+                          ...prev,
+                          activeTab: tab.id,
+                        }))
+                      }
+                    >
+                      {tab.label}
+                    </Button>
+                  ))}
+                </Stack>
+                {infoDialog.activeTab && (
+                  <Box
+                    ref={infoTabContentRef}
+                    variant="richText"
+                    onClick={handleInfoContentClick}
+                    dangerouslySetInnerHTML={{
+                      __html:
+                        infoDialog.tabs.find((tab) => tab.id === infoDialog.activeTab)?.html ||
+                        '',
+                    }}
+                  />
+                )}
+              </Stack>
+            )}
+          </Stack>
+        )}
+      </InfoModal>
+      </Stack>
+    </PageWrapper>
   );
 };
 

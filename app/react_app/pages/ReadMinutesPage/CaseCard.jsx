@@ -85,7 +85,7 @@ const CaseCard = ({ caseItem, config, messages, roleIds }) => {
             <>
               {personName !== '???' ? ': ' : ''}
               {ruleTitle}
-              {ruleTitle.trim().endsWith('.') ? '' : '.'}
+              {ruleTitle.trim().endsWith('.') ? '' : '.'}{' '}
             </>
           )}
           {severitySuffix}
@@ -129,7 +129,7 @@ const CaseCard = ({ caseItem, config, messages, roleIds }) => {
           {formatCaseDateTime(caseItem) || '—'} | Location: {formatLocation(caseItem.location)}
         </Typography>
       </Box>
-      <Stack spacing={1} sx={{ mt: 1 }}>
+      <Stack spacing={1} variant="section">
           {boolFromConfig(config.track_writer) && (
             <Typography>
               <strong>Writers:</strong>{' '}

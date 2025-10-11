@@ -18,3 +18,4 @@ export {
   normalizeOption,
   buildOptionMap,
 } from './minutesUtils';
+export { combineSx } from './sxUtils';

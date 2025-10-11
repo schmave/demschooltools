@@ -15,20 +15,16 @@ const CaseReferences = ({ caseId, references, config, onToggleReferencedCharge, 
   );
 
   if (filteredReferences.length === 0) {
-    return (
-      <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-        No referenced cases selected.
-      </Typography>
-    );
+    return null;
   }
 
   return (
-    <Stack spacing={2} sx={{ mt: 1 }}>
+    <Stack spacing={2} variant="section">
+      <Typography sx={{ fontWeight: 600 }}>Referenced cases</Typography>
       {filteredReferences.map((reference) => (
         <Paper
           key={reference.id}
           sx={{
-            p: 1.5,
             borderRadius: 1,
           }}
         >
@@ -36,7 +32,7 @@ const CaseReferences = ({ caseId, references, config, onToggleReferencedCharge, 
           <Typography variant="body2" color="text.secondary">
             {reference.findings}
           </Typography>
-          <Stack spacing={1.5} sx={{ mt: 1 }}>
+          <Stack spacing={1.5} variant="section">
             {reference.charges.map((charge) => {
               const chargeLabelPrefix = charge.is_sm_decision
                 ? 'and School Meeting decided on'
@@ -50,7 +46,6 @@ const CaseReferences = ({ caseId, references, config, onToggleReferencedCharge, 
                     border: '1px dashed',
                     borderColor: charge.isReferenced ? 'success.light' : 'divider',
                     borderRadius: 1,
-                    p: 1,
                   }}
                 >
                   <FormControlLabel
@@ -74,7 +69,7 @@ const CaseReferences = ({ caseId, references, config, onToggleReferencedCharge, 
                       </Typography>
                     }
                   />
-                  <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.5 }}>
+                  <Stack direction="row" spacing={1} variant="row" sx={{ mt: 0.5 }}>
                     {!charge.has_generated ? (
                       <Button size="small" onClick={() => onGenerateCharge(caseId, charge)}>
                         Generate charge
