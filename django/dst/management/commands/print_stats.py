@@ -25,7 +25,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, year=0, **kwargs):
         assert year > 2010, year
-        print(f"Data for school year {year}-{year+1}")
+        print(f"Data for school year {year}-{year + 1}")
 
         start_date = datetime(year, 8, 1)
         oct_first = start_date.replace(month=10)
@@ -78,7 +78,7 @@ class Command(BaseCommand):
                         person__organization=org, day__gte=start_date, day__lte=end_date
                     ).count(),
                     Swipe.objects.filter(
-                        student__person__organization=org,
+                        person__organization=org,
                         swipe_day__gte=start_date,
                         swipe_day__lte=end_date,
                     ).count(),
