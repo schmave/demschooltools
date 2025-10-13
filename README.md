@@ -23,7 +23,7 @@ You'll need to run three separate programs for each of the parts of the site.
 
 1.  [Download](http://www.postgresql.org/download/) and install PostgreSQL. If you use a Mac, I recommend installing [the "Postgres" app](https://postgresapp.com/) instead.
 
-1.  [Download](https://nodejs.org/en/download/releases/) and install Node v18.
+1.  [Download](https://nodejs.org/en/download/releases/) and install Node v22. If you use Mac or Linux or Windows WSL, I recommend using [nvm](https://github.com/nvm-sh/nvm/blob/master/README.md#about) to install it.
 
 1.  Run `npm install` to install the Javascript libraries.
 
