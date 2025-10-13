@@ -2,7 +2,7 @@ const path = require("path");
 
 const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 
-const DEV_SERVER_PORT = 8081;
+const DEV_SERVER_PORT = 8082;
 
 module.exports = function (env, argv) {
   const isDevelopment = argv.mode !== "production";
