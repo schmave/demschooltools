@@ -2,7 +2,6 @@ import ReactRefreshWebpackPlugin from "@pmmmwh/react-refresh-webpack-plugin";
 import ESLintPlugin from "eslint-webpack-plugin";
 import { resolve as _resolve, dirname, join } from "path";
 import { fileURLToPath } from "url";
-import ReactRefreshBabelPlugin from 'react-refresh/babel';
 
 const DEV_SERVER_PORT = 8082;
 
@@ -64,7 +63,7 @@ export default function (env, argv) {
             {
               loader: "babel-loader",
               options: {
-                plugins: [isDevelopment && ReactRefreshBabelPlugin].filter(
+                plugins: [isDevelopment && "react-refresh/babel"].filter(
                   Boolean,
                 ),
                 presets: [
@@ -88,7 +87,7 @@ export default function (env, argv) {
       ],
     },
     resolve: {
-      extensions: ["", ".js", ".jsx"],
+      extensions: [".js", ".jsx"],
       fallback: {
         path: false,
         fs: false,
@@ -101,12 +100,14 @@ export default function (env, argv) {
         failOnError: true, // This makes webpack fail on ESLint errors
         failOnWarning: false, // Set to true if you want warnings to fail the build too
       }),
-      // isDevelopment &&
-      //   new ReactRefreshWebpackPlugin({
-      //     overlay: {
-      //       sockPort: DEV_SERVER_PORT,
-      //     },
-      //   }),
+      isDevelopment &&
+        new ReactRefreshWebpackPlugin({
+          overlay: {
+            sockPort: DEV_SERVER_PORT,
+          },
+          esModule: true,
+          exclude: /node_modules/,
+        }),
     ].filter(Boolean),
   };
 }
