@@ -8,6 +8,7 @@ const dayjs = require("dayjs");
 
 class StudentEditor extends React.Component {
   constructor(props) {
+    console.log("new studenteditor");
     super(props);
     this.dispatchToken = dispatcher.register((action) => {
       if (
@@ -22,6 +23,7 @@ class StudentEditor extends React.Component {
       saving: false,
       student: { start_date: null },
       startdate_datepicker: null,
+      show_modal: false,
     };
   }
 
@@ -45,7 +47,6 @@ class StudentEditor extends React.Component {
   saveChange = (e) => {
     e.preventDefault();
     this.savingShow();
-    const { startdate_datepicker } = this.state;
     actionCreator
       .updateStudent(
         this.state.student._id,
@@ -57,17 +58,17 @@ class StudentEditor extends React.Component {
 
   edit = (student) => {
     const s = Object.assign({}, student);
+    console.log("opening");
     this.setState({
       student: s,
       startdate_datepicker: s.start_date ? dayjs(s.start_date) : null,
+      show_modal: true,
     });
-    this.refs.studentEditor.show();
   };
 
   close = () => {
-    if (this.refs.studentEditor) {
-      this.refs.studentEditor.hide();
-    }
+    console.log("closing");
+    this.setState({ show_modal: false });
   };
 
   handleDateChange = (e) => {
@@ -86,7 +87,11 @@ class StudentEditor extends React.Component {
   render() {
     return (
       <div className="row">
-        <Modal ref="studentEditor" title={`Edit ${this.state.student.name}`}>
+        <Modal
+          open={this.state.show_modal}
+          onClose={this.close}
+          title={`Edit ${this.state.student.name}`}
+        >
           {this.state.saving ? (
             <div>
               <p style={{ textAlign: "center" }}>

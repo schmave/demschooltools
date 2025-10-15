@@ -1,9 +1,10 @@
 import React, { Component } from "react";
 import { render as _render } from "react-dom";
-import { IndexRoute, Route, Router } from "react-router";
+import { Route } from "react-router";
+import { HashRouter } from "react-router";
+import { Routes } from "react-router";
 
 import Flash from "./flashnotification.jsx";
-import myhistory from "./myhistory.js";
 import Nav from "./nav.jsx";
 import "./polyfill.js";
 import Student from "./student.jsx";
@@ -22,16 +23,17 @@ class App extends Component {
   }
 }
 
-var router = (
-  <Router history={myhistory}>
-    <Route path="/" component={App}>
+const root = document.getElementById("react_container");
+
+ReactDOM.createRoot(root).render(
+  <HashRouter>
+    <Routes>
+      <Route path="/" component={App} />
       <Route path="students" component={StudentTable} />
       <Route path="students/:studentId(/:day)" component={Student} />
       <Route path="reports" component={StudentReports} />
 
-      <IndexRoute component={StudentTable} />
-    </Route>
-  </Router>
+      <Route index component={StudentTable} />
+    </Routes>
+  </HashRouter>,
 );
-
-_render(router, document.getElementById("react_container"));

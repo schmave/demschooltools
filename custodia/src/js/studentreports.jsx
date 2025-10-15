@@ -1,5 +1,8 @@
+// const Griddle = require("griddle-react");
+// import { DataGrid, GridColDef } from "@mui/x-data-grid";
+
 const React = require("react");
-const Griddle = require("griddle-react");
+
 const dayjs = require("dayjs");
 
 const reportStore = require("./reportstore");
@@ -245,4 +248,4 @@ class StudentReports extends React.Component {
   }
 }
 
-module.exports = StudentReports;
+export { StudentReports as default };

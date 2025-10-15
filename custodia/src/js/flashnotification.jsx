@@ -1,6 +1,6 @@
 var React = require("react"),
   store = require("./flashnotificationstore"),
-  Notification = require("react-notification-system"),
+  // Notification = require("react-notification-system"),
   constants = require("./appconstants");
 
 class FlashNotification extends React.Component {
@@ -22,7 +22,8 @@ class FlashNotification extends React.Component {
   };
 
   render() {
-    return <Notification ref="notifications" />;
+    return null;
+    // return <Notification ref="notifications" />;
   }
 }
 
