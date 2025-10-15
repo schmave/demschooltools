@@ -1,7 +1,7 @@
 import React from "react";
 
 import AdminItem from "./adminwrapper.jsx";
-import * as actionCreator from "./studentactioncreator";
+import * as actionCreator from "./studentactioncreator.js";
 
 class SwipesListing extends React.Component {
   getCurrentDay = (student, dayString) => {

@@ -1,18 +1,17 @@
-var React = require("react"),
-  store = require("./flashnotificationstore"),
-  // Notification = require("react-notification-system"),
-  constants = require("./appconstants");
+import { Component } from "react";
+import { addChangeListener, getLatest } from "./flashnotificationstore.js";
+// import { Notification } from "react-notification-system";
 
-class FlashNotification extends React.Component {
+class FlashNotification extends Component {
   state = { showing: false };
 
   componentDidMount() {
-    store.addChangeListener(this._onChange);
+    addChangeListener(this._onChange);
     this.notifications = this.refs.notifications;
   }
 
   _onChange = () => {
-    var message = store.getLatest();
+    var message = getLatest();
     if (message) {
       this.notifications.addNotification({
         message: message.message,
@@ -27,4 +26,4 @@ class FlashNotification extends React.Component {
   }
 }
 
-module.exports = FlashNotification;
+export default FlashNotification;

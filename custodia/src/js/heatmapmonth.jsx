@@ -28,7 +28,6 @@ class HeatmapMonth extends React.Component {
 
     const doUpdate = this.map !== null;
     if (!doUpdate) {
-      // eslint-disable-next-line new-cap
       this.map = new heatmap();
     }
 
@@ -48,7 +47,7 @@ class HeatmapMonth extends React.Component {
     } else {
       this.map.init({
         itemSelector: selector,
-        onClick: function (d, nb) {
+        onClick: function (d) {
           $(makeDateId(d))[0]?.click();
         },
         data,

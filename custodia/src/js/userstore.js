@@ -1,6 +1,6 @@
 import { EventEmitter } from "events";
 
-import ajax from "./ajaxhelper";
+import ajax from "./ajaxhelper.js";
 
 var isAdmin;
 var users = [];

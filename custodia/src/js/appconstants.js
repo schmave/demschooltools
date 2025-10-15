@@ -1,4 +1,4 @@
-const exports = {
+export default {
   studentEvents: {
     LOADED: "STUDENTEVENTS.LOADED",
     STUDENT_LOADED: "STUDENTEVENTS.STUDENTLOADED",
@@ -24,5 +24,3 @@ const exports = {
     PERIOD_DELETED: "REPORTEVENT.PERIOD_DELETED",
   },
 };
-
-export default exports;

@@ -1,7 +1,7 @@
-import constants from "./appconstants";
-import dispatcher from "./appdispatcher";
-import base from "./storebase";
-import * as actionCreator from "./studentactioncreator";
+import constants from "./appconstants.js";
+import dispatcher from "./appdispatcher.js";
+import base from "./storebase.js";
+import * as actionCreator from "./studentactioncreator.js";
 
 let students;
 const studentDetails = {};

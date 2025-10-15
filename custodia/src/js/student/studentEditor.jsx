@@ -2,10 +2,10 @@ import dayjs from "dayjs";
 import React from "react";
 import ReactDOM from "react-dom";
 
-import constants from "../appconstants";
-import dispatcher from "../appdispatcher";
+import constants from "../appconstants.js";
+import dispatcher from "../appdispatcher.js";
 import Modal from "../modal.jsx";
-import * as actionCreator from "../studentactioncreator";
+import * as actionCreator from "../studentactioncreator.js";
 
 class StudentEditor extends React.Component {
   constructor(props) {

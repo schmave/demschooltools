@@ -3,9 +3,7 @@ import React from "react";
 import studentStore from "./StudentStore";
 import SwipeHelpers from "./swipeHelpers.jsx";
 
-export default class extends React.Component {
-  static displayName = "StudentTable";
-
+export default class StudentTable extends React.Component {
   state = { students: studentStore.getStudents(true) };
 
   componentDidMount() {
@@ -67,7 +65,8 @@ export default class extends React.Component {
     const calendar_button = (
       <div
         onClick={function () {
-          myhistory.push("/students/" + student._id);
+          // TODO
+          // myhistory.push("/students/" + student._id);
         }}
         className={calendar_button_class}
       >

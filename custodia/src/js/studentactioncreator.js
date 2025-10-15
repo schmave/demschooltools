@@ -1,6 +1,6 @@
-import ajax from "./ajaxhelper";
-import constants from "./appconstants";
-import dispatcher from "./appdispatcher";
+import ajax from "./ajaxhelper.js";
+import constants from "./appconstants.js";
+import dispatcher from "./appdispatcher.js";
 
 export const loadStudents = () => {
   ajax
@@ -59,7 +59,8 @@ export const swipeStudent = function (student, direction, overrideTime) {
           message: student.name + " swiped successfully!",
         });
       }
-      myhistory.replace("/students");
+      // TODO
+      // myhistory.replace("/students");
     });
 };
 export const markAbsent = function (student) {

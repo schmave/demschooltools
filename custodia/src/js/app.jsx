@@ -1,8 +1,6 @@
-import React, { Component } from "react";
-import { render as _render } from "react-dom";
-import { Route } from "react-router";
-import { HashRouter } from "react-router";
-import { Routes } from "react-router";
+import { Component } from "react";
+import { HashRouter, Route, Routes, Outlet } from "react-router-dom";
+import ReactDOM from "react-dom/client";
 
 import Flash from "./flashnotification.jsx";
 import Nav from "./nav.jsx";
@@ -17,7 +15,7 @@ class App extends Component {
       <div>
         <Nav />
         <Flash />
-        <div className="content">{this.props.children}</div>
+        <div className="content"><Outlet /></div>
       </div>
     );
   }
@@ -28,12 +26,12 @@ const root = document.getElementById("react_container");
 ReactDOM.createRoot(root).render(
   <HashRouter>
     <Routes>
-      <Route path="/" component={App} />
-      <Route path="students" component={StudentTable} />
-      <Route path="students/:studentId(/:day)" component={Student} />
-      <Route path="reports" component={StudentReports} />
-
-      <Route index component={StudentTable} />
+      <Route element={<App/>}>
+        <Route index element={<StudentTable/>} />
+        <Route path="students" element={<StudentTable/>} />
+        <Route path="students/:studentId(/:day)" element={<Student/>} />
+        <Route path="reports" element={<StudentReports/>} />
+      </Route>
     </Routes>
-  </HashRouter>,
+  </HashRouter>
 );

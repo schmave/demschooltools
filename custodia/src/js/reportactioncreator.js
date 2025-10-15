@@ -1,6 +1,6 @@
-import ajax from "./ajaxhelper";
-import constants from "./appconstants";
-import dispatcher from "./appdispatcher";
+import ajax from "./ajaxhelper.js";
+import constants from "./appconstants.js";
+import dispatcher from "./appdispatcher.js";
 
 const exports = {
   loadSchoolYears: function () {

@@ -4,7 +4,7 @@ import { Link } from "react-router";
 import studentStore from "./StudentStore";
 import Heatmap from "./heatmap.jsx";
 import StudentEditor from "./student/studentEditor.jsx";
-import * as actionCreator from "./studentactioncreator";
+import * as actionCreator from "./studentactioncreator.js";
 import SwipeHelpers from "./swipeHelpers.jsx";
 import SwipesListing from "./swipeslisting.jsx";
 import userStore from "./userstore";
@@ -13,7 +13,7 @@ const groupingFunc = function (data) {
   return data.day.split("-")[0] + "-" + data.day.split("-")[1];
 };
 
-class Student extends React.Component {
+export default class Student extends React.Component {
   constructor(props) {
     super(props);
     const studentId = props.params.studentId;
@@ -296,5 +296,3 @@ class Student extends React.Component {
     });
   };
 }
-
-export default Student;

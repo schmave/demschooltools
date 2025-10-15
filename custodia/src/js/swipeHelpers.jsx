@@ -1,10 +1,10 @@
 import dayjs from "dayjs";
 import React from "react";
 
-import constants from "./appconstants";
-import dispatcher from "./appdispatcher";
+import constants from "./appconstants.js";
+import dispatcher from "./appdispatcher.js";
 import Modal from "./modal.jsx";
-import * as actionCreator from "./studentactioncreator";
+import * as actionCreator from "./studentactioncreator.js";
 import userStore from "./userstore";
 
 export default class SwipeHelpers extends React.Component {

@@ -1,20 +1,25 @@
-const path = require("path");
-
-const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
+import ReactRefreshWebpackPlugin from "@pmmmwh/react-refresh-webpack-plugin";
+import ESLintPlugin from "eslint-webpack-plugin";
+import { resolve as _resolve, dirname, join } from "path";
+import { fileURLToPath } from "url";
+import ReactRefreshBabelPlugin from 'react-refresh/babel';
 
 const DEV_SERVER_PORT = 8082;
 
-module.exports = function (env, argv) {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+export default function (env, argv) {
   const isDevelopment = argv.mode !== "production";
   return {
     mode: isDevelopment ? "development" : "production",
     devtool: "source-map",
-    context: path.join(__dirname, "/src"),
+    context: join(__dirname, "/src"),
     entry: {
       custodia: "./js/app.jsx",
     },
     output: {
-      path: path.resolve(__dirname, "..", "django", "static", "js"),
+      path: _resolve(__dirname, "..", "django", "static", "js"),
     },
     devServer: {
       client: {
@@ -59,7 +64,9 @@ module.exports = function (env, argv) {
             {
               loader: "babel-loader",
               options: {
-                plugins: [isDevelopment && require.resolve("react-refresh/babel")].filter(Boolean),
+                plugins: [isDevelopment && ReactRefreshBabelPlugin].filter(
+                  Boolean,
+                ),
                 presets: [
                   [
                     "@babel/preset-env",
@@ -88,12 +95,18 @@ module.exports = function (env, argv) {
       },
     },
     plugins: [
-      isDevelopment &&
-        new ReactRefreshWebpackPlugin({
-          overlay: {
-            sockPort: DEV_SERVER_PORT,
-          },
-        }),
+      new ESLintPlugin({
+        extensions: ["js", "jsx"],
+        context: join(__dirname, "/src"),
+        failOnError: true, // This makes webpack fail on ESLint errors
+        failOnWarning: false, // Set to true if you want warnings to fail the build too
+      }),
+      // isDevelopment &&
+      //   new ReactRefreshWebpackPlugin({
+      //     overlay: {
+      //       sockPort: DEV_SERVER_PORT,
+      //     },
+      //   }),
     ].filter(Boolean),
   };
-};
+}

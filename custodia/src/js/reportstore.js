@@ -1,7 +1,7 @@
-import constants from "./appconstants";
-import dispatcher from "./appdispatcher";
-import actionCreator from "./reportactioncreator";
-import base from "./storebase";
+import constants from "./appconstants.js";
+import dispatcher from "./appdispatcher.js";
+import actionCreator from "./reportactioncreator.js";
+import base from "./storebase.js";
 
 let reports = {};
 let schoolYears;

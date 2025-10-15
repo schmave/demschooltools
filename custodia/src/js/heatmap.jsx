@@ -26,7 +26,7 @@ export default class Heatmap extends React.Component {
 
     // Defer rendering the heatmaps so that the initial page load can take
     // place without waiting for them.
-    setTimeout(() => {
+    window.setTimeout(() => {
       this.setState({ mounted: true });
     }, 0);
   }

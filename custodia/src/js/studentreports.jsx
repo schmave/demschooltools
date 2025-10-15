@@ -1,15 +1,12 @@
+import React from "react";
 // const Griddle = require("griddle-react");
 // import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
-const React = require("react");
+import dayjs from "dayjs";
 
-const dayjs = require("dayjs");
-
-const reportStore = require("./reportstore");
-const Modal = require("./modal.jsx");
-const Router = require("react-router");
-const Link = Router.Link;
-const actionCreator = require("./reportactioncreator");
+import reportStore from "./reportstore";
+import Modal from "./modal.jsx";
+import actionCreator from "./reportactioncreator.js";
 
 // Table data as a list of array.
 const getState = function () {
@@ -62,7 +59,7 @@ class StudentLinkComponent extends React.Component {
   }
 }
 
-class StudentReports extends React.Component {
+export default class StudentReports extends React.Component {
   state = getState();
 
   componentDidMount() {
@@ -75,7 +72,7 @@ class StudentReports extends React.Component {
     reportStore.removeChangeListener(this.onReportChange);
   }
 
-  onReportChange = (x) => {
+  onReportChange = () => {
     this.refs.newSchoolYear.hide();
     const state = this.state;
     const years = reportStore.getSchoolYears();
@@ -247,5 +244,3 @@ class StudentReports extends React.Component {
     );
   }
 }
-
-export { StudentReports as default };
