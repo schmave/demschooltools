@@ -1,9 +1,8 @@
-const React = require("react");
-const heatmap = require("cal-heatmap");
-require("cal-heatmap/cal-heatmap.css");
-
-const dayjs = require("dayjs");
-const $ = require("jquery");
+import heatmap from "cal-heatmap";
+import "cal-heatmap/cal-heatmap.css";
+import dayjs from "dayjs";
+import $ from "jquery";
+import React from "react";
 
 class HeatmapMonth extends React.Component {
   map = null;
@@ -88,4 +87,4 @@ class HeatmapMonth extends React.Component {
   }
 }
 
-module.exports = HeatmapMonth;
+export default HeatmapMonth;

@@ -1,13 +1,13 @@
-const React = require("react");
-const dayjs = require("dayjs");
+import dayjs from "dayjs";
+import React from "react";
 
-const actionCreator = require("./studentactioncreator");
-const userStore = require("./userstore");
-const Modal = require("./modal.jsx");
-const constants = require("./appconstants");
-const dispatcher = require("./appdispatcher");
+import constants from "./appconstants";
+import dispatcher from "./appdispatcher";
+import Modal from "./modal.jsx";
+import * as actionCreator from "./studentactioncreator";
+import userStore from "./userstore";
 
-module.exports = class SwipeHelpers extends React.Component {
+export default class SwipeHelpers extends React.Component {
   state = {
     missing_time: undefined,
     missing_direction: undefined,
@@ -91,4 +91,4 @@ module.exports = class SwipeHelpers extends React.Component {
       )
     );
   }
-};
+}

@@ -1,6 +1,7 @@
-const React = require("react");
-const Heatmapmonth = require("./heatmapmonth.jsx");
-const dayjs = require("dayjs");
+import dayjs from "dayjs";
+import React from "react";
+
+import Heatmapmonth from "./heatmapmonth.jsx";
 
 Array.prototype.concatAll = function () {
   const results = [];
@@ -16,7 +17,7 @@ const groupingFunc = function (data) {
   return data.day.split("-")[0] + "-" + data.day.split("-")[1] + "-" + "01";
 };
 
-module.exports = class Heatmap extends React.Component {
+export default class Heatmap extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -62,4 +63,4 @@ module.exports = class Heatmap extends React.Component {
   render() {
     return this.state.mounted && <div className="row">{this.loadHeatmaps()}</div>;
   }
-};
+}

@@ -1,6 +1,6 @@
-const constants = require("./appconstants");
-const ajax = require("./ajaxhelper");
-const dispatcher = require("./appdispatcher");
+import ajax from "./ajaxhelper";
+import constants from "./appconstants";
+import dispatcher from "./appdispatcher";
 
 export const loadStudents = () => {
   ajax

@@ -1,6 +1,7 @@
-var EventEmitter = require("events").EventEmitter,
-  dispatcher = require("./appdispatcher"),
-  constants = require("./appconstants");
+import { EventEmitter } from "events";
+
+import constants from "./appconstants";
+import dispatcher from "./appdispatcher";
 
 var CHANGE_EVENT = "change";
 
@@ -34,4 +35,4 @@ dispatcher.register(function (action) {
   }
 });
 
-module.exports = exports;
+export default exports;

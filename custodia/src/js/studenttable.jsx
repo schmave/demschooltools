@@ -1,8 +1,9 @@
-const React = require("react");
-const SwipeHelpers = require("./swipeHelpers.jsx");
-const studentStore = require("./StudentStore");
+import React from "react";
 
-module.exports = class extends React.Component {
+import studentStore from "./StudentStore";
+import SwipeHelpers from "./swipeHelpers.jsx";
+
+export default class extends React.Component {
   static displayName = "StudentTable";
 
   state = { students: studentStore.getStudents(true) };
@@ -159,4 +160,4 @@ module.exports = class extends React.Component {
       students: studentStore.getStudents(),
     });
   };
-};
+}

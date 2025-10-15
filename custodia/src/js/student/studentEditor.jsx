@@ -1,10 +1,11 @@
-const React = require("react");
-const ReactDOM = require("react-dom");
-const dispatcher = require("../appdispatcher");
-const constants = require("../appconstants");
-const actionCreator = require("../studentactioncreator");
-const Modal = require("../modal.jsx");
-const dayjs = require("dayjs");
+import dayjs from "dayjs";
+import React from "react";
+import ReactDOM from "react-dom";
+
+import constants from "../appconstants";
+import dispatcher from "../appdispatcher";
+import Modal from "../modal.jsx";
+import * as actionCreator from "../studentactioncreator";
 
 class StudentEditor extends React.Component {
   constructor(props) {
@@ -136,4 +137,4 @@ class StudentEditor extends React.Component {
   }
 }
 
-module.exports = StudentEditor;
+export default StudentEditor;

@@ -1,4 +1,4 @@
-const $ = require("jquery");
+import $ from "jquery";
 
 function getCookie(name) {
   const cookie = {};
@@ -56,4 +56,4 @@ const exports = {
   },
 };
 
-module.exports = exports;
+export default exports;

@@ -1,13 +1,13 @@
-const React = require("react");
-const userStore = require("./userstore");
-const Heatmap = require("./heatmap.jsx");
-const actionCreator = require("./studentactioncreator");
-const studentStore = require("./StudentStore");
-const Router = require("react-router");
-const Link = Router.Link;
-const SwipeHelpers = require("./swipeHelpers.jsx");
-const StudentEditor = require("./student/studentEditor.jsx");
-const SwipesListing = require("./swipeslisting.jsx");
+import React from "react";
+import { Link } from "react-router";
+
+import studentStore from "./StudentStore";
+import Heatmap from "./heatmap.jsx";
+import StudentEditor from "./student/studentEditor.jsx";
+import * as actionCreator from "./studentactioncreator";
+import SwipeHelpers from "./swipeHelpers.jsx";
+import SwipesListing from "./swipeslisting.jsx";
+import userStore from "./userstore";
 
 const groupingFunc = function (data) {
   return data.day.split("-")[0] + "-" + data.day.split("-")[1];
@@ -297,4 +297,4 @@ class Student extends React.Component {
   };
 }
 
-module.exports = Student;
+export default Student;

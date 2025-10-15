@@ -1,18 +1,17 @@
-const EventEmitter = require("events").EventEmitter;
-
-const CHANGE_EVENT = "change";
+import { EventEmitter } from "events";
 
 const exports = Object.assign({}, EventEmitter.prototype, {
-  CHANGE_EVENT,
   emitChange: function () {
-    this.emit(CHANGE_EVENT);
+    this.emit("change");
   },
+
   addChangeListener: function (callback) {
-    this.on(CHANGE_EVENT, callback);
+    this.on("change", callback);
   },
+
   removeChangeListener: function (callback) {
-    this.removeListener(CHANGE_EVENT, callback);
+    this.removeListener("change", callback);
   },
 });
 
-module.exports = exports;
+export default exports;

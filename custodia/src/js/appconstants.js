@@ -25,4 +25,4 @@ const exports = {
   },
 };
 
-module.exports = exports;
+export default exports;

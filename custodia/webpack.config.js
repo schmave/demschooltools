@@ -72,7 +72,6 @@ module.exports = function (env, argv) {
                       },
                     },
                   ],
-                  // "@babel/preset-react",
                   ["@babel/preset-react", { runtime: "automatic", development: isDevelopment }],
                 ],
               },
@@ -86,9 +85,6 @@ module.exports = function (env, argv) {
       fallback: {
         path: false,
         fs: false,
-      },
-      alias: {
-        "react/jsx-runtime": "react/jsx-runtime.js",
       },
     },
     plugins: [

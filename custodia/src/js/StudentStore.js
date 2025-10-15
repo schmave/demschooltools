@@ -1,7 +1,7 @@
-const dispatcher = require("./appdispatcher");
-const constants = require("./appconstants");
-const base = require("./storebase");
-const actionCreator = require("./studentactioncreator");
+import constants from "./appconstants";
+import dispatcher from "./appdispatcher";
+import base from "./storebase";
+import * as actionCreator from "./studentactioncreator";
 
 let students;
 const studentDetails = {};
@@ -44,4 +44,4 @@ dispatcher.register(function (action) {
   }
 });
 
-module.exports = exports;
+export default exports;

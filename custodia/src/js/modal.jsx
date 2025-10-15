@@ -1,5 +1,5 @@
-const React = require("react");
-const ReactResponsiveModal = require("react-responsive-modal").default;
+import React from "react";
+import ReactResponsiveModal from "react-responsive-modal";
 
 class Modal extends React.Component {
   render() {
@@ -19,4 +19,4 @@ class Modal extends React.Component {
   }
 }
 
-module.exports = Modal;
+export default Modal;

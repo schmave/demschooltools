@@ -1,7 +1,7 @@
-const dispatcher = require("./appdispatcher");
-const base = require("./storebase");
-const constants = require("./appconstants");
-const actionCreator = require("./reportactioncreator");
+import constants from "./appconstants";
+import dispatcher from "./appdispatcher";
+import actionCreator from "./reportactioncreator";
+import base from "./storebase";
 
 let reports = {};
 let schoolYears;
@@ -60,4 +60,4 @@ dispatcher.register(function (action) {
   }
 });
 
-module.exports = exports;
+export default exports;
