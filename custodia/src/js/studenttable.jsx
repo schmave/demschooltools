@@ -1,32 +1,46 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import studentStore from "./StudentStore";
-// import SwipeHelpers from "./swipeHelpers.jsx";
+import { useSwipeLogic } from "./hooks/useSwipeLogic.js";
+import SwipeHelpers from "./swipeHelpers.jsx";
 
-export default class StudentTable extends React.Component {
-  state = { students: studentStore.getStudents(true) };
+export default function StudentTable() {
+  const navigate = useNavigate();
+  const [students, setStudents] = useState(() => studentStore.getStudents(true));
+  const {
+    swipeState,
+    validateSignDirection,
+    handleSwipeComplete,
+    handleSwipeCancel,
+    updateMissingTime,
+  } = useSwipeLogic();
 
-  componentDidMount() {
-    studentStore.addChangeListener(this._onChange);
-  }
+  useEffect(() => {
+    const onChange = () => {
+      setStudents(studentStore.getStudents());
+    };
 
-  componentWillUnmount() {
-    studentStore.removeChangeListener(this._onChange);
-  }
+    studentStore.addChangeListener(onChange);
 
-  signIn = (student) => {
-    this.refs.missingSwipeCollector.validateSignDirection(student, "in");
+    return () => {
+      studentStore.removeChangeListener(onChange);
+    };
+  }, []);
+
+  const signIn = (student) => {
+    validateSignDirection(student, "in");
   };
 
-  signOut = (student) => {
-    this.refs.missingSwipeCollector.validateSignDirection(student, "out");
+  const signOut = (student) => {
+    validateSignDirection(student, "out");
   };
 
-  isSigningIn = (student) => {
+  const isSigningIn = (student) => {
     return student.last_swipe_type === "out" || !student.in_today;
   };
 
-  getSwipeButton = (student, way) => {
+  const getSwipeButton = (student, way) => {
     let buttonIcon = "fa-arrow-right";
     if (way === "out") {
       buttonIcon = "fa-arrow-left";
@@ -34,11 +48,11 @@ export default class StudentTable extends React.Component {
     const iclassName = "fa " + buttonIcon + " sign-" + student._id;
     const is_teacher_class = student.is_teacher ? " is_teacher" : "";
     const button_class = "btn-default name-button" + (student.swiped_today_late ? " late" : "");
-    const sign_function = this.isSigningIn(student) ? this.signIn : this.signOut;
+    const sign_function = isSigningIn(student) ? signIn : signOut;
     if (way === "out") {
       return (
         <button
-          onClick={sign_function.bind(this, student)}
+          onClick={sign_function.bind(null, student)}
           className={"btn btn-sm " + button_class + is_teacher_class}
         >
           <i className={iclassName}>&nbsp;</i>
@@ -48,7 +62,7 @@ export default class StudentTable extends React.Component {
     } else {
       return (
         <button
-          onClick={sign_function.bind(this, student)}
+          onClick={sign_function.bind(null, student)}
           className={"btn btn-sm " + button_class + is_teacher_class}
         >
           <span className="name-span">{student.name}</span>
@@ -58,15 +72,14 @@ export default class StudentTable extends React.Component {
     }
   };
 
-  getStudent = (student, way) => {
+  const getStudent = (student, way) => {
     const link = <span className="glyphicon glyphicon-calendar"></span>;
-    const button = this.getSwipeButton(student, way);
+    const button = getSwipeButton(student, way);
     const calendar_button_class = "btn btn-default calendar-button";
     const calendar_button = (
       <div
         onClick={function () {
-          // TODO
-          // myhistory.push("/students/" + student._id);
+          navigate("/students/" + student._id);
         }}
         className={calendar_button_class}
       >
@@ -91,73 +104,71 @@ export default class StudentTable extends React.Component {
     }
   };
 
-  render() {
-    const absentCol = [];
-    const notYetInCol = [];
-    const inCol = [];
-    const outCol = [];
+  const absentCol = [];
+  const notYetInCol = [];
+  const inCol = [];
+  const outCol = [];
 
-    const students = this.state.students;
-    students.sort((a, b) => {
-      return a.name > b.name ? 1 : -1;
-    });
-    students.forEach((student) => {
-      if (!student.in_today && student.absent_today) {
-        absentCol.push(this.getStudent(student, "absent"));
-      } else if (!student.in_today && !student.absent_today) {
-        notYetInCol.push(this.getStudent(student, "notYetIn"));
-      } else if (student.in_today && student.last_swipe_type === "in") {
-        inCol.push(this.getStudent(student, "in"));
-      } else if (student.in_today && student.last_swipe_type === "out") {
-        outCol.push(this.getStudent(student, "out"));
-      }
-    });
+  const sortedStudents = [...students].sort((a, b) => {
+    return a.name > b.name ? 1 : -1;
+  });
 
-    return (
-      <div className="row">
-        {/* TODO */}
-        {/* <SwipeHelpers ref="missingSwipeCollector"></SwipeHelpers> */}
-        <div className="row student-listing-table">
-          <div className="col-md-3 column">
-            <div className="panel panel-info absent">
-              <div className="panel-heading absent">
-                <b>Not Coming In ({absentCol.length})</b>
-              </div>
-              <div className="panel-body row">{absentCol}</div>
+  sortedStudents.forEach((student) => {
+    if (!student.in_today && student.absent_today) {
+      absentCol.push(getStudent(student, "absent"));
+    } else if (!student.in_today && !student.absent_today) {
+      notYetInCol.push(getStudent(student, "notYetIn"));
+    } else if (student.in_today && student.last_swipe_type === "in") {
+      inCol.push(getStudent(student, "in"));
+    } else if (student.in_today && student.last_swipe_type === "out") {
+      outCol.push(getStudent(student, "out"));
+    }
+  });
+
+  return (
+    <div className="row">
+      <SwipeHelpers
+        student={swipeState.student}
+        missingDirection={swipeState.missingDirection}
+        missingTime={swipeState.missingTime}
+        onSwipeComplete={handleSwipeComplete}
+        onCancel={handleSwipeCancel}
+        onTimeChange={updateMissingTime}
+      />
+      <div className="row student-listing-table">
+        <div className="col-md-3 column">
+          <div className="panel panel-info absent">
+            <div className="panel-heading absent">
+              <b>Not Coming In ({absentCol.length})</b>
             </div>
+            <div className="panel-body row">{absentCol}</div>
           </div>
-          <div className="col-md-3 column not-in">
-            <div className="panel panel-info">
-              <div className="panel-heading">
-                <b>Not Yet In ({notYetInCol.length})</b>
-              </div>
-              <div className="panel-body row">{notYetInCol}</div>
+        </div>
+        <div className="col-md-3 column not-in">
+          <div className="panel panel-info">
+            <div className="panel-heading">
+              <b>Not Yet In ({notYetInCol.length})</b>
             </div>
+            <div className="panel-body row">{notYetInCol}</div>
           </div>
-          <div className="col-md-3 column in">
-            <div className="panel panel-info">
-              <div className="panel-heading">
-                <b>In ({inCol.length})</b>
-              </div>
-              <div className="panel-body row">{inCol}</div>
+        </div>
+        <div className="col-md-3 column in">
+          <div className="panel panel-info">
+            <div className="panel-heading">
+              <b>In ({inCol.length})</b>
             </div>
+            <div className="panel-body row">{inCol}</div>
           </div>
-          <div className="col-md-3 column out">
-            <div className="panel panel-info">
-              <div className="panel-heading">
-                <b>Out ({outCol.length})</b>
-              </div>
-              <div className="panel-body row">{outCol}</div>
+        </div>
+        <div className="col-md-3 column out">
+          <div className="panel panel-info">
+            <div className="panel-heading">
+              <b>Out ({outCol.length})</b>
             </div>
+            <div className="panel-body row">{outCol}</div>
           </div>
         </div>
       </div>
-    );
-  }
-
-  _onChange = () => {
-    this.setState({
-      students: studentStore.getStudents(),
-    });
-  };
+    </div>
+  );
 }

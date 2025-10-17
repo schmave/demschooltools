@@ -1,12 +1,11 @@
-import React from "react";
-// const Griddle = require("griddle-react");
-// import { DataGrid, GridColDef } from "@mui/x-data-grid";
-
+import { DataGrid } from "@mui/x-data-grid";
 import dayjs from "dayjs";
+import React from "react";
+import { Link } from "react-router";
 
-import reportStore from "./reportstore";
 import Modal from "./modal.jsx";
 import actionCreator from "./reportactioncreator.js";
+import reportStore from "./reportstore";
 
 // Table data as a list of array.
 const getState = function () {
@@ -17,6 +16,7 @@ const getState = function () {
     startDate: now.startOf("month").format("YYYY-MM-DD"),
     endDate: now.endOf("month").format("YYYY-MM-DD"),
     years: reportStore.getSchoolYears(),
+    showNewSchoolYearModal: false,
   };
 };
 function pad(num, size) {
@@ -24,6 +24,7 @@ function pad(num, size) {
   while (s.length < size) s = "0" + s;
   return s;
 }
+
 function deciHours(time) {
   if (!time) {
     return "0:00";
@@ -32,32 +33,51 @@ function deciHours(time) {
   return i.toString() + ":" + pad(Math.round((time - i) * 60, 10), 2);
 }
 
-class StudentTotalComponent extends React.Component {
-  render() {
-    const t = deciHours(this.props.data);
-    return <span>{t}</span>;
-  }
-}
-
-class StudentAttendedComponent extends React.Component {
-  render() {
-    const { good, short } = this.props.rowData;
-    return <span>{good + short}</span>;
-  }
-}
-
-class StudentLinkComponent extends React.Component {
-  render() {
-    // url ="#speakers/" + props.rowData._id + "/" + this.props.data;
-    const sid = this.props.rowData._id;
-    const name = this.props.data;
-    return (
-      <Link to={"/students/" + sid} id={"student-" + sid}>
-        {name}
+// Column definitions for MUI DataGrid
+const getColumns = () => [
+  {
+    field: "name",
+    headerName: "Name",
+    width: 200,
+    renderCell: (params) => (
+      <Link to={`/students/${params.row._id}`} id={`student-${params.row._id}`}>
+        {params.value}
       </Link>
-    );
-  }
-}
+    ),
+  },
+  {
+    field: "attended",
+    headerName: "Attended",
+    width: 100,
+    renderCell: (params) => <span>{params.row.good + params.row.short}</span>,
+  },
+  {
+    field: "overrides",
+    headerName: "Overrides",
+    width: 100,
+  },
+  {
+    field: "unexcused",
+    headerName: "Unexcused",
+    width: 100,
+  },
+  {
+    field: "excuses",
+    headerName: "Excused Absence",
+    width: 150,
+  },
+  {
+    field: "short",
+    headerName: "Short",
+    width: 100,
+  },
+  {
+    field: "total_hours",
+    headerName: "Total Hours",
+    width: 120,
+    renderCell: (params) => <span>{deciHours(params.value)}</span>,
+  },
+];
 
 export default class StudentReports extends React.Component {
   state = getState();
@@ -73,7 +93,6 @@ export default class StudentReports extends React.Component {
   }
 
   onReportChange = () => {
-    this.refs.newSchoolYear.hide();
     const state = this.state;
     const years = reportStore.getSchoolYears();
     const yearExists = years.years.indexOf(state.currentYear) !== -1;
@@ -81,13 +100,23 @@ export default class StudentReports extends React.Component {
 
     state.years = years;
     state.currentYear = currentYear;
+    state.showNewSchoolYearModal = false;
 
     this.setState(state, this.fetchReport);
   };
 
   fetchReport = () => {
     const report = reportStore.getReport(this.state.currentYear, this.state.filterStudents);
-    const rows = report != "loading" ? report : [];
+    let rows = report != "loading" ? report : [];
+
+    // Add unique id field required by DataGrid
+    if (Array.isArray(rows)) {
+      rows = rows.map((row, index) => ({
+        ...row,
+        id: row._id || index,
+      }));
+    }
+
     this.setState({
       loading: report == null || report == "loading",
       rows,
@@ -101,7 +130,13 @@ export default class StudentReports extends React.Component {
 
   createPeriod = () => {
     actionCreator.createPeriod(this.state.startDate, this.state.endDate).then((newYearName) => {
-      this.setState({ currentYear: newYearName }, this.fetchReport);
+      this.setState(
+        {
+          currentYear: newYearName,
+          showNewSchoolYearModal: false,
+        },
+        this.fetchReport,
+      );
     });
   };
 
@@ -129,33 +164,16 @@ export default class StudentReports extends React.Component {
       grid = <div>Loading</div>;
     } else {
       grid = (
-        <Griddle
-          id="test"
-          results={this.state.rows}
-          resultsPerPage="200"
-          columns={["name", "good", "short", "overrides", "unexcused", "excuses", "total_hours"]}
-          columnMetadata={[
-            {
-              displayName: "Name",
-              columnName: "name",
-              customComponent: StudentLinkComponent,
-            },
-            {
-              displayName: "Attended",
-              customComponent: StudentAttendedComponent,
-              columnName: "good",
-            },
-            { displayName: "Overrides", columnName: "overrides" },
-            { displayName: "Unexcused", columnName: "unexcused" },
-            { displayName: "Excused Absence", columnName: "excuses" },
-            { displayName: "Short", columnName: "short" },
-            {
-              displayName: "Total Hours",
-              columnName: "total_hours",
-              customComponent: StudentTotalComponent,
-            },
-          ]}
-        />
+        <div style={{ height: 600, width: "100%" }}>
+          <DataGrid
+            rows={this.state.rows}
+            columns={getColumns()}
+            pageSize={200}
+            rowsPerPageOptions={[50, 100, 200]}
+            disableSelectionOnClick
+            autoHeight
+          />
+        </div>
       );
     }
     return (
@@ -185,9 +203,7 @@ export default class StudentReports extends React.Component {
           <div className="col-md-2">
             <button
               className="btn btn-small btn-success"
-              onClick={function () {
-                this.refs.newSchoolYear.show();
-              }.bind(this)}
+              onClick={() => this.setState({ showNewSchoolYearModal: true })}
             >
               New Period
             </button>
@@ -217,7 +233,11 @@ export default class StudentReports extends React.Component {
           </div>
         </div>
         {grid}
-        <Modal ref="newSchoolYear" title="Create new period">
+        <Modal
+          open={this.state.showNewSchoolYearModal}
+          onClose={() => this.setState({ showNewSchoolYearModal: false })}
+          title="Create new period"
+        >
           <p>
             The start date, end date, and all dates in between the two will be included in the
             report.

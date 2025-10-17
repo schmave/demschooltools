@@ -35,7 +35,7 @@ export const updateStudent = function (id, start_date, minutes) {
     .then(loadStudentData);
 };
 
-export const swipeStudent = function (student, direction, overrideTime) {
+export const swipeStudent = function (student, direction, overrideTime, navigate) {
   let overrideDate;
   if (overrideTime) {
     overrideDate =
@@ -59,8 +59,7 @@ export const swipeStudent = function (student, direction, overrideTime) {
           message: student.name + " swiped successfully!",
         });
       }
-      // TODO
-      // myhistory.replace("/students");
+      navigate?.("/students", { replace: true });
     });
 };
 export const markAbsent = function (student) {

@@ -31,7 +31,7 @@ ReactDOM.createRoot(root).render(
       <Route element={<App />}>
         <Route index element={<StudentTable />} />
         <Route path="students" element={<StudentTable />} />
-        <Route path="students/:studentId(/:day)" element={<Student />} />
+        <Route path="students/:studentId/:day?" element={<Student />} />
         <Route path="reports" element={<StudentReports />} />
       </Route>
     </Routes>
