@@ -102,9 +102,6 @@ export default function (env, argv) {
       }),
       isDevelopment &&
         new ReactRefreshWebpackPlugin({
-          overlay: {
-            sockPort: DEV_SERVER_PORT,
-          },
           esModule: true,
           exclude: /node_modules/,
         }),

@@ -1,7 +1,7 @@
 import React from "react";
 
 import studentStore from "./StudentStore";
-import SwipeHelpers from "./swipeHelpers.jsx";
+// import SwipeHelpers from "./swipeHelpers.jsx";
 
 export default class StudentTable extends React.Component {
   state = { students: studentStore.getStudents(true) };
@@ -115,7 +115,8 @@ export default class StudentTable extends React.Component {
 
     return (
       <div className="row">
-        <SwipeHelpers ref="missingSwipeCollector"></SwipeHelpers>
+        {/* TODO */}
+        {/* <SwipeHelpers ref="missingSwipeCollector"></SwipeHelpers> */}
         <div className="row student-listing-table">
           <div className="col-md-3 column">
             <div className="panel panel-info absent">

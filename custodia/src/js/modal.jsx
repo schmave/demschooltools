@@ -1,5 +1,5 @@
 import React from "react";
-import ReactResponsiveModal from "react-responsive-modal";
+// import ReactResponsiveModal from "react-responsive-modal";
 
 class Modal extends React.Component {
   render() {
