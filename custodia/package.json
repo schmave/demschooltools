@@ -12,7 +12,6 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/x-data-grid": "^8.14.0",
-    "bootstrap": "^3.4.1",
     "cal-heatmap": "^3.6.2",
     "dayjs": "^1.11.11",
     "flux": "2.1.1",
