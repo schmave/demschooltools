@@ -1,4 +1,3 @@
-import heatmap from "cal-heatmap";
 import "cal-heatmap/cal-heatmap.css";
 import dayjs from "dayjs";
 import $ from "jquery";
@@ -22,12 +21,15 @@ class HeatmapMonth extends React.Component {
 
   getHighlights = (days) => days.filter((day) => day.excused).map((day) => dayjs(day.day).toDate());
 
-  loadHeatmap = () => {
+  loadHeatmap = async () => {
     const data = this.formatDays(this.props.days, this.props.requiredMinutes);
     const highlight = this.getHighlights(this.props.days);
 
     const doUpdate = this.map !== null;
     if (!doUpdate) {
+      // Delay this import because otherwise it fails to compile
+      // with vite.
+      const heatmap = (await import("cal-heatmap")).default;
       this.map = new heatmap();
     }
 

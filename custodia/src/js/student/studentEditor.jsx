@@ -9,7 +9,6 @@ import * as actionCreator from "../studentactioncreator.js";
 
 class StudentEditor extends React.Component {
   constructor(props) {
-    console.log("new studenteditor");
     super(props);
     this.dispatchToken = dispatcher.register((action) => {
       if (

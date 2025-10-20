@@ -2,7 +2,7 @@ import os
 
 from demschooltools.settings import *  # noqa: F403
 
-CUSTODIA_JS_LINK = ""
+CUSTODIA_DEV_SERVER = False
 SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 
 DEBUG = False

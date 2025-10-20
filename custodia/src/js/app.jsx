@@ -1,7 +1,10 @@
+import "bootstrap/dist/css/bootstrap-theme.min.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 import { Component } from "react";
 import ReactDOM from "react-dom/client";
 import { HashRouter, Outlet, Route, Routes } from "react-router-dom";
 
+import "../css/starter-template.css";
 import Flash from "./flashnotification.jsx";
 import Nav from "./nav.jsx";
 import "./polyfill.js";
