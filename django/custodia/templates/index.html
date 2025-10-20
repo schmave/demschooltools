@@ -39,8 +39,8 @@
         <script type="module" src="http://localhost:8082/@vite/client"></script>
         <script type="module" src="http://localhost:8082/src/js/app.jsx"></script>
     {% else %}
-        <script src="{% static 'js/custodia.js' %}"></script>
-        <link href="{% static 'js/custodia.css' %}" rel="stylesheet">
+        <script type="module" src="{% static 'custodia/app.js' %}"></script>
+        <link href="{% static 'custodia/app.css' %}" rel="stylesheet">
     {% endif %}
   </head>
   <body>

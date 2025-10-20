@@ -33,3 +33,5 @@ metals.sbt
 .settings/
 .classpath
 .project
+
+custodia/stats.html
