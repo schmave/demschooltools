@@ -7,14 +7,18 @@ class HeatmapMonth extends React.Component {
   map = null;
 
   formatDays = (days, requiredMinutes) => {
-    const formatted = {};
+    const formatted = [];
     days.forEach(function (day) {
-      formatted[dayjs(day.day).unix()] = day.total_mins;
+      const date = dayjs(day.day).toDate();
+      let value = day.total_mins;
+
       if (day.excused || day.override) {
-        formatted[dayjs(day.day).unix()] = requiredMinutes;
+        value = requiredMinutes;
       } else if (!day.absent && day.total_mins == 0) {
-        formatted[dayjs(day.day).unix()] = 1;
+        value = 1;
       }
+
+      formatted.push({ date, value });
     });
     return formatted;
   };
@@ -27,10 +31,8 @@ class HeatmapMonth extends React.Component {
 
     const doUpdate = this.map !== null;
     if (!doUpdate) {
-      // Delay this import because otherwise it fails to compile
-      // with vite.
-      const heatmap = (await import("cal-heatmap")).default;
-      this.map = new heatmap();
+      const CalHeatmap = (await import("cal-heatmap")).default;
+      this.map = new CalHeatmap();
     }
 
     const selector = "#heatmap" + this.props.index;
@@ -43,35 +45,78 @@ class HeatmapMonth extends React.Component {
 
       return "#day-" + datestring;
     };
+
     if (doUpdate) {
-      this.map.update(data);
-      this.map.highlight(highlight);
-    } else {
-      this.map.init({
-        itemSelector: selector,
-        onClick: function (d) {
-          $(makeDateId(d))[0]?.click();
+      await this.map.fill(data);
+      await this.map.paint({
+        date: {
+          highlight,
         },
-        data,
-        start: dayjs(this.props.days[0].day).startOf("month").toDate(),
-        domain: "month",
-        subDomain: "x_day",
-        subDomainTextFormat: "%d",
-        range: 4,
-        legend: [
-          0,
-          210,
-          this.props.requiredMinutes - 45,
-          this.props.requiredMinutes - 15,
-          this.props.requiredMinutes - 1,
-        ],
-        legendVerticalPosition: "center",
-        legendCellSize: 8,
-        itemName: ["minute", "minutes"],
-        legendOrientation: "vertical",
-        highlight,
-        cellSize: 15,
       });
+    } else {
+      const Tooltip = (await import("cal-heatmap/plugins/Tooltip")).default;
+      const Legend = (await import("cal-heatmap/plugins/Legend")).default;
+
+      await this.map.paint(
+        {
+          itemSelector: selector,
+          data: {
+            source: data,
+            x: "date",
+            y: "value",
+          },
+          date: {
+            start: dayjs(this.props.days[0].day).startOf("month").toDate(),
+            highlight,
+          },
+          domain: {
+            type: "month",
+          },
+          subDomain: {
+            type: "xDay",
+            label: "D",
+            width: 15,
+            height: 15,
+          },
+          range: 4,
+          scale: {
+            color: {
+              type: "threshold",
+              range: ["#c62828", "#ff6659", "#EEE8AA", "#80e27e", "#4caf50", "#087f23"],
+              domain: [
+                1,
+                210,
+                this.props.requiredMinutes - 45,
+                this.props.requiredMinutes - 15,
+              ].sort((a, b) => a - b),
+            },
+          },
+          onClick: function (event, timestamp, value) {
+            const d = new Date(timestamp);
+            $(makeDateId(d))[0]?.click();
+          },
+        },
+        [
+          [
+            Tooltip,
+            {
+              text: function (date, value, dayjsDate) {
+                return (
+                  (value ? value : "0") + " minute" + (value !== 1 ? "s" : "")
+                );
+              },
+            },
+          ],
+          [
+            Legend,
+            {
+              itemSelector: selector,
+              label: "minutes",
+              width: 200,
+            },
+          ],
+        ]
+      );
     }
   };
 
