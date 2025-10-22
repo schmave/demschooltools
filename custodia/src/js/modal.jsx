@@ -1,4 +1,5 @@
-import { Box, Modal as MuiModal } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import { Box, IconButton, Modal as MuiModal } from "@mui/material";
 import React from "react";
 
 class Modal extends React.Component {
@@ -26,6 +27,9 @@ class Modal extends React.Component {
       margin: 0,
       fontSize: "16px",
       fontWeight: "bold",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
     };
 
     const bodyStyle = {
@@ -43,7 +47,20 @@ class Modal extends React.Component {
       >
         <Box sx={modalStyle}>
           <div style={headerStyle} id="modal-title">
-            {this.props.title}
+            <span>{this.props.title}</span>
+            <IconButton
+              onClick={this.props.onClose}
+              size="small"
+              sx={{
+                color: "white",
+                "&:hover": {
+                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                },
+              }}
+              aria-label="close"
+            >
+              <CloseIcon />
+            </IconButton>
           </div>
           <div style={bodyStyle}>{this.props.children}</div>
         </Box>

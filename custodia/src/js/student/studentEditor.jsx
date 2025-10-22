@@ -1,6 +1,5 @@
 import dayjs from "dayjs";
 import React from "react";
-import ReactDOM from "react-dom";
 
 import constants from "../appconstants.js";
 import dispatcher from "../appdispatcher.js";
@@ -51,7 +50,7 @@ class StudentEditor extends React.Component {
       .updateStudent(
         this.state.student._id,
         this.formatDate(),
-        parseInt(ReactDOM.findDOMNode(this.refs.required_minutes).value, 10),
+        parseInt(this.state.student.required_minutes, 10),
       )
       .always(this.savingHide);
   };
@@ -104,7 +103,6 @@ class StudentEditor extends React.Component {
               <div className="form-group">
                 <label htmlFor="required_minutes">Required Minutes:</label>
                 <input
-                  ref="required_minutes"
                   className="form-control"
                   id="required_minutes"
                   type="number"

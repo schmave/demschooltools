@@ -147,7 +147,7 @@ rect.highlight-now {
 }
 
 .swipes-table td,
-th {
+.swipes-table th {
     white-space: nowrap;
 }
 
@@ -209,16 +209,6 @@ th {
 
 .student-listing-table {
     text-align: center;
-}
-
-@media (min-width: 1000px) {
-    /* .student-listing-table .student-listing:nth-child(odd) { */
-    /*     float: left; */
-    /* } */
-
-    /* .student-listing-table .student-listing:nth-child(even) { */
-    /*     float: right; */
-    /* } */
 }
 
 .hidden {
@@ -341,13 +331,6 @@ th {
     height: inherit;
 }
 
-a.skylight-close-button {
-    right: 20px !important;
-    top: initial !important;
-    color: white;
-}
-
-a.skylight-close-button:hover,
-a.skylight-close-button:focus {
-    text-decoration: none;
+html {
+    font-size: 14px;
 }

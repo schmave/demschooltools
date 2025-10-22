@@ -12,6 +12,7 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@kurkle/color": "^0.3.2",
+    "@mui/icons-material": "^7.3.4",
     "@mui/x-data-grid": "^8.14.0",
     "cal-heatmap": "^4.2.4",
     "dayjs": "^1.11.11",

@@ -1,5 +1,5 @@
 import { Component } from "react";
-import ReactDOM from "react-dom/client";
+import { createRoot } from "react-dom/client";
 import { HashRouter, Outlet, Route, Routes } from "react-router-dom";
 
 import "../css/starter-template.css";
@@ -26,7 +26,7 @@ class App extends Component {
 
 const root = document.getElementById("react_container");
 
-ReactDOM.createRoot(root).render(
+createRoot(root).render(
   <HashRouter>
     <Routes>
       <Route element={<App />}>
