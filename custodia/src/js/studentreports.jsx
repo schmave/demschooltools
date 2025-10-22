@@ -8,6 +8,8 @@ import {
   TableRow,
   TableSortLabel,
 } from "@mui/material";
+import { tableCellClasses } from "@mui/material/TableCell";
+import { styled } from "@mui/material/styles";
 import dayjs from "dayjs";
 import React from "react";
 import { Link } from "react-router";
@@ -15,6 +17,12 @@ import { Link } from "react-router";
 import Modal from "./modal.jsx";
 import actionCreator from "./reportactioncreator.js";
 import reportStore from "./reportstore";
+
+const BodyTableCell = styled(TableCell)(() => ({
+  [`&.${tableCellClasses.body}`]: {
+    padding: 4,
+  },
+}));
 
 // Table data as a list of array.
 const getState = function () {
@@ -46,7 +54,7 @@ function deciHours(time) {
 
 // Column definitions
 const columns = [
-  { id: "name", label: "Name", sortable: true, width: "300px" },
+  { id: "name", label: "Name", sortable: true, width: "200px" },
   { id: "attended", label: "Attended", sortable: true, width: "50px" },
   { id: "overrides", label: "Overrides", sortable: true, width: "50px" },
   { id: "unexcused", label: "Unexcused", sortable: true, width: "50px" },
@@ -188,11 +196,25 @@ export default class StudentReports extends React.Component {
             <TableHead>
               <TableRow>
                 {columns.map((column) => (
-                  <TableCell key={column.id} style={{ width: column.width }}>
+                  <TableCell
+                    sx={{
+                      backgroundColor: "rgb(237, 237, 239)",
+                      fontWeight: 700,
+                      padding: "4px",
+                      width: column.width,
+                    }}
+                    key={column.id}
+                  >
                     {column.sortable ? (
                       <TableSortLabel
                         active={this.state.orderBy === column.id}
-                        direction={this.state.orderBy === column.id ? this.state.order : "asc"}
+                        direction={
+                          this.state.orderBy === column.id
+                            ? this.state.order
+                            : column.id === "name"
+                              ? "asc"
+                              : "desc"
+                        }
                         onClick={() => this.handleRequestSort(column.id)}
                       >
                         {column.label}
@@ -206,18 +228,26 @@ export default class StudentReports extends React.Component {
             </TableHead>
             <TableBody>
               {sortedRows.map((row) => (
-                <TableRow key={row.id}>
-                  <TableCell>
+                <TableRow
+                  key={row.id}
+                  hover
+                  sx={{
+                    "&:hover": {
+                      backgroundColor: "rgba(0, 0, 0, 0.04)",
+                    },
+                  }}
+                >
+                  <BodyTableCell>
                     <Link to={`/students/${row._id}`} id={`student-${row._id}`}>
                       {row.name}
                     </Link>
-                  </TableCell>
-                  <TableCell>{row.attended}</TableCell>
-                  <TableCell>{row.overrides}</TableCell>
-                  <TableCell>{row.unexcused}</TableCell>
-                  <TableCell>{row.excuses}</TableCell>
-                  <TableCell>{row.short}</TableCell>
-                  <TableCell>{deciHours(row.total_hours)}</TableCell>
+                  </BodyTableCell>
+                  <BodyTableCell>{row.attended}</BodyTableCell>
+                  <BodyTableCell>{row.overrides}</BodyTableCell>
+                  <BodyTableCell>{row.unexcused}</BodyTableCell>
+                  <BodyTableCell>{row.excuses}</BodyTableCell>
+                  <BodyTableCell>{row.short}</BodyTableCell>
+                  <BodyTableCell>{deciHours(row.total_hours)}</BodyTableCell>
                 </TableRow>
               ))}
             </TableBody>

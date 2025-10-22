@@ -1,5 +1,3 @@
-import $ from "jquery";
-
 function getCookie(name) {
   const cookie = {};
   document.cookie.split(";").forEach(function (el) {
@@ -20,39 +18,51 @@ const modifyUrl = (url) => {
   return `/custodia-api/${url}`;
 };
 
+// Helper function to handle fetch responses
+const handleResponse = async (response) => {
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  const contentType = response.headers.get("content-type");
+  if (contentType && contentType.includes("application/json")) {
+    return response.json();
+  }
+  return response.text();
+};
+
 const exports = {
   post: function (url, data) {
-    return $.ajax({
-      url: modifyUrl(url),
+    return fetch(modifyUrl(url), {
       method: "POST",
-      contentType: "application/json",
-      dataType: "json",
-      data: JSON.stringify(data),
-      headers: CSRF_HEADER,
-    });
+      headers: {
+        "Content-Type": "application/json",
+        ...CSRF_HEADER,
+      },
+      body: JSON.stringify(data),
+    }).then(handleResponse);
   },
   put: function (url, data) {
-    return $.ajax({
-      url: modifyUrl(url),
+    return fetch(modifyUrl(url), {
       method: "PUT",
-      contentType: "application/json",
-      dataType: "json",
-      data: JSON.stringify(data),
-      headers: CSRF_HEADER,
-    });
+      headers: {
+        "Content-Type": "application/json",
+        ...CSRF_HEADER,
+      },
+      body: JSON.stringify(data),
+    }).then(handleResponse);
   },
   get: function (inObj) {
     if (typeof inObj === "string") {
-      return $.ajax(modifyUrl(inObj));
+      return fetch(modifyUrl(inObj)).then(handleResponse);
     }
-    return $.ajax(Object.assign({}, inObj, { url: modifyUrl(inObj.url) }));
+    const { url, ...options } = inObj;
+    return fetch(modifyUrl(url), options).then(handleResponse);
   },
   delete: function (url) {
-    return $.ajax({
-      url: modifyUrl(url),
+    return fetch(modifyUrl(url), {
       method: "DELETE",
       headers: CSRF_HEADER,
-    });
+    }).then(handleResponse);
   },
 };
 
