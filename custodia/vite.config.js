@@ -16,9 +16,11 @@ export default ({ command, mode }) =>
     build: {
       outDir: resolve(__dirname, "..", "django", "static", "custodia"),
       emptyOutDir: true,
+      target: "es2015",
       rollupOptions: {
         input: {
-          app: resolve(__dirname, "index.html"),
+          app: resolve(__dirname, "src", "js", "app.jsx"),
+          html: resolve(__dirname, "index.html"),
         },
         output: {
           assetFileNames: `[name].[ext]`,

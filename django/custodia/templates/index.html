@@ -30,6 +30,11 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+
+
+    {% comment %}
+    Consider using https://github.com/MrBin99/django-vite instead of this.
+    {% endcomment %}
     {% if dev_js %}
         <script type="module">import { injectIntoGlobalHook } from "http://localhost:8082/@react-refresh";
         injectIntoGlobalHook(window);
@@ -39,6 +44,7 @@
         <script type="module" src="http://localhost:8082/@vite/client"></script>
         <script type="module" src="http://localhost:8082/src/js/app.jsx"></script>
     {% else %}
+        <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?version=4.8.0&features=es2015%2Cdefault"></script>
         <script type="module" src="{% static 'custodia/app.js' %}"></script>
         <link href="{% static 'custodia/app.css' %}" rel="stylesheet">
     {% endif %}
