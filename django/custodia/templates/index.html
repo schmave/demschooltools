@@ -44,7 +44,6 @@
         <script type="module" src="http://localhost:8082/@vite/client"></script>
         <script type="module" src="http://localhost:8082/src/js/app.jsx"></script>
     {% else %}
-        <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?version=4.8.0&features=es2015%2Cdefault"></script>
         <script type="module" src="{% static 'custodia/app.js' %}"></script>
         <link href="{% static 'custodia/app.css' %}" rel="stylesheet">
     {% endif %}

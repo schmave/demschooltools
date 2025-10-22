@@ -16,7 +16,6 @@ export default ({ command, mode }) =>
     build: {
       outDir: resolve(__dirname, "..", "django", "static", "custodia"),
       emptyOutDir: true,
-      target: "es2015",
       rollupOptions: {
         input: {
           app: resolve(__dirname, "src", "js", "app.jsx"),
