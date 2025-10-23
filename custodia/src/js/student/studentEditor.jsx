@@ -52,12 +52,11 @@ class StudentEditor extends React.Component {
         this.formatDate(),
         parseInt(this.state.student.required_minutes, 10),
       )
-      .always(this.savingHide);
+      .finally(this.savingHide);
   };
 
   edit = (student) => {
     const s = Object.assign({}, student);
-    console.log("opening");
     this.setState({
       student: s,
       startdate_datepicker: s.start_date ? dayjs(s.start_date) : null,
@@ -66,7 +65,6 @@ class StudentEditor extends React.Component {
   };
 
   close = () => {
-    console.log("closing");
     this.setState({ show_modal: false });
   };
 

@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import React from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import Heatmapmonth from "./heatmapmonth.jsx";
 
@@ -17,23 +17,19 @@ const groupingFunc = function (data) {
   return data.day.split("-")[0] + "-" + data.day.split("-")[1] + "-" + "01";
 };
 
-export default class Heatmap extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      mounted: false,
-    };
+export default function Heatmap({ days, requiredMinutes }) {
+  const [mounted, setMounted] = useState(false);
 
-    // Defer rendering the heatmaps so that the initial page load can take
-    // place without waiting for them.
+  // Defer rendering the heatmaps so that the initial page load can take
+  // place without waiting for them.
+  useEffect(() => {
     window.setTimeout(() => {
-      this.setState({ mounted: true });
+      setMounted(true);
     }, 0);
-  }
+  }, []);
 
-  loadHeatmaps = () => {
-    const groupedDays = this.props.days.groupBy(groupingFunc);
-    const minutes = this.props.requiredMinutes;
+  const heatmaps = useMemo(() => {
+    const groupedDays = days.groupBy(groupingFunc);
     const sortedDates = Object.keys(groupedDays).sort();
 
     let i = 0;
@@ -55,12 +51,10 @@ export default class Heatmap extends React.Component {
         .concatAll();
       i = j;
 
-      maps.push(<Heatmapmonth key={i} index={i} requiredMinutes={minutes} days={dates} />);
+      maps.push(<Heatmapmonth key={i} index={i} requiredMinutes={requiredMinutes} days={dates} />);
     }
     return maps;
-  };
+  }, [days, requiredMinutes]);
 
-  render() {
-    return this.state.mounted && <div className="row">{this.loadHeatmaps()}</div>;
-  }
+  return mounted && <div className="row">{heatmaps}</div>;
 }

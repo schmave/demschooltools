@@ -3,7 +3,6 @@ import dayjs from "dayjs";
 import { useEffect, useRef } from "react";
 
 // TODO:
-// heatmap click handler doesn't seem to reload on hot reload
 // Make legend more understandable
 
 const HeatmapMonth = ({ days, requiredMinutes, index }) => {
