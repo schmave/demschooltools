@@ -1,7 +1,11 @@
+import js from "@eslint/js";
 import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
 
 export default [
+  // Apply recommended rules from @eslint/js
+  js.configs.recommended,
+
   {
     files: ["**/*.{js,jsx}"],
     plugins: {
@@ -30,18 +34,24 @@ export default [
       },
     },
     rules: {
-      // Catch undefined variables
-      "no-undef": "error",
-      "no-unused-vars": "warn",
+      // Apply React recommended rules
+      ...react.configs.recommended.rules,
 
-      // React rules
-      "react/jsx-uses-react": "error",
-      "react/jsx-uses-vars": "error",
+      // Apply React Hooks recommended rules
+      ...reactHooks.configs.recommended.rules,
+
       "react/react-in-jsx-scope": "off", // Not needed with new JSX transform
+      "react/prop-types": "off",
 
-      // React Hooks rules
-      "react-hooks/rules-of-hooks": "error",
-      "react-hooks/exhaustive-deps": "warn",
+      // Additional helpful rules
+      "no-unused-vars": [
+        "warn",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+        },
+      ],
+      "no-console": ["warn", { allow: ["warn", "error"] }],
     },
   },
 ];

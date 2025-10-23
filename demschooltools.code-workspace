@@ -71,6 +71,10 @@
         },
         "prettier.configPath": "./custodia/.prettierrc.js",
         "prettier.prettierPath": "./custodia/node_modules/prettier",
+        "eslint.workingDirectories": [
+            "custodia"
+        ],
+        "eslint.useFlatConfig": true,
     },
     "extensions": {
         "recommendations": [

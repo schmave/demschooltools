@@ -1,17 +1,13 @@
 import "cal-heatmap/cal-heatmap.css";
 import dayjs from "dayjs";
 import { useEffect, useRef } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 
 // TODO:
-// Set start of week to Monday
-// Make legend more understandable
 // heatmap click handler doesn't seem to reload on hot reload
+// Make legend more understandable
 
 const HeatmapMonth = ({ days, requiredMinutes, index }) => {
-  const mapRef = useRef(null);
-  const navigate = useNavigate();
-  const location = useLocation();
+  const calHeatmap = useRef(null);
 
   const formatDays = (days, requiredMinutes) => {
     const formatted = [];
@@ -38,11 +34,8 @@ const HeatmapMonth = ({ days, requiredMinutes, index }) => {
       const data = formatDays(days, requiredMinutes);
       const highlight = getHighlights(days);
 
-      const doUpdate = mapRef.current !== null;
-      if (!doUpdate) {
-        const CalHeatmap = (await import("cal-heatmap")).default;
-        mapRef.current = new CalHeatmap();
-      }
+      const CalHeatmap = (await import("cal-heatmap")).default;
+      calHeatmap.current = new CalHeatmap();
 
       const selector = "#heatmap" + index;
       const padNumber = function (n) {
@@ -59,75 +52,71 @@ const HeatmapMonth = ({ days, requiredMinutes, index }) => {
         return "day-" + datestring;
       };
 
-      if (doUpdate) {
-        await mapRef.current.fill(data);
-        await mapRef.current.paint({
-          date: {
-            highlight,
-          },
-        });
-      } else {
-        const Tooltip = (await import("cal-heatmap/plugins/Tooltip")).default;
-        const Legend = (await import("cal-heatmap/plugins/Legend")).default;
+      const Tooltip = (await import("cal-heatmap/plugins/Tooltip")).default;
+      const Legend = (await import("cal-heatmap/plugins/Legend")).default;
 
-        await mapRef.current.paint(
-          {
-            itemSelector: selector,
-            data: {
-              source: data,
-              x: "date",
-              y: "value",
-            },
-            date: {
-              start: dayjs(days[0].day).startOf("month").toDate(),
-              highlight,
-            },
-            domain: {
-              type: "month",
-            },
-            subDomain: {
-              type: "xDay",
-              label: "D",
-              width: 15,
-              height: 15,
-            },
-            range: 4,
-            scale: {
-              color: {
-                type: "threshold",
-                range: ["#c62828", "#ff6659", "#EEE8AA", "#80e27e", "#4caf50", "#087f23"],
-                domain: [1, 210, requiredMinutes - 45, requiredMinutes - 15].sort((a, b) => a - b),
-              },
+      await calHeatmap.current.paint(
+        {
+          itemSelector: selector,
+          data: {
+            source: data,
+            x: "date",
+            y: "value",
+          },
+          date: {
+            start: dayjs(days[0].day).startOf("month").toDate(),
+            highlight,
+            locale: { weekStart: 1 },
+          },
+          domain: {
+            type: "month",
+          },
+          subDomain: {
+            type: "xDay",
+            label: "D",
+            width: 15,
+            height: 15,
+          },
+          range: 4,
+          scale: {
+            color: {
+              type: "threshold",
+              range: ["#c62828", "#ff6659", "#EEE8AA", "#80e27e", "#4caf50", "#087f23"],
+              domain: [1, 210, requiredMinutes - 45, requiredMinutes - 15].sort((a, b) => a - b),
             },
           },
+        },
+        [
           [
-            [
-              Tooltip,
-              {
-                text: function (date, value, dayjsDate) {
-                  return (value ? value : "0") + " minute" + (value !== 1 ? "s" : "");
-                },
+            Tooltip,
+            {
+              text: function (date, value, _dayjsDate) {
+                return (value ? value : "0") + " minute" + (value !== 1 ? "s" : "");
               },
-            ],
-            [
-              Legend,
-              {
-                itemSelector: selector,
-                label: "minutes",
-                width: 200,
-              },
-            ],
+            },
           ],
-        );
-        mapRef.current.on("click", (event, timestamp, value) => {
-          const d = new Date(timestamp);
-          document.getElementById(makeDateId(d))?.click();
-        });
-      }
+          [
+            Legend,
+            {
+              itemSelector: selector,
+              label: "minutes",
+              width: 200,
+            },
+          ],
+        ],
+      );
+      calHeatmap.current.on("click", (event, timestamp, _value) => {
+        const d = new Date(timestamp);
+        document.getElementById(makeDateId(d))?.click();
+      });
     };
 
     loadHeatmap();
-  }, [days, requiredMinutes, index, navigate, location.pathname]);
+
+    return () => {
+      calHeatmap.current?.destroy();
+    };
+  }, [days, requiredMinutes, index]);
 
   return <div id={"heatmap" + index} style={{ float: "none" }}></div>;
 };
