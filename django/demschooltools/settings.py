@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
-CUSTODIA_DEV_SERVER = True
+DJANGO_VITE = {"default": {"dev_mode": True, "dev_server_port": 8082}}
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "django-insecure-8*$0&(xq!3-)o0p%f@kusqqi1^02knn!3c8t)+n&z*cs_89cf*"
@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_vite",
     "custodia",
     "dst",
 ] + (["silk"] if SILK_ENABLED else [])
@@ -194,9 +195,11 @@ USE_L10N = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
+STATIC_ROOT = "dev-static-root"  # This has to be specified for django_vite to work
 STATIC_URL = "/django-static/"
 STATICFILES_DIRS = [
     BASE_DIR / "static",
+    BASE_DIR / "static-vite",
 ]
 STORAGES = {
     "staticfiles": {"BACKEND": "demschooltools.storage.RandomVersionStaticFilesStorage"}

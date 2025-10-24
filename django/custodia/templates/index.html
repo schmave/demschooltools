@@ -1,4 +1,5 @@
 {% load static %}
+{% load django_vite %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -32,21 +33,9 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 
 
-    {% comment %}
-    Consider using https://github.com/MrBin99/django-vite instead of this.
-    {% endcomment %}
-    {% if dev_js %}
-        <script type="module">import { injectIntoGlobalHook } from "http://localhost:8082/@react-refresh";
-        injectIntoGlobalHook(window);
-        window.$RefreshReg$ = () => {};
-        window.$RefreshSig$ = () => (type) => type;</script>
-
-        <script type="module" src="http://localhost:8082/@vite/client"></script>
-        <script type="module" src="http://localhost:8082/src/js/app.jsx"></script>
-    {% else %}
-        <script type="module" src="{% static 'custodia/app.js' %}"></script>
-        <link href="{% static 'custodia/app.css' %}" rel="stylesheet">
-    {% endif %}
+    {% vite_hmr_client %}
+    {% vite_react_refresh %}
+    {% vite_asset 'src/js/app.jsx' %}
   </head>
   <body>
     {% csrf_token %}

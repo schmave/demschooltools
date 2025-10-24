@@ -12,21 +12,16 @@ export default ({ command, mode }) =>
     plugins: [react(), visualizer()],
     root: ".",
     publicDir: false, // Django handles static files
-    base: command == "build" ? "/django-static/custodia/" : "",
+    base: "/django-static",
     build: {
-      outDir: resolve(__dirname, "..", "django", "static", "custodia"),
+      outDir: resolve(__dirname, "..", "django", "static-vite"),
       emptyOutDir: true,
       rollupOptions: {
         input: {
-          app: resolve(__dirname, "src", "js", "app.jsx"),
-          html: resolve(__dirname, "index.html"),
-        },
-        output: {
-          assetFileNames: `[name].[ext]`,
-          entryFileNames: `[name].js`,
+          custodia: resolve(__dirname, "src", "js", "app.jsx"),
         },
       },
-      manifest: true,
+      manifest: "manifest.json", // django-vite requires this
       sourcemap: true,
     },
     server: {

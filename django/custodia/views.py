@@ -46,7 +46,6 @@ class IndexView(View):
             request,
             "index.html",
             {
-                "dev_js": settings.CUSTODIA_DEV_SERVER,
                 "rollbar_environment": settings.ROLLBAR_ENVIRONMENT,
                 "rollbar_token": settings.ROLLBAR_FRONTEND_TOKEN,
             },
