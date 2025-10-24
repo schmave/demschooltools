@@ -117,7 +117,7 @@ const HeatmapMonth = ({ days, requiredMinutes, index, showLegend }) => {
     return () => {
       heatmap?.destroy();
     };
-  }, [days, requiredMinutes, index]);
+  }, [days, requiredMinutes, index, showLegend]);
 
   return <div id={"heatmap" + index} style={{ float: "none" }}></div>;
 };
