@@ -33,7 +33,7 @@ export default function Heatmap({ days, requiredMinutes }) {
     const sortedDates = Object.keys(groupedDays).sort();
 
     let i = 0;
-    const maps = [];
+    const dateBunches = [];
     while (i < sortedDates.length) {
       // Find up to four months worth of dates, which we will send
       // to Heatmapmonth in one batch.
@@ -51,9 +51,17 @@ export default function Heatmap({ days, requiredMinutes }) {
         .concatAll();
       i = j;
 
-      maps.push(<Heatmapmonth key={i} index={i} requiredMinutes={requiredMinutes} days={dates} />);
+      dateBunches.push(dates);
     }
-    return maps;
+    return dateBunches.map((dates, i) => (
+      <Heatmapmonth
+        key={i}
+        index={i}
+        requiredMinutes={requiredMinutes}
+        days={dates}
+        showLegend={i === dateBunches.length - 1}
+      />
+    ));
   }, [days, requiredMinutes]);
 
   return mounted && <div className="row">{heatmaps}</div>;
