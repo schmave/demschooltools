@@ -615,10 +615,12 @@ public class Attendance extends Controller {
   public Result signInSheet(Http.Request request) {
 
     Organization org = Utils.getOrg(request);
-    String peopleJson = Application.attendancePeopleJson(org);
+    String peopleJson = Application.attendancePeopleWithTagsJson(org);
+    String tagsJson = Application.attendanceTagsJson(org);
+    String allPeopleJson = Application.allPeopleJson(org);
     return ok(
         attendance_sign_in_sheet.render(
-            peopleJson, request, mMessagesApi.preferred(request)));
+            peopleJson, tagsJson, allPeopleJson, request, mMessagesApi.preferred(request)));
   }
 
   public Result editWeek(String date, Http.Request request) {

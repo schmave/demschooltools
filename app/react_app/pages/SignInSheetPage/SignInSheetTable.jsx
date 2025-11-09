@@ -24,16 +24,35 @@ const SignInSheetTable = ({
   rows,
   schoolDays = DAYS,
   showHeader = true,
+  schoolName = 'The Circle School',
+  sheetTitle = 'Sign-In / Sign-Out Sheet',
 }) => (
   <Paper elevation={0} sx={styles.paper}>
     {showHeader && (
       <Stack spacing={1.5}>
-        <Typography variant="subtitle2" sx={styles.weekLabel}>
-          Week of {weekLabel}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {quote || 'Add a quote above to show it across each page.'}
-        </Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: 2 }}>
+          <Box sx={{ flex: '0 0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <Typography variant="h6" sx={{ fontWeight: 700 }}>
+              Week Of
+            </Typography>
+            <Typography variant="body1">
+              {weekLabel}
+            </Typography>
+          </Box>
+          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <Typography variant="body2" color="text.secondary">
+              {schoolName}
+            </Typography>
+            <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
+              {sheetTitle}
+            </Typography>
+            {quote && (
+              <Typography variant="body1" sx={{ fontStyle: 'italic', fontWeight: 700, mt: 0.5 }}>
+                {quote}
+              </Typography>
+            )}
+          </Box>
+        </Box>
         <Divider />
       </Stack>
     )}

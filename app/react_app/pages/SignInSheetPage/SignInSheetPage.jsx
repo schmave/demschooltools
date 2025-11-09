@@ -22,29 +22,157 @@ import SignInSheetTable from './SignInSheetTable';
 import SignInSheetPdf from './SignInSheetPdf';
 import {
   assignDisplayIndices,
-  buildSampleRoster,
   buildWeekDates,
   formatGeneratedAt,
   formatWeekLabel,
-  parseRosterFromInitialData,
   splitRosterByRole,
   sortPeopleByName,
   DAYS,
 } from './SignInUtils';
+import { safeParse, normalizeOption, buildOptionMap } from '../../utils';
 
 const SignInSheetPage = () => {
   const { setSnackbar } = useContext(SnackbarContext);
   const [quote, setQuote] = useState('');
+  const [sheetTitle, setSheetTitle] = useState('Sign-In / Sign-Out Sheet');
   const [weekStart, setWeekStart] = useState(() =>
     dayjs().startOf('week').add(1, 'day')
   );
   const [isPrinting, setIsPrinting] = useState(false);
   const [schoolDays, setSchoolDays] = useState(() => [...DAYS]);
 
+  // Parse people and tags from initial data
+  const initialPeople = useMemo(
+    () => safeParse(window.initialData?.people, []),
+    []
+  );
+  const peopleOptions = useMemo(
+    () =>
+      initialPeople
+        .map((person) => normalizeOption(person))
+        .filter(Boolean),
+    [initialPeople]
+  );
+  const peopleOptionMap = useMemo(
+    () => buildOptionMap(peopleOptions),
+    [peopleOptions]
+  );
+
+  // Parse all people for the Guests dropdown
+  const allPeople = useMemo(
+    () => safeParse(window.initialData?.allPeople, []),
+    []
+  );
+  const allPeopleOptions = useMemo(
+    () =>
+      allPeople
+        .map((person) => normalizeOption(person))
+        .filter(Boolean),
+    [allPeople]
+  );
+  const allPeopleOptionMap = useMemo(
+    () => buildOptionMap(allPeopleOptions),
+    [allPeopleOptions]
+  );
+
+  const initialTags = useMemo(
+    () => safeParse(window.initialData?.tags, []),
+    []
+  );
+  const tagOptions = useMemo(
+    () =>
+      initialTags
+        .map((tag) => normalizeOption(tag))
+        .filter(Boolean),
+    [initialTags]
+  );
+  const tagOptionMap = useMemo(
+    () => buildOptionMap(tagOptions),
+    [tagOptions]
+  );
+
+  // Find default tag IDs
+  const currentStudentTagId = useMemo(
+    () => tagOptions.find((tag) => tag.label === 'Current Student')?.id || null,
+    [tagOptions]
+  );
+  const staffTagId = useMemo(
+    () => tagOptions.find((tag) => tag.label === 'Staff')?.id || null,
+    [tagOptions]
+  );
+
+  // State for selected tags and people
+  const [selectedStudentTags, setSelectedStudentTags] = useState(() =>
+    currentStudentTagId ? [currentStudentTagId] : []
+  );
+  const [selectedStaffTags, setSelectedStaffTags] = useState(() =>
+    staffTagId ? [staffTagId] : []
+  );
+  const [selectedGuests, setSelectedGuests] = useState([]);
+
+  // Build roster from selected tags and people
   const roster = useMemo(() => {
-    const parsed = parseRosterFromInitialData();
-    return parsed.length ? parsed : buildSampleRoster();
-  }, []);
+    const result = [];
+
+    // Add students based on selected tags
+    if (selectedStudentTags.length > 0) {
+      const studentTagSet = new Set(selectedStudentTags.map(String));
+      initialPeople.forEach((person) => {
+        const personTags = person.tags || [];
+        const hasStudentTag = personTags.some((tagId) =>
+          studentTagSet.has(String(tagId))
+        );
+        if (hasStudentTag) {
+          result.push({
+            id: person.id,
+            name: person.label || person.name || '',
+            role: 'student',
+          });
+        }
+      });
+    }
+
+    // Add staff based on selected tags
+    if (selectedStaffTags.length > 0) {
+      const staffTagSet = new Set(selectedStaffTags.map(String));
+      initialPeople.forEach((person) => {
+        const personTags = person.tags || [];
+        const hasStaffTag = personTags.some((tagId) =>
+          staffTagSet.has(String(tagId))
+        );
+        if (hasStaffTag) {
+          // Check if already added as student
+          if (!result.some((p) => p.id === person.id)) {
+            result.push({
+              id: person.id,
+              name: person.label || person.name || '',
+              role: 'staff',
+            });
+          }
+        }
+      });
+    }
+
+    // Add guests based on selected people
+    selectedGuests.forEach((guestId) => {
+      const person = allPeopleOptionMap.get(String(guestId));
+      if (person && !result.some((p) => p.id === person.id)) {
+        result.push({
+          id: person.id,
+          name: person.label,
+          role: 'guest',
+        });
+      }
+    });
+
+    return result;
+  }, [
+    selectedStudentTags,
+    selectedStaffTags,
+    selectedGuests,
+    initialPeople,
+    allPeopleOptionMap,
+  ]);
 
   const { students, guests, staff } = useMemo(
     () => splitRosterByRole(roster),
@@ -128,6 +256,7 @@ const SignInSheetPage = () => {
           students={studentRows}
           guestStaff={guestStaffRows}
           schoolDays={schoolDays}
+          sheetTitle={sheetTitle}
         />
       );
       const blob = await pdf(doc).toBlob();
@@ -155,6 +284,7 @@ const SignInSheetPage = () => {
     studentRows,
     weekDates,
     weekLabel,
+    sheetTitle,
   ]);
 
   return (
@@ -176,34 +306,97 @@ const SignInSheetPage = () => {
           </Button>
         </Stack>
 
-        <Stack
-          direction={{ xs: 'column', md: 'row' }}
-          spacing={2}
-          alignItems={{ md: 'center' }}
-        >
-          <DatePicker
-            label="Week of"
-            value={weekStart}
-            setValue={handleWeekSelection}
-          />
-          <SelectInput
-            size="medium"
-            showClearButton
-            label="School Days"
-            multiple
-            value={schoolDays}
-            setValue={setSchoolDays}
-            options={schoolDayOptions}
-            placeholder="Select days"
-            fullWidth
-          />
-          <TextField
-            label="Quote"
-            value={quote}
-            onChange={(event) => setQuote(event.target.value)}
-            placeholder="Add an inspirational quote"
-            fullWidth
-          />
+        <Stack spacing={2}>
+          <Stack
+            direction={{ xs: 'column', md: 'row' }}
+            spacing={2}
+            alignItems={{ md: 'center' }}
+          >
+            <DatePicker
+              label="Week of"
+              value={weekStart}
+              setValue={handleWeekSelection}
+            />
+            <SelectInput
+              size="medium"
+              showClearButton
+              label="School Days"
+              multiple
+              value={schoolDays}
+              setValue={setSchoolDays}
+              options={schoolDayOptions}
+              placeholder="Select days"
+              fullWidth
+            />
+          </Stack>
+
+          <Stack
+            direction={{ xs: 'column', md: 'row' }}
+            spacing={2}
+          >
+            <TextField
+              label="Sheet Title"
+              value={sheetTitle}
+              onChange={(event) => setSheetTitle(event.target.value)}
+              placeholder="Sign-In / Sign-Out Sheet"
+              fullWidth
+            />
+            <TextField
+              label="Quote"
+              value={quote}
+              onChange={(event) => setQuote(event.target.value)}
+              placeholder="Add an inspirational quote"
+              fullWidth
+            />
+          </Stack>
+
+          <Stack
+            direction={{ xs: 'column', md: 'row' }}
+            spacing={2}
+          >
+            <SelectInput
+              autocomplete
+              multiple
+              label="Students"
+              options={tagOptions.map((tag) => ({ ...tag, value: tag.id, label: tag.label }))}
+              value={selectedStudentTags}
+              onChange={(e, newIds) => {
+                setSelectedStudentTags(Array.isArray(newIds) ? newIds : []);
+              }}
+              placeholder="Select student tags"
+              size="medium"
+              fullWidth
+              showClearButton
+            />
+            <SelectInput
+              autocomplete
+              multiple
+              label="Staff"
+              options={tagOptions.map((tag) => ({ ...tag, value: tag.id, label: tag.label }))}
+              value={selectedStaffTags}
+              onChange={(e, newIds) => {
+                setSelectedStaffTags(Array.isArray(newIds) ? newIds : []);
+              }}
+              placeholder="Select staff tags"
+              size="medium"
+              fullWidth
+              showClearButton
+            />
+            <SelectInput
+              autocomplete
+              multiple
+              label="Guests"
+              options={allPeopleOptions.map((person) => ({ ...person, value: person.id, label: person.label }))}
+              value={selectedGuests}
+              onChange={(e, newIds) => {
+                setSelectedGuests(Array.isArray(newIds) ? newIds : []);
+              }}
+              placeholder="Select guests"
+              size="medium"
+              fullWidth
+              showClearButton
+            />
+          </Stack>
         </Stack>
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -213,6 +406,7 @@ const SignInSheetPage = () => {
             quote={quote}
             rows={studentRows}
             schoolDays={schoolDays}
+            sheetTitle={sheetTitle}
           />
           {guestStaffRows.length > 0 && (
             <Stack spacing={1.5}>
@@ -225,6 +419,7 @@ const SignInSheetPage = () => {
                 rows={guestStaffRows}
                 schoolDays={schoolDays}
                 showHeader={false}
+                sheetTitle={sheetTitle}
               />
             </Stack>
           )}
