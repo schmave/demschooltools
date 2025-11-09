@@ -13,13 +13,15 @@ import '@fontsource/roboto/700.css';
 // And Pages:
 import {
   EditMinutesPage,
-  ReadMinutesPage
+  ReadMinutesPage,
+  SignInSheetPage,
 } from './pages';
 
 // We're not controlling routing with React, but this lets us use one React App and map the Play/Scala paths to React Pages
 const router = createBrowserRouter([
   { path: "/editTodayReact", element: <EditMinutesPage /> },
   { path: "/readTodayReact", element: <ReadMinutesPage /> },
+  { path: "/attendance/signInSheet", element: <SignInSheetPage /> },
 ]);
 
 function App() {

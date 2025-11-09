@@ -130,6 +130,8 @@ GET     /attendance/jsonPeople               controllers.Attendance.jsonPeople(t
 GET     /attendance/viewWeek	  controllers.Attendance.viewWeek(date : String ?= "", request: Request)
 GET     /attendance/editWeek      controllers.Attendance.editWeek(date : String ?= "", request: Request)
 
+GET     /attendance/signInSheet              controllers.Attendance.signInSheet(request: Request)
+
 GET  	/attendance/checkin				controllers.Public.checkin()
 GET     /attendance/checkin/data 		controllers.Checkin.checkinData(time: String, request: Request)
 POST    /attendance/checkin/message 	controllers.Checkin.checkinMessage(time_string: String, personId: Integer, is_arriving: Boolean, request: Request)

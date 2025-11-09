@@ -1,0 +1,12 @@
+@(peopleJson: String)(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
+
+@main("Print Sign In Sheet", "attendance", "sign_in_sheet") {
+    <div id="react-root"></div>
+
+    <script type="text/javascript">
+      window.initialData = window.initialData || {};
+      window.initialData.people = @Html(peopleJson);
+    </script>
+
+    @views.html.tags.react_bundle_loader()
+}
