@@ -1,6 +1,7 @@
 import React, {
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from 'react';
@@ -33,6 +34,8 @@ import { safeParse, normalizeOption, buildOptionMap } from '../../utils';
 
 const SignInSheetPage = () => {
   const { setSnackbar } = useContext(SnackbarContext);
+  
+  // All useState declarations grouped together
   const [quote, setQuote] = useState('');
   const [sheetTitle, setSheetTitle] = useState('Sign-In / Sign-Out Sheet');
   const [weekStart, setWeekStart] = useState(() =>
@@ -40,12 +43,25 @@ const SignInSheetPage = () => {
   );
   const [isPrinting, setIsPrinting] = useState(false);
   const [schoolDays, setSchoolDays] = useState(() => [...DAYS]);
+  const [selectedStudentTags, setSelectedStudentTags] = useState([]);
+  const [selectedStaffTags, setSelectedStaffTags] = useState([]);
+  const [selectedGuests, setSelectedGuests] = useState([]);
 
-  // Parse people and tags from initial data
+  // Parse initial data
   const initialPeople = useMemo(
     () => safeParse(window.initialData?.people, []),
     []
   );
+  const allPeople = useMemo(
+    () => safeParse(window.initialData?.allPeople, []),
+    []
+  );
+  const initialTags = useMemo(
+    () => safeParse(window.initialData?.tags, []),
+    []
+  );
+
+  // Build options and maps
   const peopleOptions = useMemo(
     () =>
       initialPeople
@@ -58,11 +74,6 @@ const SignInSheetPage = () => {
     [peopleOptions]
   );
 
-  // Parse all people for the Guests dropdown
-  const allPeople = useMemo(
-    () => safeParse(window.initialData?.allPeople, []),
-    []
-  );
   const allPeopleOptions = useMemo(
     () =>
       allPeople
@@ -75,10 +86,6 @@ const SignInSheetPage = () => {
     [allPeopleOptions]
   );
 
-  const initialTags = useMemo(
-    () => safeParse(window.initialData?.tags, []),
-    []
-  );
   const tagOptions = useMemo(
     () =>
       initialTags
@@ -91,24 +98,20 @@ const SignInSheetPage = () => {
     [tagOptions]
   );
 
-  // Find default tag IDs
-  const currentStudentTagId = useMemo(
-    () => tagOptions.find((tag) => tag.label === 'Current Student')?.id || null,
-    [tagOptions]
-  );
-  const staffTagId = useMemo(
-    () => tagOptions.find((tag) => tag.label === 'Staff')?.id || null,
-    [tagOptions]
-  );
+  // Initialize default tag selections on mount
+  useEffect(() => {
+    const currentStudentTag = tagOptions.find(
+      (tag) => tag.label === 'Current Student'
+    );
+    const staffTag = tagOptions.find((tag) => tag.label === 'Staff');
 
-  // State for selected tags and people
-  const [selectedStudentTags, setSelectedStudentTags] = useState(() =>
-    currentStudentTagId ? [currentStudentTagId] : []
-  );
-  const [selectedStaffTags, setSelectedStaffTags] = useState(() =>
-    staffTagId ? [staffTagId] : []
-  );
-  const [selectedGuests, setSelectedGuests] = useState([]);
+    if (currentStudentTag) {
+      setSelectedStudentTags([currentStudentTag.id]);
+    }
+    if (staffTag) {
+      setSelectedStaffTags([staffTag.id]);
+    }
+  }, [tagOptions]);
 
   // Build roster from selected tags and people
   const roster = useMemo(() => {
