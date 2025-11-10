@@ -1,5 +1,6 @@
 import React from "react";
 import CustodiaShell from "./app.jsx";
+import NavigationBridge from "./NavigationBridge.jsx";
 import Student from "./student.jsx";
 import StudentReports from "./studentreports.jsx";
 import StudentTable from "./studenttable.jsx";
@@ -9,7 +10,11 @@ const StudentWithRouter = withRouter(Student);
 
 export const custodiaRoute = {
   path: "/custodia",
-  element: <CustodiaShell />,
+  element: (
+    <NavigationBridge>
+      <CustodiaShell />
+    </NavigationBridge>
+  ),
   children: [
     { index: true, element: <StudentTable /> },
     { path: "students", element: <StudentTable /> },

@@ -1,39 +1,24 @@
-const normalizePath = (path) => {
-  if (!path) {
-    return "/";
+const callNavigate = (path, options = {}) => {
+  const navigate = window.__custodiaNavigate;
+  if (typeof navigate === "function") {
+    navigate(path, options);
+    return true;
   }
-  return path.startsWith("/") ? path : `/${path}`;
+  return false;
 };
 
 const push = (path) => {
-  const normalized = normalizePath(path);
-  const targetHash = `#${normalized}`;
-  if (window.location.hash === targetHash) {
-    return;
-  }
-  window.location.hash = targetHash;
-};
-
-const dispatchHashChange = () => {
-  try {
-    window.dispatchEvent(new HashChangeEvent("hashchange"));
-  } catch (e) {
-    const event = document.createEvent("HTMLEvents");
-    event.initEvent("hashchange", true, true);
-    window.dispatchEvent(event);
+  if (!callNavigate(path)) {
+    const normalized = path.startsWith("/") ? path : `/${path}`;
+    window.location.href = normalized;
   }
 };
 
 const replace = (path) => {
-  const normalized = normalizePath(path);
-  const base = `${window.location.origin}${window.location.pathname}${window.location.search}`;
-  window.history.replaceState(null, "", `${base}#${normalized}`);
-  dispatchHashChange();
+  if (!callNavigate(path, { replace: true })) {
+    const normalized = path.startsWith("/") ? path : `/${path}`;
+    window.location.replace(normalized);
+  }
 };
 
-const history = {
-  push,
-  replace,
-};
-
-module.exports = { default: history };
+module.exports = { default: { push, replace } };

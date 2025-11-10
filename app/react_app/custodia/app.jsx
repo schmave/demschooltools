@@ -4,7 +4,7 @@ import Flash from "./flashnotification.jsx";
 import Nav from "./nav.jsx";
 
 const CustodiaShell = () => (
-  <div>
+  <div className="custodia-shell">
     <Nav />
     <Flash />
     <div className="content">
