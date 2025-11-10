@@ -33,7 +33,7 @@
     </head>
     <body>
         {% csrf_token %}
-        <div id="react_container"/>
+<div id="react-root"></div>
         {% if dev_js_link %}
             {{ dev_js_link | safe}}
         {% else %}

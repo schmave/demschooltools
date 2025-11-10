@@ -85,11 +85,10 @@ Then run:
 
 ### (3 of 3) Custodia frontend code
 
-To enable the Custodia attendance system locally, run:
+To enable the Custodia attendance system locally, run these commands from the repo root (the same Webpack dev server now powers every React bundle):
 
-    cd custodia
     npm install
-    npm run watch
+    npm run dev
 
 # Play database evolutions troubleshooting
 

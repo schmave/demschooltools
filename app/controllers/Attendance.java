@@ -738,15 +738,15 @@ public class Attendance extends Controller {
   }
 
   public Result viewCustodiaAdmin(Http.Request request) {
-    return ok(
-        main_with_mustache.render(
-            "Sign in system",
-            "custodia",
-            "",
-            "custodia_admin.html",
-            new HashMap<>(),
-            request,
-            mMessagesApi.preferred(request)));
+    return redirect("/custodia");
+  }
+
+  public Result viewCustodia(Http.Request request) {
+    return ok(custodia_react.render(request, mMessagesApi.preferred(request)));
+  }
+
+  public Result viewCustodiaPath(String extra, Http.Request request) {
+    return viewCustodia(request);
   }
 
   public Result rules(Http.Request request) {

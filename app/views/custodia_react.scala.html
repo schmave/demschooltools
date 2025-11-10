@@ -1,0 +1,6 @@
+@(implicit request: play.mvc.Http.Request, messages: play.i18n.Messages)
+
+@main("Custodia", "custodia") {
+    <div id="react-root"></div>
+    @views.html.tags.react_bundle_loader("custodia.js")
+}

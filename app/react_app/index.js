@@ -1,11 +1,8 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
 import './index.scss';
-import App from './App.jsx';
+import { mountReactApp } from './renderApp';
 
-const root = ReactDOM.createRoot(document.getElementById('react-root'));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+const target = document.getElementById('react-root') || document.getElementById('react_container');
+
+if (target) {
+  mountReactApp(target);
+}

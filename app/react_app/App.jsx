@@ -1,28 +1,14 @@
 import React, { useState } from "react";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { ThemeProvider } from "@mui/material/styles";
 import { Snackbar, Alert } from "@mui/material";
 import { SnackbarContext, DefaultSnackbar } from './contexts';
 import { lightTheme } from "./theme/theme";
+import Navigation from "./containers/Navigation.jsx";
 
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-
-// And Pages:
-import {
-  EditMinutesPage,
-  ReadMinutesPage,
-  SignInSheetPage,
-} from './pages';
-
-// We're not controlling routing with React, but this lets us use one React App and map the Play/Scala paths to React Pages
-const router = createBrowserRouter([
-  { path: "/editTodayReact", element: <EditMinutesPage /> },
-  { path: "/readTodayReact", element: <ReadMinutesPage /> },
-  { path: "/attendance/signInSheet", element: <SignInSheetPage /> },
-]);
 
 function App() {
   const [showSnackbar, setShowSnackbar] = useState(false);
@@ -50,7 +36,7 @@ function App() {
       <SnackbarContext.Provider
         value={{ snackbar: snackbarDetails, setSnackbar }}
       >
-        <RouterProvider router={router} />
+        <Navigation />
         <Snackbar
           open={showSnackbar}
           onClose={onDismissSnackBar}
