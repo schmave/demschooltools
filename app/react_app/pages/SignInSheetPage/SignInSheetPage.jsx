@@ -22,6 +22,8 @@ import { SnackbarContext } from '../../contexts';
 import SignInSheetTable from './SignInSheetTable';
 import SignInSheetPdf from './SignInSheetPdf';
 import {
+  addBlankRowsToGuestStaff,
+  addBlankRowsToStudents,
   assignDisplayIndices,
   buildWeekDates,
   formatGeneratedAt,
@@ -205,11 +207,16 @@ const SignInSheetPage = () => {
     [studentsSorted, guestsSorted, staffSorted]
   );
 
-  const studentRows = studentsWithIndex;
-  const guestStaffRows = useMemo(
-    () => [...guestsWithIndex, ...staffWithIndex],
-    [guestsWithIndex, staffWithIndex]
+  const studentRows = useMemo(
+    () => addBlankRowsToStudents(studentsWithIndex),
+    [studentsWithIndex]
   );
+  
+  const guestStaffRows = useMemo(() => {
+    // Calculate starting index for guests/staff based on total student rows (including blanks)
+    const startingIndex = studentRows.length + 1;
+    return addBlankRowsToGuestStaff(guestsWithIndex, staffWithIndex, startingIndex);
+  }, [guestsWithIndex, staffWithIndex, studentRows]);
 
   const weekDates = useMemo(
     () => buildWeekDates(weekStart),
@@ -250,14 +257,16 @@ const SignInSheetPage = () => {
     setIsPrinting(true);
     try {
       const generatedAt = formatGeneratedAt();
+      // PDF adds its own blank rows, so pass original arrays
+      const pdfGuestStaff = [...guestsWithIndex, ...staffWithIndex];
       const doc = (
         <SignInSheetPdf
           weekLabel={weekLabel}
           weekDates={weekDates}
           quote={quote}
           generatedAt={generatedAt}
-          students={studentRows}
-          guestStaff={guestStaffRows}
+          students={studentsWithIndex}
+          guestStaff={pdfGuestStaff}
           schoolDays={schoolDays}
           sheetTitle={sheetTitle}
         />
@@ -279,12 +288,13 @@ const SignInSheetPage = () => {
       setIsPrinting(false);
     }
   }, [
-    guestStaffRows,
+    guestsWithIndex,
+    staffWithIndex,
+    studentsWithIndex,
     handleError,
     quote,
     schoolDays,
     setSnackbar,
-    studentRows,
     weekDates,
     weekLabel,
     sheetTitle,

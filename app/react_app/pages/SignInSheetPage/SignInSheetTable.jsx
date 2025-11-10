@@ -84,6 +84,7 @@ const SignInSheetTable = ({
 
       {rows.map((row, index) => {
         const isSection = row.type === 'section';
+        const isBlank = row.role === 'blank';
         const backgroundColor = isSection
           ? 'grey.100'
           : index % 2 === 0
@@ -114,9 +115,11 @@ const SignInSheetTable = ({
             </Box>
             <Box sx={styles.nameCell}>
               <Box sx={styles.nameCellName}>
-                <FitText maxSize={24} maxRows={2}>
-                  {row.name}
-                </FitText>
+                {!isBlank && (
+                  <FitText maxSize={24} maxRows={2}>
+                    {row.name}
+                  </FitText>
+                )}
               </Box>
               <Box sx={styles.nameCellStatusColumn}>
                 <Box sx={styles.nameCellStatusTop}>

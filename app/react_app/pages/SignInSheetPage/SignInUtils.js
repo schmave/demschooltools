@@ -154,3 +154,62 @@ export const buildGuestStaffRows = (guests, staff) => {
 
   return rows;
 };
+
+const ROWS_PER_PAGE = 18;
+
+const createBlankRow = (key, displayIndex) => ({
+  id: `blank-${key}`,
+  name: '',
+  displayIndex,
+  role: 'blank',
+});
+
+export const addBlankRowsToStudents = (students) => {
+  if (students.length === 0) {
+    return [];
+  }
+
+  const result = [...students];
+  const remainder = students.length % ROWS_PER_PAGE;
+  
+  if (remainder !== 0) {
+    const blankCount = ROWS_PER_PAGE - remainder;
+    const startIndex = students[students.length - 1].displayIndex + 1;
+    
+    for (let i = 0; i < blankCount; i += 1) {
+      result.push(createBlankRow(`student-${i}`, startIndex + i));
+    }
+  }
+
+  return result;
+};
+
+export const addBlankRowsToGuestStaff = (guests, staff, startingIndex) => {
+  if (guests.length === 0 && staff.length === 0) {
+    return [];
+  }
+
+  const total = guests.length + staff.length;
+  const remainder = total % ROWS_PER_PAGE;
+  const blankCount = remainder === 0 ? 0 : ROWS_PER_PAGE - remainder;
+
+  // Re-number guests to start from startingIndex
+  const numberedGuests = guests.map((row, idx) => ({
+    ...row,
+    displayIndex: startingIndex + idx,
+  }));
+  
+  // Create blank rows with correct numbering after guests
+  const blankRows = [];
+  for (let i = 0; i < blankCount; i += 1) {
+    blankRows.push(createBlankRow(`separator-${i}`, startingIndex + guests.length + i));
+  }
+  
+  // Re-number staff to start after guests + blank rows
+  const numberedStaff = staff.map((row, idx) => ({
+    ...row,
+    displayIndex: startingIndex + guests.length + blankCount + idx,
+  }));
+  
+  return [...numberedGuests, ...blankRows, ...numberedStaff];
+};
