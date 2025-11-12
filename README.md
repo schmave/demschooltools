@@ -19,7 +19,7 @@ See [the wiki](https://github.com/schmave/demschooltools/wiki/) for more informa
 
 1.  [Download](http://www.postgresql.org/download/) and install PostgreSQL. If you use a Mac, I recommend installing [the "Postgres" app](https://postgresapp.com/) instead.
 
-1.  [Download](https://nodejs.org/en/download/releases/) and install Node v18.
+1.  [Download](https://nodejs.org/en/download/releases/) and install Node v22. If you use Mac or Linux or Windows WSL, I recommend using [nvm](https://github.com/nvm-sh/nvm/blob/master/README.md#about) to install it.
 
 1.  [Download](https://github.com/schmave/demschooltools/archive/master.zip) the source code, or clone the git repository. `cd` into the root level of the source code.
 
