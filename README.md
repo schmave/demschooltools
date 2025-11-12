@@ -89,7 +89,19 @@ django.db.migrations.exceptions.InconsistentMigrationHistory:
     dependency dst.0001_initial on database 'default'.
 ```
 
-In order to fix this, connect to the school_crm database and run this SQL statement:
+If you're willing to discard your local data, then the easiest way to fix this is to delete your entire school_crm database and start fresh with the migrate and setup_initial_data installation step above. If you want to keep your data, read on.
+
+### Apply all old Play evolutions
+
+First, you need to apply all Play schema changes that existed before they were deleted and replaced with Django ones.
+
+Run `git checkout cadf15b712e4801fa6f1bfd9cd71f100a89b1519`, then run the Play server as described in "1 of 3" above, go to http://localhost:9000 and click "Apply this script now.".
+
+Then quit Play and sbt and run `git checkout main`.
+
+### Tell Django that the Django migrations have already been applied
+
+Connect to the school_crm database and run this SQL statement:
 
 ```sql
 INSERT INTO django_migrations(app, name, applied) VALUES
