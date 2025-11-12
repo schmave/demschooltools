@@ -13,13 +13,13 @@ See [the wiki](https://github.com/schmave/demschooltools/wiki/) for more informa
 
 ## Installation
 
-1.  [Download](https://openjdk.org/) and install OpenJDK version 11.x. Set the JAVA_HOME environment variable to be the location that you installed it, meaning that $JAVA_HOME/bin/java should be the path to the java binary.
+1.  [Download](https://www.oracle.com/java/technologies/javase/jdk11-archive-downloads.html) and install Oracle JDK version 11.x. Set the JAVA_HOME environment variable to be the location that you installed it, meaning that $JAVA_HOME/bin/java (or $JAVA_HOME/bin/java.exe on Windows) should be the path to the java binary.
 
-1.  Install [sbt 1.10](https://www.scala-sbt.org/download/). If you use a Mac, I recommend using [homebrew](https://brew.sh/) to install it.
+1.  Install [sbt 1.x](https://www.scala-sbt.org/download/). If you use a Mac, I recommend using [homebrew](https://brew.sh/) to install it.
 
-1.  [Download](http://www.postgresql.org/download/) and install PostgreSQL. If you use a Mac, I recommend installing [the "Postgres" app](https://postgresapp.com/) instead.
+1.  [Download](http://www.postgresql.org/download/) and install PostgreSQL. If you use a Mac, I recommend installing the ["Postgres" app](https://postgresapp.com/) instead.
 
-1.  [Download](https://nodejs.org/en/download/releases/) and install Node v22. If you use Mac or Linux or Windows WSL, I recommend using [nvm](https://github.com/nvm-sh/nvm/blob/master/README.md#about) to install it.
+1.  [Download](https://nodejs.org/en/download/archive/v22) and install Node v22. If you use Mac or Linux or Windows WSL, I recommend using [nvm](https://github.com/nvm-sh/nvm/blob/master/README.md#about) to download and install it instead of the Node website.
 
 1.  [Download](https://github.com/schmave/demschooltools/archive/master.zip) the source code, or clone the git repository. `cd` into the root level of the source code.
 
@@ -35,6 +35,8 @@ See [the wiki](https://github.com/schmave/demschooltools/wiki/) for more informa
         uv run manage.py migrate
         uv run manage.py setup_initial_data
         cd ..
+
+    If you see errors when running `manage.py migrate`, [read below](#dealing-with-inconsistentmigrationhistory) for troubleshooting info.
 
 ## Running the site
 
@@ -57,6 +59,7 @@ You'll need to run three separate programs for each of the parts of the site.
 Run:
 
     cd django
+    uv run manage.py migrate
     uv run manage.py runserver
 
 ### (3 of 3) Custodia frontend code
@@ -75,3 +78,23 @@ Once you have all three servers running, you can:
     and wait while DemSchoolTools is compiled.
 
 1.  Login with Email `admin@asdf.com` and password `nopassword`.
+
+## Dealing with "InconsistentMigrationHistory"
+
+If you first set up your local development environment before November 2025, you will see this error when you run `uv run manage.py migrate`:
+
+```
+django.db.migrations.exceptions.InconsistentMigrationHistory:
+    Migration admin.0001_initial is applied before its
+    dependency dst.0001_initial on database 'default'.
+```
+
+In order to fix this, connect to the school_crm database and run this SQL statement:
+
+```sql
+INSERT INTO django_migrations(app, name, applied) VALUES
+    ('dst', '0001_initial', clock_timestamp()),
+    ('custodia', '0003_swipe_person_swipe_day_empty_out_unique', clock_timestamp());
+```
+
+Then you should be able to run `uv run manage.py migrate` without errors.
