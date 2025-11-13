@@ -19,7 +19,7 @@ a {
 
 .starter-template {
     padding: 40px 0px;
-/ / text-align : center;
+    /* text-align : center; */
 }
 
 .validday {
@@ -185,12 +185,12 @@ rect.highlight, rect.highlight-now {
     height: 40px;
 }
 
-.student-listing .fa-arrow-right {
+.student-listing .glyphicon-arrow-right {
     font-size: 13px;
     margin-left: 6px;
 }
 
-.student-listing .fa-arrow-left {
+.student-listing .glyphicon-arrow-left {
     font-size: 13px;
     margin-right: 6px;
 }

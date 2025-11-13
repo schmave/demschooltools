@@ -147,7 +147,7 @@ class Student extends React.Component {
           <tr key={month + day.day} className={clsName}>
             <td>
               <Link
-                to={"/students/" + this.state.studentId + "/" + day.day}
+                to={`students/${this.state.studentId}/${day.day}`}
                 onClick={this.openMonth.bind(this, month)}
                 id={"day-" + day.day}
                 className={this.getDayClass(day)}

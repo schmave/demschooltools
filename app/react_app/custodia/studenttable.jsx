@@ -39,11 +39,11 @@ module.exports = class extends React.Component {
   };
 
   getSwipeButton = (student, way) => {
-    let buttonIcon = "fa-arrow-right";
+    let buttonIcon = "glyphicon glyphicon-arrow-right";
     if (way === "out") {
-      buttonIcon = "fa-arrow-left";
+      buttonIcon = "glyphicon glyphicon-arrow-left";
     }
-    const iclassName = "fa " + buttonIcon + " sign-" + student._id;
+    const iclassName = buttonIcon + " sign-" + student._id;
     const is_teacher_class = student.is_teacher ? " is_teacher" : "";
     const button_class = "btn-default name-button" + (student.swiped_today_late ? " late" : "");
     const sign_function = this.isSigningIn(student) ? this.signIn : this.signOut;
@@ -77,7 +77,7 @@ module.exports = class extends React.Component {
     const calendar_button = (
       <div
         onClick={function () {
-          myhistory.push("/students/" + student._id);
+          myhistory.push("students/" + student._id);
         }}
         className={calendar_button_class}
       >

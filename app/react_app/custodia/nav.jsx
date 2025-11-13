@@ -23,26 +23,20 @@ module.exports = class Nav extends React.Component {
       <nav className="navbar" role="navigation">
         <div className="container">
           <div className="navbar-header">
-            <Link to="/students" id="home" className="navbar-brand">
-              {this.state.selectedSchool ? this.state.selectedSchool.name : ""} Custodia &mdash;
-              Home
-            </Link>
+            <span className="navbar-brand">
+              {this.state.selectedSchool ? this.state.selectedSchool.name : ""} Custodia
+            </span>
           </div>
-          <div id="navbar">
-            <ul className="nav navbar-nav">
-              <AdminWrapper>
-                <li>
-                  <Link id="totals-link" to="/reports">
-                    Reports
-                  </Link>
-                </li>
-              </AdminWrapper>
-            </ul>
-            <ul className="nav navbar-nav">
-              <li>
-                <a href="/custodia/logout">Logout</a>
-              </li>
-            </ul>
+          <div id="navbar" className="subnav custodia-subnav">
+            <Link to="/custodia/students" className="custodia-home-link">
+              &mdash; Home
+            </Link>
+            <AdminWrapper>
+              <Link id="totals-link" to="/custodia/reports">
+                Reports
+              </Link>
+            </AdminWrapper>
+            <a href="/custodia/logout">Logout</a>
           </div>
         </div>
       </nav>

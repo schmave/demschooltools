@@ -60,11 +60,11 @@ export const swipeStudent = function (student, direction, overrideTime) {
           message: student.name + " swiped successfully!",
         });
       }
-      myhistory.replace("/students");
+      myhistory.replace("students");
     });
 };
 export const markAbsent = function (student) {
-  ajax.post("/students/" + student._id + "/absent").then(
+  ajax.post("students/" + student._id + "/absent").then(
     function (data) {
       dispatcher.dispatch({
         type: constants.studentEvents.MARKED_ABSENT,

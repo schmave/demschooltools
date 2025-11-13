@@ -14,7 +14,8 @@ class StudentEditor extends React.Component {
         action.type == constants.studentEvents.STUDENT_LOADED ||
         action.type == constants.studentEvents.ALL_LOADED
       ) {
-        this.close();
+        // Defer close() to avoid modifying state during dispatch
+        setTimeout(() => this.close(), 0);
       }
     });
 
@@ -26,7 +27,10 @@ class StudentEditor extends React.Component {
   }
 
   componentWillUnmount = () => {
-    dispatcher.unregister(this.dispatchToken);
+    if (this.dispatchToken) {
+      dispatcher.unregister(this.dispatchToken);
+      this.dispatchToken = null;
+    }
   };
 
   savingShow = () => {

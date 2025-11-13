@@ -1,5 +1,6 @@
 import "../index.scss";
 import "./polyfill.js";
+import "../../../django/static/starter-template.css";
 import { mountReactApp } from "../renderApp";
 
 const target =

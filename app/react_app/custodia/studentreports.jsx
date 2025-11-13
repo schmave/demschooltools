@@ -50,7 +50,7 @@ class StudentLinkComponent extends React.Component {
     const sid = this.props.rowData._id;
     const name = this.props.data;
     return (
-      <Link to={"/students/" + sid} id={"student-" + sid}>
+      <Link to={`students/${sid}`} id={"student-" + sid}>
         {name}
       </Link>
     );

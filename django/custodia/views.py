@@ -123,7 +123,7 @@ def student_to_dict(
         "last_swipe_type": (
             "in" if last_swipe and last_swipe.out_time is None else "out"
         ),
-        "swiped_today_late": (in_today_time and in_today_time.time() > org.late_time),
+        "swiped_today_late": (in_today_time and org.late_time and in_today_time.time() > org.late_time),
         "is_teacher": is_teacher,
         "in_today": in_today,
         "absent_today": student.custodia_show_as_absent == today,
