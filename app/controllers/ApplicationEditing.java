@@ -53,68 +53,6 @@ public class ApplicationEditing extends Controller {
     return editMinutes(the_meeting, request);
   }
 
-  @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
-  public Result editTodaysMinutesReact(Http.Request request) {
-    Organization org = Utils.getOrg(request);
-    Meeting the_meeting =
-        Meeting.find
-            .query()
-            .where()
-            .eq("organization", org)
-            .eq("date", Utils.localNow(Utils.getOrgConfig(org)))
-            .findOne();
-    if (the_meeting == null) {
-      CachedPage.remove(CachedPage.JC_INDEX, org);
-      the_meeting = Meeting.create(new Date(), org);
-      the_meeting.save();
-    }
-
-    // This is a nearly exact copy of editMinutes() -- stop duplicating code eventually
-    if (!authToEdit(the_meeting.getDate(), request)) {
-      return tooOldToEdit();
-    }
-    the_meeting.prepareForEditing(Utils.getOrg(request));
-
-    return ok(edit_minutes_react.render(
-            the_meeting,
-            Case.getOpenCases(Utils.getOrg(request)),
-            request,
-            mMessagesApi.preferred(request)))
-        .withHeader("Cache-Control", "max-age=0, no-cache, no-store")
-        .withHeader("Pragma", "no-cache");
-  }
-
-  @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
-  public Result readTodaysMinutesReact(Http.Request request) {
-    Organization org = Utils.getOrg(request);
-    Meeting the_meeting =
-        Meeting.find
-            .query()
-            .where()
-            .eq("organization", org)
-            .eq("date", Utils.localNow(Utils.getOrgConfig(org)))
-            .findOne();
-    if (the_meeting == null) {
-      CachedPage.remove(CachedPage.JC_INDEX, org);
-      the_meeting = Meeting.create(new Date(), org);
-      the_meeting.save();
-    }
-
-    // This is a nearly exact copy of editMinutes() -- stop duplicating code eventually
-    if (!authToEdit(the_meeting.getDate(), request)) {
-      return tooOldToEdit();
-    }
-    the_meeting.prepareForEditing(Utils.getOrg(request));
-
-    return ok(read_minutes_react.render(
-            the_meeting,
-            Case.getOpenCases(Utils.getOrg(request)),
-            request,
-            mMessagesApi.preferred(request)))
-        .withHeader("Cache-Control", "max-age=0, no-cache, no-store")
-        .withHeader("Pragma", "no-cache");
-  }
-
   Result tooOldToEdit() {
     return unauthorized("This JC data is too old for you to edit.");
   }
@@ -392,62 +330,6 @@ public class ApplicationEditing extends Controller {
     }
 
     c.delete();
-    return ok();
-  }
-
-  @Secured.Auth(UserRole.ROLE_EDIT_7_DAY_JC)
-  public Result deleteCase(Integer id, Http.Request request) {
-    Organization org = Utils.getOrg(request);
-    Case theCase = Case.findById(id, org);
-
-    if (theCase == null) {
-      return notFound();
-    }
-
-    CachedPage.remove(CachedPage.JC_INDEX, org);
-
-    List<Charge> charges = Charge.find.query().where().eq("theCase.id", theCase.getId()).findList();
-
-    for (Charge charge : charges) {
-      if (charge.getId() == null) {
-        continue;
-      }
-
-      DB.sqlUpdate(
-              "UPDATE charge SET referenced_charge_id = NULL WHERE referenced_charge_id ="
-                  + " :charge_id")
-          .setParameter("charge_id", charge.getId())
-          .execute();
-
-      DB.sqlUpdate("DELETE FROM charge_reference WHERE referenced_charge = :charge_id")
-          .setParameter("charge_id", charge.getId())
-          .execute();
-    }
-
-    DB.sqlUpdate("DELETE FROM charge_reference WHERE referencing_case = :case_id")
-        .setParameter("case_id", theCase.getId())
-        .execute();
-
-    DB.sqlUpdate(
-            "DELETE FROM case_reference WHERE referencing_case = :case_id OR referenced_case ="
-                + " :case_id")
-        .setParameter("case_id", theCase.getId())
-        .execute();
-
-    DB.sqlUpdate("DELETE FROM person_at_case WHERE case_id = :case_id")
-        .setParameter("case_id", theCase.getId())
-        .execute();
-
-    DB.sqlUpdate("DELETE FROM case_meeting WHERE case_id = :case_id")
-        .setParameter("case_id", theCase.getId())
-        .execute();
-
-    for (Charge charge : charges) {
-      charge.delete();
-    }
-
-    theCase.delete();
-
     return ok();
   }
 

@@ -6,8 +6,6 @@ GET /login	controllers.Public.index(request: Request)
 
 GET     /                         controllers.Application.index(request: Request)
 
-GET     /editTodayReact           controllers.ApplicationEditing.editTodaysMinutesReact(request: Request)
-GET     /readTodayReact           controllers.ApplicationEditing.readTodaysMinutesReact(request: Request)
 GET     /editToday                controllers.ApplicationEditing.editTodaysMinutes(request: Request)
 GET     /viewToday                controllers.Application.viewTodaysMinutes(request: Request)
 
@@ -44,7 +42,6 @@ GET /viewSchoolMeeting controllers.Application.viewSchoolMeetingDecisions(reques
 
 POST /newCase	controllers.ApplicationEditing.createCase(meeting_id : Integer, request: Request)
 POST /saveCase   controllers.ApplicationEditing.saveCase(id : Integer, request: Request)
-POST /deleteCase   controllers.ApplicationEditing.deleteCase(id : Integer, request: Request)
 POST /continueCase	controllers.ApplicationEditing.continueCase(meeting_id : Integer, case_id : Integer, request: Request)
 
 POST /addPersonAtMeeting    controllers.ApplicationEditing.addPersonAtMeeting(meeting_id : Integer, personId : Integer, role : Integer)
