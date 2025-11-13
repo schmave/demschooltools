@@ -280,6 +280,7 @@ public class CRM extends Controller {
     Tag the_tag;
     if (tagId == null) {
       the_tag = Tag.create(title, org);
+      the_tag.refresh();
     } else {
       the_tag = Tag.find.ref(tagId);
     }

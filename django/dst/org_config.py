@@ -7,6 +7,8 @@ ALL_ORG_CONFIGS: dict[str, "OrgConfig"] = {}
 
 
 def get_org_config(org: Organization) -> "OrgConfig":
+    init_org_configs()
+
     return ALL_ORG_CONFIGS[org.name]
 
 
@@ -435,22 +437,34 @@ class SouthJersey(OrgConfig):
         self.use_year_in_case_number = True
 
 
-# Initialize all the configurations
-# They will be automatically registered in ALL_ORG_CONFIGS
-ThreeRiversVillageSchool()
-PhillyFreeSchool()
-Fairhaven()
-TheCircleSchool()
-MakariosLearningCommunity()
-TheOpenSchool()
-TheOpenSchoolVirtual()
-Houston()
-Sandbox()
-Clearview()
-Wicklow()
-Tallgrass()
-MiamiSudburySchool()
-SligoSudburySchool()
-LearningProjectIbiza()
-Wilmington()
-SouthJersey()
+ORG_CONFIGS_LOADED = False
+
+
+def init_org_configs():
+    global ORG_CONFIGS_LOADED
+    if ORG_CONFIGS_LOADED:
+        return
+
+    ORG_CONFIGS_LOADED = True
+
+    # Initialize all the configurations.
+    # They will be automatically registered in ALL_ORG_CONFIGS.
+    # Don't do this at module load time because
+    # then this file won't load before the Organization table is created.
+    ThreeRiversVillageSchool()
+    PhillyFreeSchool()
+    Fairhaven()
+    TheCircleSchool()
+    MakariosLearningCommunity()
+    TheOpenSchool()
+    TheOpenSchoolVirtual()
+    Houston()
+    Sandbox()
+    Clearview()
+    Wicklow()
+    Tallgrass()
+    MiamiSudburySchool()
+    SligoSudburySchool()
+    LearningProjectIbiza()
+    Wilmington()
+    SouthJersey()
