@@ -11,12 +11,12 @@
         "@mui/x-date-pickers": "^8.11.3",
         "@react-pdf/renderer": "^4.3.1",
         "axios": "^1.12.2",
-        "bootstrap": "5.3.8",
+        "bootstrap": "3.3.7",
         "dayjs": "^1.11.18",
-        "handlebars": "4.7.8",
-        "jquery": "3.7.1",
-        "jquery-form": "4.3.0",
-        "jquery-ui": "1.14.1",
+        "handlebars": "4.0.10",
+        "jquery": "3.2.1",
+        "jquery-form": "4.2.1",
+        "jquery-ui": "1.12.1",
         "localforage": "^1.10.0",
         "moment": "^2.30.1",
         "react": "^19.1.1",
@@ -24,7 +24,7 @@
         "react-icons": "^5.5.0",
         "react-router-dom": "^7.9.1",
         "shuffle-seed": "^1.1.6",
-        "spectrum-colorpicker": "1.8.1",
+        "spectrum-colorpicker": "1.8.0",
         "uuid": "^13.0.0"
     },
     "devDependencies": {
@@ -53,7 +53,6 @@
     },
     "scripts": {
         "compile": "webpack --mode production",
-        "watch": "webpack --watch --mode development",
         "dev": "webpack serve --mode development --hot --port 8081"
     },
     "engines": {
