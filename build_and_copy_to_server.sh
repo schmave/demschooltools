@@ -5,6 +5,8 @@ set -ex
 # Make sure that there are no uncommitted changes
 git diff-index --quiet HEAD --
 
+nvm use 22
+
 ### Play Framework stuff
 npm install
 ./sbt.sh clean dist
@@ -25,3 +27,7 @@ zip django django/static/js/custodia.js*
 scp django.zip evan@demschooltools.com:/home/evan/
 
 rm django.zip
+
+echo "Build and copy successful. Now ssh to the DST machine and run"
+echo "     ./run_play.sh"
+echo "     ./run_django.sh"
