@@ -107,12 +107,12 @@ urlpatterns = [
     path("viewEntry/", preview_entry),
     path("viewEntry/<int:object_id>", preview_entry),
     path("", IndexView.as_view()),
-    path("custodia", IndexView.as_view()),
-    path("custodia/", IndexView.as_view()),
-    path("custodia/<path:unused>", IndexView.as_view()),
     path("custodia/error-test", ErrorTestView.as_view()),
     path("custodia/login", LoginView.as_view()),
     path("custodia/logout", LogoutView.as_view()),
+    path("custodia", IndexView.as_view()),
+    path("custodia/", IndexView.as_view()),
+    path("custodia/<path:unused>", IndexView.as_view()),
 ]
 
 if settings.SILK_ENABLED:

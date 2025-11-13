@@ -322,6 +322,12 @@ rect.highlight, rect.highlight-now {
     min-height: 0;
 }
 
+.navbar .container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
 .navbar-nav>li>a {
     padding-bottom: 0;
     padding-top: 0;
@@ -330,7 +336,69 @@ rect.highlight, rect.highlight-now {
 .navbar-brand {
     padding-bottom: 0;
     padding-top: 0;
+    padding-right: 15px;
     height: inherit;
+    margin-right: 0;
+    font-size: 14px;
+    font-weight: normal;
+    color: #337ab7;
+}
+
+.navbar-separator {
+    color: #337ab7;
+    font-size: 14px;
+}
+
+.navbar-header {
+    border: none !important;
+    float: none;
+    display: inline-block;
+    margin-right: 0;
+}
+
+.custodia-subnav {
+    display: inline-block;
+    padding-left: 15px;
+    margin-left: 0;
+    border: none;
+    font-size: 14px;
+}
+
+.custodia-subnav a {
+    color: #337ab7 !important;
+    text-decoration: none;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.custodia-home-link {
+    color: #337ab7 !important;
+}
+
+.custodia-subnav a:visited {
+    color: #337ab7 !important;
+}
+
+.custodia-subnav a:hover {
+    text-decoration: underline;
+}
+
+.custodia-subnav a.active {
+    font-weight: bold;
+    pointer-events: none;
+    cursor: default;
+    text-decoration: none;
+    background-color: transparent !important;
+}
+
+.btn-default {
+    background-color: #e7e7e7;
+    border-color: #ccc;
+}
+
+.btn-default:hover {
+    background-color: #d4d4d4;
+    border-color: #8c8c8c;
 }
 
 a.skylight-close-button {
