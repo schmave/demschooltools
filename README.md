@@ -95,9 +95,9 @@ If you're willing to discard your local data, then the easiest way to fix this i
 
 First, you need to apply all Play schema changes that existed before they were deleted and replaced with Django ones.
 
-Run `git checkout cadf15b712e4801fa6f1bfd9cd71f100a89b1519`, then run the Play server as described in "1 of 3" above, go to http://localhost:9000 and click "Apply this script now.".
+Run `git fetch; git checkout cadf15b712e4801fa6f1bfd9cd71f100a89b1519`, then run the Play server as described in "1 of 3" above, go to http://localhost:9000 and click "Apply this script now.".
 
-Then quit Play and sbt and run `git checkout main`.
+Then quit Play and sbt and run `git checkout main; git pull`.
 
 ### Tell Django that the Django migrations have already been applied
 
