@@ -406,15 +406,16 @@ public class ApplicationEditing extends Controller {
 
     CachedPage.remove(CachedPage.JC_INDEX, org);
 
-    List<Charge> charges =
-        Charge.find.query().where().eq("theCase.id", theCase.getId()).findList();
+    List<Charge> charges = Charge.find.query().where().eq("theCase.id", theCase.getId()).findList();
 
     for (Charge charge : charges) {
       if (charge.getId() == null) {
         continue;
       }
 
-      DB.sqlUpdate("UPDATE charge SET referenced_charge_id = NULL WHERE referenced_charge_id = :charge_id")
+      DB.sqlUpdate(
+              "UPDATE charge SET referenced_charge_id = NULL WHERE referenced_charge_id ="
+                  + " :charge_id")
           .setParameter("charge_id", charge.getId())
           .execute();
 
@@ -428,7 +429,8 @@ public class ApplicationEditing extends Controller {
         .execute();
 
     DB.sqlUpdate(
-            "DELETE FROM case_reference WHERE referencing_case = :case_id OR referenced_case = :case_id")
+            "DELETE FROM case_reference WHERE referencing_case = :case_id OR referenced_case ="
+                + " :case_id")
         .setParameter("case_id", theCase.getId())
         .execute();
 

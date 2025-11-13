@@ -389,11 +389,8 @@ public class Application extends Controller {
   }
 
   public static String allPeopleJson(Organization org) {
-    List<Person> people = Person.find.query()
-        .where()
-        .eq("organization", org)
-        .eq("isFamily", false)
-        .findList();
+    List<Person> people =
+        Person.find.query().where().eq("organization", org).eq("isFamily", false).findList();
     people.sort(Person.SORT_DISPLAY_NAME);
     return peopleToJson(people);
   }
@@ -433,11 +430,8 @@ public class Application extends Controller {
   }
 
   public static String attendanceTagsJson(Organization org) {
-    List<Tag> tags = Tag.find.query()
-        .where()
-        .eq("organization", org)
-        .eq("showInAttendance", true)
-        .findList();
+    List<Tag> tags =
+        Tag.find.query().where().eq("organization", org).eq("showInAttendance", true).findList();
     List<Map<String, String>> result = new ArrayList<>();
     for (Tag tag : tags) {
       HashMap<String, String> values = new HashMap<>();
