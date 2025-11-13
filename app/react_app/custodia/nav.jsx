@@ -1,5 +1,6 @@
 var React = require("react"),
   Link = require("react-router-dom").Link,
+  NavLink = require("react-router-dom").NavLink,
   userStore = require("./userstore"),
   AdminWrapper = require("./adminwrapper.jsx");
 
@@ -22,22 +23,21 @@ module.exports = class Nav extends React.Component {
     return (
       <nav className="navbar" role="navigation">
         <div className="container">
-          <div className="navbar-header">
-            <span className="navbar-brand">
-              {this.state.selectedSchool ? this.state.selectedSchool.name : ""} Custodia
-            </span>
-          </div>
-          <div id="navbar" className="subnav custodia-subnav">
-            <Link to="/custodia/students" className="custodia-home-link">
-              &mdash; Home
-            </Link>
+          <span className="navbar-brand">
+            {this.state.selectedSchool ? this.state.selectedSchool.name : ""} Custodia
+          </span>
+          <span className="navbar-separator">|</span>
+          <span className="custodia-subnav">
+            <NavLink to="/custodia/students" className={({ isActive }) => isActive ? "custodia-home-link active" : "custodia-home-link"}>
+              Home
+            </NavLink>
             <AdminWrapper>
-              <Link id="totals-link" to="/custodia/reports">
+              <NavLink id="totals-link" to="/custodia/reports" className={({ isActive }) => isActive ? "active" : ""}>
                 Reports
-              </Link>
+              </NavLink>
             </AdminWrapper>
             <a href="/custodia/logout">Logout</a>
-          </div>
+          </span>
         </div>
       </nav>
     );
