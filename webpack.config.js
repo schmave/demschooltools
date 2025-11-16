@@ -3,29 +3,68 @@ const webpack = require('webpack');
 
 const ESLintPlugin = require('eslint-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const { EsbuildPlugin } = require('esbuild-loader');
-
-const ESBUILD_TARGET = ['chrome58', 'edge16', 'firefox57', 'safari11'];
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
 module.exports = function (env, argv) {
+  const isDev = argv.mode !== 'production';
     return {
-        devtool: 'source-map',
+        devtool: isDev ? 'eval-source-map' : 'source-map',
         context: path.join(__dirname, '/app/assets'),
         entry: {
             bundle: './javascripts/main.js',
             checkin: './checkin/app.js',
+            reactapp: '../react_app/index.js',
         },
         module: {
             rules: [
                 {
-                    test: /\.(?:js|mjs|cjs)$/,
+                    test: /\.css$/i,
+                    use: [
+                      // Creates `style` nodes from JS strings
+                      "style-loader",
+                      // Translates CSS into CommonJS
+                      "css-loader",
+                    ],
+                },
+                {
+                    test: /\.s[ac]ss$/i,
                     exclude: /node_modules/,
-                    use: {
-                        loader: 'esbuild-loader',
-                        options: {
-                            target: ESBUILD_TARGET,
-                        },
+                    use: [
+                      // Creates `style` nodes from JS strings
+                      "style-loader",
+                      // Translates CSS into CommonJS
+                      "css-loader",
+                      // Compiles Sass to CSS
+                      "sass-loader",
+                    ],
+                },
+                {
+                  test: /\.(jsx|js|mjs|cjs)$/,
+                  exclude: /node_modules/,
+                  use: [
+                    {
+                      loader: "babel-loader",
+                      options: {
+                        presets: [
+                          [
+                            "@babel/preset-env",
+                            {
+                              targets: {
+                                chrome: 58,
+                                edge: 16,
+                                firefox: 57,
+                                safari: 11,
+                              },
+                            },
+                          ],
+                          "@babel/preset-react",
+                        ],
+                        plugins: [
+                          isDev && require.resolve('react-refresh/babel'),
+                        ].filter(Boolean),
+                      },
                     },
+                  ],
                 },
             ],
         },
@@ -34,20 +73,14 @@ module.exports = function (env, argv) {
             clean: true,
             filename: '[name].js',
             sourceMapFilename: '[file].map[query]',
+             publicPath: isDev ? '/' : undefined,
         },
         resolve: {
+            extensions: [".js", ".jsx"],
             alias: {
                 handlebars: 'handlebars/dist/handlebars',
                 jquery: 'jquery/src/jquery',
             },
-        },
-        optimization: {
-            minimize: true,
-            minimizer: [
-                new EsbuildPlugin({
-                    target: ESBUILD_TARGET,
-                }),
-            ],
         },
 
         plugins: [
@@ -71,6 +104,23 @@ module.exports = function (env, argv) {
                             : 'development',
                 },
             }),
-        ],
+            isDev && new ReactRefreshWebpackPlugin(),
+        ].filter(Boolean),
+          devServer: isDev
+          ? {
+              port: 8081,
+              host: 'localhost',
+              hot: true,
+              allowedHosts: 'all',
+              headers: { 'Access-Control-Allow-Origin': '*' },
+              client: { overlay: true, progress: true },
+              static: false, // we don't serve files from disk
+              devMiddleware: {
+                publicPath: '/', // matches output.publicPath
+                writeToDisk: false,
+              },
+              historyApiFallback: true,
+            }
+          : undefined,
     };
 };
