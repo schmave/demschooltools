@@ -29,10 +29,6 @@ function FlashNotification() {
   }, []);
 
   const handleClose = (id) => (event, reason) => {
-    // Don't close on clickaway to ensure user sees the message
-    if (reason === "clickaway") {
-      return;
-    }
     setNotifications((prev) => prev.filter((notification) => notification.id !== id));
   };
 
@@ -42,7 +38,7 @@ function FlashNotification() {
         <Snackbar
           key={notification.id}
           open={true}
-          autoHideDuration={6000}
+          autoHideDuration={4000}
           onClose={handleClose(notification.id)}
           anchorOrigin={{ vertical: "top", horizontal: "right" }}
           style={{ top: `${24 + index * 70}px` }}

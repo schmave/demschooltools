@@ -195,7 +195,11 @@ USE_L10N = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_ROOT = "dev-static-root"  # This has to be specified for django_vite to work
+# STATIC_ROOT has to be set to some value in order for django-vite to load.
+# Setting it to "" makes it so that the dev-mode PDF printing for the manual
+# works.
+STATIC_ROOT = ""
+
 STATIC_URL = "/django-static/"
 STATICFILES_DIRS = [
     BASE_DIR / "static",

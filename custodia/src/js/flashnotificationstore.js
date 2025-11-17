@@ -10,20 +10,19 @@ const CHANGE_EVENT = "change";
 let latest = "";
 let level = "success";
 
-export const getLatest = ()=> {
+export const getLatest = () => {
   return { message: latest, level: level };
 };
 
 export const emitChange = () => {
-  console.log('emitChange', latest, level);
   emitter.emit(CHANGE_EVENT);
 };
 
-export const addChangeListener = (callback)=> {
+export const addChangeListener = (callback) => {
   emitter.on(CHANGE_EVENT, callback);
 };
 
-export const removeChangeListener = (callback)=>  {
+export const removeChangeListener = (callback) => {
   emitter.removeListener(CHANGE_EVENT, callback);
 };
 
