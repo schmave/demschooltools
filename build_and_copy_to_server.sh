@@ -25,3 +25,9 @@ zip django django/static-vite/*
 scp django.zip evan@demschooltools.com:/home/evan/
 
 rm django.zip
+
+cat << EOF
+Build and copy successful. Now ssh to the DST machine and run
+    ./run_play.sh
+    ./run_django.sh
+EOF

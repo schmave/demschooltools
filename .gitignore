@@ -17,6 +17,7 @@ npm-debug.log
 
 *~
 conf/generated.keystore
+conf/evolutions
 
 __pycache__/
 
