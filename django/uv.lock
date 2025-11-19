@@ -154,6 +154,7 @@ dependencies = [
     { name = "django-vite" },
     { name = "djangorestframework" },
     { name = "drf-orjson-renderer" },
+    { name = "honcho" },
     { name = "mistletoe" },
     { name = "playwright" },
     { name = "psycopg2" },
@@ -182,6 +183,7 @@ requires-dist = [
     { name = "django-vite", specifier = ">=3.1.0" },
     { name = "djangorestframework", specifier = "~=3.15" },
     { name = "drf-orjson-renderer", specifier = "~=1.7" },
+    { name = "honcho", specifier = ">=2.0.0" },
     { name = "mistletoe", specifier = ">=1.4.0" },
     { name = "playwright", specifier = "~=1.49" },
     { name = "psycopg2", specifier = "~=2.9" },
@@ -335,6 +337,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/34/72/9614c465dc206155d93eff0ca20d42e1e35afc533971379482de953521a4/gunicorn-23.0.0.tar.gz", hash = "sha256:f014447a0101dc57e294f6c18ca6b40227a4c90e9bdb586042628030cba004ec", size = 375031 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/cb/7d/6dac2a6e1eba33ee43f318edbed4ff29151a49b5d37f080aad1e6469bca4/gunicorn-23.0.0-py3-none-any.whl", hash = "sha256:ec400d38950de4dfd418cff8328b2c8faed0edb0d517d3394e457c317908ca4d", size = 85029 },
+]
+
+[[package]]
+name = "honcho"
+version = "2.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "colorama", marker = "sys_platform == 'win32'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/65/c8/d860888358bf5c8a6e7d78d1b508b59b0e255afd5655f243b8f65166dafd/honcho-2.0.0.tar.gz", hash = "sha256:af3815c03c634bf67d50f114253ea9fef72ecff26e4fd06b29234789ac5b8b2e", size = 45618 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/48/1c/25631fc359955569e63f5446dbb7022c320edf9846cbe892ee5113433a7e/honcho-2.0.0-py3-none-any.whl", hash = "sha256:56dcd04fc72d362a4befb9303b1a1a812cba5da283526fbc6509be122918ddf3", size = 22093 },
 ]
 
 [[package]]
