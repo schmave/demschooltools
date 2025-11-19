@@ -9,6 +9,8 @@
     "watch": "vite"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^7.3.4",
     "@mui/material": "^7.3.5",
     "cal-heatmap": "^4.2.4",
@@ -24,6 +26,7 @@
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@vitejs/plugin-react": "^5.1.1",
     "eslint": "^9.37.0",
+    "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.0",
     "prettier": "^3.2.5",

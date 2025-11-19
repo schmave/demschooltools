@@ -1,4 +1,5 @@
 import js from "@eslint/js";
+import importPlugin from "eslint-plugin-import";
 import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
 
@@ -11,6 +12,7 @@ export default [
     plugins: {
       react,
       "react-hooks": reactHooks,
+      import: importPlugin,
     },
     languageOptions: {
       ecmaVersion: "latest",
@@ -52,6 +54,16 @@ export default [
         },
       ],
       "no-console": ["warn", { allow: ["warn", "error"] }],
+
+      // Import rules
+      "import/no-extraneous-dependencies": [
+        "error",
+        {
+          devDependencies: false,
+          optionalDependencies: false,
+          peerDependencies: false,
+        },
+      ],
     },
   },
 ];
