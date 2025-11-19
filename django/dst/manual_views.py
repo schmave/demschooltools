@@ -86,6 +86,7 @@ def view_manual(request: DstHttpRequest):
             {
                 "chapters": chapters,
                 "org_config": org_config,
+                "can_edit": request.user.hasRole(UserRole.EDIT_MANUAL),
             },
         ),
         f"{request.org.short_name} {org_config.str_manual_title}",
