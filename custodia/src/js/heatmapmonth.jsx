@@ -52,6 +52,7 @@ const HeatmapMonth = ({ days, requiredMinutes, index, showLegend }) => {
 
       await heatmap.paint(
         {
+          animationDuration: 0,
           itemSelector: selector,
           data: {
             source: data,
