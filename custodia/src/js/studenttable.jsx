@@ -110,7 +110,7 @@ export default function StudentTable() {
   const outCol = [];
 
   const sortedStudents = [...students].sort((a, b) => {
-    return a.name > b.name ? 1 : -1;
+    return a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1;
   });
 
   sortedStudents.forEach((student) => {
