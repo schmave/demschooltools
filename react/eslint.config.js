@@ -8,6 +8,7 @@ export default [
   js.configs.recommended,
 
   {
+    root: true,
     files: ["**/*.{js,jsx}"],
     plugins: {
       react,

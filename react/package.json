@@ -1,8 +1,6 @@
 {
-  "name": "custodia",
+  "name": "react-demschooltools",
   "version": "14.0.0",
-  "description": "Classroom attendance management.",
-  "main": "index.js",
   "type": "module",
   "scripts": {
     "build": "vite build",

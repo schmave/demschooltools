@@ -7,6 +7,8 @@ import { defineConfig } from "vite";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+const DEV_PORT = 8082;
+
 export default ({ command, mode }) =>
   defineConfig({
     plugins: [react(), visualizer()],
@@ -26,8 +28,10 @@ export default ({ command, mode }) =>
       sourcemap: true,
     },
     server: {
-      port: 8082,
+      port: DEV_PORT,
       host: "0.0.0.0",
+      // This is needed for font-source files to serve properly
+      origin: `http://localhost:${DEV_PORT}`,
     },
     resolve: {
       dedupe: ["react", "react-dom"],
