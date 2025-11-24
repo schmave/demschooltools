@@ -18,6 +18,7 @@ export default ({ command, mode }) =>
       rollupOptions: {
         input: {
           custodia: resolve(__dirname, "src", "js", "app.jsx"),
+          custodia_css: resolve(__dirname, "src", "js", "cssonly.js"),
         },
       },
       manifest: "manifest.json", // django-vite requires this
