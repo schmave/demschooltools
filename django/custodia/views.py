@@ -45,10 +45,6 @@ class IndexView(View):
         return render(
             request,
             "index.html",
-            {
-                "rollbar_environment": settings.ROLLBAR_ENVIRONMENT,
-                "rollbar_token": settings.ROLLBAR_FRONTEND_TOKEN,
-            },
         )
 
 
