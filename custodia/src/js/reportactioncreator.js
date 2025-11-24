@@ -1,6 +1,6 @@
-const constants = require("./appconstants");
-const ajax = require("./ajaxhelper");
-const dispatcher = require("./appdispatcher");
+import ajax from "./ajaxhelper.js";
+import constants from "./appconstants.js";
+import dispatcher from "./appdispatcher.js";
 
 const exports = {
   loadSchoolYears: function () {
@@ -58,4 +58,4 @@ const exports = {
   },
 };
 
-module.exports = exports;
+export default exports;

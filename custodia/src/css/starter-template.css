@@ -13,21 +13,26 @@ a {
     overflow-y: hidden;
 }
 
-.ngTopPanel.ng-scope, .ngHeaderContainer {
+.ngTopPanel.ng-scope,
+.ngHeaderContainer {
     width: auto !important;
 }
 
 .starter-template {
     padding: 40px 0px;
-/ / text-align : center;
+    / / text-align: center;
 }
 
 .validday {
     color: #73B88A;
 }
 
-[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak],
-.ng-cloak, .x-ng-cloak,
+[ng\:cloak],
+[ng-cloak],
+[data-ng-cloak],
+[x-ng-cloak],
+.ng-cloak,
+.x-ng-cloak,
 .ng-hide {
     display: none !important;
 }
@@ -118,7 +123,9 @@ a {
         width: 1300px;
     }
 }
-rect.highlight, rect.highlight-now {
+
+rect.highlight,
+rect.highlight-now {
     fill: orange !important;
     stroke: #444 !important;
 }
@@ -128,18 +135,19 @@ rect.highlight, rect.highlight-now {
 }
 
 .late {
-    background: linear-gradient(to bottom,#ffd2d2 0,#f79191 100%);
+    background: linear-gradient(to bottom, #ffd2d2 0, #f79191 100%);
 }
 
 .late:hover {
-    background: linear-gradient(to bottom,#f79191 100%, #ffd2d2 0);
+    background: linear-gradient(to bottom, #f79191 100%, #ffd2d2 0);
 }
 
 .is_teacher {
     font-weight: bold;
 }
 
-.swipes-table td,th {
+.swipes-table td,
+.swipes-table th {
     white-space: nowrap;
 }
 
@@ -202,27 +210,22 @@ rect.highlight, rect.highlight-now {
 .student-listing-table {
     text-align: center;
 }
-@media (min-width: 1000px) {
-    /* .student-listing-table .student-listing:nth-child(odd) { */
-    /*     float: left; */
-    /* } */
-
-    /* .student-listing-table .student-listing:nth-child(even) { */
-    /*     float: right; */
-    /* } */
-}
 
 .hidden {
-    display:none;
+    display: none;
 }
+
 .attended-day {
     color: green;
 }
+
 .absent-day {
     color: red;
 }
+
 /* absent */
-.q0, .q1 {
+.q0,
+.q1 {
     fill: #c62828 !important;
 }
 
@@ -234,25 +237,28 @@ rect.highlight, rect.highlight-now {
 .q3 {
     fill: #EEE8AA !important;
 }
-.subdomain-text{
+
+.subdomain-text {
     fill: black !important;
 }
+
 /* short */
 .q4 {
     fill: #80e27e !important;
 }
+
 /* little short */
 .q5 {
     fill: #4caf50 !important;
 }
+
 /* good */
 .q6 {
     fill: #087f23 !important;
 }
 
 .class-listing .panel,
-.student-listing-table .panel
-{
+.student-listing-table .panel {
     margin: 0px 0px 0px 5px;
     overflow-x: hidden;
 }
@@ -262,7 +268,7 @@ rect.highlight, rect.highlight-now {
 .not-in .student-listing .attendance-button,
 .absent .student-listing .attendance-button,
 .in .student-listing .attendance-button,
-.out .student-listing a{
+.out .student-listing a {
     float: right;
 }
 
@@ -271,7 +277,7 @@ rect.highlight, rect.highlight-now {
 .not-in .student-listing a,
 .absent .student-listing a,
 .in .student-listing a,
-.out .student-listing .attendance-button{
+.out .student-listing .attendance-button {
     float: left;
 }
 
@@ -299,17 +305,9 @@ rect.highlight, rect.highlight-now {
     flex-direction: column;
     gap: 5px;
 }
+
 .action-buttons button {
     margin: 0 3px;
-}
-
-.cal-heatmap-container rect.highlight,
-.cal-heatmap-container rect.now{
-    stroke: lightblue;
-}
-
-.cal-heatmap-container text.now{
-    fill: #0086b3;
 }
 
 .navbar {
@@ -333,12 +331,6 @@ rect.highlight, rect.highlight-now {
     height: inherit;
 }
 
-a.skylight-close-button {
-    right: 20px !important;
-    top: initial !important;
-    color: white;
-}
-
-a.skylight-close-button:hover, a.skylight-close-button:focus {
-    text-decoration: none;
+html {
+    font-size: 14px;
 }

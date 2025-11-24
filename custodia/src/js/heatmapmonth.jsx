@@ -1,91 +1,126 @@
-const React = require("react");
-const heatmap = require("cal-heatmap");
-require("cal-heatmap/cal-heatmap.css");
+import "cal-heatmap/cal-heatmap.css";
+import dayjs from "dayjs";
+import { useEffect } from "react";
 
-const dayjs = require("dayjs");
-const $ = require("jquery");
-
-class HeatmapMonth extends React.Component {
-  map = null;
-
-  formatDays = (days, requiredMinutes) => {
-    const formatted = {};
+const HeatmapMonth = ({ days, requiredMinutes, index, showLegend }) => {
+  const formatDays = (days, requiredMinutes) => {
+    const formatted = [];
     days.forEach(function (day) {
-      formatted[dayjs(day.day).unix()] = day.total_mins;
+      const date = dayjs(day.day).toDate();
+      let value = day.total_mins;
+
       if (day.excused || day.override) {
-        formatted[dayjs(day.day).unix()] = requiredMinutes;
+        value = requiredMinutes;
       } else if (!day.absent && day.total_mins == 0) {
-        formatted[dayjs(day.day).unix()] = 1;
+        value = 1;
       }
+
+      formatted.push({ date, value });
     });
     return formatted;
   };
 
-  getHighlights = (days) => days.filter((day) => day.excused).map((day) => dayjs(day.day).toDate());
+  const getHighlights = (days) =>
+    days.filter((day) => day.excused).map((day) => dayjs(day.day).toDate());
 
-  loadHeatmap = () => {
-    const data = this.formatDays(this.props.days, this.props.requiredMinutes);
-    const highlight = this.getHighlights(this.props.days);
+  useEffect(() => {
+    let heatmap = null;
 
-    const doUpdate = this.map !== null;
-    if (!doUpdate) {
-      // eslint-disable-next-line new-cap
-      this.map = new heatmap();
-    }
+    const loadHeatmap = async () => {
+      const data = formatDays(days, requiredMinutes);
+      const highlight = getHighlights(days);
 
-    const selector = "#heatmap" + this.props.index;
-    const padNumber = function (n) {
-      return ("0" + n).slice(-2);
-    };
-    const makeDateId = function (d) {
-      const datestring =
-        d.getFullYear() + "-" + padNumber(d.getMonth() + 1) + "-" + padNumber(d.getDate());
+      const CalHeatmap = (await import("cal-heatmap")).default;
+      heatmap = new CalHeatmap();
+      const selector = "#heatmap" + index;
+      const padNumber = function (n) {
+        return ("0" + n).slice(-2);
+      };
+      const makeDateId = function (d) {
+        const datestring =
+          d.getUTCFullYear() +
+          "-" +
+          padNumber(d.getUTCMonth() + 1) +
+          "-" +
+          padNumber(d.getUTCDate());
 
-      return "#day-" + datestring;
-    };
-    if (doUpdate) {
-      this.map.update(data);
-      this.map.highlight(highlight);
-    } else {
-      this.map.init({
-        itemSelector: selector,
-        onClick: function (d, nb) {
-          $(makeDateId(d))[0]?.click();
+        return "day-" + datestring;
+      };
+
+      const Tooltip = (await import("cal-heatmap/plugins/Tooltip")).default;
+      const Legend = (await import("cal-heatmap/plugins/Legend")).default;
+
+      await heatmap.paint(
+        {
+          animationDuration: 0,
+          itemSelector: selector,
+          data: {
+            source: data,
+            x: "date",
+            y: "value",
+          },
+          date: {
+            start: dayjs(days[0].day).startOf("month").toDate(),
+            highlight,
+            locale: { weekStart: 1 },
+          },
+          domain: {
+            type: "month",
+          },
+          subDomain: {
+            type: "xDay",
+            label: "D",
+            width: 15,
+            height: 15,
+          },
+          range: 4,
+          scale: {
+            color: {
+              type: "threshold",
+              range: ["#c62828", "#ff6659", "#EEE8AA", "#80e27e", "#4caf50", "#087f23"],
+              domain: [0, 210, requiredMinutes - 45, requiredMinutes - 15, requiredMinutes].sort(
+                (a, b) => a - b,
+              ),
+            },
+          },
         },
-        data,
-        start: dayjs(this.props.days[0].day).startOf("month").toDate(),
-        domain: "month",
-        subDomain: "x_day",
-        subDomainTextFormat: "%d",
-        range: 4,
-        legend: [
-          0,
-          210,
-          this.props.requiredMinutes - 45,
-          this.props.requiredMinutes - 15,
-          this.props.requiredMinutes - 1,
-        ],
-        legendVerticalPosition: "center",
-        legendCellSize: 8,
-        itemName: ["minute", "minutes"],
-        legendOrientation: "vertical",
-        highlight,
-        cellSize: 15,
+        [
+          [
+            Tooltip,
+            {
+              text: function (date, value, dayjsDate) {
+                if (value === null || value === undefined) {
+                  return null;
+                }
+                const dow = dayjsDate.format("ddd MMM D: ");
+                return dow + (value ? value : "0") + " minute" + (value !== 1 ? "s" : "");
+              },
+            },
+          ],
+          showLegend && [
+            Legend,
+            {
+              itemSelector: selector,
+              label: "minutes",
+              width: 200,
+            },
+          ],
+        ].filter((x) => Boolean(x)),
+      );
+      heatmap.on("click", (event, timestamp, _value) => {
+        const d = new Date(timestamp);
+        document.getElementById(makeDateId(d))?.click();
       });
-    }
-  };
+    };
 
-  render() {
-    return <div id={"heatmap" + this.props.index} style={{ float: "none" }}></div>;
-  }
+    loadHeatmap();
 
-  componentDidMount() {
-    this.loadHeatmap();
-  }
+    return () => {
+      heatmap?.destroy();
+    };
+  }, [days, requiredMinutes, index, showLegend]);
 
-  componentDidUpdate() {
-    this.loadHeatmap();
-  }
-}
+  return <div id={"heatmap" + index} style={{ float: "none" }}></div>;
+};
 
-module.exports = HeatmapMonth;
+export default HeatmapMonth;

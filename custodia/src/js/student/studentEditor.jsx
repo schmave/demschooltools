@@ -1,10 +1,10 @@
-const React = require("react");
-const ReactDOM = require("react-dom");
-const dispatcher = require("../appdispatcher");
-const constants = require("../appconstants");
-const actionCreator = require("../studentactioncreator");
-const Modal = require("../modal.jsx");
-const dayjs = require("dayjs");
+import dayjs from "dayjs";
+import React from "react";
+
+import constants from "../appconstants.js";
+import dispatcher from "../appdispatcher.js";
+import Modal from "../modal.jsx";
+import * as actionCreator from "../studentactioncreator.js";
 
 class StudentEditor extends React.Component {
   constructor(props) {
@@ -22,6 +22,7 @@ class StudentEditor extends React.Component {
       saving: false,
       student: { start_date: null },
       startdate_datepicker: null,
+      show_modal: false,
     };
   }
 
@@ -45,14 +46,13 @@ class StudentEditor extends React.Component {
   saveChange = (e) => {
     e.preventDefault();
     this.savingShow();
-    const { startdate_datepicker } = this.state;
     actionCreator
       .updateStudent(
         this.state.student._id,
         this.formatDate(),
-        parseInt(ReactDOM.findDOMNode(this.refs.required_minutes).value, 10),
+        parseInt(this.state.student.required_minutes, 10),
       )
-      .always(this.savingHide);
+      .finally(this.savingHide);
   };
 
   edit = (student) => {
@@ -60,14 +60,12 @@ class StudentEditor extends React.Component {
     this.setState({
       student: s,
       startdate_datepicker: s.start_date ? dayjs(s.start_date) : null,
+      show_modal: true,
     });
-    this.refs.studentEditor.show();
   };
 
   close = () => {
-    if (this.refs.studentEditor) {
-      this.refs.studentEditor.hide();
-    }
+    this.setState({ show_modal: false });
   };
 
   handleDateChange = (e) => {
@@ -86,7 +84,11 @@ class StudentEditor extends React.Component {
   render() {
     return (
       <div className="row">
-        <Modal ref="studentEditor" title={`Edit ${this.state.student.name}`}>
+        <Modal
+          open={this.state.show_modal}
+          onClose={this.close}
+          title={`Edit ${this.state.student.name}`}
+        >
           {this.state.saving ? (
             <div>
               <p style={{ textAlign: "center" }}>
@@ -99,7 +101,6 @@ class StudentEditor extends React.Component {
               <div className="form-group">
                 <label htmlFor="required_minutes">Required Minutes:</label>
                 <input
-                  ref="required_minutes"
                   className="form-control"
                   id="required_minutes"
                   type="number"
@@ -131,4 +132,4 @@ class StudentEditor extends React.Component {
   }
 }
 
-module.exports = StudentEditor;
+export default StudentEditor;
