@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 
 import studentStore from "./StudentStore";
 import Heatmap from "./heatmap.jsx";
-import { useSwipeLogic } from "./hooks/useSwipeLogic.js";
+import { useSwipeLogic } from "./hooks/useSwipeLogic";
 import StudentEditor from "./student/studentEditor.jsx";
 import * as actionCreator from "./studentactioncreator.js";
 import SwipeHelpers from "./swipeHelpers.jsx";

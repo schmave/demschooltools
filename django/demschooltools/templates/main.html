@@ -171,6 +171,9 @@
                                     <a {% if selectedBtn == "attendance_rules" %}class="active"{% endif %}
                                        href="/attendance/rules">Rules
                                     </a>
+                                    <a {% if selectedBtn == "sign_in_sheet" %}class="active"{% endif %}
+                                       href="/attendance/signInSheet">Sign In Sheet
+                                    </a>
                                     {% if org_config.org.attendance_enable_off_campus %}
                                         <a {% if selectedBtn == "off_campus_time" %}class="active"{% endif %}
                                            href="/attendance/offCampusTime">Off campus time

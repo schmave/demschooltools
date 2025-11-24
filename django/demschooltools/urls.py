@@ -34,6 +34,7 @@ from custodia.views import (
     StudentsTodayView,
     SwipeView,
 )
+from dst.attendance_views import SignInSheetView
 from dst.manual_views import (
     CreateUpdateChapter,
     CreateUpdateEntry,
@@ -86,6 +87,7 @@ urlpatterns = [
             "custodia-api",
         ),
     ),
+    path("attendance/signInSheet", SignInSheetView.as_view()),
     path("viewManual", view_manual),
     path("viewManualChanges", view_manual_changes),
     path("searchManual", search_manual),

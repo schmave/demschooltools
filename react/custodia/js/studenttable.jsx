@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import studentStore from "./StudentStore";
-import { useSwipeLogic } from "./hooks/useSwipeLogic.js";
+import { useSwipeLogic } from "./hooks/useSwipeLogic";
 import SwipeHelpers from "./swipeHelpers.jsx";
 
 export default function StudentTable() {

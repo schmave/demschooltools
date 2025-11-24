@@ -7,6 +7,8 @@ import { defineConfig } from "vite";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+const DEV_PORT = 8082;
+
 export default ({ command, mode }) =>
   defineConfig({
     plugins: [react(), visualizer()],
@@ -17,16 +19,19 @@ export default ({ command, mode }) =>
       emptyOutDir: true,
       rollupOptions: {
         input: {
-          custodia: resolve(__dirname, "src", "js", "app.jsx"),
-          custodia_css: resolve(__dirname, "src", "js", "cssonly.js"),
+          custodia: resolve(__dirname, "custodia", "js", "app.jsx"),
+          custodia_css: resolve(__dirname, "custodia", "js", "cssonly.js"),
+          reactapp:  resolve(__dirname, "index.jsx"),
         },
       },
       manifest: "manifest.json", // django-vite requires this
       sourcemap: true,
     },
     server: {
-      port: 8082,
+      port: DEV_PORT,
       host: "0.0.0.0",
+      // This is needed for font-source files to serve properly
+      origin: `http://localhost:${DEV_PORT}`,
     },
     resolve: {
       dedupe: ["react", "react-dom"],
