@@ -1,10 +1,10 @@
-var React = require("react"),
-  Router = require("react-router"),
-  Link = Router.Link,
-  userStore = require("./userstore"),
-  AdminWrapper = require("./adminwrapper.jsx");
+import React from "react";
+import { Link } from "react-router";
 
-module.exports = class Nav extends React.Component {
+import AdminWrapper from "./adminwrapper.jsx";
+import userStore from "./userstore";
+
+export default class Nav extends React.Component {
   state = { selectedSchool: userStore.getSelectedSchool() };
 
   componentDidMount() {
@@ -49,4 +49,4 @@ module.exports = class Nav extends React.Component {
       </nav>
     );
   }
-};
+}

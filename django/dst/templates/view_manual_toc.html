@@ -6,7 +6,9 @@
 
 <h1>{{ org_config.org.short_name }} {{ org_config.str_manual_title }}</h1>
 
-<p class="no-print"><a class="btn btn-primary" href="/editChapter">Add new chapter</a></p>
+{% if can_edit %}
+    <p class="no-print"><a class="btn btn-primary" href="/editChapter">Add new chapter</a></p>
+{% endif %}
 
 <ul>
     {% for c in chapters %}

@@ -1,6 +1,7 @@
-const React = require("react");
-const AdminItem = require("./adminwrapper.jsx");
-const actionCreator = require("./studentactioncreator");
+import React from "react";
+
+import AdminItem from "./adminwrapper.jsx";
+import * as actionCreator from "./studentactioncreator.js";
 
 class SwipesListing extends React.Component {
   getCurrentDay = (student, dayString) => {
@@ -109,4 +110,4 @@ class SwipesListing extends React.Component {
   }
 }
 
-module.exports = SwipesListing;
+export default SwipesListing;

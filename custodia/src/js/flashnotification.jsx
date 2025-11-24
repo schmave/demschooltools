@@ -1,29 +1,60 @@
-var React = require("react"),
-  store = require("./flashnotificationstore"),
-  Notification = require("react-notification-system"),
-  constants = require("./appconstants");
+import Alert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
+import { useEffect, useState } from "react";
 
-class FlashNotification extends React.Component {
-  state = { showing: false };
+import { addChangeListener, getLatest, removeChangeListener } from "./flashnotificationstore.js";
 
-  componentDidMount() {
-    store.addChangeListener(this._onChange);
-    this.notifications = this.refs.notifications;
-  }
+function FlashNotification() {
+  const [notifications, setNotifications] = useState([]);
 
-  _onChange = () => {
-    var message = store.getLatest();
-    if (message) {
-      this.notifications.addNotification({
-        message: message.message,
-        level: message.level,
-      });
-    }
+  useEffect(() => {
+    const handleChange = () => {
+      const notification = getLatest();
+      if (notification && notification.message) {
+        // Add new notification with unique ID
+        const newNotification = {
+          id: Date.now(),
+          message: notification.message,
+          severity: notification.level || "success",
+        };
+        setNotifications((prev) => [...prev, newNotification]);
+      }
+    };
+
+    addChangeListener(handleChange);
+
+    return () => {
+      removeChangeListener(handleChange);
+    };
+  }, []);
+
+  const handleClose = (id) => (event, reason) => {
+    setNotifications((prev) => prev.filter((notification) => notification.id !== id));
   };
 
-  render() {
-    return <Notification ref="notifications" />;
-  }
+  return (
+    <>
+      {notifications.map((notification, index) => (
+        <Snackbar
+          key={notification.id}
+          open={true}
+          autoHideDuration={4000}
+          onClose={handleClose(notification.id)}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          style={{ top: `${24 + index * 70}px` }}
+        >
+          <Alert
+            onClose={handleClose(notification.id)}
+            severity={notification.severity}
+            variant="filled"
+            sx={{ width: "100%" }}
+          >
+            {notification.message}
+          </Alert>
+        </Snackbar>
+      ))}
+    </>
+  );
 }
 
-module.exports = FlashNotification;
+export default FlashNotification;

@@ -40,9 +40,9 @@ See [the wiki](https://github.com/schmave/demschooltools/wiki/) for more informa
 
 ## Running the site
 
-You'll need to run three separate programs for each of the parts of the site.
+You'll need to run two separate programs for each of the parts of the site.
 
-### (1 of 3) Play Framework code
+### (1 of 2) Play Framework code
 
 1.  Run `./sbt.sh`, then execute the `eclipse` and `run` command in the sbt console:
 
@@ -54,25 +54,16 @@ You'll need to run three separate programs for each of the parts of the site.
         [info] modelsLibrary
         [DemSchoolTools] $ run
 
-### (2 of 3) Django code
+### (2 of 2) Django code
 
 Run:
 
     cd django
-    uv run manage.py migrate
-    uv run manage.py runserver
-
-### (3 of 3) Custodia frontend code
-
-To enable the Custodia attendance system locally, run:
-
-    cd custodia
-    npm install
-    npm run watch
+    uv run honcho start
 
 ### Opening the site
 
-Once you have all three servers running, you can:
+Once you have all two servers running, you can:
 
 1.  Navigate to [http://localhost:9000](http://localhost:9000) in your browser
     and wait while DemSchoolTools is compiled.
@@ -91,22 +82,22 @@ django.db.migrations.exceptions.InconsistentMigrationHistory:
 
 If you're willing to discard your local data, then the easiest way to fix this is to delete your entire school_crm database and start fresh with the migrate and setup_initial_data installation step above. If you want to keep your data, read on.
 
-### Apply all old Play evolutions
+### Upgrading your DB
 
-First, you need to apply all Play schema changes that existed before they were deleted and replaced with Django ones.
+1. Apply all Play schema changes that existed before they were deleted and replaced with Django ones.
 
-Run `git fetch; git checkout cadf15b712e4801fa6f1bfd9cd71f100a89b1519`, then run the Play server as described in "1 of 3" above, go to http://localhost:9000 and click "Apply this script now.".
+    Run `git fetch; git checkout cadf15b7`, then run the Play server as described in "1 of 2" above, go to http://localhost:9000 and click "Apply this script now.".
 
-Then quit Play and sbt and run `git checkout main; git pull`.
+    Then quit Play and sbt.
 
-### Tell Django that the Django migrations have already been applied
+2. Tell Django that the initial Django migrations have already been applied.
 
-Connect to the school_crm database and run this SQL statement:
+    Connect to the school_crm database and run this SQL statement:
 
-```sql
-INSERT INTO django_migrations(app, name, applied) VALUES
-    ('dst', '0001_initial', clock_timestamp()),
-    ('custodia', '0003_swipe_person_swipe_day_empty_out_unique', clock_timestamp());
-```
+    ```sql
+    INSERT INTO django_migrations(app, name, applied) VALUES
+        ('dst', '0001_initial', clock_timestamp()),
+        ('custodia', '0003_swipe_person_swipe_day_empty_out_unique', clock_timestamp());
+    ```
 
-Then you should be able to run `uv run manage.py migrate` without errors.
+3. That's it! You can go back to whatever branch you were working on before. `uv run manage.py migrate` should now work properly.

@@ -1,12 +1,28 @@
-const React = require("react");
-const Griddle = require("griddle-react");
-const dayjs = require("dayjs");
+import {
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TableSortLabel,
+} from "@mui/material";
+import { tableCellClasses } from "@mui/material/TableCell";
+import { styled } from "@mui/material/styles";
+import dayjs from "dayjs";
+import React from "react";
+import { Link } from "react-router";
 
-const reportStore = require("./reportstore");
-const Modal = require("./modal.jsx");
-const Router = require("react-router");
-const Link = Router.Link;
-const actionCreator = require("./reportactioncreator");
+import Modal from "./modal.jsx";
+import actionCreator from "./reportactioncreator.js";
+import reportStore from "./reportstore";
+
+const BodyTableCell = styled(TableCell)(() => ({
+  [`&.${tableCellClasses.body}`]: {
+    padding: 4,
+  },
+}));
 
 // Table data as a list of array.
 const getState = function () {
@@ -17,6 +33,9 @@ const getState = function () {
     startDate: now.startOf("month").format("YYYY-MM-DD"),
     endDate: now.endOf("month").format("YYYY-MM-DD"),
     years: reportStore.getSchoolYears(),
+    showNewSchoolYearModal: false,
+    orderBy: "name",
+    order: "asc",
   };
 };
 function pad(num, size) {
@@ -24,6 +43,7 @@ function pad(num, size) {
   while (s.length < size) s = "0" + s;
   return s;
 }
+
 function deciHours(time) {
   if (!time) {
     return "0:00";
@@ -32,34 +52,18 @@ function deciHours(time) {
   return i.toString() + ":" + pad(Math.round((time - i) * 60, 10), 2);
 }
 
-class StudentTotalComponent extends React.Component {
-  render() {
-    const t = deciHours(this.props.data);
-    return <span>{t}</span>;
-  }
-}
+// Column definitions
+const columns = [
+  { id: "name", label: "Name", sortable: true, width: "200px" },
+  { id: "attended", label: "Attended", sortable: true, width: "50px" },
+  { id: "overrides", label: "Overrides", sortable: true, width: "50px" },
+  { id: "unexcused", label: "Unexcused", sortable: true, width: "50px" },
+  { id: "excuses", label: "Excused Absence", sortable: true, width: "50px" },
+  { id: "short", label: "Short", sortable: true, width: "50px" },
+  { id: "total_hours", label: "Total Hours", sortable: true, width: "50px" },
+];
 
-class StudentAttendedComponent extends React.Component {
-  render() {
-    const { good, short } = this.props.rowData;
-    return <span>{good + short}</span>;
-  }
-}
-
-class StudentLinkComponent extends React.Component {
-  render() {
-    // url ="#speakers/" + props.rowData._id + "/" + this.props.data;
-    const sid = this.props.rowData._id;
-    const name = this.props.data;
-    return (
-      <Link to={"/students/" + sid} id={"student-" + sid}>
-        {name}
-      </Link>
-    );
-  }
-}
-
-class StudentReports extends React.Component {
+export default class StudentReports extends React.Component {
   state = getState();
 
   componentDidMount() {
@@ -72,8 +76,7 @@ class StudentReports extends React.Component {
     reportStore.removeChangeListener(this.onReportChange);
   }
 
-  onReportChange = (x) => {
-    this.refs.newSchoolYear.hide();
+  onReportChange = () => {
     const state = this.state;
     const years = reportStore.getSchoolYears();
     const yearExists = years.years.indexOf(state.currentYear) !== -1;
@@ -81,13 +84,24 @@ class StudentReports extends React.Component {
 
     state.years = years;
     state.currentYear = currentYear;
+    state.showNewSchoolYearModal = false;
 
     this.setState(state, this.fetchReport);
   };
 
   fetchReport = () => {
     const report = reportStore.getReport(this.state.currentYear, this.state.filterStudents);
-    const rows = report != "loading" ? report : [];
+    let rows = report != "loading" ? report : [];
+
+    // Add unique id field and calculated attended value
+    if (Array.isArray(rows)) {
+      rows = rows.map((row, index) => ({
+        ...row,
+        id: row._id || index,
+        attended: row.good + row.short,
+      }));
+    }
+
     this.setState({
       loading: report == null || report == "loading",
       rows,
@@ -101,7 +115,13 @@ class StudentReports extends React.Component {
 
   createPeriod = () => {
     actionCreator.createPeriod(this.state.startDate, this.state.endDate).then((newYearName) => {
-      this.setState({ currentYear: newYearName }, this.fetchReport);
+      this.setState(
+        {
+          currentYear: newYearName,
+          showNewSchoolYearModal: false,
+        },
+        this.fetchReport,
+      );
     });
   };
 
@@ -123,39 +143,116 @@ class StudentReports extends React.Component {
     }
   };
 
+  handleRequestSort = (property) => {
+    let sortAsc = this.state.orderBy === property && this.state.order === "desc";
+    if (property === "name" && this.state.orderBy !== property) {
+      sortAsc = true;
+    }
+    this.setState({
+      order: sortAsc ? "asc" : "desc",
+      orderBy: property,
+    });
+  };
+
+  getSortedRows = () => {
+    const { rows, order, orderBy } = this.state;
+
+    return [...rows].sort((a, b) => {
+      let aValue = a[orderBy];
+      let bValue = b[orderBy];
+
+      // Handle special cases
+      if (orderBy === "name") {
+        aValue = (aValue || "").toLowerCase();
+        bValue = (bValue || "").toLowerCase();
+      } else if (orderBy === "total_hours") {
+        aValue = parseFloat(aValue) || 0;
+        bValue = parseFloat(bValue) || 0;
+      } else {
+        aValue = aValue || 0;
+        bValue = bValue || 0;
+      }
+
+      if (bValue < aValue) {
+        return order === "asc" ? 1 : -1;
+      }
+      if (bValue > aValue) {
+        return order === "asc" ? -1 : 1;
+      }
+      return 0;
+    });
+  };
+
   render() {
     let grid = null;
     if (this.state.loading) {
       grid = <div>Loading</div>;
     } else {
+      const sortedRows = this.getSortedRows();
+
       grid = (
-        <Griddle
-          id="test"
-          results={this.state.rows}
-          resultsPerPage="200"
-          columns={["name", "good", "short", "overrides", "unexcused", "excuses", "total_hours"]}
-          columnMetadata={[
-            {
-              displayName: "Name",
-              columnName: "name",
-              customComponent: StudentLinkComponent,
-            },
-            {
-              displayName: "Attended",
-              customComponent: StudentAttendedComponent,
-              columnName: "good",
-            },
-            { displayName: "Overrides", columnName: "overrides" },
-            { displayName: "Unexcused", columnName: "unexcused" },
-            { displayName: "Excused Absence", columnName: "excuses" },
-            { displayName: "Short", columnName: "short" },
-            {
-              displayName: "Total Hours",
-              columnName: "total_hours",
-              customComponent: StudentTotalComponent,
-            },
-          ]}
-        />
+        <TableContainer component={Paper}>
+          <Table sx={{ "& .MuiTableCell-root": { fontSize: "1rem" } }}>
+            <TableHead>
+              <TableRow>
+                {columns.map((column) => (
+                  <TableCell
+                    sx={{
+                      backgroundColor: "rgb(237, 237, 239)",
+                      fontWeight: 700,
+                      padding: "4px",
+                      width: column.width,
+                    }}
+                    key={column.id}
+                  >
+                    {column.sortable ? (
+                      <TableSortLabel
+                        active={this.state.orderBy === column.id}
+                        direction={
+                          this.state.orderBy === column.id
+                            ? this.state.order
+                            : column.id === "name"
+                              ? "asc"
+                              : "desc"
+                        }
+                        onClick={() => this.handleRequestSort(column.id)}
+                      >
+                        {column.label}
+                      </TableSortLabel>
+                    ) : (
+                      column.label
+                    )}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {sortedRows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  hover
+                  sx={{
+                    "&:hover": {
+                      backgroundColor: "rgba(0, 0, 0, 0.04)",
+                    },
+                  }}
+                >
+                  <BodyTableCell>
+                    <Link to={`/students/${row._id}`} id={`student-${row._id}`}>
+                      {row.name}
+                    </Link>
+                  </BodyTableCell>
+                  <BodyTableCell>{row.attended}</BodyTableCell>
+                  <BodyTableCell>{row.overrides}</BodyTableCell>
+                  <BodyTableCell>{row.unexcused}</BodyTableCell>
+                  <BodyTableCell>{row.excuses}</BodyTableCell>
+                  <BodyTableCell>{row.short}</BodyTableCell>
+                  <BodyTableCell>{deciHours(row.total_hours)}</BodyTableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       );
     }
     return (
@@ -185,9 +282,7 @@ class StudentReports extends React.Component {
           <div className="col-md-2">
             <button
               className="btn btn-small btn-success"
-              onClick={function () {
-                this.refs.newSchoolYear.show();
-              }.bind(this)}
+              onClick={() => this.setState({ showNewSchoolYearModal: true })}
             >
               New Period
             </button>
@@ -217,7 +312,11 @@ class StudentReports extends React.Component {
           </div>
         </div>
         {grid}
-        <Modal ref="newSchoolYear" title="Create new period">
+        <Modal
+          open={this.state.showNewSchoolYearModal}
+          onClose={() => this.setState({ showNewSchoolYearModal: false })}
+          title="Create new period"
+        >
           <p>
             The start date, end date, and all dates in between the two will be included in the
             report.
@@ -244,5 +343,3 @@ class StudentReports extends React.Component {
     );
   }
 }
-
-module.exports = StudentReports;

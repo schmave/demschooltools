@@ -1,6 +1,7 @@
-const React = require("react");
-const Heatmapmonth = require("./heatmapmonth.jsx");
-const dayjs = require("dayjs");
+import dayjs from "dayjs";
+import { useEffect, useMemo, useState } from "react";
+
+import Heatmapmonth from "./heatmapmonth.jsx";
 
 Array.prototype.concatAll = function () {
   const results = [];
@@ -16,27 +17,23 @@ const groupingFunc = function (data) {
   return data.day.split("-")[0] + "-" + data.day.split("-")[1] + "-" + "01";
 };
 
-module.exports = class Heatmap extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      mounted: false,
-    };
+export default function Heatmap({ days, requiredMinutes }) {
+  const [mounted, setMounted] = useState(false);
 
-    // Defer rendering the heatmaps so that the initial page load can take
-    // place without waiting for them.
-    setTimeout(() => {
-      this.setState({ mounted: true });
+  // Defer rendering the heatmaps so that the initial page load can take
+  // place without waiting for them.
+  useEffect(() => {
+    window.setTimeout(() => {
+      setMounted(true);
     }, 0);
-  }
+  }, []);
 
-  loadHeatmaps = () => {
-    const groupedDays = this.props.days.groupBy(groupingFunc);
-    const minutes = this.props.requiredMinutes;
+  const heatmaps = useMemo(() => {
+    const groupedDays = days.groupBy(groupingFunc);
     const sortedDates = Object.keys(groupedDays).sort();
 
     let i = 0;
-    const maps = [];
+    const dateBunches = [];
     while (i < sortedDates.length) {
       // Find up to four months worth of dates, which we will send
       // to Heatmapmonth in one batch.
@@ -54,12 +51,18 @@ module.exports = class Heatmap extends React.Component {
         .concatAll();
       i = j;
 
-      maps.push(<Heatmapmonth key={i} index={i} requiredMinutes={minutes} days={dates} />);
+      dateBunches.push(dates);
     }
-    return maps;
-  };
+    return dateBunches.map((dates, i) => (
+      <Heatmapmonth
+        key={i}
+        index={i}
+        requiredMinutes={requiredMinutes}
+        days={dates}
+        showLegend={i === dateBunches.length - 1}
+      />
+    ));
+  }, [days, requiredMinutes]);
 
-  render() {
-    return this.state.mounted && <div className="row">{this.loadHeatmaps()}</div>;
-  }
-};
+  return mounted && <div className="row">{heatmaps}</div>;
+}

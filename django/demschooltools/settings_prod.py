@@ -2,10 +2,11 @@ import os
 
 from demschooltools.settings import *  # noqa: F403
 
-CUSTODIA_JS_LINK = ""
 SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 
 DEBUG = False
+
+DJANGO_VITE = {"default": {"dev_mode": False}}
 
 ALLOWED_HOSTS = [".demschooltools.com"]
 

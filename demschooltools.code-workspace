@@ -1,8 +1,8 @@
 {
     "folders": [
         {
-            "path": "."
-        }
+            "path": ".",
+        },
     ],
     "settings": {
         "[python]": {
@@ -10,50 +10,50 @@
             "editor.defaultFormatter": "charliermarsh.ruff",
             "editor.codeActionsOnSave": {
                 "source.fixAll": "always",
-                "source.organizeImports": "always"
-            }
+                "source.organizeImports": "always",
+            },
         },
         "[html]": {
             "editor.formatOnSave": false,
-            "editor.formatOnPaste": false
+            "editor.formatOnPaste": false,
         },
         "[django-html]": {
             "editor.formatOnSave": false,
-            "editor.formatOnPaste": false
+            "editor.formatOnPaste": false,
         },
         "[javascript]": {
             "editor.formatOnSave": true,
-            "editor.defaultFormatter": "esbenp.prettier-vscode"
+            "editor.defaultFormatter": "esbenp.prettier-vscode",
         },
         "[javascriptreact]": {
             "editor.formatOnSave": true,
-            "editor.defaultFormatter": "esbenp.prettier-vscode"
+            "editor.formatOnPaste": false,
+            "editor.defaultFormatter": "esbenp.prettier-vscode",
         },
         "[json]": {
             "editor.formatOnSave": true,
-            "editor.defaultFormatter": "esbenp.prettier-vscode"
+            "editor.defaultFormatter": "esbenp.prettier-vscode",
         },
         "[jsonc]": {
             "editor.formatOnSave": true,
-            "editor.defaultFormatter": "esbenp.prettier-vscode"
+            "editor.defaultFormatter": "esbenp.prettier-vscode",
         },
-        "prettier.prettierPath": "",
         "[java]": {
             "editor.formatOnSave": false,
-            "editor.formatOnPaste": false
+            "editor.formatOnPaste": false,
         },
         "python.analysis.autoImportCompletions": true,
         "python.analysis.packageIndexDepths": [
             {
                 "name": "django",
                 "depth": 4,
-                "includeAllSymbols": true
+                "includeAllSymbols": true,
             },
             {
                 "name": "rest_framework",
                 "depth": 4,
-                "includeAllSymbols": true
-            }
+                "includeAllSymbols": true,
+            },
         ],
         "python.analysis.extraPaths": ["./django"],
         "python.autoComplete.extraPaths": ["./django"],
@@ -62,20 +62,26 @@
         "editor.formatOnSave": true,
         "editor.formatOnPaste": true,
         "files.watcherExclude": {
-            "**/target": true
+            "**/target": true,
         },
         "java.compile.nullAnalysis.mode": "automatic",
         "search.exclude": {
             "/django/**/main.css": true,
-            "/django/static/js/*": true
-        }
+            "/django/static/js/*": true,
+        },
+        "prettier.configPath": "./custodia/.prettierrc.js",
+        "prettier.prettierPath": "./custodia/node_modules/prettier",
+        "eslint.workingDirectories": [
+            "custodia"
+        ],
+        "eslint.useFlatConfig": true,
     },
     "extensions": {
         "recommendations": [
             "ms-python.vscode-pylance",
             "redhat.java",
             "lcjuves.vscode-gjf",
-            "esbenp.prettier-vscode"
-        ]
-    }
+            "esbenp.prettier-vscode",
+        ],
+    },
 }

@@ -1,5 +1,6 @@
-var userStore = require("./userstore"),
-  React = require("react");
+import React from "react";
+
+import userStore from "./userstore";
 
 class AdminWrapper extends React.Component {
   state = { permitted: userStore.isAdmin() };
@@ -25,4 +26,4 @@ class AdminWrapper extends React.Component {
   };
 }
 
-module.exports = AdminWrapper;
+export default AdminWrapper;

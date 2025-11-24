@@ -1,37 +1,37 @@
-var EventEmitter = require("events").EventEmitter,
-  dispatcher = require("./appdispatcher"),
-  constants = require("./appconstants");
+import { EventEmitter } from "events";
 
-var CHANGE_EVENT = "change";
+import constants from "./appconstants.js";
+import dispatcher from "./appdispatcher.js";
 
-var latest = "";
-var level = "success";
+const emitter = new EventEmitter();
 
-function getLatest() {
+const CHANGE_EVENT = "change";
+
+let latest = "";
+let level = "success";
+
+export const getLatest = () => {
   return { message: latest, level: level };
-}
+};
 
-var exports = Object.assign({}, EventEmitter.prototype, {
-  getLatest: getLatest,
-  emitChange: function () {
-    this.emit(CHANGE_EVENT);
-  },
-  addChangeListener: function (callback) {
-    this.on(CHANGE_EVENT, callback);
-  },
-  removeChangeListener: function (callback) {
-    this.removeListener(CHANGE_EVENT, callback);
-  },
-});
+export const emitChange = () => {
+  emitter.emit(CHANGE_EVENT);
+};
+
+export const addChangeListener = (callback) => {
+  emitter.on(CHANGE_EVENT, callback);
+};
+
+export const removeChangeListener = (callback) => {
+  emitter.removeListener(CHANGE_EVENT, callback);
+};
 
 dispatcher.register(function (action) {
   switch (action.type) {
     case constants.systemEvents.FLASH:
       latest = action.message;
       level = action.level || "success";
-      exports.emitChange();
+      emitChange();
       break;
   }
 });
-
-module.exports = exports;

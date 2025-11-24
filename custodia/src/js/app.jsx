@@ -1,9 +1,9 @@
-import React, { Component } from "react";
-import { render as _render } from "react-dom";
-import { IndexRoute, Route, Router } from "react-router";
+import { Component } from "react";
+import { createRoot } from "react-dom/client";
+import { HashRouter, Outlet, Route, Routes } from "react-router-dom";
 
+import "../css/starter-template.css";
 import Flash from "./flashnotification.jsx";
-import myhistory from "./myhistory.js";
 import Nav from "./nav.jsx";
 import "./polyfill.js";
 import Student from "./student.jsx";
@@ -16,22 +16,25 @@ class App extends Component {
       <div>
         <Nav />
         <Flash />
-        <div className="content">{this.props.children}</div>
+        <div className="content">
+          <Outlet />
+        </div>
       </div>
     );
   }
 }
 
-var router = (
-  <Router history={myhistory}>
-    <Route path="/" component={App}>
-      <Route path="students" component={StudentTable} />
-      <Route path="students/:studentId(/:day)" component={Student} />
-      <Route path="reports" component={StudentReports} />
+const root = document.getElementById("react_container");
 
-      <IndexRoute component={StudentTable} />
-    </Route>
-  </Router>
+createRoot(root).render(
+  <HashRouter>
+    <Routes>
+      <Route element={<App />}>
+        <Route index element={<StudentTable />} />
+        <Route path="students" element={<StudentTable />} />
+        <Route path="students/:studentId/:day?" element={<Student />} />
+        <Route path="reports" element={<StudentReports />} />
+      </Route>
+    </Routes>
+  </HashRouter>,
 );
-
-_render(router, document.getElementById("react_container"));

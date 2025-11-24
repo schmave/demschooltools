@@ -1,5 +1,6 @@
-var EventEmitter = require("events").EventEmitter,
-  ajax = require("./ajaxhelper");
+import { EventEmitter } from "events";
+
+import ajax from "./ajaxhelper.js";
 
 var isAdmin;
 var users = [];
@@ -43,4 +44,4 @@ ajax.get("/users/is-admin").then(
   },
 );
 
-module.exports = exports;
+export default exports;

@@ -4,7 +4,6 @@ from datetime import datetime, time, timedelta
 from typing import Any, Type
 
 from django import forms
-from django.conf import settings
 from django.contrib.auth.decorators import login_required as django_login_required
 from django.db.models import CharField, Model, Prefetch, Q, QuerySet, Value
 from django.db.models.functions import Concat
@@ -63,8 +62,6 @@ def render_main_template(
             else None,
             "is_user_logged_in": request.user.is_authenticated,
             "org_config": get_org_config(request.org),
-            "rollbar_environment": settings.ROLLBAR_ENVIRONMENT,
-            "rollbar_token": settings.ROLLBAR_FRONTEND_TOKEN,
         },
     )
 
@@ -86,6 +83,7 @@ def view_manual(request: DstHttpRequest):
             {
                 "chapters": chapters,
                 "org_config": org_config,
+                "can_edit": request.user.hasRole(UserRole.EDIT_MANUAL),
             },
         ),
         f"{request.org.short_name} {org_config.str_manual_title}",
