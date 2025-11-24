@@ -20,6 +20,9 @@ export const darkTheme = createTheme({
       main: '#deff4d',
     },
   },
+  typography: {
+    fontSize: 20,
+  },
 });
 
 let lightTheme = createTheme({
@@ -42,7 +45,7 @@ let lightTheme = createTheme({
     },
   },
   typography: {
-    fontSize: '1.5rem',
+    fontSize: 20,
   },
 });
 lightTheme = responsiveFontSizes(lightTheme);

@@ -1,26 +1,37 @@
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import { Avatar as MuiAvatar } from '@mui/material';
-import shuffleSeed from 'shuffle-seed';
 import Typography from './Typography';
 
-const Avatar = (props) => {
-  const [initials, setInitials] = useState('');
-  const [colors, setColors] = useState({ color: 'white', backgroundColor: 'black' });
+// Simple hash function to deterministically select a color based on a string
+const hashString = (str) => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  return Math.abs(hash);
+};
 
+const Avatar = (props) => {
   const { name, ...restOfProps } = props;
 
-  useEffect(() => {
-    if (name?.length > 0) {
-      const initialsArray = name.split(' ');
-      let newInitials = initialsArray[0].charAt(0);
-      if (initialsArray.length > 1) {
-        newInitials += initialsArray[initialsArray.length - 1].charAt(0);
-      }
-      setInitials(newInitials);
-      const possibleColors = avatarColors;
-      const randomColors = shuffleSeed.shuffle(possibleColors, name);
-      setColors(randomColors[0]);
+  const { initials, colors } = useMemo(() => {
+    if (!name || name.length === 0) {
+      return { initials: '', colors: { color: 'white', backgroundColor: 'black' } };
     }
+
+    const initialsArray = name.split(' ');
+    let newInitials = initialsArray[0].charAt(0);
+    if (initialsArray.length > 1) {
+      newInitials += initialsArray[initialsArray.length - 1].charAt(0);
+    }
+
+    const colorIndex = hashString(name) % avatarColors.length;
+    return {
+      initials: newInitials,
+      colors: avatarColors[colorIndex],
+    };
   }, [name]);
 
   if (initials === '') {

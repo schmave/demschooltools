@@ -178,7 +178,7 @@ var _rollbarConfig = {
                 href="@routes.Attendance.rules()">Rules
             </a>
             <a @if(selectedBtn.equals("sign_in_sheet")) { class="active" }
-                href="@routes.Attendance.signInSheet()">Sign In Sheet
+                href="/attendance/signInSheet">Sign In Sheet
             </a>
             @if(Utils.getOrgConfig(request).org.getAttendanceEnableOffCampus()) {
                 <a @if(selectedBtn.equals("off_campus_time")) { class="active" }

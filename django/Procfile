@@ -1,2 +1,2 @@
 django: uv run manage.py migrate && uv run manage.py runserver
-custodia: cd ../custodia && npm install && npm run watch
+react: cd ../react && npm install && npm run watch

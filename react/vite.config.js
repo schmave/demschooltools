@@ -17,8 +17,9 @@ export default ({ command, mode }) =>
       emptyOutDir: true,
       rollupOptions: {
         input: {
-          custodia: resolve(__dirname, "src", "js", "app.jsx"),
-          custodia_css: resolve(__dirname, "src", "js", "cssonly.js"),
+          custodia: resolve(__dirname, "custodia", "js", "app.jsx"),
+          custodia_css: resolve(__dirname, "custodia", "js", "cssonly.js"),
+          reactapp:  resolve(__dirname, "index.jsx"),
         },
       },
       manifest: "manifest.json", // django-vite requires this

@@ -9,7 +9,7 @@ from django.db.models import CharField, Model, Prefetch, Q, QuerySet, Value
 from django.db.models.functions import Concat
 from django.db.transaction import atomic
 from django.forms import Form, ModelForm, TextInput, ValidationError
-from django.http import HttpRequest, HttpResponseNotFound
+from django.http import HttpResponseNotFound
 from django.http.response import HttpResponse as HttpResponse
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
@@ -33,14 +33,11 @@ from dst.pdf_utils import (
     create_pdf_response,
     render_html_to_pdf,
 )
+from dst.utils import DstHttpRequest
 
 
 def login_required():
     return django_login_required(login_url="/login")
-
-
-class DstHttpRequest(HttpRequest):
-    org: Organization
 
 
 def render_main_template(

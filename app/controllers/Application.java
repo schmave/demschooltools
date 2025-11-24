@@ -383,18 +383,6 @@ public class Application extends Controller {
     return peopleToJson(people);
   }
 
-  public static String attendancePeopleWithTagsJson(Organization org) {
-    List<Person> people = attendancePeople(org);
-    return peopleWithTagsToJson(people);
-  }
-
-  public static String allPeopleJson(Organization org) {
-    List<Person> people =
-        Person.find.query().where().eq("organization", org).eq("isFamily", false).findList();
-    people.sort(Person.SORT_DISPLAY_NAME);
-    return peopleToJson(people);
-  }
-
   public static String rolesPeopleJson(Organization org) {
     List<Person> people = rolesPeople(org);
     return peopleToJson(people);
@@ -406,37 +394,6 @@ public class Application extends Controller {
       HashMap<String, String> values = new HashMap<>();
       values.put("label", p.getDisplayName());
       values.put("id", "" + p.getPersonId());
-      result.add(values);
-    }
-    return Json.stringify(Json.toJson(result));
-  }
-
-  private static String peopleWithTagsToJson(List<Person> people) {
-    List<Map<String, Object>> result = new ArrayList<>();
-    for (Person p : people) {
-      HashMap<String, Object> values = new HashMap<>();
-      values.put("label", p.getDisplayName());
-      values.put("id", "" + p.getPersonId());
-      List<Integer> tagIds = new ArrayList<>();
-      if (p.tags != null) {
-        for (Tag tag : p.tags) {
-          tagIds.add(tag.getId());
-        }
-      }
-      values.put("tags", tagIds);
-      result.add(values);
-    }
-    return Json.stringify(Json.toJson(result));
-  }
-
-  public static String attendanceTagsJson(Organization org) {
-    List<Tag> tags =
-        Tag.find.query().where().eq("organization", org).eq("showInAttendance", true).findList();
-    List<Map<String, String>> result = new ArrayList<>();
-    for (Tag tag : tags) {
-      HashMap<String, String> values = new HashMap<>();
-      values.put("label", tag.getTitle());
-      values.put("id", "" + tag.getId());
       result.add(values);
     }
     return Json.stringify(Json.toJson(result));

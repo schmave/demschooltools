@@ -9,7 +9,7 @@ object Webpack {
       var process: Option[Process] = None
 
       override def afterStarted(): Unit = {
-        val command = Seq("npm", "run", "dev")
+        val command = Seq("npm", "run", "watch")
         val os = sys.props("os.name").toLowerCase
         val makeCmd = os match {
           case x if x contains "windows" => Seq("cmd", "/C") ++ command
