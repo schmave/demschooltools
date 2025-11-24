@@ -154,7 +154,6 @@ dependencies = [
     { name = "django-vite" },
     { name = "djangorestframework" },
     { name = "drf-orjson-renderer" },
-    { name = "honcho" },
     { name = "mistletoe" },
     { name = "playwright" },
     { name = "psycopg2" },
@@ -167,6 +166,7 @@ dependencies = [
 dev = [
     { name = "django-silk" },
     { name = "djhtml" },
+    { name = "honcho" },
     { name = "ipython" },
     { name = "pyinstrument" },
     { name = "python-dotenv" },
@@ -183,7 +183,6 @@ requires-dist = [
     { name = "django-vite", specifier = ">=3.1.0" },
     { name = "djangorestframework", specifier = "~=3.15" },
     { name = "drf-orjson-renderer", specifier = "~=1.7" },
-    { name = "honcho", specifier = ">=2.0.0" },
     { name = "mistletoe", specifier = ">=1.4.0" },
     { name = "playwright", specifier = "~=1.49" },
     { name = "psycopg2", specifier = "~=2.9" },
@@ -196,6 +195,7 @@ requires-dist = [
 dev = [
     { name = "django-silk", specifier = "~=5.3" },
     { name = "djhtml", specifier = ">=3.0.7" },
+    { name = "honcho", specifier = ">=2.0.0" },
     { name = "ipython", specifier = ">=9.4.0" },
     { name = "pyinstrument", specifier = "~=5.0" },
     { name = "python-dotenv", specifier = ">=1.1.1" },
