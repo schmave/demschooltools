@@ -722,7 +722,7 @@ class User(AbstractUser):
 
     def hasRole(self, desired_role: str) -> bool:
         for role in self.roles.values_list("role", flat=True):
-            if role_includes(role, desired_role):
+            if role == desired_role or role_includes(role, desired_role):
                 return True
         return False
 
@@ -733,20 +733,23 @@ class User(AbstractUser):
 def role_includes(greater_role: str, lesser_role: str) -> bool:
     if greater_role == UserRole.ALL_ACCESS:
         return True
-    elif greater_role == UserRole.EDIT_ALL_JC:
+
+    if greater_role == UserRole.EDIT_ALL_JC:
         return lesser_role in {
             UserRole.EDIT_31_DAY_JC,
             UserRole.EDIT_7_DAY_JC,
             UserRole.VIEW_JC,
             UserRole.EDIT_RESOLUTION_PLANS,
         }
-    elif greater_role == UserRole.EDIT_31_DAY_JC:
+
+    if greater_role == UserRole.EDIT_31_DAY_JC:
         return lesser_role in {
             UserRole.EDIT_7_DAY_JC,
             UserRole.VIEW_JC,
             UserRole.EDIT_RESOLUTION_PLANS,
         }
-    elif greater_role == UserRole.EDIT_7_DAY_JC:
+
+    if greater_role == UserRole.EDIT_7_DAY_JC:
         return lesser_role in {UserRole.VIEW_JC, UserRole.EDIT_RESOLUTION_PLANS}
 
     return False
