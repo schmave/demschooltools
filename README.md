@@ -44,15 +44,15 @@ You'll need to run two separate programs for each of the parts of the site.
 
 ### (1 of 2) Play Framework code
 
-1.  Run `./sbt.sh`, then execute the `eclipse` and `run` command in the sbt console:
+Run `./sbt.sh`, then execute the `eclipse` and `run` command in the sbt console:
 
-        [DemSchoolTools] $ eclipse
-        [info] About to create Eclipse project files for your project(s).
-        [info] Successfully created Eclipse project files for project(s):
-        [info] DemSchoolTools
-        [info] authLibrary
-        [info] modelsLibrary
-        [DemSchoolTools] $ run
+    [DemSchoolTools] $ eclipse
+    [info] About to create Eclipse project files for your project(s).
+    [info] Successfully created Eclipse project files for project(s):
+    [info] DemSchoolTools
+    [info] authLibrary
+    [info] modelsLibrary
+    [DemSchoolTools] $ run
 
 ### (2 of 2) Django code
 
