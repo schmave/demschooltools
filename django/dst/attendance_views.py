@@ -8,7 +8,11 @@ from dst.models import Person, Tag, UserRole
 from dst.utils import DstHttpRequest, render_main_template
 
 
-class SignInSheetView(LoginRequiredMixin, View):
+class AttendanceView(LoginRequiredMixin, View):
+    login_url = "/login"
+
+
+class SignInSheetView(AttendanceView):
     def get(self, request: DstHttpRequest):
         if not request.user.hasRole(UserRole.ATTENDANCE):
             raise PermissionError("You don't have privileges to access this item")
