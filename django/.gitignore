@@ -1,2 +1,3 @@
-static/js/custodia.js*
+static-vite/
+dev-static-root/
 pyinstrument/

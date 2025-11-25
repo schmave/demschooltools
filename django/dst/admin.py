@@ -13,6 +13,7 @@ from dst.models import (
     ManualChange,
     Meeting,
     Organization,
+    OrganizationHost,
     Person,
     PersonTagChange,
     Section,
@@ -106,6 +107,7 @@ admin.site.register(Meeting)
 admin.site.register(Organization)
 admin.site.register(PersonTagChange)
 admin.site.register(Section)
+admin.site.register(OrganizationHost)
 
 
 @admin.register(Session)

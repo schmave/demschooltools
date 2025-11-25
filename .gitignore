@@ -17,6 +17,7 @@ npm-debug.log
 
 *~
 conf/generated.keystore
+conf/evolutions
 
 __pycache__/
 
@@ -33,3 +34,5 @@ metals.sbt
 .settings/
 .classpath
 .project
+
+react/stats.html

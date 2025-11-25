@@ -1,0 +1,14 @@
+{% load django_vite %}
+
+<div id="react-root"></div>
+
+<script type="text/javascript">
+  window.initialData = window.initialData || {};
+  window.initialData.people = {{ people_json|safe }};
+  window.initialData.tags = {{ tags_json|safe }};
+  window.initialData.allPeople = {{ all_people_json|safe }};
+</script>
+
+{% vite_hmr_client %}
+{% vite_react_refresh %}
+{% vite_asset 'index.jsx' %}

@@ -21,6 +21,8 @@ fi
 
 export DJANGO_SETTINGS_MODULE="demschooltools.settings_prod"
 
+set -e
+
 uv run manage.py migrate
 uv run manage.py collectstatic --noinput
 # This is necessary sometimes but is annoying because you have to enter your password

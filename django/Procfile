@@ -1,0 +1,2 @@
+django: uv run manage.py migrate && uv run manage.py runserver
+react: cd ../react && npm install && npm run watch
