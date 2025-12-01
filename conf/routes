@@ -122,9 +122,6 @@ GET     /people/:id               controllers.CRM.person(id: Integer, request: R
 POST    /people                   controllers.CRM.makeNewPerson(request: Request)
 POST    /people/:id/delete        controllers.CRM.deletePerson(id: Integer)
 
-GET     /old/attendance		  controllers.Attendance.index(start_date ?= "", end_date: String ?= "", is_custom_date: Boolean ?= false, request: Request)
-GET     /old/attendance/download      controllers.Attendance.download(start_of_year ?= "", request: Request)
-
 GET /attendance       controllers.Proxy.proxy0(request: Request)
 GET /attendance?*extra controllers.Proxy.proxy(request: Request, extra: String)
 GET /attendance/download       controllers.Proxy.proxy0(request: Request)
