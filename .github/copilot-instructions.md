@@ -1,0 +1,1 @@
+Refer to `/AGENTS.md` for all coding rules, conventions, and restrictions.

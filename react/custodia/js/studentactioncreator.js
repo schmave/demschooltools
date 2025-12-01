@@ -2,17 +2,14 @@ import ajax from "./ajaxhelper.js";
 import constants from "./appconstants.js";
 import dispatcher from "./appdispatcher.js";
 
-export const loadStudents = () => {
-  ajax
-    .get({
-      url: "/students",
-    })
-    .then(function (data) {
-      dispatcher.dispatch({
-        type: constants.studentEvents.LOADED,
-        data,
-      });
-    });
+export const loadStudents = async () => {
+  const data = await ajax.get({
+    url: "/students",
+  });
+  dispatcher.dispatch({
+    type: constants.studentEvents.LOADED,
+    data,
+  });
 };
 
 function loadStudentData(requestData) {
@@ -22,63 +19,64 @@ function loadStudentData(requestData) {
   });
 }
 
-export const loadStudent = function (id) {
-  ajax.get("/students/" + id).then(loadStudentData);
+export const loadStudent = async function (id) {
+  const requestData = await ajax.get("/students/" + id);
+  loadStudentData(requestData);
 };
 
-export const updateStudent = function (id, start_date, minutes) {
-  return ajax
-    .put("/students/" + id, {
-      start_date,
-      minutes,
-    })
-    .then(loadStudentData);
+export const updateStudent = async function (id, start_date, minutes) {
+  const requestData = await ajax.put("/students/" + id, {
+    start_date,
+    minutes,
+  });
+  loadStudentData(requestData);
 };
 
-export const swipeStudent = function (student, direction, overrideTime, navigate) {
+export const swipeStudent = async function (student, direction, overrideTime, navigate) {
   let overrideDate;
   if (overrideTime) {
     overrideDate =
       direction === "in" ? new Date().toISOString().substr(0, 10) : student.last_swipe_date;
   }
-  ajax
-    .post("students/" + student._id + "/swipe", {
-      direction,
-      overrideDate,
-      overrideTime,
-    })
-    .then(function (data) {
-      dispatcher.dispatch({
-        type: constants.studentEvents.STUDENT_SWIPED,
-        data,
-      });
-      if (overrideTime === undefined) {
-        // Don't show this message if we are filling in an old missing swipe.
-        dispatcher.dispatch({
-          type: constants.systemEvents.FLASH,
-          message: student.name + " swiped successfully!",
-        });
-      }
-      navigate?.("/students", { replace: true });
+  const data = await ajax.post("students/" + student._id + "/swipe", {
+    direction,
+    overrideDate,
+    overrideTime,
+  });
+  dispatcher.dispatch({
+    type: constants.studentEvents.STUDENT_SWIPED,
+    data,
+  });
+  if (overrideTime === undefined) {
+    // Don't show this message if we are filling in an old missing swipe.
+    dispatcher.dispatch({
+      type: constants.systemEvents.FLASH,
+      message: student.name + " swiped successfully!",
     });
+  }
+  navigate?.("/students", { replace: true });
 };
-export const markAbsent = function (student) {
-  ajax.post("/students/" + student._id + "/absent").then(
-    function (data) {
-      dispatcher.dispatch({
-        type: constants.studentEvents.MARKED_ABSENT,
-        data: data.student,
-      });
-      this.loadStudents();
-    }.bind(this),
-  );
+
+export const markAbsent = async function (student) {
+  const data = await ajax.post("/students/" + student._id + "/absent");
+  dispatcher.dispatch({
+    type: constants.studentEvents.MARKED_ABSENT,
+    data: data.student,
+  });
+  loadStudents();
 };
-export const deleteSwipe = function (swipe, student) {
-  ajax.post("/students/" + student._id + "/swipe/delete", { swipe }).then(loadStudentData);
+
+export const deleteSwipe = async function (swipe, student) {
+  const requestData = await ajax.post("/students/" + student._id + "/swipe/delete", { swipe });
+  loadStudentData(requestData);
 };
-export const excuse = function (studentId, day, undo) {
-  ajax.post("students/" + studentId + "/excuse", { day, undo }).then(loadStudentData);
+
+export const excuse = async function (studentId, day, undo) {
+  const requestData = await ajax.post("students/" + studentId + "/excuse", { day, undo });
+  loadStudentData(requestData);
 };
-export const override = function (studentId, day, undo) {
-  ajax.post("/students/" + studentId + "/override", { day, undo }).then(loadStudentData);
+
+export const override = async function (studentId, day, undo) {
+  const requestData = await ajax.post("/students/" + studentId + "/override", { day, undo });
+  loadStudentData(requestData);
 };
