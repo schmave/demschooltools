@@ -249,21 +249,22 @@ class AttendanceStats:
             return 0.0
 
         hours = (end_seconds - start_seconds) / 3600.0
+        off_hours = 0
 
         # Subtract off-campus time if applicable
         if day.off_campus_departure_time and day.off_campus_return_time:
             off_start = self._time_to_seconds(day.off_campus_departure_time)
             off_end = self._time_to_seconds(day.off_campus_return_time)
 
-            if off_end > off_start:
-                off_hours = (off_end - off_start) / 3600.0
-                hours -= off_hours
+            off_hours = (off_end - off_start) / 3600.0
 
-            # Add back exempted minutes
             if day.off_campus_minutes_exempted:
-                hours += day.off_campus_minutes_exempted / 60.0
+                off_hours -= day.off_campus_minutes_exempted / 60.0
 
-        return max(0.0, hours)
+            if off_hours < 0:
+                off_hours = 0
+
+        return max(0.0, hours - off_hours)
 
     def average_hours_per_day(self) -> float:
         total_days_attended = self.days_present + self.partial_days_present
