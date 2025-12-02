@@ -36,4 +36,9 @@ export default ({ command, mode }) =>
     resolve: {
       dedupe: ["react", "react-dom"],
     },
+    test: {
+      environment: "jsdom",
+      setupFiles: resolve(__dirname, "vitest.setup.js"),
+      globals: true,
+    },
   });

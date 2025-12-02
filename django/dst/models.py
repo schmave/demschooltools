@@ -101,6 +101,126 @@ class Tag(models.Model):
     show_in_roles = models.BooleanField(default=True)
 
 
+class CustomField(models.Model):
+    """Field definition configured by an organization for a specific entity type."""
+
+    class Meta:
+        db_table = "custom_fields"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["organization", "entity_type", "label"],
+                name="custom_field_unique_label_per_entity",
+            )
+        ]
+        indexes = [
+            models.Index(
+                fields=["organization", "entity_type"],
+                name="custom_fields_org_entity_idx",
+            )
+        ]
+
+    class EntityType(models.TextChoices):
+        PERSON = ("person", "Person")
+        TAG = ("tag", "Tag")
+
+    class FieldType(models.TextChoices):
+        TEXT = ("text", "Text")
+        INTEGER = ("integer", "Integer")
+        NUMBER = ("number", "Number")
+        CONTROLLED_NUMBER = ("controlledNumber", "Controlled Number")
+        CURRENCY = ("currency", "Currency")
+        DATE = ("date", "Date")
+        DATETIME = ("datetime", "Datetime")
+        TOGGLE = ("toggle", "Toggle")
+        RADIO_GROUP = ("radioGroup", "Radio Group")
+        CHECKBOX_GROUP = ("checkboxGroup", "Checkbox Group")
+        SELECT = ("select", "Select")
+        PEOPLE_SELECT = ("peopleSelect", "People Select")
+
+    id = models.BigAutoField(primary_key=True)
+    organization = models.ForeignKey(
+        Organization,
+        on_delete=models.PROTECT,
+        related_name="custom_fields",
+    )
+    entity_type = models.CharField(
+        max_length=64,
+        default=EntityType.PERSON,
+    )
+    field_type = models.CharField(
+        max_length=64,
+        choices=FieldType.choices,
+        default=FieldType.TEXT,
+    )
+    label = models.CharField(max_length=255)
+    help_text = models.TextField(null=True, blank=True)
+    enabled = models.BooleanField(default=True)
+    required = models.BooleanField(default=False)
+    disabled = models.BooleanField(default=False)
+    display_order = models.IntegerField(null=True, blank=True)
+    type_props = models.JSONField(default=dict, blank=True)
+    type_validation = models.JSONField(default=dict, blank=True)
+    default_value = models.JSONField(null=True, blank=True)
+    required_if = models.JSONField(default=list, blank=True)
+    disabled_if = models.JSONField(default=list, blank=True)
+    visible_to_role_ids = models.JSONField(default=list, blank=True)
+    editable_by_role_ids = models.JSONField(default=list, blank=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self) -> str:
+        return f"{self.organization_id}:{self.entity_type}:{self.label}"
+
+
+class CustomFieldValue(models.Model):
+    """Stores a single custom-field value for a specific entity."""
+
+    class Meta:
+        db_table = "custom_field_values"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["custom_field", "entity_id"],
+                name="custom_field_value_unique_per_entity",
+            )
+        ]
+        indexes = [
+            models.Index(
+                fields=["custom_field"],
+                name="custom_field_values_field_idx",
+            ),
+            models.Index(
+                fields=["entity_id"],
+                name="custom_field_values_entity_idx",
+            ),
+        ]
+
+    id = models.BigAutoField(primary_key=True)
+    custom_field = models.ForeignKey(
+        CustomField,
+        on_delete=models.CASCADE,
+        related_name="values",
+    )
+    entity_id = models.BigIntegerField()
+    value_text = models.TextField(null=True, blank=True)
+    value_integer = models.BigIntegerField(null=True, blank=True)
+    value_number = models.DecimalField(
+        null=True, blank=True, max_digits=30, decimal_places=10
+    )
+    value_currency = models.DecimalField(
+        null=True, blank=True, max_digits=12, decimal_places=2
+    )
+    value_boolean = models.BooleanField(null=True, blank=True)
+    value_date = models.DateField(null=True, blank=True)
+    value_datetime = models.DateTimeField(null=True, blank=True)
+    value_option_ids = models.JSONField(null=True, blank=True)
+    value_person_ids = models.JSONField(null=True, blank=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self) -> str:
+        return f"{self.custom_field_id}:{self.entity_id}"
+
+
 class Person(models.Model):
     class Meta:
         db_table = "person"

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.hc.client5.http.classic.methods.HttpDelete;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPatch;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpPut;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
@@ -118,6 +119,8 @@ public class Proxy extends Controller {
         proxiedRequest = new HttpGet(targetUrl);
       } else if ("PUT".equalsIgnoreCase(request.method())) {
         proxiedRequest = new HttpPut(targetUrl);
+      } else if ("PATCH".equalsIgnoreCase(request.method())) {
+        proxiedRequest = new HttpPatch(targetUrl);
       } else if ("DELETE".equalsIgnoreCase(request.method())) {
         proxiedRequest = new HttpDelete(targetUrl);
       } else {
@@ -142,6 +145,8 @@ public class Proxy extends Controller {
           ((HttpPost) proxiedRequest).setEntity(entity);
         } else if (proxiedRequest instanceof HttpPut) {
           ((HttpPut) proxiedRequest).setEntity(entity);
+        } else if (proxiedRequest instanceof HttpPatch) {
+          ((HttpPatch) proxiedRequest).setEntity(entity);
         }
       }
 

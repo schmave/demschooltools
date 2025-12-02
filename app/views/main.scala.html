@@ -281,6 +281,8 @@ var _rollbarConfig = {
             <a @if(selectedBtn.equals("settings_access")) { class="active" }
                 href="@routes.Settings.viewAccess()">Users & Access</a>
             <a href="@routes.Application.viewPassword()">Change Password</a>
+            <a @if(selectedBtn.equals("custom_fields")) { class="active" }
+                href="/settings/custom-fields">Custom Fields</a>
             </div>
         </div>
         }

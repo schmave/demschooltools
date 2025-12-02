@@ -105,3 +105,16 @@ def markdown(text):
 @register.filter(name="list")
 def my_list(obj):
     return list(obj)
+
+
+@register.filter(name="has_role")
+def has_role(user, role_key: str) -> bool:
+    if not user:
+        return False
+    has_role_method = getattr(user, "hasRole", None)
+    if callable(has_role_method):
+        try:
+            return bool(has_role_method(role_key))
+        except Exception:  # pragma: no cover - defensive
+            return False
+    return False

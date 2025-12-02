@@ -35,6 +35,11 @@ from custodia.views import (
     SwipeView,
 )
 from dst.attendance_views import SignInSheetView
+from dst.custom_field_views import (
+    CustomFieldSettingsView,
+    CustomFieldViewSet,
+    RoleKeyListView,
+)
 from dst.manual_views import (
     CreateUpdateChapter,
     CreateUpdateEntry,
@@ -65,6 +70,28 @@ register_converter(NegativeIntConverter, "negint")
 urlpatterns = [
     path("admin/", admin.site.urls),
     path(
+        "api/custom-fields/",
+        CustomFieldViewSet.as_view({"get": "list", "post": "create"}),
+        name="custom-field-list",
+    ),
+    path(
+        "api/custom-fields/<int:pk>/",
+        CustomFieldViewSet.as_view(
+            {
+                "get": "retrieve",
+                "put": "update",
+                "patch": "partial_update",
+                "delete": "destroy",
+            }
+        ),
+        name="custom-field-detail",
+    ),
+    path(
+        "api/role-keys/",
+        RoleKeyListView.as_view(),
+        name="role-key-list",
+    ),
+    path(
         "custodia-api/",
         (
             [
@@ -88,6 +115,11 @@ urlpatterns = [
         ),
     ),
     path("attendance/signInSheet", SignInSheetView.as_view()),
+    path(
+        "settings/custom-fields",
+        CustomFieldSettingsView.as_view(),
+        name="custom-field-settings",
+    ),
     path("viewManual", view_manual),
     path("viewManualChanges", view_manual_changes),
     path("searchManual", search_manual),

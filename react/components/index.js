@@ -1,4 +1,5 @@
 export { default as Avatar } from './Avatar';
+export { default as Alert } from './Alert';
 export { default as BaseModal } from './BaseModal';
 export { default as Box } from './Box';
 export { default as Button } from './Button';

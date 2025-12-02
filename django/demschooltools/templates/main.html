@@ -299,6 +299,10 @@
                                        href="/settings/checklists">Checklists</a>
                                     <a {% if selectedBtn == "settings_access" %}class="active"{% endif %}
                                        href="/settings/access">Users & Access</a>
+                                    {% if request.user.is_authenticated and request.user|has_role:'all-access' %}
+                                        <a {% if selectedBtn == "settings_custom_fields" %}class="active"{% endif %}
+                                           href="/settings/custom-fields">Custom Fields</a>
+                                    {% endif %}
                                     <a href="/settings/password">Change Password</a>
                                 </div>
                             </div>

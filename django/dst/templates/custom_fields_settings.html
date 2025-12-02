@@ -1,0 +1,14 @@
+{% load django_vite %}
+
+<div id="react-root"></div>
+
+<script type="text/javascript">
+  window.initialData = window.initialData || {};
+  window.initialData.customFieldsApiBase = "{{ custom_fields_api_url }}";
+  window.initialData.roleKeysApiUrl = "{{ role_keys_api_url }}";
+  window.initialData.tagOptions = {{ tags_json|safe }};
+</script>
+
+{% vite_hmr_client %}
+{% vite_react_refresh %}
+{% vite_asset 'index.jsx' %}

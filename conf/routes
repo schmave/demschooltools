@@ -114,6 +114,19 @@ POST     /custodia-api/*extra       controllers.Proxy.proxy(request: Request, ex
 PUT      /custodia-api/*extra       controllers.Proxy.proxy(request: Request, extra: String)
 DELETE   /custodia-api/*extra       controllers.Proxy.proxy(request: Request, extra: String)
 
+GET      /api/custom-fields                controllers.Proxy.proxy0(request: Request)
+GET      /api/custom-fields/               controllers.Proxy.proxy0(request: Request)
+POST     /api/custom-fields                controllers.Proxy.proxy0(request: Request)
+POST     /api/custom-fields/               controllers.Proxy.proxy0(request: Request)
+GET      /api/custom-fields/*extra         controllers.Proxy.proxy(request: Request, extra: String)
+PUT      /api/custom-fields/*extra         controllers.Proxy.proxy(request: Request, extra: String)
+PATCH    /api/custom-fields                controllers.Proxy.proxy0(request: Request)
+PATCH    /api/custom-fields/               controllers.Proxy.proxy0(request: Request)
+PATCH    /api/custom-fields/*extra         controllers.Proxy.proxy(request: Request, extra: String)
+DELETE   /api/custom-fields/*extra         controllers.Proxy.proxy(request: Request, extra: String)
+GET      /api/role-keys                    controllers.Proxy.proxy0(request: Request)
+GET      /api/role-keys/                   controllers.Proxy.proxy0(request: Request)
+
 GET     /jsonPeople               controllers.CRM.jsonPeople(term ?= "", request: Request)
 GET     /people                   controllers.CRM.recentComments(request: Request)
 GET     /allPeople                controllers.CRM.allPeople(request: Request)
@@ -232,6 +245,8 @@ GET     /settings/access/editUser/:id controllers.Settings.editUser(id : Integer
 POST     /settings/access/newUser controllers.Settings.newUser(request: Request)
 POST     /settings/access/saveUser controllers.Settings.saveUser(request: Request)
 
+GET     /settings/custom-fields              controllers.Proxy.proxy0(request: Request)
+GET     /settings/custom-fields/*extra      controllers.Proxy.proxy(request: Request, extra: String)
 
 GET    /misc/fileSharing           controllers.Application.fileSharing(request: Request)
 GET    /misc/viewFiles              controllers.Application.viewFiles(request: Request)
