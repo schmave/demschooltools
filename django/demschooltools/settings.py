@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "django_vite",
     "custodia",
     "dst",
+    "auditlog",
 ] + (["silk"] if SILK_ENABLED else [])
 
 AUTH_USER_MODEL = "dst.User"
@@ -74,7 +75,10 @@ MIDDLEWARE = (["silk.middleware.SilkyMiddleware"] if SILK_ENABLED else []) + [
     "demschooltools.middleware.TimezoneMiddleware",
     # "pyinstrument.middleware.ProfilerMiddleware",
     "rollbar.contrib.django.middleware.RollbarNotifierMiddlewareExcluding404",
+    "auditlog.middleware.AuditlogMiddleware",
 ]
+
+AUDITLOG_USE_BASE_MANAGER = True
 
 ROLLBAR_FRONTEND_TOKEN = os.environ.get("ROLLBAR_FRONTEND_TOKEN", "")
 ROLLBAR_ENVIRONMENT = "development"

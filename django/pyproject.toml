@@ -6,6 +6,7 @@ requires-python = "~=3.12"
 dependencies = [
     "bcrypt~=4.3",
     "django~=5.1",
+    "django-auditlog>=3.3.0",
     "django-vite>=3.1.0",
     "djangorestframework~=3.15",
     "drf-orjson-renderer~=1.7",
