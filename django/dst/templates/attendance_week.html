@@ -1,0 +1,81 @@
+{% load dst_tags %}
+
+<h3>Attendance weekly report {% yymmddDate monday %}
+<a class="edit-link" href="/attendance/editWeek?date={{ monday|format_date_for_input }}">Edit</a>
+</h3>
+<p><a href="/attendance/viewWeek?date={{ monday|add_days:-7|format_date_for_input }}">&lt;&lt; Prev week</a>
+ {% yymmddDate monday %} <a href="/attendance/viewWeek?date={{ monday|add_days:7|format_date_for_input }}">Next week &gt;&gt;</a>
+</p>
+
+<table class="attendance-view table sortable">
+<tr>
+	<th class="sorttable_sorted_reverse">First<br/>Name<span id="sorttable_sortrevind">&nbsp;▴</span></th>
+	<th>Last<br/>Name</th>
+	<th colspan=2>Monday</th>
+	<th colspan=2>Tuesday</th>
+	<th colspan=2>Wednesday</th>
+	<th colspan=2>Thursday</th>
+	<th colspan=2>Friday</th>
+	<th width=20>Extra hours</th>
+	<th width=20>Days Present</th>
+	<th width=20>Total hours</th>
+	<th width=20>Average hours per day</th>
+</tr>
+
+{% for person in people %}
+<tr>
+	<td>{{ person.first_name }}</td>
+	<td>{{ person.last_name }}</td>
+	{% with days=person_to_days|lookup:person %}
+		{% if days %}
+			{% for day in days %}
+				{% if day.code %}
+					{% with code=codes_map|lookup:day.code %}
+						{% if code %}
+							<td colspan=2 class="attendance-code" style="background-color:{{ code.color }}">
+							{{ code.description }}
+							</td>
+						{% else %}
+							<td colspan=2 class="attendance-error">{{ day.code }}</td>
+						{% endif %}
+					{% endwith %}
+				{% else %}
+					{% if not day.start_time and not day.end_time %}
+						<td colspan=2 class="attendance-error">&mdash;</td>
+					{% else %}
+						{% if not day.start_time %}
+							<td class="attendance-error">?</td>
+						{% else %}
+							<td>{{ day.start_time|format_time }}</td>
+						{% endif %}
+						{% if not day.end_time %}
+							<td class="attendance-error">?</td>
+						{% else %}
+							<td>{{ day.end_time|format_time }}</td>
+						{% endif %}
+					{% endif %}
+				{% endif %}
+			{% endfor %}
+		{% else %}
+			<td colspan=10></td>
+		{% endif %}
+	{% endwith %}
+
+	{% with week=person_to_week|lookup:person %}
+		{% if week %}
+			<td>{{ week.extra_hours }}</td>
+		{% else %}
+			<td>--</td>
+		{% endif %}
+
+		{% if days %}
+			<td>{{ days|length }}</td>
+			<td>--</td>
+			<td>--</td>
+		{% else %}
+			<td>--</td><td>--</td><td>--</td>
+		{% endif %}
+	{% endwith %}
+</tr>
+{% endfor %}
+</table>

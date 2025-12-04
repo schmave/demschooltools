@@ -129,7 +129,7 @@ GET /attendance/download*extra controllers.Proxy.proxy(request: Request, extra: 
 
 
 GET     /attendance/jsonPeople               controllers.Attendance.jsonPeople(term ?= "", request: Request)
-GET     /attendance/viewWeek	  controllers.Attendance.viewWeek(date : String ?= "", request: Request)
+GET     /attendance/viewWeek	  controllers.Proxy.proxy0(request: Request)
 GET     /attendance/editWeek      controllers.Attendance.editWeek(date : String ?= "", request: Request)
 
 GET     /attendance/signInSheet              controllers.Proxy.proxy0(request: Request)

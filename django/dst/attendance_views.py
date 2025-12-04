@@ -4,7 +4,7 @@ import json
 import math
 import zipfile
 from collections import defaultdict
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 from typing import Dict, List, Optional
 
 from django import forms
@@ -395,6 +395,48 @@ def get_attendance_people(org: Organization) -> List[Person]:
     )
 
 
+def get_days_present(days: List[AttendanceDay]) -> int:
+    """Count days where person was present (has start and end times, no code)"""
+    result = 0
+    for day in days:
+        if day.code is None and day.start_time and day.end_time:
+            result += 1
+    return result
+
+
+def get_total_hours(days: List[AttendanceDay], week: Optional[AttendanceWeek]) -> float:
+    """Calculate total hours including extra hours from week"""
+    result = 0.0
+    for day in days:
+        if day.code is None and day.start_time and day.end_time:
+            result += _calculate_day_hours(day)
+
+    if week:
+        result += week.extra_hours
+
+    return result
+
+
+def get_average_hours(
+    days: List[AttendanceDay], week: Optional[AttendanceWeek]
+) -> float:
+    """Calculate average hours per day present"""
+    days_present = get_days_present(days)
+    if days_present == 0:
+        return 0.0
+
+    return get_total_hours(days, week) / float(days_present)
+
+
+def adjust_to_previous_monday(d: date) -> date:
+    """Adjust date to the previous Monday (or same day if already Monday)"""
+    # weekday(): Monday=0, Sunday=6
+    days_since_monday = d.weekday()
+    if days_since_monday == 0:
+        return d
+    return d - timedelta(days=days_since_monday)
+
+
 class AttendanceIndexForm(forms.Form):
     start_date = DateToDatetimeField(required=False)
     end_date = DateToDatetimeField(required=False)
@@ -593,6 +635,79 @@ def _calculate_day_hours(day: AttendanceDay) -> float:
 
     # Match Java calculation exactly: (endTime.getTime() - startTime.getTime() - off_campus_time) / (1000.0 * 60 * 60)
     return (end_millis - start_millis - off_campus_time) / (1000.0 * 60 * 60)
+
+
+@login_required()
+def view_week(request: DstHttpRequest):
+    """View attendance for a specific week"""
+    if not request.user.hasRole(UserRole.ATTENDANCE):
+        return HttpResponse("Access denied", status=403)
+
+    # Parse date parameter and adjust to Monday
+    date_str = request.GET.get("date", "")
+    start_date = adjust_to_previous_monday(parse_date_or_now(date_str))
+
+    # Calculate end date (Friday)
+    end_date = start_date + timedelta(days=4)
+
+    org = request.org
+
+    # Query attendance days for the week
+    days = list(
+        AttendanceDay.objects.filter(
+            person__organization=org,
+            day__gte=start_date,
+            day__lte=end_date,
+        )
+        .select_related("person")
+        .order_by("day")
+    )
+
+    # Group days by person
+    person_to_days = defaultdict(list)
+    for day in days:
+        person_to_days[day.person].append(day)
+
+    # Query attendance weeks
+    weeks = list(
+        AttendanceWeek.objects.filter(
+            person__organization=org,
+            monday=start_date,
+        ).select_related("person")
+    )
+
+    # Map person to week
+    person_to_week = {}
+    for week in weeks:
+        person_to_week[week.person] = week
+
+    # Get all people (union of people with days and people with weeks)
+    all_people = set(person_to_days.keys())
+    all_people.update(person_to_week.keys())
+    all_people = sorted(all_people, key=lambda p: (p.first_name, p.last_name))
+
+    # Get codes map
+    codes_map = get_codes_map(True, org)
+
+    org_config = get_org_config(org)
+
+    return render_main_template(
+        request,
+        "attendance",
+        render_to_string(
+            "attendance_week.html",
+            {
+                "monday": start_date,
+                "codes_map": codes_map,
+                "people": all_people,
+                "person_to_days": person_to_days,
+                "person_to_week": person_to_week,
+                "org_config": org_config,
+            },
+        ),
+        "Attendance data",
+        "week",
+    )
 
 
 @login_required()

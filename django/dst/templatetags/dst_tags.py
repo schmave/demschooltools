@@ -146,3 +146,27 @@ def format_date_for_input(d):
     if isinstance(d, datetime):
         d = d.date()
     return d.strftime("%Y-%m-%d")
+
+
+@register.filter
+def format_time(t):
+    """Format time object as h:mm AM/PM"""
+    if t is None:
+        return "---"
+    # Convert time to datetime for strftime formatting
+    from datetime import datetime
+
+    dt = datetime.combine(datetime.today(), t)
+    return dt.strftime("%-I:%M %p")
+
+
+@register.filter
+def add_days(d, days):
+    """Add days to a date"""
+    from datetime import timedelta
+
+    if d is None:
+        return None
+    if isinstance(d, datetime):
+        d = d.date()
+    return d + timedelta(days=days)

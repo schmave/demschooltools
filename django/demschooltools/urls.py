@@ -34,7 +34,12 @@ from custodia.views import (
     StudentsTodayView,
     SwipeView,
 )
-from dst.attendance_views import attendance_download, attendance_index, SignInSheetView
+from dst.attendance_views import (
+    SignInSheetView,
+    attendance_download,
+    attendance_index,
+    view_week,
+)
 from dst.manual_views import (
     CreateUpdateChapter,
     CreateUpdateEntry,
@@ -115,6 +120,7 @@ urlpatterns = [
     path("custodia/logout", LogoutView.as_view()),
     path("attendance", attendance_index),
     path("attendance/download", attendance_download),
+    path("attendance/viewWeek", view_week),
 ]
 
 if settings.SILK_ENABLED:
