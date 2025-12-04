@@ -1,0 +1,10 @@
+{% extends "admin/change_form.html" %}
+
+{% block object-tools-items %}
+    {{ block.super }}
+    {% if original %}
+        <li>
+            <a href="../auditlog/" class="historylink">Audit Log</a>
+        </li>
+    {% endif %}
+{% endblock %}
