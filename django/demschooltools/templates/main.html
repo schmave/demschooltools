@@ -29,26 +29,22 @@
     </head>
     <body>
 
-        <div id="modal_wrapper">
-            <div id="modal_window">
+    <div style="display:none" id="feedback-dialog" title="Feedback">
+        <h3>Thanks for your feedback!</h3>
+        <p>Please use this form to send a message to DemSchoolTools headquarters with your bug report,
+            feature request, or other comment.</p>
 
-                <div style="text-align: right;"><a id="modal_close" href="#">close <b>X</b></a></div>
+        <form id="modal_feedback" method="POST" action="/sendFeedbackEmail" accept-charset="UTF-8">
 
-                <h3>Thanks for your feedback!</h3>
-                <p>Please use this form to send a message to DemSchoolTools headquarters with your bug report,
-                    feature request, or other comment.</p>
-
-                <form id="modal_feedback" method="POST" action="/sendFeedbackEmail" accept-charset="UTF-8">
-
-                    <p><label>Your Name<br />
-                        <input type="text" autofocus="true" size="48" name="name" value="" /></label></p>
-                    <p><label>Your Email<br />
-                        <input type="email" title="Please enter a valid email address" size="48" name="email" value="" /></label></p>
-                    <p><label>Feedback<br />
-                        <textarea name="message" cols="48" rows="8"></textarea></label></p>
-                    <p><input type="submit" name="feedbackForm" value="Send Message" /></p>
-                </form>
-            </div></div>
+            <p><label>Your Name<br />
+                <input type="text" autofocus="true" size="48" name="name" value="" /></label></p>
+            <p><label>Your Email<br />
+                <input type="email" title="Please enter a valid email address" size="48" name="email" value="" /></label></p>
+            <p><label>Feedback<br />
+                <textarea name="message" cols="48" rows="8"></textarea></label></p>
+            <p><input type="submit" name="feedbackForm" value="Send Message" /></p>
+        </form>
+    </div>
 
         {% with username=current_username %}
             {% if username %}
