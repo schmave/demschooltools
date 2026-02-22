@@ -56,6 +56,10 @@ const getDefaultTypeProps = (fieldType) => {
       return {
         step: 1,
       };
+    case 'text':
+      return {
+        multiline: false,
+      };
     case 'peopleSelect':
       return {
         multiSelect: false,
@@ -256,7 +260,7 @@ const CustomFieldModal = ({
         throw new Error('Value must be an array.');
       }
       return parsed;
-    } catch (error) {
+    } catch (_error) {
       errorBag[key] = 'Must be valid JSON array.';
       return [];
     }
@@ -284,6 +288,18 @@ const CustomFieldModal = ({
 
   const renderTypeSettings = () => {
     switch (formState.field_type) {
+      case 'text':
+        return (
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={Boolean(formState.type_props?.multiline)}
+                onChange={(event) => handleTypePropChange('multiline', event.target.checked)}
+              />
+            }
+            label="Multi-line input"
+          />
+        );
       case 'select':
         return (
           <Stack spacing={2}>
@@ -376,8 +392,8 @@ const CustomFieldModal = ({
           key="allowNegative"
           control={
             <Checkbox
-              checked={Boolean(formState.type_props?.allowNegative)}
-              onChange={(event) => handleTypePropChange('allowNegative', event.target.checked)}
+              checked={Boolean(formState.type_validation?.allowNegative)}
+              onChange={(event) => handleValidationChange('allowNegative', event.target.checked)}
             />
           }
           label="Allow negative values"
@@ -478,6 +494,9 @@ const CustomFieldModal = ({
     );
   };
 
+  const typeSettingsContent = renderTypeSettings();
+  const validationContent = renderValidation();
+
   return (
     <InfoModal
       open={open}
@@ -552,13 +571,21 @@ const CustomFieldModal = ({
           </Stack>
         </Stack>
 
-        <Divider />
-
-        {renderTypeSettings()}
-        {errors.type_props ? (
-          <Typography color="error" variant="body2">
-            {errors.type_props}
-          </Typography>
+        {typeSettingsContent ? (
+          <>
+            <Divider />
+            <Stack spacing={2}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                Type Settings
+              </Typography>
+              {typeSettingsContent}
+              {errors.type_props ? (
+                <Typography color="error" variant="body2">
+                  {errors.type_props}
+                </Typography>
+              ) : null}
+            </Stack>
+          </>
         ) : null}
 
         <Divider />
@@ -581,9 +608,12 @@ const CustomFieldModal = ({
           ) : null}
         </Stack>
 
-        <Divider />
-
-        {renderValidation()}
+        {validationContent ? (
+          <>
+            <Divider />
+            {validationContent}
+          </>
+        ) : null}
 
         <Divider />
 

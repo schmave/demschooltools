@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { SnackbarContext } from '../../../contexts';
 import CustomFieldsSettingsPage from '../CustomFieldsSettingsPage';
 
 const mockJsonResponse = (data, { ok = true, status = 200 } = {}) => ({
@@ -23,6 +24,18 @@ const setupInitialData = () => {
   };
 };
 
+const renderWithContext = (ui) => {
+  const mockSetSnackbar = vi.fn();
+  return {
+    ...render(
+      <SnackbarContext.Provider value={{ snackbar: {}, setSnackbar: mockSetSnackbar }}>
+        {ui}
+      </SnackbarContext.Provider>,
+    ),
+    mockSetSnackbar,
+  };
+};
+
 describe('CustomFieldsSettingsPage', () => {
   beforeEach(() => {
     setupInitialData();
@@ -41,7 +54,7 @@ describe('CustomFieldsSettingsPage', () => {
 
     const user = userEvent.setup();
 
-    render(<CustomFieldsSettingsPage />);
+    renderWithContext(<CustomFieldsSettingsPage />);
 
     await screen.findByText('Nickname');
     expect(screen.getByText('Custom Fields')).toBeInTheDocument();
@@ -64,7 +77,7 @@ describe('CustomFieldsSettingsPage', () => {
 
     const user = userEvent.setup();
 
-    render(<CustomFieldsSettingsPage />);
+    renderWithContext(<CustomFieldsSettingsPage />);
 
     await user.click(screen.getByRole('button', { name: /Add Field/i }));
     await user.click(screen.getByRole('button', { name: /Save/i }));
@@ -94,7 +107,7 @@ describe('CustomFieldsSettingsPage', () => {
 
     const user = userEvent.setup();
 
-    render(<CustomFieldsSettingsPage />);
+    renderWithContext(<CustomFieldsSettingsPage />);
 
     await user.click(screen.getByRole('button', { name: /Add Field/i }));
     await user.type(screen.getByLabelText('Label'), 'Emergency Contact');
@@ -143,7 +156,7 @@ describe('CustomFieldsSettingsPage', () => {
 
     const user = userEvent.setup();
 
-    render(<CustomFieldsSettingsPage />);
+    renderWithContext(<CustomFieldsSettingsPage />);
 
     await screen.findByText('Nickname');
 

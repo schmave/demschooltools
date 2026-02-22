@@ -192,7 +192,7 @@ const CustomFieldsSettingsPage = () => {
       setCustomFields((prev) =>
         prev.map((item) => (Number(item.id) === Number(updated.id) ? updated : item)),
       );
-    } catch (error) {
+    } catch (_error) {
       setSnackbar({
         message: 'Unable to update field status.',
         severity: 'error',
@@ -222,7 +222,7 @@ const CustomFieldsSettingsPage = () => {
           severity: 'info',
         });
       }
-    } catch (error) {
+    } catch (_error) {
       setSnackbar({ message: 'Failed to delete field.', severity: 'error' });
     } finally {
       setDeleteTarget(null);
@@ -285,7 +285,7 @@ const CustomFieldsSettingsPage = () => {
         }),
       );
       setSnackbar({ message: 'Field order updated.' });
-    } catch (error) {
+    } catch (_error) {
       setSnackbar({ message: 'Failed to update order.', severity: 'error' });
     }
   };

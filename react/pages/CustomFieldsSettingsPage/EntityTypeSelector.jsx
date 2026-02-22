@@ -1,20 +1,28 @@
 import React from 'react';
-import { Button, Stack } from '../../components';
+import { ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { ENTITY_TYPES } from './constants';
 
 const EntityTypeSelector = ({ value, onChange }) => {
+  const handleChange = (event, newValue) => {
+    if (newValue !== null) {
+      onChange(newValue);
+    }
+  };
+
   return (
-    <Stack direction="row" spacing={1}>
+    <ToggleButtonGroup
+      value={value}
+      exclusive
+      onChange={handleChange}
+      size="small"
+      sx={{ alignSelf: 'flex-start' }}
+    >
       {ENTITY_TYPES.map((type) => (
-        <Button
-          key={type.id}
-          variant={value === type.id ? 'contained' : 'outlined'}
-          onClick={() => onChange(type.id)}
-        >
+        <ToggleButton key={type.id} value={type.id} sx={{ px: 3, textTransform: 'none' }}>
           {type.label}
-        </Button>
+        </ToggleButton>
       ))}
-    </Stack>
+    </ToggleButtonGroup>
   );
 };
 

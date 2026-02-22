@@ -8,7 +8,6 @@ export default [
   js.configs.recommended,
 
   {
-    root: true,
     files: ["**/*.{js,jsx}"],
     plugins: {
       react,
@@ -52,6 +51,7 @@ export default [
         {
           argsIgnorePattern: "^_",
           varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
         },
       ],
       "no-console": ["warn", { allow: ["warn", "error"] }],
@@ -61,6 +61,27 @@ export default [
         "error",
         {
           devDependencies: false,
+          optionalDependencies: false,
+          peerDependencies: false,
+        },
+      ],
+    },
+  },
+
+  // Test file overrides
+  {
+    files: ["**/__tests__/**/*.{js,jsx}", "**/*.test.{js,jsx}", "**/*.spec.{js,jsx}"],
+    languageOptions: {
+      globals: {
+        global: "readonly",
+        globalThis: "readonly",
+      },
+    },
+    rules: {
+      "import/no-extraneous-dependencies": [
+        "error",
+        {
+          devDependencies: true,
           optionalDependencies: false,
           peerDependencies: false,
         },
