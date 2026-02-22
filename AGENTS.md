@@ -11,9 +11,7 @@
 |----------|---------------------------------------------------------------------------------------------------------|----------------------|
 | Backend  | You must implement all backend work with Django under `django/`. New apps live beside `custodia` and `dst`, are wired into `django/demschooltools/settings.py`, and exposed through `django/demschooltools/urls.py`. | Use `uv run manage.py startapp`, register the app, add URLs/migrations/tests in the same subtree. |
 | Frontend | You must implement all frontend work with React under `react/` using the existing Vite build (see `react/vite.config.js`). Update the manifest entries and Django templates (`django/dst/templates/*.html`) to load new bundles via `django-vite`. | Run `npm run watch` during development and `vite build` only via CI/deploy scripts. |
-| Legacy   | The historical Play/Scala + JVM stack under `app/`, `conf/`, `project/`, `target/`, `authLibrary/`, `modelsLibrary/`, `lib/`, `node_modules/`, and related webpack config in the repo root is frozen. Do **not** modify or expand it without explicit human approval, except for shared `node_modules` packages that modern React requires. |
-
-> Note: The repository root `node_modules/` and `package.json` are shared between the legacy webpack build and the modern React app. Install new dependencies there only when the React/Vite code under `react/` cannot function without them, and keep both `package-lock.json` files in sync.
+| Legacy   | The historical Play/Scala + JVM stack under `app/`, `conf/`, `project/`, `target/`, `authLibrary/`, `modelsLibrary/`, `lib/`, `node_modules/`, and related webpack config in the repo root (`/package.json`) is frozen. Do **not** modify or expand it without explicit human approval. |
 
 ## Current Django Architecture
 
@@ -77,7 +75,7 @@
 ## Behavior Contract for AI Agents
 
 - ❌ Do **not** modify or extend legacy Play/Scala/Java code under `app/`, `project/`, `conf/`, `target/`, `authLibrary/`, `modelsLibrary/`, or legacy webpack configs without human direction.
-- ❌ Do **not** introduce new Python dependencies, npm packages, or system-level tools without approval, except when a React/Vite change makes a new root-level npm dependency unavoidable. In that case, update the appropriate `package-lock.json` (root and/or `react/`) and document the requirement.
+- ❌ Do **not** introduce new Python dependencies, npm packages, or system-level tools without approval, except when a React/Vite change makes a new npm dependency unavoidable. In that case, update `react/package.json` and document the requirement.
 - ❌ Do **not** rename database columns, change `db_table` mappings, or drop constraints without human review.
 - ❌ Do **not** generate, commit, or log secrets (`APPLICATION_SECRET`, Rollbar tokens, etc.).
 - ❌ Do **not** run destructive migrations or data backfills that can drop or rewrite production data without explicit sign-off.

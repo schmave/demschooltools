@@ -1,6 +1,8 @@
 from datetime import date
 from decimal import Decimal
 
+from auditlog.models import AuditlogHistoryField
+from auditlog.registry import auditlog
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models.functions import Now
@@ -99,6 +101,8 @@ class Tag(models.Model):
     show_in_menu = models.BooleanField(default=True)
     show_in_account_balances = models.BooleanField(default=False)
     show_in_roles = models.BooleanField(default=True)
+
+    history = AuditlogHistoryField()
 
 
 class CustomField(models.Model):
@@ -271,6 +275,8 @@ class Person(models.Model):
     custodia_show_as_absent = models.DateField(null=True, blank=True)
     custodia_start_date = models.DateField(null=True, blank=True)
 
+    history = AuditlogHistoryField()
+
     def get_name(self):
         return self.display_name or self.first_name
 
@@ -352,6 +358,8 @@ class RoleRecord(models.Model):
     role_name = models.TextField()
     date_created = models.DateTimeField()
 
+    history = AuditlogHistoryField()
+
 
 class RoleRecordMember(models.Model):
     class Meta:
@@ -385,6 +393,8 @@ class AttendanceRule(models.Model):
     latest_start_time = models.TimeField(null=True, blank=True)
     earliest_departure_time = models.TimeField(null=True, blank=True)
     exempt_from_fees = models.BooleanField()
+
+    history = AuditlogHistoryField()
 
 
 class Comment(models.Model):
@@ -443,6 +453,8 @@ class NotificationRule(models.Model):
     email = models.TextField()
     organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
 
+    history = AuditlogHistoryField()
+
 
 class MailchimpSync(models.Model):
     class Meta:
@@ -465,6 +477,8 @@ class AttendanceCode(models.Model):
     color = models.CharField(max_length=16)
     counts_toward_attendance = models.BooleanField(default=False)
     not_counted = models.BooleanField(default=False)
+
+    history = AuditlogHistoryField()
 
 
 class AttendanceDay(models.Model):
@@ -836,6 +850,8 @@ class User(AbstractUser):
 
     roles: "models.Manager[UserRole]"
 
+    history = AuditlogHistoryField()
+
     # Disable Django's normal group & permission setup for admin access.
     groups = None
     user_permissions = None
@@ -917,3 +933,12 @@ class AllowedIp(models.Model):
 
     ip = models.TextField(primary_key=True)
     organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
+
+
+auditlog.register(AttendanceCode)
+auditlog.register(AttendanceRule)
+auditlog.register(NotificationRule)
+auditlog.register(Person)
+auditlog.register(RoleRecord)
+auditlog.register(Tag)
+auditlog.register(User)

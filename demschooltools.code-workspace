@@ -50,6 +50,11 @@
                 "includeAllSymbols": true,
             },
             {
+                "name": "auditlog",
+                "depth": 4,
+                "includeAllSymbols": true,
+            },
+            {
                 "name": "rest_framework",
                 "depth": 4,
                 "includeAllSymbols": true,
