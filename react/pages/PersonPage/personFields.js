@@ -1,0 +1,201 @@
+/**
+ * Core person field definitions — full parity with the legacy Play/Scala person form.
+ * These are the built-in fields for the Person entity type.
+ */
+
+const ORDER_SPACING = 1000;
+
+export const CORE_PERSON_FIELDS = [
+  // --- Basic Info ---
+  {
+    key: 'first_name',
+    label: 'First Name',
+    fieldType: 'text',
+    required: true,
+    displayOrder: ORDER_SPACING * 1,
+    isCore: true,
+    columns: 6,
+  },
+  {
+    key: 'last_name',
+    label: 'Last Name',
+    fieldType: 'text',
+    required: true,
+    displayOrder: ORDER_SPACING * 2,
+    isCore: true,
+    columns: 6,
+  },
+  {
+    key: 'display_name',
+    label: 'Short Name',
+    fieldType: 'text',
+    required: false,
+    displayOrder: ORDER_SPACING * 3,
+    isCore: true,
+    helpText: 'Used in JC displays',
+    columns: 4,
+  },
+  {
+    key: 'gender',
+    label: 'Gender',
+    fieldType: 'select',
+    required: false,
+    displayOrder: ORDER_SPACING * 4,
+    isCore: true,
+    typeProps: {
+      options: [
+        { id: 'Unknown', label: 'Unknown' },
+        { id: 'Female', label: 'Female' },
+        { id: 'Male', label: 'Male' },
+        { id: 'Other', label: 'Other' },
+      ],
+    },
+    columns: 4,
+  },
+  {
+    key: 'dob',
+    label: 'Date of Birth',
+    fieldType: 'date',
+    required: false,
+    displayOrder: ORDER_SPACING * 5,
+    isCore: true,
+    columns: 4,
+  },
+  {
+    key: 'notes',
+    label: 'Notes',
+    fieldType: 'text',
+    required: false,
+    displayOrder: ORDER_SPACING * 6,
+    isCore: true,
+    typeProps: { multiline: true },
+    columns: 12,
+  },
+
+  // --- Contact ---
+  {
+    key: 'email',
+    label: 'Email',
+    fieldType: 'text',
+    required: false,
+    displayOrder: ORDER_SPACING * 7,
+    isCore: true,
+    columns: 6,
+  },
+  {
+    key: 'phone_numbers',
+    label: 'Phone Numbers',
+    fieldType: 'special',
+    required: false,
+    displayOrder: ORDER_SPACING * 8,
+    isCore: true,
+    columns: 12,
+  },
+  {
+    key: 'address',
+    label: 'Address',
+    fieldType: 'text',
+    required: false,
+    displayOrder: ORDER_SPACING * 9,
+    isCore: true,
+    columns: 12,
+  },
+  {
+    key: 'city',
+    label: 'City',
+    fieldType: 'text',
+    required: false,
+    displayOrder: ORDER_SPACING * 10,
+    isCore: true,
+    columns: 4,
+  },
+  {
+    key: 'state',
+    label: 'State',
+    fieldType: 'text',
+    required: false,
+    displayOrder: ORDER_SPACING * 11,
+    isCore: true,
+    columns: 4,
+  },
+  {
+    key: 'zip',
+    label: 'Zip',
+    fieldType: 'text',
+    required: false,
+    displayOrder: ORDER_SPACING * 12,
+    isCore: true,
+    columns: 4,
+  },
+  {
+    key: 'neighborhood',
+    label: 'Neighborhood',
+    fieldType: 'text',
+    required: false,
+    displayOrder: ORDER_SPACING * 13,
+    isCore: true,
+    columns: 6,
+  },
+
+  // --- Student Info ---
+  {
+    key: 'grade',
+    label: 'Current Grade',
+    fieldType: 'text',
+    required: false,
+    displayOrder: ORDER_SPACING * 14,
+    isCore: true,
+    columns: 4,
+  },
+  {
+    key: 'previous_school',
+    label: 'Previous School',
+    fieldType: 'text',
+    required: false,
+    displayOrder: ORDER_SPACING * 15,
+    isCore: true,
+    columns: 4,
+  },
+  {
+    key: 'school_district',
+    label: 'School District',
+    fieldType: 'text',
+    required: false,
+    displayOrder: ORDER_SPACING * 16,
+    isCore: true,
+    columns: 4,
+  },
+  {
+    key: 'pin',
+    label: 'Attendance PIN',
+    fieldType: 'text',
+    required: false,
+    displayOrder: ORDER_SPACING * 17,
+    isCore: true,
+    conditionalOn: 'showElectronicSignin',
+    columns: 4,
+  },
+
+  // --- Tags (special renderer) ---
+  {
+    key: 'tags',
+    label: 'Tags',
+    fieldType: 'special',
+    required: false,
+    displayOrder: ORDER_SPACING * 18,
+    isCore: true,
+    columns: 12,
+  },
+
+  // --- Family (special renderer) ---
+  {
+    key: 'family_person_id',
+    label: 'Same family as',
+    fieldType: 'special',
+    required: false,
+    displayOrder: ORDER_SPACING * 19,
+    isCore: true,
+    helpText: 'Choose a sibling to link this person to their family',
+    columns: 12,
+  },
+];

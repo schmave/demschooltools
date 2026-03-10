@@ -110,6 +110,9 @@
                                 <a {% if selectedBtn == "all_people" %}class="active"{% endif %}
                                    href="/allPeople">
                                     All people</a>
+                                <a {% if selectedBtn == "people_list" %}class="active"{% endif %}
+                                   href="/people/list">
+                                    Grid view</a>
                                 <span class="dropdown">
                                     <ul class="dropdown-menu">
                                         {% for kv in tags_with_prefixes %}

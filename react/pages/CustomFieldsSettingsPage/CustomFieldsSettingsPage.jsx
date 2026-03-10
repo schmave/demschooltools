@@ -1,19 +1,24 @@
 import React from 'react';
-import { Button, PageTitle, PageWrapper, Stack, Typography } from '../../components';
+import { Button, Divider, PageTitle, PageWrapper, Stack, Typography } from '../../components';
 import { DeleteDialog } from '../../containers';
 import { SnackbarContext } from '../../contexts';
 import { safeParse } from '../../utils';
 import { CORE_FIELDS, ENTITY_TYPES, FIELD_TYPE_LABELS } from './constants';
-import EntityTypeSelector from './EntityTypeSelector';
-import FieldList from './FieldList';
+import UnifiedFieldTable from './FieldList';
 import CustomFieldModal from './CustomFieldModal';
+import GroupModal from './GroupModal';
 import {
   createCustomField,
+  createGroup,
   deleteCustomField,
+  deleteGroup,
   fetchCustomFields,
+  fetchGroups,
   fetchRoleKeys,
   patchCustomField,
+  patchGroup,
   updateCustomField,
+  updateGroup,
 } from './api';
 
 const getEntityLabel = (entityType) =>
@@ -24,10 +29,6 @@ const formatFieldForDisplay = (field, entityLabel) => ({
   entityLabel,
   typeLabel: FIELD_TYPE_LABELS[field.field_type] || field.field_type,
   isCore: Boolean(field.isCore),
-  displayValue:
-    field.display_order === undefined || field.display_order === null
-      ? '—'
-      : field.display_order,
 });
 
 const normalizeTagOptions = (options = []) =>
@@ -52,11 +53,12 @@ const getInitialData = () => {
 const CustomFieldsSettingsPage = () => {
   const initialData = getInitialData();
   const customFieldsApiBase = initialData.customFieldsApiBase || '/api/custom-fields/';
+  const groupsApiBase = initialData.groupsApiBase || '/api/custom-field-groups/';
   const roleKeysApiUrl = initialData.roleKeysApiUrl || '/api/role-keys/';
   const initialTags = normalizeTagOptions(safeParse(initialData.tagOptions, []));
 
   const { setSnackbar } = React.useContext(SnackbarContext);
-  const [entityType, setEntityType] = React.useState(ENTITY_TYPES[0].id);
+  const entityType = 'person';
   const [customFields, setCustomFields] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   const [roleOptions, setRoleOptions] = React.useState([]);
@@ -64,6 +66,11 @@ const CustomFieldsSettingsPage = () => {
   const [modalError, setModalError] = React.useState('');
   const [saving, setSaving] = React.useState(false);
   const [deleteTarget, setDeleteTarget] = React.useState(null);
+  const [groups, setGroups] = React.useState([]);
+  const [groupModalState, setGroupModalState] = React.useState({ open: false, group: null });
+  const [groupModalError, setGroupModalError] = React.useState('');
+  const [groupSaving, setGroupSaving] = React.useState(false);
+  const [groupDeleteTarget, setGroupDeleteTarget] = React.useState(null);
 
   React.useEffect(() => {
     let isMounted = true;
@@ -86,10 +93,14 @@ const CustomFieldsSettingsPage = () => {
   React.useEffect(() => {
     let isMounted = true;
     setLoading(true);
-    fetchCustomFields(customFieldsApiBase, entityType)
-      .then((payload) => {
+    Promise.all([
+      fetchCustomFields(customFieldsApiBase, entityType),
+      fetchGroups(groupsApiBase, entityType),
+    ])
+      .then(([fieldsPayload, groupsPayload]) => {
         if (!isMounted) return;
-        setCustomFields(payload);
+        setCustomFields(fieldsPayload);
+        setGroups(groupsPayload);
       })
       .catch(() => {
         setSnackbar({
@@ -106,50 +117,45 @@ const CustomFieldsSettingsPage = () => {
     return () => {
       isMounted = false;
     };
-  }, [customFieldsApiBase, entityType, setSnackbar]);
+  }, [customFieldsApiBase, groupsApiBase, entityType, setSnackbar]);
 
   const entityLabel = getEntityLabel(entityType);
-  const coreFields = React.useMemo(
-    () =>
-      (CORE_FIELDS[entityType] || []).map((coreField) =>
-        formatFieldForDisplay(
-          {
-            id: coreField.key,
-            label: coreField.label,
-            entity_type: entityType,
-            field_type: coreField.fieldType,
-            required: coreField.required,
-            enabled: true,
-            disabled: false,
-            display_order: coreField.displayOrder,
-            isCore: true,
-          },
-          entityLabel,
-        ),
+  const coreFields = React.useMemo(() => {
+    // Build lookups from groups
+    const keyToGroup = {};
+    const hiddenKeys = new Set();
+    for (const g of groups) {
+      for (const k of g.core_field_keys || []) {
+        keyToGroup[k] = g.id;
+      }
+      for (const k of g.hidden_core_field_keys || []) {
+        hiddenKeys.add(k);
+      }
+    }
+    return (CORE_FIELDS[entityType] || []).map((coreField) =>
+      formatFieldForDisplay(
+        {
+          id: coreField.key,
+          label: coreField.label,
+          entity_type: entityType,
+          field_type: coreField.fieldType,
+          required: coreField.required,
+          enabled: !hiddenKeys.has(coreField.key),
+          disabled: false,
+          display_order: coreField.displayOrder,
+          isCore: true,
+          group: keyToGroup[coreField.key] || null,
+        },
+        entityLabel,
       ),
-    [entityType, entityLabel],
-  );
+    );
+  }, [entityType, entityLabel, groups]);
 
   const fieldsForDisplay = React.useMemo(() => {
     const customEntries = customFields.map((field) =>
       formatFieldForDisplay(field, entityLabel),
     );
-    const combined = [...coreFields, ...customEntries];
-    combined.sort((a, b) => {
-      const orderA =
-        a.display_order === undefined || a.display_order === null
-          ? Number.MAX_SAFE_INTEGER
-          : a.display_order;
-      const orderB =
-        b.display_order === undefined || b.display_order === null
-          ? Number.MAX_SAFE_INTEGER
-          : b.display_order;
-      if (orderA !== orderB) {
-        return orderA - orderB;
-      }
-      return a.label.localeCompare(b.label);
-    });
-    return combined;
+    return [...coreFields, ...customEntries];
   }, [coreFields, customFields, entityLabel]);
 
   const handleCloseModal = () => {
@@ -171,6 +177,22 @@ const CustomFieldsSettingsPage = () => {
       } else {
         const created = await createCustomField(customFieldsApiBase, payload);
         setCustomFields((prev) => [...prev, created]);
+        // Add to the group's field order
+        if (created.group) {
+          const cfKey = `cf_${created.id}`;
+          const group = groups.find((g) => g.id === created.group);
+          if (group) {
+            const newKeys = [...(group.core_field_keys || []), cfKey];
+            setGroups((prev) =>
+              prev.map((g) =>
+                g.id === created.group ? { ...g, core_field_keys: newKeys } : g,
+              ),
+            );
+            patchGroup(groupsApiBase, created.group, { core_field_keys: newKeys }).catch(
+              () => {},
+            );
+          }
+        }
         setSnackbar({ message: 'Field created successfully.' });
       }
       handleCloseModal();
@@ -183,6 +205,31 @@ const CustomFieldsSettingsPage = () => {
 
   const handleToggleEnabled = async (field) => {
     if (field.isCore) {
+      // Toggle core field visibility via hidden_core_field_keys on the group
+      if (field.required) return;
+      const groupId = getFieldGroupId(field);
+      if (!groupId) return;
+      const group = groups.find((g) => g.id === groupId);
+      if (!group) return;
+
+      const hidden = group.hidden_core_field_keys || [];
+      const isHidden = hidden.includes(field.id);
+      const newHidden = isHidden
+        ? hidden.filter((k) => k !== field.id)
+        : [...hidden, field.id];
+
+      const prevGroups = groups;
+      setGroups((prev) =>
+        prev.map((g) =>
+          g.id === groupId ? { ...g, hidden_core_field_keys: newHidden } : g,
+        ),
+      );
+      try {
+        await patchGroup(groupsApiBase, groupId, { hidden_core_field_keys: newHidden });
+      } catch (_error) {
+        setGroups(prevGroups);
+        setSnackbar({ message: 'Unable to update field visibility.', severity: 'error' });
+      }
       return;
     }
     try {
@@ -229,64 +276,172 @@ const CustomFieldsSettingsPage = () => {
     }
   };
 
-  const handleReorder = async (field, direction) => {
-    if (field.isCore) {
-      return;
-    }
+  const handleCloseGroupModal = () => {
+    setGroupModalState({ open: false, group: null });
+    setGroupModalError('');
+    setGroupSaving(false);
+  };
 
-    const currentIndex = fieldsForDisplay.findIndex(
-      (item) => !item.isCore && Number(item.id) === Number(field.id),
-    );
-    if (currentIndex === -1) {
-      return;
-    }
-    let targetIndex =
-      direction === 'up' ? currentIndex - 1 : currentIndex + 1;
-    targetIndex = Math.max(0, Math.min(fieldsForDisplay.length - 1, targetIndex));
-
-    const working = [...fieldsForDisplay];
-    const [moved] = working.splice(currentIndex, 1);
-    working.splice(targetIndex, 0, moved);
-
-    let lastValue = 0;
-    const nextOrders = {};
-
-    working.forEach((item) => {
-      if (item.isCore) {
-        lastValue =
-          item.display_order === undefined || item.display_order === null
-            ? lastValue
-            : item.display_order;
+  const handleSubmitGroup = async (payload) => {
+    setGroupSaving(true);
+    setGroupModalError('');
+    try {
+      if (payload.id) {
+        const updated = await updateGroup(groupsApiBase, payload.id, payload);
+        setGroups((prev) =>
+          prev.map((g) => (Number(g.id) === Number(updated.id) ? updated : g)),
+        );
+        setSnackbar({ message: 'Group updated successfully.' });
       } else {
-        lastValue = lastValue ? lastValue + 1 : 1;
-        nextOrders[item.id] = lastValue;
+        const created = await createGroup(groupsApiBase, payload);
+        setGroups((prev) => [...prev, created]);
+        setSnackbar({ message: 'Group created successfully.' });
+      }
+      handleCloseGroupModal();
+    } catch (error) {
+      setGroupModalError(extractErrorMessage(error));
+    } finally {
+      setGroupSaving(false);
+    }
+  };
+
+  const handleDeleteGroupConfirmed = async () => {
+    if (!groupDeleteTarget) return;
+    try {
+      await deleteGroup(groupsApiBase, groupDeleteTarget.id);
+      setGroups((prev) =>
+        prev.filter((g) => Number(g.id) !== Number(groupDeleteTarget.id)),
+      );
+      setSnackbar({ message: 'Group deleted.' });
+    } catch (_error) {
+      setSnackbar({ message: 'Failed to delete group.', severity: 'error' });
+    } finally {
+      setGroupDeleteTarget(null);
+    }
+  };
+
+  // Build a lookup: field id -> group id (for both core and custom fields)
+  const getFieldGroupId = React.useCallback(
+    (field) => {
+      if (field.isCore) {
+        for (const g of groups) {
+          if ((g.core_field_keys || []).includes(field.id)) return g.id;
+        }
+        return null;
+      }
+      return field.group;
+    },
+    [groups],
+  );
+
+  const handleDragReorderGroup = async (fromIdx, toIdx) => {
+    const sorted = [...groups].sort(
+      (a, b) => (a.display_order ?? 0) - (b.display_order ?? 0),
+    );
+    if (fromIdx < 0 || toIdx < 0 || fromIdx >= sorted.length || toIdx >= sorted.length) return;
+
+    // Reorder the array and reassign display_order values
+    const reordered = [...sorted];
+    const [moved] = reordered.splice(fromIdx, 1);
+    reordered.splice(toIdx, 0, moved);
+
+    const updates = {};
+    reordered.forEach((g, idx) => {
+      const newOrder = (idx + 1) * 1000;
+      if (g.display_order !== newOrder) {
+        updates[g.id] = newOrder;
       }
     });
 
-    const changes = Object.entries(nextOrders).filter(([id, order]) => {
-      const original = customFields.find((entry) => Number(entry.id) === Number(id));
-      return original && Number(original.display_order ?? 0) !== order;
-    });
+    if (Object.keys(updates).length === 0) return;
 
-    if (changes.length === 0) {
-      return;
-    }
+    const previousGroups = groups;
+    setGroups((prev) =>
+      prev.map((g) => (updates[g.id] != null ? { ...g, display_order: updates[g.id] } : g)),
+    );
 
     try {
       await Promise.all(
-        changes.map(([id, order]) =>
-          patchCustomField(customFieldsApiBase, id, { display_order: order }),
+        Object.entries(updates).map(([id, order]) =>
+          patchGroup(groupsApiBase, id, { display_order: order }),
         ),
       );
-      setCustomFields((prev) =>
-        prev.map((item) => {
-          const change = changes.find(([id]) => Number(id) === Number(item.id));
-          return change ? { ...item, display_order: change[1] } : item;
+    } catch (_error) {
+      setGroups(previousGroups);
+      setSnackbar({ message: 'Failed to reorder groups.', severity: 'error' });
+    }
+  };
+
+  const handleDragReorder = async (fieldKey, sourceGroupId, targetGroupId, targetIndex) => {
+    const prevGroups = groups;
+    const prevFields = customFields;
+
+    // Determine if the field is a custom field (needs group FK update)
+    const isCustom = fieldKey.startsWith('cf_');
+    const sameGroup = sourceGroupId === targetGroupId;
+
+    if (sameGroup) {
+      // Reorder within the same group's core_field_keys
+      const group = groups.find((g) => g.id === sourceGroupId);
+      if (!group) return;
+      const keys = [...(group.core_field_keys || [])];
+      const fromIdx = keys.indexOf(fieldKey);
+      if (fromIdx === -1) return;
+      keys.splice(fromIdx, 1);
+      keys.splice(targetIndex, 0, fieldKey);
+
+      setGroups((prev) =>
+        prev.map((g) =>
+          g.id === sourceGroupId ? { ...g, core_field_keys: keys } : g,
+        ),
+      );
+      try {
+        await patchGroup(groupsApiBase, sourceGroupId, { core_field_keys: keys });
+      } catch (_error) {
+        setGroups(prevGroups);
+        setSnackbar({ message: 'Failed to reorder field.', severity: 'error' });
+      }
+    } else {
+      // Move between groups
+      const sourceGroup = groups.find((g) => g.id === sourceGroupId);
+      const targetGroup = groups.find((g) => g.id === targetGroupId);
+      if (!sourceGroup || !targetGroup) return;
+
+      const newSourceKeys = (sourceGroup.core_field_keys || []).filter((k) => k !== fieldKey);
+      const newTargetKeys = [...(targetGroup.core_field_keys || [])];
+      newTargetKeys.splice(targetIndex, 0, fieldKey);
+
+      setGroups((prev) =>
+        prev.map((g) => {
+          if (g.id === sourceGroupId) return { ...g, core_field_keys: newSourceKeys };
+          if (g.id === targetGroupId) return { ...g, core_field_keys: newTargetKeys };
+          return g;
         }),
       );
-      setSnackbar({ message: 'Field order updated.' });
-    } catch (_error) {
-      setSnackbar({ message: 'Failed to update order.', severity: 'error' });
+      if (isCustom) {
+        const rawId = fieldKey.replace('cf_', '');
+        setCustomFields((prev) =>
+          prev.map((item) =>
+            String(item.id) === rawId ? { ...item, group: targetGroupId } : item,
+          ),
+        );
+      }
+
+      try {
+        const promises = [
+          patchGroup(groupsApiBase, sourceGroupId, { core_field_keys: newSourceKeys }),
+          patchGroup(groupsApiBase, targetGroupId, { core_field_keys: newTargetKeys }),
+        ];
+        if (isCustom) {
+          const rawId = fieldKey.replace('cf_', '');
+          promises.push(patchCustomField(customFieldsApiBase, rawId, { group: targetGroupId }));
+        }
+        await Promise.all(promises);
+      } catch (_error) {
+        setGroups(prevGroups);
+        if (isCustom) setCustomFields(prevFields);
+        setSnackbar({ message: 'Failed to move field.', severity: 'error' });
+      }
     }
   };
 
@@ -295,20 +450,26 @@ const CustomFieldsSettingsPage = () => {
       <Stack spacing={3}>
         <PageTitle>Custom Fields</PageTitle>
         <Typography variant="body1" color="text.secondary">
-          Configure additional fields for {entityLabel.toLowerCase()} records. Core fields are
-          always visible and cannot be edited.
+          Configure additional fields for {entityLabel.toLowerCase()} records. Core fields can be
+          hidden but not deleted.
         </Typography>
 
-        <Stack spacing={2}>
-          <EntityTypeSelector value={entityType} onChange={setEntityType} />
-          <Stack direction="row" justifyContent="flex-end">
-            <Button variant="contained" onClick={() => setModalState({ open: true, field: null })}>
-              Add Field
-            </Button>
-          </Stack>
+        <Divider />
+
+        <Stack direction="row" spacing={1}>
+          <Button
+            variant="outlined"
+            onClick={() => setGroupModalState({ open: true, group: null })}
+          >
+            Add Group
+          </Button>
+          <Button variant="contained" onClick={() => setModalState({ open: true, field: null })}>
+            Add Field
+          </Button>
         </Stack>
 
-        <FieldList
+        <UnifiedFieldTable
+          groups={groups}
           fields={fieldsForDisplay}
           loading={loading}
           onEdit={(field) => {
@@ -319,7 +480,10 @@ const CustomFieldsSettingsPage = () => {
           }}
           onDelete={setDeleteTarget}
           onToggleEnabled={handleToggleEnabled}
-          onReorder={handleReorder}
+          onEditGroup={(group) => setGroupModalState({ open: true, group })}
+          onDeleteGroup={setGroupDeleteTarget}
+          onDragReorderGroup={handleDragReorderGroup}
+          onDragReorder={handleDragReorder}
         />
       </Stack>
 
@@ -330,6 +494,7 @@ const CustomFieldsSettingsPage = () => {
         field={modalState.field}
         roleOptions={roleOptions}
         tagOptions={initialTags}
+        groups={groups}
         saving={saving}
         serverError={modalError}
         onClose={handleCloseModal}
@@ -342,6 +507,25 @@ const CustomFieldsSettingsPage = () => {
         message="Deleting a field removes the definition permanently if no values exist. Continue?"
         handleConfirm={handleDeleteConfirmed}
         handleClose={() => setDeleteTarget(null)}
+      />
+
+      <GroupModal
+        open={groupModalState.open}
+        mode={groupModalState.group ? 'edit' : 'create'}
+        entityType={entityType}
+        group={groupModalState.group}
+        saving={groupSaving}
+        serverError={groupModalError}
+        onClose={handleCloseGroupModal}
+        onSubmit={handleSubmitGroup}
+      />
+
+      <DeleteDialog
+        open={Boolean(groupDeleteTarget)}
+        title="Delete group"
+        message="Deleting a group will ungroup any fields assigned to it. Continue?"
+        handleConfirm={handleDeleteGroupConfirmed}
+        handleClose={() => setGroupDeleteTarget(null)}
       />
     </PageWrapper>
   );

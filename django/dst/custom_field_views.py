@@ -17,8 +17,8 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from dst.models import CustomField, Tag, User, UserRole
-from dst.serializers import CustomFieldSerializer
+from dst.models import CustomField, CustomFieldGroup, Tag, User, UserRole
+from dst.serializers import CustomFieldGroupSerializer, CustomFieldSerializer
 from dst.utils import DstHttpRequest, render_main_template
 
 
@@ -85,6 +85,49 @@ class CustomFieldViewSet(viewsets.ModelViewSet):
         raise PermissionDenied("Unable to determine organization context.")
 
 
+class CustomFieldGroupViewSet(viewsets.ModelViewSet):
+    """CRUD operations for organization-specific field groups."""
+
+    serializer_class = CustomFieldGroupSerializer
+    permission_classes = [RequireOrgAdmin]
+
+    def get_queryset(self) -> QuerySet[CustomFieldGroup]:
+        org = self._get_request_org()
+        queryset = CustomFieldGroup.objects.filter(organization=org)
+        entity_type = self.request.query_params.get(
+            "entity_type", CustomFieldGroup.EntityType.PERSON
+        )
+        return queryset.filter(entity_type=entity_type).order_by(
+            "display_order", "label"
+        )
+
+    def perform_create(self, serializer: CustomFieldGroupSerializer) -> None:
+        try:
+            serializer.save(organization=self._get_request_org())
+        except IntegrityError as exc:
+            raise ValidationError(
+                {"label": "A group with this label already exists for the entity."}
+            ) from exc
+
+    def perform_update(self, serializer: CustomFieldGroupSerializer) -> None:
+        instance = self.get_object()
+        try:
+            serializer.save(organization=instance.organization)
+        except IntegrityError as exc:
+            raise ValidationError(
+                {"label": "A group with this label already exists for the entity."}
+            ) from exc
+
+    def _get_request_org(self):
+        org = getattr(self.request, "org", None)
+        if org:
+            return org
+        user = self.request.user
+        if isinstance(user, User) and user.organization:
+            return user.organization
+        raise PermissionDenied("Unable to determine organization context.")
+
+
 class RoleKeyListView(APIView):
     """Expose the available UserRole keys for client-side filtering."""
 
@@ -127,6 +170,7 @@ class CustomFieldSettingsView(LoginRequiredMixin, View):
             "custom_fields_settings.html",
             {
                 "custom_fields_api_url": reverse("custom-field-list"),
+                "groups_api_url": reverse("custom-field-group-list"),
                 "role_keys_api_url": reverse("role-key-list"),
                 "tags_json": json.dumps(
                     [

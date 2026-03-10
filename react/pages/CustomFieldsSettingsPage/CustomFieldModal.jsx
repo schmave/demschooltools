@@ -23,6 +23,7 @@ const defaultFormState = (entityType) => ({
   required: false,
   enabled: true,
   display_order: '',
+  group: '',
   type_props: {},
   type_validation: {},
   default_value: null,
@@ -77,6 +78,7 @@ const CustomFieldModal = ({
   field,
   roleOptions,
   tagOptions,
+  groups = [],
   saving,
   serverError,
   onClose,
@@ -91,16 +93,23 @@ const CustomFieldModal = ({
   const [jsonErrors, setJsonErrors] = React.useState({});
   const [defaultValueError, setDefaultValueError] = React.useState('');
 
+  const sortedGroups = React.useMemo(
+    () => [...groups].sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0)),
+    [groups],
+  );
+
   React.useEffect(() => {
+    const firstGroupId = sortedGroups.length > 0 ? String(sortedGroups[0].id) : '';
     const nextState = field
       ? {
           ...field,
           display_order: field.display_order ?? '',
+          group: field.group ?? '',
           type_props: { ...(field.type_props || {}) },
           type_validation: { ...(field.type_validation || {}) },
           default_value: field?.default_value ?? null,
         }
-      : defaultFormState(entityType);
+      : { ...defaultFormState(entityType), group: firstGroupId };
     setFormState(nextState);
     setJsonText({
       required_if: formatJson(nextState.required_if),
@@ -109,7 +118,7 @@ const CustomFieldModal = ({
     setErrors({});
     setJsonErrors({});
     setDefaultValueError('');
-  }, [field, entityType, open]);
+  }, [field, entityType, open, sortedGroups]);
 
   const handleBasicChange = (key) => (event) => {
     const value =
@@ -164,6 +173,7 @@ const CustomFieldModal = ({
       entity_type: entityType,
       display_order:
         formState.display_order === '' ? null : Number(formState.display_order),
+      group: formState.group === '' ? null : Number(formState.group),
       type_validation: {},
     };
 
@@ -198,6 +208,9 @@ const CustomFieldModal = ({
     }
     if (!formState.field_type) {
       newErrors.field_type = 'Field type is required.';
+    }
+    if (!formState.group) {
+      newErrors.group = 'Group is required.';
     }
 
     const requiresOptions = ['select', 'radioGroup', 'checkboxGroup'].includes(
@@ -512,7 +525,7 @@ const CustomFieldModal = ({
         </>
       }
     >
-      <Stack spacing={3} component="form" onSubmit={handleSubmit}>
+      <Stack spacing={3} component="form" onSubmit={handleSubmit} sx={{ pb: 2 }}>
         {serverError ? (
           <Alert severity="error">{serverError}</Alert>
         ) : null}
@@ -551,14 +564,19 @@ const CustomFieldModal = ({
             multiline
             minRows={2}
           />
-          <TextField
-            label="Display order"
-            type="number"
-            value={formState.display_order}
-            onChange={handleBasicChange('display_order')}
-            helperText="Lower numbers appear earlier in the list."
-            size="small"
+          <SelectInput
+            label="Group"
+            value={formState.group === null ? '' : String(formState.group)}
+            onChange={(event) => {
+              setFormState((prev) => ({ ...prev, group: event.target.value }));
+            }}
+            options={sortedGroups.map((g) => ({ value: String(g.id), label: g.label }))}
           />
+          {errors.group ? (
+            <Typography color="error" variant="body2">
+              {errors.group}
+            </Typography>
+          ) : null}
           <Stack direction="row" spacing={2}>
             <FormControlLabel
               control={<Checkbox checked={formState.required} onChange={handleBasicChange('required')} />}
@@ -631,7 +649,7 @@ const CustomFieldModal = ({
               setJsonText((prev) => ({ ...prev, required_if: event.target.value }))
             }
             error={Boolean(jsonErrors.required_if)}
-            helperText={jsonErrors.required_if}
+            helperText={jsonErrors.required_if || 'e.g. [{"fieldKey": "gender", "op": "equals", "value": "Male"}]'}
           />
           <TextField
             label="Disabled if (JSON array)"
@@ -643,7 +661,7 @@ const CustomFieldModal = ({
               setJsonText((prev) => ({ ...prev, disabled_if: event.target.value }))
             }
             error={Boolean(jsonErrors.disabled_if)}
-            helperText={jsonErrors.disabled_if}
+            helperText={jsonErrors.disabled_if || 'e.g. [{"fieldKey": "status", "op": "equals", "value": "Inactive"}]'}
           />
         </Stack>
 

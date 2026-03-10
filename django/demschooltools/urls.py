@@ -36,9 +36,18 @@ from custodia.views import (
 )
 from dst.attendance_views import SignInSheetView
 from dst.custom_field_views import (
+    CustomFieldGroupViewSet,
     CustomFieldSettingsView,
     CustomFieldViewSet,
     RoleKeyListView,
+)
+from dst.person_views import (
+    PeopleListView,
+    PersonCreateView,
+    PersonDetailView,
+    PersonEditView,
+    PersonViewSet,
+    SavedGridViewViewSet,
 )
 from dst.manual_views import (
     CreateUpdateChapter,
@@ -92,6 +101,23 @@ urlpatterns = [
         name="role-key-list",
     ),
     path(
+        "api/custom-field-groups/",
+        CustomFieldGroupViewSet.as_view({"get": "list", "post": "create"}),
+        name="custom-field-group-list",
+    ),
+    path(
+        "api/custom-field-groups/<int:pk>/",
+        CustomFieldGroupViewSet.as_view(
+            {
+                "get": "retrieve",
+                "put": "update",
+                "patch": "partial_update",
+                "delete": "destroy",
+            }
+        ),
+        name="custom-field-group-detail",
+    ),
+    path(
         "custodia-api/",
         (
             [
@@ -113,6 +139,55 @@ urlpatterns = [
             "custodia-api",
             "custodia-api",
         ),
+    ),
+    # Person pages (React shells)
+    path("people/list/", PeopleListView.as_view(), name="people-list-page"),
+    path("people/new", PersonCreateView.as_view(), name="person-create-page"),
+    path(
+        "people/edit/<int:person_id>",
+        PersonEditView.as_view(),
+        name="person-edit-page",
+    ),
+    path(
+        "people/<int:person_id>",
+        PersonDetailView.as_view(),
+        name="person-view-page",
+    ),
+    # Person API
+    path(
+        "api/people/",
+        PersonViewSet.as_view({"get": "list", "post": "create"}),
+        name="person-list",
+    ),
+    path(
+        "api/people/<int:pk>/",
+        PersonViewSet.as_view(
+            {
+                "get": "retrieve",
+                "put": "update",
+                "patch": "partial_update",
+                "delete": "destroy",
+            }
+        ),
+        name="person-detail",
+    ),
+    # Saved grid views API
+    path(
+        "api/grid-views/",
+        SavedGridViewViewSet.as_view({"get": "list", "post": "create"}),
+        name="grid-view-list",
+    ),
+    path(
+        "api/grid-views/<int:pk>/",
+        SavedGridViewViewSet.as_view(
+            {
+                "get": "retrieve",
+                "put": "update",
+                "patch": "partial_update",
+                "delete": "destroy",
+            }
+        ),
+        name="grid-view-detail",
     ),
     path("attendance/signInSheet", SignInSheetView.as_view()),
     path(

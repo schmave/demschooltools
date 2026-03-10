@@ -3,6 +3,15 @@ export const nth = (num) => {
   return num + (n >= 11 && n <= 13 ? 'th' : ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'][num % 10]);
 }
 
+export const formatPhoneNumber = (number) => {
+  if (!number) return '';
+  const digits = number.replace(/\D/g, '');
+  if (digits.length === 10) {
+    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+  }
+  return number;
+};
+
 export const oxfordComma = (arr, conjunction, ifempty) => {
   const l = arr.length;
   if (!l) return ifempty;

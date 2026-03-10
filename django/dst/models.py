@@ -105,6 +105,50 @@ class Tag(models.Model):
     history = AuditlogHistoryField()
 
 
+class CustomFieldGroup(models.Model):
+    """User-defined grouping for fields on an entity form."""
+
+    class Meta:
+        db_table = "custom_field_groups"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["organization", "entity_type", "label"],
+                name="custom_field_group_unique_label",
+            )
+        ]
+        indexes = [
+            models.Index(
+                fields=["organization", "entity_type"],
+                name="cf_groups_org_entity_idx",
+            )
+        ]
+
+    # Placeholder for when we have multiple types of entities with custom fields (People and Families)
+    class EntityType(models.TextChoices):
+        PERSON = ("person", "Person")
+        TAG = ("tag", "Tag")
+
+    id = models.BigAutoField(primary_key=True)
+    organization = models.ForeignKey(
+        Organization,
+        on_delete=models.PROTECT,
+        related_name="custom_field_groups",
+    )
+    entity_type = models.CharField(
+        max_length=64,
+        default=EntityType.PERSON,
+    )
+    label = models.CharField(max_length=255)
+    display_order = models.IntegerField(null=True, blank=True)
+    core_field_keys = models.JSONField(default=list, blank=True)
+    hidden_core_field_keys = models.JSONField(default=list, blank=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self) -> str:
+        return f"{self.organization_id}:{self.entity_type}:{self.label}"
+
+
 class CustomField(models.Model):
     """Field definition configured by an organization for a specific entity type."""
 
@@ -145,6 +189,13 @@ class CustomField(models.Model):
     organization = models.ForeignKey(
         Organization,
         on_delete=models.PROTECT,
+        related_name="custom_fields",
+    )
+    group = models.ForeignKey(
+        CustomFieldGroup,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name="custom_fields",
     )
     entity_type = models.CharField(
@@ -232,7 +283,7 @@ class Person(models.Model):
     # Names and display
     first_name = models.CharField(max_length=255, default="")
     last_name = models.CharField(max_length=255, default="")
-    display_name = models.CharField(max_length=255, default="")
+    display_name = models.CharField(max_length=255, default="", blank=True)
 
     # Family relationship
     family_person = models.ForeignKey(
@@ -260,8 +311,8 @@ class Person(models.Model):
     notes = models.TextField(default="", blank=True)
 
     # School info
-    previous_school = models.CharField(max_length=255, default="")
-    school_district = models.CharField(max_length=255, default="")
+    previous_school = models.CharField(max_length=255, default="", blank=True)
+    school_district = models.CharField(max_length=255, default="", blank=True)
 
     # System fields
     id = models.AutoField(primary_key=True, db_column="person_id")
@@ -933,6 +984,31 @@ class AllowedIp(models.Model):
 
     ip = models.TextField(primary_key=True)
     organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
+
+
+class SavedGridView(models.Model):
+    class Meta:
+        db_table = "saved_grid_views"
+        ordering = ["name"]
+
+    organization = models.ForeignKey(
+        Organization, on_delete=models.CASCADE, related_name="saved_grid_views"
+    )
+    created_by = models.ForeignKey(
+        "User",
+        on_delete=models.CASCADE,
+        related_name="saved_grid_views",
+        db_column="created_by_id",
+    )
+    name = models.CharField(max_length=255)
+    entity_type = models.CharField(max_length=50, default="person")
+    state = models.JSONField()
+    is_private = models.BooleanField(default=False)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.name} ({self.organization_id})"
 
 
 auditlog.register(AttendanceCode)

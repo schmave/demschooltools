@@ -12,12 +12,19 @@ import '@fontsource/roboto/700.css';
 
 import SignInSheetPage from './pages/SignInSheetPage/SignInSheetPage';
 import CustomFieldsSettingsPage from './pages/CustomFieldsSettingsPage/CustomFieldsSettingsPage';
+import PersonFormPage from './pages/PersonPage/PersonFormPage';
+import PersonViewPage from './pages/PersonPage/PersonViewPage';
+import PeopleListPage from './pages/PeopleListPage/PeopleListPage';
 
 // We're not controlling routing with React, but this lets us use one React App
 // and map the Play/Scala paths to React Pages
 const router = createBrowserRouter([
+    { path: '/people/list', element: <PeopleListPage /> },
     { path: '/attendance/signInSheet', element: <SignInSheetPage /> },
     { path: '/settings/custom-fields', element: <CustomFieldsSettingsPage /> },
+    { path: '/people/new', element: <PersonFormPage /> },
+    { path: '/people/edit/:id', element: <PersonFormPage /> },
+    { path: '/people/:id', element: <PersonViewPage /> },
 ]);
 
 function App() {

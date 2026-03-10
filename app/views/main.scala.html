@@ -114,6 +114,9 @@ var _rollbarConfig = {
             <a @if(selectedBtn.equals("all_people")) { class="active" }
                 href="@routes.CRM.allPeople()">
                 All people</a>
+            <a @if(selectedBtn.equals("people_list")) { class="active" }
+                href="/people/list">
+                Grid view</a>
             <span class="dropdown">
                 <ul class="dropdown-menu">
                     @for( kv <- Tag.getWithPrefixes(Utils.getOrgConfig(request).org) ) {
@@ -277,7 +280,7 @@ var _rollbarConfig = {
             <a @if(selectedBtn.equals("settings_access")) { class="active" }
                 href="@routes.Settings.viewAccess()">Users & Access</a>
             <a href="@routes.Application.viewPassword()">Change Password</a>
-            <a @if(selectedBtn.equals("custom_fields")) { class="active" }
+            <a @if(selectedBtn.equals("settings_custom_fields")) { class="active" }
                 href="/settings/custom-fields">Custom Fields</a>
             </div>
         </div>

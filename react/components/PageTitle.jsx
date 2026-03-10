@@ -5,7 +5,7 @@ const PageTitle = React.forwardRef(({ children, sx, ...props }, ref) => {
   return (
     <Typography
       ref={ref}
-      variant="h3"
+      variant="h5"
       sx={{ fontWeight: 600, ...sx }}
       {...props}
     >

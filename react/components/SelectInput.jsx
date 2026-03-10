@@ -249,7 +249,7 @@ const SelectInput = (props) => {
 
   // Fallback: Select behavior
   return (
-    <FormControl fullWidth={fullWidth} sx={{ marginTop, marginBottom }}>
+    <FormControl fullWidth={fullWidth} size={size} sx={{ marginTop, marginBottom }}>
       {label && <InputLabel id="select-label">{label}</InputLabel>}
       <Select
         value={value}

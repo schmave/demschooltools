@@ -1,0 +1,20 @@
+{% load django_vite %}
+
+<div id="react-root"></div>
+
+<script type="text/javascript">
+  window.initialData = window.initialData || {};
+  window.initialData.mode = "list";
+  window.initialData.personApiUrl = "{{ person_api_url }}";
+  window.initialData.customFields = {{ custom_fields_json|safe }};
+  window.initialData.groups = {{ groups_json|safe }};
+  window.initialData.tagOptions = {{ tags_json|safe }};
+  window.initialData.peopleOptions = {{ people_json|safe }};
+  window.initialData.savedViews = {{ saved_views_json|safe }};
+  window.initialData.currentUserId = {{ user_id }};
+  window.initialData.gridViewsApiUrl = "/api/grid-views/";
+</script>
+
+{% vite_hmr_client %}
+{% vite_react_refresh %}
+{% vite_asset 'index.jsx' %}

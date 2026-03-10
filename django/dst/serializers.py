@@ -4,7 +4,33 @@ from typing import Any
 
 from rest_framework import serializers
 
-from dst.models import CustomField
+from dst.models import CustomField, CustomFieldGroup
+
+
+class CustomFieldGroupSerializer(serializers.ModelSerializer):
+    """Serializer for CRUD operations on field groups."""
+
+    class Meta:
+        model = CustomFieldGroup
+        fields = [
+            "id",
+            "organization",
+            "entity_type",
+            "label",
+            "display_order",
+            "core_field_keys",
+            "hidden_core_field_keys",
+            "date_created",
+            "date_updated",
+        ]
+        read_only_fields = ["id", "organization", "date_created", "date_updated"]
+
+    def validate_core_field_keys(self, value: Any) -> list[str]:
+        if value is None:
+            return []
+        if not isinstance(value, list) or not all(isinstance(k, str) for k in value):
+            raise serializers.ValidationError("Must be an array of field key strings.")
+        return value
 
 
 class CustomFieldSerializer(serializers.ModelSerializer):
@@ -36,6 +62,7 @@ class CustomFieldSerializer(serializers.ModelSerializer):
             "required",
             "disabled",
             "display_order",
+            "group",
             "type_props",
             "type_validation",
             "default_value",
