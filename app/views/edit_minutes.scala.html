@@ -148,9 +148,11 @@ $(function () {
           <label><input type="radio" class="plea plea-no-contest" value="No Contest"><span>No Contest</span></label>
         </div>
         }
-        <div class="radio-inline">
-          <label><input type="radio" class="plea plea-not-guilty" value="Not Guilty"><span>@Utils.getOrgConfig(request).str_not_guilty</span></label>
-        </div>
+        @if( !Utils.getOrgConfig(request).str_not_guilty.equals("") ) {
+            <div class="radio-inline">
+            <label><input type="radio" class="plea plea-not-guilty" value="Not Guilty"><span>@Utils.getOrgConfig(request).str_not_guilty</span></label>
+            </div>
+        }
         @if( Utils.getOrgConfig(request).show_na_plea ) {
         <div class="radio-inline">
           <label><input type="radio" class="plea plea-na" value="N/A"><span>@Utils.getOrgConfig(request).str_na</span></label>

@@ -427,11 +427,13 @@ class SouthJersey(OrgConfig):
 
         self.str_manual_title = "Rulebook"
         self.str_manual_title_short = "Rulebook"
-        self.str_res_plan_short = "Sentence"
-        self.str_res_plan = "sentence"
-        self.str_res_plan_cap = "Sentence"
-        self.str_res_plans = "sentences"
-        self.str_res_plans_cap = "Sentences"
+        self.str_res_plan_short = "Restorative action"
+        self.str_res_plan = "restorative action"
+        self.str_res_plan_cap = "Restorative action"
+        self.str_res_plans = "restorative actions"
+        self.str_res_plans_cap = "Restorative actions"
+        self.str_guilty = "Case dismissed"
+        self.str_not_guilty = ""
 
         self.track_writer = True
         self.use_year_in_case_number = True

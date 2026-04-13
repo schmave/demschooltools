@@ -548,11 +548,13 @@ class SouthJersey extends OrgConfig {
 
     str_manual_title = "Rulebook";
     str_manual_title_short = "Rulebook";
-    str_res_plan_short = "Sentence";
-    str_res_plan = "sentence";
-    str_res_plan_cap = "Sentence";
-    str_res_plans = "sentences";
-    str_res_plans_cap = "Sentences";
+    str_res_plan_short = "Restorative action";
+    str_res_plan = "restorative action";
+    str_res_plan_cap = "Restorative action";
+    str_res_plans = "restorative actions";
+    str_res_plans_cap = "Restorative actions";
+    str_guilty = "Case dismissed";
+    str_not_guilty = "";
 
     track_writer = true;
     use_year_in_case_number = true;
