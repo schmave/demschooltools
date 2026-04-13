@@ -9,6 +9,7 @@ import javax.inject.Singleton;
 import models.*;
 import org.mindrot.jbcrypt.BCrypt;
 import play.Environment;
+import play.data.Form;
 import play.api.libs.mailer.MailerClient;
 import play.cache.SyncCacheApi;
 import play.i18n.MessagesApi;
@@ -17,6 +18,12 @@ import play.mvc.Http;
 import play.mvc.Result;
 import views.html.logged_out;
 import views.html.login;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import play.data.FormFactory;
+import play.data.validation.Constraints;
+
 
 @Singleton
 public class Public extends Controller {
@@ -29,6 +36,7 @@ public class Public extends Controller {
   public static Config sConfig;
   MailerClient mMailer;
   final MessagesApi mMessagesApi;
+  FormFactory mFormFactory;
 
   @Inject
   public Public(
@@ -38,7 +46,8 @@ public class Public extends Controller {
       final Environment environment,
       final Config config,
       final MailerClient mailer,
-      MessagesApi messagesApi) {
+      MessagesApi messagesApi,
+    final FormFactory formFactory) {
     mPlayAuth = playAuth;
     mAuth = auth;
     sCache = cache;
@@ -46,6 +55,7 @@ public class Public extends Controller {
     sConfig = config;
     mMailer = mailer;
     mMessagesApi = messagesApi;
+    mFormFactory = formFactory;
   }
 
   public Result facebookDeleteInfo() {
@@ -76,13 +86,31 @@ public class Public extends Controller {
             mMessagesApi.preferred(request)));
   }
 
-  public Result doLogin(Http.Request request) {
-    final Map<String, String[]> values = request.body().asFormUrlEncoded();
 
-    String email = values.get("email")[0];
+  @Data
+  @NoArgsConstructor
+  public static class LoginData {
+      @Constraints.Required
+      private String email;
+
+      @Constraints.Required
+      private String password;
+
+      private String noredirect;
+  }
+
+  public Result doLogin(Http.Request request) {
+    Form<LoginData> loginForm = mFormFactory.form(LoginData.class).bindFromRequest(request);
+    if (loginForm.hasErrors()) {
+        return badRequest("Invalid data");
+    }
+
+    LoginData data = loginForm.get();
+
+    String email = data.getEmail();
     User u = User.findByEmail(email);
 
-    String password = values.get("password")[0];
+    String password = data.getPassword();
 
     if (u != null && u.getHashedPassword().length() > 0) {
       if (BCrypt.checkpw(password, u.getHashedPassword())) {
@@ -91,7 +119,8 @@ public class Public extends Controller {
     }
 
     Result result;
-    if (values.get("noredirect") != null) {
+
+    if (data.getNoredirect() != null) {
       result = unauthorized();
     } else {
       result = redirect(routes.Public.index());
