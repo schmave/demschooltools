@@ -6,24 +6,22 @@ import com.typesafe.config.Config;
 import java.util.*;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import models.*;
 import org.mindrot.jbcrypt.BCrypt;
 import play.Environment;
-import play.data.Form;
 import play.api.libs.mailer.MailerClient;
 import play.cache.SyncCacheApi;
+import play.data.Form;
+import play.data.FormFactory;
+import play.data.validation.Constraints;
 import play.i18n.MessagesApi;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
 import views.html.logged_out;
 import views.html.login;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import play.data.FormFactory;
-import play.data.validation.Constraints;
-
 
 @Singleton
 public class Public extends Controller {
@@ -47,7 +45,7 @@ public class Public extends Controller {
       final Config config,
       final MailerClient mailer,
       MessagesApi messagesApi,
-    final FormFactory formFactory) {
+      final FormFactory formFactory) {
     mPlayAuth = playAuth;
     mAuth = auth;
     sCache = cache;
@@ -86,23 +84,20 @@ public class Public extends Controller {
             mMessagesApi.preferred(request)));
   }
 
-
   @Data
   @NoArgsConstructor
   public static class LoginData {
-      @Constraints.Required
-      private String email;
+    @Constraints.Required private String email;
 
-      @Constraints.Required
-      private String password;
+    @Constraints.Required private String password;
 
-      private String noredirect;
+    private String noredirect;
   }
 
   public Result doLogin(Http.Request request) {
     Form<LoginData> loginForm = mFormFactory.form(LoginData.class).bindFromRequest(request);
     if (loginForm.hasErrors()) {
-        return badRequest("Invalid data");
+      return badRequest("Invalid data");
     }
 
     LoginData data = loginForm.get();
