@@ -439,6 +439,25 @@ class SouthJersey(OrgConfig):
         self.use_year_in_case_number = True
 
 
+class SaintLouis(OrgConfig):
+    def __init__(self):
+        super().__init__("Saint Louis Sudbury School")
+        self.people_url = "https://stl.demschooltools.com"
+
+        self.str_manual_title = "Rulebook"
+        self.str_manual_title_short = "Rulebook"
+        self.str_res_plan_short = "Restorative action"
+        self.str_res_plan = "restorative action"
+        self.str_res_plan_cap = "Restorative action"
+        self.str_res_plans = "restorative actions"
+        self.str_res_plans_cap = "Restorative actions"
+        self.str_jc_name = "Restoration Committee"
+        self.str_jc_name_short = "RC"
+
+        self.track_writer = True
+        self.use_year_in_case_number = True
+
+
 ORG_CONFIGS_LOADED = False
 
 
@@ -470,3 +489,4 @@ def init_org_configs():
     LearningProjectIbiza()
     Wilmington()
     SouthJersey()
+    SaintLouis()

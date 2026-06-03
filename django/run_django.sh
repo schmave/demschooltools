@@ -2,11 +2,13 @@ set -x
 
 . ../set_env.sh
 
+uv self update
+
 PID_FILE=../dst-django.pid
 
 if [ -f $PID_FILE ]; then
     kill $(cat $PID_FILE)
-    sleep 5
+    sleep 3
 fi
 
 if [ -f $PID_FILE ]; then
@@ -23,7 +25,6 @@ export DJANGO_SETTINGS_MODULE="demschooltools.settings_prod"
 
 set -e
 
-uv self update
 uv run manage.py migrate
 uv run manage.py collectstatic --noinput
 # This is necessary sometimes but is annoying because you have to enter your password

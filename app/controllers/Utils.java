@@ -174,6 +174,7 @@ class OrgConfigs {
     register(new LearningProjectIbiza());
     register(new Wilmington());
     register(new SouthJersey());
+    register(new SaintLouis());
   }
 }
 
@@ -555,6 +556,26 @@ class SouthJersey extends OrgConfig {
     str_res_plans_cap = "Restorative actions";
     str_guilty = "Case dismissed";
     str_not_guilty = "";
+
+    track_writer = true;
+    use_year_in_case_number = true;
+  }
+}
+
+class SaintLouis extends OrgConfig {
+  public SaintLouis() {
+    name = "Saint Louis Sudbury School";
+    people_url = "https://stl.demschooltools.com";
+
+    str_manual_title = "Rulebook";
+    str_manual_title_short = "Rulebook";
+    str_res_plan_short = "Restorative action";
+    str_res_plan = "restorative action";
+    str_res_plan_cap = "Restorative action";
+    str_res_plans = "restorative actions";
+    str_res_plans_cap = "Restorative actions";
+    str_jc_name = "Restoration Committee";
+    str_jc_name_short = "RC";
 
     track_writer = true;
     use_year_in_case_number = true;
