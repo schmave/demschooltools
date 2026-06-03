@@ -174,6 +174,7 @@ class OrgConfigs {
     register(new LearningProjectIbiza());
     register(new Wilmington());
     register(new SouthJersey());
+    register(new SaintLouis());
   }
 }
 
@@ -561,8 +562,8 @@ class SouthJersey extends OrgConfig {
   }
 }
 
-class StLouis extends OrgConfig {
-  public StLouis() {
+class SaintLouis extends OrgConfig {
+  public SaintLouis() {
     name = "Saint Louis Sudbury School";
     people_url = "https://stl.demschooltools.com";
 

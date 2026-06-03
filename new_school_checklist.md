@@ -3,6 +3,8 @@
 1. Update Facebook SSO settings ("[App Domains](https://developers.facebook.com/apps/306846672797935/settings/basic/)" and "[Valid OAuth Redirect URIs](https://developers.facebook.com/apps/306846672797935/fb-login/settings/)")
 1. Update Google SSO settings ("[Authorized redirect URIs](https://console.cloud.google.com/auth/clients/477883553858.apps.googleusercontent.com?project=api-project-477883553858)")
 1. app/controllers/Utils.java: Create a new subclass of OrgConfig. Then register an instance of it in the OrgConfigs static block.
+1. django/dst/org_config.py: Create a new subclass of OrgConfig. Instantiate it in init_org_configs().
+
 1. Create new entry in organization table (ID, name, short_name):
 
     ```sql
