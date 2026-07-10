@@ -94,6 +94,45 @@ class ManualChangesForm(Form):
 
 
 @login_required()
+def view_entry_history(request: DstHttpRequest, entry_id):
+    changes = list(
+        ManualChange.objects.filter(
+            entry__section__chapter__organization=request.org,
+        )
+        .filter(entry_id=entry_id)
+        .prefetch_related("user")
+    )
+
+    changes.sort(
+        key=lambda change: (
+            change.date_entered.date(),
+            change.new_num or change.old_num,
+            change.date_entered,
+        )
+    )
+
+    org_config = get_org_config(request.org)
+
+    entry_name = "entry not found"
+    if len(changes) > 0:
+        last_change = changes[-1]
+        entry_name = (last_change.new_num or "") + " " + (last_change.new_title or "")
+
+    return render_main_template(
+        request,
+        render_to_string(
+            "view_manual_changes.html",
+            {
+                "changes": changes,
+                "org_config": org_config,
+                "entry_name": entry_name,
+            },
+        ),
+        "Changes to " + entry_name,
+    )
+
+
+@login_required()
 def view_manual_changes(request: DstHttpRequest):
     form = ManualChangesForm(request.GET)
 

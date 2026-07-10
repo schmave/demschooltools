@@ -161,6 +161,12 @@ class RoleRecordAdmin(DstAuditlogModelAdmin):
     search_fields = ["role_name"]
 
 
+@admin.register(Entry)
+class EntryAdmin(DstAuditlogModelAdmin):
+    list_display = ["id", "title", "num"]
+    search_fields = ["title"]
+
+
 # Simple registrations for models without auditlog
 admin.site.register(Account)
 admin.site.register(AllowedIp)
@@ -172,7 +178,6 @@ admin.site.register(Comment)
 admin.site.register(CompletedTask)
 admin.site.register(Donation)
 admin.site.register(Email)
-admin.site.register(Entry)
 admin.site.register(LinkedAccount)
 admin.site.register(MailchimpSync)
 admin.site.register(Meeting)

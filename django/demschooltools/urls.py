@@ -44,6 +44,7 @@ from dst.manual_views import (
     print_manual_chapter,
     search_manual,
     view_chapter,
+    view_entry_history,
     view_manual,
     view_manual_changes,
 )
@@ -106,6 +107,7 @@ urlpatterns = [
     path("addEntry/<int:section_id>", CreateUpdateEntry.as_view()),
     path("editEntry", CreateUpdateEntry.as_view()),
     path("editEntry/<int:object_id>", CreateUpdateEntry.as_view()),
+    path("viewEntryHistory/<int:entry_id>", view_entry_history),
     path("viewEntry/", preview_entry),
     path("viewEntry/<int:object_id>", preview_entry),
     path("", IndexView.as_view()),
