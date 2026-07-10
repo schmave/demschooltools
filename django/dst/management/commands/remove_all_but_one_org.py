@@ -7,10 +7,13 @@ $ pg_restore -O -d for_export ~/Downloads/backup_2025_06_30/db.dump
 $ psql for_export
    truncate allowed_ips;
    truncate django_admin_log;
+   truncate auditlog_logentry;
    truncate django_session;
    truncate donation;
    truncate linked_account;
    truncate organization_hosts;
+   drop schema overseer cascade;
+   drop schema demo cascade;
 
 $ DST_DB_NAME=for_export uv run manage.py remove_all_but_one_org --org_id <N>
 $ pg_dump -O for_export -f <school-name>.sql
@@ -37,6 +40,7 @@ from dst.models import (
     CompletedTask,
     Entry,
     MailchimpSync,
+    ManualChange,
     Meeting,
     NotificationRule,
     Organization,
@@ -66,10 +70,10 @@ class Command(BaseCommand):
     def handle(self, *args, org_id=0, **kwargs):
         assert Organization.objects.filter(id=org_id).exists()
 
-        def org_filter(model: Type[Model]):
-            return model.objects.filter(
-                ~Q(organization_id=org_id) | Q(organization_id=None)
-            )
+        def org_filter(model: Type[Model] | None, manager=None):
+            if model is not None:
+                manager = model.objects
+            return manager.filter(~Q(organization_id=org_id) | Q(organization_id=None))
 
         people = org_filter(Person)
 
@@ -106,7 +110,7 @@ class Command(BaseCommand):
 
         meetings = org_filter(Meeting)
         charges = Charge.objects.filter(case__meeting__in=meetings)
-        ChargeReference.objects.filter(charge__in=charges).delete()
+        ChargeReference.objects.filter(referenced_charge__in=charges).delete()
         charges._raw_delete(charges.db)
 
         cases = Case.objects.filter(meeting__in=meetings)
@@ -132,14 +136,18 @@ class Command(BaseCommand):
         people.exclude(family_person=None).delete()
         people.delete()
 
-        chapters = org_filter(Chapter)
-        sections = Section.objects.filter(chapter__in=chapters)
-        entries = Entry.objects.filter(section__in=sections)
+        chapters = org_filter(None, manager=Chapter.all_objects)
+        sections = Section.all_objects.filter(chapter__in=chapters)
+        entries = Entry.all_objects.filter(section__in=sections)
+        ManualChange.objects.filter(entry__in=entries).delete()
+        ManualChange.objects.filter(section__in=sections).delete()
+        ManualChange.objects.filter(chapter__in=chapters).delete()
         entries.delete()
         sections.delete()
         chapters.delete()
 
         users = org_filter(User)
+        ManualChange.objects.filter(user__in=users).delete()
         Comment.objects.filter(user__in=users).delete()
         users.delete()
         Organization.objects.exclude(id=org_id).delete()
